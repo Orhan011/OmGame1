@@ -3,107 +3,279 @@
 
 {% block content %}
 <div class="profile-container">
+  <!-- Profile Header with Animation Background -->
   <div class="profile-header-section">
-    <div class="profile-banner">
-      <div class="profile-avatar-wrapper">
+    <div class="pattern-bg-animation">
+      <div class="pattern-shape shape1"></div>
+      <div class="pattern-shape shape2"></div>
+      <div class="pattern-shape shape3"></div>
+      <div class="pattern-shape shape4"></div>
+    </div>
+    
+    <div class="profile-banner glass-card">
+      <div class="profile-avatar-container">
         {% if user.avatar_url %}
-          <img src="{{ user.avatar_url }}" alt="Profil" class="profile-avatar">
+          <img src="{{ user.avatar_url }}" alt="Profil" class="profile-avatar animate-pulse">
         {% else %}
-          <div class="default-avatar">
+          <div class="default-avatar animate-pulse">
             {{ user.username[0].upper() }}
           </div>
         {% endif %}
+        <div class="profile-level-badge">{{ user.rank }}</div>
       </div>
+      
       <div class="profile-basic-info">
-        <h1>{{ user.username }}</h1>
-        <span class="user-level">{{ user.rank }}</span>
-        <p class="join-date">Katılım: {{ user.created_at.strftime('%d %B %Y') }}</p>
+        <h1 class="profile-username">{{ user.username }}</h1>
+        <div class="profile-badges">
+          {% if user.experience_points > 5000 %}
+          <span class="badge pro-badge"><i class="fas fa-crown"></i> PRO</span>
+          {% endif %}
+          {% if user.total_games_played > 50 %}
+          <span class="badge experienced-badge"><i class="fas fa-medal"></i> Tecrübeli</span>
+          {% endif %}
+        </div>
+        <p class="join-date"><i class="fas fa-calendar-alt"></i> Katılım: {{ user.created_at.strftime('%d %B %Y') }}</p>
+        <div class="last-active-status">
+          <span class="status-indicator online"></span> Son aktivite: {{ user.last_active.strftime('%d %B %Y, %H:%M') }}
+        </div>
+      </div>
+      
+      <div class="profile-actions">
+        <button class="btn btn-edit-profile" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+          <i class="fas fa-edit"></i> Profili Düzenle
+        </button>
       </div>
     </div>
   </div>
 
   <div class="profile-content">
+    <!-- Left Panel: Personal Info & Statistics -->
     <div class="profile-sidebar">
-      <div class="profile-card">
-        <h3>Kişisel Bilgiler</h3>
-        <div class="profile-info-item">
-          <i class="fas fa-user"></i>
-          <span>{{ user.full_name or 'İsim belirtilmedi' }}</span>
+      <!-- Personal Information Card -->
+      <div class="profile-card glass-card">
+        <div class="card-header">
+          <h3><i class="fas fa-user-circle"></i> Kişisel Bilgiler</h3>
         </div>
-        <div class="profile-info-item">
-          <i class="fas fa-envelope"></i>
-          <span>{{ user.email }}</span>
+        <div class="profile-info-content">
+          <div class="profile-info-item">
+            <div class="info-icon"><i class="fas fa-user"></i></div>
+            <div class="info-details">
+              <div class="info-label">Ad Soyad</div>
+              <div class="info-value">{{ user.full_name or 'Belirtilmedi' }}</div>
+            </div>
+          </div>
+          
+          <div class="profile-info-item">
+            <div class="info-icon"><i class="fas fa-envelope"></i></div>
+            <div class="info-details">
+              <div class="info-label">E-mail</div>
+              <div class="info-value">{{ user.email }}</div>
+            </div>
+          </div>
+          
+          <div class="profile-info-item">
+            <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="info-details">
+              <div class="info-label">Konum</div>
+              <div class="info-value">{{ user.location or 'Belirtilmedi' }}</div>
+            </div>
+          </div>
+          
+          <div class="profile-info-item">
+            <div class="info-icon"><i class="fas fa-birthday-cake"></i></div>
+            <div class="info-details">
+              <div class="info-label">Yaş</div>
+              <div class="info-value">{{ user.age or 'Belirtilmedi' }}</div>
+            </div>
+          </div>
+
+          {% if user.bio %}
+          <div class="bio-container">
+            <div class="bio-heading">Hakkımda</div>
+            <div class="bio-content">{{ user.bio }}</div>
+          </div>
+          {% endif %}
         </div>
-        <div class="profile-info-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>{{ user.location or 'Konum belirtilmedi' }}</span>
-        </div>
-        <div class="profile-info-item">
-          <i class="fas fa-calendar"></i>
-          <span>{{ user.age or 'Yaş belirtilmedi' }} yaş</span>
-        </div>
-        <button class="edit-profile-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-          <i class="fas fa-edit"></i> Profili Düzenle
-        </button>
       </div>
 
-      <div class="stats-card">
-        <h3>İstatistikler</h3>
-        <div class="stat-item">
-          <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ user.highest_score }}</span>
-            <span class="stat-label">En Yüksek Skor</span>
-          </div>
+      <!-- Statistics Card -->
+      <div class="stats-card glass-card">
+        <div class="card-header">
+          <h3><i class="fas fa-chart-line"></i> İstatistikler</h3>
         </div>
-        <div class="stat-item">
-          <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ user.total_games_played }}</span>
-            <span class="stat-label">Toplam Oyun</span>
+        
+        <div class="stats-content">
+          <div class="stat-row">
+            <div class="stat-item glow-effect">
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-info">
+                <span class="stat-value counter-animation">{{ user.highest_score }}</span>
+                <span class="stat-label">En Yüksek Skor</span>
+              </div>
+            </div>
+            
+            <div class="stat-item glow-effect">
+              <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+              <div class="stat-info">
+                <span class="stat-value counter-animation">{{ user.total_games_played }}</span>
+                <span class="stat-label">Toplam Oyun</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon"><i class="fas fa-star"></i></div>
-          <div class="stat-info">
-            <span class="stat-value">{{ user.experience_points }}</span>
-            <span class="stat-label">XP</span>
+          
+          <div class="stat-row">
+            <div class="stat-item glow-effect">
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-info">
+                <span class="stat-value counter-animation">{{ user.experience_points }}</span>
+                <span class="stat-label">XP Puanı</span>
+              </div>
+            </div>
+            
+            <div class="stat-item glow-effect">
+              <div class="stat-icon"><i class="fas fa-brain"></i></div>
+              <div class="stat-info">
+                <span class="stat-value">{{ user.rank }}</span>
+                <span class="stat-label">Seviye</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="xp-progress-container">
+            <div class="xp-label">Sonraki seviyeye:</div>
+            {% set next_level = 1000 if user.experience_points < 1000 else 5000 if user.experience_points < 5000 else 10000 %}
+            {% set current_level = 0 if user.experience_points < 1000 else 1000 if user.experience_points < 5000 else 5000 %}
+            {% set progress = ((user.experience_points - current_level) / (next_level - current_level) * 100)|int %}
+            <div class="xp-progress-bar">
+              <div class="xp-progress" style="width: {{ progress }}%"></div>
+            </div>
+            <div class="xp-progress-text">{{ user.experience_points }} / {{ next_level }} XP ({{ progress }}%)</div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Right Panel: Recent Activities & Achievements -->
     <div class="profile-main">
-      <div class="recent-activity-card">
-        <h3>Son Aktiviteler</h3>
-        <div class="activity-list">
-          {% for score in recent_scores %}
-          <div class="activity-item">
-            <div class="activity-game">
-              <i class="fas fa-gamepad"></i>
-              <span>{{ score.game_type }}</span>
+      <!-- Recent Activities Card -->
+      <div class="recent-activity-card glass-card">
+        <div class="card-header">
+          <h3><i class="fas fa-history"></i> Son Aktiviteler</h3>
+        </div>
+        
+        <div class="activity-content">
+          {% if recent_scores %}
+            <div class="activity-list">
+              {% for score in recent_scores %}
+              <div class="activity-item">
+                <div class="activity-icon">
+                  {% if score.game_type == 'wordPuzzle' %}
+                    <i class="fas fa-font"></i>
+                  {% elif score.game_type == 'memoryMatch' %}
+                    <i class="fas fa-clone"></i>
+                  {% elif score.game_type == 'numberSequence' %}
+                    <i class="fas fa-sort-numeric-up"></i>
+                  {% elif score.game_type == 'puzzle' %}
+                    <i class="fas fa-puzzle-piece"></i>
+                  {% elif score.game_type == '3dRotation' %}
+                    <i class="fas fa-cube"></i>
+                  {% else %}
+                    <i class="fas fa-gamepad"></i>
+                  {% endif %}
+                </div>
+                <div class="activity-details">
+                  <div class="activity-game">
+                    {% if score.game_type == 'wordPuzzle' %}
+                      Kelime Bulmaca
+                    {% elif score.game_type == 'memoryMatch' %}
+                      Hafıza Kartları
+                    {% elif score.game_type == 'numberSequence' %}
+                      Sayı Dizisi
+                    {% elif score.game_type == 'puzzle' %}
+                      Yapboz
+                    {% elif score.game_type == '3dRotation' %}
+                      3D Döndürme
+                    {% else %}
+                      {{ score.game_type }}
+                    {% endif %}
+                  </div>
+                  <div class="activity-score">{{ score.score }} puan</div>
+                </div>
+                <div class="activity-date">{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</div>
+              </div>
+              {% endfor %}
             </div>
-            <div class="activity-score">{{ score.score }} puan</div>
-            <div class="activity-date">{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</div>
-          </div>
-          {% endfor %}
+          {% else %}
+            <div class="no-activity">
+              <i class="fas fa-info-circle"></i>
+              <p>Henüz hiç oyun oynamadınız. Oynamaya başlayın ve skorlarınızı görün!</p>
+            </div>
+          {% endif %}
         </div>
       </div>
 
-      <div class="achievements-card">
-        <h3>Başarılar</h3>
-        <div class="achievements-grid">
-          <div class="achievement-item locked">
-            <i class="fas fa-medal"></i>
-            <span>İlk 1000 Puan</span>
-          </div>
-          <div class="achievement-item {% if user.highest_score >= 5000 %}unlocked{% else %}locked{% endif %}">
-            <i class="fas fa-trophy"></i>
-            <span>5000 Puan Rozeti</span>
-          </div>
-          <div class="achievement-item {% if user.total_games_played >= 100 %}unlocked{% else %}locked{% endif %}">
-            <i class="fas fa-gamepad"></i>
-            <span>100 Oyun Tamamlandı</span>
+      <!-- Achievements Card -->
+      <div class="achievements-card glass-card">
+        <div class="card-header">
+          <h3><i class="fas fa-award"></i> Başarılar</h3>
+        </div>
+        
+        <div class="achievements-content">
+          <div class="achievements-grid">
+            <div class="achievement-item {{ 'unlocked' if user.experience_points >= 1000 else 'locked' }}">
+              <div class="achievement-icon">
+                <i class="fas fa-medal"></i>
+              </div>
+              <div class="achievement-details">
+                <div class="achievement-title">İlk 1000 Puan</div>
+                <div class="achievement-progress">
+                  <div class="progress-bar">
+                    <div class="progress" style="width: {{ min(user.experience_points / 10, 100) }}%"></div>
+                  </div>
+                  <div class="progress-text">{{ min(user.experience_points, 1000) }}/1000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="achievement-item {{ 'unlocked' if user.highest_score >= 5000 else 'locked' }}">
+              <div class="achievement-icon">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="achievement-details">
+                <div class="achievement-title">5000 Puan Rozeti</div>
+                <div class="achievement-progress">
+                  <div class="progress-bar">
+                    <div class="progress" style="width: {{ min(user.highest_score / 50, 100) }}%"></div>
+                  </div>
+                  <div class="progress-text">{{ min(user.highest_score, 5000) }}/5000</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="achievement-item {{ 'unlocked' if user.total_games_played >= 100 else 'locked' }}">
+              <div class="achievement-icon">
+                <i class="fas fa-gamepad"></i>
+              </div>
+              <div class="achievement-details">
+                <div class="achievement-title">100 Oyun Tamamlandı</div>
+                <div class="achievement-progress">
+                  <div class="progress-bar">
+                    <div class="progress" style="width: {{ user.total_games_played }}%"></div>
+                  </div>
+                  <div class="progress-text">{{ user.total_games_played }}/100</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="achievement-item {{ 'unlocked' if user.rank == 'Uzman' else 'locked' }}">
+              <div class="achievement-icon">
+                <i class="fas fa-crown"></i>
+              </div>
+              <div class="achievement-details">
+                <div class="achievement-title">Uzman Seviyesi</div>
+                <div class="achievement-description">10,000+ XP puana ulaşarak uzman seviyesine geldiniz</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -113,38 +285,88 @@
 
 <!-- Profil Düzenleme Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content dark-theme">
       <div class="modal-header">
-        <h5 class="modal-title">Profili Düzenle</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="fas fa-user-edit"></i> Profili Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
       </div>
       <div class="modal-body">
         <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST">
           <div class="mb-3">
-            <label class="form-label">Tam Ad</label>
-            <input type="text" class="form-control" name="full_name" value="{{ user.full_name or '' }}">
+            <label class="form-label"><i class="fas fa-user"></i> Tam Ad</label>
+            <input type="text" class="form-control" name="full_name" value="{{ user.full_name or '' }}" placeholder="Adınız ve soyadınız">
           </div>
+          
           <div class="mb-3">
-            <label class="form-label">Yaş</label>
-            <input type="number" class="form-control" name="age" value="{{ user.age or '' }}">
+            <label class="form-label"><i class="fas fa-birthday-cake"></i> Yaş</label>
+            <input type="number" class="form-control" name="age" value="{{ user.age or '' }}" placeholder="Yaşınız" min="1" max="120">
           </div>
+          
           <div class="mb-3">
-            <label class="form-label">Konum</label>
-            <input type="text" class="form-control" name="location" value="{{ user.location or '' }}">
+            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Konum</label>
+            <input type="text" class="form-control" name="location" value="{{ user.location or '' }}" placeholder="Şehir, Ülke">
           </div>
+          
           <div class="mb-3">
-            <label class="form-label">Biyografi</label>
-            <textarea class="form-control" name="bio" rows="3">{{ user.bio or '' }}</textarea>
+            <label class="form-label"><i class="fas fa-comment"></i> Hakkımda</label>
+            <textarea class="form-control" name="bio" rows="3" placeholder="Kendinizi kısaca tanıtın...">{{ user.bio or '' }}</textarea>
           </div>
+          
           <div class="mb-3">
-            <label class="form-label">Profil Resmi URL</label>
-            <input type="url" class="form-control" name="avatar_url" value="{{ user.avatar_url or '' }}">
+            <label class="form-label"><i class="fas fa-image"></i> Profil Resmi URL</label>
+            <input type="url" class="form-control" name="avatar_url" value="{{ user.avatar_url or '' }}" placeholder="https://example.com/image.jpg">
+            <small class="form-text text-muted">Profil resminiz için geçerli bir URL girin.</small>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-save"></i> Değişiklikleri Kaydet
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times"></i> İptal Et
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+
+<!-- JavaScript for counter animation -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Counter animation for statistics
+    const counterElements = document.querySelectorAll('.counter-animation');
+    
+    counterElements.forEach(el => {
+      const target = parseInt(el.textContent, 10);
+      const duration = 1500; // Animation duration in milliseconds
+      const frameDuration = 1000/60; // 60fps
+      const totalFrames = Math.round(duration / frameDuration);
+      let frame = 0;
+      
+      // Starting value
+      el.textContent = '0';
+      
+      // Animation function
+      const counter = setInterval(() => {
+        frame++;
+        const progress = frame / totalFrames;
+        const currentCount = Math.round(progress * target);
+        
+        // Update count
+        if (currentCount <= target) {
+          el.textContent = currentCount;
+        }
+        
+        // End animation
+        if (frame === totalFrames) {
+          clearInterval(counter);
+          el.textContent = target;
+        }
+      }, frameDuration);
+    });
+  });
+</script>
 {% endblock %}

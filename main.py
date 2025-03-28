@@ -32,6 +32,16 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_active = db.Column(db.DateTime, default=datetime.utcnow)
+    full_name = db.Column(db.String(100))
+    age = db.Column(db.Integer)
+    bio = db.Column(db.Text)
+    avatar_url = db.Column(db.String(200))
+    location = db.Column(db.String(100))
+    experience_points = db.Column(db.Integer, default=0)
+    rank = db.Column(db.String(50), default='Başlangıç')
+    total_games_played = db.Column(db.Integer, default=0)
+    highest_score = db.Column(db.Integer, default=0)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
@@ -301,12 +311,6 @@ def update_profile():
         flash('Lütfen önce giriş yapın.', 'error')
         return redirect(url_for('login'))
         
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    flash('Başarıyla çıkış yaptınız.')
-    return redirect(url_for('login'))
-    
     user = User.query.get(session['user_id'])
     user.full_name = request.form.get('full_name')
     user.age = request.form.get('age', type=int)
@@ -336,6 +340,12 @@ def logout():
     db.session.commit()
     flash('Profil başarıyla güncellendi!', 'success')
     return redirect(url_for('profile'))
+        
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Başarıyla çıkış yaptınız.')
+    return redirect(url_for('login'))
 
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])
