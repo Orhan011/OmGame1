@@ -588,6 +588,31 @@ footer::before {
   transform: translateY(-5px);
 }
 
+/* Social media links in footer */
+.social-media {
+  margin-top: 15px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  color: var(--primary-text);
+  text-decoration: none;
+  background-color: rgba(20, 20, 43, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 10px;
+  padding: 8px 15px;
+  transition: all 0.3s ease;
+  width: fit-content;
+}
+
+.social-link:hover {
+  background-color: rgba(255, 215, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  color: var(--primary-text);
+}
+
 /* Tüm oyunlar için yatay sırada istatistikler */
 .game-stats-container {
   display: flex;
