@@ -275,9 +275,24 @@ def save_score():
 
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
-    scores = Score.query.filter_by(game_type=game_type).order_by(Score.score.desc()).limit(10).all()
-    score_list = []
+    game_type_map = {
+        'word-puzzle': 'wordPuzzle',
+        'memory-match': 'memoryMatch',
+        'number-sequence': 'numberSequence',
+        'puzzle': 'puzzle',
+        '3d-rotation': '3dRotation'
+    }
     
+    internal_game_type = game_type_map.get(game_type)
+    if not internal_game_type:
+        return jsonify({'error': 'Invalid game type'}), 400
+        
+    scores = Score.query.filter_by(game_type=internal_game_type)\
+                       .order_by(Score.score.desc())\
+                       .limit(10)\
+                       .all()
+    
+    score_list = []
     for score in scores:
         user = User.query.get(score.user_id)
         score_list.append({

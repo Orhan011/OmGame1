@@ -1,26 +1,23 @@
-
 document.addEventListener('DOMContentLoaded', function() {
-  // Load initial scores
-  loadAllScores();
-  
+  // Load initial scores for word puzzle (default tab)
+  loadScores('word-puzzle');
+
   // Tab switching
   const tabs = document.querySelectorAll('.game-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      // Remove active class from all tabs and cards
       tabs.forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.leaderboard-card').forEach(card => card.classList.remove('active'));
-      
-      // Add active class to clicked tab and corresponding card
+
       tab.classList.add('active');
       const gameType = tab.getAttribute('data-game');
-      document.getElementById(`${gameType}-board`).classList.add('active');
-      
-      // Reload scores for the selected game
+      const board = document.getElementById(`${gameType}-board`);
+      board.classList.add('active');
+
       loadScores(gameType);
     });
   });
-  
+
   // Refresh button functionality
   document.querySelectorAll('.refresh-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -35,40 +32,25 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-function loadAllScores() {
-  const gameTypes = ['word-puzzle', 'memory-match', 'number-sequence', 'puzzle', '3d-rotation'];
-  gameTypes.forEach(type => loadScores(type));
-}
-
 function loadScores(gameType) {
-  const container = document.getElementById(`${gameType}-scores`);
+  const container = document.querySelector(`#${gameType}-board .table-body`);
+  if (!container) return;
+
   container.innerHTML = '<div class="loading">Yükleniyor...</div>';
-  
+
   fetch(`/api/get-scores/${gameType}`)
     .then(response => response.json())
     .then(scores => {
       container.innerHTML = scores.map((score, index) => `
-        <div class="table-row">
+        <div class="table-row ${index < 3 ? 'top-rank' : ''}">
           <div class="rank">${index + 1}</div>
           <div class="player">${score.username}</div>
           <div class="score">${score.score}</div>
-          <div class="date">${formatDate(score.timestamp)}</div>
+          <div class="date">${new Date(score.timestamp).toLocaleString()}</div>
         </div>
       `).join('');
     })
     .catch(error => {
-      container.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu.</div>';
-      console.error('Error loading scores:', error);
+      container.innerHTML = '<div class="error">Hata: Skorlar yüklenemedi</div>';
     });
-}
-
-function formatDate(timestamp) {
-  const date = new Date(timestamp);
-  return date.toLocaleDateString('tr-TR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
 }
