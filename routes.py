@@ -135,16 +135,30 @@ def save_score():
     # Use anonymous user or a session-based temporary user if not logged in
     user_id = session.get('user_id', 1)  # Default to user id 1 if not logged in
 
-    new_score = Score(
+    # Mevcut en yüksek skoru kontrol et
+    existing_score = Score.query.filter_by(
         user_id=user_id,
-        game_type=data['gameType'],
-        score=data['score']
-    )
+        game_type=data['gameType']
+    ).first()
 
-    db.session.add(new_score)
-    db.session.commit()
+    if existing_score:
+        if data['score'] > existing_score.score:
+            existing_score.score = data['score']
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Score updated successfully'})
+    else:
+        new_score = Score(
+            user_id=user_id,
+            game_type=data['gameType'],
+            score=data['score']
+        )
+
+        db.session.add(new_score)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Score saved successfully'})
 
     return jsonify({'success': True, 'message': 'Score saved successfully'})
+
 
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
