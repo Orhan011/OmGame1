@@ -134,20 +134,38 @@ def init_db_route():
     return 'Database initialized'
 
 # Home page with initialization
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password_hash, password):
+            session['user_id'] = user.id
+            flash('Başarıyla giriş yaptınız!')
+            return redirect(url_for('index'))
+        else:
+            flash('Geçersiz email veya şifre.')
+            return redirect(url_for('login'))
+            
+    return render_template('login.html')
+
 @app.route('/')
 def index():
-    # Try to initialize database on first request
+    # Check if user is logged in
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+        
     try:
-        # Only try to create tables
         db.create_all()
-        # Try to initialize data once
         if User.query.count() == 0:
             initialize_database()
     except Exception as e:
         logger.error(f"Error initializing on first request: {e}")
     
-    # Continue with normal request
-    return render_template('index.html')
+    user = User.query.get(session['user_id'])
+    return render_template('index.html', user=user)
 
 # Game routes
 @app.route('/games/word-puzzle')
@@ -253,6 +271,12 @@ def update_profile():
     if not session.get('user_id'):
         flash('Lütfen önce giriş yapın.', 'error')
         return redirect(url_for('login'))
+        
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Başarıyla çıkış yaptınız.')
+    return redirect(url_for('login'))
     
     user = User.query.get(session['user_id'])
     user.full_name = request.form.get('full_name')
