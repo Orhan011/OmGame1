@@ -77,11 +77,33 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Örnek görseller (SVG)
   const puzzleImages = [
-    // Geometrik desenler (SVG formatında)
+    // Geometrik desenler
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#1a1a2e"/>
       <circle cx="150" cy="150" r="100" fill="#4d3ee3"/>
-      <rect x="100" y="100" width="100" height="100" fill="#f72585" transform="rotate(45 150 150)"/>
+      <rect x="100" y="100" width="100" height="100" fill="#f72585"/>
+    </svg>`,
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#2d3436"/>
+      <polygon points="150,50 250,150 150,250 50,150" fill="#00b894"/>
+      <circle cx="150" cy="150" r="50" fill="#fd79a8"/>
+    </svg>`,
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#130f40"/>
+      <rect x="50" y="50" width="200" height="200" fill="#e056fd" transform="rotate(45 150 150)"/>
+      <circle cx="150" cy="150" r="70" fill="#7bed9f"/>
+    </svg>`,
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#2c3e50"/>
+      <circle cx="100" cy="100" r="60" fill="#e74c3c"/>
+      <circle cx="200" cy="200" r="60" fill="#3498db"/>
+      <circle cx="150" cy="150" r="40" fill="#2ecc71"/>
+    </svg>`,
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#192a56"/>
+      <path d="M150 50 L250 150 L150 250 L50 150 Z" fill="#ffa502"/>
+      <circle cx="150" cy="150" r="50" fill="#ff6348"/>
+    </svg>`2585" transform="rotate(45 150 150)"/>
       <circle cx="150" cy="150" r="50" fill="#1a1a2e"/>
       <circle cx="150" cy="150" r="25" fill="#4cc9f0"/>
     </svg>`,
