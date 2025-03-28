@@ -48,7 +48,7 @@
           <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
           <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
           <li><a class="dropdown-item" href="{{ url_for('number_sequence') }}"><i class="fas fa-sort-numeric-up me-2"></i>Sayı Dizisi</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('pattern_recognition') }}"><i class="fas fa-braille me-2"></i>Örüntü Tanıma</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
         </ul>
@@ -99,9 +99,9 @@
           <i class="fas fa-sort-numeric-up"></i>
           <span>Sayı Dizisi</span>
         </a>
-        <a href="{{ url_for('pattern_recognition') }}" class="footer-game-button">
-          <i class="fas fa-braille"></i>
-          <span>Örüntü Tanıma</span>
+        <a href="{{ url_for('puzzle') }}" class="footer-game-button">
+          <i class="fas fa-puzzle-piece"></i>
+          <span>Yapboz</span>
         </a>
       </div>
     </div>
