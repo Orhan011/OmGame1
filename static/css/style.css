@@ -379,15 +379,31 @@ line-height:1.6;
 color: #6A5AE0;
 font-weight: 700;
 text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+display: flex;
+gap: 10px;
+justify-content: center;
 }
 
 .hero-title span {
-display: block;
+display: inline;
 margin: 5px 0;
 background: linear-gradient(135deg, #6A5AE0, #B469FF);
 -webkit-background-clip: text;
 background-clip: text;
 color: transparent;
+}
+
+.hero-subtitle {
+max-width: 600px;
+margin: 0 auto;
+}
+
+.card {
+border-radius: 25px;
+background-color:rgba(33,33,61,0.7);
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:var(--box-shadow);
+}t;
 }
 
 .hero-subtitle {
