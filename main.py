@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
