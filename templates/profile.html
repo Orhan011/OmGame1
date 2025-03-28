@@ -1,0 +1,54 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="profile-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <i class="fas fa-user-circle fa-5x"></i>
+          </div>
+          <h2 class="profile-username">{{ user.username }}</h2>
+          <p class="profile-join-date">Katılım: {{ user.join_date }}</p>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="stats-card">
+          <h3>Oyun İstatistikleri</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Toplam Oyun</span>
+              <span class="stat-value">{{ stats.total_games }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">En Yüksek Skor</span>
+              <span class="stat-value">{{ stats.high_score }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Başarılar</span>
+              <span class="stat-value">{{ stats.achievements }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="achievements-section">
+          <h3>Başarılar</h3>
+          <div class="achievement-list">
+            {% for achievement in achievements %}
+            <div class="achievement-item">
+              <i class="{{ achievement.icon }}"></i>
+              <div class="achievement-info">
+                <h4>{{ achievement.name }}</h4>
+                <p>{{ achievement.description }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
