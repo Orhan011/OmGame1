@@ -4322,14 +4322,40 @@ main {
 }
 
 .leaderboard-table th {
-  background: linear-gradient(135deg, rgba(33, 33, 61, 0.9), rgba(38, 38, 70, 1));
-  color: var(--accent-color);
-  padding: 18px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  background: linear-gradient(135deg, rgba(106, 90, 224, 0.8), rgba(90, 103, 216, 0.9));
+  color: #ffffff;
+  padding: 20px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  border-bottom: 2px solid rgba(120, 104, 230, 0.3);
+  font-size: 0.9rem;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.leaderboard-table tr {
+  transition: all 0.3s ease;
+  background: rgba(33, 33, 61, 0.4);
+}
+
+.leaderboard-table tr:hover {
+  transform: translateX(5px);
+  background: rgba(106, 90, 224, 0.15);
+}
+
+.leaderboard-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1.1rem;
+}
+
+.score-value {
+  font-weight: 700;
+  color: #6a5ae0;
+  background: -webkit-linear-gradient(45deg, #6a5ae0, #9f8aff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2rem;
 }
 
 .leaderboard-table td {

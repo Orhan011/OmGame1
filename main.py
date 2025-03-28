@@ -202,10 +202,18 @@ def tips():
 def profile():
     user_id = session.get('user_id', 1)
     user = User.query.get(user_id)
+    if not user:
+        flash('Kullanıcı bulunamadı', 'error')
+        return redirect(url_for('index'))
+        
+    recent_scores = Score.query.filter_by(user_id=user_id).order_by(Score.timestamp.desc()).limit(10).all()
+    highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user_id).scalar() or 0
+    total_games = Score.query.filter_by(user_id=user_id).count()
+    
     stats = {
-        'total_games': Score.query.filter_by(user_id=user_id).count(),
-        'high_score': db.session.query(db.func.max(Score.score)).filter_by(user_id=user_id).scalar() or 0,
-        'achievements': 0
+        'total_games': total_games,
+        'high_score': highest_score,
+        'achievements': len(recent_scores)
     }
     recent_scores = Score.query.filter_by(user_id=user_id).order_by(Score.timestamp.desc()).limit(5).all()
     return render_template('profile.html', user=user, stats=stats, recent_scores=recent_scores)
