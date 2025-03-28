@@ -3,35 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beyin Geliştirme - IQ</title>
+<title>Beyin Geliştirme - IQ Oyunları</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-{% if request.path == '/games/3d-rotation' %}<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>{% endif %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<!-- Meta Tags-->
+<meta name="description" content="Zihinsel becerilerinizi geliştirmek için bilimsel olarak tasarlanmış bilişsel oyunlar. IQ, hafıza, konsantrasyon ve çözüm odaklı düşünmeyi geliştirin.">
+<meta name="keywords" content="beyin geliştirme, iq oyunları, zihin oyunları, hafıza geliştirme, bilişsel beceriler">
 </head>
 <body>
+<!-- Dinamik Arkaplan Efekti -->
+<div class="background-shapes">
+  <div class="shape circle"></div>
+  <div class="shape square"></div>
+  <div class="shape triangle"></div>
+  <div class="shape star"></div>
+</div>
+
 <nav class="navbar navbar-expand-lg navbar-dark">
 <div class="container">
-<a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-brain me-2"></i>Beyin Geliştirme</a>
-<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-<div class="collapse navbar-collapse" id="navbarNav">
-<ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">Anasayfa</a></li>
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle {% if '/games/' in request.path %}active{% endif %}" href="#" id="gamesDropdown" data-bs-toggle="dropdown">Oyunlar</a>
-<ul class="dropdown-menu bg-dark">
-<li><a class="dropdown-item nav-link" href="{{ url_for('word_puzzle') }}">Kelime Bulmaca</a></li>
-<li><a class="dropdown-item nav-link" href="{{ url_for('memory_match') }}">Hafıza Kartları</a></li>
-<li><a class="dropdown-item nav-link" href="{{ url_for('number_sequence') }}">Sayı Dizisi</a></li>
-<li><a class="dropdown-item nav-link" href="{{ url_for('pattern_recognition') }}">Örüntü Tanıma</a></li>
-</ul>
-</li>
-<li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}">Skor Tablosu</a></li>
-<li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}">Makaleler</a></li>
-<li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}">İpuçları</a></li>
-</ul>
-</div>
+  <a class="navbar-brand" href="{{ url_for('index') }}">
+    <i class="fas fa-brain me-2 brain-icon"></i>
+    <span class="brand-text">Beyin Geliştirme</span>
+  </a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
+          <i class="fas fa-home nav-icon"></i>Anasayfa
+        </a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {% if '/games/' in request.path %}active{% endif %}" href="#" id="gamesDropdown" data-bs-toggle="dropdown">
+          <i class="fas fa-gamepad nav-icon"></i>Oyunlar
+        </a>
+        <ul class="dropdown-menu glass-dropdown">
+          <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('number_sequence') }}"><i class="fas fa-sort-numeric-up me-2"></i>Sayı Dizisi</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('pattern_recognition') }}"><i class="fas fa-braille me-2"></i>Örüntü Tanıma</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
+    </ul>
+  </div>
 </div>
 </nav>
 
@@ -41,30 +67,49 @@
 
 <footer class="footer">
 <div class="container">
-<div class="row">
-<div class="col-md-6">
-<h5 class="footer-title"><i class="fas fa-brain me-2"></i>Beyin Geliştirme</h5>
-<p class="footer-text">Bilişsel yeteneklerinizi geliştirmek için tasarlanmış zihin oyunları koleksiyonu</p>
-</div>
-<div class="col-md-3">
-<h5 class="footer-title">Bağlantılar</h5>
-<ul class="list-unstyled">
-<li><a href="{{ url_for('index') }}" class="footer-text">Anasayfa</a></li>
-<li><a href="{{ url_for('leaderboard') }}" class="footer-text">Skor Tablosu</a></li>
-</ul>
-</div>
-<div class="col-md-3">
-<h5 class="footer-title">Oyunlar</h5>
-<ul class="list-unstyled">
-<li><a href="{{ url_for('word_puzzle') }}" class="footer-text">Kelime Bulmaca</a></li>
-<li><a href="{{ url_for('memory_match') }}" class="footer-text">Hafıza Kartları</a></li>
-</ul>
-</div>
-</div>
-<hr class="my-3">
-<div class="text-center footer-text">
-<p>&copy; 2025 Beyin Geliştirme</p>
-</div>
+  <div class="row">
+    <div class="col-md-5">
+      <div class="footer-brand">
+        <i class="fas fa-brain me-2 brain-icon"></i>
+        <h5 class="footer-title">Beyin Geliştirme</h5>
+      </div>
+      <p class="footer-text">Bilişsel yeteneklerinizi geliştirmek için tasarlanmış zihin oyunları koleksiyonu. Her gün 10 dakikalık beyin egzersizi, zekânızı katlayabilir.</p>
+    </div>
+    <div class="col-md-3">
+      <h5 class="footer-title">Hızlı Erişim</h5>
+      <ul class="footer-links">
+        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right me-2"></i>Anasayfa</a></li>
+        <li><a href="{{ url_for('leaderboard') }}"><i class="fas fa-chevron-right me-2"></i>Skor Tablosu</a></li>
+        <li><a href="{{ url_for('articles') }}"><i class="fas fa-chevron-right me-2"></i>Makaleler</a></li>
+        <li><a href="{{ url_for('tips') }}"><i class="fas fa-chevron-right me-2"></i>İpuçları</a></li>
+      </ul>
+    </div>
+    <div class="col-md-4">
+      <h5 class="footer-title">Oyunlar</h5>
+      <div class="footer-games">
+        <a href="{{ url_for('word_puzzle') }}" class="footer-game-button">
+          <i class="fas fa-spell-check"></i>
+          <span>Kelime Bulmaca</span>
+        </a>
+        <a href="{{ url_for('memory_match') }}" class="footer-game-button">
+          <i class="fas fa-clone"></i>
+          <span>Hafıza Kartları</span>
+        </a>
+        <a href="{{ url_for('number_sequence') }}" class="footer-game-button">
+          <i class="fas fa-sort-numeric-up"></i>
+          <span>Sayı Dizisi</span>
+        </a>
+        <a href="{{ url_for('pattern_recognition') }}" class="footer-game-button">
+          <i class="fas fa-braille"></i>
+          <span>Örüntü Tanıma</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="text-center footer-text">
+    <p>&copy; 2025 Beyin Geliştirme | Her hakkı saklıdır</p>
+  </div>
 </div>
 </footer>
 
