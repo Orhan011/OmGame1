@@ -5667,3 +5667,149 @@ main {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 0.25rem rgba(106, 90, 224, 0.25);
 }
+/* Gelişmiş Profil Stilleri */
+.profile-section {
+  background: rgba(20, 20, 43, 0.4);
+  min-height: 100vh;
+}
+
+.glass-panel {
+  background: rgba(20, 20, 43, 0.7);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.profile-avatar {
+  margin-bottom: 15px;
+}
+
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-color);
+  object-fit: cover;
+}
+
+.profile-username {
+  font-size: 1.8rem;
+  margin: 10px 0;
+  color: var(--primary-text);
+}
+
+.profile-rank {
+  margin: 10px 0;
+}
+
+.profile-rank .badge {
+  font-size: 0.9rem;
+  padding: 8px 15px;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  color: var(--secondary-text);
+}
+
+.info-item i {
+  width: 25px;
+  color: var(--accent-color);
+  margin-right: 10px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 15px;
+  background: rgba(106, 90, 224, 0.1);
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--primary-text);
+  margin: 5px 0;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-info i {
+  color: var(--accent-color);
+}
+
+.score-value {
+  font-weight: bold;
+  color: var(--primary-text);
+}
+
+.table {
+  margin: 0;
+}
+
+.table th {
+  border-bottom: 2px solid rgba(106, 90, 224, 0.2);
+  color: var(--secondary-text);
+  font-weight: 600;
+}
+
+.table td {
+  border-bottom: 1px solid rgba(106, 90, 224, 0.1);
+  vertical-align: middle;
+}
+
+.dark-theme .modal-content {
+  background: var(--background);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.dark-theme .modal-header {
+  border-bottom: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.dark-theme .form-control {
+  background: rgba(35, 35, 65, 0.8);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  color: var(--primary-text);
+}
+
+.dark-theme .form-control:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.2rem rgba(106, 90, 224, 0.25);
+}

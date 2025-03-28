@@ -2,70 +2,104 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<section class="profile-section">
+<div class="profile-section py-5">
   <div class="container">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-lg-4">
         <div class="profile-card glass-panel">
-          <div class="profile-avatar">
-            {% if user.avatar_url %}
-              <img src="{{ user.avatar_url }}" alt="Profile" class="avatar-img">
-            {% else %}
-              <i class="fas fa-user-circle fa-5x"></i>
-            {% endif %}
+          <div class="profile-header">
+            <div class="profile-avatar">
+              {% if user.avatar_url %}
+                <img src="{{ user.avatar_url }}" alt="Profile" class="avatar-img">
+              {% else %}
+                <i class="fas fa-user-circle fa-5x"></i>
+              {% endif %}
+            </div>
+            <h2 class="profile-username">{{ user.username }}</h2>
+            <div class="profile-rank">
+              <span class="badge bg-primary">{{ user.rank }}</span>
+            </div>
           </div>
-          <h2 class="profile-username">{{ user.username }}</h2>
-          {% if user.full_name %}
-            <p class="profile-fullname">{{ user.full_name }}</p>
-          {% endif %}
-          <p class="profile-join-date">Üye Olma: {{ user.created_at.strftime('%d/%m/%Y') }}</p>
-          <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+          
+          <div class="profile-info">
+            <div class="info-item">
+              <i class="fas fa-user"></i>
+              <span>{{ user.full_name or 'İsim belirtilmedi' }}</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-calendar"></i>
+              <span>{{ user.age or 'Yaş belirtilmedi' }} yaşında</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ user.location or 'Konum belirtilmedi' }}</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <span>Son aktif: {{ user.last_active.strftime('%d/%m/%Y %H:%M') }}</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             <i class="fas fa-edit"></i> Profili Düzenle
           </button>
         </div>
-        
-        <div class="profile-bio glass-panel mt-4">
-          <h4>Hakkımda</h4>
-          <p>{{ user.bio or 'Henüz bir bio eklenmemiş.' }}</p>
-        </div>
-      </div>
-      
-      <div class="col-md-8">
-        <div class="stats-card glass-panel">
-          <h3>Oyun İstatistikleri</h3>
-          <div class="stats-grid">
+
+        <div class="stats-summary glass-panel mt-4">
+          <h3>Genel İstatistikler</h3>
+          <div class="stat-grid">
             <div class="stat-item">
-              <span class="stat-label">Toplam Oyun</span>
-              <span class="stat-value">{{ stats.total_games }}</span>
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-value">{{ user.highest_score }}</div>
+              <div class="stat-label">En Yüksek Skor</div>
             </div>
             <div class="stat-item">
-              <span class="stat-label">En Yüksek Skor</span>
-              <span class="stat-value">{{ stats.high_score }}</span>
+              <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+              <div class="stat-value">{{ user.total_games_played }}</div>
+              <div class="stat-label">Toplam Oyun</div>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Son Aktif</span>
-              <span class="stat-value">{{ user.last_active.strftime('%d/%m/%Y') }}</span>
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-value">{{ user.experience_points }}</div>
+              <div class="stat-label">Deneyim Puanı</div>
             </div>
           </div>
         </div>
-        
-        <div class="recent-games glass-panel mt-4">
-          <h3>Son Oyunlar</h3>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="recent-activity glass-panel">
+          <h3>Oyun Geçmişi</h3>
           <div class="table-responsive">
-            <table class="table table-dark table-hover">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th>Oyun</th>
                   <th>Skor</th>
                   <th>Tarih</th>
+                  <th>Durum</th>
                 </tr>
               </thead>
               <tbody>
                 {% for score in recent_scores %}
                 <tr>
-                  <td>{{ score.game_type }}</td>
-                  <td>{{ score.score }}</td>
+                  <td>
+                    <div class="game-info">
+                      <i class="fas fa-gamepad"></i>
+                      <span>{{ score.game_type }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="score-value">{{ score.score }}</span>
+                  </td>
                   <td>{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                  <td>
+                    {% if score.score > (user.highest_score * 0.8) %}
+                      <span class="badge bg-success">Yüksek Skor</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Normal</span>
+                    {% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -75,9 +109,9 @@
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Edit Profile Modal -->
+<!-- Profil Düzenleme Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content dark-theme">
@@ -96,6 +130,10 @@
             <input type="number" class="form-control" name="age" value="{{ user.age or '' }}">
           </div>
           <div class="mb-3">
+            <label class="form-label">Konum</label>
+            <input type="text" class="form-control" name="location" value="{{ user.location or '' }}">
+          </div>
+          <div class="mb-3">
             <label class="form-label">Bio</label>
             <textarea class="form-control" name="bio" rows="3">{{ user.bio or '' }}</textarea>
           </div>
@@ -103,7 +141,7 @@
             <label class="form-label">Avatar URL</label>
             <input type="url" class="form-control" name="avatar_url" value="{{ user.avatar_url or '' }}">
           </div>
-          <button type="submit" class="btn btn-primary">Kaydet</button>
+          <button type="submit" class="btn btn-primary w-100">Kaydet</button>
         </form>
       </div>
     </div>

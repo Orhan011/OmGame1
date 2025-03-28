@@ -15,8 +15,12 @@ class User(db.Model):
     age = db.Column(db.Integer)
     bio = db.Column(db.Text)
     avatar_url = db.Column(db.String(200))
+    location = db.Column(db.String(100))
+    experience_points = db.Column(db.Integer, default=0)
+    rank = db.Column(db.String(50), default='Başlangıç')
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     total_games_played = db.Column(db.Integer, default=0)
+    highest_score = db.Column(db.Integer, default=0)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):

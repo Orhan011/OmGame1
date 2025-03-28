@@ -221,7 +221,26 @@ def update_profile():
     user.age = request.form.get('age', type=int)
     user.bio = request.form.get('bio')
     user.avatar_url = request.form.get('avatar_url')
+    user.location = request.form.get('location')
     user.last_active = datetime.utcnow()
+    
+    # Skorları güncelle
+    highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar() or 0
+    user.highest_score = highest_score
+    user.total_games_played = Score.query.filter_by(user_id=user.id).count()
+    
+    # Deneyim ve rütbe hesapla
+    total_points = sum(score.score for score in user.scores)
+    user.experience_points = total_points
+    
+    if total_points > 10000:
+        user.rank = 'Uzman'
+    elif total_points > 5000:
+        user.rank = 'İleri Seviye'
+    elif total_points > 1000:
+        user.rank = 'Orta Seviye'
+    else:
+        user.rank = 'Başlangıç'
     
     db.session.commit()
     flash('Profil başarıyla güncellendi!', 'success')
