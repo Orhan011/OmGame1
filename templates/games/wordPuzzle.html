@@ -2,46 +2,83 @@
 
 {% block content %}
 <div class="container">
-  <h1 class="game-title text-center mb-4">Kelime Bulmaca</h1>
+  <h1 class="game-title text-center">Kelime Bulmaca</h1>
   
   <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="start-screen text-center" id="start-screen">
-        <div class="game-instructions mb-5">
-          <p>Verilen harflerden anlamlı kelimeler oluşturun. Kelimeler en az 3 harf içermelidir. Süreniz dolmadan önce ne kadar çok kelime bulursanız, o kadar çok puan kazanırsınız!</p>
-          <ul class="mt-3 text-start">
-            <li>Harflere tıklayarak veya klavyeden yazarak kelimeler oluşturun</li>
-            <li>Her harf birden fazla kullanılabilir</li>
-            <li>Bulunan her kelime için puan kazanırsınız (uzun kelimeler daha değerli!)</li>
-            <li>Toplam süreniz: 90 saniye</li>
-          </ul>
-        </div>
-        
-        <!-- Game Start Button -->
-        <div class="text-center mb-4">
-          <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
-            <i class="fas fa-play me-2"></i>Oyunu Başlat
-          </button>
+    <div class="col-lg-10">
+      <!-- Intro Section -->
+      <div class="game-instructions" id="start-screen">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
+            <p>Verilen harflerden anlamlı kelimeler oluşturun. Kelimeler en az 3 harf içermelidir. Süreniz dolmadan önce ne kadar çok kelime bulursanız, o kadar çok puan kazanırsınız!</p>
+            <div class="game-rules mt-3">
+              <div class="rule-item">
+                <i class="fas fa-keyboard"></i>
+                <span>Harflere tıklayarak veya klavyeden yazarak kelimeler oluşturun</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-retweet"></i>
+                <span>Her harf birden fazla kullanılabilir</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-coins"></i>
+                <span>Bulunan her kelime için puan kazanırsınız (uzun kelimeler daha değerli!)</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-hourglass-half"></i>
+                <span>Toplam süreniz: 90 saniye</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
+              <i class="fas fa-play me-2"></i>Oyunu Başlat
+            </button>
+          </div>
         </div>
       </div>
       
       <!-- Game Container -->
       <div id="game-container" class="game-container" style="display: none;">
         <!-- Game Header -->
-        <div class="game-header">
-          <div class="score-display">
-            <span id="score-display">0</span>
+        <div class="game-stats">
+          <div class="game-stat">
+            <i class="fas fa-trophy"></i>
+            <span class="stat-label">Puan</span>
+            <span id="score-display" class="stat-value">0</span>
           </div>
-          <div class="timer-display">
-            <span id="timer-display">1:30</span>
+          <div class="game-stat">
+            <i class="fas fa-hourglass-half"></i>
+            <span class="stat-label">Süre</span>
+            <span id="timer-display" class="stat-value">1:30</span>
+          </div>
+          <div class="game-stat">
+            <i class="fas fa-spell-check"></i>
+            <span class="stat-label">Kelimeler</span>
+            <span id="words-counter" class="stat-value">0</span>
           </div>
         </div>
         
-        <!-- Alert Container -->
-        <div id="alert-container" class="mt-3"></div>
+        <!-- Game Controls Top -->
+        <div class="game-controls-top">
+          <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
+            <i class="fas fa-pause"></i>
+          </button>
+          <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
+            <i class="fas fa-volume-up"></i>
+          </button>
+        </div>
         
-        <!-- Letter Tiles -->
-        <div id="letter-container" class="letter-container my-4"></div>
+        <!-- Alert Container -->
+        <div id="alert-container" class="memory-alert"></div>
+        
+        <!-- Game Board Container -->
+        <div class="game-board-container">
+          <div class="board-backdrop"></div>
+          <!-- Letter Tiles -->
+          <div id="letter-container" class="letter-container"></div>
+        </div>
         
         <!-- Word Input -->
         <div class="input-group mb-4">
@@ -52,8 +89,8 @@
         </div>
         
         <!-- Found Words -->
-        <div class="mt-4">
-          <h5 class="mb-3"><i class="fas fa-star me-2"></i>Bulunan Kelimeler:</h5>
+        <div class="word-collection-container">
+          <h5 class="word-collection-title"><i class="fas fa-star me-2"></i>Bulunan Kelimeler:</h5>
           <div id="word-list" class="words-found"></div>
         </div>
         
@@ -69,41 +106,127 @@
       </div>
       
       <!-- Game Over Container -->
-      <div id="game-over-container" class="text-center game-container" style="display: none;">
-        <h2 class="mb-4">Oyun Bitti!</h2>
-        
-        <div class="result-card mb-4">
-          <div class="result-score">
-            <span id="final-score">0</span>
-            <small>puan</small>
+      <div id="game-over-container" class="memory-results-container" style="display: none;">
+        <div class="memory-results-card">
+          <div class="memory-results-header">
+            <span class="result-badge">
+              <i class="fas fa-flag-checkered"></i>
+            </span>
+            <h2 class="mb-0">Oyun Tamamlandı!</h2>
           </div>
-          <div class="result-stats">
-            <div class="stat-item">
-              <i class="fas fa-check-circle"></i>
-              <span id="words-found-count">0</span> kelime bulundu
+          
+          <div class="memory-results-body">
+            <div class="results-stats">
+              <div class="result-stat">
+                <i class="fas fa-trophy"></i>
+                <div class="result-stat-value">
+                  <span id="final-score">0</span>
+                </div>
+                <div class="result-stat-label">Toplam Puan</div>
+              </div>
+              
+              <div class="result-stat">
+                <i class="fas fa-spell-check"></i>
+                <div class="result-stat-value">
+                  <span id="words-found-count">0</span>
+                </div>
+                <div class="result-stat-label">Bulunan Kelimeler</div>
+              </div>
+              
+              <div class="result-stat">
+                <i class="fas fa-crown"></i>
+                <div class="result-stat-value">
+                  <span id="longest-word">-</span>
+                </div>
+                <div class="result-stat-label">En Uzun Kelime</div>
+              </div>
             </div>
-            <div class="stat-item">
-              <i class="fas fa-star"></i>
-              <span id="longest-word">-</span> en uzun kelime
+            
+            <div class="results-rating">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <div class="rating-text" id="rating-text">İyi!</div>
             </div>
+          </div>
+          
+          <div class="memory-results-footer">
+            <button id="play-again" class="btn btn-primary btn-lg">
+              <i class="fas fa-redo me-2"></i>Tekrar Oyna
+            </button>
+            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-trophy me-2"></i>Skor Tablosu
+            </a>
           </div>
         </div>
         
-        <div class="game-controls">
-          <button id="play-again" class="btn btn-primary btn-lg">
-            <i class="fas fa-redo me-2"></i>Tekrar Oyna
+        <div class="memory-share-section">
+          <p>Skorunuzu paylaşın:</p>
+          <div class="share-buttons">
+            <button class="share-btn" title="Kopyala" id="copy-score">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button class="share-btn" title="Paylaş" id="share-score">
+              <i class="fas fa-share-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pause Menu Overlay -->
+      <div id="pause-overlay" class="pause-overlay" style="display: none;">
+        <div class="pause-card">
+          <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
+          <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
+          <button id="resume-game" class="btn btn-primary btn-lg">
+            <i class="fas fa-play me-2"></i>Devam Et
           </button>
-          <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
-            <i class="fas fa-trophy me-2"></i>Puan Tablosu
-          </a>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .game-rules {
+    margin-top: 15px;
+  }
+  
+  .rule-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .rule-item i {
+    color: var(--accent-color);
+    margin-right: 10px;
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+  }
+  
+  .word-collection-container {
+    background: rgba(15, 15, 30, 0.3);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-top: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .word-collection-title {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+</style>
 {% endblock %}
 
 {% block scripts %}
-<script src="https://kit.fontawesome.com/e2a0a3d5c3.js" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/games/wordPuzzle.js') }}"></script>
 {% endblock %}

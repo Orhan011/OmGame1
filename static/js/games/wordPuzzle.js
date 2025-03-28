@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const longestWordDisplay = document.getElementById('longest-word');
   const shuffleBtn = document.getElementById('shuffle-letters');
   const hintBtn = document.getElementById('hint-button');
+  const wordCounter = document.getElementById('words-counter');
+  const pauseBtn = document.getElementById('pause-game');
+  const resumeBtn = document.getElementById('resume-game');
+  const pauseOverlay = document.getElementById('pause-overlay');
+  const soundToggle = document.getElementById('sound-toggle');
+  const ratingText = document.getElementById('rating-text');
+  const copyScoreBtn = document.getElementById('copy-score');
+  const shareScoreBtn = document.getElementById('share-score');
   
   // Game State
   let letters = [];
@@ -22,10 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let foundWords = [];
   let possibleWords = []; // For hints
   let timer;
+  let timerInterval;
+  let remainingTime = 0;
   let isGameActive = false;
+  let isPaused = false;
   let hintCount = 0;
   let selectedLetters = [];
   let gameStartTime;
+  let soundEnabled = true;
   
   // Constants 
   const GAME_DURATION = 90; // in seconds
@@ -69,6 +81,25 @@ document.addEventListener('DOMContentLoaded', function() {
     hintBtn.addEventListener('click', provideHint);
   }
   
+  // Pause/Resume functionality
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', togglePause);
+  }
+  
+  if (resumeBtn) {
+    resumeBtn.addEventListener('click', togglePause);
+  }
+  
+  // Sound toggle
+  if (soundToggle) {
+    soundToggle.addEventListener('click', toggleSound);
+  }
+  
+  // Word counter initialization
+  if (wordCounter) {
+    wordCounter.textContent = '0';
+  }
+  
   // Add pulse animation to start button for visual appeal
   if (startBtn.classList.contains('pulse-animation')) {
     startBtn.addEventListener('animationend', () => {
@@ -88,15 +119,35 @@ document.addEventListener('DOMContentLoaded', function() {
     startBtn.style.display = 'none';
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
+    pauseOverlay.style.display = 'none';
     
     // Initialize game state
     score = 0;
     foundWords = [];
     possibleWords = [];
     isGameActive = true;
+    isPaused = false;
     hintCount = 0;
     selectedLetters = [];
     gameStartTime = Date.now();
+    soundEnabled = true;
+    
+    // Reset UI elements
+    if (soundToggle) {
+      soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
+      soundToggle.classList.add('active');
+    }
+    
+    if (wordCounter) {
+      wordCounter.textContent = '0';
+    }
+    
+    // Reset hint button state
+    if (hintBtn) {
+      hintBtn.textContent = `İpucu (${HINT_MAX})`;
+      hintBtn.classList.remove('disabled');
+      hintBtn.removeAttribute('disabled');
+    }
     
     // Generate letters and set up game
     generateLetters();
@@ -403,6 +454,9 @@ document.addEventListener('DOMContentLoaded', function() {
     wordsFoundCount.textContent = wordsCount;
     longestWordDisplay.textContent = longestWord;
     
+    // Update rating based on score and word count
+    updateRatingDisplay();
+    
     // Show game over screen with animation
     gameContainer.style.display = 'none';
     gameOverContainer.style.display = 'block';
@@ -413,8 +467,108 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save score to leaderboard
     window.saveScore('wordPuzzle', score);
     
-    // Add play again button functionality
+    // Add event listeners for game over screen
     document.getElementById('play-again').addEventListener('click', startGame);
+    
+    // Setup share buttons
+    if (copyScoreBtn) {
+      copyScoreBtn.addEventListener('click', copyScore);
+    }
+    
+    if (shareScoreBtn) {
+      shareScoreBtn.addEventListener('click', shareScore);
+    }
+  }
+  
+  function updateRatingDisplay() {
+    const stars = document.querySelectorAll('.rating-stars i');
+    let rating = 0;
+    
+    // Determine rating based on score and words found
+    if (score >= 800) rating = 5;
+    else if (score >= 600) rating = 4;
+    else if (score >= 400) rating = 3;
+    else if (score >= 200) rating = 2;
+    else rating = 1;
+    
+    // Update star display
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.className = 'fas fa-star';
+      } else {
+        star.className = 'far fa-star';
+      }
+    });
+    
+    // Update rating text
+    let ratingDescription = 'Başlangıç';
+    if (rating === 5) ratingDescription = 'Efsanevi!';
+    else if (rating === 4) ratingDescription = 'Çok İyi!';
+    else if (rating === 3) ratingDescription = 'İyi!';
+    else if (rating === 2) ratingDescription = 'İdare Eder';
+    
+    if (ratingText) {
+      ratingText.textContent = ratingDescription;
+    }
+  }
+  
+  function togglePause() {
+    if (!isGameActive) return;
+    
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+      // Pause the game
+      pauseOverlay.style.display = 'flex';
+      // Stop the timer
+      clearInterval(timerInterval);
+    } else {
+      // Resume the game
+      pauseOverlay.style.display = 'none';
+      // Resume timer
+      startTimer(remainingTime);
+    }
+  }
+  
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    
+    if (soundToggle) {
+      if (soundEnabled) {
+        soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
+        soundToggle.classList.add('active');
+      } else {
+        soundToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        soundToggle.classList.remove('active');
+      }
+    }
+  }
+  
+  function copyScore() {
+    const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${foundWords.length} kelime buldum ve en uzun kelimem: ${longestWordDisplay.textContent}`;
+    
+    navigator.clipboard.writeText(scoreText)
+      .then(() => {
+        showMessage('Skor kopyalandı!', 'success');
+      })
+      .catch(err => {
+        console.error('Kopyalama başarısız: ', err);
+        showMessage('Kopyalama başarısız', 'danger');
+      });
+  }
+  
+  function shareScore() {
+    const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${foundWords.length} kelime buldum ve en uzun kelimem: ${longestWordDisplay.textContent}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Beyin Egzersizi Oyun Skoru',
+        text: scoreText,
+      })
+      .catch(error => console.log('Paylaşım başarısız:', error));
+    } else {
+      copyScore();
+    }
   }
   
   /**
