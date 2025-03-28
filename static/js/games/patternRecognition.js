@@ -865,13 +865,18 @@ document.addEventListener('DOMContentLoaded', function() {
    * Ses efekti çalar
    */
   function playSound(soundName) {
+    // Ses dosyası yoksa veya browser ses desteği yoksa hata vermeyi engelle
+    if (!sounds[soundName]) {
+      return;
+    }
+    
     try {
       sounds[soundName].currentTime = 0;
       sounds[soundName].play().catch(err => {
-        console.log('Ses çalınamadı:', err);
+        // Sessizce devam et
       });
     } catch (err) {
-      console.log('Ses çalma hatası:', err);
+      // Sessizce devam et
     }
   }
   

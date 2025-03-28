@@ -186,9 +186,9 @@ document.addEventListener('DOMContentLoaded', function() {
   pauseBtn.addEventListener('click', togglePause);
   resumeBtn.addEventListener('click', togglePause);
   restartBtn.addEventListener('click', restartGame);
+  document.getElementById('play-again').addEventListener('click', restartGame);
   hintBtn.addEventListener('click', showHint);
   soundToggle.addEventListener('click', toggleSound);
-  document.getElementById('play-again').addEventListener('click', startGame);
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
    * Plays a sound effect if audio is enabled
    */
   function playSound(soundName) {
-    if (!audioEnabled || sounds[soundName].muted) {
+    if (!sounds[soundName] || sounds[soundName].muted) {
       return;
     }
     
