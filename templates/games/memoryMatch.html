@@ -2,28 +2,30 @@
 
 {% block content %}
 <div class="container">
-  <h1 class="text-center mb-4">Memory Match</h1>
+  <h1 class="game-title text-center mb-4">Hafıza Kartları</h1>
   
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <p class="text-center mb-4">
-        Test your visual memory by matching pairs of cards. Remember the positions and find all pairs as quickly as possible.
-      </p>
+      <div class="game-instructions mb-4">
+        <p>Görsel hafızanızı kart çiftlerini eşleştirerek test edin. Pozisyonları hatırlayın ve tüm çiftleri mümkün olduğunca çabuk bulun.</p>
+      </div>
       
       <!-- Game Start Button -->
       <div class="text-center mb-4">
-        <button id="start-game" class="btn btn-primary btn-lg">Start Game</button>
+        <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
+          <i class="fas fa-play me-2"></i>Oyunu Başlat
+        </button>
       </div>
       
       <!-- Game Container -->
       <div id="game-container" class="game-container" style="display: none;">
         <!-- Game Header -->
         <div class="game-header">
-          <div class="score-box">
-            <span>Score: <span id="score-display">100</span></span>
+          <div class="score-display">
+            <span id="score-display">100</span>
           </div>
-          <div class="timer-box">
-            <span>Time: <span id="timer-display">2:00</span></span>
+          <div class="timer-display">
+            <span id="timer-display">2:00</span>
           </div>
         </div>
         
@@ -36,11 +38,22 @@
       
       <!-- Game Over Container -->
       <div id="game-over-container" class="text-center game-container" style="display: none;">
-        <h2 class="mb-4">Game Over!</h2>
-        <p class="fs-4 mb-3">Your final score: <span id="final-score" class="fw-bold text-primary">0</span></p>
+        <h2 class="mb-4">Oyun Bitti!</h2>
+        <div class="result-card mb-4">
+          <div class="result-score">
+            <span id="final-score">0</span>
+            <small>puan</small>
+          </div>
+        </div>
         
-        <button id="play-again" class="btn btn-primary btn-lg mt-3">Play Again</button>
-        <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg mt-3 ms-2">View Leaderboard</a>
+        <div class="game-controls">
+          <button id="play-again" class="btn btn-primary btn-lg">
+            <i class="fas fa-redo me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-trophy me-2"></i>Skor Tablosu
+          </a>
+        </div>
       </div>
     </div>
   </div>
