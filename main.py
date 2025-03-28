@@ -1,6 +1,8 @@
 import os
 import logging
-from datetime import datetime
+import random
+import secrets
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -42,6 +44,8 @@ class User(db.Model):
     rank = db.Column(db.String(50), default='Başlangıç')
     total_games_played = db.Column(db.Integer, default=0)
     highest_score = db.Column(db.Integer, default=0)
+    reset_token = db.Column(db.String(100))
+    reset_token_expiry = db.Column(db.DateTime)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
@@ -346,6 +350,130 @@ def logout():
     session.pop('user_id', None)
     flash('Başarıyla çıkış yaptınız.')
     return redirect(url_for('login'))
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            flash('Bu email adresi ile kayıtlı bir kullanıcı bulunamadı.', 'danger')
+            return redirect(url_for('forgot_password'))
+        
+        # Generate a random 6-digit verification code
+        verification_code = ''.join(random.choices('0123456789', k=6))
+        token_expiry = datetime.utcnow() + timedelta(minutes=30)  # Token valid for 30 minutes
+        
+        # Save the verification code and expiry in the user's record
+        user.reset_token = verification_code
+        user.reset_token_expiry = token_expiry
+        db.session.commit()
+        
+        # In a real application, send an email with the verification code
+        # For this demo, we'll just log it and show it in a flash message
+        logger.info(f"Password reset code for {email}: {verification_code}")
+        flash(f'Doğrulama kodu email adresinize gönderildi: {verification_code}', 'success')
+        
+        # Redirect to the verification code page
+        return redirect(url_for('reset_code', email=email))
+    
+    email = request.args.get('email', '')
+    return render_template('forgot_password.html', email=email)
+
+@app.route('/reset-code', methods=['GET', 'POST'])
+def reset_code():
+    email = request.args.get('email', '')
+    if not email and request.method == 'POST':
+        email = request.form.get('email', '')
+    
+    if not email:
+        flash('Email adresi belirtilmedi.', 'danger')
+        return redirect(url_for('forgot_password'))
+    
+    if request.method == 'POST':
+        verification_code = request.form.get('verification_code', '')
+        if not verification_code:
+            # Try to get individual digits and combine them
+            code_parts = []
+            for i in range(1, 7):
+                digit = request.form.get(f'code{i}', '')
+                if not digit:
+                    break
+                code_parts.append(digit)
+            
+            if len(code_parts) == 6:
+                verification_code = ''.join(code_parts)
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            flash('Geçersiz email adresi.', 'danger')
+            return redirect(url_for('forgot_password'))
+        
+        if not user.reset_token or user.reset_token != verification_code:
+            flash('Geçersiz doğrulama kodu.', 'danger')
+            return render_template('reset_code.html', email=email)
+        
+        if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
+            flash('Doğrulama kodunun süresi doldu. Lütfen yeni bir kod talep edin.', 'danger')
+            return redirect(url_for('forgot_password'))
+        
+        # Generate a secure token for the password reset page
+        reset_token = secrets.token_urlsafe(32)
+        user.reset_token = reset_token
+        user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=15)  # Token valid for 15 minutes
+        db.session.commit()
+        
+        return redirect(url_for('reset_password', email=email, token=reset_token))
+    
+    return render_template('reset_code.html', email=email)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = request.args.get('email', '')
+    token = request.args.get('token', '')
+    
+    if request.method == 'POST':
+        email = request.form.get('email', '')
+        token = request.form.get('token', '')
+    
+    if not email or not token:
+        flash('Geçersiz istek.', 'danger')
+        return redirect(url_for('login'))
+    
+    user = User.query.filter_by(email=email, reset_token=token).first()
+    
+    if not user:
+        flash('Geçersiz link. Lütfen şifre sıfırlama sürecini tekrar başlatın.', 'danger')
+        return redirect(url_for('forgot_password'))
+    
+    if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
+        flash('Şifre sıfırlama linkinin süresi doldu. Lütfen tekrar deneyin.', 'danger')
+        return redirect(url_for('forgot_password'))
+    
+    if request.method == 'POST':
+        password = request.form.get('password')
+        password_confirm = request.form.get('password_confirm')
+        
+        if not password or len(password) < 6:
+            flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
+            return render_template('reset_password.html', email=email, token=token)
+        
+        if password != password_confirm:
+            flash('Şifreler eşleşmiyor.', 'danger')
+            return render_template('reset_password.html', email=email, token=token)
+        
+        # Update password
+        user.password_hash = generate_password_hash(password)
+        user.reset_token = None
+        user.reset_token_expiry = None
+        db.session.commit()
+        
+        flash('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('reset_password.html', email=email, token=token)
 
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])

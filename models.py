@@ -19,9 +19,10 @@ class User(db.Model):
     location = db.Column(db.String(100))
     experience_points = db.Column(db.Integer, default=0)
     rank = db.Column(db.String(50), default='Başlangıç')
-    last_active = db.Column(db.DateTime, default=datetime.utcnow)
     total_games_played = db.Column(db.Integer, default=0)
     highest_score = db.Column(db.Integer, default=0)
+    reset_token = db.Column(db.String(100))
+    reset_token_expiry = db.Column(db.DateTime)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
