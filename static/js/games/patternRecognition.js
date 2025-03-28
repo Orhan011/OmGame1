@@ -1,476 +1,733 @@
 /**
- * Örüntü Tanıma Oyunu - 2.0
- * Tamamen yenilenmiş modern, duyarlı (responsive) ve profesyonel sürüm
+ * Örüntü Tanıma Oyunu - 3.0
+ * 
+ * Tamamen sıfırdan tasarlanmış profesyonel, şık ve modern bir örüntü tanıma oyunu.
  * 
  * Özellikler:
- * - Farklı örüntü türleri
- * - Zorluk seviyeleri
- * - Başarımlar ve ödüller
- * - Gelişmiş oyun deneyimi
+ * - Gelişmiş görsel tasarım ve animasyonlar
+ * - Çeşitli örüntü türleri ve zorluk seviyeleri
+ * - Kombo sistemi ile puan çarpanları
+ * - Başarımlar ve seviye sistemi
  * - Tüm cihazlara uyumlu tasarım
- * - Yeni animasyonlar ve efektler
+ * - Ses efektleri ve yüksek kaliteli kullanıcı deneyimi
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elementleri
-  const startBtn = document.getElementById('start-game');
-  const restartBtn = document.getElementById('restart-game');
+  // DOM Elementleri - Ana Kontroller
+  const startGameBtn = document.getElementById('start-game');
+  const welcomeStartBtn = document.getElementById('welcome-start');
+  const restartGameBtn = document.getElementById('restart-game');
+  const toggleSoundBtn = document.getElementById('toggle-sound');
+  const shareScoreBtn = document.getElementById('share-score');
+  
+  // DOM Elementleri - Oyun Alanları
+  const welcomeScreen = document.getElementById('pattern-welcome');
+  const gameBoard = document.getElementById('pattern-game-board');
+  const gameOverScreen = document.getElementById('game-over');
+  
+  // DOM Elementleri - İstatistikler ve Göstergeler
   const scoreDisplay = document.getElementById('score');
   const timerDisplay = document.getElementById('timer');
   const levelDisplay = document.getElementById('level');
+  const comboDisplay = document.getElementById('combo');
+  const streakIndicator = document.getElementById('streak-indicator');
+  const streakCount = streakIndicator.querySelector('.streak-count');
+  
+  // DOM Elementleri - Oyun Sonu Ekranı
+  const resultTitle = document.getElementById('result-title');
   const finalScoreDisplay = document.getElementById('final-score');
   const correctAnswersDisplay = document.getElementById('correct-answers');
   const wrongAnswersDisplay = document.getElementById('wrong-answers');
-  const resultTitle = document.getElementById('result-title');
+  const maxLevelDisplay = document.getElementById('max-level');
   const achievementSection = document.getElementById('achievement-section');
+  const ratingStars = document.getElementById('rating-stars');
+  const ratingText = document.getElementById('rating-text');
+  
+  // DOM Elementleri - Örüntü ve Seçenekler
   const patternSequence = document.getElementById('pattern-sequence');
   const optionsGrid = document.getElementById('options-grid');
-  const patternFeedback = document.getElementById('pattern-feedback');
-  const patternWelcome = document.getElementById('pattern-welcome');
-  const patternArea = document.getElementById('pattern-area');
-  const patternOptions = document.getElementById('pattern-options');
-  const gameOver = document.getElementById('game-over');
+  const feedbackArea = document.getElementById('feedback-area');
+  const currentPatternTypeDisplay = document.getElementById('current-pattern-type');
+  const currentDifficultyDisplay = document.getElementById('current-difficulty');
+  const notificationsContainer = document.getElementById('notifications-container');
   
-  // Mod ve zorluk seçimi için butonlar
-  const modeButtons = document.querySelectorAll('.mode-btn');
-  const levelButtons = document.querySelectorAll('.level-btn');
+  // Mod ve Zorluk Seçimi Butonları
+  const patternTypeButtons = document.querySelectorAll('.pattern-type-btn');
+  const difficultyButtons = document.querySelectorAll('.difficulty-btn');
   
-  // Ses efektleri
+  // Ses Efektleri
   const sounds = {
     correct: new Audio('/static/sounds/correct.mp3'),
     wrong: new Audio('/static/sounds/wrong.mp3'),
     levelUp: new Audio('/static/sounds/level-up.mp3'),
+    click: new Audio('/static/sounds/click.mp3'),
     gameOver: new Audio('/static/sounds/game-over.mp3'),
-    tick: new Audio('/static/sounds/tick.mp3'),
-    achievement: new Audio('/static/sounds/achievement.mp3')
+    achievement: new Audio('/static/sounds/achievement.mp3'),
+    combo: new Audio('/static/sounds/combo.mp3'),
+    hint: new Audio('/static/sounds/hint.mp3'),
+    tick: new Audio('/static/sounds/tick.mp3')
   };
   
-  // Oyun değişkenleri
-  let isGameActive = false;
-  let score = 0;
-  let level = 1;
-  let timeRemaining = 120;
-  let timerInterval;
-  let currentPattern = [];
-  let correctAnswer = null;
-  let consecutiveCorrect = 0;
-  let comboMultiplier = 1;
-  let correctAnswersCount = 0;
-  let wrongAnswersCount = 0;
-  let patternLength = 4;
+  // Tüm ses efektlerini yükle
+  for (const sound in sounds) {
+    sounds[sound].load();
+    sounds[sound].volume = 0.7;
+  }
   
-  // Oyun ayarları
-  let currentDifficulty = 'easy';
-  let currentMode = 'symbols';
-  let difficultySettings = {
-    easy: { baseTime: 120, patternBaseLength: 3, optionsCount: 4, scoreMultiplier: 1 },
-    medium: { baseTime: 100, patternBaseLength: 4, optionsCount: 5, scoreMultiplier: 1.5 },
-    hard: { baseTime: 80, patternBaseLength: 5, optionsCount: 6, scoreMultiplier: 2 }
+  // Oyun Durumu
+  let gameState = {
+    isActive: false,
+    isPaused: false,
+    isSoundEnabled: true,
+    score: 0,
+    level: 1,
+    maxLevel: 1,
+    timeRemaining: 120,
+    timerInterval: null,
+    currentPattern: [],
+    selectedPatternType: 'symbols',
+    selectedDifficulty: 'easy',
+    correctAnswer: null,
+    correctAnswers: 0,
+    wrongAnswers: 0,
+    streak: 0,
+    maxStreak: 0,
+    comboMultiplier: 1,
+    responseTime: 0,
+    startTime: 0,
+    achievements: new Set(),
+    patternLengthBase: 4
   };
   
-  // Örüntü türleri
+  // Zorluk Seviyesi Ayarları
+  const difficultySettings = {
+    easy: { 
+      baseTime: 120, 
+      timePerLevel: 5,
+      patternLength: 4, 
+      optionsCount: 4, 
+      scoreMultiplier: 1.0,
+      name: 'Kolay'
+    },
+    medium: { 
+      baseTime: 100, 
+      timePerLevel: 4,
+      patternLength: 5, 
+      optionsCount: 5, 
+      scoreMultiplier: 1.5,
+      name: 'Orta'
+    },
+    hard: { 
+      baseTime: 80, 
+      timePerLevel: 3,
+      patternLength: 6, 
+      optionsCount: 6, 
+      scoreMultiplier: 2.0,
+      name: 'Zor'
+    }
+  };
+  
+  // Örüntü Türleri
   const patternTypes = {
     symbols: {
       name: 'Semboller',
       icon: 'shapes',
-      values: ['▲', '■', '●', '◆', '★', '♦', '♥', '♠', '♣', '⬟', '◐', '◧']
+      values: ['▲', '■', '●', '◆', '★', '♦', '♥', '♠', '♣', '⬟', '◐', '◧'],
+      colorClass: 'pattern-symbols'
     },
     numbers: {
       name: 'Sayılar',
       icon: 'sort-numeric-up',
-      values: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+      values: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+      colorClass: 'pattern-numbers'
     },
     colors: {
       name: 'Renkler',
       icon: 'palette',
-      values: ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'brown', 'gray', 'teal']
+      values: ['#FF5252', '#FF7043', '#FFCA28', '#66BB6A', '#42A5F5', '#5C6BC0', '#AB47BC', '#8D6E63', '#78909C', '#26A69A'],
+      displayNames: ['Kırmızı', 'Turuncu', 'Sarı', 'Yeşil', 'Mavi', 'Lacivert', 'Mor', 'Kahverengi', 'Gri', 'Turkuaz'],
+      colorClass: 'pattern-colors'
     },
     mixed: {
       name: 'Karışık',
       icon: 'random',
-      values: ['▲', '2', '●', '5', '★', '8', '♥', '0', '♣', '3', '◐', '6']
+      values: ['▲', '2', '●', '5', '★', '7', '♥', '0', '♣', '3', '◐', '8'],
+      colorClass: 'pattern-mixed'
+    }
+  };
+  
+  // Örüntü Stratejileri
+  const patternStrategies = {
+    repetition: {
+      name: 'Tekrarlı',
+      generate: createRepetitionPattern,
+      weight: { easy: 0.4, medium: 0.3, hard: 0.2 },
+      minLevel: 1
+    },
+    arithmetic: {
+      name: 'Aritmetik',
+      generate: createArithmeticPattern,
+      weight: { easy: 0.3, medium: 0.3, hard: 0.2 },
+      minLevel: 1
+    },
+    mirror: {
+      name: 'Aynalama',
+      generate: createMirrorPattern,
+      weight: { easy: 0.2, medium: 0.2, hard: 0.3 },
+      minLevel: 2
+    },
+    fibonacci: {
+      name: 'Fibonacci',
+      generate: createFibonacciPattern,
+      weight: { easy: 0.1, medium: 0.2, hard: 0.3 },
+      minLevel: 3
+    },
+    random: {
+      name: 'Rastgele',
+      generate: createRandomPattern,
+      weight: { easy: 0.1, medium: 0.1, hard: 0.1 },
+      minLevel: 1
     }
   };
   
   // Başarımlar
   const ACHIEVEMENTS = {
+    QUICK_THINKER: {
+      id: 'quick-thinker',
+      name: 'Hızlı Düşünür',
+      description: 'Bir örüntüyü 2 saniyeden az sürede çözdünüz.',
+      icon: 'bolt',
+      condition: () => gameState.responseTime < 2000
+    },
     PATTERN_MASTER: {
       id: 'pattern-master',
       name: 'Örüntü Ustası',
-      description: '10 ardışık doğru cevap verdiniz!',
-      icon: 'trophy'
+      description: '5 ardışık doğru cevap verdiniz.',
+      icon: 'brain',
+      condition: () => gameState.streak >= 5
     },
-    SPEED_DEMON: {
-      id: 'speed-demon',
-      name: 'Hız Ustası',
-      description: 'Zorlu bir örüntüyü 3 saniyeden kısa sürede çözdünüz!',
-      icon: 'bolt'
-    },
-    HIGH_SCORER: {
-      id: 'high-scorer',
-      name: 'Puan Kralı',
-      description: '500+ puan topladınız!',
-      icon: 'crown'
+    COMBO_KING: {
+      id: 'combo-king',
+      name: 'Kombo Kralı',
+      description: '3x kombo çarpanına ulaştınız.',
+      icon: 'fire',
+      condition: () => gameState.comboMultiplier >= 3
     },
     LEVEL_MASTER: {
       id: 'level-master',
       name: 'Seviye Ustası',
-      description: 'Seviye 10\'a ulaştınız!',
-      icon: 'medal'
+      description: 'Seviye 5\'e ulaştınız.',
+      icon: 'trophy',
+      condition: () => gameState.level >= 5
+    },
+    PERFECT_ROUND: {
+      id: 'perfect-round',
+      name: 'Mükemmel Tur',
+      description: 'Zorlu bir seviyeyi hiç hata yapmadan tamamladınız.',
+      icon: 'crown',
+      condition: () => gameState.level >= 3 && gameState.wrongAnswers === 0 && gameState.correctAnswers >= 10
+    },
+    HIGH_SCORER: {
+      id: 'high-scorer',
+      name: 'Puan Rekortmeni',
+      description: '500+ puan topladınız.',
+      icon: 'medal',
+      condition: () => gameState.score >= 500
     }
   };
   
-  // Olay dinleyicileri
-  startBtn.addEventListener('click', startGame);
-  restartBtn.addEventListener('click', resetGame);
+  // Olay Dinleyicileri
+  startGameBtn.addEventListener('click', toggleGame);
+  welcomeStartBtn.addEventListener('click', startGame);
+  restartGameBtn.addEventListener('click', restartGame);
+  toggleSoundBtn.addEventListener('click', toggleSound);
+  shareScoreBtn.addEventListener('click', shareScore);
   
-  // Mod seçimi
-  modeButtons.forEach(button => {
+  // Örüntü türü seçimi için olay dinleyicileri
+  patternTypeButtons.forEach(button => {
     button.addEventListener('click', function() {
-      if (isGameActive) return; // Oyun aktifse mod değiştirmeyi engelle
+      if (gameState.isActive) return; // Oyun sırasında değiştirmeyi engelle
       
-      // Aktif sınıfını güncelle
-      modeButtons.forEach(btn => btn.classList.remove('active'));
+      // UI güncelle
+      patternTypeButtons.forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
       
-      // Seçilen modu güncelle
-      currentMode = this.getAttribute('data-mode');
+      // Seçilen örüntü türünü kaydet
+      gameState.selectedPatternType = this.getAttribute('data-mode');
+      
+      // Ses çal
+      playSound('click');
     });
   });
   
-  // Zorluk seviyesi seçimi
-  levelButtons.forEach(button => {
+  // Zorluk seviyesi seçimi için olay dinleyicileri
+  difficultyButtons.forEach(button => {
     button.addEventListener('click', function() {
-      if (isGameActive) return; // Oyun aktifse zorluk değiştirmeyi engelle
+      if (gameState.isActive) return; // Oyun sırasında değiştirmeyi engelle
       
-      // Aktif sınıfını güncelle
-      levelButtons.forEach(btn => btn.classList.remove('active'));
+      // UI güncelle
+      difficultyButtons.forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
       
-      // Seçilen zorluğu güncelle
-      currentDifficulty = this.getAttribute('data-level');
+      // Seçilen zorluğu kaydet
+      gameState.selectedDifficulty = this.getAttribute('data-level');
+      
+      // Ses çal
+      playSound('click');
     });
   });
   
-  /**
-   * Oyunu başlatır
-   */
-  function startGame() {
-    // Eğer oyun zaten aktifse, durdur
-    if (isGameActive) {
-      clearInterval(timerInterval);
-      isGameActive = false;
-      startBtn.innerHTML = '<i class="fas fa-play me-2"></i>Başlat';
-      showFeedback('Oyun durduruldu', 'info');
-      return;
+  // Oyunu başlat/durdur
+  function toggleGame() {
+    if (!gameState.isActive) {
+      startGame();
+    } else {
+      pauseGame();
     }
+  }
+  
+  // Oyunu başlat
+  function startGame() {
+    // Oyun durumunu sıfırla
+    resetGameState();
     
-    // Oyun değişkenlerini sıfırla
-    score = 0;
-    level = 1;
-    correctAnswersCount = 0;
-    wrongAnswersCount = 0;
-    consecutiveCorrect = 0;
-    comboMultiplier = 1;
+    // UI güncelle
+    updateUI();
     
-    // Süreyi ayarla
-    timeRemaining = difficultySettings[currentDifficulty].baseTime;
+    // Ekranları ayarla
+    welcomeScreen.classList.remove('active');
+    gameBoard.style.display = 'flex';
+    gameOverScreen.style.display = 'none';
     
-    // UI'ı güncelle
-    updateScoreDisplay();
-    updateLevelDisplay();
-    updateTimerDisplay();
+    // Başlat butonunu güncelle
+    startGameBtn.innerHTML = `
+      <span class="button-icon"><i class="fas fa-pause"></i></span>
+      <span class="button-text">Duraklat</span>
+    `;
     
-    // Hoş geldiniz ekranını gizle, oyun alanını göster
-    patternWelcome.classList.remove('active');
-    patternArea.style.display = 'flex';
-    gameOver.style.display = 'none';
-    
-    // Oyunu aktif et
-    isGameActive = true;
-    startBtn.innerHTML = '<i class="fas fa-pause me-2"></i>Durdur';
+    // Mevcut örüntü türü ve zorluk bilgilerini göster
+    updateGameTypeDisplay();
     
     // İlk örüntüyü oluştur
     generatePattern();
     
     // Zamanlayıcıyı başlat
-    timerInterval = setInterval(updateTimer, 1000);
+    gameState.timerInterval = setInterval(updateTimer, 1000);
     
-    // Yükleme animasyonu efekti
-    startBtn.classList.add('loading');
+    // Yükleme animasyonu
+    startGameBtn.classList.add('loading');
     setTimeout(() => {
-      startBtn.classList.remove('loading');
-    }, 300);
+      startGameBtn.classList.remove('loading');
+    }, 400);
     
-    // Başlangıç mesajı
-    showFeedback('Oyun başladı! İyi şanslar!', 'info');
+    // Ses çal
+    playSound('click');
+    
+    // Başlangıç bildirimi
+    showNotification('Oyun başladı! Örüntüleri çözün.', 'info');
   }
   
-  /**
-   * Zamanlayıcıyı günceller
-   */
+  // Oyunu duraklat
+  function pauseGame() {
+    if (!gameState.isActive) return;
+    
+    gameState.isPaused = !gameState.isPaused;
+    
+    if (gameState.isPaused) {
+      // Zamanlayıcıyı durdur
+      clearInterval(gameState.timerInterval);
+      
+      // Buton metnini güncelle
+      startGameBtn.innerHTML = `
+        <span class="button-icon"><i class="fas fa-play"></i></span>
+        <span class="button-text">Devam Et</span>
+      `;
+      
+      // Oyun alanına duraklatma katmanı ekle
+      const pauseOverlay = document.createElement('div');
+      pauseOverlay.className = 'pause-overlay';
+      pauseOverlay.innerHTML = `
+        <div class="pause-content">
+          <div class="pause-icon"><i class="fas fa-pause"></i></div>
+          <h3>Oyun Duraklatıldı</h3>
+          <p>Devam etmek için "Devam Et" düğmesine tıklayın</p>
+        </div>
+      `;
+      gameBoard.appendChild(pauseOverlay);
+      
+      // Bildiri göster
+      showNotification('Oyun duraklatıldı', 'info');
+    } else {
+      // Zamanlayıcıyı tekrar başlat
+      gameState.timerInterval = setInterval(updateTimer, 1000);
+      
+      // Buton metnini güncelle
+      startGameBtn.innerHTML = `
+        <span class="button-icon"><i class="fas fa-pause"></i></span>
+        <span class="button-text">Duraklat</span>
+      `;
+      
+      // Duraklatma katmanını kaldır
+      const pauseOverlay = document.querySelector('.pause-overlay');
+      if (pauseOverlay) {
+        gameBoard.removeChild(pauseOverlay);
+      }
+      
+      // Bildiri göster
+      showNotification('Oyun devam ediyor', 'info');
+    }
+    
+    // Ses çal
+    playSound('click');
+  }
+  
+  // Oyunu yeniden başlat
+  function restartGame() {
+    // Oyun durumunu sıfırla
+    resetGameState();
+    
+    // Ekranları ayarla
+    gameOverScreen.style.display = 'none';
+    welcomeScreen.classList.add('active');
+    
+    // Ses çal
+    playSound('click');
+  }
+  
+  // Ses açma/kapama
+  function toggleSound() {
+    gameState.isSoundEnabled = !gameState.isSoundEnabled;
+    
+    // Buton durumunu güncelle
+    if (gameState.isSoundEnabled) {
+      toggleSoundBtn.classList.add('active');
+      toggleSoundBtn.innerHTML = '<span class="button-icon"><i class="fas fa-volume-up"></i></span>';
+      showNotification('Ses açıldı', 'info');
+    } else {
+      toggleSoundBtn.classList.remove('active');
+      toggleSoundBtn.innerHTML = '<span class="button-icon"><i class="fas fa-volume-mute"></i></span>';
+      showNotification('Ses kapatıldı', 'info');
+    }
+    
+    // İlk sese erişimi engelle, sadece durum bilgisini güncelle
+    if (gameState.isActive) {
+      playSound('click');
+    }
+  }
+  
+  // Skoru paylaş
+  function shareScore() {
+    const scoreText = `Örüntü Tanıma oyununda ${gameState.score} puan topladım! Seviye ${gameState.maxLevel}'e ulaştım. ${gameState.correctAnswers} doğru, ${gameState.wrongAnswers} yanlış cevap verdim.`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Örüntü Tanıma Oyunu Skorum',
+        text: scoreText
+      }).then(() => {
+        showNotification('Skor başarıyla paylaşıldı!', 'success');
+      }).catch(err => {
+        copyToClipboard(scoreText);
+      });
+    } else {
+      copyToClipboard(scoreText);
+    }
+    
+    // Ses çal
+    playSound('click');
+  }
+  
+  // Panoya kopyalama yardımcı fonksiyonu
+  function copyToClipboard(text) {
+    try {
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification('Skor panoya kopyalandı!', 'success');
+      }).catch(() => {
+        showNotification('Kopyalama işlemi başarısız oldu.', 'error');
+      });
+    } catch (err) {
+      showNotification('Kopyalama işlemi başarısız oldu.', 'error');
+    }
+  }
+  
+  // Oyun durumunu sıfırlama
+  function resetGameState() {
+    // Oyun ayarlarını başlangıç değerlerine sıfırla
+    gameState.isActive = true;
+    gameState.isPaused = false;
+    gameState.score = 0;
+    gameState.level = 1;
+    gameState.maxLevel = 1;
+    gameState.correctAnswers = 0;
+    gameState.wrongAnswers = 0;
+    gameState.streak = 0;
+    gameState.maxStreak = 0;
+    gameState.comboMultiplier = 1;
+    gameState.timeRemaining = difficultySettings[gameState.selectedDifficulty].baseTime;
+    gameState.patternLengthBase = difficultySettings[gameState.selectedDifficulty].patternLength;
+    
+    // Zamanlayıcıyı temizle
+    if (gameState.timerInterval) {
+      clearInterval(gameState.timerInterval);
+      gameState.timerInterval = null;
+    }
+    
+    // Başarımları sıfırla
+    gameState.achievements = new Set();
+    
+    // UI'yı güncelle
+    updateUI();
+  }
+  
+  // Zamanlayıcıyı güncelle
   function updateTimer() {
-    // Zamanı azalt
-    timeRemaining--;
+    if (gameState.isPaused) return;
+    
+    gameState.timeRemaining--;
+    
+    // Zamanı güncelle
     updateTimerDisplay();
     
     // Son 10 saniye için uyarı
-    if (timeRemaining <= 10) {
-      timerDisplay.classList.add('text-danger', 'pulse');
+    if (gameState.timeRemaining <= 10) {
+      timerDisplay.classList.add('warning');
       
       // Tik sesi
-      playSound('tick');
+      if (gameState.timeRemaining > 0) {
+        playSound('tick');
+      }
     }
     
-    // Süre bitti mi kontrol et
-    if (timeRemaining <= 0) {
+    // Süre doldu mu kontrol et
+    if (gameState.timeRemaining <= 0) {
       endGame(false);
     }
   }
   
-  /**
-   * Görüntüleme fonksiyonları
-   */
-  function updateScoreDisplay() {
-    scoreDisplay.textContent = score;
-  }
-  
-  function updateLevelDisplay() {
-    levelDisplay.textContent = level;
-  }
-  
-  function updateTimerDisplay() {
-    timerDisplay.textContent = timeRemaining;
-  }
-  
-  /**
-   * Bir örüntü oluşturur
-   */
+  // Bir örüntü oluştur
   function generatePattern() {
     // Örüntü dizisini temizle
     patternSequence.innerHTML = '';
-    currentPattern = [];
+    gameState.currentPattern = [];
     
-    // Örüntü uzunluğunu hesapla
-    patternLength = difficultySettings[currentDifficulty].patternBaseLength + Math.floor(level / 3);
-    if (patternLength > 8) patternLength = 8; // Maksimum 8 eleman
+    // Mevcut örüntü türüne ait değerleri al
+    const patternValues = patternTypes[gameState.selectedPatternType].values;
     
-    // Mevcut moda göre değerleri al
-    const patternValues = patternTypes[currentMode].values;
+    // Zamanı kaydet (cevap verme süresini ölçmek için)
+    gameState.startTime = Date.now();
     
-    // Zorluk ve seviyeye göre örüntü oluşturma stratejisini belirle
-    const patternStrategy = determinePatternStrategy();
+    // Örüntü uzunluğunu hesapla (seviye arttıkça artar)
+    const baseLength = gameState.patternLengthBase;
+    const additionalLength = Math.min(Math.floor(gameState.level / 3), 3);
+    const patternLength = baseLength + additionalLength;
+    
+    // Örüntü oluşturma stratejisini seç
+    const strategy = selectPatternStrategy();
     
     // Seçilen stratejiye göre örüntü oluştur
-    switch (patternStrategy) {
-      case 'repetition':
-        createRepetitionPattern(patternValues);
-        break;
-      case 'arithmetic':
-        createArithmeticPattern(patternValues);
-        break;
-      case 'fibonacci':
-        createFibonacciPattern(patternValues);
-        break;
-      case 'mirror':
-        createMirrorPattern(patternValues);
-        break;
-      default:
-        createRandomPattern(patternValues);
-    }
+    patternStrategies[strategy].generate(patternValues, patternLength);
     
     // Doğru cevabı belirle
-    correctAnswer = determineNextInSequence(currentPattern, patternValues);
+    gameState.correctAnswer = calculateNextInSequence(patternValues);
     
     // Örüntüyü görsel olarak göster
     displayPattern();
     
-    // Seçenekleri göster
-    createOptions(patternValues, correctAnswer);
+    // Seçenekleri oluştur
+    createOptions(patternValues);
   }
   
-  /**
-   * Örüntü stratejisini belirler
-   */
-  function determinePatternStrategy() {
-    const strategies = ['repetition', 'arithmetic', 'random'];
+  // Seviye ve zorluğa göre strateji seçimi
+  function selectPatternStrategy() {
+    // Kullanılabilir stratejileri filtrele (seviyeye göre)
+    const availableStrategies = Object.keys(patternStrategies).filter(
+      strategy => gameState.level >= patternStrategies[strategy].minLevel
+    );
     
-    // Seviye ilerledikçe daha karmaşık stratejiler ekle
-    if (level >= 3) {
-      strategies.push('mirror');
-    }
+    // Ağırlıklı seçim yap
+    const totalWeight = availableStrategies.reduce((sum, strategy) => {
+      return sum + (patternStrategies[strategy].weight[gameState.selectedDifficulty] || 0);
+    }, 0);
     
-    if (level >= 5 && (currentMode === 'numbers' || currentMode === 'mixed')) {
-      strategies.push('fibonacci');
-    }
+    let random = Math.random() * totalWeight;
+    let currentWeight = 0;
     
-    // Zorluk arttıkça karmaşık stratejilerin ağırlığını artır
-    let weights = {
-      easy: { repetition: 0.4, arithmetic: 0.3, mirror: 0.2, fibonacci: 0.1, random: 0.2 },
-      medium: { repetition: 0.3, arithmetic: 0.3, mirror: 0.2, fibonacci: 0.2, random: 0.2 },
-      hard: { repetition: 0.2, arithmetic: 0.2, mirror: 0.3, fibonacci: 0.3, random: 0.2 }
-    };
-    
-    // Ağırlıklı rastgele seçim yap
-    const rand = Math.random();
-    let cumulativeWeight = 0;
-    
-    for (const strategy of strategies) {
-      cumulativeWeight += weights[currentDifficulty][strategy] || 0;
-      if (rand <= cumulativeWeight) {
+    for (const strategy of availableStrategies) {
+      currentWeight += patternStrategies[strategy].weight[gameState.selectedDifficulty] || 0;
+      if (random <= currentWeight) {
         return strategy;
       }
     }
     
+    // Varsayılan olarak rastgele strateji döndür
     return 'random';
   }
   
-  /**
-   * Tekrarlayan örüntü oluşturur
-   */
-  function createRepetitionPattern(values) {
-    // Tekrar sayısı (2-4 arası)
-    const repeatCount = Math.min(Math.floor(patternLength / 2), 4);
+  // Tekrarlayan örüntü oluştur
+  function createRepetitionPattern(values, length) {
+    // Tekrar uzunluğu (2-4 arası)
+    const repeatSize = Math.min(Math.max(2, Math.floor(length / 2)), 4);
     
-    // Tekrarlanacak elemanları seç
-    const patternBase = [];
-    for (let i = 0; i < repeatCount; i++) {
+    // Tekrar edilecek temel örüntüyü oluştur
+    const basePattern = [];
+    for (let i = 0; i < repeatSize; i++) {
       const randomIndex = Math.floor(Math.random() * values.length);
-      patternBase.push(values[randomIndex]);
+      basePattern.push(values[randomIndex]);
     }
     
-    // Örüntüyü oluştur
-    for (let i = 0; i < patternLength; i++) {
-      currentPattern.push(patternBase[i % repeatCount]);
+    // Örüntüyü tekrar ederek oluştur
+    for (let i = 0; i < length; i++) {
+      gameState.currentPattern.push(basePattern[i % repeatSize]);
     }
   }
   
-  /**
-   * Aritmetik örüntü oluşturur (sayılar için)
-   */
-  function createArithmeticPattern(values) {
-    if (currentMode === 'numbers') {
-      // Başlangıç değeri ve artış miktarı
+  // Aritmetik örüntü oluştur
+  function createArithmeticPattern(values, length) {
+    if (gameState.selectedPatternType === 'numbers') {
+      // Sayılar için artmalı/azalmalı sıra
       const start = Math.floor(Math.random() * 5);
       const step = Math.floor(Math.random() * 3) + 1;
       const isDecreasing = Math.random() < 0.5;
       
-      for (let i = 0; i < patternLength; i++) {
+      for (let i = 0; i < length; i++) {
         const value = isDecreasing
-          ? (start - i * step + 10) % 10  // Negatif olmasın diye
-          : (start + i * step) % 10;      // 10'u geçmesin diye
-        currentPattern.push(values[value]);
+          ? (start - i * step + 10) % 10  // Dairesel, negatif değer olmasın
+          : (start + i * step) % 10;      // Dairesel, 10'u geçmesin
+        gameState.currentPattern.push(values[value]);
       }
     } else {
-      // Renk/sembol sıralaması için
-      const step = Math.floor(Math.random() * 3) + 1;
-      const start = Math.floor(Math.random() * (values.length - patternLength * step));
+      // Semboller/renkler için artmalı sıra
+      const step = Math.floor(Math.random() * 2) + 1;
+      const start = Math.floor(Math.random() * (values.length - length * step));
       
-      for (let i = 0; i < patternLength; i++) {
+      for (let i = 0; i < length; i++) {
         const index = (start + i * step) % values.length;
-        currentPattern.push(values[index]);
+        gameState.currentPattern.push(values[index]);
       }
     }
   }
   
-  /**
-   * Fibonacci benzeri örüntü oluşturur
-   */
-  function createFibonacciPattern(values) {
-    // İlk iki değeri seç
-    const a = Math.floor(Math.random() * values.length);
-    const b = Math.floor(Math.random() * values.length);
+  // Aynalama örüntüsü oluştur
+  function createMirrorPattern(values, length) {
+    const halfLength = Math.ceil(length / 2);
     
-    currentPattern.push(values[a]);
-    currentPattern.push(values[b]);
-    
-    // Fibonacci kuralı: her eleman önceki iki elemanın toplamı
-    for (let i = 2; i < patternLength; i++) {
-      const nextIndex = (parseInt(currentPattern[i-2]) + parseInt(currentPattern[i-1])) % values.length;
-      currentPattern.push(values[nextIndex]);
-    }
-  }
-  
-  /**
-   * Aynalama örüntüsü oluşturur
-   */
-  function createMirrorPattern(values) {
-    const halfLength = Math.ceil(patternLength / 2);
-    
-    // İlk yarıyı rastgele oluştur
+    // İlk yarıyı oluştur
     for (let i = 0; i < halfLength; i++) {
       const randomIndex = Math.floor(Math.random() * values.length);
-      currentPattern.push(values[randomIndex]);
+      gameState.currentPattern.push(values[randomIndex]);
     }
     
-    // İkinci yarı: ya aynısı ya tersi (seviyeye göre)
-    const isReverse = level > 5 || Math.random() < 0.5;
+    // Aynalama yöntemini belirle
+    const isReversed = Math.random() < 0.5;
     
-    if (isReverse) {
-      // Tersi
-      for (let i = halfLength - 2; i >= 0; i--) {
-        currentPattern.push(currentPattern[i]);
+    if (isReversed) {
+      // Tersten aynala
+      for (let i = halfLength - 2; i >= 0 && gameState.currentPattern.length < length; i--) {
+        gameState.currentPattern.push(gameState.currentPattern[i]);
       }
     } else {
-      // Aynısı
-      for (let i = 0; i < halfLength - 1 && currentPattern.length < patternLength; i++) {
-        currentPattern.push(currentPattern[i]);
+      // Düz aynala
+      for (let i = 0; i < halfLength && gameState.currentPattern.length < length; i++) {
+        if (gameState.currentPattern.length < length) {
+          gameState.currentPattern.push(gameState.currentPattern[i]);
+        }
       }
     }
   }
   
-  /**
-   * Tamamen rastgele örüntü oluşturur
-   */
-  function createRandomPattern(values) {
-    for (let i = 0; i < patternLength; i++) {
-      const randomIndex = Math.floor(Math.random() * values.length);
-      currentPattern.push(values[randomIndex]);
+  // Fibonacci benzeri örüntü oluştur
+  function createFibonacciPattern(values, length) {
+    if (gameState.selectedPatternType === 'numbers' || gameState.selectedPatternType === 'mixed') {
+      // İlk iki değeri seç
+      const a = Math.floor(Math.random() * Math.min(5, values.length));
+      const b = Math.floor(Math.random() * Math.min(5, values.length));
+      
+      gameState.currentPattern.push(values[a]);
+      if (length > 1) gameState.currentPattern.push(values[b]);
+      
+      // Fibonacci kuralını uygula
+      for (let i = 2; i < length; i++) {
+        try {
+          const num1 = parseInt(gameState.currentPattern[i-2]) || 0;
+          const num2 = parseInt(gameState.currentPattern[i-1]) || 0;
+          const nextVal = (num1 + num2) % 10;
+          gameState.currentPattern.push(values[nextVal % values.length]);
+        } catch (e) {
+          // Sayı çevirme hatası durumunda rastgele değer ekle
+          const randomIndex = Math.floor(Math.random() * values.length);
+          gameState.currentPattern.push(values[randomIndex]);
+        }
+      }
+    } else {
+      // Sayı olmayan değerler için indeks tabanlı fibonacci
+      const a = Math.floor(Math.random() * values.length);
+      const b = Math.floor(Math.random() * values.length);
+      
+      gameState.currentPattern.push(values[a]);
+      if (length > 1) gameState.currentPattern.push(values[b]);
+      
+      for (let i = 2; i < length; i++) {
+        const indexA = values.indexOf(gameState.currentPattern[i-2]);
+        const indexB = values.indexOf(gameState.currentPattern[i-1]);
+        const nextIndex = (indexA + indexB) % values.length;
+        gameState.currentPattern.push(values[nextIndex]);
+      }
     }
   }
   
-  /**
-   * Oluşturulan örüntüyü ekranda gösterir
-   */
+  // Rastgele örüntü oluştur
+  function createRandomPattern(values, length) {
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * values.length);
+      gameState.currentPattern.push(values[randomIndex]);
+    }
+  }
+  
+  // Örüntüyü ekranda görüntüle
   function displayPattern() {
     patternSequence.innerHTML = '';
+    patternSequence.className = `pattern-sequence ${patternTypes[gameState.selectedPatternType].colorClass}`;
     
-    // Her örüntü elemanı için bir kutu oluştur
-    currentPattern.forEach((item, index) => {
+    // Animasyon gecikmesi
+    const animationDelay = 100;
+    
+    // Her örüntü elemanını göster
+    gameState.currentPattern.forEach((item, index) => {
       const patternItem = document.createElement('div');
       patternItem.className = 'pattern-item';
       
-      // Renk modu için arka plan rengi ayarla
-      if (currentMode === 'colors') {
+      if (gameState.selectedPatternType === 'colors') {
         patternItem.style.backgroundColor = item;
+        patternItem.setAttribute('data-color', patternTypes.colors.displayNames[patternTypes.colors.values.indexOf(item)] || '');
       } else {
         patternItem.textContent = item;
       }
       
-      // Animasyon için biraz gecikme
+      // Görünüm animasyonu
+      setTimeout(() => {
+        patternItem.classList.add('visible');
+      }, index * animationDelay);
+      
+      // Vurgu animasyonu
       setTimeout(() => {
         patternItem.classList.add('highlight');
         setTimeout(() => {
           patternItem.classList.remove('highlight');
         }, 300);
-      }, index * 200);
+      }, index * animationDelay + 200);
       
       patternSequence.appendChild(patternItem);
     });
   }
   
-  /**
-   * Seçenekleri oluşturur
-   */
-  function createOptions(values, correctValue) {
+  // Seçenekleri oluştur
+  function createOptions(values) {
     optionsGrid.innerHTML = '';
-    patternOptions.style.display = 'flex';
     
-    // Kaç seçenek olacağını belirle
-    const optionsCount = difficultySettings[currentDifficulty].optionsCount;
+    // Zorluk seviyesine göre seçenek sayısını belirle
+    const optionsCount = difficultySettings[gameState.selectedDifficulty].optionsCount;
     
-    // Seçenekleri oluştur
-    const options = [correctValue];
+    // Doğru cevabı içeren seçenekler listesi
+    const options = [gameState.correctAnswer];
     
     // Diğer yanlış seçenekleri ekle
     while (options.length < optionsCount) {
@@ -483,413 +740,639 @@ document.addEventListener('DOMContentLoaded', function() {
     // Seçenekleri karıştır
     shuffleArray(options);
     
-    // Seçenekleri ekrana yerleştir
+    // Seçenek sayısına göre ızgara sütun sayısını ayarla
+    optionsGrid.style.gridTemplateColumns = `repeat(${Math.min(4, optionsCount)}, 1fr)`;
+    
+    // Seçenekleri ekrana ekle
     options.forEach((option, index) => {
-      const optionItem = document.createElement('div');
-      optionItem.className = 'option-item';
+      const optionButton = document.createElement('button');
+      optionButton.className = 'option-button';
+      optionButton.classList.add(patternTypes[gameState.selectedPatternType].colorClass);
       
-      // Renk modu için arka plan rengi ayarla
-      if (currentMode === 'colors') {
-        optionItem.style.backgroundColor = option;
+      if (gameState.selectedPatternType === 'colors') {
+        optionButton.style.backgroundColor = option;
+        optionButton.setAttribute('data-color', patternTypes.colors.displayNames[patternTypes.colors.values.indexOf(option)] || '');
       } else {
-        optionItem.textContent = option;
+        optionButton.textContent = option;
       }
       
-      // Tıklama olayını ekle
-      optionItem.addEventListener('click', () => selectOption(optionItem, option));
+      // Tıklama olayı
+      optionButton.addEventListener('click', () => {
+        if (gameState.isPaused) return;
+        checkAnswer(optionButton, option);
+      });
       
-      // Animasyon için biraz gecikme ekle
+      // Animasyonlu görünüm
       setTimeout(() => {
-        optionItem.style.opacity = '1';
-        optionItem.style.transform = 'translateY(0)';
+        optionButton.classList.add('visible');
       }, index * 50);
       
-      optionsGrid.appendChild(optionItem);
+      optionsGrid.appendChild(optionButton);
     });
   }
   
-  /**
-   * Bir seçeneğin seçildiğinde çalışır
-   */
-  function selectOption(optionElement, selectedValue) {
-    // Tüm seçenekleri devre dışı bırak
-    const allOptions = document.querySelectorAll('.option-item');
+  // Kullanıcının cevabını kontrol et
+  function checkAnswer(optionButton, selectedAnswer) {
+    // Tüm seçenekleri geçici olarak devre dışı bırak
+    const allOptions = document.querySelectorAll('.option-button');
     allOptions.forEach(option => {
-      option.style.pointerEvents = 'none';
+      option.disabled = true;
     });
     
-    // Seçimi doğrula
-    const isCorrect = selectedValue === correctAnswer;
+    // Cevap süresini hesapla
+    gameState.responseTime = Date.now() - gameState.startTime;
     
-    // Doğru/yanlış sınıflarını ekle
+    // Cevabı kontrol et
+    const isCorrect = selectedAnswer === gameState.correctAnswer;
+    
     if (isCorrect) {
-      optionElement.classList.add('correct');
-      correctAnswersCount++;
-      consecutiveCorrect++;
+      // Doğru cevap
+      optionButton.classList.add('correct');
+      gameState.correctAnswers++;
+      gameState.streak++;
+      gameState.maxStreak = Math.max(gameState.maxStreak, gameState.streak);
       
-      // Combo çarpanını güncelle
-      if (consecutiveCorrect >= 3) {
-        comboMultiplier = Math.min(comboMultiplier + 0.5, 3);
+      // Kombo çarpanını güncelle
+      updateComboMultiplier();
+      
+      // Puan hesapla
+      const basePoints = 10 * difficultySettings[gameState.selectedDifficulty].scoreMultiplier;
+      const timeBonus = calculateTimeBonus();
+      const comboBonus = calculateComboBonus(basePoints);
+      const levelBonus = Math.max(1, gameState.level * 0.1);
+      const totalPoints = Math.floor((basePoints + timeBonus + comboBonus) * levelBonus);
+      
+      // Puanı ekle
+      gameState.score += totalPoints;
+      
+      // Ses çal
+      if (gameState.comboMultiplier >= 2) {
+        playSound('combo');
+      } else {
+        playSound('correct');
       }
       
       // Başarımları kontrol et
-      if (consecutiveCorrect >= 10) {
-        addAchievement(ACHIEVEMENTS.PATTERN_MASTER);
-      }
+      checkAchievements();
       
-      // Puanı hesapla ve ekle
-      const basePoints = 10 * difficultySettings[currentDifficulty].scoreMultiplier;
-      const levelBonus = level * 2;
-      const timeBonus = timeRemaining < 5 ? 20 : 0; // Hızlı cevap bonusu
-      const earnedPoints = Math.floor((basePoints + levelBonus) * comboMultiplier);
+      // Bildirimi göster
+      showAnswerFeedback(true, totalPoints);
       
-      // Puan ekle
-      score += earnedPoints;
-      updateScoreDisplay();
+      // Seri göstergesini güncelle
+      updateStreakIndicator();
       
-      // Ses efekti
-      playSound('correct');
+      // Yeni seviye kontrolü
+      checkLevelUp();
       
-      // Geri bildirim göster
-      if (comboMultiplier > 1) {
-        showFeedback(`Doğru! +${earnedPoints} puan (${comboMultiplier.toFixed(1)}x combo)`, 'success');
-      } else {
-        showFeedback(`Doğru! +${earnedPoints} puan`, 'success');
-      }
+      // UI'yı güncelle
+      updateUI();
       
-      // Hız başarımı için kontrol
-      if (timeBonus > 0) {
-        addAchievement(ACHIEVEMENTS.SPEED_DEMON);
-      }
-      
-      // Yüksek skor başarımı
-      if (score >= 500) {
-        addAchievement(ACHIEVEMENTS.HIGH_SCORER);
-      }
-      
-      // Seviye atladı mı kontrol et
-      if (score >= level * 100) {
-        levelUp();
-      }
+      // Kısa bir süre bekle ve yeni örüntüye geç
+      setTimeout(() => {
+        if (gameState.isActive && !gameState.isPaused) {
+          generatePattern();
+        }
+      }, 1200);
     } else {
       // Yanlış cevap
-      optionElement.classList.add('wrong');
-      wrongAnswersCount++;
-      consecutiveCorrect = 0;
-      comboMultiplier = 1;
+      optionButton.classList.add('wrong');
+      gameState.wrongAnswers++;
+      gameState.streak = 0;
+      gameState.comboMultiplier = 1;
       
       // Doğru cevabı göster
       allOptions.forEach(option => {
-        if ((currentMode === 'colors' && option.style.backgroundColor === correctAnswer) ||
-            (currentMode !== 'colors' && option.textContent === correctAnswer)) {
+        const optionValue = gameState.selectedPatternType === 'colors'
+          ? option.style.backgroundColor
+          : option.textContent;
+          
+        if (optionValue === gameState.correctAnswer) {
           option.classList.add('correct');
         }
       });
       
-      // Ses efekti
+      // Ses çal
       playSound('wrong');
       
-      // Geri bildirim göster
-      showFeedback(`Yanlış! Doğru cevap: ${currentMode === 'colors' ? correctAnswer.toUpperCase() : correctAnswer}`, 'error');
+      // Bildirimi göster
+      showAnswerFeedback(false);
+      
+      // Seri göstergesini güncelle
+      updateStreakIndicator();
+      
+      // UI'yı güncelle
+      updateUI();
+      
+      // Daha uzun bir süre bekle ve yeni örüntüye geç
+      setTimeout(() => {
+        if (gameState.isActive && !gameState.isPaused) {
+          generatePattern();
+        }
+      }, 2000);
     }
-    
-    // Kısa gecikme sonra sonraki soruya geç
-    setTimeout(() => {
-      if (isGameActive) {
-        generatePattern();
-      }
-    }, 1500);
   }
   
-  /**
-   * Seviye atlamayı yönetir
-   */
-  function levelUp() {
-    level++;
-    updateLevelDisplay();
+  // Bir sonraki elemanı hesapla (örüntü analizi)
+  function calculateNextInSequence(values) {
+    const pattern = gameState.currentPattern;
+    const len = pattern.length;
     
-    // Seviye başarımı
-    if (level >= 10) {
-      addAchievement(ACHIEVEMENTS.LEVEL_MASTER);
-    }
-    
-    // Ekstra süre ekle (zorluk seviyesine göre)
-    const timeBonus = Math.max(10 - Math.floor(level / 2), 3);
-    timeRemaining += timeBonus;
-    updateTimerDisplay();
-    
-    // Ses efekti
-    playSound('levelUp');
-    
-    // Geri bildirim
-    showFeedback(`Seviye ${level}'e yükseldiniz! +${timeBonus} saniye eklendi.`, 'info');
-  }
-  
-  /**
-   * Dizideki bir sonraki elemanı tahmin eder
-   */
-  function determineNextInSequence(pattern, values) {
-    // Desen analizi yaparak bir sonraki elemanı tahmin et
-    
-    // Tekrarlanan desen kontrolü
-    if (pattern.length >= 4) {
-      for (let repeat = 2; repeat <= Math.floor(pattern.length / 2); repeat++) {
-        let isRepeating = true;
-        for (let i = 0; i < repeat; i++) {
-          if (pattern[pattern.length - repeat - i] !== pattern[pattern.length - i - 1]) {
-            isRepeating = false;
-            break;
-          }
-        }
-        if (isRepeating) {
-          return pattern[pattern.length - repeat];
-        }
-      }
-    }
-    
-    // Fibonacci tarzı desenler için
-    if (currentMode === 'numbers' && pattern.length >= 3) {
-      let isFibonacciLike = true;
-      for (let i = 2; i < pattern.length; i++) {
-        const a = parseInt(pattern[i-2]) || 0;
-        const b = parseInt(pattern[i-1]) || 0;
-        const c = parseInt(pattern[i]) || 0;
-        
-        if ((a + b) % 10 !== c) {
-          isFibonacciLike = false;
+    // 1. Tekrarlayan örüntüler
+    for (let repeatLen = 1; repeatLen <= Math.floor(len / 2); repeatLen++) {
+      let isRepeating = true;
+      
+      for (let i = 0; i < repeatLen && i + repeatLen < len; i++) {
+        if (pattern[len - repeatLen + i] !== pattern[i]) {
+          isRepeating = false;
           break;
         }
       }
       
-      if (isFibonacciLike) {
-        const a = parseInt(pattern[pattern.length - 2]) || 0;
-        const b = parseInt(pattern[pattern.length - 1]) || 0;
-        return ((a + b) % 10).toString();
+      if (isRepeating) {
+        return pattern[len % repeatLen];
       }
     }
     
-    // Aritmetik desen kontrolü (sayılar için)
-    if (currentMode === 'numbers' && pattern.length >= 3) {
-      const diffs = [];
-      let isArithmetic = true;
-      
-      for (let i = 1; i < pattern.length; i++) {
-        const diff = (parseInt(pattern[i]) - parseInt(pattern[i-1]) + 10) % 10;
-        diffs.push(diff);
-      }
-      
-      for (let i = 1; i < diffs.length; i++) {
-        if (diffs[i] !== diffs[0]) {
-          isArithmetic = false;
-          break;
-        }
-      }
-      
-      if (isArithmetic) {
-        const nextVal = (parseInt(pattern[pattern.length - 1]) + diffs[0]) % 10;
-        return nextVal.toString();
+    // 2. Aritmetik/artış-azalış örüntüleri (sayılar için)
+    if (gameState.selectedPatternType === 'numbers' && len >= 2) {
+      try {
+        const lastNum = parseInt(pattern[len - 1]);
+        const prevNum = parseInt(pattern[len - 2]);
+        const diff = (lastNum - prevNum + 10) % 10; // Negatif olmasın diye
+        const nextNum = (lastNum + diff) % 10;
+        return values[nextNum];
+      } catch (e) {
+        // Çevirme hatası durumunda devam et
       }
     }
     
-    // Aynalanmış desen kontrolü
-    if (pattern.length >= 5) {
-      const mid = Math.floor(pattern.length / 2);
+    // 3. Fibonacci benzeri örüntüler
+    if ((gameState.selectedPatternType === 'numbers' || gameState.selectedPatternType === 'mixed') && len >= 2) {
+      try {
+        const a = parseInt(pattern[len - 2]) || 0;
+        const b = parseInt(pattern[len - 1]) || 0;
+        const next = (a + b) % 10;
+        return values[next % values.length];
+      } catch (e) {
+        // Çevirme hatası durumunda devam et
+      }
+    }
+    
+    // 4. Aynalama örüntüleri
+    const halfLen = Math.floor(len / 2);
+    if (len >= 3) {
+      // Aynalama kontrolü
       let isMirrored = true;
-      
-      for (let i = 0; i < mid; i++) {
-        if (pattern[i] !== pattern[pattern.length - 1 - i]) {
+      for (let i = 0; i < halfLen; i++) {
+        if (pattern[i] !== pattern[len - 1 - i]) {
           isMirrored = false;
           break;
         }
       }
       
       if (isMirrored) {
-        return pattern[0]; // Deseni baştan başlat
+        return pattern[halfLen];
       }
     }
     
-    // Varsayılan: son elemanı tekrarla veya rastgele bir eleman seç
-    if (Math.random() < 0.7) {
-      return pattern[pattern.length - 1];
+    // 5. İndeks tabanlı örüntüler (renkler/semboller için)
+    if (len >= 3 && gameState.selectedPatternType !== 'numbers') {
+      const indices = [];
+      
+      // İndeksleri hesapla
+      for (let i = 0; i < len; i++) {
+        indices.push(values.indexOf(pattern[i]));
+      }
+      
+      // Aritmetik artış/azalış kontrolü
+      let isArithmetic = true;
+      const diff = (indices[1] - indices[0] + values.length) % values.length;
+      
+      for (let i = 2; i < indices.length; i++) {
+        if ((indices[i] - indices[i-1] + values.length) % values.length !== diff) {
+          isArithmetic = false;
+          break;
+        }
+      }
+      
+      if (isArithmetic) {
+        const nextIndex = (indices[len-1] + diff) % values.length;
+        return values[nextIndex];
+      }
+    }
+    
+    // Son çare: Genel örüntü kuralı belirlenemediğinden, ilk elemanı döndür
+    return pattern[0];
+  }
+  
+  // Kombo çarpanını güncelle
+  function updateComboMultiplier() {
+    // Artan streak'e göre kombo çarpanını güncelle
+    if (gameState.streak >= 10) {
+      gameState.comboMultiplier = 3.0;
+    } else if (gameState.streak >= 7) {
+      gameState.comboMultiplier = 2.5;
+    } else if (gameState.streak >= 5) {
+      gameState.comboMultiplier = 2.0;
+    } else if (gameState.streak >= 3) {
+      gameState.comboMultiplier = 1.5;
     } else {
-      return values[Math.floor(Math.random() * values.length)];
+      gameState.comboMultiplier = 1.0;
+    }
+    
+    // Kombo göstergesini güncelle
+    comboDisplay.textContent = `x${gameState.comboMultiplier.toFixed(1)}`;
+    
+    // Kombo göstergesini vurgula
+    if (gameState.comboMultiplier > 1) {
+      comboDisplay.classList.add('highlight');
+      setTimeout(() => {
+        comboDisplay.classList.remove('highlight');
+      }, 300);
     }
   }
   
-  /**
-   * Oyunu sonlandırır
-   */
-  function endGame(isCompleted = false) {
-    // Zamanlayıcıyı durdur
-    clearInterval(timerInterval);
-    isGameActive = false;
+  // Zaman bonusu hesapla (hızlı cevaplar için)
+  function calculateTimeBonus() {
+    // Maksimum cevap süresi (3 saniye)
+    const maxResponseTime = 3000;
+    const minBonus = 0;
+    const maxBonus = 20;
     
-    // Doğru son istatistikleri göster
-    finalScoreDisplay.textContent = score;
-    correctAnswersDisplay.textContent = correctAnswersCount;
-    wrongAnswersDisplay.textContent = wrongAnswersCount;
-    
-    // Oyun sonu başlığını güncelle
-    if (isCompleted) {
-      resultTitle.textContent = "Tebrikler! Oyunu Tamamladınız!";
-      playSound('levelUp');
-    } else {
-      resultTitle.textContent = "Süre Doldu! Oyun Bitti.";
-      playSound('gameOver');
+    // Eğer yanıt süresi çok uzunsa bonus verme
+    if (gameState.responseTime >= maxResponseTime) {
+      return minBonus;
     }
     
-    // Başlat düğmesini sıfırla
-    startBtn.innerHTML = '<i class="fas fa-play me-2"></i>Başlat';
+    // Yanıt süresine göre doğrusal bir bonus hesapla
+    const timeRatio = 1 - (gameState.responseTime / maxResponseTime);
+    return Math.floor(minBonus + timeRatio * (maxBonus - minBonus));
+  }
+  
+  // Kombo bonusu hesapla
+  function calculateComboBonus(basePoints) {
+    return Math.floor(basePoints * (gameState.comboMultiplier - 1));
+  }
+  
+  // Seviye atlamalı mı kontrol et
+  function checkLevelUp() {
+    // Her 5 doğru cevapta seviye atla
+    if (gameState.correctAnswers % 5 === 0 && gameState.correctAnswers > 0) {
+      gameState.level++;
+      gameState.maxLevel = Math.max(gameState.maxLevel, gameState.level);
+      
+      // Süre bonusu ekle
+      const timeBonus = difficultySettings[gameState.selectedDifficulty].timePerLevel;
+      gameState.timeRemaining += timeBonus;
+      
+      // Seviye atlama animasyonu
+      levelDisplay.classList.add('level-up');
+      setTimeout(() => {
+        levelDisplay.classList.remove('level-up');
+      }, 1000);
+      
+      // Seviye atlama sesi
+      playSound('levelUp');
+      
+      // Seviye atlama bildirimi
+      showNotification(`Seviye ${gameState.level}'e yükseldiniz! +${timeBonus} saniye bonus.`, 'level-up');
+      
+      // UI güncelle
+      updateUI();
+    }
+  }
+  
+  // Başarımları kontrol et
+  function checkAchievements() {
+    // Tüm başarımları döngüyle kontrol et
+    for (const achievementId in ACHIEVEMENTS) {
+      const achievement = ACHIEVEMENTS[achievementId];
+      
+      // Eğer bu başarım henüz kazanılmadıysa ve koşulları sağlanıyorsa
+      if (!gameState.achievements.has(achievementId) && achievement.condition()) {
+        // Başarımı ekle
+        gameState.achievements.add(achievementId);
+        
+        // Başarım animasyonunu göster
+        showAchievement(achievement);
+        
+        // Başarım sesini çal
+        playSound('achievement');
+      }
+    }
+  }
+  
+  // Başarım bildirimi göster
+  function showAchievement(achievement) {
+    // Başarım bildirimi oluştur
+    const achievementNotification = document.createElement('div');
+    achievementNotification.className = 'achievement-notification';
+    
+    achievementNotification.innerHTML = `
+      <div class="achievement-notification-content">
+        <div class="achievement-icon">
+          <i class="fas fa-${achievement.icon}"></i>
+        </div>
+        <div class="achievement-details">
+          <div class="achievement-title">Başarım Kazanıldı!</div>
+          <div class="achievement-name">${achievement.name}</div>
+          <div class="achievement-description">${achievement.description}</div>
+        </div>
+      </div>
+    `;
+    
+    // Bildirimi ekle ve animasyonu başlat
+    notificationsContainer.appendChild(achievementNotification);
+    
+    // Görünüm animasyonu
+    setTimeout(() => {
+      achievementNotification.classList.add('show');
+    }, 100);
+    
+    // Belirli bir süre sonra kaldır
+    setTimeout(() => {
+      achievementNotification.classList.remove('show');
+      setTimeout(() => {
+        notificationsContainer.removeChild(achievementNotification);
+      }, 500);
+    }, 5000);
+    
+    // Oyun sonu ekranı için başarımı ekle
+    if (!document.querySelector(`.achievement-item[data-id="${achievement.id}"]`)) {
+      const achievementElement = document.createElement('div');
+      achievementElement.className = 'achievement-item';
+      achievementElement.dataset.id = achievement.id;
+      
+      achievementElement.innerHTML = `
+        <div class="achievement-icon">
+          <i class="fas fa-${achievement.icon}"></i>
+        </div>
+        <div class="achievement-info">
+          <div class="achievement-name">${achievement.name}</div>
+          <div class="achievement-description">${achievement.description}</div>
+        </div>
+      `;
+      
+      achievementSection.appendChild(achievementElement);
+    }
+  }
+  
+  // Cevap geri bildirimi göster
+  function showAnswerFeedback(isCorrect, points = 0) {
+    const feedbackElement = document.createElement('div');
+    feedbackElement.className = `answer-feedback ${isCorrect ? 'correct' : 'wrong'}`;
+    
+    if (isCorrect) {
+      feedbackElement.innerHTML = `
+        <div class="feedback-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="feedback-text">
+          <div class="feedback-title">Doğru!</div>
+          <div class="feedback-points">+${points} puan</div>
+        </div>
+      `;
+      
+      if (gameState.comboMultiplier > 1) {
+        feedbackElement.innerHTML += `
+          <div class="feedback-combo">
+            <div class="combo-multiplier">x${gameState.comboMultiplier.toFixed(1)}</div>
+            <div class="combo-text">Kombo!</div>
+          </div>
+        `;
+      }
+    } else {
+      feedbackElement.innerHTML = `
+        <div class="feedback-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="feedback-text">
+          <div class="feedback-title">Yanlış!</div>
+          <div class="feedback-points">Kombo sıfırlandı</div>
+        </div>
+      `;
+    }
+    
+    feedbackArea.appendChild(feedbackElement);
+    
+    // Animasyon
+    setTimeout(() => {
+      feedbackElement.classList.add('show');
+    }, 10);
+    
+    // Belirli bir süre sonra kaldır
+    setTimeout(() => {
+      feedbackElement.classList.remove('show');
+      setTimeout(() => {
+        feedbackArea.removeChild(feedbackElement);
+      }, 300);
+    }, isCorrect ? 1000 : 1800);
+  }
+  
+  // Bildirimi göster
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = message;
+    
+    notificationsContainer.appendChild(notification);
+    
+    // Animasyon
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    // Belirli bir süre sonra kaldır
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notificationsContainer.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+  }
+  
+  // Seri göstergesini güncelle
+  function updateStreakIndicator() {
+    streakCount.textContent = gameState.streak;
+    
+    // Animasyon
+    if (gameState.streak > 0) {
+      streakIndicator.classList.add('pulse');
+      setTimeout(() => {
+        streakIndicator.classList.remove('pulse');
+      }, 300);
+    }
+    
+    // Renk değiştirme
+    streakIndicator.className = 'streak-indicator';
+    if (gameState.streak >= 10) {
+      streakIndicator.classList.add('streak-max');
+    } else if (gameState.streak >= 5) {
+      streakIndicator.classList.add('streak-high');
+    } else if (gameState.streak >= 3) {
+      streakIndicator.classList.add('streak-medium');
+    }
+  }
+  
+  // Oyun türü ve zorluk bilgisini göster
+  function updateGameTypeDisplay() {
+    currentPatternTypeDisplay.textContent = patternTypes[gameState.selectedPatternType].name;
+    currentDifficultyDisplay.textContent = difficultySettings[gameState.selectedDifficulty].name;
+  }
+  
+  // Oyunu sonlandır
+  function endGame(isCompleted = false) {
+    // Oyun durumunu güncelle
+    gameState.isActive = false;
+    clearInterval(gameState.timerInterval);
+    
+    // Oyun sonu ekranını hazırla
+    finalScoreDisplay.textContent = gameState.score;
+    correctAnswersDisplay.textContent = gameState.correctAnswers;
+    wrongAnswersDisplay.textContent = gameState.wrongAnswers;
+    maxLevelDisplay.textContent = gameState.maxLevel;
+    
+    // Sonuç başlığını ayarla
+    if (isCompleted) {
+      resultTitle.textContent = 'Tebrikler!';
+    } else {
+      resultTitle.textContent = 'Süre Doldu!';
+    }
+    
+    // Performans puanını hesapla ve göster
+    const performance = calculatePerformance();
+    updatePerformanceRating(performance);
+    
+    // Oyun bitti sesini çal
+    playSound('gameOver');
     
     // Oyun alanını gizle, sonuç ekranını göster
-    patternArea.style.display = 'none';
-    patternOptions.style.display = 'none';
-    gameOver.style.display = 'flex';
+    gameBoard.style.display = 'none';
+    gameOverScreen.style.display = 'flex';
+    
+    // Başlat butonunu sıfırla
+    startGameBtn.innerHTML = `
+      <span class="button-icon"><i class="fas fa-play"></i></span>
+      <span class="button-text">Oyunu Başlat</span>
+    `;
     
     // Skoru kaydet
     saveScore();
   }
   
-  /**
-   * Oyunu sıfırlar
-   */
-  function resetGame() {
-    // Tüm oyun alanlarını sıfırla
-    score = 0;
-    level = 1;
-    timeRemaining = difficultySettings[currentDifficulty].baseTime;
-    correctAnswersCount = 0;
-    wrongAnswersCount = 0;
-    consecutiveCorrect = 0;
-    comboMultiplier = 1;
+  // Performans puanı hesapla
+  function calculatePerformance() {
+    // Toplam puan
+    let performanceScore = 0;
     
-    // UI'ı güncelle
-    updateScoreDisplay();
-    updateLevelDisplay();
-    updateTimerDisplay();
+    // Doğru/yanlış cevap oranı (maks 35 puan)
+    const totalAnswers = gameState.correctAnswers + gameState.wrongAnswers;
+    if (totalAnswers > 0) {
+      const correctRatio = gameState.correctAnswers / totalAnswers;
+      performanceScore += correctRatio * 35;
+    }
     
-    // Zamanlayıcıyı temizle
-    clearInterval(timerInterval);
+    // Seviye (maks 25 puan)
+    performanceScore += Math.min(25, gameState.maxLevel * 5);
     
-    // Sınıfları sıfırla
-    timerDisplay.classList.remove('text-danger', 'pulse');
+    // Maksimum seri (maks 20 puan)
+    performanceScore += Math.min(20, gameState.maxStreak * 2);
     
-    // Oyun alanlarını sıfırla
-    gameOver.style.display = 'none';
-    patternWelcome.classList.add('active');
-    patternArea.style.display = 'none';
-    patternOptions.style.display = 'none';
+    // Skor (maks 20 puan)
+    performanceScore += Math.min(20, gameState.score / 50);
     
-    // Başlangıç ekranını göster
-    isGameActive = false;
-    startBtn.innerHTML = '<i class="fas fa-play me-2"></i>Başlat';
-    
-    // Başarımları temizle
-    achievementSection.innerHTML = '';
-    
-    // Geri bildirim 
-    showFeedback('Oyun sıfırlandı. Başlamak için Başlat düğmesine tıklayın.', 'info');
+    // 5 yıldız üzerinden hesapla
+    return Math.min(5, Math.max(1, Math.ceil(performanceScore / 20)));
   }
   
-  /**
-   * Skoru kaydeder
-   */
+  // Performans puanını göster
+  function updatePerformanceRating(stars) {
+    // Yıldızları güncelle
+    const starElements = ratingStars.querySelectorAll('i');
+    starElements.forEach((star, index) => {
+      if (index < stars) {
+        star.className = 'fas fa-star';
+      } else {
+        star.className = 'far fa-star';
+      }
+    });
+    
+    // Derecelendirme metnini ayarla
+    const ratingLabels = {
+      1: 'Acemi',
+      2: 'Ortalama',
+      3: 'İyi',
+      4: 'Çok İyi',
+      5: 'Mükemmel!'
+    };
+    
+    ratingText.textContent = ratingLabels[stars] || 'İyi';
+  }
+  
+  // Skoru kaydet
   function saveScore() {
-    // Yeterli puan varsa skoru kaydet
-    if (score > 0) {
-      // Global skoru kaydet
-      window.saveScore('patternRecognition', score);
+    if (gameState.score > 0) {
+      window.saveScore('patternRecognition', gameState.score);
     }
   }
   
-  /**
-   * Başarım ekler
-   */
-  function addAchievement(achievement) {
-    // Başarımın zaten gösterilip gösterilmediğini kontrol et
-    if (achievementSection.querySelector(`[data-achievement="${achievement.id}"]`)) {
-      return; // Zaten gösterilmiş
-    }
-    
-    // Ses efekti
-    playSound('achievement');
-    
-    // Oyun sırasında bildirim göster
-    if (isGameActive) {
-      const feedbackMsg = `<i class="fas fa-trophy text-warning"></i> ${achievement.name} başarımını kazandınız!`;
-      showFeedback(feedbackMsg, 'success');
-    }
-    
-    // Sonuç ekranına başarımı ekle
-    const achievementItem = document.createElement('div');
-    achievementItem.className = 'achievement-item';
-    achievementItem.setAttribute('data-achievement', achievement.id);
-    
-    achievementItem.innerHTML = `
-      <div class="achievement-icon">
-        <i class="fas fa-${achievement.icon}"></i>
-      </div>
-      <div class="achievement-text">
-        <div class="achievement-title">${achievement.name}</div>
-        <div class="achievement-description">${achievement.description}</div>
-      </div>
-    `;
-    
-    achievementSection.appendChild(achievementItem);
+  // UI güncellemeleri
+  function updateUI() {
+    // İstatistikleri güncelle
+    scoreDisplay.textContent = gameState.score;
+    timerDisplay.textContent = gameState.timeRemaining;
+    levelDisplay.textContent = gameState.level;
+    comboDisplay.textContent = `x${gameState.comboMultiplier.toFixed(1)}`;
+    streakCount.textContent = gameState.streak;
   }
   
-  /**
-   * Geri bildirim mesajı gösterir
-   */
-  function showFeedback(message, type) {
-    const feedbackMsg = document.createElement('div');
-    feedbackMsg.className = `feedback-message ${type}`;
-    feedbackMsg.innerHTML = message;
+  // Zamanlayıcı göstergesini güncelle
+  function updateTimerDisplay() {
+    timerDisplay.textContent = gameState.timeRemaining;
     
-    // Önceki mesajları temizle
-    patternFeedback.innerHTML = '';
-    patternFeedback.appendChild(feedbackMsg);
-    
-    // Mesajı 3 saniye sonra kaldır
-    setTimeout(() => {
-      feedbackMsg.style.opacity = '0';
-      setTimeout(() => {
-        if (patternFeedback.contains(feedbackMsg)) {
-          patternFeedback.removeChild(feedbackMsg);
-        }
-      }, 500);
-    }, 3000);
+    // Son 10 saniyede renk değişimi
+    if (gameState.timeRemaining <= 10) {
+      timerDisplay.classList.add('warning');
+    } else {
+      timerDisplay.classList.remove('warning');
+    }
   }
   
-  /**
-   * Ses efekti çalar
-   */
+  // Ses çalma fonksiyonu
   function playSound(soundName) {
-    // Ses dosyası yoksa veya browser ses desteği yoksa hata vermeyi engelle
-    if (!sounds[soundName]) {
-      return;
-    }
+    if (!gameState.isSoundEnabled || !sounds[soundName]) return;
     
     try {
       sounds[soundName].currentTime = 0;
-      sounds[soundName].play().catch(err => {
-        // Sessizce devam et
+      sounds[soundName].play().catch(error => {
+        // Ses çalma hatalarını yok say
       });
-    } catch (err) {
-      // Sessizce devam et
+    } catch (error) {
+      // Ses çalma hatalarını yok say
     }
   }
   
-  /**
-   * Yardımcı fonksiyonlar
-   */
+  // Yardımcı fonksiyonlar
   function shuffleArray(array) {
-    // Fisher-Yates shuffle algoritması
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
-    return shuffled;
+    return newArray;
   }
+  
+  // İlk başlangıç
+  (function initialize() {
+    // Tip animasyonu için aralıklı renk değişimi
+    setInterval(() => {
+      document.querySelector('.tip-card').classList.toggle('highlight');
+    }, 5000);
+    
+    // Örüntü türü ve zorluk bilgilerini güncelle
+    updateGameTypeDisplay();
+    
+    // Karşılama ekranı buton animasyonu
+    setInterval(() => {
+      welcomeStartBtn.classList.toggle('pulse');
+    }, 1500);
+  })();
 });

@@ -5,157 +5,272 @@
   <div class="glass-panel">
     <h1 class="game-title text-center"><i class="fas fa-braille me-2"></i>Örüntü Tanıma</h1>
     
-    <!-- Ana Oyun Alanı -->
+    <!-- Ana Oyun Paneli -->
     <div class="pattern-game-wrapper">
-      <!-- Oyun Açıklaması -->
-      <div class="game-intro mb-4">
-        <p class="lead">Görüntülenen örüntüyü analiz ederek bir sonraki şekli tahmin edin. Görsel algı ve analitik düşünme becerilerinizi geliştirin.</p>
-        <div class="tips-box mt-3">
-          <i class="fas fa-lightbulb"></i> İpucu: Desenlerdeki tekrarları, artan/azalan sayıları ve örüntüleri gözlemleyin.
+      <!-- Üst Bilgi Paneli -->
+      <div class="game-info-panel">
+        <div class="game-info-wrapper">
+          <!-- Oyun Açıklaması -->
+          <div class="game-intro">
+            <p class="lead">Örüntüleri analiz ederek bir sonraki elemanı tahmin edin. Görsel algı ve analitik düşünme becerinizi geliştirin.</p>
+          </div>
+
+          <!-- İpucu kutusu -->
+          <div class="tip-card gradient-border">
+            <div class="tip-card-header">
+              <i class="fas fa-lightbulb"></i>
+              <span>İPUCU</span>
+            </div>
+            <div class="tip-card-body">
+              <p>Tekrarlayan kalıpları arayın, artan/azalan sayılara ve simetrik düzenlere dikkat edin.</p>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <!-- Mod Seçici -->
-      <div class="pattern-modes-selector mb-3">
-        <div class="level-label">Örüntü Türü</div>
-        <div class="mode-buttons">
-          <button class="mode-btn active" data-mode="symbols"><i class="fas fa-shapes"></i> Semboller</button>
-          <button class="mode-btn" data-mode="numbers"><i class="fas fa-sort-numeric-up"></i> Sayılar</button>
-          <button class="mode-btn" data-mode="colors"><i class="fas fa-palette"></i> Renkler</button>
-          <button class="mode-btn" data-mode="mixed"><i class="fas fa-random"></i> Karışık</button>
+
+      <!-- Oyun Kontrol Paneli -->
+      <div class="game-control-panel">
+        <!-- Mod ve Zorluk Seçimi -->
+        <div class="control-settings">
+          <div class="setting-group pattern-type">
+            <h3 class="setting-title"><i class="fas fa-puzzle-piece me-2"></i>Örüntü Türü</h3>
+            <div class="setting-options">
+              <button class="option-btn pattern-type-btn active" data-mode="symbols">
+                <i class="fas fa-shapes"></i>
+                <span>Semboller</span>
+              </button>
+              <button class="option-btn pattern-type-btn" data-mode="numbers">
+                <i class="fas fa-sort-numeric-up"></i>
+                <span>Sayılar</span>
+              </button>
+              <button class="option-btn pattern-type-btn" data-mode="colors">
+                <i class="fas fa-palette"></i>
+                <span>Renkler</span>
+              </button>
+              <button class="option-btn pattern-type-btn" data-mode="mixed">
+                <i class="fas fa-random"></i>
+                <span>Karışık</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="setting-group difficulty">
+            <h3 class="setting-title"><i class="fas fa-chart-line me-2"></i>Zorluk Seviyesi</h3>
+            <div class="setting-options">
+              <button class="option-btn difficulty-btn active" data-level="easy">
+                <i class="fas fa-child"></i>
+                <span>Kolay</span>
+              </button>
+              <button class="option-btn difficulty-btn" data-level="medium">
+                <i class="fas fa-user"></i>
+                <span>Orta</span>
+              </button>
+              <button class="option-btn difficulty-btn" data-level="hard">
+                <i class="fas fa-dragon"></i>
+                <span>Zor</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <!-- Zorluk Seviyesi Seçici -->
-      <div class="pattern-difficulty-selector mb-4">
-        <div class="level-label">Zorluk Seviyesi</div>
-        <div class="level-buttons">
-          <button class="level-btn active" data-level="easy"><i class="fas fa-baby"></i> Kolay</button>
-          <button class="level-btn" data-level="medium"><i class="fas fa-user"></i> Orta</button>
-          <button class="level-btn" data-level="hard"><i class="fas fa-dragon"></i> Zor</button>
-        </div>
-      </div>
-      
-      <!-- Oyun Kontrolleri ve İstatistikler -->
-      <div class="game-controls-panel mb-4">
-        <div class="game-stat-row">
-          <div class="game-stat-item">
-            <div class="stats-icon"><i class="fas fa-star"></i></div>
-            <div class="stats-label">Skor</div>
-            <div class="stats-value" id="score">0</div>
+        
+        <!-- Oyun İstatistikleri -->
+        <div class="game-stats">
+          <div class="stat-group">
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-value" id="score">0</div>
+              <div class="stat-label">Puan</div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-clock"></i></div>
+              <div class="stat-value" id="timer">120</div>
+              <div class="stat-label">Süre</div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-value" id="level">1</div>
+              <div class="stat-label">Seviye</div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+              <div class="stat-value" id="combo">x1</div>
+              <div class="stat-label">Kombo</div>
+            </div>
           </div>
           
-          <div class="game-stat-item">
-            <div class="stats-icon"><i class="fas fa-clock"></i></div>
-            <div class="stats-label">Süre</div>
-            <div class="stats-value" id="timer">120</div>
-          </div>
-          
-          <div class="game-stat-item">
-            <div class="stats-icon"><i class="fas fa-layer-group"></i></div>
-            <div class="stats-label">Seviye</div>
-            <div class="stats-value" id="level">1</div>
-          </div>
-          
-          <div class="game-stat-item">
-            <button id="start-game" class="btn btn-glow">
-              <i class="fas fa-play me-2"></i>Başlat
+          <div class="game-action">
+            <button id="start-game" class="action-button">
+              <span class="button-icon"><i class="fas fa-play"></i></span>
+              <span class="button-text">Oyunu Başlat</span>
+            </button>
+            <button id="toggle-sound" class="action-button sound-button active">
+              <span class="button-icon"><i class="fas fa-volume-up"></i></span>
             </button>
           </div>
         </div>
       </div>
       
       <!-- Oyun Alanı -->
-      <div class="pattern-display-container">
-        <!-- Oyun Başlangıç Ekranı -->
-        <div id="pattern-welcome" class="pattern-welcome active">
-          <div class="welcome-icon">
-            <i class="fas fa-brain fa-4x"></i>
-          </div>
-          <div class="welcome-text">
-            <h3>Örüntü Tanıma Oyununa Hoş Geldiniz!</h3>
-            <p>Farklı örüntüleri analiz ederek bir sonraki şekli tahmin edin.</p>
-            <p>Yukarıdaki kontrolleri kullanarak oyun türünü ve zorluğu ayarlayabilirsiniz.</p>
-          </div>
-          <div class="welcome-arrow">
-            <i class="fas fa-arrow-down"></i>
+      <div class="pattern-gameplay-area">
+        <!-- Hoş Geldiniz Ekranı -->
+        <div id="pattern-welcome" class="welcome-screen active">
+          <div class="welcome-content">
+            <div class="welcome-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h2 class="welcome-title">Örüntü Tanıma Oyununa Hoş Geldiniz</h2>
+            <p class="welcome-text">Beyin gücünüzü test edin! Verilen örüntüdeki kuralı analiz edin ve bir sonraki elemanı tahmin edin.</p>
+            <div class="welcome-action">
+              <button id="welcome-start" class="action-button">
+                <span class="button-text">Hemen Başla</span>
+                <span class="button-icon"><i class="fas fa-arrow-right"></i></span>
+              </button>
+            </div>
           </div>
         </div>
         
-        <!-- Örüntü Gösterim Alanı -->
-        <div id="pattern-area" class="pattern-area">
-          <div class="pattern-sequence" id="pattern-sequence">
-            <!-- Burada örüntü dinamik olarak gösterilecek -->
+        <!-- Örüntü Oyun Alanı -->
+        <div id="pattern-game-board" class="game-board">
+          <!-- Üst Bilgi Çubuğu -->
+          <div class="game-board-header">
+            <div class="pattern-info">
+              <div class="current-pattern-type">
+                <i class="fas fa-shapes"></i>
+                <span id="current-pattern-type">Semboller</span>
+              </div>
+              <div class="pattern-difficulty">
+                <i class="fas fa-chart-line"></i>
+                <span id="current-difficulty">Kolay</span>
+              </div>
+            </div>
+            <div class="streak-indicator" id="streak-indicator">
+              <div class="streak-count">0</div>
+              <div class="streak-label">Seri</div>
+            </div>
           </div>
           
-          <div class="pattern-question">
-            <div class="question-mark pulse">?</div>
-          </div>
-        </div>
-        
-        <!-- Seçenekler Alanı -->
-        <div id="pattern-options" class="pattern-options">
-          <!-- Seçenekler burada dinamik olarak gösterilecek -->
-          <div class="options-instruction">Sıradaki şekli seçin</div>
-          <div id="options-grid" class="options-grid">
-            <!-- Seçenekler JavaScript ile eklenecek -->
-          </div>
-        </div>
-        
-        <!-- Bilgiler ve Mesajlar Alanı -->
-        <div id="pattern-feedback" class="pattern-feedback">
-          <!-- Mesajlar burada dinamik olarak gösterilecek -->
-        </div>
-      </div>
-      
-      <!-- Oyun Sonu Ekranı -->
-      <div id="game-over" class="game-over-screen">
-        <div class="game-over-header">
-          <h2 id="result-title">Oyun Bitti!</h2>
-        </div>
-        
-        <div class="game-results">
-          <div class="result-item">
-            <div class="result-icon"><i class="fas fa-star"></i></div>
-            <div class="result-label">Toplam Puan</div>
-            <div class="result-value" id="final-score">0</div>
+          <!-- Örüntü Görüntüleme Alanı -->
+          <div class="pattern-display">
+            <div class="pattern-sequence-container">
+              <div id="pattern-sequence" class="pattern-sequence">
+                <!-- JavaScript ile doldurulacak -->
+              </div>
+              <div class="pattern-next">
+                <div class="next-indicator">?</div>
+                <div class="next-label">Sıradaki</div>
+              </div>
+            </div>
           </div>
           
-          <div class="result-item">
-            <div class="result-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="result-label">Doğru Cevaplar</div>
-            <div class="result-value" id="correct-answers">0</div>
+          <!-- Seçenekler Alanı -->
+          <div class="pattern-options-container">
+            <div class="options-header">
+              <div class="options-title">Sıradaki elemanı seçin</div>
+            </div>
+            <div id="options-grid" class="options-grid">
+              <!-- JavaScript ile doldurulacak -->
+            </div>
           </div>
           
-          <div class="result-item">
-            <div class="result-icon"><i class="fas fa-times-circle"></i></div>
-            <div class="result-label">Yanlış Cevaplar</div>
-            <div class="result-value" id="wrong-answers">0</div>
+          <!-- Geri Bildirim Alanı -->
+          <div id="feedback-area" class="feedback-area">
+            <!-- JavaScript ile doldurulacak -->
           </div>
         </div>
         
-        <div class="achievement-section" id="achievement-section">
-          <!-- Başarımlar burada gösterilecek -->
-        </div>
-        
-        <div class="game-over-actions">
-          <button id="restart-game" class="btn btn-glow">
-            <i class="fas fa-redo me-2"></i>Tekrar Oyna
-          </button>
-          <a href="{{ url_for('index') }}" class="btn btn-outline-glow">
-            <i class="fas fa-home me-2"></i>Anasayfa
-          </a>
+        <!-- Oyun Sonu Ekranı -->
+        <div id="game-over" class="game-over-screen">
+          <div class="game-over-content">
+            <div class="result-header">
+              <div class="result-icon">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <h2 id="result-title" class="result-title">Oyun Tamamlandı!</h2>
+            </div>
+            
+            <div class="result-stats">
+              <div class="result-stat-item">
+                <div class="result-stat-icon">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="result-stat-value" id="final-score">0</div>
+                <div class="result-stat-label">Toplam Puan</div>
+              </div>
+              
+              <div class="result-stat-item">
+                <div class="result-stat-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="result-stat-value" id="correct-answers">0</div>
+                <div class="result-stat-label">Doğru Cevap</div>
+              </div>
+              
+              <div class="result-stat-item">
+                <div class="result-stat-icon">
+                  <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="result-stat-value" id="wrong-answers">0</div>
+                <div class="result-stat-label">Yanlış Cevap</div>
+              </div>
+              
+              <div class="result-stat-item">
+                <div class="result-stat-icon">
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <div class="result-stat-value" id="max-level">1</div>
+                <div class="result-stat-label">Maks. Seviye</div>
+              </div>
+            </div>
+            
+            <div id="achievement-section" class="achievement-section">
+              <!-- JavaScript ile doldurulacak -->
+            </div>
+            
+            <div class="rating-section">
+              <div class="rating-title">Performans Puanınız</div>
+              <div class="rating-stars" id="rating-stars">
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <div class="rating-text" id="rating-text">İyi</div>
+            </div>
+            
+            <div class="game-over-actions">
+              <button id="restart-game" class="action-button">
+                <span class="button-icon"><i class="fas fa-redo"></i></span>
+                <span class="button-text">Tekrar Oyna</span>
+              </button>
+              <button id="share-score" class="action-button">
+                <span class="button-icon"><i class="fas fa-share-alt"></i></span>
+                <span class="button-text">Skoru Paylaş</span>
+              </button>
+              <a href="{{ url_for('index') }}" class="action-button secondary">
+                <span class="button-icon"><i class="fas fa-home"></i></span>
+                <span class="button-text">Ana Sayfa</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Arkaplan Animasyonu -->
-  <div class="pattern-bg-animation">
-    <div class="pattern-shape shape1"></div>
-    <div class="pattern-shape shape2"></div>
-    <div class="pattern-shape shape3"></div>
-    <div class="pattern-shape shape4"></div>
+  <!-- Bildirimler -->
+  <div id="notifications-container" class="notifications-container"></div>
+  
+  <!-- Arkaplan Efektleri -->
+  <div class="background-effects">
+    <div class="pattern-particle particle-1"></div>
+    <div class="pattern-particle particle-2"></div>
+    <div class="pattern-particle particle-3"></div>
+    <div class="pattern-particle particle-4"></div>
+    <div class="pattern-particle particle-5"></div>
   </div>
 </div>
 {% endblock %}
