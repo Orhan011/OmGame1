@@ -198,6 +198,18 @@ def tips():
     tips = Article.query.filter_by(category='tip').all()
     return render_template('tips.html', tips=tips)
 
+@app.route('/profile')
+def profile():
+    user_id = session.get('user_id', 1)
+    user = User.query.get(user_id)
+    stats = {
+        'total_games': Score.query.filter_by(user_id=user_id).count(),
+        'high_score': db.session.query(db.func.max(Score.score)).filter_by(user_id=user_id).scalar() or 0,
+        'achievements': 0  # Başarı sistemi daha sonra eklenebilir
+    }
+    achievements = []  # Başarı sistemi daha sonra eklenebilir
+    return render_template('profile.html', user=user, stats=stats, achievements=achievements)
+
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
