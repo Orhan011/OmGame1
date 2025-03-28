@@ -380,8 +380,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const hintIndex = Math.floor(Math.random() * Math.min(5, availableHints.length));
     const hint = availableHints[hintIndex];
 
-    // Show hint and apply time penalty
-    showMessage(`İpucu: ${hint.slice(0, 2)}...`, 'info');
+    // Rastgele bir pozisyon seç ve o harfi göster
+    const randomPos = Math.floor(Math.random() * hint.length);
+    const hintLetter = hint[randomPos];
+    
+    // İpucu metnini oluştur
+    let hintText = Array(hint.length).fill('_').join(' ');
+    hintText = hintText.split(' ');
+    hintText[randomPos] = hintLetter;
+    hintText = hintText.join(' ');
+    
+    // İpucunu göster
+    const hintDisplay = document.getElementById('hint-display');
+    hintDisplay.textContent = `İpucu: ${hintText}`;
     hintCount++;
 
     // Apply time penalty if timer exists

@@ -73,6 +73,10 @@
           <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
             <i class="fas fa-volume-up"></i>
           </button>
+          <div class="hint-container mb-3">
+            <button id="hint-button" class="btn btn-info">İpucu (3)</button>
+            <div id="hint-display" class="hint-text mt-2"></div>
+          </div>
         </div>
 
         <!-- Alert Container -->
@@ -85,9 +89,7 @@
           <div id="letter-container" class="letter-container"></div>
         </div>
 
-        <div class="word-hint mb-3" id="word-hint">
-          <i class="fas fa-lightbulb me-2"></i><span>İpucu: _ _ _ _ _</span>
-        </div>
+
         <!-- Word Input -->
         <div class="input-group mb-4">
           <input type="text" id="word-input" class="word-input" placeholder="Kelime yazın veya harflere tıklayın" aria-label="Kelime girin">
@@ -107,10 +109,7 @@
           <button id="shuffle-letters" class="btn btn-outline-primary">
             <i class="fas fa-random me-1"></i>Harfleri Karıştır
           </button>
-          <button id="hint-button" class="btn btn-outline-primary">
-            <i class="fas fa-lightbulb me-1"></i>İpucu
-          </button>
-        </div>
+          </div>
       </div>
 
       <!-- Game Over Container -->
@@ -232,8 +231,12 @@
     margin-bottom: 15px;
     font-weight: 600;
   }
-  .word-hint {
+  .hint-container {
     margin-bottom: 10px;
+  }
+  .hint-text {
+    font-style: italic;
+    color: grey;
   }
 </style>
 {% endblock %}
