@@ -29,12 +29,12 @@
       </div>
 
       <!-- Oyun Kontrol Paneli -->
-      <div class="game-control-panel">
+      <div class="game-control-panel horizontal">
         <!-- Mod ve Zorluk Seçimi -->
-        <div class="control-settings">
+        <div class="control-settings horizontal">
           <div class="setting-group pattern-type">
             <h3 class="setting-title"><i class="fas fa-puzzle-piece me-2"></i>Örüntü Türü</h3>
-            <div class="setting-options">
+            <div class="setting-options horizontal">
               <button class="option-btn pattern-type-btn active" data-mode="symbols">
                 <i class="fas fa-shapes"></i>
                 <span>Semboller</span>
@@ -56,7 +56,7 @@
           
           <div class="setting-group difficulty">
             <h3 class="setting-title"><i class="fas fa-chart-line me-2"></i>Zorluk Seviyesi</h3>
-            <div class="setting-options">
+            <div class="setting-options horizontal">
               <button class="option-btn difficulty-btn active" data-level="easy">
                 <i class="fas fa-child"></i>
                 <span>Kolay</span>
@@ -74,8 +74,8 @@
         </div>
         
         <!-- Oyun İstatistikleri -->
-        <div class="game-stats">
-          <div class="stat-group">
+        <div class="game-stats horizontal">
+          <div class="stat-group horizontal">
             <div class="stat-item">
               <div class="stat-icon"><i class="fas fa-star"></i></div>
               <div class="stat-value" id="score">0</div>
@@ -101,7 +101,7 @@
             </div>
           </div>
           
-          <div class="game-action">
+          <div class="game-action horizontal">
             <button id="start-game" class="action-button">
               <span class="button-icon"><i class="fas fa-play"></i></span>
               <span class="button-text">Oyunu Başlat</span>
