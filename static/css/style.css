@@ -455,9 +455,9 @@ transition:color 0.3s ease;
 .memory-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin: 30px auto;
-  max-width: 600px;
+  gap: 8px;
+  margin: 20px auto;
+  max-width: 420px;
   perspective: 1000px;
 }
 
@@ -465,10 +465,10 @@ transition:color 0.3s ease;
   aspect-ratio: 1;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .memory-card:hover {
@@ -480,17 +480,17 @@ transition:color 0.3s ease;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 15px;
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 .memory-card__front {
   background: linear-gradient(135deg, rgba(33, 33, 61, 0.8), rgba(38, 38, 70, 0.9));
-  border: 2px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   transform: rotateY(180deg);
   color: var(--primary-text);
 }
@@ -498,7 +498,7 @@ transition:color 0.3s ease;
 .memory-card__back {
   background: linear-gradient(135deg, var(--accent-color), #5a4bd1);
   color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -507,7 +507,7 @@ transition:color 0.3s ease;
   content: '?';
   position: absolute;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 2.5rem;
+  font-size: 1.8rem;
 }
 
 .memory-card__back::after {
@@ -600,19 +600,58 @@ transition:color 0.3s ease;
   box-shadow: 0 4px 15px rgba(120, 104, 230, 0.4);
 }
 
-/* 3D Rotation */
-#three-d-container {
-  width: 100%;
-  height: 400px;
-  margin: 30px 0 20px;
+/* Pattern Recognition */
+.pattern-container {
+  background-color: rgba(33, 33, 61, 0.7);
   border-radius: 20px;
-  overflow: hidden;
+  padding: 30px 20px;
+  margin: 30px 0 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  position: relative;
 }
 
-.shape-options {
+#pattern-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 150px;
+}
+
+.pattern-sequence {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.pattern-item {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(33, 33, 61, 0.8), rgba(38, 38, 70, 0.9));
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-size: 2.5rem;
+  color: var(--primary-text);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.pattern-item.empty {
+  background: linear-gradient(135deg, rgba(120, 104, 230, 0.2), rgba(120, 104, 230, 0.1));
+  border: 2px dashed rgba(120, 104, 230, 0.3);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+#pattern-placeholder {
+  flex-direction: column;
+  color: rgba(255, 255, 255, 0.5);
+  height: 150px;
+}
+
+.pattern-options {
   display: flex;
   justify-content: center;
   gap: 15px;
@@ -620,22 +659,50 @@ transition:color 0.3s ease;
   flex-wrap: wrap;
 }
 
-.shape-option {
-  padding: 10px 20px;
-  background-color: rgba(33, 33, 61, 0.7);
+.pattern-option {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(33, 33, 61, 0.7), rgba(38, 38, 70, 0.8));
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.8rem;
   color: var(--primary-text);
-  border-radius: 50px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.shape-option:hover, .shape-option.active {
-  background-color: var(--accent-color);
-  color: white;
-  box-shadow: 0 5px 15px rgba(120, 104, 230, 0.4);
+.pattern-option:hover {
+  background: linear-gradient(135deg, var(--accent-color), #5a4bd1);
   transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(120, 104, 230, 0.3);
+}
+
+.pattern-option.selected {
+  background: linear-gradient(135deg, var(--accent-color), #5a4bd1);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(120, 104, 230, 0.5);
+}
+
+.pattern-item.correct {
+  background: linear-gradient(135deg, var(--success-color), #1a995a);
+  box-shadow: 0 0 15px rgba(46, 199, 109, 0.5);
+  transform: scale(1.05);
+}
+
+.pattern-item.incorrect {
+  background: linear-gradient(135deg, var(--danger-color), #d13838);
+  box-shadow: 0 0 15px rgba(209, 56, 56, 0.5);
+  animation: shake 0.5s;
+}
+
+@keyframes pulse-pattern {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 /* Leaderboard */
@@ -1030,8 +1097,20 @@ transition:color 0.3s ease;
     gap: 10px;
   }
   
-  #three-d-container {
-    height: 300px;
+  .pattern-container {
+    padding: 20px 10px;
+  }
+  
+  .pattern-item {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+  
+  .pattern-option {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
   
   .sequence-display {
@@ -1123,6 +1202,24 @@ transition:color 0.3s ease;
     font-size: 0.9rem;
   }
   
+  .pattern-sequence {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .pattern-item {
+    width: 50px;
+    height: 50px;
+    font-size: 1.7rem;
+  }
+  
+  .pattern-option {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+  
   .hero-title {
     font-size: 1.8rem;
   }
@@ -1177,6 +1274,18 @@ transition:color 0.3s ease;
     height: 38px;
     font-size: 1rem;
     margin: 2px;
+  }
+  
+  .pattern-item {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+  
+  .pattern-option {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
   
   .hero-title {

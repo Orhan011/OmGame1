@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.loadLeaderboard('wordPuzzle', 'word-puzzle-leaderboard');
   window.loadLeaderboard('memoryMatch', 'memory-match-leaderboard');
   window.loadLeaderboard('numberSequence', 'number-sequence-leaderboard');
-  window.loadLeaderboard('3dRotation', '3d-rotation-leaderboard');
+  window.loadLeaderboard('patternRecognition', 'pattern-recognition-leaderboard');
   
   // Tab switching functionality
   const tabButtons = document.querySelectorAll('.leaderboard-tab');

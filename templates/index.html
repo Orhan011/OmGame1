@@ -3,22 +3,13 @@
 {% block content %}
 <section class="hero-section">
 <div class="row align-items-center">
-<div class="col-lg-6">
+<div class="col-lg-12 text-center">
 <h1 class="hero-title">Zekânı Geliştir<br>IQ'nu Yükselt</h1>
 <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>
-<div class="d-flex flex-wrap">
+<div class="d-flex justify-content-center flex-wrap">
 <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Hemen Başla</a>
 <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Detaylar</a>
 </div>
-</div>
-<div class="col-lg-6 text-center">
-<svg width="250" height="250" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-<path d="M50 5 C25 5, 10 25, 10 45 C10 75, 35 85, 50 95 C65 85, 90 75, 90 45 C90 25, 75 5, 50 5" fill="#7868e6" opacity="0.8" />
-<path d="M50 15 C35 15, 25 30, 25 45 C25 65, 40 75, 50 80 C60 75, 75 65, 75 45 C75 30, 65 15, 50 15" fill="#21213d" />
-<path d="M35 40 C35 32, 42 25, 50 25 C58 25, 65 32, 65 40 C65 48, 58 55, 50 55 C42 55, 35 48, 35 40" fill="#7868e6" />
-<circle cx="50" cy="40" r="5" fill="#FFF" />
-<path d="M50 55 L50 70 M40 60 L60 60" stroke="#7868e6" stroke-width="2" />
-</svg>
 </div>
 </div>
 </section>
@@ -62,10 +53,10 @@
 <div class="col-md-6 col-lg-3 mb-3">
 <div class="card h-100">
 <div class="card-body text-center">
-<i class="fas fa-cube feature-icon"></i>
-<h3 class="card-title">3B Döndürme</h3>
-<p class="card-text">3D nesneleri zihinsel olarak döndürerek uzamsal zekânızı geliştirin.</p>
-<a href="{{ url_for('three_d_rotation') }}" class="btn btn-primary">Oyna</a>
+<i class="fas fa-puzzle-piece feature-icon"></i>
+<h3 class="card-title">Örüntü Tanıma</h3>
+<p class="card-text">Görsel örüntüleri tanımlayarak analitik düşünme ve algı yeteneklerinizi geliştirin.</p>
+<a href="{{ url_for('pattern_recognition') }}" class="btn btn-primary">Oyna</a>
 </div>
 </div>
 </div>
