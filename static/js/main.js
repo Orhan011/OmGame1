@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
   
+  // Setup button loading animations
+  setupButtonLoadingStates();
+  
   // Save game score
   window.saveScore = function(gameType, score) {
     fetch('/api/save-score', {
@@ -167,5 +170,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+  
+  // Button Loading Animation Functionality
+  function setupButtonLoadingStates() {
+    document.querySelectorAll('.btn').forEach(button => {
+      if (!button.classList.contains('no-loading')) {
+        button.addEventListener('click', function(e) {
+          // Skip special buttons or those that should navigate immediately
+          if (this.classList.contains('no-loading') || 
+              this.getAttribute('type') === 'button' || 
+              this.getAttribute('type') === 'reset' ||
+              this.hasAttribute('data-bs-toggle') ||
+              this.hasAttribute('data-bs-dismiss')) {
+            return;
+          }
+          
+          // Don't add loading to buttons that are links with href
+          if (this.tagName === 'A' && this.hasAttribute('href') && 
+              !this.href.includes('javascript:void')) {
+            return;
+          }
+          
+          // Store the original content if not already stored
+          if (!this.dataset.originalHtml) {
+            this.dataset.originalHtml = this.innerHTML;
+          }
+          
+          // Add loading spinner
+          this.classList.add('btn-loading');
+          const originalHtml = this.dataset.originalHtml;
+          
+          // Create spinner and text wrapper
+          this.innerHTML = `
+            <span class="btn-spinner"></span>
+            <span class="btn-text">${originalHtml}</span>
+          `;
+          
+          // Return to original state after some time (failsafe)
+          setTimeout(() => {
+            if (this.classList.contains('btn-loading')) {
+              this.classList.remove('btn-loading');
+              this.innerHTML = originalHtml;
+            }
+          }, 3000); // 3 second timeout as fallback
+        });
+      }
+    });
   }
 });

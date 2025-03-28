@@ -18,6 +18,18 @@
 --glass-effect:backdrop-filter:blur(10px);
 --border-radius:15px;
 --transition-bounce:cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+/* Cihaz optimizasyonu için değişkenler */
+--nav-height: 70px;
+--container-padding: 1.5rem;
+--section-padding: 4rem 0;
+--header-padding: 4rem 0 2rem;
+--card-padding: 1.5rem;
+--content-max-width: 1240px;
+--mobile-breakpoint: 576px;
+--tablet-breakpoint: 768px;
+--laptop-breakpoint: 992px;
+--desktop-breakpoint: 1200px;
 }
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 body {
@@ -3158,4 +3170,47 @@ main {
     padding: 8px 16px;
     font-size: 0.8rem;
   }
+}
+
+/* Button Loading Spinner */
+.btn-loading {
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-loading .btn-text {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.btn-spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+.btn-loading .btn-spinner {
+  display: inline-block;
+}
+
+.btn-primary .btn-spinner {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+}
+
+.btn-outline-primary .btn-spinner {
+  border: 2px solid rgba(120, 104, 230, 0.3);
+  border-top-color: var(--accent-color);
+}
+
+@keyframes btn-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }

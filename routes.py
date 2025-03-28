@@ -95,6 +95,10 @@ def number_sequence():
 def pattern_recognition():
     return render_template('games/patternRecognition.html')
 
+@app.route('/games/3d-rotation')
+def three_d_rotation():
+    return render_template('games/3dRotation.html')
+
 # Leaderboard
 @app.route('/leaderboard')
 def leaderboard():
@@ -102,12 +106,14 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     pattern_recognition_scores = Score.query.filter_by(game_type='patternRecognition').order_by(Score.score.desc()).limit(10).all()
+    rotation_3d_scores = Score.query.filter_by(game_type='3dRotation').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
                           number_sequence_scores=number_sequence_scores,
-                          pattern_recognition_scores=pattern_recognition_scores)
+                          pattern_recognition_scores=pattern_recognition_scores,
+                          rotation_3d_scores=rotation_3d_scores)
 
 # Articles
 @app.route('/articles')
