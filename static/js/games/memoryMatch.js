@@ -176,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let isGameActive = false;
   let movesCount = 0;
   let hintsRemaining = 3;
+  let hintsUsed = 0; // Toplam kullanılan ipucu sayısı
   let lastHintTime = 0;
   let showingHint = false;
   let hintTimeout;
@@ -261,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
     matchedPairs = 0;
     movesCount = 0;
     hintsRemaining = currentLevel.hints;
+    hintsUsed = 0; // Kullanılan ipucu sayısını sıfırla
     timeElapsed = 0;
     lastHintTime = 0;
     isGameActive = true;
@@ -551,6 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // İpucu kullanımını işle
     hintsRemaining--;
+    hintsUsed++; // Kullanılan ipucu sayısını arttır
     updateHintCounter();
     
     // Puan düşür

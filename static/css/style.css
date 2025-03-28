@@ -583,6 +583,39 @@ footer::before {
   transform: translateY(-5px);
 }
 
+/* Yatay sırada istatistikler için stil */
+.game-stat-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+  gap: 20px;
+}
+
+.game-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.game-stat-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.game-stat-item i {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  color: var(--accent-color);
+}
+
 /* Main content wrapper */
 main {
   flex: 1;
