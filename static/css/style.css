@@ -6056,39 +6056,3 @@ main {
   border: 1px solid #b8daff;
   color: #004085;
 }
-.hero-section {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 3rem;
-    margin: 2rem auto;
-    max-width: 1200px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.hero-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    line-height: 1.2;
-}
-
-.hero-title span {
-    display: inline-block;
-}
-
-.hero-subtitle {
-    font-size: 1.4rem;
-    color: #555;
-    margin-bottom: 2rem;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.5;
-    letter-spacing: 0.2px;
-}

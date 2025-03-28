@@ -231,8 +231,15 @@ def register():
             flash('Tüm alanları doldurunuz.')
             return redirect(url_for('register'))
             
-        if not email.endswith('@gmail.com'):
-            flash('Lütfen geçerli bir Gmail adresi kullanın.')
+        # Email validation
+        if not '@' in email or not '.' in email:
+            flash('Geçerli bir email adresi giriniz.')
+            return redirect(url_for('register'))
+            
+        email_domain = email.split('@')[1]
+        valid_domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com']
+        if email_domain not in valid_domains:
+            flash('Lütfen geçerli bir email servis sağlayıcısı kullanın (Gmail, Hotmail, Yahoo, Outlook).')
             return redirect(url_for('register'))
             
         if User.query.filter_by(username=username).first():
