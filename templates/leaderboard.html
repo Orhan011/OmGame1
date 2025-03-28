@@ -1,60 +1,44 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container leaderboard-page">
+<div class="leaderboard-container">
   <div class="leaderboard-header">
-    <h1 class="text-center">Skor Tablosu</h1>
-    <p class="text-center lead">Tüm beyin geliştirme oyunlarında skorlarınızın diğer oyunculara göre nasıl olduğunu kontrol edin.</p>
+    <h1>Skor Tablosu</h1>
+    <p>Tüm beyin geliştirme oyunlarında skorlarınızın diğer oyunculara göre nasıl olduğunu kontrol edin.</p>
   </div>
 
-  <div class="game-tabs">
-    <div class="nav-container">
-      <button class="game-tab active" data-game="word-puzzle">
-        <i class="fas fa-font"></i>
-        Kelime Bulmaca
-      </button>
-      <button class="game-tab" data-game="memory-match">
-        <i class="fas fa-brain"></i>
-        Hafıza Kartları
-      </button>
-      <button class="game-tab" data-game="number-sequence">
-        <i class="fas fa-sort-numeric-up"></i>
-        Sayı Dizisi
-      </button>
-      <button class="game-tab" data-game="puzzle">
-        <i class="fas fa-puzzle-piece"></i>
-        Yapboz
-      </button>
-      <button class="game-tab" data-game="3d-rotation">
-        <i class="fas fa-cube"></i>
-        3D Rotasyon
-      </button>
+  <div class="game-filter">
+    <button class="game-filter-btn active" data-game="word-puzzle">
+      <i class="fas fa-font"></i>
+      Kelime Bulmaca
+    </button>
+    <button class="game-filter-btn" data-game="memory-match">
+      <i class="fas fa-brain"></i>
+      Hafıza Kartları
+    </button>
+    <button class="game-filter-btn" data-game="number-sequence">
+      <i class="fas fa-sort-numeric-up"></i>
+      Sayı Dizisi
+    </button>
+    <button class="game-filter-btn" data-game="puzzle">
+      <i class="fas fa-puzzle-piece"></i>
+      Yapboz
+    </button>
+    <button class="game-filter-btn" data-game="3d-rotation">
+      <i class="fas fa-cube"></i>
+      3D Rotasyon
+    </button>
+  </div>
+
+  <div class="leaderboard-table">
+    <div class="table-header">
+      <div class="rank-cell">Sıra</div>
+      <div class="username-cell">Oyuncu</div>
+      <div class="score-cell">Skor</div>
+      <div class="date-cell">Tarih</div>
     </div>
-
-    <div class="leaderboard-cards">
-      <div class="leaderboard-card active" id="word-puzzle-board">
-        <div class="card-header">
-          <h3>Kelime Bulmaca En Yüksek Skorlar</h3>
-          <span class="refresh-btn"><i class="fas fa-sync-alt"></i></span>
-        </div>
-        <div class="leaderboard-table">
-          <div class="table-header">
-            <div class="rank">Sıra</div>
-            <div class="player">Oyuncu</div>
-            <div class="score">Skor</div>
-            <div class="date">Tarih</div>
-          </div>
-          <div class="table-body" id="word-puzzle-scores">
-            <!-- Scores will be loaded here -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Other game boards -->
-      <div class="leaderboard-card" id="memory-match-board"></div>
-      <div class="leaderboard-card" id="number-sequence-board"></div>
-      <div class="leaderboard-card" id="puzzle-board"></div>
-      <div class="leaderboard-card" id="3d-rotation-board"></div>
+    <div class="table-body" id="scores-container">
+      <!-- Scores will be loaded here -->
     </div>
   </div>
 </div>

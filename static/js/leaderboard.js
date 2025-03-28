@@ -1,41 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Load initial scores for word puzzle (default tab)
+  // Load initial scores
   loadScores('word-puzzle');
 
-  // Tab switching
-  const tabs = document.querySelectorAll('.game-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.leaderboard-card').forEach(card => card.classList.remove('active'));
+  // Setup game filter buttons
+  const filterButtons = document.querySelectorAll('.game-filter-btn');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Update active state
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
 
-      tab.classList.add('active');
-      const gameType = tab.getAttribute('data-game');
-      const board = document.getElementById(`${gameType}-board`);
-      board.classList.add('active');
-
+      // Load scores for selected game
+      const gameType = button.getAttribute('data-game');
       loadScores(gameType);
-    });
-  });
-
-  // Refresh button functionality
-  document.querySelectorAll('.refresh-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const card = e.target.closest('.leaderboard-card');
-      const gameType = card.id.replace('-board', '');
-      loadScores(gameType);
-      
-      // Add rotation animation
-      btn.style.transform = 'rotate(360deg)';
-      setTimeout(() => btn.style.transform = '', 500);
     });
   });
 });
 
 function loadScores(gameType) {
-  const container = document.querySelector(`#${gameType}-board .table-body`);
-  if (!container) return;
-
+  const container = document.getElementById('scores-container');
   container.innerHTML = '<div class="loading">Yükleniyor...</div>';
 
   fetch(`/api/get-scores/${gameType}`)
@@ -43,14 +26,15 @@ function loadScores(gameType) {
     .then(scores => {
       container.innerHTML = scores.map((score, index) => `
         <div class="table-row ${index < 3 ? 'top-rank' : ''}">
-          <div class="rank">${index + 1}</div>
-          <div class="player">${score.username}</div>
-          <div class="score">${score.score}</div>
-          <div class="date">${new Date(score.timestamp).toLocaleString()}</div>
+          <div class="rank-cell">${index + 1}</div>
+          <div class="username-cell">${score.username}</div>
+          <div class="score-cell">${score.score}</div>
+          <div class="date-cell">${new Date(score.timestamp).toLocaleString('tr-TR')}</div>
         </div>
       `).join('');
     })
     .catch(error => {
-      container.innerHTML = '<div class="error">Hata: Skorlar yüklenemedi</div>';
+      container.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu.</div>';
+      console.error('Error:', error);
     });
 }
