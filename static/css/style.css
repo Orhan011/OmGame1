@@ -374,6 +374,28 @@ border-radius:10px;
 color:var(--secondary-text);
 line-height:1.6;
 }
+
+.hero-title {
+color: #6A5AE0;
+font-weight: 700;
+text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero-title span {
+display: block;
+margin: 5px 0;
+background: linear-gradient(135deg, #6A5AE0, #B469FF);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+}
+
+.hero-subtitle {
+color: #8075FF;
+font-size: 1.2rem;
+font-weight: 500;
+text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
 .btn {
 border-radius:50px;
 padding:10px 25px;
