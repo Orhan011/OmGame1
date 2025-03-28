@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
   // Load initial scores for word puzzle (default tab)
   loadScores('word-puzzle');
@@ -9,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      
+
       const gameType = tab.getAttribute('data-game');
       loadScores(gameType);
     });
@@ -30,16 +29,15 @@ function loadScores(gameType) {
 
       container.innerHTML = scores.map((score, index) => `
         <div class="table-row ${index < 3 ? 'top-rank' : ''}">
-          <div class="rank-cell">${index + 1}</div>
-          <div class="username-cell">${score.username}</div>
-          <div class="score-cell">${score.score}</div>
-          <div class="date-cell">${new Date(score.timestamp).toLocaleDateString('tr-TR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}</div>
+          <div class="rank">${index + 1}</div>
+          <div class="player">
+            <div class="player-info">
+              <span class="username">${score.username}</span>
+              ${score.email ? `<span class="email">${score.email}</span>` : ''}
+            </div>
+          </div>
+          <div class="score">${score.score}</div>
+          <div class="date">${new Date(score.timestamp).toLocaleString('tr-TR')}</div>
         </div>
       `).join('');
     })

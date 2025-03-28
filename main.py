@@ -198,6 +198,36 @@ def tips():
     tips = Article.query.filter_by(category='tip').all()
     return render_template('tips.html', tips=tips)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if User.query.filter_by(username=username).first():
+            flash('Bu kullanıcı adı zaten kullanılıyor.')
+            return redirect(url_for('register'))
+            
+        if User.query.filter_by(email=email).first():
+            flash('Bu email adresi zaten kullanılıyor.')
+            return redirect(url_for('register'))
+        
+        new_user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password)
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        session['user_id'] = new_user.id
+        flash('Kayıt başarılı!')
+        return redirect(url_for('profile'))
+        
+    return render_template('register.html')
+
 @app.route('/profile')
 def profile():
     user_id = session.get('user_id', 1)
