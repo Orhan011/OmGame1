@@ -270,13 +270,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewBox = `${j * 300 / gameState.grid.cols} ${i * 300 / gameState.grid.rows} ${300 / gameState.grid.cols} ${300 / gameState.grid.rows}`;
         pieceElement.innerHTML = svgClone.replace('viewBox="0 0 300 300"', `viewBox="${viewBox}"`);
         
-        // Sürükle-bırak olaylarını ekle
+        // Dokunmatik ve fare olaylarını ekle
+        // Fare olayları
         pieceElement.draggable = true;
         pieceElement.addEventListener('dragstart', dragStart);
         pieceElement.addEventListener('dragover', dragOver);
         pieceElement.addEventListener('drop', drop);
         pieceElement.addEventListener('dragend', dragEnd);
         pieceElement.addEventListener('click', selectPiece);
+        
+        // Dokunmatik olaylar
+        pieceElement.addEventListener('touchstart', dragStart);
+        pieceElement.addEventListener('touchmove', function(e) {
+          e.preventDefault(); // Sayfanın sürüklenmesini engelle
+        });
+        pieceElement.addEventListener('touchend', drop);
         
         puzzleGrid.appendChild(pieceElement);
       }
@@ -316,18 +324,32 @@ document.addEventListener('DOMContentLoaded', () => {
   function dragStart(e) {
     if (gameState.isPaused || !gameState.isPlaying) return;
     
-    const pieceId = parseInt(e.target.closest('.puzzle-piece').dataset.id);
+    // Dokunmatik cihazlar için kontrol
+    const isTouchEvent = e.type === 'touchstart';
+    const target = isTouchEvent ? 
+      document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) : 
+      e.target;
+    
+    const pieceElement = target.closest('.puzzle-piece');
+    if (!pieceElement) return;
+    
+    const pieceId = parseInt(pieceElement.dataset.id);
     gameState.selectedPiece = gameState.puzzlePieces.find(p => p.id === pieceId);
     
     // Seçilen parçaya stil ekle
-    e.target.closest('.puzzle-piece').classList.add('selected');
+    pieceElement.classList.add('selected');
     
     // Ses çal
     playSound('pickup');
     
-    // Sürüklenen veriyi ayarla
-    e.dataTransfer.setData('text/plain', pieceId);
-    e.dataTransfer.effectAllowed = 'move';
+    if (!isTouchEvent) {
+      // Sürüklenen veriyi ayarla (mouse için)
+      e.dataTransfer.setData('text/plain', pieceId);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    
+    // İçerik menüsünü engelle
+    e.preventDefault();
   }
   
   /**
@@ -337,7 +359,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameState.isPaused || !gameState.isPlaying) return;
     
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
   }
   
   /**
@@ -348,8 +372,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     e.preventDefault();
     
-    const sourceId = parseInt(e.dataTransfer.getData('text/plain'));
-    const targetElement = e.target.closest('.puzzle-piece');
+    // Dokunmatik cihazlar için kontrol
+    let sourceId, targetElement;
+    
+    const isTouchEvent = e.type === 'touchend';
+    
+    if (isTouchEvent) {
+      // Dokunmatik olayı: selectedPiece değerini kullan
+      if (!gameState.selectedPiece) return;
+      sourceId = gameState.selectedPiece.id;
+      
+      const touch = e.changedTouches[0];
+      targetElement = document.elementFromPoint(touch.clientX, touch.clientY).closest('.puzzle-piece');
+    } else {
+      // Mouse olayı: dataTransfer'dan al
+      sourceId = parseInt(e.dataTransfer.getData('text/plain'));
+      targetElement = e.target.closest('.puzzle-piece');
+    }
     
     if (!targetElement) return;
     
@@ -384,7 +423,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function selectPiece(e) {
     if (gameState.isPaused || !gameState.isPlaying) return;
     
-    const pieceElement = e.target.closest('.puzzle-piece');
+    // Dokunmatik cihazlar için kontrol
+    const isTouchEvent = e.type.startsWith('touch');
+    const target = isTouchEvent ? 
+      document.elementFromPoint(
+        e.touches ? e.touches[0].clientX : e.changedTouches[0].clientX, 
+        e.touches ? e.touches[0].clientY : e.changedTouches[0].clientY
+      ) : 
+      e.target;
+    
+    const pieceElement = target.closest('.puzzle-piece');
+    if (!pieceElement) return;
+    
     const pieceId = parseInt(pieceElement.dataset.id);
     
     // Eğer zaten seçili bir parça varsa
@@ -415,6 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Ses çal
       playSound('pickup');
     }
+    
+    // İçerik menüsünü engelle
+    e.preventDefault();
   }
   
   /**
