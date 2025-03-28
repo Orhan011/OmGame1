@@ -125,6 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
       gameState.difficulty = button.dataset.level;
       
       // Zorluk seviyesine göre ızgara boyutları ayarla
+      // Cihaz genişliğini kontrol et
+      const isMobile = window.innerWidth < 576;
+      
       if (gameState.difficulty === 'EASY') {
         gameState.grid.rows = 3;
         gameState.grid.cols = 3;
@@ -132,8 +135,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.grid.rows = 4;
         gameState.grid.cols = 4;
       } else if (gameState.difficulty === 'HARD') {
-        gameState.grid.rows = 5;
-        gameState.grid.cols = 5;
+        // Mobil cihazlar için en zor seviyeyi azalt
+        if (isMobile) {
+          gameState.grid.rows = 4;
+          gameState.grid.cols = 4;
+        } else {
+          gameState.grid.rows = 5;
+          gameState.grid.cols = 5;
+        }
       }
     });
   });
@@ -183,13 +192,28 @@ document.addEventListener('DOMContentLoaded', () => {
     gameState.bonusPoints = 0;
     gameState.achievements = [];
     
-    // Zorluğa göre süreyi ayarla
+    // Cihaz genişliğini kontrol et
+    const isMobile = window.innerWidth < 576;
+    
+    // Zorluğa göre ızgara boyutlarını ve süreyi ayarla
     if (gameState.difficulty === 'EASY') {
+      gameState.grid.rows = 3;
+      gameState.grid.cols = 3;
       gameState.timeRemaining = 300; // 5 dakika
     } else if (gameState.difficulty === 'MEDIUM') {
+      gameState.grid.rows = 4;
+      gameState.grid.cols = 4;
       gameState.timeRemaining = 450; // 7.5 dakika
       gameState.level = 2;
     } else if (gameState.difficulty === 'HARD') {
+      // Mobil cihazlar için en zor seviyeyi azalt
+      if (isMobile) {
+        gameState.grid.rows = 4;
+        gameState.grid.cols = 4;
+      } else {
+        gameState.grid.rows = 5;
+        gameState.grid.cols = 5;
+      }
       gameState.timeRemaining = 600; // 10 dakika
       gameState.level = 3;
     }
@@ -235,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Referans görseli göster
     referenceImage.innerHTML = selectedImage;
     
-    // Izgara boyutlarını ayarla
+    // Izgara boyutlarını ayarla - cihaz boyutuna göre optimize et
     puzzleGrid.style.gridTemplateRows = `repeat(${gameState.grid.rows}, 1fr)`;
     puzzleGrid.style.gridTemplateColumns = `repeat(${gameState.grid.cols}, 1fr)`;
     
@@ -270,6 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewBox = `${j * 300 / gameState.grid.cols} ${i * 300 / gameState.grid.rows} ${300 / gameState.grid.cols} ${300 / gameState.grid.rows}`;
         pieceElement.innerHTML = svgClone.replace('viewBox="0 0 300 300"', `viewBox="${viewBox}"`);
         
+        // SVG kenar çizgisini hafiflet
+        const svgElement = pieceElement.querySelector('svg');
+        if (svgElement) {
+          svgElement.style.strokeWidth = '0.8'; // Daha ince kenar çizgisi
+          svgElement.style.width = '100%';
+          svgElement.style.height = '100%';
+        }
+        
         // Dokunmatik ve fare olaylarını ekle
         // Fare olayları
         pieceElement.draggable = true;
@@ -289,6 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
         puzzleGrid.appendChild(pieceElement);
       }
     }
+    
+    // Mobil cihazlar için grid boyutunu düşürme işlemi 
+    // (Bu işlem zaten zorluk seçildiğinde yapılıyor, 
+    // burada tekrar edilmesine gerek yok)
     
     // Parçaları karıştır
     shufflePuzzle();

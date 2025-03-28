@@ -112,7 +112,7 @@ def leaderboard():
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
                           number_sequence_scores=number_sequence_scores,
-                          pattern_recognition_scores=puzzle_scores,
+                          puzzle_scores=puzzle_scores,  # Değişken adını düzelttim, pattern_recognition_scores -> puzzle_scores
                           rotation_3d_scores=rotation_3d_scores)
 
 # Articles

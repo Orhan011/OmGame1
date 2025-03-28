@@ -226,9 +226,11 @@
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    padding: 10px;
+    padding: 8px;
     overflow: hidden;
-    min-height: 400px;
+    min-height: 320px; /* Küçültülmüş yükseklik */
+    max-width: 600px; /* Maksimum genişlik sınırlaması */
+    margin: 0 auto; /* Ortalama */
     touch-action: manipulation; /* Dokunmatik cihazlar için optimize */
   }
   
@@ -237,7 +239,7 @@
     gap: 2px;
     width: 100%;
     height: 100%;
-    min-height: 380px;
+    min-height: 300px; /* Küçültülmüş yükseklik */
     position: relative;
     z-index: 1;
   }
@@ -277,9 +279,9 @@
     background: rgba(30, 30, 60, 0.3);
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 15px;
+    padding: 12px;
     width: 100%;
-    max-width: 300px;
+    max-width: 240px; /* Küçültülmüş boyut */
     margin: 0 auto;
   }
   

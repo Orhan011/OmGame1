@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.loadLeaderboard('wordPuzzle', 'word-puzzle-leaderboard');
   window.loadLeaderboard('memoryMatch', 'memory-match-leaderboard');
   window.loadLeaderboard('numberSequence', 'number-sequence-leaderboard');
-  window.loadLeaderboard('patternRecognition', 'pattern-recognition-leaderboard');
+  window.loadLeaderboard('puzzle', 'pattern-recognition-leaderboard'); // 'patternRecognition' -> 'puzzle' olarak değiştirildi
   window.loadLeaderboard('3dRotation', 'rotation-3d-leaderboard');
   
   // Tab switching functionality
