@@ -205,10 +205,27 @@ def profile():
     stats = {
         'total_games': Score.query.filter_by(user_id=user_id).count(),
         'high_score': db.session.query(db.func.max(Score.score)).filter_by(user_id=user_id).scalar() or 0,
-        'achievements': 0  # Başarı sistemi daha sonra eklenebilir
+        'achievements': 0
     }
-    achievements = []  # Başarı sistemi daha sonra eklenebilir
-    return render_template('profile.html', user=user, stats=stats, achievements=achievements)
+    recent_scores = Score.query.filter_by(user_id=user_id).order_by(Score.timestamp.desc()).limit(5).all()
+    return render_template('profile.html', user=user, stats=stats, recent_scores=recent_scores)
+
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    if not session.get('user_id'):
+        flash('Lütfen önce giriş yapın.', 'error')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    user.full_name = request.form.get('full_name')
+    user.age = request.form.get('age', type=int)
+    user.bio = request.form.get('bio')
+    user.avatar_url = request.form.get('avatar_url')
+    user.last_active = datetime.utcnow()
+    
+    db.session.commit()
+    flash('Profil başarıyla güncellendi!', 'success')
+    return redirect(url_for('profile'))
 
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])

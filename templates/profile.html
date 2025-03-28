@@ -6,16 +6,32 @@
   <div class="container">
     <div class="row">
       <div class="col-md-4">
-        <div class="profile-card">
+        <div class="profile-card glass-panel">
           <div class="profile-avatar">
-            <i class="fas fa-user-circle fa-5x"></i>
+            {% if user.avatar_url %}
+              <img src="{{ user.avatar_url }}" alt="Profile" class="avatar-img">
+            {% else %}
+              <i class="fas fa-user-circle fa-5x"></i>
+            {% endif %}
           </div>
           <h2 class="profile-username">{{ user.username }}</h2>
-          <p class="profile-join-date">Katılım: {{ user.join_date }}</p>
+          {% if user.full_name %}
+            <p class="profile-fullname">{{ user.full_name }}</p>
+          {% endif %}
+          <p class="profile-join-date">Üye Olma: {{ user.created_at.strftime('%d/%m/%Y') }}</p>
+          <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit"></i> Profili Düzenle
+          </button>
+        </div>
+        
+        <div class="profile-bio glass-panel mt-4">
+          <h4>Hakkımda</h4>
+          <p>{{ user.bio or 'Henüz bir bio eklenmemiş.' }}</p>
         </div>
       </div>
+      
       <div class="col-md-8">
-        <div class="stats-card">
+        <div class="stats-card glass-panel">
           <h3>Oyun İstatistikleri</h3>
           <div class="stats-grid">
             <div class="stat-item">
@@ -27,28 +43,70 @@
               <span class="stat-value">{{ stats.high_score }}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Başarılar</span>
-              <span class="stat-value">{{ stats.achievements }}</span>
+              <span class="stat-label">Son Aktif</span>
+              <span class="stat-value">{{ user.last_active.strftime('%d/%m/%Y') }}</span>
             </div>
           </div>
         </div>
         
-        <div class="achievements-section">
-          <h3>Başarılar</h3>
-          <div class="achievement-list">
-            {% for achievement in achievements %}
-            <div class="achievement-item">
-              <i class="{{ achievement.icon }}"></i>
-              <div class="achievement-info">
-                <h4>{{ achievement.name }}</h4>
-                <p>{{ achievement.description }}</p>
-              </div>
-            </div>
-            {% endfor %}
+        <div class="recent-games glass-panel mt-4">
+          <h3>Son Oyunlar</h3>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover">
+              <thead>
+                <tr>
+                  <th>Oyun</th>
+                  <th>Skor</th>
+                  <th>Tarih</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for score in recent_scores %}
+                <tr>
+                  <td>{{ score.game_type }}</td>
+                  <td>{{ score.score }}</td>
+                  <td>{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content dark-theme">
+      <div class="modal-header">
+        <h5 class="modal-title">Profili Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST">
+          <div class="mb-3">
+            <label class="form-label">Tam Ad</label>
+            <input type="text" class="form-control" name="full_name" value="{{ user.full_name or '' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Yaş</label>
+            <input type="number" class="form-control" name="age" value="{{ user.age or '' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" name="bio" rows="3">{{ user.bio or '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Avatar URL</label>
+            <input type="url" class="form-control" name="avatar_url" value="{{ user.avatar_url or '' }}">
+          </div>
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

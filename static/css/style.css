@@ -5587,3 +5587,83 @@ main {
   }
 }
 
+/* Enhanced Profile Styles */
+.profile-card {
+  text-align: center;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.3);
+}
+
+.profile-username {
+  margin: 1rem 0;
+  color: var(--primary-text);
+  font-size: 1.8rem;
+}
+
+.profile-fullname {
+  color: var(--secondary-text);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(106, 90, 224, 0.1);
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+}
+
+.stat-label {
+  display: block;
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  display: block;
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.dark-theme {
+  background: var(--background);
+  color: var(--primary-text);
+}
+
+.dark-theme .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .form-control {
+  background: rgba(35, 35, 65, 0.8);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  color: var(--primary-text);
+}
+
+.dark-theme .form-control:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.25rem rgba(106, 90, 224, 0.25);
+}

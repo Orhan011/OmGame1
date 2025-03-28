@@ -5,12 +5,18 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class User(db.Model):
-    __tablename__ = 'users'  # Explicit table name to avoid reserved word conflicts
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    full_name = db.Column(db.String(100))
+    age = db.Column(db.Integer)
+    bio = db.Column(db.Text)
+    avatar_url = db.Column(db.String(200))
+    last_active = db.Column(db.DateTime, default=datetime.utcnow)
+    total_games_played = db.Column(db.Integer, default=0)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
