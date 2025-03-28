@@ -63,6 +63,7 @@ class Article(db.Model):
 def initialize_database():
     try:
         logger.info("Creating database tables if they don't exist")
+        db.drop_all()
         db.create_all()
         
         # Check if we need to add sample data
