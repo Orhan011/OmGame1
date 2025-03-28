@@ -1,8 +1,37 @@
 {% extends "layout.html" %}
 
+{% block title %}Hafıza Kartları Oyunu{% endblock %}
+
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center mb-4">Hafıza Kartları</h1>
+  
+  <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">100</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-hourglass-half"></i>
+      <div class="game-stat-value" id="timer-display">2:00</div>
+      <div class="game-stat-label">SÜRE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-sync-alt"></i>
+      <div class="game-stat-value" id="moves-display">0</div>
+      <div class="game-stat-label">HAMLE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-lightbulb"></i>
+      <div class="game-stat-value" id="hint-counter">3</div>
+      <div class="game-stat-label">İPUCU</div>
+    </div>
+  </div>
   
   <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -42,26 +71,6 @@
         <!-- Game Header -->
         <div class="game-header">
           <div class="memory-stats-panel">
-            <div class="game-stats">
-              <div class="game-stat-row">
-                <div class="game-stat-item">
-                  <i class="fas fa-trophy"></i>
-                  <span class="stat-label">Puan</span>
-                  <span id="score-display" class="stat-value">100</span>
-                </div>
-                <div class="game-stat-item">
-                  <i class="fas fa-hourglass-half"></i>
-                  <span class="stat-label">Süre</span>
-                  <span id="timer-display" class="stat-value">2:00</span>
-                </div>
-                <div class="game-stat-item">
-                  <i class="fas fa-sync-alt"></i>
-                  <span class="stat-label">Hamle</span>
-                  <span id="moves-display" class="stat-value">0</span>
-                </div>
-              </div>
-            </div>
-            
             <div class="theme-indicator" id="theme-indicator">
               <span class="theme-icon"></span>
               <span class="theme-name">Tema</span>

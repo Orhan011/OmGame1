@@ -588,13 +588,20 @@ footer::before {
   transform: translateY(-5px);
 }
 
-/* Yatay sırada istatistikler için stil */
-.game-stat-row {
+/* Tüm oyunlar için yatay sırada istatistikler */
+.game-stats-container {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  align-items: center;
+  background: rgba(25, 25, 45, 0.7);
+  border-radius: 15px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: nowrap;
   width: 100%;
-  gap: 20px;
 }
 
 .game-stat-item {
@@ -603,9 +610,68 @@ footer::before {
   align-items: center;
   position: relative;
   flex: 1;
+  padding: 5px 10px;
 }
 
 .game-stat-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 15%;
+  height: 70%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.game-stat-item i {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  color: var(--accent-color);
+  background: linear-gradient(135deg, var(--accent-color), var(--pattern-color-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.game-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-text);
+  line-height: 1;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.game-stat-value.highlight {
+  color: var(--accent-color);
+  transform: scale(1.1);
+  text-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+}
+
+.game-stat-label {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.game-stat-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+  gap: 20px;
+}
+
+.game-stat-item-old {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.game-stat-item-old:not(:last-child)::after {
   content: "";
   position: absolute;
   right: -10px;
@@ -615,7 +681,7 @@ footer::before {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.game-stat-item i {
+.game-stat-item-old i {
   font-size: 1.5rem;
   margin-bottom: 5px;
   color: var(--accent-color);

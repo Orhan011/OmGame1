@@ -1,8 +1,31 @@
 {% extends "layout.html" %}
 
+{% block title %}3B Döndürme Oyunu{% endblock %}
+
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center mb-4">3B Döndürme</h1>
+  
+  <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-hourglass-half"></i>
+      <div class="game-stat-value" id="timer-display">3:00</div>
+      <div class="game-stat-label">SÜRE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-cube"></i>
+      <div class="game-stat-value" id="level-display">1</div>
+      <div class="game-stat-label">SEVİYE</div>
+    </div>
+  </div>
   
   <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -19,15 +42,6 @@
       
       <!-- Game Container -->
       <div id="game-container" class="game-container" style="display: none;">
-        <!-- Game Header -->
-        <div class="game-header">
-          <div class="score-display">
-            <span id="score-display">0</span>
-          </div>
-          <div class="timer-display">
-            <span id="timer-display">3:00</span>
-          </div>
-        </div>
         
         <!-- Alert Container -->
         <div id="alert-container" class="mt-3"></div>

@@ -1,9 +1,38 @@
 {% extends "layout.html" %}
 
+{% block title %}Örüntü Tanıma Oyunu{% endblock %}
+
 {% block content %}
 <div class="game-container pattern-recognition">
   <div class="glass-panel">
     <h1 class="game-title text-center"><i class="fas fa-braille me-2"></i>Örüntü Tanıma</h1>
+    
+    <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
+    <div class="game-stats-container">
+      <div class="game-stat-item">
+        <i class="fas fa-star"></i>
+        <div class="game-stat-value" id="score">0</div>
+        <div class="game-stat-label">PUAN</div>
+      </div>
+      
+      <div class="game-stat-item">
+        <i class="fas fa-clock"></i>
+        <div class="game-stat-value" id="timer">120</div>
+        <div class="game-stat-label">SÜRE</div>
+      </div>
+      
+      <div class="game-stat-item">
+        <i class="fas fa-trophy"></i>
+        <div class="game-stat-value" id="level">1</div>
+        <div class="game-stat-label">SEVİYE</div>
+      </div>
+      
+      <div class="game-stat-item">
+        <i class="fas fa-bolt"></i>
+        <div class="game-stat-value" id="combo">x1</div>
+        <div class="game-stat-label">KOMBO</div>
+      </div>
+    </div>
     
     <!-- Ana Oyun Paneli -->
     <div class="pattern-game-wrapper">
@@ -12,7 +41,7 @@
         <div class="game-info-wrapper">
           <!-- Oyun Açıklaması -->
           <div class="game-intro">
-            <p class="lead">Örüntüleri analiz ederek bir sonraki elemanı tahmin edin. Görsel algı ve analitik düşünme becerinizi geliştirin.</p>
+            <p class="lead text-center">Sıradaki elemanı doğru tahmin ederek örüntü algılama yeteneğinizi geliştirin.</p>
           </div>
 
           <!-- İpucu kutusu -->
@@ -73,43 +102,15 @@
           </div>
         </div>
         
-        <!-- Oyun İstatistikleri -->
-        <div class="game-stats horizontal">
-          <div class="stat-group horizontal">
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-star"></i></div>
-              <div class="stat-value" id="score">0</div>
-              <div class="stat-label">Puan</div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-clock"></i></div>
-              <div class="stat-value" id="timer">120</div>
-              <div class="stat-label">Süre</div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-              <div class="stat-value" id="level">1</div>
-              <div class="stat-label">Seviye</div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-bolt"></i></div>
-              <div class="stat-value" id="combo">x1</div>
-              <div class="stat-label">Kombo</div>
-            </div>
-          </div>
-          
-          <div class="game-action horizontal">
-            <button id="start-game" class="action-button">
-              <span class="button-icon"><i class="fas fa-play"></i></span>
-              <span class="button-text">Oyunu Başlat</span>
-            </button>
-            <button id="toggle-sound" class="action-button sound-button active">
-              <span class="button-icon"><i class="fas fa-volume-up"></i></span>
-            </button>
-          </div>
+        <!-- Oyun Aksiyonları -->
+        <div class="game-action horizontal">
+          <button id="start-game" class="action-button">
+            <span class="button-icon"><i class="fas fa-play"></i></span>
+            <span class="button-text">Oyunu Başlat</span>
+          </button>
+          <button id="toggle-sound" class="action-button sound-button active">
+            <span class="button-icon"><i class="fas fa-volume-up"></i></span>
+          </button>
         </div>
       </div>
       
@@ -124,7 +125,7 @@
             <h2 class="welcome-title">Örüntü Tanıma Oyununa Hoş Geldiniz</h2>
             <p class="welcome-text">Beyin gücünüzü test edin! Verilen örüntüdeki kuralı analiz edin ve bir sonraki elemanı tahmin edin.</p>
             <div class="welcome-action">
-              <button id="welcome-start" class="action-button">
+              <button id="welcome-start" class="action-button pulse">
                 <span class="button-text">Hemen Başla</span>
                 <span class="button-icon"><i class="fas fa-arrow-right"></i></span>
               </button>

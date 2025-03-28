@@ -1,8 +1,31 @@
 {% extends "layout.html" %}
 
+{% block title %}Kelime Bulmaca Oyunu{% endblock %}
+
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center">Kelime Bulmaca</h1>
+  
+  <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-hourglass-half"></i>
+      <div class="game-stat-value" id="timer-display">1:30</div>
+      <div class="game-stat-label">SÜRE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-spell-check"></i>
+      <div class="game-stat-value" id="words-counter">0</div>
+      <div class="game-stat-label">KELİMELER</div>
+    </div>
+  </div>
   
   <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -41,24 +64,6 @@
       
       <!-- Game Container -->
       <div id="game-container" class="game-container" style="display: none;">
-        <!-- Game Header -->
-        <div class="game-stats">
-          <div class="game-stat">
-            <i class="fas fa-trophy"></i>
-            <span class="stat-label">Puan</span>
-            <span id="score-display" class="stat-value">0</span>
-          </div>
-          <div class="game-stat">
-            <i class="fas fa-hourglass-half"></i>
-            <span class="stat-label">Süre</span>
-            <span id="timer-display" class="stat-value">1:30</span>
-          </div>
-          <div class="game-stat">
-            <i class="fas fa-spell-check"></i>
-            <span class="stat-label">Kelimeler</span>
-            <span id="words-counter" class="stat-value">0</span>
-          </div>
-        </div>
         
         <!-- Game Controls Top -->
         <div class="game-controls-top">
