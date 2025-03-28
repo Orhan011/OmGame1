@@ -1,17 +1,18 @@
 /**
- * Hafıza Kartları Oyunu
- * Modern, duyarlı (responsive) ve profesyonel sürüm
+ * Hafıza Kartları Oyunu - 2.0
+ * Tamamen yenilenmiş modern, duyarlı (responsive) ve profesyonel sürüm
  * 
  * Özellikler:
- * - Animasyonlu kartlar ve efektler
- * - Ses efektleri
- * - İpucu sistemi
- * - Duraklatma özelliği
- * - Performans derecelendirmesi
- * - Duyarlı tasarım (mobil uyumlu)
+ * - Sınırlı ipucu kullanımı
+ * - Tema göstergesi
+ * - Zorluk seviyeleri
+ * - Başarımlar ve ödüller
+ * - Gelişmiş oyun deneyimi
+ * - Tüm cihazlara uyumlu tasarım
+ * - Yeni animasyonlar ve efektler
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
+  // DOM Elements - Ana arayüz
   const gameBoard = document.getElementById('memory-grid');
   const scoreDisplay = document.getElementById('score-display');
   const timerDisplay = document.getElementById('timer-display');
@@ -21,65 +22,150 @@ document.addEventListener('DOMContentLoaded', function() {
   const startBtn = document.getElementById('start-game');
   const pauseBtn = document.getElementById('pause-game');
   const resumeBtn = document.getElementById('resume-game');
+  const restartBtn = document.getElementById('restart-game');
   const hintBtn = document.getElementById('hint-button');
+  const hintCounter = document.getElementById('hint-counter');
   const soundToggle = document.getElementById('sound-toggle');
+  const themeIndicator = document.getElementById('theme-indicator');
+  
+  // DOM Elements - Ekranlar 
   const gameContainer = document.getElementById('game-container');
   const introSection = document.getElementById('intro-section');
   const gameOverContainer = document.getElementById('game-over-container');
   const pauseOverlay = document.getElementById('pause-overlay');
+  
+  // DOM Elements - Sonuç ekranı
+  const gameResultTitle = document.getElementById('game-result-title');
   const finalScoreDisplay = document.getElementById('final-score');
   const finalTimeDisplay = document.getElementById('final-time');
   const finalMovesDisplay = document.getElementById('final-moves');
+  const ratingStars = document.getElementById('rating-stars');
   const ratingText = document.getElementById('rating-text');
   const alertContainer = document.getElementById('alert-container');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
+  const memoryAchievement = document.getElementById('memory-achievement');
+  const achievementName = document.getElementById('achievement-name');
   
-  // Game Configuration
-  const TOTAL_PAIRS = 12;
+  // DOM Elements - Zorluk seviyeleri
+  const levelButtons = document.querySelectorAll('.level-btn');
+  
+  // Oyun Konfigürasyonu - Zorluk seviyeleri
   const LEVELS = {
-    EASY: { gridSize: 4, cols: 4, pairs: 8, timeLimit: 120 },
-    MEDIUM: { gridSize: 4, cols: 6, pairs: 12, timeLimit: 180 },
-    HARD: { gridSize: 5, cols: 6, pairs: 15, timeLimit: 240 }
+    EASY: { 
+      rows: 3, 
+      cols: 4, 
+      pairs: 6, 
+      timeLimit: 90, 
+      baseScore: 100,
+      hints: 3,
+      cardSize: 'large'
+    },
+    MEDIUM: { 
+      rows: 4, 
+      cols: 5, 
+      pairs: 10, 
+      timeLimit: 180, 
+      baseScore: 150,
+      hints: 3,
+      cardSize: 'medium'
+    },
+    HARD: { 
+      rows: 5, 
+      cols: 6, 
+      pairs: 15, 
+      timeLimit: 300, 
+      baseScore: 200,
+      hints: 2,
+      cardSize: 'small'
+    }
   };
   
-  // Current game level
-  let currentLevel = LEVELS.MEDIUM;
-  
-  // Card themes (emojis grouped by category)
+  // Kart temaları (emojiler kategoriye göre gruplandırılmış)
   const THEMES = {
-    ANIMALS: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🦋'],
-    FOODS: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🥝', '🍍', '🥥', '🥑', '🌮', '🍕', '🍦'],
-    TRAVEL: ['🚗', '✈️', '🚀', '🚁', '🚂', '⛵', '🏎️', '🚲', '🛵', '🚢', '🚕', '🚑', '🚒', '🚓', '🏍️', '🛸'],
-    SPORTS: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '⛳', '🏊', '🏄', '🧗', '🚴'],
-    FACES: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😊', '😇', '🥰', '😍', '🤩', '😎', '🧐'],
-    SPACE: ['🌞', '🌝', '🌛', '🌜', '☀️', '🌙', '⭐', '🌟', '💫', '✨', '☄️', '🌈', '☁️', '🌠', '🪐', '🌍']
+    ANIMALS: {
+      name: 'Hayvanlar', 
+      icon: '🦊', 
+      symbols: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🐙', '🦋', '🦆']
+    },
+    FOODS: {
+      name: 'Yiyecekler', 
+      icon: '🍕', 
+      symbols: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🥝', '🍍', '🥥', '🥑', '🌮', '🍕', '🍦', '🍪', '🥞']
+    },
+    SPACE: {
+      name: 'Uzay', 
+      icon: '🚀', 
+      symbols: ['🌞', '🌝', '🌛', '🌜', '☀️', '🌙', '⭐', '🌟', '💫', '✨', '☄️', '🌍', '🪐', '🌌', '🌠', '🚀', '👨‍🚀', '🛸']
+    },
+    SPORTS: {
+      name: 'Sporlar', 
+      icon: '⚽', 
+      symbols: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '⛳', '🏊', '🏄', '🧗', '🚴', '⛷️', '🏋️']
+    },
+    TECH: {
+      name: 'Teknoloji', 
+      icon: '💻', 
+      symbols: ['📱', '💻', '⌨️', '🖥️', '💾', '💿', '📷', '🔋', '🔌', '📡', '📺', '📟', '⏰', '🔍', '📱', '🎮', '🎧', '📸']
+    },
+    FACES: {
+      name: 'Yüzler', 
+      icon: '😎', 
+      symbols: ['😀', '😎', '🤔', '😍', '🥳', '😮', '🙄', '😴', '🥺', '🤯', '🧐', '🤪', '😇', '🤓', '😏', '🤩', '🤗', '😉']
+    }
   };
   
-  // Select a random theme
-  const selectedTheme = Object.keys(THEMES)[Math.floor(Math.random() * Object.keys(THEMES).length)];
-  const symbols = THEMES[selectedTheme];
+  // Başarımlar
+  const ACHIEVEMENTS = {
+    SPEED_DEMON: {
+      name: 'Hız Canavarı',
+      icon: '⚡',
+      description: 'Oyunu rekor sürede tamamladınız!'
+    },
+    PERFECT_MEMORY: {
+      name: 'Kusursuz Hafıza',
+      icon: '🧠',
+      description: 'Hiç hata yapmadan tamamladınız!'
+    },
+    HINT_MASTER: {
+      name: 'İpucu Ustası',
+      icon: '💡',
+      description: 'Hiç ipucu kullanmadan bitirdiniz!'
+    },
+    HIGH_SCORER: {
+      name: 'Puan Kralı',
+      icon: '👑',
+      description: 'Çok yüksek puan topladınız!'
+    }
+  };
   
-  // Audio
-  const audioEnabled = true;
+  // Mevcut oyun seviyesi ve teması
+  let currentLevel = LEVELS.MEDIUM;
+  let selectedTheme = null;
+  let themeSymbols = [];
+  
+  // Sesler
   const sounds = {
     flip: new Audio(),
     match: new Audio(),
     nomatch: new Audio(),
     win: new Audio(),
+    lose: new Audio(),
     hint: new Audio(),
-    click: new Audio()
+    click: new Audio(),
+    fanfare: new Audio(),
+    achievement: new Audio()
   };
   
-  // Initialize audio stub paths (sounds can be loaded later if needed)
+  // Ses ayarları
+  let soundEnabled = true;
   for (const key in sounds) {
     sounds[key].volume = 0.5;
   }
   
-  // Game state variables
+  // Oyun durum değişkenleri
   let cards = [];
   let score = 0;
-  let baseScore = 100;
   let flippedCards = [];
   let matchedPairs = 0;
   let timer;
@@ -89,95 +175,153 @@ document.addEventListener('DOMContentLoaded', function() {
   let isPaused = false;
   let isGameActive = false;
   let movesCount = 0;
-  let hintsUsed = 0;
+  let hintsRemaining = 3;
   let lastHintTime = 0;
   let showingHint = false;
   let hintTimeout;
+  let achievements = [];
   
-  // Add event listeners
+  // Olay dinleyicileri
   startBtn.addEventListener('click', startGame);
   pauseBtn.addEventListener('click', togglePause);
   resumeBtn.addEventListener('click', togglePause);
+  restartBtn.addEventListener('click', restartGame);
   hintBtn.addEventListener('click', showHint);
   soundToggle.addEventListener('click', toggleSound);
   document.getElementById('play-again').addEventListener('click', startGame);
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
   
-  // Responsive sizing - recalculate card size on window resize
+  // Zorluk seviyesi butonları için olay dinleyicileri
+  levelButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      levelButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      currentLevel = LEVELS[this.dataset.level];
+    });
+  });
+  
+  // Duyarlı boyutlandırma - pencere boyutu değiştiğinde kart boyutlarını yeniden hesapla
   window.addEventListener('resize', adjustCardSize);
   
   /**
-   * Starts a new game
+   * Oyunu başlatır
    */
   function startGame() {
     playSound('click');
     
-    // Hide intro and game over, show game container
+    // Ekranları ayarla - Giriş ve oyun sonu gizle, oyun ekranını göster
     introSection.style.display = 'none';
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
     pauseOverlay.style.display = 'none';
     
-    // Reset game state
-    cards = [];
-    score = baseScore;
-    flippedCards = [];
-    matchedPairs = 0;
-    movesCount = 0;
-    hintsUsed = 0;
-    isGameActive = true;
-    isPaused = false;
-    showingHint = false;
+    // Oyun durumunu sıfırla
+    resetGameState();
     
-    if (hintTimeout) {
-      clearTimeout(hintTimeout);
-    }
-    
-    // Create card deck
+    // Kart destesini oluştur ve temayı seç
+    selectRandomTheme();
     createCardDeck();
     
-    // Render cards on board
+    // Kart boyutlarını ayarla ve kartları oluştur
     renderCards();
-    
-    // Adjust card size for responsive design
     adjustCardSize();
     
-    // Update displays
+    // Tema göstergesini güncelle
+    updateThemeIndicator();
+    
+    // İpucu sayısını güncelle
+    hintsRemaining = currentLevel.hints;
+    updateHintCounter();
+    
+    // Ekranları güncelle
     updateScoreDisplay();
     updateMovesDisplay();
     updateProgressDisplay();
     
-    // Start the timer
+    // Zamanlayıcıyı başlat
     timeStarted = Date.now();
     timeElapsed = 0;
     
-    if (timer) {
-      clearInterval(timer);
+    if (timerInterval) {
+      clearInterval(timerInterval);
     }
     
-    timer = startTimer(currentLevel.timeLimit);
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimerDisplay(currentLevel.timeLimit);
   }
   
   /**
-   * Creates the deck of cards for the game
+   * Oyun durumunu sıfırlar
+   */
+  function resetGameState() {
+    cards = [];
+    score = currentLevel.baseScore;
+    flippedCards = [];
+    matchedPairs = 0;
+    movesCount = 0;
+    hintsRemaining = currentLevel.hints;
+    timeElapsed = 0;
+    lastHintTime = 0;
+    isGameActive = true;
+    isPaused = false;
+    showingHint = false;
+    achievements = [];
+    
+    if (hintTimeout) {
+      clearTimeout(hintTimeout);
+    }
+  }
+  
+  /**
+   * Oyunu yeniden başlatır
+   */
+  function restartGame() {
+    if (isPaused) {
+      togglePause(); // Duraklatmayı kapat
+    }
+    startGame(); // Yeni oyun başlat
+  }
+  
+  /**
+   * Rastgele bir tema seçer
+   */
+  function selectRandomTheme() {
+    const themeKeys = Object.keys(THEMES);
+    const randomThemeKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+    selectedTheme = THEMES[randomThemeKey];
+    themeSymbols = shuffleArray([...selectedTheme.symbols]);
+  }
+  
+  /**
+   * Tema göstergesini günceller
+   */
+  function updateThemeIndicator() {
+    const themeIcon = selectedTheme.icon;
+    const themeName = selectedTheme.name;
+    
+    themeIndicator.innerHTML = `
+      <span class="theme-icon">${themeIcon}</span>
+      <span class="theme-name">${themeName}</span>
+    `;
+  }
+  
+  /**
+   * Kart destesini oluşturur
    */
   function createCardDeck() {
-    // Create pairs of cards
     cards = [];
     
-    // Shuffle and get symbols for this game
-    const shuffledSymbols = shuffleArray([...symbols]);
-    const gameSymbols = shuffledSymbols.slice(0, currentLevel.pairs);
+    // Gerekli sembol sayısını al
+    const neededSymbols = themeSymbols.slice(0, currentLevel.pairs);
     
-    // Create pairs
-    gameSymbols.forEach(symbol => {
-      // Add two of each symbol
+    // Her sembol için iki kart oluştur
+    neededSymbols.forEach(symbol => {
       cards.push(createCard(symbol));
       cards.push(createCard(symbol));
     });
     
-    // Shuffle the cards
+    // Kartları karıştır
     cards = shuffleArray(cards);
   }
   
@@ -371,59 +515,153 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /**
-   * Provides a hint by briefly revealing random unmatched cards
+   * İpucu sayısını günceller
+   */
+  function updateHintCounter() {
+    hintCounter.textContent = hintsRemaining;
+    
+    // Görsel olarak ipucu düğmesini devre dışı bırak eğer kalan ipucu yoksa
+    if (hintsRemaining <= 0) {
+      hintBtn.classList.add('disabled');
+    } else {
+      hintBtn.classList.remove('disabled');
+    }
+  }
+  
+  /**
+   * Oyuncuya kısa bir süreliğine çift eşleşen iki kart gösterir (ipucu)
    */
   function showHint() {
+    // İpucu kullanım koşulları
     if (!isGameActive || isPaused || showingHint) return;
     
-    // Check if enough time has passed since last hint
-    const now = Date.now();
-    if (now - lastHintTime < 10000) { // 10 seconds cooldown
-      showAlert('İpucu kullanmak için 10 saniye beklemelisiniz', 'warning');
+    // İpucu sayısını kontrol et
+    if (hintsRemaining <= 0) {
+      showAlert('İpucu hakkınız kalmadı!', 'warning');
       return;
     }
     
-    // Deduct points for using hint
+    // Yeterli süre geçti mi kontrol et
+    const now = Date.now();
+    if (now - lastHintTime < 8000) { // 8 saniye bekleme süresi
+      const remainingSecs = Math.ceil((8000 - (now - lastHintTime)) / 1000);
+      showAlert(`İpucu için ${remainingSecs} saniye bekleyin`, 'warning');
+      return;
+    }
+    
+    // İpucu kullanımını işle
+    hintsRemaining--;
+    updateHintCounter();
+    
+    // Puan düşür
     const hintCost = 10;
     score = Math.max(0, score - hintCost);
-    hintsUsed++;
     lastHintTime = now;
     showingHint = true;
     
-    // Play hint sound
+    // İpucu sesi çal
     playSound('hint');
     
-    // Get all unmatched and unflipped cards
-    const unmatchedCardIndices = cards
-      .map((card, index) => ({ card, index }))
-      .filter(({ card }) => !card.isMatched && !card.isFlipped)
-      .map(({ index }) => index);
+    // Açılmamış ve eşleşmemiş kartları bul
+    const unmatchedCards = [];
     
-    // Shuffle the array and get the first 2 cards
-    const hintIndices = shuffleArray(unmatchedCardIndices).slice(0, 2);
-    
-    // Mark cards as being revealed
-    hintIndices.forEach(index => {
-      cards[index].isRevealed = true;
+    // Açılmamış tüm kartları diziye ekle
+    cards.forEach((card, index) => {
+      if (!card.isMatched && !card.isFlipped) {
+        unmatchedCards.push(index);
+      }
     });
     
-    // Render the cards to show the hint
-    renderCards();
+    // Eşleşen çiftleri bul
+    const pairs = findMatchingPairs(unmatchedCards);
     
-    // Show message
-    showAlert(`İpucu gösteriliyor... -${hintCost} puan`, 'info');
-    
-    // Hide the hint after a delay
-    hintTimeout = setTimeout(() => {
+    // Eğer eşleşen bir çift varsa, o çifti göster
+    if (pairs.length > 0) {
+      // Rastgele bir çift seç
+      const randomPairIndex = Math.floor(Math.random() * pairs.length);
+      const hintIndices = pairs[randomPairIndex];
+      
+      // Kartları göster
       hintIndices.forEach(index => {
-        cards[index].isRevealed = false;
+        cards[index].isRevealed = true;
       });
+      
+      // Kartları tekrar oluştur
       renderCards();
-      showingHint = false;
-    }, 1500);
+      
+      // Mesaj göster
+      showAlert(`İpucu gösteriliyor... -${hintCost} puan`, 'info');
+      
+      // Belirli bir süre sonra ipucunu gizle
+      hintTimeout = setTimeout(() => {
+        hintIndices.forEach(index => {
+          cards[index].isRevealed = false;
+        });
+        renderCards();
+        showingHint = false;
+      }, 1500);
+    } else {
+      // Eşleşen çift yoksa, rastgele 2 açılmamış kart göster
+      if (unmatchedCards.length >= 2) {
+        const shuffledCards = shuffleArray([...unmatchedCards]);
+        const hintIndices = shuffledCards.slice(0, 2);
+        
+        // Kartları göster
+        hintIndices.forEach(index => {
+          cards[index].isRevealed = true;
+        });
+        
+        // Kartları tekrar oluştur
+        renderCards();
+        
+        // Mesaj göster
+        showAlert(`İpucu gösteriliyor... -${hintCost} puan`, 'info');
+        
+        // Belirli bir süre sonra ipucunu gizle
+        hintTimeout = setTimeout(() => {
+          hintIndices.forEach(index => {
+            cards[index].isRevealed = false;
+          });
+          renderCards();
+          showingHint = false;
+        }, 1500);
+      } else {
+        // Yeterli kart yoksa, ipucunu geri ver
+        hintsRemaining++;
+        updateHintCounter();
+        showAlert('Gösterilecek yeterli kart kalmadı!', 'info');
+      }
+    }
     
-    // Update score display
+    // Skoru güncelle
     updateScoreDisplay();
+  }
+  
+  /**
+   * Açılmamış kartlar arasında eşleşen çiftleri bulur
+   */
+  function findMatchingPairs(unmatchedCardIndices) {
+    const pairs = [];
+    const symbolMap = new Map();
+    
+    // Kartları sembollere göre grupla
+    unmatchedCardIndices.forEach(index => {
+      const symbol = cards[index].symbol;
+      if (symbolMap.has(symbol)) {
+        symbolMap.get(symbol).push(index);
+      } else {
+        symbolMap.set(symbol, [index]);
+      }
+    });
+    
+    // Eşleşen çiftleri bul
+    symbolMap.forEach((indices, symbol) => {
+      if (indices.length >= 2) {
+        pairs.push(indices.slice(0, 2));
+      }
+    });
+    
+    return pairs;
   }
   
   /**
@@ -690,49 +928,159 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /**
-   * Ends the game
+   * Oyunu sonlandırır ve skoru hesaplar
    */
   function endGame(completed = false) {
     isGameActive = false;
     
-    // Stop the timer
+    // Eğer zamanlayıcı aktifse durdur
     if (timerInterval) {
       clearInterval(timerInterval);
     }
     
-    // Calculate final score
+    // Başlık ve başarım bölümünü ayarla
     if (completed) {
-      // Time bonus: 2 points per second remaining
+      gameResultTitle.textContent = "Tebrikler! Oyunu Tamamladınız!";
+      
+      // Bonus puanları hesapla
       const timeRemaining = currentLevel.timeLimit - timeElapsed;
       const timeBonus = timeRemaining * 2;
       
-      // Efficiency bonus for fewer moves
+      // Verimlilik bonusu (daha az hamle için)
       const optimalMoves = currentLevel.pairs * 2;
       const moveRatio = optimalMoves / movesCount;
       const efficiencyBonus = Math.round(moveRatio * 50);
       
-      // Add bonuses to score
-      score += timeBonus + efficiencyBonus;
+      // Zorluk seviyesi bonusu
+      let difficultyBonus = 0;
+      if (currentLevel === LEVELS.HARD) {
+        difficultyBonus = 100;
+      } else if (currentLevel === LEVELS.MEDIUM) {
+        difficultyBonus = 50;
+      }
       
-      // Play win sound
+      // Bonusları skora ekle
+      score += timeBonus + efficiencyBonus + difficultyBonus;
+      
+      // Kazanma sesini çal
       playSound('win');
+      
+      // Başarımları kontrol et ve ekle
+      checkAchievements();
+    } else {
+      gameResultTitle.textContent = "Süre Bitti! Oyun Tamamlanamadı.";
+      playSound('lose');
     }
     
-    // Update displays
+    // Ekranları güncelle
     finalScoreDisplay.textContent = score;
     finalTimeDisplay.textContent = formatTime(timeElapsed);
     finalMovesDisplay.textContent = movesCount;
     
-    // Calculate and display rating
+    // Derecelendirmeyi hesapla ve göster
     const stars = calculateRating();
-    updateRatingDisplay(stars);
+    updateRatingStarsDisplay(stars);
     
-    // Show game over screen
+    // Oyun sonu ekranını göster
     gameContainer.style.display = 'none';
     gameOverContainer.style.display = 'block';
     
-    // Save score to leaderboard
-    window.saveScore('memoryMatch', score);
+    // Skoru kaydet
+    if (completed) {
+      window.saveScore('memoryMatch', score);
+    }
+  }
+  
+  /**
+   * Başarımları kontrol eder ve kazanılan başarımları ekler
+   */
+  function checkAchievements() {
+    // Başarımlar listesini temizle
+    achievements = [];
+    
+    // Zorluk seviyesine göre ideal süre ve hamle sayısını belirle
+    const idealTime = currentLevel.timeLimit * 0.4; // ideal süre toplam sürenin %40'ı
+    const optimalMoves = currentLevel.pairs * 2;    // ideal hamle kartların 2 katı
+    
+    // Hız başarımı - Zamanın %40'ından daha hızlı tamamlama
+    if (timeElapsed <= idealTime) {
+      achievements.push(ACHIEVEMENTS.SPEED_DEMON);
+    }
+    
+    // Kusursuz hafıza başarımı - Hiç yanlış hamle yapmadan tamamlama
+    if (movesCount <= optimalMoves) {
+      achievements.push(ACHIEVEMENTS.PERFECT_MEMORY);
+    }
+    
+    // İpucu ustası başarımı - Hiç ipucu kullanmadan tamamlama
+    if (hintsRemaining === currentLevel.hints) {
+      achievements.push(ACHIEVEMENTS.HINT_MASTER);
+    }
+    
+    // Puan kralı başarımı - Yüksek puan toplama
+    const highScoreThreshold = currentLevel.baseScore * 3;
+    if (score >= highScoreThreshold) {
+      achievements.push(ACHIEVEMENTS.HIGH_SCORER);
+    }
+    
+    // Eğer başarım kazanıldıysa, rastgele bir başarımı göster
+    if (achievements.length > 0) {
+      const randomAchievement = achievements[Math.floor(Math.random() * achievements.length)];
+      showAchievement(randomAchievement);
+      
+      // Eğer ses efektleri açıksa, başarım sesini çal
+      playSound('achievement');
+    }
+  }
+  
+  /**
+   * Başarımı gösterir
+   */
+  function showAchievement(achievement) {
+    if (!achievement) return;
+    
+    // Başarım adını ve ikonu ayarla
+    achievementName.textContent = `${achievement.name} - ${achievement.description}`;
+    
+    // Başarım göstergesini görünür yap
+    memoryAchievement.style.display = 'flex';
+    
+    // Animasyon için önce gizli sınıfı ekle
+    memoryAchievement.classList.add('achievement-reveal');
+    
+    // 1 saniye sonra animasyon sınıfını kaldır
+    setTimeout(() => {
+      memoryAchievement.classList.remove('achievement-reveal');
+    }, 1000);
+  }
+  
+  /**
+   * Yıldız derecelendirmesi göstergesini günceller
+   */
+  function updateRatingStarsDisplay(starsCount) {
+    // Tüm yıldızları boş yap
+    const starElements = ratingStars.querySelectorAll('i');
+    starElements.forEach(star => {
+      star.className = 'far fa-star';
+    });
+    
+    // İlgili sayıda yıldızı dolu yap
+    for (let i = 0; i < starsCount; i++) {
+      if (i < starElements.length) {
+        starElements[i].className = 'fas fa-star';
+      }
+    }
+    
+    // Derecelendirme metnini güncelle
+    const ratingTexts = {
+      1: 'Acemi',
+      2: 'Ortalama',
+      3: 'İyi',
+      4: 'Çok İyi',
+      5: 'Mükemmel!'
+    };
+    
+    ratingText.textContent = ratingTexts[starsCount] || 'İyi';
   }
   
   /**

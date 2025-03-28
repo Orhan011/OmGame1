@@ -11,7 +11,7 @@
         <div class="row align-items-center">
           <div class="col-md-8">
             <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
+              <h4 class="instruction-title"><i class="fas fa-brain me-2"></i>Nasıl Oynanır?</h4>
               <p>Görsel hafızanızı kart çiftlerini eşleştirerek test edin. Kartların pozisyonlarını hatırlayın ve tüm çiftleri mümkün olduğunca az hamlede bulmaya çalışın.</p>
               <div class="memory-tips">
                 <div class="tip-badge">
@@ -22,7 +22,15 @@
             </div>
           </div>
           <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
+            <div class="memory-levels-selector">
+              <div class="level-label">Zorluk</div>
+              <div class="level-buttons">
+                <button id="level-easy" class="level-btn" data-level="EASY">Kolay</button>
+                <button id="level-medium" class="level-btn active" data-level="MEDIUM">Orta</button>
+                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
+              </div>
+            </div>
+            <button id="start-game" class="btn btn-primary btn-lg pulse-animation mt-3">
               <i class="fas fa-play me-2"></i>Oyunu Başlat
             </button>
           </div>
@@ -33,32 +41,40 @@
       <div id="game-container" class="memory-game-container" style="display: none;">
         <!-- Game Header -->
         <div class="game-header">
-          <div class="game-stats">
-            <div class="game-stat">
-              <i class="fas fa-trophy"></i>
-              <span class="stat-label">Puan</span>
-              <span id="score-display" class="stat-value">100</span>
+          <div class="memory-stats-panel">
+            <div class="game-stats">
+              <div class="game-stat">
+                <i class="fas fa-trophy"></i>
+                <span class="stat-label">Puan</span>
+                <span id="score-display" class="stat-value">100</span>
+              </div>
+              <div class="game-stat">
+                <i class="fas fa-hourglass-half"></i>
+                <span class="stat-label">Süre</span>
+                <span id="timer-display" class="stat-value">2:00</span>
+              </div>
+              <div class="game-stat">
+                <i class="fas fa-sync-alt"></i>
+                <span class="stat-label">Hamle</span>
+                <span id="moves-display" class="stat-value">0</span>
+              </div>
             </div>
-            <div class="game-stat">
-              <i class="fas fa-hourglass-half"></i>
-              <span class="stat-label">Süre</span>
-              <span id="timer-display" class="stat-value">2:00</span>
-            </div>
-            <div class="game-stat">
-              <i class="fas fa-sync-alt"></i>
-              <span class="stat-label">Hamle</span>
-              <span id="moves-display" class="stat-value">0</span>
+            
+            <div class="theme-indicator" id="theme-indicator">
+              <span class="theme-icon"></span>
+              <span class="theme-name">Tema</span>
             </div>
           </div>
           
           <div class="game-controls-top">
-            <button id="pause-game" class="game-control-btn">
+            <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
               <i class="fas fa-pause"></i>
             </button>
-            <button id="hint-button" class="game-control-btn" title="İpucu göster (5 puan)">
+            <button id="hint-button" class="game-control-btn" title="İpucu göster (10 puan düşer)">
               <i class="fas fa-lightbulb"></i>
+              <span class="hint-counter" id="hint-counter">3</span>
             </button>
-            <button id="sound-toggle" class="game-control-btn active">
+            <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
               <i class="fas fa-volume-up"></i>
             </button>
           </div>
@@ -68,16 +84,18 @@
         <div id="alert-container" class="memory-alert"></div>
         
         <!-- Memory Board -->
-        <div class="memory-board-container">
-          <div class="memory-board-backdrop"></div>
-          <div id="memory-grid" class="memory-grid"></div>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="memory-progress">
-          <div class="progress-label">İlerleme: <span id="progress-percent">0%</span></div>
-          <div class="progress">
-            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        <div class="memory-board-wrapper">
+          <div class="memory-board-container">
+            <div class="memory-board-backdrop"></div>
+            <div id="memory-grid" class="memory-grid"></div>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div class="memory-progress">
+            <div class="progress-label">İlerleme: <span id="progress-percent">0%</span></div>
+            <div class="progress">
+              <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -89,7 +107,7 @@
             <span class="result-badge">
               <i class="fas fa-flag-checkered"></i>
             </span>
-            <h2 class="mb-0">Oyun Tamamlandı!</h2>
+            <h2 class="mb-0" id="game-result-title">Oyun Tamamlandı!</h2>
           </div>
           
           <div class="memory-results-body">
@@ -107,7 +125,7 @@
                 <div class="result-stat-value">
                   <span id="final-time">0:00</span>
                 </div>
-                <div class="result-stat-label">Tamamlama Süresi</div>
+                <div class="result-stat-label">Süre</div>
               </div>
               
               <div class="result-stat">
@@ -115,12 +133,12 @@
                 <div class="result-stat-value">
                   <span id="final-moves">0</span>
                 </div>
-                <div class="result-stat-label">Toplam Hamle</div>
+                <div class="result-stat-label">Hamle</div>
               </div>
             </div>
             
             <div class="results-rating">
-              <div class="rating-stars">
+              <div class="rating-stars" id="rating-stars">
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
@@ -128,6 +146,16 @@
                 <i class="far fa-star"></i>
               </div>
               <div class="rating-text" id="rating-text">İyi!</div>
+            </div>
+            
+            <div class="memory-achievement" id="memory-achievement" style="display: none;">
+              <div class="achievement-icon">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="achievement-text">
+                <div class="achievement-title">Başarım Kazanıldı!</div>
+                <div class="achievement-name" id="achievement-name">Hafıza Uzmanı</div>
+              </div>
             </div>
           </div>
           
@@ -139,17 +167,17 @@
               <i class="fas fa-trophy me-2"></i>Skor Tablosu
             </a>
           </div>
-        </div>
-        
-        <div class="memory-share-section">
-          <p>Skorunuzu paylaşın:</p>
-          <div class="share-buttons">
-            <button class="share-btn" title="Kopyala" id="copy-score">
-              <i class="fas fa-copy"></i>
-            </button>
-            <button class="share-btn" title="Paylaş" id="share-score">
-              <i class="fas fa-share-alt"></i>
-            </button>
+          
+          <div class="memory-share-section">
+            <p>Skorunuzu paylaşın:</p>
+            <div class="share-buttons">
+              <button class="share-btn" title="Kopyala" id="copy-score">
+                <i class="fas fa-copy"></i>
+              </button>
+              <button class="share-btn" title="Paylaş" id="share-score">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -159,9 +187,17 @@
         <div class="pause-card">
           <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
           <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
-          <button id="resume-game" class="btn btn-primary btn-lg">
-            <i class="fas fa-play me-2"></i>Devam Et
-          </button>
+          <div class="pause-menu-buttons">
+            <button id="resume-game" class="btn btn-primary">
+              <i class="fas fa-play me-2"></i>Devam Et
+            </button>
+            <button id="restart-game" class="btn btn-outline-primary">
+              <i class="fas fa-redo me-2"></i>Yeniden Başlat
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+              <i class="fas fa-home me-2"></i>Ana Sayfa
+            </a>
+          </div>
         </div>
       </div>
     </div>
