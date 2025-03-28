@@ -1,97 +1,60 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container">
-  <h1 class="leaderboard-title text-center mb-4">Skor Tablosu</h1>
-  
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="game-instructions mb-4">
-        <p>Tüm beyin geliştirme oyunlarında skorlarınızın diğer oyunculara göre nasıl olduğunu kontrol edin.</p>
-      </div>
-      
-      <!-- Tab Navigation -->
-      <div class="game-filter">
-        <button class="game-filter-btn active" id="word-puzzle-tab" data-bs-toggle="tab" data-bs-target="#word-puzzle" type="button" role="tab" aria-controls="word-puzzle" aria-selected="true">Kelime Bulmaca</button>
-        <button class="game-filter-btn" id="memory-match-tab" data-bs-toggle="tab" data-bs-target="#memory-match" type="button" role="tab" aria-controls="memory-match" aria-selected="false">Hafıza Kartları</button>
-        <button class="game-filter-btn" id="number-sequence-tab" data-bs-toggle="tab" data-bs-target="#number-sequence" type="button" role="tab" aria-controls="number-sequence" aria-selected="false">Sayı Dizisi</button>
-        <button class="game-filter-btn" id="pattern-recognition-tab" data-bs-toggle="tab" data-bs-target="#pattern-recognition" type="button" role="tab" aria-controls="pattern-recognition" aria-selected="false">Yapboz</button>
-        <button class="game-filter-btn" id="rotation-3d-tab" data-bs-toggle="tab" data-bs-target="#rotation-3d" type="button" role="tab" aria-controls="rotation-3d" aria-selected="false">3D Rotasyon</button>
-      </div>
-      
-      <!-- Tab Content -->
-      <div class="tab-content leaderboard-container" id="leaderboardTabContent">
-        <!-- Word Puzzle Leaderboard -->
-        <div class="tab-pane fade show active" id="word-puzzle" role="tabpanel" aria-labelledby="word-puzzle-tab">
-          <h3 class="mb-3">Kelime Bulmaca En Yüksek Skorlar</h3>
-          <div id="word-puzzle-leaderboard" class="leaderboard-section">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-              </div>
-            </div>
-          </div>
+<div class="container leaderboard-page">
+  <div class="leaderboard-header">
+    <h1 class="text-center">Skor Tablosu</h1>
+    <p class="text-center lead">Tüm beyin geliştirme oyunlarında skorlarınızın diğer oyunculara göre nasıl olduğunu kontrol edin.</p>
+  </div>
+
+  <div class="game-tabs">
+    <div class="nav-container">
+      <button class="game-tab active" data-game="word-puzzle">
+        <i class="fas fa-font"></i>
+        Kelime Bulmaca
+      </button>
+      <button class="game-tab" data-game="memory-match">
+        <i class="fas fa-brain"></i>
+        Hafıza Kartları
+      </button>
+      <button class="game-tab" data-game="number-sequence">
+        <i class="fas fa-sort-numeric-up"></i>
+        Sayı Dizisi
+      </button>
+      <button class="game-tab" data-game="puzzle">
+        <i class="fas fa-puzzle-piece"></i>
+        Yapboz
+      </button>
+      <button class="game-tab" data-game="3d-rotation">
+        <i class="fas fa-cube"></i>
+        3D Rotasyon
+      </button>
+    </div>
+
+    <div class="leaderboard-cards">
+      <div class="leaderboard-card active" id="word-puzzle-board">
+        <div class="card-header">
+          <h3>Kelime Bulmaca En Yüksek Skorlar</h3>
+          <span class="refresh-btn"><i class="fas fa-sync-alt"></i></span>
         </div>
-        
-        <!-- Memory Match Leaderboard -->
-        <div class="tab-pane fade" id="memory-match" role="tabpanel" aria-labelledby="memory-match-tab">
-          <h3 class="mb-3">Hafıza Kartları En Yüksek Skorlar</h3>
-          <div id="memory-match-leaderboard" class="leaderboard-section">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-              </div>
-            </div>
+        <div class="leaderboard-table">
+          <div class="table-header">
+            <div class="rank">Sıra</div>
+            <div class="player">Oyuncu</div>
+            <div class="score">Skor</div>
+            <div class="date">Tarih</div>
           </div>
-        </div>
-        
-        <!-- Number Sequence Leaderboard -->
-        <div class="tab-pane fade" id="number-sequence" role="tabpanel" aria-labelledby="number-sequence-tab">
-          <h3 class="mb-3">Sayı Dizisi En Yüksek Skorlar</h3>
-          <div id="number-sequence-leaderboard" class="leaderboard-section">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Pattern Recognition Leaderboard -->
-        <div class="tab-pane fade" id="pattern-recognition" role="tabpanel" aria-labelledby="pattern-recognition-tab">
-          <h3 class="mb-3">Yapboz En Yüksek Skorlar</h3>
-          <div id="pattern-recognition-leaderboard" class="leaderboard-section">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 3D Rotation Leaderboard -->
-        <div class="tab-pane fade" id="rotation-3d" role="tabpanel" aria-labelledby="rotation-3d-tab">
-          <h3 class="mb-3">3D Rotasyon En Yüksek Skorlar</h3>
-          <div id="rotation-3d-leaderboard" class="leaderboard-section">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-              </div>
-            </div>
+          <div class="table-body" id="word-puzzle-scores">
+            <!-- Scores will be loaded here -->
           </div>
         </div>
       </div>
-      
-      <!-- Overall Stats -->
-      <div class="card bg-dark mt-5">
-        <div class="card-body">
-          <h3 class="card-title">Beyin Geliştirme Faydaları</h3>
-          <p class="card-text">Düzenli beyin egzersizleri, hafıza, dikkat ve problem çözme becerileri gibi bilişsel yetenekleri geliştirebilir. Zihinsel performansınızı artırmak için oynamaya devam edin!</p>
-          <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">
-            <i class="fas fa-gamepad me-1"></i>Daha Fazla Oyun Deneyin
-          </a>
-        </div>
-      </div>
+
+      <!-- Other game boards -->
+      <div class="leaderboard-card" id="memory-match-board"></div>
+      <div class="leaderboard-card" id="number-sequence-board"></div>
+      <div class="leaderboard-card" id="puzzle-board"></div>
+      <div class="leaderboard-card" id="3d-rotation-board"></div>
     </div>
   </div>
 </div>
