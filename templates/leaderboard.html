@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center mb-4">Leaderboard</h1>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <p class="text-center mb-4">
+        Check how your scores compare to other players across all brain training games.
+      </p>
+      
+      <!-- Tab Navigation -->
+      <ul class="nav nav-tabs mb-4" id="leaderboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active leaderboard-tab" id="word-puzzle-tab" data-bs-toggle="tab" data-bs-target="#word-puzzle" type="button" role="tab" aria-controls="word-puzzle" aria-selected="true">Word Puzzle</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link leaderboard-tab" id="memory-match-tab" data-bs-toggle="tab" data-bs-target="#memory-match" type="button" role="tab" aria-controls="memory-match" aria-selected="false">Memory Match</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link leaderboard-tab" id="number-sequence-tab" data-bs-toggle="tab" data-bs-target="#number-sequence" type="button" role="tab" aria-controls="number-sequence" aria-selected="false">Number Sequence</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link leaderboard-tab" id="three-d-tab" data-bs-toggle="tab" data-bs-target="#three-d" type="button" role="tab" aria-controls="three-d" aria-selected="false">3D Rotation</button>
+        </li>
+      </ul>
+      
+      <!-- Tab Content -->
+      <div class="tab-content" id="leaderboardTabContent">
+        <!-- Word Puzzle Leaderboard -->
+        <div class="tab-pane fade show active" id="word-puzzle" role="tabpanel" aria-labelledby="word-puzzle-tab">
+          <h3 class="mb-3">Word Puzzle Top Scores</h3>
+          <div id="word-puzzle-leaderboard" class="leaderboard-section">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Memory Match Leaderboard -->
+        <div class="tab-pane fade" id="memory-match" role="tabpanel" aria-labelledby="memory-match-tab">
+          <h3 class="mb-3">Memory Match Top Scores</h3>
+          <div id="memory-match-leaderboard" class="leaderboard-section">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Number Sequence Leaderboard -->
+        <div class="tab-pane fade" id="number-sequence" role="tabpanel" aria-labelledby="number-sequence-tab">
+          <h3 class="mb-3">Number Sequence Top Scores</h3>
+          <div id="number-sequence-leaderboard" class="leaderboard-section">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 3D Rotation Leaderboard -->
+        <div class="tab-pane fade" id="three-d" role="tabpanel" aria-labelledby="three-d-tab">
+          <h3 class="mb-3">3D Rotation Top Scores</h3>
+          <div id="3d-rotation-leaderboard" class="leaderboard-section">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Overall Stats -->
+      <div class="card bg-dark mt-5">
+        <div class="card-body">
+          <h3 class="card-title">Brain Training Benefits</h3>
+          <p class="card-text">Regular brain training can improve cognitive abilities such as memory, attention, and problem-solving skills. Keep playing to enhance your mental performance!</p>
+          <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">Try More Games</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+{% endblock %}

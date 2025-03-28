@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center mb-4">Brain Development Articles</h1>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-center mb-5">
+        Explore our collection of informative articles about brain function, cognitive development, and the science behind our brain training games.
+      </p>
+      
+      {% for article in articles %}
+      <div class="article-container mb-5">
+        <h2 class="article-title">{{ article.title }}</h2>
+        <div class="article-content">
+          {{ article.content|safe }}
+        </div>
+        <p class="article-meta">Published: {{ article.created_at.strftime('%B %d, %Y') }}</p>
+      </div>
+      {% endfor %}
+      
+      <div class="text-center mt-5">
+        <a href="{{ url_for('tips') }}" class="btn btn-primary">View Performance Tips</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

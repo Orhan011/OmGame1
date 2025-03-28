@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center mb-4">Number Sequence</h1>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-center mb-4">
+        Identify the pattern in each sequence and predict the next number. Test your mathematical and logical reasoning skills.
+      </p>
+      
+      <!-- Game Start Button -->
+      <div class="text-center mb-4">
+        <button id="start-game" class="btn btn-primary btn-lg">Start Game</button>
+      </div>
+      
+      <!-- Game Container -->
+      <div id="game-container" class="game-container" style="display: none;">
+        <!-- Game Header -->
+        <div class="game-header">
+          <div class="d-flex">
+            <div class="score-box me-3">
+              <span>Score: <span id="score-display">0</span></span>
+            </div>
+            <div class="level-box">
+              <span>Level: <span id="level-display">1</span></span>
+            </div>
+          </div>
+          <div class="timer-box">
+            <span>Time: <span id="timer-display">3:00</span></span>
+          </div>
+        </div>
+        
+        <!-- Alert Container -->
+        <div id="alert-container" class="mt-3"></div>
+        
+        <!-- Sequence Display -->
+        <div id="sequence-display" class="sequence-display my-4">2, 4, 6, 8, 10, ?</div>
+        
+        <!-- Answer Input -->
+        <div class="input-group mb-3">
+          <input type="number" id="sequence-input" class="form-control sequence-input" placeholder="Enter the next number" aria-label="Next number">
+          <button class="btn btn-primary" type="button" id="submit-answer">Submit</button>
+        </div>
+      </div>
+      
+      <!-- Game Over Container -->
+      <div id="game-over-container" class="text-center game-container" style="display: none;">
+        <h2 class="mb-4">Game Over!</h2>
+        <p class="fs-4 mb-3">Your final score: <span id="final-score" class="fw-bold text-primary">0</span></p>
+        
+        <button id="play-again" class="btn btn-primary btn-lg mt-3">Play Again</button>
+        <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg mt-3 ms-2">View Leaderboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/numberSequence.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="row align-items-center">
+    <div class="col-lg-6">
+      <h1 class="hero-title">Train Your Brain,<br>Boost Your IQ</h1>
+      <p class="hero-subtitle">Challenge yourself with our collection of brain training games designed to improve cognitive abilities.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Start Playing Now</a>
+        <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Learn More</a>
+      </div>
+    </div>
+    <div class="col-lg-6 mt-4 mt-lg-0 text-center">
+      <svg width="300" height="300" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5 C25 5, 10 25, 10 45 C10 75, 35 85, 50 95 C65 85, 90 75, 90 45 C90 25, 75 5, 50 5" fill="#4c8bf5" opacity="0.8" />
+        <path d="M50 15 C35 15, 25 30, 25 45 C25 65, 40 75, 50 80 C60 75, 75 65, 75 45 C75 30, 65 15, 50 15" fill="#121212" />
+        <path d="M35 40 C35 32, 42 25, 50 25 C58 25, 65 32, 65 40 C65 48, 58 55, 50 55 C42 55, 35 48, 35 40" fill="#4c8bf5" />
+        <circle cx="50" cy="40" r="5" fill="#FFF" />
+        <path d="M50 55 L50 70 M40 60 L60 60" stroke="#4c8bf5" stroke-width="2" />
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Games Section -->
+<section class="mt-5">
+  <h2 class="text-center mb-4">Brain Training Games</h2>
+  <div class="row">
+    <!-- Word Puzzle -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-font feature-icon"></i>
+          <h3 class="card-title">Word Puzzle</h3>
+          <p class="card-text">Create meaningful words from given letters to test your vocabulary and linguistic abilities.</p>
+          <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary mt-2">Play Now</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Memory Match -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-clone feature-icon"></i>
+          <h3 class="card-title">Memory Match</h3>
+          <p class="card-text">Test your visual memory by matching pairs of cards as quickly as possible.</p>
+          <a href="{{ url_for('memory_match') }}" class="btn btn-primary mt-2">Play Now</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Number Sequence -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-sort-numeric-up feature-icon"></i>
+          <h3 class="card-title">Number Sequence</h3>
+          <p class="card-text">Identify patterns in number sequences to improve your logical reasoning skills.</p>
+          <a href="{{ url_for('number_sequence') }}" class="btn btn-primary mt-2">Play Now</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 3D Rotation -->
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-cube feature-icon"></i>
+          <h3 class="card-title">3D Rotation</h3>
+          <p class="card-text">Enhance your spatial intelligence by mentally rotating 3D objects.</p>
+          <a href="{{ url_for('three_d_rotation') }}" class="btn btn-primary mt-2">Play Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="mt-5">
+  <h2 class="text-center mb-4">Benefits of Brain Training</h2>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="card-title"><i class="fas fa-tachometer-alt me-2"></i> Improved Processing Speed</h3>
+          <p class="card-text">Regular brain training has been shown to enhance how quickly your brain processes information, leading to faster decision-making and reaction times.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="card-title"><i class="fas fa-memory me-2"></i> Enhanced Memory</h3>
+          <p class="card-text">Memory games help strengthen neural pathways, improving both short-term and long-term memory functions for better information retention.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h3 class="card-title"><i class="fas fa-lightbulb me-2"></i> Problem-Solving Skills</h3>
+          <p class="card-text">Engaging with puzzles and pattern recognition exercises improves your ability to analyze situations and develop effective solutions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="mt-5 text-center">
+  <div class="card bg-dark">
+    <div class="card-body py-5">
+      <h2 class="card-title">Ready to Challenge Your Brain?</h2>
+      <p class="card-text mb-4">Start playing our brain training games today and track your progress over time.</p>
+      <a href="{{ url_for('word_puzzle') }}" class="btn btn-lg btn-primary me-2 mb-2">Play Now</a>
+      <a href="{{ url_for('leaderboard') }}" class="btn btn-lg btn-outline-primary mb-2">View Leaderboard</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center mb-4">Performance Improvement Tips</h1>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-center mb-5">
+        Practical advice and strategies to help you maximize your brain training results and improve your cognitive performance.
+      </p>
+      
+      {% for tip in tips %}
+      <div class="article-container mb-5">
+        <h2 class="article-title">{{ tip.title }}</h2>
+        <div class="article-content">
+          {{ tip.content|safe }}
+        </div>
+        <p class="article-meta">Published: {{ tip.created_at.strftime('%B %d, %Y') }}</p>
+      </div>
+      {% endfor %}
+      
+      <div class="card bg-dark mt-5">
+        <div class="card-body text-center">
+          <h3 class="card-title">Ready to Put These Tips into Practice?</h3>
+          <p class="card-text">Try our brain training games and see how applying these strategies can improve your performance.</p>
+          <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">Play Brain Games</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

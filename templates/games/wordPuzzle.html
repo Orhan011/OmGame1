@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center mb-4">Word Puzzle</h1>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <p class="text-center mb-4">
+        Create as many words as possible using the letters below. Words must be at least 3 letters long.
+      </p>
+      
+      <!-- Game Start Button -->
+      <div class="text-center mb-4">
+        <button id="start-game" class="btn btn-primary btn-lg">Start Game</button>
+      </div>
+      
+      <!-- Game Container -->
+      <div id="game-container" class="game-container" style="display: none;">
+        <!-- Game Header -->
+        <div class="game-header">
+          <div class="score-box">
+            <span>Score: <span id="score-display">0</span></span>
+          </div>
+          <div class="timer-box">
+            <span>Time: <span id="timer-display">1:30</span></span>
+          </div>
+        </div>
+        
+        <!-- Alert Container -->
+        <div id="alert-container" class="mt-3"></div>
+        
+        <!-- Letter Tiles -->
+        <div id="letter-container" class="letter-container my-4"></div>
+        
+        <!-- Word Input -->
+        <div class="input-group mb-3">
+          <input type="text" id="word-input" class="form-control word-input" placeholder="Type or click letters" aria-label="Enter word">
+          <button class="btn btn-primary" type="button" id="submit-word">Submit</button>
+        </div>
+        
+        <!-- Found Words -->
+        <div class="mt-4">
+          <h5>Found Words:</h5>
+          <div id="word-list" class="d-flex flex-wrap mt-2"></div>
+        </div>
+      </div>
+      
+      <!-- Game Over Container -->
+      <div id="game-over-container" class="text-center game-container" style="display: none;">
+        <h2 class="mb-4">Game Over!</h2>
+        <p class="fs-4 mb-3">Your final score: <span id="final-score" class="fw-bold text-primary">0</span></p>
+        
+        <button id="play-again" class="btn btn-primary btn-lg mt-3">Play Again</button>
+        <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg mt-3 ms-2">View Leaderboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/wordPuzzle.js') }}"></script>
+{% endblock %}
