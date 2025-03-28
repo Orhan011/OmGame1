@@ -14,7 +14,7 @@ def initialize_database():
         # Check if we need to initialize the database by safely querying
         if User.query.filter_by(username="Anonymous").first() is None:
             app.logger.info("Initializing database with default data")
-            
+
             # Create a default user
             default_user = User(
                 username="Anonymous",
@@ -23,7 +23,7 @@ def initialize_database():
             )
             db.session.add(default_user)
             db.session.commit()  # Commit the user first to get a valid ID
-            
+
             # Create some sample articles
             articles = [
                 Article(
@@ -62,10 +62,10 @@ def initialize_database():
                     category="tip"
                 )
             ]
-            
+
             for article in articles:
                 db.session.add(article)
-            
+
             db.session.commit()
             app.logger.info("Database initialized with default data")
     except Exception as e:
@@ -107,7 +107,7 @@ def leaderboard():
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
     rotation_3d_scores = Score.query.filter_by(game_type='3dRotation').order_by(Score.score.desc()).limit(10).all()
-    
+
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
@@ -131,26 +131,26 @@ def tips():
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
     data = request.json
-    
+
     # Use anonymous user or a session-based temporary user if not logged in
     user_id = session.get('user_id', 1)  # Default to user id 1 if not logged in
-    
+
     new_score = Score(
         user_id=user_id,
         game_type=data['gameType'],
         score=data['score']
     )
-    
+
     db.session.add(new_score)
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Score saved successfully'})
 
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
     scores = Score.query.filter_by(game_type=game_type).order_by(Score.score.desc()).limit(10).all()
     score_list = []
-    
+
     for score in scores:
         user = User.query.get(score.user_id)
         score_list.append({
@@ -158,7 +158,7 @@ def get_scores(game_type):
             'score': score.score,
             'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
-    
+
     return jsonify(score_list)
 
 # The initialize_database function is already defined above using the @app.before_first_request decorator
