@@ -87,32 +87,32 @@ def initialize_database():
                 ),
                 Article(
                     title="How Brain Training Works",
-                    content="Brain training works on the principle of neuroplasticity - your brain's ability to reorganize itself by forming new neural connections. When you engage in brain training exercises, you're essentially giving your brain a workout. Just as physical exercise strengthens your muscles, cognitive exercises can strengthen neural pathways, potentially improving your mental capabilities. Consistent practice is key to seeing improvements.",
+                    content="Beyin eğitimi, nöroplastisite prensibi üzerinde çalışır - beyninizin yeni sinirsel bağlantılar oluşturarak kendini yeniden düzenleme yeteneğidir. Beyin eğitimi egzersizleriyle uğraştığınızda, aslında beyninize bir antrenman yaptırıyorsunuz. Fiziksel egzersizin kaslarınızı güçlendirmesi gibi, bilişsel egzersizler de sinir yollarını güçlendirerek zihinsel yeteneklerinizi potansiyel olarak geliştirebilir. İyileşmeleri görmek için tutarlı pratik yapmak önemlidir.",
                     category="article"
                 ),
                 Article(
-                    title="The Science of Memory",
-                    content="Memory is not a single entity but a complex system comprising different types: sensory memory, short-term (working) memory, and long-term memory. Our memory games target each type, helping you improve information retention and recall. Research shows that regular memory exercises can slow age-related decline and potentially enhance mental performance across various cognitive tasks.",
+                    title="Hafızanın Bilimi",
+                    content="Hafıza tek bir varlık değil, farklı türleri içeren karmaşık bir sistemdir: duyusal hafıza, kısa süreli (çalışma) hafıza ve uzun süreli hafıza. Hafıza oyunlarımız her türü hedefleyerek bilgi saklama ve hatırlama yeteneğinizi geliştirmenize yardımcı olur. Araştırmalar, düzenli hafıza egzersizlerinin yaşla ilgili gerilemeyi yavaşlatabileceğini ve çeşitli bilişsel görevlerde zihinsel performansı potansiyel olarak artırabileceğini gösteriyor.",
                     category="article"
                 ),
                 Article(
-                    title="Hydration and Brain Function",
-                    content="Staying well-hydrated is crucial for optimal brain function. Even mild dehydration can impair cognitive performance, including attention, memory, and mood. Aim to drink at least 8 glasses of water daily for peak mental performance during brain training exercises.",
+                    title="Hidrasyon ve Beyin Fonksiyonu",
+                    content="İyi hidrate kalmak, optimal beyin fonksiyonu için çok önemlidir. Hafif dehidrasyon bile dikkat, hafıza ve ruh hali dahil olmak üzere bilişsel performansı bozabilir. Beyin eğitimi egzersizleri sırasında en yüksek zihinsel performans için günde en az 8 bardak su içmeyi hedefleyin.",
                     category="tip"
                 ),
                 Article(
-                    title="Sleep Quality and Cognitive Performance",
-                    content="Quality sleep is essential for cognitive processing and memory consolidation. Aim for 7-9 hours of uninterrupted sleep nightly. Establish a regular sleep schedule and create a restful environment by limiting screen time before bed and keeping your bedroom cool and dark.",
+                    title="Uyku Kalitesi ve Bilişsel Performans",
+                    content="Kaliteli uyku, bilişsel işlem ve hafıza pekiştirmesi için gereklidir. Her gece kesintisiz 7-9 saat uyumayı hedefleyin. Düzenli bir uyku programı oluşturun ve yatmadan önce ekran süresini sınırlayarak, yatak odanızı serin ve karanlık tutarak huzurlu bir ortam yaratın.",
                     category="tip"
                 ),
                 Article(
-                    title="Nutrition for Brain Health",
-                    content="What you eat affects how your brain functions. Foods rich in omega-3 fatty acids (like fish, walnuts, and flaxseeds), antioxidants (colorful fruits and vegetables), and B vitamins (whole grains, eggs) support brain health. Consider incorporating these brain-boosting foods into your daily diet.",
+                    title="Beyin Sağlığı için Beslenme",
+                    content="Ne yediğiniz beyninizin nasıl çalıştığını etkiler. Omega-3 yağ asitleri (balık, ceviz ve keten tohumu gibi), antioksidanlar (renkli meyve ve sebzeler) ve B vitaminleri (tam tahıllar, yumurta) açısından zengin gıdalar beyin sağlığını destekler. Bu beyin güçlendirici gıdaları günlük diyetinize dahil etmeyi düşünün.",
                     category="tip"
                 ),
                 Article(
-                    title="Physical Exercise and Cognitive Function",
-                    content="Regular physical activity increases blood flow to the brain and stimulates the growth of new brain cells. Even 30 minutes of moderate exercise daily can enhance memory, attention, and problem-solving abilities. Try combining brain training with physical exercise for maximum benefits.",
+                    title="Fiziksel Egzersiz ve Bilişsel İşlev",
+                    content="Düzenli fiziksel aktivite, beyne kan akışını artırır ve yeni beyin hücrelerinin oluşumunu teşvik eder. Günde sadece 30 dakikalık orta yoğunlukta egzersiz bile hafıza, dikkat ve problem çözme yeteneklerini geliştirebilir. Maksimum fayda için beyin eğitimini fiziksel egzersizle birleştirmeyi deneyin.",
                     category="tip"
                 )
             ]
