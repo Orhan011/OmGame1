@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const ratingText = document.getElementById('rating-text');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
-  
+
   // Game State
   let letters = [];
   let score = 0;
@@ -38,13 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
   let selectedLetters = [];
   let gameStartTime;
   let soundEnabled = true;
-  
+
   // Constants 
   const GAME_DURATION = 90; // in seconds
   const MIN_WORD_LENGTH = 3;
   const HINT_MAX = 3;
-  const HINT_PENALTY = 15; // Time penalty for using a hint
-  
+  const HINT_PENALTY = 0; // İpucu cezasını kaldırdık
+
   // Turkish word list - basic words for demo
   const turkishWordList = [
     'kapı', 'masa', 'kalem', 'kitap', 'kedi', 'köpek', 'kuş', 'balık', 
@@ -61,45 +61,45 @@ document.addEventListener('DOMContentLoaded', function() {
     'büyük', 'küçük', 'uzun', 'kısa', 'güzel', 'çirkin', 'sıcak', 'soğuk',
     'hızlı', 'yavaş', 'yeni', 'eski', 'iyi', 'kötü', 'doğru', 'yanlış'
   ];
-  
+
   // Dictionary to verify words
   const wordDictionary = new Set(turkishWordList);
-  
+
   // Consonants and vowels in Turkish
   const consonants = ['b', 'c', 'ç', 'd', 'f', 'g', 'ğ', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'r', 's', 'ş', 't', 'v', 'y', 'z'];
   const vowels = ['a', 'e', 'ı', 'i', 'o', 'ö', 'u', 'ü'];
-  
+
   // Event Listeners
   startBtn.addEventListener('click', startGame);
   submitBtn.addEventListener('click', submitWord);
-  
+
   if (shuffleBtn) {
     shuffleBtn.addEventListener('click', shuffleLetters);
   }
-  
+
   if (hintBtn) {
     hintBtn.addEventListener('click', provideHint);
   }
-  
+
   // Pause/Resume functionality
   if (pauseBtn) {
     pauseBtn.addEventListener('click', togglePause);
   }
-  
+
   if (resumeBtn) {
     resumeBtn.addEventListener('click', togglePause);
   }
-  
+
   // Sound toggle
   if (soundToggle) {
     soundToggle.addEventListener('click', toggleSound);
   }
-  
+
   // Word counter initialization
   if (wordCounter) {
     wordCounter.textContent = '0';
   }
-  
+
   // Add pulse animation to start button for visual appeal
   if (startBtn.classList.contains('pulse-animation')) {
     startBtn.addEventListener('animationend', () => {
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 1000);
     });
   }
-  
+
   /**
    * Main game functions
    */
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
     pauseOverlay.style.display = 'none';
-    
+
     // Initialize game state
     score = 0;
     foundWords = [];
@@ -131,70 +131,70 @@ document.addEventListener('DOMContentLoaded', function() {
     selectedLetters = [];
     gameStartTime = Date.now();
     soundEnabled = true;
-    
+
     // Reset UI elements
     if (soundToggle) {
       soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
       soundToggle.classList.add('active');
     }
-    
+
     if (wordCounter) {
       wordCounter.textContent = '0';
     }
-    
+
     // Reset hint button state
     if (hintBtn) {
       hintBtn.textContent = `İpucu (${HINT_MAX})`;
       hintBtn.classList.remove('disabled');
       hintBtn.removeAttribute('disabled');
     }
-    
+
     // Generate letters and set up game
     generateLetters();
     findPossibleWords();
-    
+
     // Update displays
     updateScoreDisplay();
     updateWordListDisplay();
-    
+
     // Start the timer 
     timer = window.startTimer(GAME_DURATION, 'timer-display', endGame);
-    
+
     // Setup input, button, and keyboard events
     wordInput.value = '';
     wordInput.focus();
-    
+
     wordInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         submitWord();
       }
     });
-    
+
     // Add animations to game elements
     animateGameStart();
   }
-  
+
   function generateLetters() {
     // Clear previous letters
     letterContainer.innerHTML = '';
     letters = [];
-    
+
     // Generate 4 vowels and 6 consonants (ensures playable words are possible)
     for (let i = 0; i < 4; i++) {
       letters.push(vowels[Math.floor(Math.random() * vowels.length)]);
     }
-    
+
     for (let i = 0; i < 6; i++) {
       letters.push(consonants[Math.floor(Math.random() * consonants.length)]);
     }
-    
+
     // Shuffle the letters
     letters = shuffleArray(letters);
-    
+
     // Create letter tiles with enhanced UI
     createLetterTiles();
   }
-  
+
   function createLetterTiles() {
     letters.forEach((letter, index) => {
       const tile = document.createElement('div');
@@ -202,54 +202,54 @@ document.addEventListener('DOMContentLoaded', function() {
       tile.textContent = letter;
       tile.dataset.index = index;
       tile.dataset.letter = letter;
-      
+
       // Add a slight random delay for staggered animation
       tile.style.animationDelay = `${index * 0.1}s`;
-      
+
       // Add click handler with selection effect
       tile.addEventListener('click', () => {
         if (!isGameActive) return;
-        
+
         // Add tile selection effect
         tile.classList.add('selected');
         selectedLetters.push({tile, letter});
-        
+
         // Add letter to input
         wordInput.value += letter;
         wordInput.focus();
-        
+
         // Play a subtle sound (optional)
         playTileSound(index % 4); // Different sounds for variety
-        
+
         // Remove selection after a delay for visual feedback
         setTimeout(() => {
           tile.classList.remove('selected');
         }, 300);
       });
-      
+
       letterContainer.appendChild(tile);
-      
+
       // Add animation class for entrance effect
       setTimeout(() => {
         tile.classList.add('animated');
       }, index * 50);
     });
   }
-  
+
   function shuffleLetters() {
     if (!isGameActive) return;
-    
+
     // Shuffle the letters array
     letters = shuffleArray([...letters]);
-    
+
     // Update the DOM
     const tiles = letterContainer.querySelectorAll('.letter-tile');
-    
+
     // Apply animation to all tiles
     tiles.forEach(tile => {
       tile.classList.add('shuffle-animation');
     });
-    
+
     // After animation completes, update the letters
     setTimeout(() => {
       tiles.forEach((tile, index) => {
@@ -257,74 +257,74 @@ document.addEventListener('DOMContentLoaded', function() {
         tile.dataset.letter = letters[index];
         tile.classList.remove('shuffle-animation');
       });
-      
+
       // Update possible words with new letter arrangement
       findPossibleWords();
-      
+
     }, 500); // Match this to the animation duration
-    
+
     // Show feedback
     showMessage('Harfler karıştırıldı!', 'info');
   }
-  
+
   function submitWord() {
     if (!isGameActive) return;
-    
+
     const word = wordInput.value.trim().toLowerCase();
-    
+
     // Validate word
     if (word.length < MIN_WORD_LENGTH) {
       showMessage(`Kelimeler en az ${MIN_WORD_LENGTH} harf içermelidir`, 'danger');
       shakeTiles(); // Visual feedback for error
       return;
     }
-    
+
     if (foundWords.includes(word)) {
       showMessage('Bu kelimeyi zaten buldunuz', 'warning');
       shakeTiles(); // Visual feedback for error
       return;
     }
-    
+
     // Check if word can be formed with available letters
     if (!canFormWord(word, [...letters])) {
       showMessage('Bu kelime verilen harflerle oluşturulamaz', 'danger');
       shakeTiles(); // Visual feedback for error
       return;
     }
-    
+
     // Check if word exists in dictionary
     if (!wordDictionary.has(word)) {
       showMessage('Sözlüğümüzde geçerli bir kelime değil', 'danger');
       shakeTiles(); // Visual feedback for error
       return;
     }
-    
+
     // Valid word - add to found words and update score
     foundWords.push(word);
-    
+
     // Calculate score based on word length (longer words = more points)
     const wordScore = calculateWordScore(word);
     score += wordScore;
-    
+
     // Update displays
     updateScoreDisplay();
     updateWordListDisplay();
-    
+
     // Clear input and selected letters
     wordInput.value = '';
     selectedLetters.forEach(item => item.tile.classList.remove('selected'));
     selectedLetters = [];
-    
+
     // Animate tiles for positive feedback
     highlightTilesForWord(word);
-    
+
     // Show success message
     showMessage(`Harika! +${wordScore} puan kazandınız`, 'success');
   }
-  
+
   function canFormWord(word, availableLetters) {
     const wordLetters = word.split('');
-    
+
     for (let letter of wordLetters) {
       const index = availableLetters.indexOf(letter);
       if (index === -1) {
@@ -333,63 +333,63 @@ document.addEventListener('DOMContentLoaded', function() {
       // Allowing multiple uses of the same letter makes the game more fun
       // availableLetters.splice(index, 1);
     }
-    
+
     return true;
   }
-  
+
   function calculateWordScore(word) {
     // Bonus points for longer words
     const baseScore = word.length * 10;
     let bonusMultiplier = 1;
-    
+
     if (word.length >= 6) bonusMultiplier = 1.5;
     if (word.length >= 8) bonusMultiplier = 2;
-    
+
     return Math.floor(baseScore * bonusMultiplier);
   }
-  
+
   function findPossibleWords() {
     possibleWords = [];
-    
+
     // This is a simplified approach - in a real game we'd use a more sophisticated algorithm
     turkishWordList.forEach(word => {
       if (word.length >= MIN_WORD_LENGTH && canFormWord(word, [...letters])) {
         possibleWords.push(word);
       }
     });
-    
+
     // Sort by length for hints (show shorter words first)
     possibleWords.sort((a, b) => a.length - b.length);
   }
-  
+
   function provideHint() {
     if (!isGameActive || hintCount >= HINT_MAX) {
       showMessage(`Maksimum ipucu sayısına ulaştınız (${HINT_MAX})`, 'warning');
       return;
     }
-    
+
     // Find a word that hasn't been discovered yet
     const availableHints = possibleWords.filter(word => !foundWords.includes(word));
-    
+
     if (availableHints.length === 0) {
       showMessage('Tüm olası kelimeleri buldunuz!', 'success');
       return;
     }
-    
+
     // Choose a hint from the first third of the available words (easier words)
     const hintIndex = Math.floor(Math.random() * Math.min(5, availableHints.length));
     const hint = availableHints[hintIndex];
-    
+
     // Show hint and apply time penalty
     showMessage(`İpucu: ${hint.slice(0, 2)}...`, 'info');
     hintCount++;
-    
+
     // Apply time penalty if timer exists
     if (timer && timer.subtractTime) {
       timer.subtractTime(HINT_PENALTY);
       showMessage(`İpucu kullandınız: ${HINT_PENALTY} saniye ceza`, 'warning');
     }
-    
+
     // Update hint button state
     hintBtn.textContent = `İpucu (${HINT_MAX - hintCount})`;
     if (hintCount >= HINT_MAX) {
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
       hintBtn.setAttribute('disabled', true);
     }
   }
-  
+
   function updateScoreDisplay() {
     // Animate score change
     if (scoreDisplay.textContent !== score.toString()) {
@@ -406,91 +406,91 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreDisplay.classList.remove('score-updated');
       }, 500);
     }
-    
+
     scoreDisplay.textContent = score;
   }
-  
+
   function updateWordListDisplay() {
     wordList.innerHTML = '';
-    
+
     if (foundWords.length === 0) {
       wordList.innerHTML = '<p class="text-secondary">Henüz kelime bulunmadı.</p>';
       return;
     }
-    
+
     // Sort words by length for better display
     const sortedWords = [...foundWords].sort((a, b) => b.length - a.length);
-    
+
     sortedWords.forEach(word => {
       const wordElement = document.createElement('span');
       wordElement.className = 'word-tag';
       wordElement.textContent = word;
-      
+
       // Add tooltip showing points earned for this word
       wordElement.title = `+${calculateWordScore(word)} puan`;
-      
+
       wordList.appendChild(wordElement);
     });
   }
-  
+
   function endGame() {
     isGameActive = false;
-    
+
     // Stop the timer
     if (timer && timer.stop) {
       timer.stop();
     }
-    
+
     // Calculate statistics
     const gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
     const wordsCount = foundWords.length;
     let longestWord = foundWords.reduce((longest, word) => 
       word.length > longest.length ? word : longest, '');
-      
+
     if (!longestWord) longestWord = '-';
-    
+
     // Update stats display
     finalScoreDisplay.textContent = score;
     wordsFoundCount.textContent = wordsCount;
     longestWordDisplay.textContent = longestWord;
-    
+
     // Update rating based on score and word count
     updateRatingDisplay();
-    
+
     // Show game over screen with animation
     gameContainer.style.display = 'none';
     gameOverContainer.style.display = 'block';
-    
+
     // Add classes for animation
     gameOverContainer.classList.add('fade-in');
-    
+
     // Save score to leaderboard
     window.saveScore('wordPuzzle', score);
-    
+
     // Add event listeners for game over screen
     document.getElementById('play-again').addEventListener('click', startGame);
-    
+
     // Setup share buttons
     if (copyScoreBtn) {
       copyScoreBtn.addEventListener('click', copyScore);
     }
-    
+
     if (shareScoreBtn) {
       shareScoreBtn.addEventListener('click', shareScore);
     }
   }
-  
+
   function updateRatingDisplay() {
     const stars = document.querySelectorAll('.rating-stars i');
     let rating = 0;
-    
+
     // Determine rating based on score and words found
     if (score >= 800) rating = 5;
     else if (score >= 600) rating = 4;
     else if (score >= 400) rating = 3;
     else if (score >= 200) rating = 2;
     else rating = 1;
-    
+
     // Update star display
     stars.forEach((star, index) => {
       if (index < rating) {
@@ -499,24 +499,24 @@ document.addEventListener('DOMContentLoaded', function() {
         star.className = 'far fa-star';
       }
     });
-    
+
     // Update rating text
     let ratingDescription = 'Başlangıç';
     if (rating === 5) ratingDescription = 'Efsanevi!';
     else if (rating === 4) ratingDescription = 'Çok İyi!';
     else if (rating === 3) ratingDescription = 'İyi!';
     else if (rating === 2) ratingDescription = 'İdare Eder';
-    
+
     if (ratingText) {
       ratingText.textContent = ratingDescription;
     }
   }
-  
+
   function togglePause() {
     if (!isGameActive) return;
-    
+
     isPaused = !isPaused;
-    
+
     if (isPaused) {
       // Pause the game
       pauseOverlay.style.display = 'flex';
@@ -529,10 +529,10 @@ document.addEventListener('DOMContentLoaded', function() {
       startTimer(remainingTime);
     }
   }
-  
+
   function toggleSound() {
     soundEnabled = !soundEnabled;
-    
+
     if (soundToggle) {
       if (soundEnabled) {
         soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
@@ -543,10 +543,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-  
+
   function copyScore() {
     const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${foundWords.length} kelime buldum ve en uzun kelimem: ${longestWordDisplay.textContent}`;
-    
+
     navigator.clipboard.writeText(scoreText)
       .then(() => {
         showMessage('Skor kopyalandı!', 'success');
@@ -556,10 +556,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showMessage('Kopyalama başarısız', 'danger');
       });
   }
-  
+
   function shareScore() {
     const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${foundWords.length} kelime buldum ve en uzun kelimem: ${longestWordDisplay.textContent}`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'Beyin Egzersizi Oyun Skoru',
@@ -570,13 +570,13 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
-  
+
   /**
    * Utility functions and animations
    */
   function showMessage(message, type) {
     const alertContainer = document.getElementById('alert-container');
-    
+
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
     alert.role = 'alert';
@@ -584,9 +584,9 @@ document.addEventListener('DOMContentLoaded', function() {
       ${message}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    
+
     alertContainer.appendChild(alert);
-    
+
     // Auto dismiss after 3 seconds
     setTimeout(() => {
       alert.classList.remove('show');
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 150);
     }, 3000);
   }
-  
+
   function shuffleArray(array) {
     const newArray = [...array]; // Create a copy to avoid modifying the original
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -606,15 +606,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return newArray;
   }
-  
+
   function animateGameStart() {
     // Add entrance animations for game elements
     const elements = gameContainer.querySelectorAll('.game-header, .letter-container, .input-group, .game-footer');
-    
+
     elements.forEach((el, i) => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(20px)';
-      
+
       setTimeout(() => {
         el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         el.style.opacity = '1';
@@ -622,12 +622,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }, i * 100);
     });
   }
-  
+
   function highlightTilesForWord(word) {
     const letters = word.split('');
     const tiles = letterContainer.querySelectorAll('.letter-tile');
     const tileIndices = [];
-    
+
     // Find tiles for the word
     for (let letter of letters) {
       for (let i = 0; i < tiles.length; i++) {
@@ -637,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-    
+
     // Highlight tiles sequentially
     tileIndices.forEach((index, i) => {
       setTimeout(() => {
@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, i * 100);
     });
   }
-  
+
   function shakeTiles() {
     // Visual feedback for errors
     letterContainer.classList.add('shake-animation');
@@ -656,71 +656,71 @@ document.addEventListener('DOMContentLoaded', function() {
       letterContainer.classList.remove('shake-animation');
     }, 500);
   }
-  
+
   function playTileSound(variant = 0) {
     // Optional: Add sound effects if needed
     // We'd implement this function if we want actual sounds
     // For now, it's just a placeholder
   }
-  
+
   // Add CSS for new animations
   const style = document.createElement('style');
   style.textContent = `
     .score-updated {
       animation: pulse 0.5s ease;
     }
-    
+
     .shake-animation {
       animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
     }
-    
+
     .match-animation {
       animation: match 0.5s ease;
     }
-    
+
     .shuffle-animation {
       animation: shuffle 0.5s ease;
     }
-    
+
     .fade-in {
       animation: fadeIn 0.5s ease;
     }
-    
+
     .pulse-animation {
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-    
+
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
       20%, 40%, 60%, 80% { transform: translateX(5px); }
     }
-    
+
     @keyframes match {
       0% { transform: scale(1); background-color: var(--card-bg); }
       50% { transform: scale(1.2); background-color: var(--accent-color); }
       100% { transform: scale(1); background-color: var(--card-bg); }
     }
-    
+
     @keyframes shuffle {
       0% { transform: translateY(0) rotate(0); }
       50% { transform: translateY(-10px) rotate(5deg); }
       100% { transform: translateY(0) rotate(0); }
     }
-    
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
   `;
   document.head.appendChild(style);
-  
+
   // Initialize the result card
   const resultCard = document.createElement('style');
   resultCard.textContent = `
@@ -732,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
       position: relative;
       overflow: hidden;
     }
-    
+
     .result-score {
       font-size: 3rem;
       font-weight: 700;
@@ -740,25 +740,25 @@ document.addEventListener('DOMContentLoaded', function() {
       text-align: center;
       margin-bottom: 15px;
     }
-    
+
     .result-score small {
       font-size: 1rem;
       color: var(--secondary-text);
       display: block;
       margin-top: 5px;
     }
-    
+
     .result-stats {
       display: flex;
       justify-content: space-around;
       margin-top: 20px;
     }
-    
+
     .stat-item {
       text-align: center;
       color: var(--secondary-text);
     }
-    
+
     .stat-item i {
       color: var(--accent-color);
       margin-right: 5px;
