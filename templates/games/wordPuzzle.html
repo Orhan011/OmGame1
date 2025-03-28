@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center">Kelime Bulmaca</h1>
-  
+
   <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
   <div class="game-stats-container">
     <div class="game-stat-item">
@@ -13,20 +13,20 @@
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-hourglass-half"></i>
       <div class="game-stat-value" id="timer-display">1:30</div>
       <div class="game-stat-label">SÜRE</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-spell-check"></i>
       <div class="game-stat-value" id="words-counter">0</div>
       <div class="game-stat-label">KELİMELER</div>
     </div>
   </div>
-  
+
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <!-- Intro Section -->
@@ -61,10 +61,10 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Game Container -->
       <div id="game-container" class="game-container" style="display: none;">
-        
+
         <!-- Game Controls Top -->
         <div class="game-controls-top">
           <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
@@ -74,31 +74,37 @@
             <i class="fas fa-volume-up"></i>
           </button>
         </div>
-        
+
         <!-- Alert Container -->
         <div id="alert-container" class="memory-alert"></div>
-        
+
         <!-- Game Board Container -->
         <div class="game-board-container">
           <div class="board-backdrop"></div>
           <!-- Letter Tiles -->
           <div id="letter-container" class="letter-container"></div>
         </div>
-        
+
+        <div class="word-hint mb-3" id="word-hint">
+          <i class="fas fa-lightbulb me-2"></i><span>İpucu: _ _ _ _ _</span>
+        </div>
         <!-- Word Input -->
         <div class="input-group mb-4">
           <input type="text" id="word-input" class="word-input" placeholder="Kelime yazın veya harflere tıklayın" aria-label="Kelime girin">
           <button class="btn btn-primary" type="button" id="submit-word">
             <i class="fas fa-check me-1"></i>Gönder
           </button>
+          <button class="btn btn-secondary" type="button" id="get-hint">
+            <i class="fas fa-lightbulb me-1"></i>İpucu Al
+          </button>
         </div>
-        
+
         <!-- Found Words -->
         <div class="word-collection-container">
           <h5 class="word-collection-title"><i class="fas fa-star me-2"></i>Bulunan Kelimeler:</h5>
           <div id="word-list" class="words-found"></div>
         </div>
-        
+
         <!-- Game Controls -->
         <div class="game-footer">
           <button id="shuffle-letters" class="btn btn-outline-primary">
@@ -109,7 +115,7 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Game Over Container -->
       <div id="game-over-container" class="memory-results-container" style="display: none;">
         <div class="memory-results-card">
@@ -119,7 +125,7 @@
             </span>
             <h2 class="mb-0">Oyun Tamamlandı!</h2>
           </div>
-          
+
           <div class="memory-results-body">
             <div class="results-stats">
               <div class="result-stat">
@@ -129,7 +135,7 @@
                 </div>
                 <div class="result-stat-label">Toplam Puan</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-spell-check"></i>
                 <div class="result-stat-value">
@@ -137,7 +143,7 @@
                 </div>
                 <div class="result-stat-label">Bulunan Kelimeler</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-crown"></i>
                 <div class="result-stat-value">
@@ -146,7 +152,7 @@
                 <div class="result-stat-label">En Uzun Kelime</div>
               </div>
             </div>
-            
+
             <div class="results-rating">
               <div class="rating-stars">
                 <i class="fas fa-star"></i>
@@ -158,7 +164,7 @@
               <div class="rating-text" id="rating-text">İyi!</div>
             </div>
           </div>
-          
+
           <div class="memory-results-footer">
             <button id="play-again" class="btn btn-primary btn-lg">
               <i class="fas fa-redo me-2"></i>Tekrar Oyna
@@ -168,7 +174,7 @@
             </a>
           </div>
         </div>
-        
+
         <div class="memory-share-section">
           <p>Skorunuzu paylaşın:</p>
           <div class="share-buttons">
@@ -181,7 +187,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Pause Menu Overlay -->
       <div id="pause-overlay" class="pause-overlay" style="display: none;">
         <div class="pause-card">
@@ -200,13 +206,13 @@
   .game-rules {
     margin-top: 15px;
   }
-  
+
   .rule-item {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
   }
-  
+
   .rule-item i {
     color: var(--accent-color);
     margin-right: 10px;
@@ -214,7 +220,7 @@
     min-width: 20px;
     text-align: center;
   }
-  
+
   .word-collection-container {
     background: rgba(15, 15, 30, 0.3);
     border-radius: 15px;
@@ -222,12 +228,15 @@
     margin-top: 25px;
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
-  
+
   .word-collection-title {
     color: var(--accent-color);
     font-size: 1.1rem;
     margin-bottom: 15px;
     font-weight: 600;
+  }
+  .word-hint {
+    margin-bottom: 10px;
   }
 </style>
 {% endblock %}
