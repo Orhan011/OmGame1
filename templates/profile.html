@@ -1,116 +1,109 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="profile-section py-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-4">
-        <div class="profile-card glass-panel">
-          <div class="profile-header">
-            <div class="profile-avatar">
-              {% if user.avatar_url %}
-                <img src="{{ user.avatar_url }}" alt="Profile" class="avatar-img">
-              {% else %}
-                <i class="fas fa-user-circle fa-5x"></i>
-              {% endif %}
-            </div>
-            <h2 class="profile-username">{{ user.username }}</h2>
-            <div class="profile-rank">
-              <span class="badge bg-primary">{{ user.rank }}</span>
-            </div>
+<div class="profile-container">
+  <div class="profile-header-section">
+    <div class="profile-banner">
+      <div class="profile-avatar-wrapper">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="Profil" class="profile-avatar">
+        {% else %}
+          <div class="default-avatar">
+            {{ user.username[0].upper() }}
           </div>
+        {% endif %}
+      </div>
+      <div class="profile-basic-info">
+        <h1>{{ user.username }}</h1>
+        <span class="user-level">{{ user.rank }}</span>
+        <p class="join-date">Katılım: {{ user.created_at.strftime('%d %B %Y') }}</p>
+      </div>
+    </div>
+  </div>
 
-          <div class="profile-info">
-              <div class="info-item">
-                <i class="fas fa-envelope"></i>
-                <span>{{ user.email }}</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-clock"></i>
-                <span>Kayıt tarihi: {{ user.created_at.strftime('%d/%m/%Y') }}</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-user"></i>
-                <span>{{ user.full_name if user.full_name else 'İsim belirtilmedi' }}</span>
-              </div>
-            <div class="info-item">
-              <i class="fas fa-calendar"></i>
-              <span>{{ (str(user.age) + ' yaşında') if user.age else 'Yaş belirtilmedi' }}</span>
-            </div>
-            <div class="info-item">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>{{ user.location or 'Konum belirtilmedi' }}</span>
-            </div>
-            <div class="info-item">
-              <i class="fas fa-clock"></i>
-              <span>Son aktif: {{ user.last_active.strftime('%d/%m/%Y %H:%M') }}</span>
-            </div>
-          </div>
-
-          <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-            <i class="fas fa-edit"></i> Profili Düzenle
-          </button>
+  <div class="profile-content">
+    <div class="profile-sidebar">
+      <div class="profile-card">
+        <h3>Kişisel Bilgiler</h3>
+        <div class="profile-info-item">
+          <i class="fas fa-user"></i>
+          <span>{{ user.full_name or 'İsim belirtilmedi' }}</span>
         </div>
+        <div class="profile-info-item">
+          <i class="fas fa-envelope"></i>
+          <span>{{ user.email }}</span>
+        </div>
+        <div class="profile-info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ user.location or 'Konum belirtilmedi' }}</span>
+        </div>
+        <div class="profile-info-item">
+          <i class="fas fa-calendar"></i>
+          <span>{{ user.age or 'Yaş belirtilmedi' }} yaş</span>
+        </div>
+        <button class="edit-profile-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+          <i class="fas fa-edit"></i> Profili Düzenle
+        </button>
+      </div>
 
-        <div class="stats-summary glass-panel mt-4">
-          <h3>Genel İstatistikler</h3>
-          <div class="stat-grid">
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-              <div class="stat-value">{{ user.highest_score }}</div>
-              <div class="stat-label">En Yüksek Skor</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
-              <div class="stat-value">{{ user.total_games_played }}</div>
-              <div class="stat-label">Toplam Oyun</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-star"></i></div>
-              <div class="stat-value">{{ user.experience_points }}</div>
-              <div class="stat-label">Deneyim Puanı</div>
-            </div>
+      <div class="stats-card">
+        <h3>İstatistikler</h3>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.highest_score }}</span>
+            <span class="stat-label">En Yüksek Skor</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.total_games_played }}</span>
+            <span class="stat-label">Toplam Oyun</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="fas fa-star"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.experience_points }}</span>
+            <span class="stat-label">XP</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-lg-8">
-        <div class="recent-activity glass-panel">
-          <h3>Oyun Geçmişi</h3>
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Oyun</th>
-                  <th>Skor</th>
-                  <th>Tarih</th>
-                  <th>Durum</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for score in recent_scores %}
-                <tr>
-                  <td>
-                    <div class="game-info">
-                      <i class="fas fa-gamepad"></i>
-                      <span>{{ score.game_type }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="score-value">{{ score.score }}</span>
-                  </td>
-                  <td>{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
-                  <td>
-                    {% if score.score > (user.highest_score * 0.8) %}
-                      <span class="badge bg-success">Yüksek Skor</span>
-                    {% else %}
-                      <span class="badge bg-secondary">Normal</span>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+    <div class="profile-main">
+      <div class="recent-activity-card">
+        <h3>Son Aktiviteler</h3>
+        <div class="activity-list">
+          {% for score in recent_scores %}
+          <div class="activity-item">
+            <div class="activity-game">
+              <i class="fas fa-gamepad"></i>
+              <span>{{ score.game_type }}</span>
+            </div>
+            <div class="activity-score">{{ score.score }} puan</div>
+            <div class="activity-date">{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="achievements-card">
+        <h3>Başarılar</h3>
+        <div class="achievements-grid">
+          <div class="achievement-item locked">
+            <i class="fas fa-medal"></i>
+            <span>İlk 1000 Puan</span>
+          </div>
+          <div class="achievement-item {% if user.highest_score >= 5000 %}unlocked{% else %}locked{% endif %}">
+            <i class="fas fa-trophy"></i>
+            <span>5000 Puan Rozeti</span>
+          </div>
+          <div class="achievement-item {% if user.total_games_played >= 100 %}unlocked{% else %}locked{% endif %}">
+            <i class="fas fa-gamepad"></i>
+            <span>100 Oyun Tamamlandı</span>
           </div>
         </div>
       </div>
@@ -121,7 +114,7 @@
 <!-- Profil Düzenleme Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
   <div class="modal-dialog">
-    <div class="modal-content dark-theme">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Profili Düzenle</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -141,11 +134,11 @@
             <input type="text" class="form-control" name="location" value="{{ user.location or '' }}">
           </div>
           <div class="mb-3">
-            <label class="form-label">Bio</label>
+            <label class="form-label">Biyografi</label>
             <textarea class="form-control" name="bio" rows="3">{{ user.bio or '' }}</textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label">Avatar URL</label>
+            <label class="form-label">Profil Resmi URL</label>
             <input type="url" class="form-control" name="avatar_url" value="{{ user.avatar_url or '' }}">
           </div>
           <button type="submit" class="btn btn-primary w-100">Kaydet</button>
