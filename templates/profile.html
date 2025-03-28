@@ -26,6 +26,14 @@
               <span>{{ user.full_name if user.full_name else 'İsim belirtilmedi' }}</span>
             </div>
             <div class="info-item">
+              <i class="fas fa-envelope"></i>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Kayıt tarihi: {{ user.created_at.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <div class="info-item">
               <i class="fas fa-calendar"></i>
               <span>{{ (str(user.age) + ' yaşında') if user.age else 'Yaş belirtilmedi' }}</span>
             </div>

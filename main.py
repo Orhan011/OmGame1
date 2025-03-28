@@ -231,6 +231,10 @@ def register():
             flash('Tüm alanları doldurunuz.')
             return redirect(url_for('register'))
             
+        if not email.endswith('@gmail.com'):
+            flash('Lütfen geçerli bir Gmail adresi kullanın.')
+            return redirect(url_for('register'))
+            
         if User.query.filter_by(username=username).first():
             flash('Bu kullanıcı adı zaten kullanılıyor.')
             return redirect(url_for('register'))
