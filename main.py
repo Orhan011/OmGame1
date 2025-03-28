@@ -143,11 +143,15 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
+            session['username'] = user.username
             flash('Başarıyla giriş yaptınız!')
             return redirect(url_for('index'))
         else:
             flash('Geçersiz email veya şifre.')
             return redirect(url_for('login'))
+    
+    if session.get('user_id'):
+        return redirect(url_for('index'))
             
     return render_template('login.html')
 
@@ -223,6 +227,10 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         
+        if not username or not email or not password:
+            flash('Tüm alanları doldurunuz.')
+            return redirect(url_for('register'))
+            
         if User.query.filter_by(username=username).first():
             flash('Bu kullanıcı adı zaten kullanılıyor.')
             return redirect(url_for('register'))
@@ -237,12 +245,21 @@ def register():
             password_hash=generate_password_hash(password)
         )
         
-        db.session.add(new_user)
-        db.session.commit()
-        
-        session['user_id'] = new_user.id
-        flash('Kayıt başarılı!')
-        return redirect(url_for('profile'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            
+            session['user_id'] = new_user.id
+            session['username'] = new_user.username
+            flash('Kayıt başarılı! Hoş geldiniz!')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.')
+            return redirect(url_for('register'))
+    
+    if session.get('user_id'):
+        return redirect(url_for('index'))
         
     return render_template('register.html')
 
