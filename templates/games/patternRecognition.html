@@ -277,5 +277,16 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/games/patternRecognition.js') }}"></script>
+<!-- Sound Effects -->
+<audio id="successSound" preload="auto">
+  <source src="{{ url_for('static', filename='sounds/success.mp3') }}" type="audio/mp3">
+</audio>
+<audio id="failureSound" preload="auto">
+  <source src="{{ url_for('static', filename='sounds/failure.mp3') }}" type="audio/mp3">
+</audio>
+<audio id="clickSound" preload="auto">
+  <source src="{{ url_for('static', filename='sounds/click.mp3') }}" type="audio/mp3">
+</audio>
+
+<script src="{{ url_for('static', filename='js/games/patternRecognition.js') }}"></script>="{{ url_for('static', filename='js/games/patternRecognition.js') }}"></script>
 {% endblock %}
