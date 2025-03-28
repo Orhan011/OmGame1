@@ -3559,57 +3559,9 @@ main {
 /* Pattern Recognition - Enhanced Version */
 .pattern-recognition {
   position: relative;
-  margin: 30px auto;
-  max-width: 800px;
+  margin-top: 30px;
   overflow: visible;
-  padding: 20px;
-  background: rgba(20, 20, 43, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.pattern-game-wrapper {
-  padding: 20px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.game-info-panel {
-  margin-bottom: 20px;
-  padding: 15px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.game-stats-container {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.game-stat-item {
-  text-align: center;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  min-width: 120px;
-}
-
-.game-stat-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--accent-color);
-  margin: 5px 0;
-}
-
-.game-stat-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.8;
+  padding-bottom: 40px;
 }
 
 .glass-panel {
