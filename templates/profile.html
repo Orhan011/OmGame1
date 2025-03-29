@@ -360,18 +360,155 @@
 
 {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    let profileForm = document.getElementById('profileForm');
-    let profileImage = document.getElementById('profile_image');
-    let avatarPreview = document.getElementById('avatarPreview');
-    let avatarPlaceholder = document.getElementById('avatarPlaceholder');
-    let removePhotoBtn = document.getElementById('removePhotoBtn');
-    let removePhotoInput = document.getElementById('remove_photo');
-    let profileUsername = document.getElementById('profile_username');
-    let profileBirthYear = document.getElementById('profile_birth_year');
-    let profileSaveBtn = document.getElementById('profileSaveBtn');
-    let saveSpinner = document.getElementById('saveSpinner');
-    let avatarOverlay = document.querySelector('.profile-avatar-overlay');
+document.addEventListener('DOMContentLoaded', function() {
+  // Form ve input elementlerini seç
+  const profileForm = document.getElementById('profileForm');
+  const profileImage = document.getElementById('profile_image');
+  const avatarPreview = document.getElementById('avatarPreview');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+  const removePhotoBtn = document.getElementById('removePhotoBtn');
+  const removePhotoInput = document.getElementById('remove_photo');
+  const profileUsername = document.getElementById('profile_username');
+  const profileBirthYear = document.getElementById('profile_birth_year');
+  const profileSaveBtn = document.getElementById('profileSaveBtn');
+  const saveSpinner = document.getElementById('saveSpinner');
+  const avatarOverlay = document.querySelector('.profile-avatar-overlay');
+  
+  // Profil fotoğrafı yükleme fonksiyonu
+  function handleProfilePhotoUpload(file) {
+    if (!file) return;
+    
+    if (file.size > 512000) {
+      Swal.fire({
+        title: 'Dosya çok büyük',
+        text: 'Lütfen 500KB\'dan küçük bir dosya seçin',
+        icon: 'error'
+      });
+      return;
+    }
+    
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      Swal.fire({
+        title: 'Geçersiz dosya tipi',
+        text: 'Lütfen JPG veya PNG formatında bir dosya seçin',
+        icon: 'error'
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      if (avatarPreview) {
+        avatarPreview.src = e.target.result;
+        avatarPreview.classList.remove('d-none');
+      }
+      if (avatarPlaceholder) {
+        avatarPlaceholder.classList.add('d-none');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Profil resmi yükleme olayını dinle
+  if (profileImage) {
+    profileImage.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleProfilePhotoUpload(e.target.files[0]);
+      }
+    });
+  }
+
+  // Fotoğraf kaldır butonu olayı
+  if (removePhotoBtn) {
+    removePhotoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Profil Fotoğrafını Kaldır',
+        text: 'Profil fotoğrafınızı kaldırmak istediğinize emin misiniz?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, Kaldır',
+        cancelButtonText: 'İptal',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (avatarPreview) {
+            avatarPreview.classList.add('d-none');
+            avatarPreview.src = '';
+          }
+          if (avatarPlaceholder) {
+            avatarPlaceholder.classList.remove('d-none');
+          }
+          if (profileImage) {
+            profileImage.value = '';
+          }
+          if (removePhotoInput) {
+            removePhotoInput.value = '1';
+          }
+        }
+      });
+    });
+  }
+
+  // Form gönderme olayı
+  if (profileForm) {
+    profileForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+      }
+
+      if (saveSpinner) {
+        saveSpinner.classList.remove('d-none');
+      }
+      
+      if (profileSaveBtn) {
+        profileSaveBtn.disabled = true;
+      }
+
+      // Form verilerini gönder
+      const formData = new FormData(this);
+      fetch('/update-profile', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            title: 'Başarılı!',
+            text: 'Profil bilgileriniz güncellendi.',
+            icon: 'success'
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          throw new Error(data.message || 'Bir hata oluştu');
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Hata!',
+          text: error.message,
+          icon: 'error'
+        });
+      })
+      .finally(() => {
+        if (saveSpinner) {
+          saveSpinner.classList.add('d-none');
+        }
+        if (profileSaveBtn) {
+          profileSaveBtn.disabled = false;
+        }
+      });
+    });
+  }
+});
+</script>
     
     // Fotoğraf yükleme işlemleri - fotoğrafı overlay alanına tıklayarak da yükleyebilme
     if (avatarOverlay) {

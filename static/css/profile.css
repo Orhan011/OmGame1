@@ -6,6 +6,75 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
 }
 
+/* Mobil cihazlar için responsive düzenlemeler */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 15px;
+  }
+  
+  .profile-upload-preview {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-edit-form .form-control {
+    font-size: 16px; /* iOS'ta zoom sorununu önler */
+    padding: 10px;
+  }
+  
+  .profile-edit-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .profile-edit-actions button {
+    width: 100%;
+  }
+  
+  .btn-upload, .btn-remove {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .modal-dialog {
+    margin: 10px;
+  }
+  
+  .profile-avatar-container {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .profile-stats .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .profile-info-item {
+    padding: 8px;
+  }
+}
+
+/* Küçük ekranlar için ek düzenlemeler */
+@media (max-width: 480px) {
+  .profile-username {
+    font-size: 1.5rem;
+  }
+  
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-avatar-overlay span {
+    font-size: 12px;
+  }
+  
+  .info-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+}
+
 .profile-edit-avatar-container {
   display: flex;
   flex-direction: column;
