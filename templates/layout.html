@@ -29,44 +29,6 @@
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
     <span class="brand-text">OmGame</span>
   </a>
-  {% if session.get('user_id') %}
-  <div class="profile-menu me-3">
-    <div class="profile-avatar" data-bs-toggle="dropdown">
-      {% set username = session.get('username', '') %}
-      {% if username %}
-        <div class="avatar-circle">{{ username[0]|upper }}</div>
-      {% endif %}
-    </div>
-    <div class="dropdown-menu profile-dropdown glass-card">
-      <div class="profile-header">
-        <div class="avatar-circle-large">{{ username[0]|upper }}</div>
-        <h5 class="profile-name">{{ username }}</h5>
-      </div>
-      <div class="profile-stats">
-        <div class="stat-item">
-          <i class="fas fa-gamepad"></i>
-          <span class="stat-value">{{ user.total_games_played }}</span>
-          <span class="stat-label">Oyunlar</span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-trophy"></i>
-          <span class="stat-value">{{ user.highest_score }}</span>
-          <span class="stat-label">En Yüksek Skor</span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-star"></i>
-          <span class="stat-value">{{ user.experience_points }}</span>
-          <span class="stat-label">XP</span>
-        </div>
-      </div>
-      <div class="profile-actions">
-        <a href="{{ url_for('logout') }}" class="btn btn-logout">
-          <i class="fas fa-sign-out-alt"></i> Çıkış Yap
-        </a>
-      </div>
-    </div>
-  </div>
-  {% endif %}
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <div class="menu-icon">
       <span></span>
