@@ -1454,6 +1454,7 @@
   background: linear-gradient(135deg, #6a5ae0 0%, #9f8aff 100%);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
 }
 
 .settings-form .btn-primary:hover {
