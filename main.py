@@ -32,14 +32,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
-@app.context_processor
-def utility_processor():
-    def get_current_user():
-        if 'user_id' in session:
-            return User.query.get(session['user_id'])
-        return None
-    return dict(current_user=get_current_user())
-
 # Define models
 class User(db.Model):
     __tablename__ = 'users'  # Explicit table name to avoid reserved word conflicts
@@ -214,7 +206,7 @@ def index():
         logger.error(f"Error initializing on first request: {e}")
     
     user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user, current_user=user)
+    return render_template('index.html', user=user)
 
 # Game routes
 @app.route('/games/word-puzzle')
