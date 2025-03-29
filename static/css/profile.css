@@ -151,17 +151,24 @@
 
 .profile-stats {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.8rem;
+  flex-direction: column;
+  gap: 1.5rem;
   margin-top: 1.5rem;
   justify-content: flex-start;
+  width: 100%;
+}
+
+.stat-row {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .stat-item {
-  flex: 0 0 calc(50% - 1.8rem);
-  min-width: 180px;
+  flex: 1;
+  min-width: 120px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-  padding: 1.2rem 1.5rem;
+  padding: 1.2rem 1rem;
   border-radius: 1.5rem;
   text-align: center;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);

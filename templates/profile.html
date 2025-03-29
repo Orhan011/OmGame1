@@ -22,21 +22,25 @@
         <h1 class="profile-username">{{ current_user.username }}</h1>
         <div class="profile-rank">{{ current_user.rank }}</div>
         <div class="profile-stats">
-          <div class="stat-item">
-            <div class="stat-value">{{ current_user.total_games_played }}</div>
-            <div class="stat-label">Oyun</div>
+          <div class="stat-row">
+            <div class="stat-item">
+              <div class="stat-value">{{ current_user.total_games_played }}</div>
+              <div class="stat-label">Oyun</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ current_user.highest_score }}</div>
+              <div class="stat-label">En Yüksek Skor</div>
+            </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ current_user.highest_score }}</div>
-            <div class="stat-label">En Yüksek Skor</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ current_user.win_count or 0 }}</div>
-            <div class="stat-label">Kazanma</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ current_user.loss_count or 0 }}</div>
-            <div class="stat-label">Kaybetme</div>
+          <div class="stat-row">
+            <div class="stat-item">
+              <div class="stat-value">{{ current_user.win_count or 0 }}</div>
+              <div class="stat-label">Kazanma</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ current_user.loss_count or 0 }}</div>
+              <div class="stat-label">Kaybetme</div>
+            </div>
           </div>
         </div>
         <div class="profile-badges">
