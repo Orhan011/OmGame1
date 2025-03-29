@@ -817,7 +817,16 @@ def save_score():
     data = request.json
     
     # Use anonymous user or a session-based temporary user if not logged in
-    user_id = session.get('user_id', 1)  # Default to user id 1 if not logged in
+    user_id = session.get('user_id')
+    
+    # Kullanıcı giriş yapmamışsa
+    if not user_id:
+        # Skorları kaydetmeyi devre dışı bırak ve kullanıcıya bildir
+        return jsonify({
+            'success': False, 
+            'message': 'Login required',
+            'score': data.get('score', 0)
+        })
     
     # Kullanıcı bilgilerini getir
     user = User.query.get(user_id)

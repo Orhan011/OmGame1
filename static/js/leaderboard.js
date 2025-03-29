@@ -16,12 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
       displayScoresForGameType(gameType);
     });
   });
+  
+  // 10 saniyede bir skorları otomatik güncelle
+  setInterval(loadAllScores, 10000);
 });
 
 // Tüm oyunların skorlarını tek bir API çağrısıyla alır
 function loadAllScores() {
   const container = document.getElementById('scores-container');
-  container.innerHTML = '<div class="loading">Tüm skorlar yükleniyor...</div>';
+  
+  // İlk yüklemede loading göster, otomatik yenilemelerde mevcut içeriği koru
+  if (!allGameScores || Object.keys(allGameScores).length === 0) {
+    container.innerHTML = '<div class="loading">Tüm skorlar yükleniyor...</div>';
+  }
   
   fetch('/api/get-scores/all')
     .then(response => {
@@ -43,7 +50,10 @@ function loadAllScores() {
       displayScoresForGameType(activeGameType);
     })
     .catch(error => {
-      container.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu</div>';
+      // Eğer daha önce skorlar yüklenmişse, hata nedeniyle mevcut verileri koruyalım
+      if (!allGameScores || Object.keys(allGameScores).length === 0) {
+        container.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu</div>';
+      }
       console.error('Error loading scores:', error);
     });
 }
