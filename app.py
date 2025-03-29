@@ -2,17 +2,7 @@ import os
 import logging
 
 from flask import Flask
-from flask_login import LoginManager
-from models import db, User
-
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.login_message = 'Lütfen giriş yapın.'
-login_manager.login_message_category = 'warning'
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+from models import db
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -29,9 +19,8 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Initialize the app with SQLAlchemy and LoginManager
+# Initialize the app with SQLAlchemy
 db.init_app(app)
-login_manager.init_app(app)
 
 # Initialize database
 with app.app_context():

@@ -4,9 +4,7 @@ from datetime import datetime
 # Initialize SQLAlchemy without binding to a specific app
 db = SQLAlchemy()
 
-from flask_login import UserMixin
-
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
