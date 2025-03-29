@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const scoresContainer = document.getElementById('scores-container');
   const gameButtons = document.querySelectorAll('.game-filter-btn');
   let currentGame = 'wordPuzzle';
+  let loadingTimeout;
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -54,35 +55,52 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function loadScores(gameType) {
+    clearTimeout(loadingTimeout);
     scoresContainer.innerHTML = '<div class="loading">Yükleniyor...</div>';
     
-    fetch(`/api/get-scores/${gameType}`)
-      .then(response => response.json())
-      .then(scores => {
-        if (!scores || scores.length === 0) {
-          scoresContainer.innerHTML = '<div class="no-scores">Henüz skor kaydı bulunmuyor.</div>';
-          return;
-        }
+    loadingTimeout = setTimeout(() => {
+      fetch(`/api/get-scores/${gameType}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(scores => {
+          if (!scores || (Array.isArray(scores) && scores.length === 0)) {
+            scoresContainer.innerHTML = '<div class="no-scores">Henüz skor kaydı bulunmuyor.</div>';
+            return;
+          }
 
-        let html = '';
-        scores.forEach((score, index) => {
-          const rowClass = index < 3 ? 'table-row top-rank' : 'table-row';
-          html += `
-            <div class="${rowClass}">
-              <div class="rank-cell">${index + 1}</div>
-              <div class="username-cell">${score.username}</div>
-              <div class="score-cell">${score.score}</div>
-              <div class="date-cell">${formatDate(score.timestamp)}</div>
-            </div>
-          `;
+          let html = '';
+          if (Array.isArray(scores)) {
+            scores.forEach((score, index) => {
+              const rowClass = index < 3 ? 'table-row top-rank' : 'table-row';
+              html += `
+                <div class="${rowClass}">
+                  <div class="rank-cell">${index + 1}</div>
+                  <div class="username-cell">${score.username || 'Anonim'}</div>
+                  <div class="score-cell">${score.score}</div>
+                  <div class="date-cell">${formatDate(score.timestamp)}</div>
+                </div>
+              `;
+            });
+          }
+          
+          if (html) {
+            scoresContainer.innerHTML = html;
+          } else {
+            scoresContainer.innerHTML = '<div class="no-scores">Henüz skor kaydı bulunmuyor.</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading scores:', error);
+          scoresContainer.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.</div>';
+          
+          // 3 saniye sonra tekrar dene
+          setTimeout(() => loadScores(gameType), 3000);
         });
-        
-        scoresContainer.innerHTML = html;
-      })
-      .catch(error => {
-        console.error('Error loading scores:', error);
-        scoresContainer.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu.</div>';
-      });
+    }, 100);
   }
 
   gameButtons.forEach(button => {
