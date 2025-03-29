@@ -408,28 +408,43 @@ def update_profile():
         # Profil fotoğrafı kaldırma kontrolü
         if remove_photo == '1':
             user.avatar_url = None
-            flash('Profil fotoğrafı kaldırıldı.', 'info')
+            flash('Profil fotoğrafı kaldırıldı.', 'success')
         else:
             # Profil resmi yükleme işlemi
             profile_image = request.files.get('profile_image')
             
             if profile_image and profile_image.filename:
-                # Dosya tipi kontrolü
-                if profile_image.content_type not in ['image/jpeg', 'image/png']:
-                    flash('Sadece JPG veya PNG dosyaları yükleyebilirsiniz.', 'warning')
+                try:
+                    # Güvenlik kontrolü - dosya adını temizleme
+                    filename = secure_filename(profile_image.filename)
+                    
+                    # Dosya tipi kontrolü
+                    allowed_extensions = {'jpg', 'jpeg', 'png'}
+                    file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+                    
+                    if file_ext not in allowed_extensions or profile_image.content_type not in ['image/jpeg', 'image/png']:
+                        flash('Sadece JPG veya PNG dosyaları yükleyebilirsiniz.', 'warning')
+                        return redirect(url_for('profile'))
+                    
+                    # Dosya boyutu kontrolü (500KB = 512000 bytes)
+                    image_data = profile_image.read()
+                    if len(image_data) > 512000:
+                        flash('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.', 'warning')
+                        return redirect(url_for('profile'))
+                    
+                    # Base64 olarak kaydetme (daha güvenli saklama için)
+                    encoded_image = base64.b64encode(image_data).decode('utf-8')
+                    image_type = profile_image.content_type
+                    
+                    # Random bir ID ekleyerek aynı fotoğrafların farklı önbelleklenmesini sağlama
+                    random_id = str(uuid.uuid4())[:8]
+                    user.avatar_url = f"data:{image_type};base64,{encoded_image}#{random_id}"
+                    
+                    flash('Profil fotoğrafı başarıyla güncellendi.', 'success')
+                except Exception as e:
+                    app.logger.error(f"Fotoğraf yüklerken hata: {str(e)}")
+                    flash('Fotoğraf yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'error')
                     return redirect(url_for('profile'))
-                
-                # Dosya boyutu kontrolü (500KB = 512000 bytes)
-                image_data = profile_image.read()
-                if len(image_data) > 512000:
-                    flash('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.', 'warning')
-                    return redirect(url_for('profile'))
-                
-                # Base64 olarak kaydetme
-                encoded_image = base64.b64encode(image_data).decode('utf-8')
-                image_type = profile_image.content_type
-                user.avatar_url = f"data:{image_type};base64,{encoded_image}"
-                flash('Profil resmi başarıyla yüklendi.', 'success')
         
         # Skorları güncelle
         highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar() or 0

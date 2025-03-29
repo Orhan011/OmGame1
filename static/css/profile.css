@@ -143,6 +143,23 @@
   font-weight: bold;
 }
 
+.profile-avatar-container {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
 .profile-avatar-placeholder {
   width: 150px;
   height: 150px;
@@ -153,6 +170,36 @@
   justify-content: center;
   color: var(--accent-color);
   border: 3px solid var(--accent-color);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Profil fotoğrafı üzerine overlay */
+.profile-avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.profile-avatar-container:hover .profile-avatar-overlay {
+  opacity: 1;
+}
+
+.profile-avatar-container:hover .profile-avatar-img,
+.profile-avatar-container:hover .profile-avatar-placeholder {
+  transform: scale(1.05);
+  border-color: #8a72f1; /* Hover durumunda kenarlık rengini parlat */
 }
 
 .empty-state {
