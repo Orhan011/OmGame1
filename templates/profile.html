@@ -361,18 +361,17 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Gelişmiş profil sayfası JavaScript
-    const profileForm = document.getElementById('profileForm');
-    const profileImage = document.getElementById('profile_image');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-    const removePhotoBtn = document.getElementById('removePhotoBtn');
-    const removePhotoInput = document.getElementById('remove_photo');
-    const profileUsername = document.getElementById('profile_username');
-    const profileBirthYear = document.getElementById('profile_birth_year');
-    const profileSaveBtn = document.getElementById('profileSaveBtn');
-    const saveSpinner = document.getElementById('saveSpinner');
-    const avatarOverlay = document.querySelector('.profile-avatar-overlay');
+    let profileForm = document.getElementById('profileForm');
+    let profileImage = document.getElementById('profile_image');
+    let avatarPreview = document.getElementById('avatarPreview');
+    let avatarPlaceholder = document.getElementById('avatarPlaceholder');
+    let removePhotoBtn = document.getElementById('removePhotoBtn');
+    let removePhotoInput = document.getElementById('remove_photo');
+    let profileUsername = document.getElementById('profile_username');
+    let profileBirthYear = document.getElementById('profile_birth_year');
+    let profileSaveBtn = document.getElementById('profileSaveBtn');
+    let saveSpinner = document.getElementById('saveSpinner');
+    let avatarOverlay = document.querySelector('.profile-avatar-overlay');
     
     // Fotoğraf yükleme işlemleri - fotoğrafı overlay alanına tıklayarak da yükleyebilme
     if (avatarOverlay) {
@@ -638,26 +637,27 @@
         }
       });
     }
-        e.preventDefault();
-        
-        // Form doğrulaması
-        if (!this.checkValidity()) {
-          e.stopPropagation();
-          this.classList.add('was-validated');
-          return;
+        if (profileForm) {
+          profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!this.checkValidity()) {
+              e.stopPropagation();
+              this.classList.add('was-validated');
+              return;
+            }
+            
+            if (saveSpinner) {
+              saveSpinner.classList.remove('d-none');
+            }
+            
+            if (profileSaveBtn) {
+              profileSaveBtn.disabled = true;
+            }
+            
+            this.submit();
+          });
         }
-        
-        // Yükleniyor göstergesi
-        if (saveSpinner) {
-          saveSpinner.classList.remove('d-none');
-        }
-        
-        if (profileSaveBtn) {
-          profileSaveBtn.disabled = true;
-        }
-        
-        // Formu gönder
-        this.submit();
       });
     }
     
