@@ -216,6 +216,13 @@ def index():
     user = User.query.get(session['user_id'])
     return render_template('index.html', user=user, current_user=user)
 
+@app.route('/profile')
+def profile():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    return render_template('profile.html', user=user, current_user=user)
+
 # Game routes
 @app.route('/games/word-puzzle')
 def word_puzzle():
