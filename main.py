@@ -352,8 +352,8 @@ def profile():
     if not session.get('user_id'):
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    if not user:
+    current_user = User.query.get(session['user_id'])
+    if not current_user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
     
@@ -380,7 +380,7 @@ def profile():
             user.total_games_played = 0
         db.session.commit()
         
-        return render_template('profile.html', user=user, user_scores=user_scores)
+        return render_template('profile.html', current_user=current_user, user=current_user, user_scores=user_scores)
         
     except Exception as e:
         logger.error(f"Error in profile page: {e}")
