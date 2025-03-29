@@ -57,9 +57,7 @@ function displayScoresForGameType(gameType) {
     'word-puzzle': 'wordPuzzle',
     'memory-match': 'memoryMatch',
     'labyrinth': 'labyrinth',
-    'puzzle': 'puzzle',
-    '3d-rotation': '3dRotation',
-    '3d-labyrinth': 'labyrinth3d'
+    'puzzle': 'puzzle'
   };
   
   const internalGameType = gameTypeMap[gameType];

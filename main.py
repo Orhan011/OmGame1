@@ -540,13 +540,7 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
-@app.route('/games/3d-rotation')
-def three_d_rotation():
-    return render_template('games/3dRotation.html')
-
-@app.route('/games/3d-labyrinth')
-def three_d_labyrinth():
-    return render_template('games/3dLabyrinth.html')
+# 3D oyunları kaldırıldı
 
 # Leaderboard
 @app.route('/leaderboard')
@@ -555,16 +549,12 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    rotation_3d_scores = Score.query.filter_by(game_type='3dRotation').order_by(Score.score.desc()).limit(10).all()
-    labyrinth3d_scores = Score.query.filter_by(game_type='labyrinth3d').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
                           number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
-                          pattern_recognition_scores=puzzle_scores,
-                          rotation_3d_scores=rotation_3d_scores,
-                          labyrinth3d_scores=labyrinth3d_scores)
+                          pattern_recognition_scores=puzzle_scores)
 
 # Articles
 @app.route('/articles')
@@ -915,7 +905,7 @@ def get_scores(game_type):
     # "all" özellği eklenmiş - tüm oyunların verilerini getir
     if game_type == 'all':
         # Tüm oyun türleri için en yüksek skorları getir
-        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', '3dRotation', 'labyrinth3d']
+        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle']
         all_scores = {}
         
         for internal_game_type in game_types:
@@ -965,9 +955,7 @@ def get_scores(game_type):
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
             'number-sequence': 'labyrinth',  # number-sequence da labyrinth'e yönlendiriliyor (geriye uyumluluk için)
-            'puzzle': 'puzzle',
-            '3d-rotation': '3dRotation',
-            '3d-labyrinth': 'labyrinth3d'
+            'puzzle': 'puzzle'
         }
         
         internal_game_type = game_type_map.get(game_type)
