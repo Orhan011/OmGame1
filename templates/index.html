@@ -8,7 +8,7 @@
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
   <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>
   <div class="d-flex justify-content-center flex-wrap">
-    <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Hemen Başla</a>
+    <a href="{{ url_for('three_d_labyrinth') }}" class="btn btn-primary me-2 mb-2">Hemen Başla</a>
     <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Detaylar</a>
   </div>
 </div>
@@ -19,7 +19,7 @@
 <section class="mt-4">
 <h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
 <div class="row">
-<div class="col-md-6 col-lg-3 mb-3">
+<div class="col-md-6 col-lg-4 mb-3">
 <div class="card h-100">
 <div class="card-body text-center">
 <i class="fas fa-font feature-icon"></i>
@@ -30,7 +30,7 @@
 </div>
 </div>
 
-<div class="col-md-6 col-lg-3 mb-3">
+<div class="col-md-6 col-lg-4 mb-3">
 <div class="card h-100">
 <div class="card-body text-center">
 <i class="fas fa-clone feature-icon"></i>
@@ -41,7 +41,7 @@
 </div>
 </div>
 
-<div class="col-md-6 col-lg-3 mb-3">
+<div class="col-md-6 col-lg-4 mb-3">
 <div class="card h-100">
 <div class="card-body text-center">
 <i class="fas fa-route feature-icon"></i>
@@ -52,13 +52,35 @@
 </div>
 </div>
 
-<div class="col-md-6 col-lg-3 mb-3">
+<div class="col-md-6 col-lg-4 mb-3">
 <div class="card h-100">
 <div class="card-body text-center">
 <i class="fas fa-puzzle-piece feature-icon"></i>
 <h3 class="card-title">Yapboz</h3>
 <p class="card-text">Parçalanmış görselleri doğru şekilde birleştirerek görsel-uzamsal zekânızı geliştirin.</p>
 <a href="{{ url_for('puzzle') }}" class="btn btn-primary">Oyna</a>
+</div>
+</div>
+</div>
+
+<div class="col-md-6 col-lg-4 mb-3">
+<div class="card h-100">
+<div class="card-body text-center">
+<i class="fas fa-cube feature-icon"></i>
+<h3 class="card-title">3D Rotasyon</h3>
+<p class="card-text">3D nesneleri zihinsel olarak döndürün ve uzamsal akıl yürütme yeteneğinizi geliştirin.</p>
+<a href="{{ url_for('three_d_rotation') }}" class="btn btn-primary">Oyna</a>
+</div>
+</div>
+</div>
+
+<div class="col-md-6 col-lg-4 mb-3">
+<div class="card h-100">
+<div class="card-body text-center">
+<i class="fas fa-cubes feature-icon"></i>
+<h3 class="card-title">3D Labirent</h3>
+<p class="card-text">3 boyutlu labirentte gezinerek uzamsal farkındalık ve navigasyon yeteneklerinizi test edin.</p>
+<a href="{{ url_for('three_d_labyrinth') }}" class="btn btn-primary">Oyna</a>
 </div>
 </div>
 </div>
@@ -102,7 +124,7 @@
 <div class="card-body py-4">
 <h2 class="card-title">Beynini Zorlamaya Hazır mısın?</h2>
 <p class="card-text mb-3">Hemen beyin egzersizi oyunlarımızı oynamaya başla ve gelişimini takip et.</p>
-<a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Oyna</a>
+<a href="{{ url_for('three_d_labyrinth') }}" class="btn btn-primary me-2 mb-2">Oyna</a>
 <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary mb-2">Skor Tablosu</a>
 </div>
 </div>
