@@ -30,12 +30,13 @@
     <span class="brand-text">OmGame</span>
   </a>
   {% if session.get('user_id') %}
-    <div class="user-dashboard me-2">
-      <div class="user-quick-stats">
-        <a href="{{ url_for('logout') }}" class="nav-link">
-          <i class="fas fa-sign-out-alt nav-icon"></i>Çıkış Yap
-        </a>
-      </div>
+    <div class="user-dashboard me-2 d-flex align-items-center">
+      <a href="{{ url_for('profile') }}" class="nav-link me-3">
+        <i class="fas fa-user nav-icon"></i>Profil
+      </a>
+      <a href="{{ url_for('logout') }}" class="nav-link">
+        <i class="fas fa-sign-out-alt nav-icon"></i>Çıkış Yap
+      </a>
     </div>
   {% endif %}
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
