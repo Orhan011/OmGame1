@@ -201,9 +201,9 @@ def word_puzzle():
 def memory_match():
     return render_template('games/memoryMatch.html')
 
-@app.route('/games/brain-gym')
-def brain_gym():
-    return render_template('games/brainGym.html')
+@app.route('/games/labyrinth')
+def labyrinth():
+    return render_template('games/labyrinth.html')
 
 @app.route('/games/puzzle')
 def puzzle():
@@ -218,14 +218,14 @@ def three_d_rotation():
 def leaderboard():
     word_puzzle_scores = Score.query.filter_by(game_type='wordPuzzle').order_by(Score.score.desc()).limit(10).all()
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
-    brain_gym_scores = Score.query.filter_by(game_type='brainGym').order_by(Score.score.desc()).limit(10).all()
+    labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
     rotation_3d_scores = Score.query.filter_by(game_type='3dRotation').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
-                          number_sequence_scores=brain_gym_scores, # Sayı Dizisi yerine Beyin Jimnastiği
+                          number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
                           pattern_recognition_scores=puzzle_scores,
                           rotation_3d_scores=rotation_3d_scores)
 
@@ -516,7 +516,8 @@ def get_scores(game_type):
     game_type_map = {
         'word-puzzle': 'wordPuzzle',
         'memory-match': 'memoryMatch',
-        'brain-gym': 'brainGym',
+        'labyrinth': 'labyrinth',
+        'number-sequence': 'labyrinth',  # number-sequence da labyrinth'e yönlendiriliyor (geriye uyumluluk için)
         'puzzle': 'puzzle',
         '3d-rotation': '3dRotation'
     }

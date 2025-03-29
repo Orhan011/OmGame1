@@ -87,9 +87,9 @@ def word_puzzle():
 def memory_match():
     return render_template('games/memoryMatch.html')
 
-@app.route('/games/number-sequence')
-def number_sequence():
-    return render_template('games/numberSequence.html')
+@app.route('/games/labyrinth')
+def labyrinth():
+    return render_template('games/labyrinth.html')
 
 @app.route('/games/puzzle')
 def puzzle():
@@ -104,15 +104,15 @@ def three_d_rotation():
 def leaderboard():
     word_puzzle_scores = Score.query.filter_by(game_type='wordPuzzle').order_by(Score.score.desc()).limit(10).all()
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
-    number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
+    labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
     rotation_3d_scores = Score.query.filter_by(game_type='3dRotation').order_by(Score.score.desc()).limit(10).all()
 
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
-                          number_sequence_scores=number_sequence_scores,
-                          puzzle_scores=puzzle_scores,  # Değişken adını düzelttim, pattern_recognition_scores -> puzzle_scores
+                          number_sequence_scores=labyrinth_scores,  # Labyrinth skorlarını number_sequence değişken adıyla gönderiyoruz
+                          puzzle_scores=puzzle_scores,
                           rotation_3d_scores=rotation_3d_scores)
 
 # Articles
