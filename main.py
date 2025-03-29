@@ -13,6 +13,114 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
+def check_achievements(user, game_type=None, score=None):
+    """Kullanıcının başarılarını kontrol eder ve yeni başarılar kazanıldıysa ekler"""
+    achievements = []
+    
+    # Toplam oyun sayısı başarıları
+    total_games = user.total_games_played
+    for level_idx, required_games in enumerate(ACHIEVEMENT_TYPES['GAMES_PLAYED']['levels']):
+        if total_games >= required_games:
+            achievement_id = f"GAMES_PLAYED_{level_idx + 1}"
+            if achievement_id not in user.achievements:
+                achievements.append({
+                    'id': achievement_id,
+                    'name': ACHIEVEMENT_TYPES['GAMES_PLAYED']['name'],
+                    'description': ACHIEVEMENT_TYPES['GAMES_PLAYED']['description'].format(count=required_games),
+                    'points': ACHIEVEMENT_TYPES['GAMES_PLAYED']['points'][level_idx]
+                })
+    
+    # Yüksek skor başarıları
+    if game_type and score:
+        for level_idx, required_score in enumerate(ACHIEVEMENT_TYPES['HIGH_SCORE']['levels']):
+            if score >= required_score:
+                achievement_id = f"HIGH_SCORE_{game_type}_{level_idx + 1}"
+                if achievement_id not in user.achievements:
+                    achievements.append({
+                        'id': achievement_id,
+                        'name': ACHIEVEMENT_TYPES['HIGH_SCORE']['name'],
+                        'description': ACHIEVEMENT_TYPES['HIGH_SCORE']['description'].format(
+                            game=game_type, score=required_score
+                        ),
+                        'points': ACHIEVEMENT_TYPES['HIGH_SCORE']['points'][level_idx]
+                    })
+    
+    # Başarıları kullanıcıya ekle
+    for achievement in achievements:
+        if achievement['id'] not in user.achievements:
+            user.achievements.append(achievement['id'])
+            user.achievement_points += achievement['points']
+            
+            # Başarı geçmişine ekle
+            if not user.game_stats.get('achievement_history'):
+                user.game_stats['achievement_history'] = []
+            user.game_stats['achievement_history'].append({
+                'achievement_id': achievement['id'],
+                'name': achievement['name'],
+                'description': achievement['description'],
+                'points': achievement['points'],
+                'date': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            })
+    
+    return achievements if achievements else None
+
+def update_game_stats(user, game_type, score, playtime):
+    """Oyun istatistiklerini günceller"""
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+    
+    # Günlük istatistikler
+    if 'daily_stats' not in user.game_stats:
+        user.game_stats['daily_stats'] = {}
+    if today not in user.game_stats['daily_stats']:
+        user.game_stats['daily_stats'][today] = {
+            'games_played': 0,
+            'total_score': 0,
+            'total_playtime': 0,
+            'games': {}
+        }
+    
+    daily_stats = user.game_stats['daily_stats'][today]
+    daily_stats['games_played'] += 1
+    daily_stats['total_score'] += score
+    daily_stats['total_playtime'] += playtime
+    
+    if game_type not in daily_stats['games']:
+        daily_stats['games'][game_type] = {
+            'games_played': 0,
+            'high_score': 0,
+            'total_score': 0,
+            'total_playtime': 0
+        }
+    
+    game_stats = daily_stats['games'][game_type]
+    game_stats['games_played'] += 1
+    game_stats['total_score'] += score
+    game_stats['total_playtime'] += playtime
+    if score > game_stats['high_score']:
+        game_stats['high_score'] = score
+    
+    # Favori oyunları güncelle
+    if 'favorite_games' not in user.game_stats:
+        user.game_stats['favorite_games'] = []
+    
+    favorite_games = user.game_stats['favorite_games']
+    game_index = next((i for i, g in enumerate(favorite_games) if g['game_type'] == game_type), -1)
+    
+    if game_index == -1:
+        favorite_games.append({
+            'game_type': game_type,
+            'games_played': 1,
+            'high_score': score
+        })
+    else:
+        favorite_games[game_index]['games_played'] += 1
+        if score > favorite_games[game_index]['high_score']:
+            favorite_games[game_index]['high_score'] = score
+    
+    # En çok oynanan oyunlara göre sırala
+    favorite_games.sort(key=lambda x: x['games_played'], reverse=True)
+
+
 from app import app, db
 from models import User, Score, Article
 
@@ -893,17 +1001,97 @@ def reset_password():
 def save_score():
     data = request.json
     
-    # Use anonymous user or a session-based temporary user if not logged in
     user_id = session.get('user_id')
-    
-    # Kullanıcı giriş yapmamışsa
     if not user_id:
-        # Skorları kaydetmeyi devre dışı bırak ve kullanıcıya bildir
         return jsonify({
             'success': False, 
             'message': 'Login required',
             'score': data.get('score', 0)
         })
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'})
+    
+    game_type = data['gameType']
+    score = data['score']
+    playtime = data.get('playtime', 0)  # Oyun süresi (saniye)
+    
+    # İstatistikleri güncelle
+    update_game_stats(user, game_type, score, playtime)
+    
+    # Başarıları kontrol et
+    new_achievements = check_achievements(user, game_type, score)
+    
+    # Skoru kaydet
+    existing_score = Score.query.filter_by(
+        user_id=user_id,
+        game_type=game_type
+    ).order_by(Score.score.desc()).first()
+    
+    is_high_score = False
+    if existing_score:
+        if score > existing_score.score:
+            existing_score.score = score
+            existing_score.timestamp = datetime.utcnow()
+            is_high_score = True
+    else:
+        new_score = Score(
+            user_id=user_id,
+            game_type=game_type,
+            score=score
+        )
+        db.session.add(new_score)
+        is_high_score = True
+    
+    # XP ve seviye hesaplamaları
+    original_level = user.experience_points // 1000 + 1
+    xp_gain = min(score // 10, 100)
+    
+    if is_high_score:
+        xp_gain += 20
+    if new_achievements:
+        xp_gain += sum(achievement['points'] for achievement in new_achievements)
+    
+    user.experience_points += xp_gain
+    user.total_games_played += 1
+    
+    if score > user.highest_score:
+        user.highest_score = score
+    
+    # Seviye kontrolü
+    new_level = user.experience_points // 1000 + 1
+    
+    # Rank güncelleme
+    if new_level <= 5:
+        user.rank = 'Başlangıç'
+    elif new_level <= 10:
+        user.rank = 'Acemi'
+    elif new_level <= 15:
+        user.rank = 'İlerleyen'
+    elif new_level <= 20:
+        user.rank = 'Usta'
+    elif new_level <= 30:
+        user.rank = 'Uzman'
+    else:
+        user.rank = 'Efsane'
+    
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
+    
+    return jsonify({
+        'success': True,
+        'xp_gained': xp_gain,
+        'new_total_xp': user.experience_points,
+        'level': new_level,
+        'is_level_up': new_level > original_level,
+        'is_high_score': is_high_score,
+        'rank': user.rank,
+        'new_achievements': new_achievements
+    })
     
     # Kullanıcı bilgilerini getir
     user = User.query.get(user_id)
