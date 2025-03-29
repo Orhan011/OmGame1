@@ -7656,3 +7656,84 @@ main {
 .form-control {
   color: var(--primary-text) !important;
 }
+/* Animated Menu Button Styles */
+.animated-menu {
+  padding: 10px;
+  background: transparent !important;
+  border: none !important;
+  position: relative;
+}
+
+.animated-menu:focus {
+  box-shadow: none !important;
+}
+
+.menu-icon {
+  width: 25px;
+  height: 20px;
+  position: relative;
+}
+
+.menu-icon span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-icon span:first-child {
+  top: 0;
+}
+
+.menu-icon span:nth-child(2) {
+  top: 8px;
+  width: 80%;
+}
+
+.menu-icon span:last-child {
+  bottom: 0;
+}
+
+.animated-menu[aria-expanded="true"] .menu-icon span:first-child {
+  transform: rotate(45deg);
+  top: 8px;
+}
+
+.animated-menu[aria-expanded="true"] .menu-icon span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.animated-menu[aria-expanded="true"] .menu-icon span:last-child {
+  transform: rotate(-45deg);
+  bottom: 10px;
+}
+
+#navbarNav {
+  background: rgba(20, 20, 35, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 15px 15px;
+  padding: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 991px) {
+  #navbarNav {
+    margin-top: 10px;
+  }
+  
+  .nav-link {
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    background: rgba(106, 90, 224, 0.2);
+    transform: translateX(5px);
+  }
+}
