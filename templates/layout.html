@@ -32,16 +32,8 @@
   {% if session.get('user_id') %}
     <div class="user-dashboard me-2">
       <div class="user-quick-stats">
-        <div class="stat-pill rank">
-          <i class="fas fa-crown"></i>
-          <span>{{ current_user.rank }}</span>
-        </div>
-        <div class="stat-pill xp">
-          <i class="fas fa-star"></i>
-          <span>{{ current_user.experience_points }} XP</span>
-        </div>
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
+        <a href="{{ url_for('logout') }}" class="nav-link">
+          <i class="fas fa-sign-out-alt nav-icon"></i>Çıkış Yap
         </a>
       </div>
     </div>
