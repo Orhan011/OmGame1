@@ -8,14 +8,18 @@
     <div class="col-lg-4 mb-4">
       <div class="card glass-card">
         <div class="card-body text-center">
-          <div class="profile-avatar-container mb-4">
+          <div class="profile-avatar-container mb-4" id="profileAvatarContainer">
             {% if user.avatar_url %}
-              <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="img-fluid profile-avatar">
+              <img src="{{ user.avatar_url }}?v={{ user.last_active|int }}" alt="{{ user.username }}" class="profile-avatar">
             {% else %}
               <div class="profile-avatar-placeholder">
                 <i class="fas fa-user fa-4x"></i>
               </div>
             {% endif %}
+            <div class="profile-avatar-overlay">
+              <i class="fas fa-camera"></i>
+              <span>Fotoğraf Değiştir</span>
+            </div>
           </div>
 
           <h3 class="profile-username mb-2">{{ user.username }}</h3>
@@ -381,7 +385,69 @@
     
     // Profil fotoğrafı işlemleri
     if (profileImage) {
-      profileImage.addEventListener('change', function(e) {
+      const handleImageUpload = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Check file size (500KB = 512000 bytes)
+        if (file.size > 512000) {
+          Swal.fire({
+            title: 'Dosya çok büyük',
+            text: 'Lütfen 500KB\'dan küçük bir dosya seçin',
+            icon: 'error'
+          });
+          return;
+        }
+        
+        // Check file type
+        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+          Swal.fire({
+            title: 'Geçersiz dosya tipi',
+            text: 'Lütfen JPG veya PNG formatında bir dosya seçin',
+            icon: 'error'
+          });
+          return;
+        }
+        
+        // Show loading state
+        Swal.fire({
+          title: 'Yükleniyor...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        
+        // Create FormData and submit
+        const formData = new FormData();
+        formData.append('profile_image', file);
+        
+        fetch('/update-profile', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            Swal.fire({
+              title: 'Hata',
+              text: data.message || 'Bir hata oluştu',
+              icon: 'error'
+            });
+          }
+        })
+        .catch(error => {
+          Swal.fire({
+            title: 'Hata',
+            text: 'Yükleme sırasında bir hata oluştu',
+            icon: 'error'
+          });
+        });
+      };
+      
+      profileImage.addEventListener('change', handleImageUpload);
         if (e.target.files.length > 0) {
           const file = e.target.files[0];
           
