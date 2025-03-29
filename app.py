@@ -12,8 +12,31 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "braingames_secret_key")
 
 # Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///braintraining.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///permanent/braintraining.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+
+import shutil
+from datetime import datetime
+import os
+
+# Veritabanı dizinini oluştur
+os.makedirs('permanent', exist_ok=True)
+os.makedirs('backups', exist_ok=True)
+
+def backup_database():
+    """Veritabanının yedeğini al"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_path = f'backups/braintraining_{timestamp}.db'
+    
+    if os.path.exists('permanent/braintraining.db'):
+        shutil.copy2('permanent/braintraining.db', backup_path)
+        app.logger.info(f"Database backed up to {backup_path}")
+
+# Her gün otomatik yedek al
+@app.before_first_request
+def setup_backup():
+    backup_database()
+
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
