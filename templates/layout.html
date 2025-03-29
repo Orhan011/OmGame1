@@ -89,8 +89,7 @@
       <li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
-      
-      {% else %}
+      {% if not session.get('user_id') %}
         <li class="nav-item"><a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt nav-icon"></i>Giriş Yap</a></li>
         <li class="nav-item"><a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}"><i class="fas fa-user-plus nav-icon"></i>Kayıt Ol</a></li>
       {% endif %}
