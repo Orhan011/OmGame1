@@ -1,92 +1,371 @@
+{% extends 'layout.html' %}
 
-{% extends "layout.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block title %}Profil - {{ current_user.username }}{% endblock %}
 
 {% block content %}
-<div class="profile-container">
+<div class="container profile-page">
   <div class="profile-header glass-effect">
-    <div class="profile-avatar-section">
-      <div class="avatar-container">
+    <div class="profile-info">
+      <div class="profile-avatar">
         {% if current_user.avatar_url %}
-          <img src="{{ current_user.avatar_url }}" alt="Profile Avatar" class="profile-avatar">
+          <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }} Avatar">
         {% else %}
-          <div class="avatar-placeholder">{{ current_user.username[0]|upper }}</div>
+          {{ current_user.username[0]|upper }}
         {% endif %}
-        <button class="avatar-edit-btn" data-bs-toggle="modal" data-bs-target="#avatarModal">
-          <i class="fas fa-camera"></i>
-        </button>
+      </div>
+      <div class="profile-details">
+        <h1 class="profile-username">{{ current_user.username }}</h1>
+        <div class="profile-rank">{{ current_user.rank }}</div>
+        <div class="profile-stats">
+          <div class="stat-item">
+            <div class="stat-value">{{ current_user.total_games_played }}</div>
+            <div class="stat-label">Oyun</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ current_user.highest_score }}</div>
+            <div class="stat-label">En Yüksek Skor</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ current_user.win_count or 0 }}</div>
+            <div class="stat-label">Kazanma</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ current_user.loss_count or 0 }}</div>
+            <div class="stat-label">Kaybetme</div>
+          </div>
+        </div>
+        <div class="profile-badges">
+          {% if current_user.badges %}
+            {% for badge in current_user.badges %}
+              <div class="badge-item" data-tooltip="{{ badge.name }}">
+                <i class="{{ badge.icon }}"></i>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="profile-exp-bar">
+          <div class="exp-progress" style="width: {{ (current_user.experience_points % 1000) / 10 }}%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="settings-section">
+    <div class="settings-tabs">
+      <div class="settings-tab active" data-tab="personal"><i class="fas fa-user"></i> Kişisel Bilgiler</div>
+      <div class="settings-tab" data-tab="security"><i class="fas fa-lock"></i> Güvenlik</div>
+      <div class="settings-tab" data-tab="appearance"><i class="fas fa-paint-brush"></i> Görünüm</div>
+      <div class="settings-tab" data-tab="notifications"><i class="fas fa-bell"></i> Bildirimler</div>
+      <div class="settings-tab" data-tab="account"><i class="fas fa-user-cog"></i> Hesap</div>
+      <div class="settings-tab" data-tab="avatar"><i class="fas fa-image"></i> Profil Fotoğrafı</div>
+    </div>
+    
+    <div class="settings-content active" id="personal-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect">
+            <h3 class="settings-title"><i class="fas fa-user-edit"></i> Kişisel Bilgiler</h3>
+            <form class="settings-form" method="POST" action="{{ url_for('update_profile') }}">
+              <div class="form-group">
+                <label>Tam İsim</label>
+                <input type="text" class="form-control" value="{{ current_user.full_name }}" name="full_name">
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" value="{{ current_user.email }}" name="email">
+              </div>
+              <div class="form-group">
+                <label>Yaş</label>
+                <input type="number" class="form-control" value="{{ current_user.age }}" name="age">
+              </div>
+              <div class="form-group">
+                <label>Konum</label>
+                <input type="text" class="form-control" value="{{ current_user.location }}" name="location">
+              </div>
+              <div class="form-group">
+                <label>Hakkında</label>
+                <textarea class="form-control" name="bio">{{ current_user.bio }}</textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Kaydet</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
     
-    <div class="profile-info">
-      <h2 class="profile-username">{{ current_user.username }}</h2>
-      <div class="profile-status">
-        <span class="status-badge {% if current_user.last_active %}active{% endif %}">
-          {{ "Aktif" if current_user.last_active else "Çevrimdışı" }}
-        </span>
-      </div>
-      
-      <div class="xp-bar-container">
-        <div class="xp-bar" style="width: {{ (current_user.experience_points % 100) }}%"></div>
-        <span class="xp-text">{{ current_user.experience_points }} XP</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="profile-stats-grid">
-    <div class="stat-card glass-effect">
-      <i class="fas fa-gamepad"></i>
-      <h3>Oynanılan Oyunlar</h3>
-      <div class="stat-value">{{ current_user.total_games_played }}</div>
-    </div>
-    <div class="stat-card glass-effect">
-      <i class="fas fa-trophy"></i>
-      <h3>En Yüksek Skor</h3>
-      <div class="stat-value">{{ current_user.highest_score }}</div>
-    </div>
-    <div class="stat-card glass-effect">
-      <i class="fas fa-star"></i>
-      <h3>Rütbe</h3>
-      <div class="stat-value">{{ current_user.rank }}</div>
-    </div>
-  </div>
-
-  <div class="profile-settings glass-effect">
-    <h3><i class="fas fa-cog"></i> Ayarlar</h3>
-    <form class="settings-form" method="POST" action="{{ url_for('update_profile') }}">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" class="form-control" value="{{ current_user.email }}" name="email">
-      </div>
-      <div class="form-group">
-        <label>Yeni Şifre</label>
-        <input type="password" class="form-control" placeholder="Yeni şifre" name="new_password">
-      </div>
-      <div class="form-group">
-        <label>Konum</label>
-        <input type="text" class="form-control" value="{{ current_user.location }}" name="location">
-      </div>
-      <button type="submit" class="btn btn-primary">Kaydet</button>
-    </form>
-  </div>
-</div>
-
-<!-- Avatar Modal -->
-<div class="modal fade" id="avatarModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Profil Fotoğrafını Güncelle</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form id="avatarForm" action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data">
-          <div class="avatar-upload-container">
-            <input type="file" id="avatarInput" name="avatar" accept="image/*" class="form-control">
+    <div class="settings-content" id="security-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect">
+            <h3 class="settings-title"><i class="fas fa-key"></i> Şifre Değiştir</h3>
+            <form class="settings-form" method="POST" action="{{ url_for('update_password') }}">
+              <div class="form-group">
+                <label>Mevcut Şifre</label>
+                <input type="password" class="form-control" name="current_password" required>
+              </div>
+              <div class="form-group">
+                <label>Yeni Şifre</label>
+                <input type="password" class="form-control" name="new_password" required>
+              </div>
+              <div class="form-group">
+                <label>Yeni Şifre (Tekrar)</label>
+                <input type="password" class="form-control" name="confirm_password" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+            </form>
           </div>
-          <button type="submit" class="btn btn-primary mt-3">Yükle</button>
-        </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-content" id="appearance-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect">
+            <h3 class="settings-title"><i class="fas fa-palette"></i> Tema Ayarları</h3>
+            <form class="settings-form" method="POST" action="{{ url_for('update_theme') }}">
+              <h5>Tema Modu</h5>
+              <div class="theme-options">
+                <div class="theme-option dark {% if current_user.theme_preference == 'dark' %}active{% endif %}" data-theme="dark">
+                  <div class="theme-icon"><i class="fas fa-moon"></i></div>
+                  <div class="theme-title">Karanlık</div>
+                  <input type="radio" name="theme_preference" value="dark" {% if current_user.theme_preference == 'dark' %}checked{% endif %} style="display: none;">
+                </div>
+                <div class="theme-option light {% if current_user.theme_preference == 'light' %}active{% endif %}" data-theme="light">
+                  <div class="theme-icon"><i class="fas fa-sun"></i></div>
+                  <div class="theme-title">Aydınlık</div>
+                  <input type="radio" name="theme_preference" value="light" {% if current_user.theme_preference == 'light' %}checked{% endif %} style="display: none;">
+                </div>
+                <div class="theme-option contrast {% if current_user.theme_preference == 'contrast' %}active{% endif %}" data-theme="contrast">
+                  <div class="theme-icon"><i class="fas fa-adjust"></i></div>
+                  <div class="theme-title">Yüksek Kontrast</div>
+                  <input type="radio" name="theme_preference" value="contrast" {% if current_user.theme_preference == 'contrast' %}checked{% endif %} style="display: none;">
+                </div>
+              </div>
+              
+              <h5 class="mt-4">Tema Rengi</h5>
+              <div class="color-palette">
+                <div class="color-option active" data-color="#6a5ae0" style="background-color: #6a5ae0;"></div>
+                <div class="color-option" data-color="#ff4d6b" style="background-color: #ff4d6b;"></div>
+                <div class="color-option" data-color="#00c6ff" style="background-color: #00c6ff;"></div>
+                <div class="color-option" data-color="#ff9900" style="background-color: #ff9900;"></div>
+                <div class="color-option" data-color="#00d084" style="background-color: #00d084;"></div>
+                <div class="color-option" data-color="#8338ec" style="background-color: #8338ec;"></div>
+                <input type="hidden" name="theme_color" id="themeColor" value="#6a5ae0">
+              </div>
+              
+              <button type="submit" class="btn btn-primary mt-4">Tema Ayarlarını Kaydet</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-content" id="notifications-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect">
+            <h3 class="settings-title"><i class="fas fa-bell"></i> Bildirim Ayarları</h3>
+            <form class="settings-form" method="POST" action="{{ url_for('update_notifications') }}">
+              <label class="form-switch">
+                <span class="switch">
+                  <input type="checkbox" name="email_notifications" {% if current_user.notification_settings and current_user.notification_settings.email %}checked{% endif %}>
+                  <span class="slider"></span>
+                </span>
+                Email Bildirimleri
+              </label>
+              
+              <label class="form-switch">
+                <span class="switch">
+                  <input type="checkbox" name="achievement_notifications" {% if current_user.notification_settings and current_user.notification_settings.push %}checked{% endif %}>
+                  <span class="slider"></span>
+                </span>
+                Başarım Bildirimleri
+              </label>
+              
+              <button type="submit" class="btn btn-primary mt-3">Bildirim Ayarlarını Kaydet</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-content" id="account-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect danger-zone">
+            <h3 class="settings-title"><i class="fas fa-exclamation-triangle"></i> Tehlikeli Bölge</h3>
+            <p>Bu işlemler geri alınamaz ve hesabınıza kalıcı olarak zarar verebilir.</p>
+            <form class="settings-form" method="POST" action="{{ url_for('deactivate_account') }}">
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Hesabınızı devre dışı bırakmak istediğinizden emin misiniz? Giriş yaparak tekrar aktive edebilirsiniz.');">Hesabı Devre Dışı Bırak</button>
+            </form>
+            <form class="settings-form mt-3" method="POST" action="{{ url_for('delete_account') }}">
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!');">Hesabı Kalıcı Olarak Sil</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-content" id="avatar-content">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="settings-card glass-effect">
+            <h3 class="settings-title"><i class="fas fa-user-circle"></i> Profil Fotoğrafı</h3>
+            <form id="avatarForm" action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data">
+              <h5>Yükle veya Seç</h5>
+              <div class="avatar-upload-container">
+                <div class="avatar-preview mb-3">
+                  {% if current_user.avatar_url %}
+                    <img src="{{ current_user.avatar_url }}" alt="Avatar Preview" class="avatar-preview-img" id="avatarPreview">
+                  {% else %}
+                    <div class="avatar-placeholder preview" id="avatarPreview">{{ current_user.username[0]|upper }}</div>
+                  {% endif %}
+                </div>
+                <input type="file" id="avatarInput" name="avatar" accept="image/*" class="form-control">
+              </div>
+              <div class="avatar-options mt-3">
+                <h6>Hazır Avatarlar</h6>
+                <div class="preset-avatars">
+                  <div class="preset-avatar" data-avatar="avatar1.svg">
+                    <img src="{{ url_for('static', filename='images/avatars/avatar1.svg') }}" alt="Avatar 1">
+                  </div>
+                  <div class="preset-avatar" data-avatar="avatar2.svg">
+                    <img src="{{ url_for('static', filename='images/avatars/avatar2.svg') }}" alt="Avatar 2">
+                  </div>
+                  <div class="preset-avatar" data-avatar="avatar3.svg">
+                    <img src="{{ url_for('static', filename='images/avatars/avatar3.svg') }}" alt="Avatar 3">
+                  </div>
+                  <div class="preset-avatar" data-avatar="avatar4.svg">
+                    <img src="{{ url_for('static', filename='images/avatars/avatar4.svg') }}" alt="Avatar 4">
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="selected_avatar" id="selectedAvatar" value="">
+              <button type="submit" class="btn btn-primary mt-3">Kaydet</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Avatar yükleme önizleme
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const selectedAvatarInput = document.getElementById('selectedAvatar');
+    
+    if (avatarInput) {
+      avatarInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            if (avatarPreview.tagName === 'IMG') {
+              avatarPreview.src = e.target.result;
+            } else {
+              // Placeholder div'i resim ile değiştir
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.classList.add('avatar-preview-img');
+              img.id = 'avatarPreview';
+              avatarPreview.parentNode.replaceChild(img, avatarPreview);
+            }
+            // Hazır avatar seçimini temizle
+            selectedAvatarInput.value = '';
+            document.querySelectorAll('.preset-avatar').forEach(el => {
+              el.classList.remove('selected');
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    
+    // Hazır avatar seçimi
+    const presetAvatars = document.querySelectorAll('.preset-avatar');
+    presetAvatars.forEach(avatar => {
+      avatar.addEventListener('click', function() {
+        const avatarName = this.getAttribute('data-avatar');
+        selectedAvatarInput.value = avatarName;
+        
+        // Seçili sınıfını değiştir
+        presetAvatars.forEach(a => a.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        // Önizlemeyi güncelle
+        const avatarSrc = this.querySelector('img').src;
+        if (avatarPreview.tagName === 'IMG') {
+          avatarPreview.src = avatarSrc;
+        } else {
+          const img = document.createElement('img');
+          img.src = avatarSrc;
+          img.classList.add('avatar-preview-img');
+          img.id = 'avatarPreview';
+          avatarPreview.parentNode.replaceChild(img, avatarPreview);
+        }
+        
+        // Dosya girdisini temizle
+        avatarInput.value = '';
+      });
+    });
+    
+    // Tema renk seçimi
+    const colorOptions = document.querySelectorAll('.color-option');
+    const themeColorInput = document.getElementById('themeColor');
+    
+    colorOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        const color = this.getAttribute('data-color');
+        themeColorInput.value = color;
+        
+        colorOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // Tema modu seçimi
+    const themeOptions = document.querySelectorAll('.theme-option');
+    
+    themeOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        const theme = this.getAttribute('data-theme');
+        const radioInput = this.querySelector('input[type="radio"]');
+        radioInput.checked = true;
+        
+        themeOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // Ayarlar tablarını değiştirme
+    const settingsTabs = document.querySelectorAll('.settings-tab');
+    
+    settingsTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.getAttribute('data-tab');
+        
+        // Aktif tab'ı değiştir
+        settingsTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // İçerik alanlarını değiştir
+        document.querySelectorAll('.settings-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-content`).classList.add('active');
+      });
+    });
+  });
+</script>
 {% endblock %}

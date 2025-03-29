@@ -223,6 +223,212 @@ def profile():
     user = User.query.get(session['user_id'])
     return render_template('profile.html', user=user, current_user=user)
 
+@app.route('/profile/update', methods=['POST'])
+def update_profile():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    # Get form data
+    email = request.form.get('email')
+    full_name = request.form.get('full_name')
+    age = request.form.get('age')
+    location = request.form.get('location')
+    bio = request.form.get('bio')
+    
+    # Update user information
+    if email and email != user.email:
+        # Check if email already exists
+        if User.query.filter_by(email=email).first() and User.query.filter_by(email=email).first().id != user.id:
+            flash('Bu email adresi zaten kullanılıyor.', 'danger')
+            return redirect(url_for('profile'))
+        user.email = email
+    
+    if full_name is not None:
+        user.full_name = full_name
+    
+    if age is not None and age != '':
+        try:
+            user.age = int(age)
+        except ValueError:
+            pass
+        
+    if location is not None:
+        user.location = location
+        
+    if bio is not None:
+        user.bio = bio
+    
+    try:
+        db.session.commit()
+        flash('Profil bilgileriniz başarıyla güncellendi.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating profile: {e}")
+        flash('Profil güncellenirken bir hata oluştu.', 'danger')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/profile/password', methods=['POST'])
+def update_password():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    # Validate inputs
+    if not current_password or not new_password or not confirm_password:
+        flash('Tüm şifre alanlarını doldurunuz.', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Check if current password is correct
+    if not check_password_hash(user.password_hash, current_password):
+        flash('Mevcut şifreniz hatalı.', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Check if new passwords match
+    if new_password != confirm_password:
+        flash('Yeni şifreler eşleşmiyor.', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Update password
+    user.password_hash = generate_password_hash(new_password)
+    
+    try:
+        db.session.commit()
+        flash('Şifreniz başarıyla güncellendi.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating password: {e}")
+        flash('Şifre güncellenirken bir hata oluştu.', 'danger')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/profile/theme', methods=['POST'])
+def update_theme():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    theme_preference = request.form.get('theme_preference')
+    theme_color = request.form.get('theme_color')
+    
+    # Update user's theme preference
+    if hasattr(user, 'theme_preference') and theme_preference in ['dark', 'light', 'contrast']:
+        user.theme_preference = theme_preference
+    
+    # In the future, we can add theme_color to the User model and update it here
+    
+    try:
+        db.session.commit()
+        flash('Tema ayarlarınız başarıyla güncellendi.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating theme: {e}")
+        flash('Tema ayarları güncellenirken bir hata oluştu.', 'danger')
+    
+    return redirect(url_for('profile'))
+
+@app.route('/profile/notifications', methods=['POST'])
+def update_notifications():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    email_notifications = 'email_notifications' in request.form
+    achievement_notifications = 'achievement_notifications' in request.form
+    
+    # You can update notification_settings in the future if you add this field to the User model
+    # For now, we'll just show a success message
+    
+    flash('Bildirim ayarlarınız başarıyla güncellendi.', 'success')
+    return redirect(url_for('profile'))
+
+@app.route('/profile/deactivate', methods=['POST'])
+def deactivate_account():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    # In a real app, you would set an account status field to 'inactive'
+    # For now, we'll just show a message
+    flash('Hesabınız geçici olarak devre dışı bırakıldı. Giriş yaparak tekrar aktive edebilirsiniz.', 'warning')
+    return redirect(url_for('logout'))
+
+@app.route('/profile/delete', methods=['POST'])
+def delete_account():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user_id = session.get('user_id')
+    
+    try:
+        # Delete user's scores
+        Score.query.filter_by(user_id=user_id).delete()
+        
+        # Delete the user
+        User.query.filter_by(id=user_id).delete()
+        
+        db.session.commit()
+        session.clear()
+        flash('Hesabınız kalıcı olarak silindi.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting account: {e}")
+        flash('Hesap silinirken bir hata oluştu.', 'danger')
+    
+    return redirect(url_for('login'))
+
+@app.route('/profile/avatar/update', methods=['POST'])
+def update_avatar():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    # Check if user selected a preset avatar
+    selected_avatar = request.form.get('selected_avatar')
+    if selected_avatar:
+        user.avatar_url = url_for('static', filename=f'images/avatars/{selected_avatar}')
+        try:
+            db.session.commit()
+            flash('Profil fotoğrafınız başarıyla güncellendi.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error updating avatar: {e}")
+            flash('Profil fotoğrafı güncellenirken bir hata oluştu.', 'danger')
+        return redirect(url_for('profile'))
+    
+    # Check if user uploaded a file
+    if 'avatar' not in request.files:
+        flash('Dosya seçilmedi.', 'danger')
+        return redirect(url_for('profile'))
+    
+    file = request.files['avatar']
+    
+    if file.filename == '':
+        flash('Dosya seçilmedi.', 'danger')
+        return redirect(url_for('profile'))
+    
+    if file:
+        # Generate a secure filename
+        filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+        # Save to avatars directory
+        file_path = os.path.join('static', 'images', 'avatars', filename)
+        try:
+            file.save(file_path)
+            user.avatar_url = url_for('static', filename=f'images/avatars/{filename}')
+            db.session.commit()
+            flash('Profil fotoğrafınız başarıyla yüklendi.', 'success')
+        except Exception as e:
+            logger.error(f"Error saving avatar: {e}")
+            flash('Profil fotoğrafı yüklenirken bir hata oluştu.', 'danger')
+    
+    return redirect(url_for('profile'))
+
 # Game routes
 @app.route('/games/word-puzzle')
 def word_puzzle():
