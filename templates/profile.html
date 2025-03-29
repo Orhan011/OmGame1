@@ -250,98 +250,61 @@
   </div>
 </div>
 
-<!-- Profil Düzenleme Modal - Profesyonel Sürüm -->
+<!-- Basit Profil Düzenleme Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content profile-edit-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editProfileModalLabel"><i class="fas fa-user-edit"></i> Profil Bilgilerini Düzenle</h5>
+        <h5 class="modal-title" id="editProfileModalLabel"><i class="fas fa-user-edit"></i> Profil Düzenle</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data" id="profileForm">
-          <div class="row">
-            <!-- Sol taraf: Profil resmi yükleme -->
-            <div class="col-md-4">
-              <div class="profile-edit-avatar-container text-center">
-                <h6 class="mb-4"><i class="fas fa-portrait me-2"></i>Profil Fotoğrafı</h6>
-
-                <div class="profile-picture-upload">
-                  <div class="profile-upload-preview rounded-circle mb-4">
-                    {% if user.avatar_url %}
-                      <img src="{{ user.avatar_url }}" alt="{{ user.username }}" id="avatarPreview" class="img-fluid profile-avatar">
-                    {% else %}
-                      <div class="profile-avatar-placeholder" id="avatarPlaceholder">
-                        <i class="fas fa-user fa-4x"></i>
-                      </div>
-                      <img src="" alt="" id="avatarPreview" class="img-fluid profile-avatar d-none">
-                    {% endif %}
-
-                    <div class="avatar-overlay">
-                      <i class="fas fa-camera"></i>
-                    </div>
-                  </div>
-
-                  <div class="profile-image-upload-controls text-center">
-                    <label for="profile_image" class="btn btn-upload btn-sm mb-2">
-                      <i class="fas fa-upload me-2"></i>Fotoğraf Yükle
-                    </label>
-                    <input type="file" id="profile_image" name="profile_image" accept="image/*" class="d-none">
-
-                    <button type="button" class="btn btn-outline-danger btn-sm d-block mx-auto" id="removePhotoBtn">
-                      <i class="fas fa-trash me-1"></i>Fotoğrafı Kaldır
-                    </button>
-                  </div>
+          <!-- Profil Resmi -->
+          <div class="text-center mb-4">
+            <div class="d-inline-block position-relative" style="width: 120px; height: 120px;">
+              {% if user.avatar_url %}
+                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" id="avatarPreview" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+              {% else %}
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" id="avatarPlaceholder" style="width: 120px; height: 120px;">
+                  <i class="fas fa-user fa-3x text-white"></i>
                 </div>
-
-                <small class="avatar-help-text text-center d-block mt-4">
-                  <i class="fas fa-info-circle me-1"></i> Yükleyeceğiniz fotoğraf 500KB'dan küçük olmalıdır. JPG, PNG formatları desteklenir.
-                </small>
-              </div>
+                <img src="" alt="" id="avatarPreview" class="d-none">
+              {% endif %}
             </div>
-
-            <!-- Sağ taraf: Diğer profil bilgileri -->
-            <div class="col-md-8">
-              <div class="profile-edit-form p-4">
-                <h6 class="mb-4"><i class="fas fa-id-card me-2"></i>Kişisel Bilgiler</h6>
-
-                <div class="mb-4">
-                  <label for="username" class="form-label">
-                    <i class="fas fa-user me-2"></i>Kullanıcı Adı
-                  </label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-at"></i></span>
-                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-                    <span class="input-group-text bg-transparent border-0 p-0">
-                      <span class="validity-indicator ms-2" id="usernameValidity"></span>
-                    </span>
-                  </div>
-                  <small class="form-text mt-1" id="usernameHelp">Kullanıcı adınız en az 3, en fazla 20 karakter olmalıdır.</small>
-                </div>
-
-                <div class="mb-4">
-                  <label for="birth_year" class="form-label">
-                    <i class="fas fa-birthday-cake me-2"></i>Doğum Yılı
-                  </label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                    <input type="number" class="form-control" id="birth_year" name="birth_year" value="{{ user.birth_year or '' }}" min="1900" max="{{ current_year }}" placeholder="YYYY">
-                  </div>
-                  <small class="form-text mt-1">İstatistikler için kullanılacaktır, zorunlu değildir.</small>
-                </div>
-
-                <div class="profile-edit-actions text-end">
-                  <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>İptal
-                  </button>
-                  <button type="submit" class="btn btn-save-profile" id="saveProfileBtn">
-                    <i class="fas fa-save me-2"></i>
-                    <span>Değişiklikleri Kaydet</span>
-                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                  </button>
-                </div>
-              </div>
+            
+            <div class="mt-3">
+              <label for="profile_image" class="btn btn-primary btn-sm mb-2">
+                <i class="fas fa-upload me-1"></i> Fotoğraf Yükle
+              </label>
+              <input type="file" id="profile_image" name="profile_image" accept="image/*" class="d-none">
+              <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="removePhotoBtn">
+                <i class="fas fa-trash-alt me-1"></i> Kaldır
+              </button>
             </div>
+            <small class="text-muted">JPG veya PNG, maks. 500KB</small>
+            <!-- Hidden field for photo removal -->
+            <input type="hidden" id="remove_photo" name="remove_photo" value="0">
+          </div>
+          
+          <!-- Kullanıcı Adı -->
+          <div class="mb-3">
+            <label for="profile_username" class="form-label"><i class="fas fa-user me-1"></i> Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="profile_username" name="username" value="{{ user.username }}" required>
+          </div>
+          
+          <!-- Doğum Yılı -->
+          <div class="mb-3">
+            <label for="profile_birth_year" class="form-label"><i class="fas fa-birthday-cake me-1"></i> Doğum Yılı</label>
+            <input type="number" class="form-control" id="profile_birth_year" name="birth_year" value="{{ user.birth_year or '' }}" min="1900" max="2025" placeholder="YYYY">
+          </div>
+          
+          <!-- Butonlar -->
+          <div class="text-end mt-4">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="submit" class="btn btn-primary" id="profileSaveBtn">
+              <i class="fas fa-save me-1"></i> Kaydet
+            </button>
           </div>
         </form>
       </div>
@@ -353,159 +316,103 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Basit profil sayfası JavaScript
     const profileForm = document.getElementById('profileForm');
     const profileImage = document.getElementById('profile_image');
     const avatarPreview = document.getElementById('avatarPreview');
     const avatarPlaceholder = document.getElementById('avatarPlaceholder');
     const removePhotoBtn = document.getElementById('removePhotoBtn');
-    const usernameInput = document.getElementById('username');
-    const birthYearInput = document.getElementById('birth_year');
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const removePhotoInput = document.getElementById('remove_photo');
+    const profileUsername = document.getElementById('profile_username');
+    const profileBirthYear = document.getElementById('profile_birth_year');
+    const profileSaveBtn = document.getElementById('profileSaveBtn');
     
-    // Form submission handler
-    if (profileForm) {
-      profileForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        
-        try {
-          saveProfileBtn.disabled = true;
-          const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData
-          });
-          
-          const result = await response.json();
-          
-          if (result.success) {
-            location.reload();
-          } else {
-            alert(result.message || 'Profil güncellenirken bir hata oluştu.');
-          }
-        } catch (error) {
-          alert('Profil güncellenirken bir hata oluştu.');
-        } finally {
-          saveProfileBtn.disabled = false;
-        }
-      });
-    }
-
-    // Yeni değişken - profil fotoğrafı kaldırıldı mı?
-    let photoRemoved = false;
-
+    // Profil fotoğrafı işlemleri
     if (profileImage) {
       profileImage.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
           const file = e.target.files[0];
-
+          
           // Dosya boyutu kontrolü (500KB = 512000 bytes)
           if (file.size > 512000) {
             alert('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.');
             return;
           }
-
+          
           // Dosya tipi kontrolü
-          if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-            alert('Lütfen geçerli bir resim dosyası seçin (JPG, PNG veya GIF).');
+          if (!['image/jpeg', 'image/png'].includes(file.type)) {
+            alert('Lütfen geçerli bir resim dosyası seçin (JPG veya PNG).');
             return;
           }
-
+          
           const reader = new FileReader();
-
           reader.onload = function(e) {
-            avatarPreview.src = e.target.result;
-            avatarPreview.classList.remove('d-none');
+            if (avatarPreview) {
+              avatarPreview.src = e.target.result;
+              avatarPreview.classList.remove('d-none');
+            }
+            
             if (avatarPlaceholder) {
               avatarPlaceholder.classList.add('d-none');
             }
-            // Fotoğraf eklendiğinde, kaldırma işlemini sıfırla
-            photoRemoved = false;
+            
+            // Fotoğrafı kaldırma bayrağını sıfırla
+            if (removePhotoInput) {
+              removePhotoInput.value = '0';
+            }
           };
-
+          
           reader.readAsDataURL(file);
         }
       });
     }
-
-    // Fotoğraf kaldırma butonu işlevselliği
+    
+    // Fotoğraf kaldır butonu
     if (removePhotoBtn) {
       removePhotoBtn.addEventListener('click', function() {
-        // Avatar önizlemeyi gizle ve placeholder'ı göster
         if (avatarPreview) {
           avatarPreview.classList.add('d-none');
           avatarPreview.src = '';
         }
-
+        
         if (avatarPlaceholder) {
           avatarPlaceholder.classList.remove('d-none');
         }
-
-        // Dosya seçim alanını sıfırla
+        
         if (profileImage) {
           profileImage.value = '';
         }
-
-        // Fotoğrafın kaldırıldığını işaretle
-        photoRemoved = true;
-
-        // Gizli input ekle - backend'e fotoğrafın kaldırıldığını bildirmek için
-        let removePhotoInput = document.getElementById('remove_photo');
-        if (!removePhotoInput) {
-          removePhotoInput = document.createElement('input');
-          removePhotoInput.type = 'hidden';
-          removePhotoInput.name = 'remove_photo';
-          removePhotoInput.id = 'remove_photo';
-          removePhotoInput.value = '1';
-          document.getElementById('profileForm').appendChild(removePhotoInput);
-        } else {
+        
+        if (removePhotoInput) {
           removePhotoInput.value = '1';
         }
       });
     }
-
-    // Kullanıcı adı doğrulama
-    const usernameInput = document.getElementById('username');
-    const usernameValidity = document.getElementById('usernameValidity');
-    const usernameHelp = document.getElementById('usernameHelp');
-
-    if (usernameInput && usernameValidity) {
-      usernameInput.addEventListener('input', function() {
+    
+    // Kullanıcı adı kontrolü
+    if (profileUsername) {
+      profileUsername.addEventListener('input', function() {
         const username = this.value.trim();
-
+        
         if (username.length < 3) {
-          usernameValidity.innerHTML = '<i class="fas fa-times-circle text-danger"></i>';
-          usernameHelp.innerHTML = 'Kullanıcı adı en az 3 karakter olmalıdır.';
-          usernameHelp.className = 'form-text mt-1 text-danger';
+          this.setCustomValidity('Kullanıcı adı en az 3 karakter olmalıdır.');
         } else if (username.length > 20) {
-          usernameValidity.innerHTML = '<i class="fas fa-times-circle text-danger"></i>';
-          usernameHelp.innerHTML = 'Kullanıcı adı en fazla 20 karakter olmalıdır.';
-          usernameHelp.className = 'form-text mt-1 text-danger';
+          this.setCustomValidity('Kullanıcı adı en fazla 20 karakter olmalıdır.');
         } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-          usernameValidity.innerHTML = '<i class="fas fa-times-circle text-danger"></i>';
-          usernameHelp.innerHTML = 'Kullanıcı adı sadece harf, rakam ve alt çizgi (_) içerebilir.';
-          usernameHelp.className = 'form-text mt-1 text-danger';
+          this.setCustomValidity('Kullanıcı adı sadece harf, rakam ve alt çizgi (_) içerebilir.');
         } else {
-          usernameValidity.innerHTML = '<i class="fas fa-check-circle text-success"></i>';
-          usernameHelp.innerHTML = 'Geçerli bir kullanıcı adı.';
-          usernameHelp.className = 'form-text mt-1 text-success';
+          this.setCustomValidity('');
         }
       });
-
-      // Sayfa yüklendiğinde de kontrolü yap
-      usernameInput.dispatchEvent(new Event('input'));
     }
-
-    // Doğum yılı doğrulaması
-    const birthYearInput = document.getElementById('birth_year');
-
-    if (birthYearInput) {
-      birthYearInput.addEventListener('input', function() {
+    
+    // Doğum yılı kontrolü
+    if (profileBirthYear) {
+      profileBirthYear.addEventListener('input', function() {
         const year = parseInt(this.value);
         const currentYear = new Date().getFullYear();
-
+        
         if (isNaN(year)) {
-          // Değer boş veya sayısal değil
           this.setCustomValidity('');
         } else if (year < 1900) {
           this.setCustomValidity('Doğum yılı 1900\'den küçük olamaz.');
@@ -513,38 +420,6 @@
           this.setCustomValidity('Doğum yılı günümüzden ileri olamaz.');
         } else {
           this.setCustomValidity('');
-        }
-      });
-    }
-
-    // Form gönderme sırasında yükleme durumu göster
-    const profileForm = document.getElementById('profileForm');
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
-
-    if (profileForm && saveProfileBtn) {
-      profileForm.addEventListener('submit', function(e) {
-        // Form doğrulaması
-        const username = usernameInput.value.trim();
-
-        if (username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
-          e.preventDefault();
-          alert('Lütfen geçerli bir kullanıcı adı giriniz.');
-          return false;
-        }
-
-        // Yükleme durumunu göster
-        const spinner = saveProfileBtn.querySelector('.spinner-border');
-        spinner.classList.remove('d-none');
-        saveProfileBtn.disabled = true;
-      });
-    }
-
-    // Profil resmi yükleme butonu için hover efekti
-    const profileUploadPreview = document.querySelector('.profile-upload-preview');
-    if (profileUploadPreview) {
-      profileUploadPreview.addEventListener('click', function() {
-        if (profileImage) {
-          profileImage.click();
         }
       });
     }

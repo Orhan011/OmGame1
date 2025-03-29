@@ -353,32 +353,38 @@ def profile():
 @app.route('/update-profile', methods=['POST'])
 def update_profile():
     if not session.get('user_id'):
-        return jsonify({'success': False, 'message': 'Lütfen önce giriş yapın.'}), 401
+        flash('Lütfen önce giriş yapın.', 'danger')
+        return redirect(url_for('login'))
         
     try:
         user_id = session['user_id']
         user = User.query.get(user_id)
         
         if not user:
-            return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı.'}), 404
+            flash('Kullanıcı bulunamadı.', 'danger')
+            return redirect(url_for('login'))
             
         # Form verilerini al
         username = request.form.get('username')
         birth_year = request.form.get('birth_year')
         remove_photo = request.form.get('remove_photo')
         
-        # Kullanıcı adı validasyonu
+        # Kullanıcı adını kontrol et
         if not username or len(username) < 3 or len(username) > 20:
-            return jsonify({'success': False, 'message': 'Geçersiz kullanıcı adı.'}), 400
+            flash('Kullanıcı adı 3-20 karakter arasında olmalıdır.', 'danger')
+            return redirect(url_for('profile'))
             
         # Kullanıcı adı benzersizlik kontrolü
         existing_user = User.query.filter(User.username == username, User.id != user_id).first()
         if existing_user:
-            return jsonify({'success': False, 'message': 'Bu kullanıcı adı zaten kullanımda.'}), 400
+            flash('Bu kullanıcı adı zaten kullanımda.', 'danger')
+            return redirect(url_for('profile'))
             
+        # Kullanıcı adını güncelle
         user.username = username
+        session['username'] = username  # Session'ı da güncelle
         
-        # Doğum yılı işleme
+        # Doğum yılını kontrol et ve güncelle
         if birth_year:
             try:
                 birth_year = int(birth_year)
@@ -386,114 +392,44 @@ def update_profile():
                 if 1900 <= birth_year <= current_year:
                     user.birth_year = birth_year
                     user.age = current_year - birth_year
-            except ValueError:
-                return jsonify({'success': False, 'message': 'Geçersiz doğum yılı.'}), 400
-                
-        # Profil fotoğrafı işleme
-        if remove_photo == '1':
-            user.avatar_url = None
-        else:
-            profile_image = request.files.get('profile_image')
-            if profile_image and profile_image.filename:
-                if profile_image.content_type not in ['image/jpeg', 'image/png', 'image/gif']:
-                    return jsonify({'success': False, 'message': 'Desteklenmeyen dosya formatı.'}), 400
-                    
-                image_data = profile_image.read()
-                if len(image_data) > 512000:  # 500KB limit
-                    return jsonify({'success': False, 'message': 'Dosya boyutu çok büyük (max: 500KB).'}), 400
-                    
-                encoded_image = base64.b64encode(image_data).decode('utf-8')
-                user.avatar_url = f"data:{profile_image.content_type};base64,{encoded_image}"
-        
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Profil başarıyla güncellendi.'})
-        
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error(f"Profil güncellenirken hata: {str(e)}")
-        return jsonify({'success': False, 'message': 'Profil güncellenirken bir hata oluştu.'}), 500
-        
-    try:
-        user_id = session['user_id']
-        user = User.query.get(user_id)
-        
-        if not user:
-            flash('Kullanıcı bulunamadı.', 'error')
-            return redirect(url_for('login'))
-            
-        # Form verilerini al ve güncelle
-        username = request.form.get('username')
-        birth_year = request.form.get('birth_year')
-        remove_photo = request.form.get('remove_photo')
-        
-        # Kullanıcı adını kontrol et - geçerliliğini doğrula
-        if not username or len(username) < 3 or len(username) > 20 or not username.isalnum():
-            flash('Kullanıcı adı geçerli değil. 3-20 karakter arasında olmalı ve sadece harf ve rakam içermelidir.', 'danger')
-            return redirect(url_for('profile'))
-            
-        # Kullanıcı adını kontrol et - aynı kullanıcı adı başka bir kullanıcıda var mı?
-        if username and username != user.username:
-            existing_user = User.query.filter_by(username=username).first()
-            if existing_user and existing_user.id != user.id:
-                flash('Bu kullanıcı adı zaten kullanımda.', 'danger')
-                return redirect(url_for('profile'))
-            user.username = username
-            logger.info(f"Kullanıcı adı güncellendi: {username}")
-        
-        # Doğum yılını kontrol et ve güncelle
-        if birth_year:
-            try:
-                birth_year = int(birth_year)
-                current_year = datetime.utcnow().year
-                if 1900 <= birth_year <= current_year:  # Makul bir aralık kontrol et
-                    user.birth_year = birth_year
-                    # Yaşı da güncelle
-                    user.age = current_year - birth_year
-                    logger.info(f"Doğum yılı güncellendi: {birth_year}, Yaş: {user.age}")
                 else:
                     flash(f'Geçerli bir doğum yılı giriniz (1900-{current_year}).', 'warning')
+                    return redirect(url_for('profile'))
             except ValueError:
                 flash('Doğum yılı sayısal bir değer olmalıdır.', 'danger')
+                return redirect(url_for('profile'))
         elif birth_year == '':
             # Boş değer gönderilirse, doğum yılı ve yaş bilgisini temizle
             user.birth_year = None
             user.age = None
-            logger.info("Doğum yılı temizlendi")
         
         user.last_active = datetime.utcnow()
         
         # Profil fotoğrafı kaldırma kontrolü
         if remove_photo == '1':
             user.avatar_url = None
-            logger.info("Profil fotoğrafı kaldırıldı")
             flash('Profil fotoğrafı kaldırıldı.', 'info')
         else:
             # Profil resmi yükleme işlemi
             profile_image = request.files.get('profile_image')
             
             if profile_image and profile_image.filename:
-                try:
-                    # Dosya tipi kontrolü
-                    if profile_image.content_type not in ['image/jpeg', 'image/png', 'image/gif']:
-                        flash('Sadece JPG, PNG veya GIF dosyaları yükleyebilirsiniz.', 'warning')
-                        return redirect(url_for('profile'))
-                    
-                    # Dosya boyutu kontrolü (500KB = 512000 bytes)
-                    image_data = profile_image.read()
-                    if len(image_data) > 512000:
-                        flash('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.', 'warning')
-                        return redirect(url_for('profile'))
-                    
-                    # Base64 olarak kaydetme
-                    encoded_image = base64.b64encode(image_data).decode('utf-8')
-                    image_type = profile_image.content_type
-                    user.avatar_url = f"data:{image_type};base64,{encoded_image}"
-                    
-                    logger.info(f"Profil resmi yüklendi: {profile_image.filename}, Boyut: {len(image_data)} bytes, Tip: {image_type}")
-                    flash('Profil resmi başarıyla yüklendi.', 'success')
-                except Exception as e:
-                    logger.error(f"Profil resmi yüklenirken hata oluştu: {e}")
-                    flash('Profil resmi yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+                # Dosya tipi kontrolü
+                if profile_image.content_type not in ['image/jpeg', 'image/png']:
+                    flash('Sadece JPG veya PNG dosyaları yükleyebilirsiniz.', 'warning')
+                    return redirect(url_for('profile'))
+                
+                # Dosya boyutu kontrolü (500KB = 512000 bytes)
+                image_data = profile_image.read()
+                if len(image_data) > 512000:
+                    flash('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.', 'warning')
+                    return redirect(url_for('profile'))
+                
+                # Base64 olarak kaydetme
+                encoded_image = base64.b64encode(image_data).decode('utf-8')
+                image_type = profile_image.content_type
+                user.avatar_url = f"data:{image_type};base64,{encoded_image}"
+                flash('Profil resmi başarıyla yüklendi.', 'success')
         
         # Skorları güncelle
         highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar() or 0
@@ -515,11 +451,10 @@ def update_profile():
         
         db.session.commit()
         flash('Profil başarıyla güncellendi!', 'success')
-        logger.info(f"Kullanıcı {user.id} profili başarıyla güncellendi")
         
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Profil güncellenirken hata oluştu: {e}")
+        app.logger.error(f"Profil güncellenirken hata: {str(e)}")
         flash('Profil güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
         
     return redirect(url_for('profile'))
