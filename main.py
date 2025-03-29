@@ -357,20 +357,36 @@ def profile():
         session.pop('user_id', None)
         return redirect(url_for('login'))
     
-    # Kullanıcının en yüksek skorlarını bul
-    word_puzzle_score = Score.query.filter_by(user_id=user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
-    memory_match_score = Score.query.filter_by(user_id=user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
-    labyrinth_score = Score.query.filter_by(user_id=user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
-    puzzle_score = Score.query.filter_by(user_id=user.id, game_type='puzzle').order_by(Score.score.desc()).first()
-    
-    user_scores = {
-        'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
-        'memoryMatch': memory_match_score.score if memory_match_score else 0,
-        'labyrinth': labyrinth_score.score if labyrinth_score else 0,
-        'puzzle': puzzle_score.score if puzzle_score else 0
-    }
-    
-    return render_template('profile.html', user=user, user_scores=user_scores)
+    try:
+        # Kullanıcının en yüksek skorlarını bul
+        word_puzzle_score = Score.query.filter_by(user_id=user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
+        memory_match_score = Score.query.filter_by(user_id=user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
+        labyrinth_score = Score.query.filter_by(user_id=user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
+        puzzle_score = Score.query.filter_by(user_id=user.id, game_type='puzzle').order_by(Score.score.desc()).first()
+        
+        user_scores = {
+            'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
+            'memoryMatch': memory_match_score.score if memory_match_score else 0,
+            'labyrinth': labyrinth_score.score if labyrinth_score else 0,
+            'puzzle': puzzle_score.score if puzzle_score else 0
+        }
+        
+        # Kullanıcı bilgilerini güncel tut
+        if not user.experience_points:
+            user.experience_points = 0
+        if not user.rank:
+            user.rank = 'Başlangıç'
+        if not user.total_games_played:
+            user.total_games_played = 0
+        db.session.commit()
+        
+        return render_template('profile.html', user=user, user_scores=user_scores)
+        
+    except Exception as e:
+        logger.error(f"Error in profile page: {e}")
+        db.session.rollback()
+        flash('Profil bilgileri yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        return redirect(url_for('index'))
 
 # Game routes
 @app.route('/games/word-puzzle')
