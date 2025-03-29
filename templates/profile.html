@@ -545,8 +545,61 @@
     }
     
     // Form gönderme
-    if (profileForm) {
-      profileForm.addEventListener('submit', function(e) {
+    // Profile photo upload handler
+const handleProfilePhotoUpload = (file) => {
+  if (!file) return;
+  
+  // Size check (500KB)
+  if (file.size > 512000) {
+    Swal.fire({
+      title: 'Dosya çok büyük',
+      text: 'Lütfen 500KB\'dan küçük bir dosya seçin',
+      icon: 'error'
+    });
+    return;
+  }
+  
+  // Type check 
+  if (!['image/jpeg', 'image/png'].includes(file.type)) {
+    Swal.fire({
+      title: 'Geçersiz dosya tipi',
+      text: 'Lütfen JPG veya PNG formatında bir dosya seçin',
+      icon: 'error'
+    });
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('profile_image', file);
+  
+  fetch('/update-profile', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    }
+  });
+};
+
+// Username validation handler
+const validateUsername = (username) => {
+  if (username.length < 3) {
+    return 'Kullanıcı adı en az 3 karakter olmalıdır.';
+  }
+  if (username.length > 20) {
+    return 'Kullanıcı adı en fazla 20 karakter olmalıdır.';
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    return 'Kullanıcı adı sadece harf, rakam ve alt çizgi (_) içerebilir.';
+  }
+  return '';
+};
+
+if (profileForm) {
+  profileForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         // Form doğrulaması
