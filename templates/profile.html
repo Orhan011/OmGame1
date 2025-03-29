@@ -138,51 +138,71 @@
   </div>
 </div>
 
-<!-- Profil Düzenleme Modal - Dosya Yükleme Özelliği Eklenmiş -->
+<!-- Profil Düzenleme Modal - Geliştirilmiş Tasarım -->
 <div class="modal fade" id="editProfileModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content dark-theme">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content dark-theme profile-edit-modal">
       <div class="modal-header">
         <h5 class="modal-title"><i class="fas fa-user-edit"></i> Profili Düzenle</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
       </div>
       <div class="modal-body">
         <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
-          <!-- Profil Resmi Seçimi ve Önizleme -->
-          <div class="mb-4 text-center">
-            <div class="profile-picture-upload">
-              {% if user.avatar_url %}
-                <img id="profileImagePreview" src="{{ user.avatar_url }}" alt="Profil Resmi" class="profile-upload-preview">
-              {% else %}
-                <img id="profileImagePreview" src="/static/images/default-avatar.png" alt="Profil Resmi" class="profile-upload-preview">
-              {% endif %}
+          <div class="row">
+            <!-- Sol Taraf - Profil Resmi -->
+            <div class="col-md-5">
+              <div class="profile-edit-avatar-container">
+                <div class="profile-picture-upload">
+                  {% if user.avatar_url %}
+                    <img id="profileImagePreview" src="{{ user.avatar_url }}" alt="Profil Resmi" class="profile-upload-preview">
+                  {% else %}
+                    <img id="profileImagePreview" src="/static/images/default-avatar.png" alt="Profil Resmi" class="profile-upload-preview">
+                  {% endif %}
 
-              <div class="profile-image-upload-controls">
-                <label for="profileImageInput" class="btn btn-upload">
-                  <i class="fas fa-camera"></i> Resim Seç
-                </label>
-                <input type="file" id="profileImageInput" name="profile_image" accept="image/*" class="d-none">
+                  <div class="profile-image-upload-controls">
+                    <label for="profileImageInput" class="btn btn-upload btn-lg">
+                      <i class="fas fa-camera"></i> Fotoğraf Yükle
+                    </label>
+                    <input type="file" id="profileImageInput" name="profile_image" accept="image/*" class="d-none">
+                  </div>
+                  <div class="avatar-help-text">
+                    Profil fotoğrafınızı değiştirmek için tıklayın
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Sağ Taraf - Profil Bilgileri -->
+            <div class="col-md-7">
+              <div class="profile-edit-form">
+                <div class="form-group mb-4">
+                  <label class="form-label"><i class="fas fa-user"></i> Kullanıcı Adı</label>
+                  <input type="text" class="form-control form-control-lg" value="{{ user.username }}" disabled placeholder="Kullanıcı adınız" readonly>
+                  <div class="form-text">Kullanıcı adınız değiştirilemez</div>
+                </div>
+                
+                <div class="form-group mb-4">
+                  <label class="form-label"><i class="fas fa-user"></i> Tam Ad</label>
+                  <input type="text" class="form-control form-control-lg" name="full_name" value="{{ user.full_name or '' }}" placeholder="Adınız ve soyadınız">
+                </div>
+                
+                <div class="form-group mb-4">
+                  <label class="form-label"><i class="fas fa-envelope"></i> E-mail</label>
+                  <input type="email" class="form-control form-control-lg" name="email" value="{{ user.email or '' }}" placeholder="E-mail adresiniz">
+                </div>
               </div>
             </div>
           </div>
           
-          <div class="mb-3">
-            <label class="form-label"><i class="fas fa-user"></i> Tam Ad</label>
-            <input type="text" class="form-control form-control-lg" name="full_name" value="{{ user.full_name or '' }}" placeholder="Adınız ve soyadınız">
-          </div>
-          
-          <div class="mb-3">
-            <label class="form-label"><i class="fas fa-envelope"></i> E-mail</label>
-            <input type="email" class="form-control form-control-lg" name="email" value="{{ user.email or '' }}" placeholder="E-mail adresiniz">
-          </div>
-          
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fas fa-save"></i> Değişiklikleri Kaydet
-            </button>
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> İptal Et
-            </button>
+          <div class="profile-edit-actions mt-4">
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg btn-save-profile">
+                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
+                <i class="fas fa-times"></i> İptal Et
+              </button>
+            </div>
           </div>
         </form>
       </div>
