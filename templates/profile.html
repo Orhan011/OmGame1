@@ -20,10 +20,9 @@
     <div class="profile-info">
       <h2 class="profile-username">{{ current_user.username }}</h2>
       <div class="profile-status">
-        <span class="status-badge {% if current_user.last_active|default %}active{% endif %}">
-          {{ "Aktif" if current_user.last_active|default else "Çevrimdışı" }}
+        <span class="status-badge {% if current_user.last_active %}active{% endif %}">
+          {{ "Aktif" if current_user.last_active else "Çevrimdışı" }}
         </span>
-        <span class="user-rank">{{ current_user.rank }}</span>
       </div>
       
       <div class="xp-bar-container">
@@ -36,7 +35,7 @@
   <div class="profile-stats-grid">
     <div class="stat-card glass-effect">
       <i class="fas fa-gamepad"></i>
-      <h3>Oyunlar</h3>
+      <h3>Oynanılan Oyunlar</h3>
       <div class="stat-value">{{ current_user.total_games_played }}</div>
     </div>
     <div class="stat-card glass-effect">
@@ -59,7 +58,7 @@
         <input type="email" class="form-control" value="{{ current_user.email }}" name="email">
       </div>
       <div class="form-group">
-        <label>Şifre Değiştir</label>
+        <label>Yeni Şifre</label>
         <input type="password" class="form-control" placeholder="Yeni şifre" name="new_password">
       </div>
       <div class="form-group">

@@ -10,6 +10,7 @@
   backdrop-filter: blur(10px);
   border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header {
@@ -178,21 +179,23 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--primary-text);
   padding: 0.8rem;
+  border-radius: 8px;
+}
+
+.settings-form .form-control:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(106, 90, 224, 0.2);
 }
 
 .settings-form .btn-primary {
   background: var(--accent-color);
   border: none;
   padding: 0.8rem 2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .profile-info {
-    width: 100%;
-  }
+.settings-form .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.3);
 }
