@@ -4,10 +4,10 @@
 {% block content %}
 <div class="auth-container">
   <div class="auth-card glass-card">
+    <div class="auth-logo-corner">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
+    </div>
     <div class="auth-header">
-      <div class="auth-logo-container">
-        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="OmGame Logo" class="auth-logo">
-      </div>
       <h2>Giriş Yap</h2>
       <p class="auth-subtitle">Beyin Egzersizleri'ne hoş geldiniz</p>
     </div>
@@ -27,7 +27,7 @@
       <div class="form-group floating-label">
         <div class="input-icon-wrapper">
           <i class="fas fa-envelope input-icon"></i>
-          <input type="email" name="email" id="email" class="form-control" placeholder=" " required autocomplete="email">
+          <input type="email" name="email" id="email" class="form-control" placeholder=" " value="{{ remembered_email or '' }}" required autocomplete="email">
           <label for="email">Email Adresiniz</label>
         </div>
       </div>

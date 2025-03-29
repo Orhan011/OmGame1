@@ -5,7 +5,7 @@ import secrets
 import base64
 import uuid
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session, make_response
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -160,21 +160,37 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        remember = request.form.get('remember')
         
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             session['username'] = user.username
-            flash('Başarıyla giriş yaptınız!')
-            return redirect(url_for('index'))
+            
+            # Eğer "Beni hatırla" işaretlenmişse, email'i bir cookie'de saklayalım
+            if remember:
+                remember_cookie_duration = timedelta(days=30)  # 30 gün hatırla
+                resp = make_response(redirect(url_for('index')))
+                resp.set_cookie('remembered_email', email, max_age=remember_cookie_duration.total_seconds())
+                flash('Başarıyla giriş yaptınız!')
+                return resp
+            else:
+                # Eğer "Beni hatırla" işaretlenmemişse, varsa hatırlanan email'i silelim
+                resp = make_response(redirect(url_for('index')))
+                resp.delete_cookie('remembered_email')
+                flash('Başarıyla giriş yaptınız!')
+                return resp
         else:
             flash('Geçersiz email veya şifre.')
             return redirect(url_for('login'))
     
     if session.get('user_id'):
         return redirect(url_for('index'))
+    
+    # Hatırlanan bir email varsa login ekranında göster
+    remembered_email = request.cookies.get('remembered_email')
             
-    return render_template('login.html')
+    return render_template('login.html', remembered_email=remembered_email)
 
 @app.route('/')
 def index():

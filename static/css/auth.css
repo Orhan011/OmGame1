@@ -1,0 +1,248 @@
+/* Authentication Styles */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 70px);
+  padding: 40px 20px;
+}
+
+.auth-card {
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  padding: 35px 30px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.auth-header {
+  margin-bottom: 30px;
+}
+
+.auth-logo-corner {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  animation: fadeIn 1s ease forwards;
+}
+
+.auth-logo-small {
+  max-width: 60px;
+  height: auto;
+  animation: pulse 3s infinite alternate;
+}
+
+.auth-logo-container {
+  margin-bottom: 20px;
+  animation: fadeInDown 1s ease forwards;
+}
+
+.auth-logo {
+  max-width: 120px;
+  height: auto;
+  animation: pulse 3s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: var(--primary-text);
+  font-weight: 700;
+}
+
+.auth-subtitle {
+  color: var(--secondary-text);
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+/* Input Styles */
+.auth-form {
+  margin-top: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.floating-label {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-icon-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  z-index: 10;
+}
+
+.floating-label input.form-control {
+  height: 55px;
+  padding-left: 45px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background-color: rgba(35,35,65,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--primary-text);
+}
+
+.floating-label input.form-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(106,90,224,0.3);
+  border-color: rgba(106,90,224,0.5);
+  background-color: rgba(35,35,65,0.6);
+}
+
+.floating-label label {
+  position: absolute;
+  left: 45px;
+  top: 17px;
+  color: var(--secondary-text);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.floating-label input.form-control:focus ~ label,
+.floating-label input.form-control:not(:placeholder-shown) ~ label {
+  top: -8px;
+  left: 20px;
+  font-size: 0.85rem;
+  background-color: var(--accent-color);
+  color: white;
+  padding: 0 8px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(106,90,224,0.3);
+}
+
+/* Password Toggle */
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: var(--accent-color);
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+/* Form Options */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+.forgot-password {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.terms-agreement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+.terms-link {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* Button Styles */
+.btn-animated {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-animated:hover .btn-icon {
+  transform: translateX(5px);
+}
+
+.auth-links {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: var(--secondary-text);
+}
+
+.auth-links a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
