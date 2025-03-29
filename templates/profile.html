@@ -306,7 +306,16 @@
           }
           
           reader.readAsDataURL(this.files[0]);
+          console.log('Profil resmi seçildi:', this.files[0].name);
         }
+      });
+    }
+    
+    // Profil düzenleme formunu dinle
+    const profileEditForm = document.getElementById('profileEditForm');
+    if (profileEditForm) {
+      profileEditForm.addEventListener('submit', function(e) {
+        console.log('Profil düzenleme formu gönderiliyor...');
       });
     }
     
