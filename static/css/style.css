@@ -99,6 +99,12 @@ overflow-x:hidden;
   75% { transform:translate(-40px, -50px) rotate(10deg); }
   100% { transform:translate(30px, 40px) rotate(-10deg); }
 }
+.navbar-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
 .navbar {
 background-color:rgba(15,15,30,0.85);
 box-shadow:var(--box-shadow);
