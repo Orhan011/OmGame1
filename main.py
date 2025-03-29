@@ -233,6 +233,7 @@ def initialize_database():
     
     # Create admin user if no users exist
     if User.query.count() == 0:
+        # Admin kullanıcısı
         admin = User(
             username="admin",
             email="admin@example.com",
@@ -243,9 +244,69 @@ def initialize_database():
             rank="Yönetici",
             experience_points=5000
         )
-        db.session.add(admin)
+        
+        # Ek test kullanıcıları
+        user1 = User(
+            username="mehmet",
+            email="mehmet@example.com",
+            password_hash=generate_password_hash("123456"),
+            full_name="Mehmet Yılmaz",
+            age=25,
+            bio="Bilgisayar mühendisi",
+            rank="İlerleyen",
+            experience_points=12500
+        )
+        
+        user2 = User(
+            username="ayse",
+            email="ayse@example.com",
+            password_hash=generate_password_hash("123456"),
+            full_name="Ayşe Demir",
+            age=29,
+            bio="Matematik öğretmeni",
+            rank="Usta",
+            experience_points=18700
+        )
+        
+        user3 = User(
+            username="emin",
+            email="emin@example.com",
+            password_hash=generate_password_hash("123456"),
+            full_name="Emin Kaya",
+            age=22,
+            bio="Bilgisayar bilimi öğrencisi",
+            rank="Acemi",
+            experience_points=8200
+        )
+        
+        db.session.add_all([admin, user1, user2, user3])
         db.session.commit()
-        logger.info("Admin user created")
+        
+        # Test kullanıcıları için örnek skorlar ekle
+        scores = [
+            # Mehmet'in skorları
+            Score(user_id=2, game_type="wordPuzzle", score=1200),
+            Score(user_id=2, game_type="memoryMatch", score=1800),
+            Score(user_id=2, game_type="labyrinth", score=950),
+            Score(user_id=2, game_type="puzzle", score=2200),
+            
+            # Ayşe'nin skorları
+            Score(user_id=3, game_type="wordPuzzle", score=1500),
+            Score(user_id=3, game_type="memoryMatch", score=2100),
+            Score(user_id=3, game_type="labyrinth", score=1100),
+            Score(user_id=3, game_type="puzzle", score=2500),
+            
+            # Emin'in skorları
+            Score(user_id=4, game_type="wordPuzzle", score=900),
+            Score(user_id=4, game_type="memoryMatch", score=1300),
+            Score(user_id=4, game_type="labyrinth", score=700),
+            Score(user_id=4, game_type="puzzle", score=1800),
+        ]
+        
+        db.session.add_all(scores)
+        db.session.commit()
+        
+        logger.info("Admin ve test kullanıcıları oluşturuldu")
 
 # Init database route
 @app.route('/init-db')
