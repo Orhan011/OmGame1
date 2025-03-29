@@ -159,13 +159,13 @@
                     <img id="profileImagePreview" src="/static/images/default-avatar.png" alt="Profil Resmi" class="profile-upload-preview">
                   {% endif %}
 
-                  <div class="profile-image-upload-controls">
-                    <label for="profileImageInput" class="btn btn-upload btn-lg">
+                  <div class="profile-image-upload-controls mt-3">
+                    <label for="profileImageInput" class="btn btn-primary btn-lg">
                       <i class="fas fa-camera"></i> Fotoğraf Yükle
                     </label>
                     <input type="file" id="profileImageInput" name="profile_image" accept="image/*" class="d-none">
                   </div>
-                  <div class="avatar-help-text">
+                  <div class="avatar-help-text mt-2 text-muted">
                     Profil fotoğrafınızı değiştirmek için tıklayın
                   </div>
                 </div>
@@ -209,6 +209,85 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Modal arkaplana ekstra opak katman ekleyelim */
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Profil düzenleme modalı */
+  .profile-edit-modal {
+    background-color: #1a1a2e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(106, 90, 224, 0.1);
+    border-radius: 15px 15px 0 0;
+  }
+  
+  .modal-title {
+    color: #fff;
+    font-weight: 600;
+  }
+  
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+  
+  /* Profil resmi yükleme */
+  .profile-edit-avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: rgba(33, 33, 61, 0.5);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+  }
+  
+  .profile-upload-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(106, 90, 224, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-edit-form {
+    background-color: rgba(33, 33, 61, 0.5);
+    padding: 25px;
+    border-radius: 15px;
+  }
+  
+  .form-control {
+    background-color: rgba(26, 26, 46, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  
+  .form-control:focus {
+    background-color: rgba(26, 26, 46, 0.9);
+    border-color: rgba(106, 90, 224, 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(106, 90, 224, 0.25);
+  }
+  
+  .form-control:disabled {
+    background-color: rgba(26, 26, 46, 0.5);
+    color: #8a8aa3;
+  }
+  
+  .form-text {
+    color: #8a8aa3;
+  }
+</style>
 
 <!-- JavaScript for counter animation and image preview -->
 <script>

@@ -19,25 +19,34 @@ function loadScores(gameType) {
   const container = document.getElementById('scores-container');
   container.innerHTML = '<div class="loading">Yükleniyor...</div>';
 
+  // Debug için
+  console.log('Skor yükleniyor:', gameType);
+  
   fetch(`/api/get-scores/${gameType}`)
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(scores => {
-      if (scores.length === 0) {
+      console.log('Yüklenen skorlar:', scores);
+      
+      if (!scores || scores.length === 0) {
         container.innerHTML = '<div class="no-scores">Henüz skor kaydedilmemiş</div>';
         return;
       }
 
       container.innerHTML = scores.map((score, index) => `
         <div class="table-row ${index < 3 ? 'top-rank' : ''}">
-          <div class="rank">${index + 1}</div>
-          <div class="player">
+          <div class="rank-cell">${index + 1}</div>
+          <div class="username-cell">
             <div class="player-info">
-              <span class="username">${score.username}</span>
-              ${score.email ? `<span class="email">${score.email}</span>` : ''}
+              <span class="username">${score.username || 'Anonim'}</span>
             </div>
           </div>
-          <div class="score">${score.score}</div>
-          <div class="date">${new Date(score.timestamp).toLocaleString('tr-TR')}</div>
+          <div class="score-cell">${score.score}</div>
+          <div class="date-cell">${new Date(score.timestamp).toLocaleString('tr-TR')}</div>
         </div>
       `).join('');
     })
