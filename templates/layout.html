@@ -60,7 +60,34 @@
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
       {% if session.get('user_id') %}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt nav-icon"></i>Çıkış Yap</a></li>
+        <li class="nav-item dropdown profile-dropdown">
+          <div class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+            <div class="profile-avatar">
+              {% if current_user.username %}
+                <div class="avatar-circle">{{ current_user.username[0]|upper }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <ul class="dropdown-menu glass-dropdown profile-dropdown-menu">
+            <li class="profile-stats-container">
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="stat-value">{{ current_user.total_games_played }}</span>
+                  <span class="stat-label">Oyunlar</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value">{{ current_user.highest_score }}</span>
+                  <span class="stat-label">En Yüksek Skor</span>
+                </div>
+              </div>
+              <div class="rank-info">
+                <span class="rank-badge">{{ current_user.rank }}</span>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Çıkış Yap</a></li>
+          </ul>
+        </li>
       {% else %}
         <li class="nav-item"><a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt nav-icon"></i>Giriş Yap</a></li>
         <li class="nav-item"><a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}"><i class="fas fa-user-plus nav-icon"></i>Kayıt Ol</a></li>
