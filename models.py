@@ -14,7 +14,6 @@ class User(db.Model):
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     full_name = db.Column(db.String(100))
     age = db.Column(db.Integer)
-    birth_year = db.Column(db.Integer)
     bio = db.Column(db.Text)
     avatar_url = db.Column(db.String(2000))
     location = db.Column(db.String(100))
@@ -22,38 +21,11 @@ class User(db.Model):
     rank = db.Column(db.String(50), default='Başlangıç')
     total_games_played = db.Column(db.Integer, default=0)
     highest_score = db.Column(db.Integer, default=0)
-    win_count = db.Column(db.Integer, default=0)
-    loss_count = db.Column(db.Integer, default=0)
     theme_preference = db.Column(db.String(20), default='dark')
-    notification_settings = db.Column(db.JSON, default=lambda: {"email": True, "push": True})
-    badges = db.Column(db.JSON, default=lambda: [])
     account_status = db.Column(db.String(20), default='active')
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
     scores = db.relationship('Score', backref='user', lazy=True)
-    
-    # Çoklu oyuncu özellikleri
-    friends = db.relationship('User', secondary='friendships',
-                            primaryjoin='User.id==friendships.c.user_id',
-                            secondaryjoin='User.id==friendships.c.friend_id',
-                            backref='friend_of')
-    
-    # Başarı sistemi
-    achievements = db.Column(db.JSON, default=lambda: [])
-    achievement_points = db.Column(db.Integer, default=0)
-    
-    # Kişiselleştirme
-    profile_theme = db.Column(db.String(50), default='default')
-    custom_settings = db.Column(db.JSON, default=lambda: {})
-    
-    # İstatistikler
-    game_stats = db.Column(db.JSON, default=lambda: {
-        'daily_playtime': 0,
-        'weekly_stats': {},
-        'monthly_stats': {},
-        'favorite_games': [],
-        'achievement_history': []
-    })
 
     def __repr__(self):
         return f'<User {self.username}>'

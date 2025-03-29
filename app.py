@@ -25,9 +25,10 @@ db.init_app(app)
 # Initialize database
 with app.app_context():
     try:
-        # Create all database tables
+        # Drop all tables and recreate
+        db.drop_all()
         db.create_all()
-        app.logger.info("Database tables created successfully")
+        app.logger.info("Database tables recreated successfully")
         
         # Main.py artık tüm route'ları içeriyor, routes.py kullanılmıyor
     except Exception as e:
