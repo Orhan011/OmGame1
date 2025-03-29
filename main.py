@@ -4,6 +4,8 @@ import random
 import secrets
 import base64
 import uuid
+import smtplib
+from email.message import EmailMessage
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session, make_response
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +15,71 @@ from werkzeug.utils import secure_filename
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+# Email verification function
+def send_verification_email(to_email, verification_code):
+    """
+    Sends a verification email with the provided code
+    
+    In production, configure SMTP settings for real email delivery.
+    For development, we'll log the email content.
+    """
+    # Check if SMTP settings are configured
+    smtp_server = os.environ.get('SMTP_SERVER')
+    smtp_port = os.environ.get('SMTP_PORT')
+    smtp_username = os.environ.get('SMTP_USERNAME')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
+    
+    if not all([smtp_server, smtp_port, smtp_username, smtp_password]) and not app.debug:
+        logger.warning("SMTP settings not configured. Email sending skipped.")
+        return
+    
+    # Create email message
+    msg = EmailMessage()
+    msg['Subject'] = 'Beyin Oyunları - Şifre Sıfırlama Kodu'
+    msg['From'] = smtp_username or 'noreply@beyin-oyunlari.com'
+    msg['To'] = to_email
+    
+    # Email content
+    email_content = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #2a3f5f; border-bottom: 2px solid #eee; padding-bottom: 10px;">Şifre Sıfırlama İsteği</h2>
+            <p>Merhaba,</p>
+            <p>Beyin Oyunları hesabınız için bir şifre sıfırlama talebinde bulundunuz.</p>
+            <p>Şifrenizi sıfırlamak için aşağıdaki doğrulama kodunu kullanın:</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 4px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; color: #2a3f5f;">
+                {verification_code}
+            </div>
+            <p style="margin-top: 20px;">Bu kodu kimseyle paylaşmayın. Eğer bu işlemi siz başlatmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+            <p>Doğrulama kodunun geçerlilik süresi 30 dakikadır.</p>
+            <p style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #777;">
+                Bu otomatik bir e-postadır, lütfen yanıtlamayın.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    msg.set_content("Şifre sıfırlama kodunuz: " + verification_code)
+    msg.add_alternative(email_content, subtype='html')
+    
+    if app.debug and not all([smtp_server, smtp_port, smtp_username, smtp_password]):
+        # In development, just log the email content
+        logger.info(f"Would send email to {to_email} with verification code: {verification_code}")
+        return
+    
+    try:
+        # Connect to SMTP server and send email
+        with smtplib.SMTP(smtp_server, int(smtp_port)) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
+        logger.info(f"Verification email sent to {to_email}")
+    except Exception as e:
+        logger.error(f"Failed to send email: {e}")
+        raise
 
 # Create the Flask application
 app = Flask(__name__)
@@ -559,10 +626,18 @@ def forgot_password():
         user.reset_token_expiry = token_expiry
         db.session.commit()
         
-        # In a real application, send an email with the verification code
-        # For this demo, we'll just log it and show it in a flash message
-        logger.info(f"Password reset code for {email}: {verification_code}")
-        flash(f'Doğrulama kodu email adresinize gönderildi: {verification_code}', 'success')
+        # Send the verification code via email
+        try:
+            send_verification_email(email, verification_code)
+            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+            # For development purposes, also log the code
+            logger.info(f"Password reset code for {email}: {verification_code}")
+        except Exception as e:
+            logger.error(f"Error sending verification email: {e}")
+            flash('Doğrulama kodu gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+            # Return the verification code in development environment
+            if app.debug:
+                flash(f'Geliştirme modu: Doğrulama kodunuz: {verification_code}', 'info')
         
         # Redirect to the verification code page
         return redirect(url_for('reset_code', email=email))
@@ -672,6 +747,17 @@ def save_score():
     # Use anonymous user or a session-based temporary user if not logged in
     user_id = session.get('user_id', 1)  # Default to user id 1 if not logged in
     
+    # Kullanıcı bilgilerini getir
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'})
+    
+    # XP ve seviye hesaplamaları için değerler
+    original_level = user.experience_points // 1000 + 1
+    xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
+    
+    is_high_score = False
+    
     # Önce mevcut skoru kontrol et
     existing_score = Score.query.filter_by(
         user_id=user_id,
@@ -683,11 +769,17 @@ def save_score():
         if data['score'] > existing_score.score:
             existing_score.score = data['score']
             existing_score.timestamp = datetime.utcnow()  # Ayrıca zaman damgasını da güncelle
-            db.session.commit()
-            return jsonify({'success': True, 'message': 'Score updated successfully'})
+            
+            # Yeni rekor kırdığı için ekstra XP
+            xp_gain += 20
+            is_high_score = True
+            
+            # En yüksek skor güncelleme
+            if data['score'] > user.highest_score:
+                user.highest_score = data['score']
         else:
-            # Yeni skor daha düşükse, değiştirme
-            return jsonify({'success': True, 'message': 'Existing score is higher'})
+            # Yeni skor daha düşükse, XP kazancını azalt ama yine de ver
+            xp_gain = xp_gain // 2
     else:
         # İlk kez oynuyorsa yeni skor kaydı oluştur
         new_score = Score(
@@ -697,9 +789,51 @@ def save_score():
         )
         
         db.session.add(new_score)
-        db.session.commit()
         
-        return jsonify({'success': True, 'message': 'Score saved successfully'})
+        # İlk defa oynamak için bonus XP
+        xp_gain += 10
+        
+        # En yüksek skor güncelleme
+        if data['score'] > user.highest_score:
+            user.highest_score = data['score']
+    
+    # XP ekle
+    user.experience_points += xp_gain
+    
+    # Toplam oyun sayısını artır
+    user.total_games_played += 1
+    
+    # Seviye yükseldi mi kontrol et
+    new_level = user.experience_points // 1000 + 1
+    
+    # Rank güncelleme
+    if new_level <= 5:
+        user.rank = 'Başlangıç'
+    elif new_level <= 10:
+        user.rank = 'Acemi'
+    elif new_level <= 15:
+        user.rank = 'İlerleyen'
+    elif new_level <= 20:
+        user.rank = 'Usta'
+    elif new_level <= 30:
+        user.rank = 'Uzman'
+    else:
+        user.rank = 'Efsane'
+    
+    db.session.commit()
+    
+    # Kullanıcıya dönecek bilgileri hazırla
+    response_data = {
+        'success': True,
+        'xp_gained': xp_gain,
+        'new_total_xp': user.experience_points,
+        'level': new_level,
+        'is_level_up': new_level > original_level,
+        'is_high_score': is_high_score,
+        'rank': user.rank
+    }
+    
+    return jsonify(response_data)
 
 @app.route('/api/get-scores/<game_type>')
 @app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint

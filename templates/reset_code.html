@@ -1,126 +1,41 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block title %}Şifre Sıfırlama Kodu{% endblock %}
 
 {% block content %}
 <div class="auth-container">
-  <div class="auth-card glass-card">
-    <div class="auth-logo-corner">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
-    </div>
+  <div class="auth-card glass-effect">
     <div class="auth-header">
-      <h2><i class="fas fa-lock-open"></i> Doğrulama Kodu</h2>
-      <p class="auth-subtitle">E-posta adresinize gönderilen doğrulama kodunu girin</p>
+      <h1><i class="fas fa-key"></i> Şifre Sıfırlama Kodu</h1>
+      <p>E-posta adresinize gönderilen 6 haneli kodu giriniz.</p>
     </div>
     
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category if category != '_' else 'info' }} alert-dismissible fade show">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    
-    <form method="POST" action="{{ url_for('reset_code') }}" class="auth-form">
-      <input type="hidden" name="email" value="{{ email }}">
-      
-      <div class="verification-code-container">
+    <div class="auth-body">
+      <form action="{{ url_for('reset_code') }}" method="POST">
+        <input type="hidden" name="email" value="{{ email }}">
+        
         <div class="form-group">
-          <label for="reset-code" class="form-label">Doğrulama Kodu</label>
-          <div class="code-inputs">
-            <input type="text" id="code1" name="code1" class="form-control code-input" maxlength="1" autofocus>
-            <input type="text" id="code2" name="code2" class="form-control code-input" maxlength="1">
-            <input type="text" id="code3" name="code3" class="form-control code-input" maxlength="1">
-            <input type="text" id="code4" name="code4" class="form-control code-input" maxlength="1">
-            <input type="text" id="code5" name="code5" class="form-control code-input" maxlength="1">
-            <input type="text" id="code6" name="code6" class="form-control code-input" maxlength="1">
+          <label for="reset_code">Sıfırlama Kodu</label>
+          <div class="input-group">
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <input type="text" id="reset_code" name="reset_code" pattern="[0-9]{6}" class="form-control" placeholder="000000" maxlength="6" autocomplete="off" required>
           </div>
-          <input type="hidden" id="verification_code" name="verification_code">
+          <small class="form-text text-muted">E-posta adresinize gönderilen 6 haneli kodu giriniz.</small>
         </div>
-      </div>
-      
-      <div class="form-text text-center mb-4">
-        <div class="countdown-timer" id="countdown">05:00</div>
-        <p>Kod gelmedi mi? <a href="#" id="resend-code">Tekrar Gönder</a></p>
-      </div>
-      
-      <button type="submit" class="btn btn-primary btn-block btn-animated">
-        <span class="btn-text">Kodu Doğrula</span>
-        <i class="fas fa-arrow-right btn-icon"></i>
-      </button>
-    </form>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-block">Doğrula</button>
+        </div>
+      </form>
+    </div>
     
-    <div class="auth-links">
-      <p><a href="{{ url_for('login') }}">Giriş sayfasına dön</a></p>
+    <div class="auth-footer">
+      <a href="{{ url_for('login') }}" class="auth-link"><i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön</a>
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle code input - move to next input when a character is entered
-    const codeInputs = document.querySelectorAll('.code-input');
-    const hiddenInput = document.getElementById('verification_code');
-    
-    codeInputs.forEach((input, index) => {
-      // Only allow numeric input
-      input.addEventListener('input', function(e) {
-        const value = e.target.value;
-        if (!/^\d*$/.test(value)) {
-          e.target.value = '';
-          return;
-        }
-        
-        // Move to next input if this one has a character
-        if (value.length === 1 && index < codeInputs.length - 1) {
-          codeInputs[index + 1].focus();
-        }
-        
-        // Combine all inputs into the hidden field
-        updateHiddenInput();
-      });
-      
-      // Handle backspace
-      input.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && index > 0 && e.target.value === '') {
-          codeInputs[index - 1].focus();
-        }
-      });
-    });
-    
-    function updateHiddenInput() {
-      hiddenInput.value = Array.from(codeInputs).map(input => input.value).join('');
-    }
-    
-    // Countdown timer
-    let timeLeft = 5 * 60; // 5 minutes in seconds
-    const countdownElement = document.getElementById('countdown');
-    const resendButton = document.getElementById('resend-code');
-    
-    function updateCountdown() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        resendButton.classList.add('active');
-      } else {
-        timeLeft--;
-      }
-    }
-    
-    const timer = setInterval(updateCountdown, 1000);
-    updateCountdown();
-    
-    // Resend code
-    resendButton.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (timeLeft <= 0) {
-        window.location.href = "{{ url_for('forgot_password') }}?resend=true&email={{ email }}";
-      }
-    });
-  });
-</script>
 {% endblock %}
