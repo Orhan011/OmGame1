@@ -5150,9 +5150,45 @@ main {
   background: rgba(33, 33, 61, 0.4);
 }
 
-.leaderboard-table tr:hover {
-  transform: translateX(5px);
-  background: rgba(106, 90, 224, 0.15);
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 180px;
+  padding: 15px;
+  align-items: center;
+  background-color: rgba(33, 33, 61, 0.5);
+  margin-bottom: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.table-row:hover {
+  background-color: rgba(106, 90, 224, 0.2);
+  transform: translateY(-3px);
+}
+
+.top-rank {
+  background: linear-gradient(to right, rgba(106, 90, 224, 0.3), rgba(33, 33, 61, 0.5));
+  border-left: 4px solid #6a5ae0;
+}
+
+.rank-cell, .username-cell, .score-cell, .date-cell {
+  padding: 8px;
+}
+
+.loading, .no-scores, .error {
+  padding: 30px;
+  text-align: center;
+  background-color: rgba(33, 33, 61, 0.3);
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.no-scores {
+  color: #8a8aa3;
+}
+
+.error {
+  color: #ff6b6b;
 }
 
 .leaderboard-table td {

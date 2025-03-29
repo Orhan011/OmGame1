@@ -9,11 +9,11 @@
   </div>
 
   <div class="game-filter">
-    <button class="game-filter-btn active" data-game="word-puzzle">
+    <button class="game-filter-btn active" data-game="wordPuzzle">
       <i class="fas fa-font"></i>
       Kelime Bulmaca
     </button>
-    <button class="game-filter-btn" data-game="memory-match">
+    <button class="game-filter-btn" data-game="memoryMatch">
       <i class="fas fa-brain"></i>
       Hafıza Kartları
     </button>
@@ -25,7 +25,6 @@
       <i class="fas fa-puzzle-piece"></i>
       Yapboz
     </button>
-
   </div>
 
   <div class="leaderboard-table">
@@ -35,48 +34,6 @@
       <div class="score-cell">Skor</div>
       <div class="date-cell">Tarih</div>
     </div>
-    <style>
-      .table-row {
-        display: grid;
-        grid-template-columns: 80px 1fr 120px 180px;
-        padding: 15px;
-        align-items: center;
-        background-color: rgba(33, 33, 61, 0.5);
-        margin-bottom: 8px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-      
-      .table-row:hover {
-        background-color: rgba(106, 90, 224, 0.2);
-        transform: translateY(-3px);
-      }
-      
-      .top-rank {
-        background: linear-gradient(to right, rgba(106, 90, 224, 0.3), rgba(33, 33, 61, 0.5));
-        border-left: 4px solid #6a5ae0;
-      }
-      
-      .rank-cell, .username-cell, .score-cell, .date-cell {
-        padding: 8px;
-      }
-      
-      .loading, .no-scores, .error {
-        padding: 30px;
-        text-align: center;
-        background-color: rgba(33, 33, 61, 0.3);
-        border-radius: 8px;
-        margin-top: 15px;
-      }
-      
-      .no-scores {
-        color: #8a8aa3;
-      }
-      
-      .error {
-        color: #ff6b6b;
-      }
-    </style>
     <div class="table-body" id="scores-container">
       <!-- Scores will be loaded here -->
     </div>
@@ -85,5 +42,60 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const scoresContainer = document.getElementById('scores-container');
+  const gameButtons = document.querySelectorAll('.game-filter-btn');
+  let currentGame = 'wordPuzzle';
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('tr-TR');
+  }
+
+  function loadScores(gameType) {
+    scoresContainer.innerHTML = '<div class="loading">Yükleniyor...</div>';
+    
+    fetch(`/api/get-scores/${gameType}`)
+      .then(response => response.json())
+      .then(scores => {
+        if (!scores || scores.length === 0) {
+          scoresContainer.innerHTML = '<div class="no-scores">Henüz skor kaydı bulunmuyor.</div>';
+          return;
+        }
+
+        let html = '';
+        scores.forEach((score, index) => {
+          const rowClass = index < 3 ? 'table-row top-rank' : 'table-row';
+          html += `
+            <div class="${rowClass}">
+              <div class="rank-cell">${index + 1}</div>
+              <div class="username-cell">${score.username}</div>
+              <div class="score-cell">${score.score}</div>
+              <div class="date-cell">${formatDate(score.timestamp)}</div>
+            </div>
+          `;
+        });
+        
+        scoresContainer.innerHTML = html;
+      })
+      .catch(error => {
+        console.error('Error loading scores:', error);
+        scoresContainer.innerHTML = '<div class="error">Skorlar yüklenirken bir hata oluştu.</div>';
+      });
+  }
+
+  gameButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      gameButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentGame = button.dataset.game;
+      loadScores(currentGame);
+    });
+  });
+
+  // Load initial scores
+  loadScores(currentGame);
+});
+</script>
 {% endblock %}
