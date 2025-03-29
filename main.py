@@ -9,6 +9,7 @@ import logging
 from datetime import datetime, timedelta
 
 from flask import Flask, request, session, redirect, url_for, render_template, make_response, jsonify, flash
+from flask_login import login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -338,7 +339,7 @@ def login():
             flash('Geçersiz email veya şifre.', 'danger')
             return redirect(url_for('login'))
         
-        session['user_id'] = user.id
+        login_user(user)
         flash('Başarıyla giriş yaptınız!', 'success')
         return redirect(url_for('index'))
     
@@ -348,9 +349,8 @@ def login():
     return render_template('login.html')
 
 @app.route('/profile')
+@login_required
 def profile():
-    if not session.get('user_id'):
-        return redirect(url_for('login'))
     
     current_user = User.query.get(session['user_id'])
     if not current_user:
@@ -487,8 +487,9 @@ def register():
     return render_template('register.html')
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user_id', None)
+    logout_user()
     flash('Başarıyla çıkış yaptınız.')
     return redirect(url_for('login'))
 
