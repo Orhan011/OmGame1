@@ -1192,6 +1192,34 @@ footer::before {
   margin-bottom: 20px;
 }
 
+/* Avatar Overlay Efekti */
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.profile-upload-preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-upload-preview:hover .avatar-overlay {
+  opacity: 1;
+}
+
 /* ====================== Örüntü Tanıma Oyunu Stilleri ====================== */
 
 /* Oyun Alanı Stilleri */
