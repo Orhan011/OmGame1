@@ -500,16 +500,34 @@ def save_score():
     # Use anonymous user or a session-based temporary user if not logged in
     user_id = session.get('user_id', 1)  # Default to user id 1 if not logged in
     
-    new_score = Score(
+    # Önce mevcut skoru kontrol et
+    existing_score = Score.query.filter_by(
         user_id=user_id,
-        game_type=data['gameType'],
-        score=data['score']
-    )
+        game_type=data['gameType']
+    ).first()
     
-    db.session.add(new_score)
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Score saved successfully'})
+    if existing_score:
+        # Eğer yeni skor daha yüksekse, mevcut skoru güncelle
+        if data['score'] > existing_score.score:
+            existing_score.score = data['score']
+            existing_score.timestamp = datetime.utcnow()  # Ayrıca zaman damgasını da güncelle
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Score updated successfully'})
+        else:
+            # Yeni skor daha düşükse, değiştirme
+            return jsonify({'success': True, 'message': 'Existing score is higher'})
+    else:
+        # İlk kez oynuyorsa yeni skor kaydı oluştur
+        new_score = Score(
+            user_id=user_id,
+            game_type=data['gameType'],
+            score=data['score']
+        )
+        
+        db.session.add(new_score)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Score saved successfully'})
 
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
@@ -526,14 +544,37 @@ def get_scores(game_type):
     if not internal_game_type:
         return jsonify({'error': 'Invalid game type'}), 400
         
-    scores = Score.query.filter_by(game_type=internal_game_type)\
-                       .order_by(Score.score.desc())\
-                       .limit(10)\
-                       .all()
+    # Kullanıcı başına en yüksek skorları içeren bir sorgu oluştur
+    # SQLAlchemy ile subquery kullanarak her kullanıcı için en yüksek puanı alalım
+    from sqlalchemy import func
+    
+    # Önce her kullanıcı için maksimum skoru bulalım
+    max_scores_subquery = db.session.query(
+        Score.user_id, 
+        func.max(Score.score).label('max_score')
+    ).filter_by(
+        game_type=internal_game_type
+    ).group_by(
+        Score.user_id
+    ).subquery()
+    
+    # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
+    scores = db.session.query(Score, User).join(
+        max_scores_subquery, 
+        db.and_(
+            Score.user_id == max_scores_subquery.c.user_id,
+            Score.score == max_scores_subquery.c.max_score,
+            Score.game_type == internal_game_type
+        )
+    ).join(
+        User, 
+        User.id == Score.user_id
+    ).order_by(
+        Score.score.desc()
+    ).limit(10).all()
     
     score_list = []
-    for score in scores:
-        user = User.query.get(score.user_id)
+    for score, user in scores:
         score_list.append({
             'username': user.username if user else 'Anonymous',
             'score': score.score,
