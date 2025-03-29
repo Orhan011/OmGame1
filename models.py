@@ -2,28 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 # Initialize SQLAlchemy without binding to a specific app
-
-ACHIEVEMENT_TYPES = {
-    'GAMES_PLAYED': {
-        'name': 'Oyun Ustası',
-        'description': 'Toplam {count} oyun oyna',
-        'levels': [10, 50, 100, 500, 1000],
-        'points': [10, 50, 100, 500, 1000]
-    },
-    'HIGH_SCORE': {
-        'name': 'Rekor Kırıcı', 
-        'description': '{game} oyununda {score} puan kazan',
-        'levels': [1000, 5000, 10000, 50000, 100000],
-        'points': [20, 100, 200, 1000, 2000]
-    },
-    'DAILY_PLAYER': {
-        'name': 'Günlük Oyuncu',
-        'description': 'Art arda {count} gün giriş yap',
-        'levels': [3, 7, 14, 30, 90],
-        'points': [30, 70, 140, 300, 900]
-    }
-}
-
 db = SQLAlchemy()
 
 class User(db.Model):
