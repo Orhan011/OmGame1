@@ -219,3 +219,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+// Profile Modal Lazy Loading
+document.addEventListener('DOMContentLoaded', function() {
+  const profileButton = document.getElementById('profileButton');
+  const profileModal = document.getElementById('profileModal');
+  const profileModalContent = document.getElementById('profileModalContent');
+  const profileContentTemplate = document.getElementById('profileContentTemplate');
+  let isContentLoaded = false;
+
+  if (profileButton && profileModal) {
+    profileButton.addEventListener('click', function() {
+      const modal = new bootstrap.Modal(profileModal);
+      modal.show();
+      
+      if (!isContentLoaded) {
+        // Delay content loading slightly to ensure smooth modal animation
+        setTimeout(() => {
+          profileModalContent.innerHTML = profileContentTemplate.innerHTML;
+          isContentLoaded = true;
+        }, 150);
+      }
+    });
+  }
+});

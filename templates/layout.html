@@ -31,7 +31,7 @@
   </a>
   {% if session.get('user_id') %}
     <div class="nav-item dropdown profile-dropdown me-2">
-      <div class="nav-link" data-bs-toggle="modal" data-bs-target="#profileModal">
+      <div class="nav-link" id="profileButton">
         <div class="profile-avatar">
           {% if current_user.username %}
             <div class="avatar-circle">{{ current_user.username[0]|upper }}</div>
@@ -39,7 +39,7 @@
         </div>
       </div>
 
-      <!-- Modern Profile Modal -->
+      <!-- Optimized Profile Modal -->
       <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content profile-modal-content">
@@ -49,82 +49,91 @@
               </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="profile-avatar-container text-center">
-                    <div class="profile-avatar-preview">
-                      <div class="avatar-circle large">{{ current_user.username[0]|upper }}</div>
-                      <div class="avatar-overlay">
-                        <i class="fas fa-camera"></i>
-                      </div>
-                    </div>
-                    <button class="btn btn-upload mt-3">
-                      <i class="fas fa-camera me-2"></i>Profil Fotoğrafı Yükle
-                    </button>
-                  </div>
-                </div>
-                <div class="col-md-8">
-                  <div class="profile-info-section">
-                    <h6 class="section-title"><i class="fas fa-user me-2"></i>Kişisel Bilgiler</h6>
-                    <div class="mb-3">
-                      <label class="form-label">Kullanıcı Adı</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-at"></i></span>
-                        <input type="text" class="form-control" value="{{ current_user.username }}">
-                      </div>
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label">E-posta</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="profile-stats-section mt-4">
-                    <h6 class="section-title"><i class="fas fa-chart-line me-2"></i>İstatistikler</h6>
-                    <div class="stats-grid">
-                      <div class="stat-card">
-                        <div class="stat-icon">
-                          <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="stat-info">
-                          <span class="stat-value">{{ current_user.total_games_played }}</span>
-                          <span class="stat-label">Toplam Oyun</span>
-                        </div>
-                      </div>
-                      <div class="stat-card">
-                        <div class="stat-icon">
-                          <i class="fas fa-trophy"></i>
-                        </div>
-                        <div class="stat-info">
-                          <span class="stat-value">{{ current_user.highest_score }}</span>
-                          <span class="stat-label">En Yüksek Skor</span>
-                        </div>
-                      </div>
-                      <div class="stat-card">
-                        <div class="stat-icon">
-                          <i class="fas fa-star"></i>
-                        </div>
-                        <div class="stat-info">
-                          <span class="stat-value">{{ current_user.rank }}</span>
-                          <span class="stat-label">Seviye</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div class="modal-body" id="profileModalContent">
+              <!-- Content will be loaded dynamically -->
+              <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Yükleniyor...</span>
                 </div>
               </div>
-            </div>
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-              <button type="button" class="btn btn-primary">Değişiklikleri Kaydet</button>
             </div>
           </div>
         </div>
       </div>
+
+      <template id="profileContentTemplate">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="profile-avatar-container text-center">
+              <div class="profile-avatar-preview">
+                <div class="avatar-circle large">{{ current_user.username[0]|upper }}</div>
+                <div class="avatar-overlay">
+                  <i class="fas fa-camera"></i>
+                </div>
+              </div>
+              <button class="btn btn-upload mt-3">
+                <i class="fas fa-camera me-2"></i>Profil Fotoğrafı Yükle
+              </button>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="profile-info-section">
+              <h6 class="section-title"><i class="fas fa-user me-2"></i>Kişisel Bilgiler</h6>
+              <div class="mb-3">
+                <label class="form-label">Kullanıcı Adı</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-at"></i></span>
+                  <input type="text" class="form-control" value="{{ current_user.username }}">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">E-posta</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                  <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-stats-section mt-4">
+              <h6 class="section-title"><i class="fas fa-chart-line me-2"></i>İstatistikler</h6>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <i class="fas fa-gamepad"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ current_user.total_games_played }}</span>
+                    <span class="stat-label">Toplam Oyun</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ current_user.highest_score }}</span>
+                    <span class="stat-label">En Yüksek Skor</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ current_user.rank }}</span>
+                    <span class="stat-label">Seviye</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="button" class="btn btn-primary">Değişiklikleri Kaydet</button>
+        </div>
+      </template>
     </div>
   {% endif %}
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
