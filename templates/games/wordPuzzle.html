@@ -82,26 +82,38 @@
         <!-- Alert Container -->
         <div id="alert-container" class="memory-alert"></div>
 
-        <!-- Game Board Container -->
-        <div class="game-board-container">
-          <div class="board-backdrop"></div>
-          <!-- Letter Tiles -->
-          <div id="letter-container" class="letter-container"></div>
+        <!-- Bilmece Kartı -->
+        <div class="riddle-card-container">
+          <div class="riddle-card">
+            <div class="riddle-number">Bilmece #<span id="riddle-number">1</span></div>
+            <div class="riddle-text" id="riddle-text">Yükleniyor...</div>
+            <div class="riddle-hints" id="riddle-hints"></div>
+            <div class="riddle-attempts">
+              Kalan Hak: <span id="attempts-left">3</span>
+            </div>
+          </div>
         </div>
-
 
         <!-- Word Input -->
         <div class="input-group mb-4">
-          <input type="text" id="word-input" class="word-input" placeholder="Kelime yazın veya harflere tıklayın" aria-label="Kelime girin">
+          <input type="text" id="word-input" class="word-input" placeholder="Cevabı buraya yazın" aria-label="Cevap girin">
           <button class="btn btn-primary" type="button" id="submit-word">
-            <i class="fas fa-check me-1"></i>Gönder
+            <i class="fas fa-check me-1"></i>Cevapla
+          </button>
+          <button class="btn btn-secondary" type="button" id="pass-button">
+            <i class="fas fa-forward me-1"></i>Pas Geç
           </button>
         </div>
 
-        <!-- Found Words -->
+        <!-- Feedback Container -->
+        <div class="feedback-container" id="feedback-container">
+          <div class="feedback-matches" id="letter-matches"></div>
+        </div>
+
+        <!-- Solved Riddles -->
         <div class="word-collection-container">
-          <h5 class="word-collection-title"><i class="fas fa-star me-2"></i>Bulunan Kelimeler:</h5>
-          <div id="word-list" class="words-found"></div>
+          <h5 class="word-collection-title"><i class="fas fa-star me-2"></i>Çözdüğünüz Bilmeceler:</h5>
+          <div id="solved-riddles" class="words-found"></div>
         </div>
 
         <!-- Game Controls -->
@@ -231,12 +243,123 @@
     margin-bottom: 15px;
     font-weight: 600;
   }
+  
   .hint-container {
     margin-bottom: 10px;
   }
+  
   .hint-text {
     font-style: italic;
     color: grey;
+  }
+  
+  /* Bilmece Kartı Stilleri */
+  .riddle-card-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+  
+  .riddle-card {
+    background: rgba(15, 15, 30, 0.5);
+    border-radius: 15px;
+    padding: 25px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .riddle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  }
+  
+  .riddle-number {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .riddle-text {
+    font-size: 1.2rem;
+    margin: 10px 0 20px;
+    line-height: 1.6;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .riddle-hints {
+    margin: 15px 0;
+    min-height: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .riddle-attempts {
+    text-align: center;
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+  
+  .feedback-container {
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(15, 15, 30, 0.3);
+    text-align: center;
+  }
+  
+  .feedback-matches {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .letter-match {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 3px;
+    font-weight: bold;
+    animation: pop-in 0.3s ease forwards;
+  }
+  
+  .letter-match.correct {
+    background-color: rgba(46, 204, 113, 0.3);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+  }
+  
+  .letter-match.wrong {
+    background-color: rgba(231, 76, 60, 0.3);
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+  }
+  
+  @keyframes pop-in {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    70% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 </style>
 {% endblock %}

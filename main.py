@@ -531,57 +531,106 @@ def save_score():
 
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
-    game_type_map = {
-        'word-puzzle': 'wordPuzzle',
-        'memory-match': 'memoryMatch',
-        'labyrinth': 'labyrinth',
-        'number-sequence': 'labyrinth',  # number-sequence da labyrinth'e yönlendiriliyor (geriye uyumluluk için)
-        'puzzle': 'puzzle',
-        '3d-rotation': '3dRotation'
-    }
-    
-    internal_game_type = game_type_map.get(game_type)
-    if not internal_game_type:
-        return jsonify({'error': 'Invalid game type'}), 400
-        
-    # Kullanıcı başına en yüksek skorları içeren bir sorgu oluştur
-    # SQLAlchemy ile subquery kullanarak her kullanıcı için en yüksek puanı alalım
     from sqlalchemy import func
     
-    # Önce her kullanıcı için maksimum skoru bulalım
-    max_scores_subquery = db.session.query(
-        Score.user_id, 
-        func.max(Score.score).label('max_score')
-    ).filter_by(
-        game_type=internal_game_type
-    ).group_by(
-        Score.user_id
-    ).subquery()
-    
-    # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
-    scores = db.session.query(Score, User).join(
-        max_scores_subquery, 
-        db.and_(
-            Score.user_id == max_scores_subquery.c.user_id,
-            Score.score == max_scores_subquery.c.max_score,
-            Score.game_type == internal_game_type
-        )
-    ).join(
-        User, 
-        User.id == Score.user_id
-    ).order_by(
-        Score.score.desc()
-    ).limit(10).all()
-    
-    score_list = []
-    for score, user in scores:
-        score_list.append({
-            'username': user.username if user else 'Anonymous',
-            'score': score.score,
-            'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        })
-    
-    return jsonify(score_list)
+    # "all" özellği eklenmiş - tüm oyunların verilerini getir
+    if game_type == 'all':
+        # Tüm oyun türleri için en yüksek skorları getir
+        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', '3dRotation']
+        all_scores = {}
+        
+        for internal_game_type in game_types:
+            # Her oyun türü için kullanıcı başına en yüksek puanları bul
+            max_scores_subquery = db.session.query(
+                Score.user_id, 
+                func.max(Score.score).label('max_score')
+            ).filter_by(
+                game_type=internal_game_type
+            ).group_by(
+                Score.user_id
+            ).subquery()
+            
+            # Tam skor kayıtlarını ve kullanıcı bilgilerini getir
+            scores = db.session.query(Score, User).join(
+                max_scores_subquery, 
+                db.and_(
+                    Score.user_id == max_scores_subquery.c.user_id,
+                    Score.score == max_scores_subquery.c.max_score,
+                    Score.game_type == internal_game_type
+                )
+            ).join(
+                User, 
+                User.id == Score.user_id
+            ).order_by(
+                Score.score.desc()
+            ).limit(10).all()
+            
+            # Skor listesini oyun türüne göre oluştur
+            score_list = []
+            for score, user in scores:
+                score_list.append({
+                    'username': user.username if user else 'Anonymous',
+                    'score': score.score,
+                    'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                    'game_type': internal_game_type
+                })
+            
+            # Her oyun türü için skorları ekle
+            all_scores[internal_game_type] = score_list
+        
+        return jsonify(all_scores)
+    else:
+        # Belirli bir oyun türü için skorları getir
+        game_type_map = {
+            'word-puzzle': 'wordPuzzle',
+            'memory-match': 'memoryMatch',
+            'labyrinth': 'labyrinth',
+            'number-sequence': 'labyrinth',  # number-sequence da labyrinth'e yönlendiriliyor (geriye uyumluluk için)
+            'puzzle': 'puzzle',
+            '3d-rotation': '3dRotation'
+        }
+        
+        internal_game_type = game_type_map.get(game_type)
+        if not internal_game_type:
+            return jsonify({'error': 'Invalid game type'}), 400
+            
+        # Kullanıcı başına en yüksek skorları içeren bir sorgu oluştur
+        # SQLAlchemy ile subquery kullanarak her kullanıcı için en yüksek puanı alalım
+        
+        # Önce her kullanıcı için maksimum skoru bulalım
+        max_scores_subquery = db.session.query(
+            Score.user_id, 
+            func.max(Score.score).label('max_score')
+        ).filter_by(
+            game_type=internal_game_type
+        ).group_by(
+            Score.user_id
+        ).subquery()
+        
+        # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
+        scores = db.session.query(Score, User).join(
+            max_scores_subquery, 
+            db.and_(
+                Score.user_id == max_scores_subquery.c.user_id,
+                Score.score == max_scores_subquery.c.max_score,
+                Score.game_type == internal_game_type
+            )
+        ).join(
+            User, 
+            User.id == Score.user_id
+        ).order_by(
+            Score.score.desc()
+        ).limit(10).all()
+        
+        score_list = []
+        for score, user in scores:
+            score_list.append({
+                'username': user.username if user else 'Anonymous',
+                'score': score.score,
+                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            })
+        
+        return jsonify(score_list)
 
 # Initialize the database at startup
 with app.app_context():
