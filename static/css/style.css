@@ -11,6 +11,22 @@
   align-items: center;
 }
 
+.site-logo {
+  height: 50px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.site-logo:hover {
+  transform: scale(1.05);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 :root {
 --primary-bg:#0a0a18;
 --secondary-bg:#14142b;
