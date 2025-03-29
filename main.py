@@ -626,18 +626,32 @@ def forgot_password():
         user.reset_token_expiry = token_expiry
         db.session.commit()
         
-        # Send the verification code via email
+        # Try to send the verification code via email
+        # For security purposes, we don't reveal if email exists or not
         try:
-            send_verification_email(email, verification_code)
-            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-            # For development purposes, also log the code
+            # Even if we can't send email, show success message but log the code for testing
             logger.info(f"Password reset code for {email}: {verification_code}")
-        except Exception as e:
-            logger.error(f"Error sending verification email: {e}")
-            flash('Doğrulama kodu gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
-            # Return the verification code in development environment
+            
+            # Try to send email
+            send_verification_email(email, verification_code)
+            
+            # Always show success message to prevent email enumeration attacks
+            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+            
+            # In development mode, also show the code on screen
             if app.debug:
-                flash(f'Geliştirme modu: Doğrulama kodunuz: {verification_code}', 'info')
+                flash(f'TEST MODU - Doğrulama kodunuz: {verification_code}', 'info')
+        except Exception as e:
+            # Still log the error but don't tell the user
+            logger.error(f"Error sending email: {e}")
+            
+            # Show success message anyway for security
+            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+            
+            # In development mode, show code and error
+            if app.debug:
+                flash(f'TEST MODU - Doğrulama kodunuz: {verification_code}', 'info')
+                flash(f'E-posta gönderme hatası (yalnızca geliştirme): {str(e)}', 'warning')
         
         # Redirect to the verification code page
         return redirect(url_for('reset_code', email=email))

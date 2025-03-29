@@ -1,41 +1,103 @@
-{% extends 'layout.html' %}
-
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-{% endblock %}
-
-{% block title %}Şifre Sıfırlama Kodu{% endblock %}
-
-{% block content %}
-<div class="auth-container">
-  <div class="auth-card glass-effect">
-    <div class="auth-header">
-      <h1><i class="fas fa-key"></i> Şifre Sıfırlama Kodu</h1>
-      <p>E-posta adresinize gönderilen 6 haneli kodu giriniz.</p>
-    </div>
-    
-    <div class="auth-body">
-      <form action="{{ url_for('reset_code') }}" method="POST">
-        <input type="hidden" name="email" value="{{ email }}">
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şifre Sıfırlama Kodu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-only-body">
+  <div class="fullscreen-auth">
+    <div class="auth-container">
+      <div class="auth-card glass-card">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="auth-logo-small">
         
-        <div class="form-group">
-          <label for="reset_code">Sıfırlama Kodu</label>
-          <div class="input-group">
-            <span class="input-icon"><i class="fas fa-lock"></i></span>
-            <input type="text" id="reset_code" name="reset_code" pattern="[0-9]{6}" class="form-control" placeholder="000000" maxlength="6" autocomplete="off" required>
+        <div class="auth-header">
+          <h2>Doğrulama Kodu</h2>
+          <p class="auth-subtitle">E-postanıza gönderilen 6 haneli kodu giriniz</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category if category != '_' else 'info' }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <form action="{{ url_for('reset_code') }}" method="POST" class="auth-form">
+          <input type="hidden" name="email" value="{{ email }}">
+          
+          <div class="verification-code">
+            <input type="text" name="code1" maxlength="1" pattern="[0-9]" class="code-input" required autofocus>
+            <input type="text" name="code2" maxlength="1" pattern="[0-9]" class="code-input" required>
+            <input type="text" name="code3" maxlength="1" pattern="[0-9]" class="code-input" required>
+            <input type="text" name="code4" maxlength="1" pattern="[0-9]" class="code-input" required>
+            <input type="text" name="code5" maxlength="1" pattern="[0-9]" class="code-input" required>
+            <input type="text" name="code6" maxlength="1" pattern="[0-9]" class="code-input" required>
           </div>
-          <small class="form-text text-muted">E-posta adresinize gönderilen 6 haneli kodu giriniz.</small>
-        </div>
+          
+          <button type="submit" class="btn btn-primary btn-block btn-animated">
+            <span class="btn-text">Doğrula</span>
+            <i class="fas fa-check-circle btn-icon"></i>
+          </button>
+        </form>
         
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-block">Doğrula</button>
+        <div class="auth-links">
+          <a href="{{ url_for('login') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön
+          </a>
         </div>
-      </form>
-    </div>
-    
-    <div class="auth-footer">
-      <a href="{{ url_for('login') }}" class="auth-link"><i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön</a>
+      </div>
     </div>
   </div>
-</div>
-{% endblock %}
+
+  <script>
+    // Kod girişleri için otomatik ilerleme
+    document.addEventListener('DOMContentLoaded', function() {
+      const codeInputs = document.querySelectorAll('.code-input');
+      
+      codeInputs.forEach((input, index) => {
+        // Bir karakter girildiğinde sonraki inputa geç
+        input.addEventListener('input', function() {
+          if(this.value.length === 1) {
+            if(index < codeInputs.length - 1) {
+              codeInputs[index + 1].focus();
+            }
+          }
+        });
+        
+        // Backspace tuşuna basıldığında önceki inputa geç
+        input.addEventListener('keydown', function(e) {
+          if(e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+            codeInputs[index - 1].focus();
+          }
+        });
+      });
+      
+      // Form gönderimi sırasında doğrulama kodunu birleştir
+      document.querySelector('.auth-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let code = '';
+        codeInputs.forEach(input => {
+          code += input.value;
+        });
+        
+        // Gizli bir input oluştur
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'reset_code';
+        hiddenInput.value = code;
+        this.appendChild(hiddenInput);
+        
+        this.submit();
+      });
+    });
+  </script>
+</body>
+</html>
