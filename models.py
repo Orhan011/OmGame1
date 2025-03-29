@@ -31,6 +31,29 @@ class User(db.Model):
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
     scores = db.relationship('Score', backref='user', lazy=True)
+    
+    # Çoklu oyuncu özellikleri
+    friends = db.relationship('User', secondary='friendships',
+                            primaryjoin='User.id==friendships.c.user_id',
+                            secondaryjoin='User.id==friendships.c.friend_id',
+                            backref='friend_of')
+    
+    # Başarı sistemi
+    achievements = db.Column(db.JSON, default=lambda: [])
+    achievement_points = db.Column(db.Integer, default=0)
+    
+    # Kişiselleştirme
+    profile_theme = db.Column(db.String(50), default='default')
+    custom_settings = db.Column(db.JSON, default=lambda: {})
+    
+    # İstatistikler
+    game_stats = db.Column(db.JSON, default=lambda: {
+        'daily_playtime': 0,
+        'weekly_stats': {},
+        'monthly_stats': {},
+        'favorite_games': [],
+        'achievement_history': []
+    })
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -56,3 +79,35 @@ class Article(db.Model):
 
     def __repr__(self):
         return f'<Article {self.title}>'
+
+
+# Arkadaşlık ilişkisi tablosu
+friendships = db.Table('friendships',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('friend_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('status', db.String(20), default='pending'),  # pending, accepted, blocked
+    db.Column('created_at', db.DateTime, default=datetime.utcnow)
+)
+
+
+class Achievement(db.Model):
+    __tablename__ = 'achievements'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    image_url = db.Column(db.String(2000))
+    points = db.Column(db.Integer, default=0)
+    requirement = db.Column(db.JSON)  # Başarı koşulları
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class GameStat(db.Model):
+    __tablename__ = 'game_stats'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)
+    playtime = db.Column(db.Integer, default=0)  # Saniye cinsinden
+    score = db.Column(db.Integer, default=0)
+    date = db.Column(db.Date, nullable=False)
+    achievements_earned = db.Column(db.JSON, default=lambda: [])
+    detailed_stats = db.Column(db.JSON, default=lambda: {})
