@@ -697,7 +697,12 @@ def reset_code():
         return redirect(url_for('forgot_password'))
     
     if request.method == 'POST':
+        # Debug: log form data
+        logger.debug(f"Reset code form data: {request.form}")
+        
+        # İki farklı form parametresi kontrolü
         verification_code = request.form.get('verification_code', '')
+        
         if not verification_code:
             # Try to get individual digits and combine them
             code_parts = []
@@ -716,6 +721,9 @@ def reset_code():
             flash('Geçersiz email adresi.', 'danger')
             return redirect(url_for('forgot_password'))
         
+        # Debug: log verification details
+        logger.debug(f"Verification attempt: code={verification_code}, user_token={user.reset_token}")
+        
         if not user.reset_token or user.reset_token != verification_code:
             flash('Geçersiz doğrulama kodu.', 'danger')
             return render_template('reset_code.html', email=email)
@@ -724,13 +732,19 @@ def reset_code():
             flash('Doğrulama kodunun süresi doldu. Lütfen yeni bir kod talep edin.', 'danger')
             return redirect(url_for('forgot_password'))
         
-        # Generate a secure token for the password reset page
-        reset_token = secrets.token_urlsafe(32)
-        user.reset_token = reset_token
-        user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=15)  # Token valid for 15 minutes
-        db.session.commit()
-        
-        return redirect(url_for('reset_password', email=email, token=reset_token))
+        try:
+            # Generate a secure token for the password reset page
+            reset_token = secrets.token_urlsafe(32)
+            user.reset_token = reset_token
+            user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=15)  # Token valid for 15 minutes
+            db.session.commit()
+            
+            return redirect(url_for('reset_password', email=email, token=reset_token))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error generating reset token: {e}")
+            flash('İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+            return redirect(url_for('forgot_password'))
     
     return render_template('reset_code.html', email=email)
 
@@ -742,41 +756,52 @@ def reset_password():
     if request.method == 'POST':
         email = request.form.get('email', '')
         token = request.form.get('token', '')
+        
+        # Debug: Print form data
+        logger.debug(f"Reset password form data: {request.form}")
     
     if not email or not token:
-        flash('Geçersiz istek.', 'danger')
+        flash('Geçersiz istek. Email veya token eksik.', 'danger')
+        logger.error(f"Invalid reset request: email={email}, token={token}")
         return redirect(url_for('login'))
     
     user = User.query.filter_by(email=email, reset_token=token).first()
     
     if not user:
         flash('Geçersiz link. Lütfen şifre sıfırlama sürecini tekrar başlatın.', 'danger')
+        logger.error(f"User not found for reset: email={email}, token={token}")
         return redirect(url_for('forgot_password'))
     
     if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
         flash('Şifre sıfırlama linkinin süresi doldu. Lütfen tekrar deneyin.', 'danger')
+        logger.error(f"Token expired for user: {user.email}")
         return redirect(url_for('forgot_password'))
     
     if request.method == 'POST':
         password = request.form.get('password')
-        password_confirm = request.form.get('password_confirm')
+        confirm_password = request.form.get('confirm_password')  # Changed to match the form field name
         
         if not password or len(password) < 6:
             flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
             return render_template('reset_password.html', email=email, token=token)
         
-        if password != password_confirm:
+        if password != confirm_password:
             flash('Şifreler eşleşmiyor.', 'danger')
             return render_template('reset_password.html', email=email, token=token)
         
-        # Update password
-        user.password_hash = generate_password_hash(password)
-        user.reset_token = None
-        user.reset_token_expiry = None
-        db.session.commit()
-        
-        flash('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.', 'success')
-        return redirect(url_for('login'))
+        try:
+            # Update password
+            user.password_hash = generate_password_hash(password)
+            user.reset_token = None
+            user.reset_token_expiry = None
+            db.session.commit()
+            
+            flash('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error updating password: {e}")
+            flash('Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
     
     return render_template('reset_password.html', email=email, token=token)
 
