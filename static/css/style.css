@@ -125,6 +125,7 @@ text-shadow:0 0 15px rgba(106,90,224,0.5);
 position:relative;
 display:flex;
 align-items:center;
+margin-right: auto;
 }
 
 .brain-icon {
