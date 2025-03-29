@@ -127,6 +127,55 @@ def tips():
     tips = Article.query.filter_by(category='tip').all()
     return render_template('tips.html', tips=tips)
 
+@app.route('/profile')
+def profile():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    return render_template('profile.html')
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+        
+    user = User.query.get(session['user_id'])
+    if request.form.get('email'):
+        user.email = request.form.get('email')
+    if request.form.get('new_password'):
+        user.password_hash = generate_password_hash(request.form.get('new_password'))
+    if request.form.get('location'):
+        user.location = request.form.get('location')
+        
+    db.session.commit()
+    flash('Profil başarıyla güncellendi!', 'success')
+    return redirect(url_for('profile'))
+
+@app.route('/update_avatar', methods=['POST'])
+def update_avatar():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+        
+    if 'avatar' not in request.files:
+        flash('Dosya seçilmedi', 'error')
+        return redirect(url_for('profile'))
+        
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('Dosya seçilmedi', 'error')
+        return redirect(url_for('profile'))
+        
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        
+        user = User.query.get(session['user_id'])
+        user.avatar_url = url_for('static', filename=f'uploads/{filename}')
+        db.session.commit()
+        
+        flash('Profil fotoğrafı güncellendi!', 'success')
+    return redirect(url_for('profile'))
+
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])
 def save_score():

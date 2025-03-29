@@ -1,0 +1,93 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="profile-container">
+  <div class="profile-header glass-effect">
+    <div class="profile-avatar-section">
+      <div class="avatar-container">
+        {% if current_user.avatar_url %}
+          <img src="{{ current_user.avatar_url }}" alt="Profile Avatar" class="profile-avatar">
+        {% else %}
+          <div class="avatar-placeholder">{{ current_user.username[0]|upper }}</div>
+        {% endif %}
+        <button class="avatar-edit-btn" data-bs-toggle="modal" data-bs-target="#avatarModal">
+          <i class="fas fa-camera"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="profile-info">
+      <h2 class="profile-username">{{ current_user.username }}</h2>
+      <div class="profile-status">
+        <span class="status-badge {% if current_user.last_active|default %}active{% endif %}">
+          {{ "Aktif" if current_user.last_active|default else "Çevrimdışı" }}
+        </span>
+        <span class="user-rank">{{ current_user.rank }}</span>
+      </div>
+      
+      <div class="xp-bar-container">
+        <div class="xp-bar" style="width: {{ (current_user.experience_points % 100) }}%"></div>
+        <span class="xp-text">{{ current_user.experience_points }} XP</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-stats-grid">
+    <div class="stat-card glass-effect">
+      <i class="fas fa-gamepad"></i>
+      <h3>Oyunlar</h3>
+      <div class="stat-value">{{ current_user.total_games_played }}</div>
+    </div>
+    <div class="stat-card glass-effect">
+      <i class="fas fa-trophy"></i>
+      <h3>En Yüksek Skor</h3>
+      <div class="stat-value">{{ current_user.highest_score }}</div>
+    </div>
+    <div class="stat-card glass-effect">
+      <i class="fas fa-star"></i>
+      <h3>Rütbe</h3>
+      <div class="stat-value">{{ current_user.rank }}</div>
+    </div>
+  </div>
+
+  <div class="profile-settings glass-effect">
+    <h3><i class="fas fa-cog"></i> Ayarlar</h3>
+    <form class="settings-form" method="POST" action="{{ url_for('update_profile') }}">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-control" value="{{ current_user.email }}" name="email">
+      </div>
+      <div class="form-group">
+        <label>Şifre Değiştir</label>
+        <input type="password" class="form-control" placeholder="Yeni şifre" name="new_password">
+      </div>
+      <div class="form-group">
+        <label>Konum</label>
+        <input type="text" class="form-control" value="{{ current_user.location }}" name="location">
+      </div>
+      <button type="submit" class="btn btn-primary">Kaydet</button>
+    </form>
+  </div>
+</div>
+
+<!-- Avatar Modal -->
+<div class="modal fade" id="avatarModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Profil Fotoğrafını Güncelle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="avatarForm" action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data">
+          <div class="avatar-upload-container">
+            <input type="file" id="avatarInput" name="avatar" accept="image/*" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Yükle</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
