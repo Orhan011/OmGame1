@@ -353,8 +353,65 @@ def profile():
 @app.route('/update-profile', methods=['POST'])
 def update_profile():
     if not session.get('user_id'):
-        flash('Lütfen önce giriş yapın.', 'error')
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Lütfen önce giriş yapın.'}), 401
+        
+    try:
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı.'}), 404
+            
+        # Form verilerini al
+        username = request.form.get('username')
+        birth_year = request.form.get('birth_year')
+        remove_photo = request.form.get('remove_photo')
+        
+        # Kullanıcı adı validasyonu
+        if not username or len(username) < 3 or len(username) > 20:
+            return jsonify({'success': False, 'message': 'Geçersiz kullanıcı adı.'}), 400
+            
+        # Kullanıcı adı benzersizlik kontrolü
+        existing_user = User.query.filter(User.username == username, User.id != user_id).first()
+        if existing_user:
+            return jsonify({'success': False, 'message': 'Bu kullanıcı adı zaten kullanımda.'}), 400
+            
+        user.username = username
+        
+        # Doğum yılı işleme
+        if birth_year:
+            try:
+                birth_year = int(birth_year)
+                current_year = datetime.utcnow().year
+                if 1900 <= birth_year <= current_year:
+                    user.birth_year = birth_year
+                    user.age = current_year - birth_year
+            except ValueError:
+                return jsonify({'success': False, 'message': 'Geçersiz doğum yılı.'}), 400
+                
+        # Profil fotoğrafı işleme
+        if remove_photo == '1':
+            user.avatar_url = None
+        else:
+            profile_image = request.files.get('profile_image')
+            if profile_image and profile_image.filename:
+                if profile_image.content_type not in ['image/jpeg', 'image/png', 'image/gif']:
+                    return jsonify({'success': False, 'message': 'Desteklenmeyen dosya formatı.'}), 400
+                    
+                image_data = profile_image.read()
+                if len(image_data) > 512000:  # 500KB limit
+                    return jsonify({'success': False, 'message': 'Dosya boyutu çok büyük (max: 500KB).'}), 400
+                    
+                encoded_image = base64.b64encode(image_data).decode('utf-8')
+                user.avatar_url = f"data:{profile_image.content_type};base64,{encoded_image}"
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Profil başarıyla güncellendi.'})
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Profil güncellenirken hata: {str(e)}")
+        return jsonify({'success': False, 'message': 'Profil güncellenirken bir hata oluştu.'}), 500
         
     try:
         user_id = session['user_id']

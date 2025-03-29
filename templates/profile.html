@@ -353,11 +353,43 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Profil resmi önizleme
+    const profileForm = document.getElementById('profileForm');
     const profileImage = document.getElementById('profile_image');
     const avatarPreview = document.getElementById('avatarPreview');
     const avatarPlaceholder = document.getElementById('avatarPlaceholder');
     const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const usernameInput = document.getElementById('username');
+    const birthYearInput = document.getElementById('birth_year');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    
+    // Form submission handler
+    if (profileForm) {
+      profileForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+          saveProfileBtn.disabled = true;
+          const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            location.reload();
+          } else {
+            alert(result.message || 'Profil güncellenirken bir hata oluştu.');
+          }
+        } catch (error) {
+          alert('Profil güncellenirken bir hata oluştu.');
+        } finally {
+          saveProfileBtn.disabled = false;
+        }
+      });
+    }
 
     // Yeni değişken - profil fotoğrafı kaldırıldı mı?
     let photoRemoved = false;
