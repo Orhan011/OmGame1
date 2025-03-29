@@ -61,17 +61,17 @@
   
   <div class="settings-section">
     <div class="settings-tabs">
-      <div class="settings-tab active" data-tab="personal">
-        <span><i class="fas fa-user"></i> Kişisel Bilgiler</span>
+      <div class="settings-tab active" data-tab="personal" data-tooltip="Kişisel Bilgiler">
+        <span><i class="fas fa-user"></i></span>
       </div>
-      <div class="settings-tab" data-tab="security">
-        <span><i class="fas fa-lock"></i> Güvenlik</span>
+      <div class="settings-tab" data-tab="security" data-tooltip="Güvenlik">
+        <span><i class="fas fa-lock"></i></span>
       </div>
-      <div class="settings-tab" data-tab="account">
-        <span><i class="fas fa-user-cog"></i> Hesap</span>
+      <div class="settings-tab" data-tab="account" data-tooltip="Hesap">
+        <span><i class="fas fa-user-cog"></i></span>
       </div>
-      <div class="settings-tab" data-tab="avatar">
-        <span><i class="fas fa-image"></i> Profil Fotoğrafı</span>
+      <div class="settings-tab" data-tab="avatar" data-tooltip="Profil Fotoğrafı">
+        <span><i class="fas fa-image"></i></span>
       </div>
       <div class="tab-indicator"></div>
     </div>
@@ -300,16 +300,37 @@
       const tabLeft = activeTab.offsetLeft;
       const tabWidth = activeTab.offsetWidth;
       
-      // Tab göstergesini konumlandır
-      tabIndicator.style.width = `${tabWidth - 20}px`;
-      tabIndicator.style.left = `${tabLeft + 10}px`;
+      // Tab göstergesini konumlandır - yuvarlak butonlar için alt ortalamaya ayarla
+      tabIndicator.style.width = `${tabWidth / 2}px`;
+      tabIndicator.style.left = `${tabLeft + tabWidth/4}px`;
     }
     
-    // İlk sayfa yüklendiğinde aktif tab'a göre göstergeyi konumlandır
+    // Tooltip işlevselliği ekle
+    function setupTooltips() {
+      settingsTabs.forEach(tab => {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tab-tooltip';
+        tooltip.textContent = tab.getAttribute('data-tooltip');
+        tab.appendChild(tooltip);
+        
+        tab.addEventListener('mouseenter', () => {
+          tooltip.style.opacity = '1';
+          tooltip.style.transform = 'translateY(0)';
+        });
+        
+        tab.addEventListener('mouseleave', () => {
+          tooltip.style.opacity = '0';
+          tooltip.style.transform = 'translateY(10px)';
+        });
+      });
+    }
+    
+    // İlk sayfa yüklendiğinde aktif tab'a göre göstergeyi konumlandır ve tooltipleri ayarla
     const initialActiveTab = document.querySelector('.settings-tab.active');
     if (initialActiveTab) {
       setTimeout(() => {
         positionTabIndicator(initialActiveTab);
+        setupTooltips(); // Tooltip işlevselliğini başlat
       }, 100); // Sayfa tam yüklendikten sonra çalıştırmak için kısa bir gecikme
     }
     
