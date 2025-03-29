@@ -21,23 +21,21 @@ def send_verification_email(to_email, verification_code):
     """
     Sends a verification email with the provided code
     
-    In production, configure SMTP settings for real email delivery.
-    For development, we'll log the email content.
+    Uses the configured Gmail account (orhanmedia0@gmail.com) to send verification emails
     """
-    # Check if SMTP settings are configured
-    smtp_server = os.environ.get('SMTP_SERVER')
-    smtp_port = os.environ.get('SMTP_PORT')
-    smtp_username = os.environ.get('SMTP_USERNAME')
-    smtp_password = os.environ.get('SMTP_PASSWORD')
+    # Gmail SMTP ayarları
+    SMTP_SERVER = "smtp.gmail.com"
+    SMTP_PORT = 587
+    SENDER_EMAIL = "orhanmedia0@gmail.com"  # Gönderici email adresi
     
-    if not all([smtp_server, smtp_port, smtp_username, smtp_password]) and not app.debug:
-        logger.warning("SMTP settings not configured. Email sending skipped.")
-        return
+    # Normalde bu kısmı çevre değişkenlerinden alırız, ama şimdilik doğrudan kodda belirtiyoruz
+    # Gerçek uygulamada bu bilgilerin güvenli bir şekilde saklanması önemlidir!
+    smtp_password = os.environ.get('GMAIL_APP_PASSWORD')
     
     # Create email message
     msg = EmailMessage()
     msg['Subject'] = 'Beyin Oyunları - Şifre Sıfırlama Kodu'
-    msg['From'] = smtp_username or 'noreply@beyin-oyunlari.com'
+    msg['From'] = SENDER_EMAIL
     msg['To'] = to_email
     
     # Email content
@@ -65,20 +63,26 @@ def send_verification_email(to_email, verification_code):
     msg.set_content("Şifre sıfırlama kodunuz: " + verification_code)
     msg.add_alternative(email_content, subtype='html')
     
-    if app.debug and not all([smtp_server, smtp_port, smtp_username, smtp_password]):
-        # In development, just log the email content
-        logger.info(f"Would send email to {to_email} with verification code: {verification_code}")
+    # Gmail App şifresi yoksa sadece loglama yap (geliştirme modunda)
+    if app.debug and not smtp_password:
+        logger.info(f"TEST MODU: {SENDER_EMAIL} adresinden {to_email} adresine email gönderilecekti. Kod: {verification_code}")
         return
     
     try:
-        # Connect to SMTP server and send email
-        with smtplib.SMTP(smtp_server, int(smtp_port)) as server:
-            server.starttls()
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
-        logger.info(f"Verification email sent to {to_email}")
+        # Gmail SMTP sunucusuna bağlan ve email gönder
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # TLS güvenlik bağlantısı başlat
+            
+            # Gmail'e giriş yap (App Password kullanılmalı)
+            if smtp_password:
+                server.login(SENDER_EMAIL, smtp_password)
+                server.send_message(msg)
+                logger.info(f"Doğrulama kodu {to_email} adresine başarıyla gönderildi.")
+            else:
+                logger.warning("Gmail şifresi belirtilmemiş, email gönderimi atlanıyor.")
+                
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error(f"Email gönderme hatası: {e}")
         raise
 
 # Create the Flask application
