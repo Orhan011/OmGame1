@@ -311,9 +311,129 @@ def register():
         
     return render_template('register.html')
 
-# Profile route removed
+@app.route('/profile')
+def profile():
+    if not session.get('user_id'):
+        flash('Lütfen önce giriş yapın.', 'error')
+        return redirect(url_for('login'))
+        
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    
+    if not user:
+        flash('Kullanıcı bulunamadı', 'error')
+        return redirect(url_for('index'))
+        
+    # Kullanıcının tüm oyunlardaki skorlarını getir
+    game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', '3dRotation']
+    user_scores = {}
+    
+    for game_type in game_types:
+        highest_score = db.session.query(db.func.max(Score.score)).filter_by(
+            user_id=user_id, game_type=game_type).scalar() or 0
+            
+        recent_scores = Score.query.filter_by(
+            user_id=user_id, game_type=game_type
+        ).order_by(Score.timestamp.desc()).limit(5).all()
+        
+        user_scores[game_type] = {
+            'highest': highest_score,
+            'recent': recent_scores
+        }
+    
+    stats = {
+        'total_games': user.total_games_played,
+        'high_score': user.highest_score,
+        'rank': user.rank,
+        'experience_points': user.experience_points
+    }
+    
+    return render_template('profile.html', user=user, stats=stats, scores=user_scores, game_types=game_types)
 
-# Update profile route removed
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    if not session.get('user_id'):
+        flash('Lütfen önce giriş yapın.', 'error')
+        return redirect(url_for('login'))
+        
+    try:
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        
+        if not user:
+            flash('Kullanıcı bulunamadı.', 'error')
+            return redirect(url_for('login'))
+            
+        # Form verilerini al ve güncelle
+        username = request.form.get('username')
+        birth_year = request.form.get('birth_year')
+        
+        # Kullanıcı adını kontrol et - aynı kullanıcı adı başka bir kullanıcıda var mı?
+        if username and username != user.username:
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user and existing_user.id != user.id:
+                flash('Bu kullanıcı adı zaten kullanımda.', 'danger')
+                return redirect(url_for('profile'))
+            user.username = username
+        
+        # Doğum yılını kontrol et ve güncelle
+        if birth_year:
+            try:
+                birth_year = int(birth_year)
+                if 1900 <= birth_year <= 2023:  # Makul bir aralık kontrol et
+                    user.birth_year = birth_year
+                    # Yaşı da güncelle
+                    current_year = datetime.utcnow().year
+                    user.age = current_year - birth_year
+                else:
+                    flash('Geçerli bir doğum yılı giriniz (1900-2023).', 'warning')
+            except ValueError:
+                flash('Doğum yılı sayısal bir değer olmalıdır.', 'danger')
+        
+        user.last_active = datetime.utcnow()
+        
+        # Profil resmi yükleme işlemi
+        profile_image = request.files.get('profile_image')
+        
+        if profile_image and profile_image.filename:
+            try:
+                # Base64 olarak kaydetme
+                image_data = profile_image.read()
+                encoded_image = base64.b64encode(image_data).decode('utf-8')
+                image_type = profile_image.content_type
+                user.avatar_url = f"data:{image_type};base64,{encoded_image}"
+                flash('Profil resmi başarıyla yüklendi.', 'success')
+            except Exception as e:
+                logger.error(f"Profil resmi yüklenirken hata oluştu: {e}")
+                flash('Profil resmi yüklenirken bir hata oluştu.', 'danger')
+        
+        # Skorları güncelle
+        highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar() or 0
+        user.highest_score = highest_score
+        user.total_games_played = Score.query.filter_by(user_id=user.id).count()
+        
+        # Deneyim ve rütbe hesapla
+        total_points = sum(score.score for score in user.scores) if user.scores else 0
+        user.experience_points = total_points
+        
+        if total_points > 10000:
+            user.rank = 'Uzman'
+        elif total_points > 5000:
+            user.rank = 'İleri Seviye'
+        elif total_points > 1000:
+            user.rank = 'Orta Seviye'
+        else:
+            user.rank = 'Başlangıç'
+        
+        db.session.commit()
+        flash('Profil başarıyla güncellendi!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Profil güncellenirken hata oluştu: {e}")
+        flash('Profil güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        
+    return redirect(url_for('profile'))
         
 @app.route('/logout')
 def logout():

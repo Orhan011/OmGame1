@@ -1,373 +1,352 @@
-
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block content %}
 <div class="profile-container">
-  <!-- Modern Profile Header with Animated Background -->
-  <div class="profile-header-section">
-    <div class="pattern-bg-animation">
-      <div class="pattern-shape shape1"></div>
-      <div class="pattern-shape shape2"></div>
-      <div class="pattern-shape shape3"></div>
-      <div class="pattern-shape shape4"></div>
+  <div class="row">
+    <!-- Sol Taraf: Kullanıcı Bilgileri -->
+    <div class="col-lg-4 mb-4">
+      <div class="card glass-card">
+        <div class="card-body text-center">
+          <div class="profile-avatar-container mb-4">
+            {% if user.avatar_url %}
+              <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="img-fluid profile-avatar">
+            {% else %}
+              <div class="profile-avatar-placeholder">
+                <i class="fas fa-user fa-4x"></i>
+              </div>
+            {% endif %}
+          </div>
+          
+          <h3 class="profile-username mb-2">{{ user.username }}</h3>
+          <p class="profile-email mb-3">{{ user.email }}</p>
+          
+          <div class="profile-stats mb-4">
+            <div class="row g-0">
+              <div class="col">
+                <div class="profile-stat">
+                  <div class="stat-value">{{ stats.total_games }}</div>
+                  <div class="stat-label">Oyun</div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="profile-stat">
+                  <div class="stat-value">{{ stats.high_score }}</div>
+                  <div class="stat-label">En Yüksek Puan</div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="profile-stat">
+                  <div class="stat-value">{{ stats.experience_points }}</div>
+                  <div class="stat-label">XP</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="profile-rank mb-4">
+            <span class="rank-badge">{{ stats.rank }}</span>
+          </div>
+          
+          <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit me-2"></i>Profili Düzenle
+          </button>
+        </div>
+      </div>
     </div>
     
-    <div class="profile-banner glass-card">
-      <div class="profile-avatar-container">
-        {% if user.avatar_url %}
-          <img src="{{ user.avatar_url }}" alt="Profil" class="profile-avatar animate-pulse">
-        {% else %}
-          <div class="default-avatar animate-pulse">
-            {{ user.username[0].upper() }}
-          </div>
-        {% endif %}
-        <div class="profile-level-badge">{{ user.rank }}</div>
-      </div>
-      
-      <div class="profile-basic-info">
-        <h1 class="profile-username">{{ user.username }}</h1>
-        <p class="join-date"><i class="fas fa-calendar-alt"></i> Katılım: {{ user.created_at.strftime('%d %B %Y') }}</p>
-        <div class="last-active-status">
-          <span class="status-indicator online"></span> Son Aktivite: {{ user.last_active.strftime('%d %B %Y, %H:%M') }}
-        </div>
-      </div>
-      
-      <div class="profile-actions">
-        <button class="btn btn-edit-profile" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-          <i class="fas fa-edit"></i> Profili Düzenle
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="profile-content">
-    <!-- Left Panel: Personal Info -->
-    <div class="profile-sidebar">
-      <!-- Personal Information Card -->
-      <div class="profile-card glass-card">
+    <!-- Sağ Taraf: Skorlar ve İstatistikler -->
+    <div class="col-lg-8">
+      <div class="card glass-card mb-4">
         <div class="card-header">
-          <h3><i class="fas fa-user-circle"></i> Kişisel Bilgiler</h3>
+          <h4 class="mb-0"><i class="fas fa-trophy me-2"></i>Oyun Skorları</h4>
         </div>
-        <div class="profile-info-content">
-          <div class="profile-info-item">
-            <div class="info-icon"><i class="fas fa-user"></i></div>
-            <div class="info-details">
-              <div class="info-label">Kullanıcı Adı</div>
-              <div class="info-value">{{ user.username }}</div>
-            </div>
-          </div>
+        <div class="card-body">
+          <ul class="nav nav-tabs" id="gameTabs" role="tablist">
+            {% for game_type in game_types %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link {% if loop.first %}active{% endif %}" 
+                      id="{{ game_type }}-tab" 
+                      data-bs-toggle="tab" 
+                      data-bs-target="#{{ game_type }}-content" 
+                      type="button" 
+                      role="tab" 
+                      aria-controls="{{ game_type }}-content" 
+                      aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                {% if game_type == 'wordPuzzle' %}
+                  <i class="fas fa-spell-check me-1"></i>Kelime Bulmaca
+                {% elif game_type == 'memoryMatch' %}
+                  <i class="fas fa-clone me-1"></i>Hafıza Kartları
+                {% elif game_type == 'labyrinth' %}
+                  <i class="fas fa-route me-1"></i>Labirent
+                {% elif game_type == 'puzzle' %}
+                  <i class="fas fa-puzzle-piece me-1"></i>Yapboz
+                {% elif game_type == '3dRotation' %}
+                  <i class="fas fa-cube me-1"></i>3D Döndürme
+                {% else %}
+                  {{ game_type }}
+                {% endif %}
+              </button>
+            </li>
+            {% endfor %}
+          </ul>
           
-          <div class="profile-info-item">
-            <div class="info-icon"><i class="fas fa-user"></i></div>
-            <div class="info-details">
-              <div class="info-label">Ad Soyad</div>
-              <div class="info-value">{{ user.full_name or 'Belirtilmedi' }}</div>
-            </div>
-          </div>
-          
-          <div class="profile-info-item">
-            <div class="info-icon"><i class="fas fa-envelope"></i></div>
-            <div class="info-details">
-              <div class="info-label">E-mail</div>
-              <div class="info-value">{{ user.email }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Panel: Recent Activities -->
-    <div class="profile-main">
-      <!-- Recent Activities Card -->
-      <div class="recent-activity-card glass-card">
-        <div class="card-header">
-          <h3><i class="fas fa-history"></i> Son Aktiviteler</h3>
-        </div>
-        
-        <div class="activity-content">
-          {% if recent_scores %}
-            <div class="activity-list">
-              {% for score in recent_scores %}
-              <div class="activity-item">
-                <div class="activity-icon">
-                  {% if score.game_type == 'wordPuzzle' %}
-                    <i class="fas fa-font"></i>
-                  {% elif score.game_type == 'memoryMatch' %}
-                    <i class="fas fa-clone"></i>
-                  {% elif score.game_type == 'labyrinth' %}
-                    <i class="fas fa-route"></i>
-                  {% elif score.game_type == 'puzzle' %}
-                    <i class="fas fa-puzzle-piece"></i>
-                  {% elif score.game_type == '3dRotation' %}
-                    <i class="fas fa-cube"></i>
-                  {% else %}
-                    <i class="fas fa-gamepad"></i>
-                  {% endif %}
+          <div class="tab-content p-3" id="gameTabsContent">
+            {% for game_type in game_types %}
+            <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                 id="{{ game_type }}-content" 
+                 role="tabpanel" 
+                 aria-labelledby="{{ game_type }}-tab">
+              
+              <div class="game-score-summary mb-4">
+                <div class="row align-items-center">
+                  <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="highest-score-display">
+                      <div class="score-value">{{ scores[game_type].highest }}</div>
+                      <div class="score-label">En Yüksek Puan</div>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="progress-container">
+                      {% if game_type == 'wordPuzzle' %}
+                        {% set next_milestone = 500 %}
+                      {% elif game_type == 'memoryMatch' %}
+                        {% set next_milestone = 1000 %}
+                      {% elif game_type == 'labyrinth' %}
+                        {% set next_milestone = 800 %}
+                      {% elif game_type == 'puzzle' %}
+                        {% set next_milestone = 1500 %}
+                      {% else %}
+                        {% set next_milestone = 2000 %}
+                      {% endif %}
+                      
+                      {% set progress = (scores[game_type].highest / next_milestone * 100)|int if scores[game_type].highest > 0 else 0 %}
+                      
+                      <div class="progress-label d-flex justify-content-between mb-1">
+                        <span>İlerleme</span>
+                        <span>{{ progress }}%</span>
+                      </div>
+                      <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: {{ progress }}%" 
+                             aria-valuenow="{{ progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                      </div>
+                      <div class="progress-description mt-1">
+                        <small>Bir sonraki seviye: {{ next_milestone }} puan</small>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="activity-details">
-                  <div class="activity-game">
-                    {% if score.game_type == 'wordPuzzle' %}
-                      Kelime Bulmaca
-                    {% elif score.game_type == 'memoryMatch' %}
-                      Hafıza Kartları
-                    {% elif score.game_type == 'labyrinth' %}
-                      Labirent
-                    {% elif score.game_type == 'puzzle' %}
-                      Yapboz
-                    {% elif score.game_type == '3dRotation' %}
-                      3D Döndürme
-                    {% else %}
-                      {{ score.game_type }}
+              </div>
+              
+              <h5 class="mb-3"><i class="fas fa-history me-2"></i>Son Skorlar</h5>
+              
+              {% if scores[game_type].recent %}
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Puan</th>
+                        <th>Tarih</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for score in scores[game_type].recent %}
+                      <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ score.score }}</td>
+                        <td>{{ score.timestamp.strftime('%d.%m.%Y %H:%M') }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <div class="empty-state">
+                    <i class="fas fa-gamepad fa-3x mb-3"></i>
+                    <p>Henüz bu oyunda skor kaydınız bulunmuyor.</p>
+                    {% if game_type == 'wordPuzzle' %}
+                      <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary btn-sm">Oynamak İçin Tıklayın</a>
+                    {% elif game_type == 'memoryMatch' %}
+                      <a href="{{ url_for('memory_match') }}" class="btn btn-primary btn-sm">Oynamak İçin Tıklayın</a>
+                    {% elif game_type == 'labyrinth' %}
+                      <a href="{{ url_for('labyrinth') }}" class="btn btn-primary btn-sm">Oynamak İçin Tıklayın</a>
+                    {% elif game_type == 'puzzle' %}
+                      <a href="{{ url_for('puzzle') }}" class="btn btn-primary btn-sm">Oynamak İçin Tıklayın</a>
+                    {% elif game_type == '3dRotation' %}
+                      <a href="{{ url_for('three_d_rotation') }}" class="btn btn-primary btn-sm">Oynamak İçin Tıklayın</a>
                     {% endif %}
                   </div>
-                  <div class="activity-score">{{ score.score }} puan</div>
                 </div>
-                <div class="activity-date">{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="card glass-card">
+        <div class="card-header">
+          <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>İstatistikler</h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Kayıt Tarihi</div>
+                  <div class="stat-value">{{ user.created_at.strftime('%d.%m.%Y') }}</div>
+                </div>
               </div>
-              {% endfor %}
             </div>
-          {% else %}
-            <div class="no-activity">
-              <i class="fas fa-info-circle"></i>
-              <p>Henüz hiç oyun oynamadınız. Oynamaya başlayın ve skorlarınızı görün!</p>
+            
+            <div class="col-md-6 mb-4">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Son Aktivite</div>
+                  <div class="stat-value">{{ user.last_active.strftime('%d.%m.%Y %H:%M') }}</div>
+                </div>
+              </div>
             </div>
-          {% endif %}
+            
+            <div class="col-md-6 mb-4">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <i class="fas fa-birthday-cake"></i>
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Doğum Yılı</div>
+                  <div class="stat-value">{{ user.birth_year or 'Belirtilmemiş' }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="stat-info">
+                  <div class="stat-label">Toplam Oyun</div>
+                  <div class="stat-value">{{ stats.total_games }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Profil Düzenleme Modal - Geliştirilmiş Tasarım -->
-<div class="modal fade" id="editProfileModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content dark-theme profile-edit-modal">
+<!-- Profil Düzenleme Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fas fa-user-edit"></i> Profili Düzenle</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        <h5 class="modal-title" id="editProfileModalLabel">Profili Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
-          <input type="hidden" name="user_id" value="{{ user.id }}">
-          <div class="row">
-            <!-- Sol Taraf - Profil Resmi -->
-            <div class="col-md-5">
-              <div class="profile-edit-avatar-container">
-                <div class="profile-picture-upload">
-                  {% if user.avatar_url %}
-                    <img id="profileImagePreview" src="{{ user.avatar_url }}" alt="Profil Resmi" class="profile-upload-preview">
-                  {% else %}
-                    <img id="profileImagePreview" src="/static/images/default-avatar.png" alt="Profil Resmi" class="profile-upload-preview">
-                  {% endif %}
-
-                  <div class="profile-image-upload-controls mt-3">
-                    <label for="profileImageInput" class="btn btn-primary btn-lg">
-                      <i class="fas fa-camera"></i> Fotoğraf Yükle
-                    </label>
-                    <input type="file" id="profileImageInput" name="profile_image" accept="image/*" class="d-none">
-                  </div>
-                  <div class="avatar-help-text mt-2 text-muted">
-                    Profil fotoğrafınızı değiştirmek için tıklayın
-                  </div>
+        <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data" id="profileForm">
+          <div class="mb-4 text-center">
+            <div class="profile-avatar-preview mb-3">
+              {% if user.avatar_url %}
+                <img src="{{ user.avatar_url }}" alt="{{ user.username }}" id="avatarPreview" class="img-fluid profile-avatar">
+              {% else %}
+                <div class="profile-avatar-placeholder" id="avatarPlaceholder">
+                  <i class="fas fa-user fa-4x"></i>
                 </div>
-              </div>
+                <img src="" alt="" id="avatarPreview" class="img-fluid profile-avatar d-none">
+              {% endif %}
             </div>
             
-            <!-- Sağ Taraf - Profil Bilgileri -->
-            <div class="col-md-7">
-              <div class="profile-edit-form">
-                <div class="form-group mb-4">
-                  <label class="form-label"><i class="fas fa-user"></i> Kullanıcı Adı</label>
-                  <input type="text" class="form-control form-control-lg" name="username" value="{{ user.username }}" disabled placeholder="Kullanıcı adınız" readonly>
-                  <div class="form-text">Kullanıcı adınız değiştirilemez</div>
-                </div>
-                
-                <div class="form-group mb-4">
-                  <label class="form-label"><i class="fas fa-user"></i> Tam Ad</label>
-                  <input type="text" class="form-control form-control-lg" name="full_name" value="{{ user.full_name or '' }}" placeholder="Adınız ve soyadınız">
-                </div>
-                
-                <div class="form-group mb-4">
-                  <label class="form-label"><i class="fas fa-envelope"></i> E-mail</label>
-                  <input type="email" class="form-control form-control-lg" name="email" value="{{ user.email }}" placeholder="E-mail adresiniz">
-                </div>
-
-                <div class="form-group mb-4">
-                  <label class="form-label"><i class="fas fa-map-marker-alt"></i> Konum</label>
-                  <input type="text" class="form-control form-control-lg" name="location" value="{{ user.location or '' }}" placeholder="Konumunuz">
-                </div>
-
-                <div class="form-group mb-4">
-                  <label class="form-label"><i class="fas fa-info-circle"></i> Hakkımda</label>
-                  <textarea class="form-control form-control-lg" name="bio" rows="3" placeholder="Kendiniz hakkında kısa bir bilgi">{{ user.bio or '' }}</textarea>
-                </div>
-              </div>
+            <div class="custom-file-upload">
+              <label for="profile_image" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-camera me-2"></i>Fotoğraf Değiştir
+              </label>
+              <input type="file" id="profile_image" name="profile_image" accept="image/*" class="d-none">
             </div>
           </div>
           
-          <div class="profile-edit-actions mt-4">
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary btn-lg btn-save-profile">
-                <i class="fas fa-save"></i> Değişiklikleri Kaydet
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
-                <i class="fas fa-times"></i> İptal Et
-              </button>
-            </div>
+          <div class="mb-3">
+            <label for="username" class="form-label">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label">E-posta</label>
+            <input type="email" class="form-control" id="email" value="{{ user.email }}" disabled>
+            <small class="form-text text-muted">E-posta adresi değiştirilemez.</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="birth_year" class="form-label">Doğum Yılı</label>
+            <input type="number" class="form-control" id="birth_year" name="birth_year" value="{{ user.birth_year or '' }}" min="1900" max="2023" placeholder="YYYY">
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+              <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              Kaydet
+            </button>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
 
-<style>
-  /* Modal arkaplana ekstra opak katman ekleyelim */
-  .modal-backdrop {
-    background-color: rgba(0, 0, 0, 0.8) !important;
-    backdrop-filter: blur(10px);
-  }
-  
-  /* Profil düzenleme modalı */
-  .profile-edit-modal {
-    background-color: #1a1a2e;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  }
-  
-  .modal-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(106, 90, 224, 0.1);
-    border-radius: 15px 15px 0 0;
-  }
-  
-  .modal-title {
-    color: #fff;
-    font-weight: 600;
-  }
-  
-  .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
-  }
-  
-  /* Profil resmi yükleme */
-  .profile-edit-avatar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-    background-color: rgba(33, 33, 61, 0.5);
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-  }
-  
-  .profile-upload-preview {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgba(106, 90, 224, 0.5);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .profile-edit-form {
-    background-color: rgba(33, 33, 61, 0.5);
-    padding: 25px;
-    border-radius: 15px;
-  }
-  
-  .form-control {
-    background-color: rgba(26, 26, 46, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
-  
-  .form-control:focus {
-    background-color: rgba(26, 26, 46, 0.9);
-    border-color: rgba(106, 90, 224, 0.5);
-    box-shadow: 0 0 0 0.25rem rgba(106, 90, 224, 0.25);
-  }
-  
-  .form-control:disabled {
-    background-color: rgba(26, 26, 46, 0.5);
-    color: #8a8aa3;
-  }
-  
-  .form-text {
-    color: #8a8aa3;
-  }
-</style>
-
-<!-- JavaScript for counter animation and image preview -->
+{% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Profil resmi önizleme
-    const profileImageInput = document.getElementById('profileImageInput');
-    const profileImagePreview = document.getElementById('profileImagePreview');
+    const profileImage = document.getElementById('profile_image');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarPlaceholder = document.getElementById('avatarPlaceholder');
     
-    if (profileImageInput && profileImagePreview) {
-      profileImageInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
+    if (profileImage) {
+      profileImage.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+          const file = e.target.files[0];
           const reader = new FileReader();
           
           reader.onload = function(e) {
-            profileImagePreview.src = e.target.result;
-          }
+            avatarPreview.src = e.target.result;
+            avatarPreview.classList.remove('d-none');
+            if (avatarPlaceholder) {
+              avatarPlaceholder.classList.add('d-none');
+            }
+          };
           
-          reader.readAsDataURL(this.files[0]);
-          console.log('Profil resmi seçildi:', this.files[0].name);
+          reader.readAsDataURL(file);
         }
       });
     }
     
-    // Profil düzenleme formunu dinle
-    const profileEditForm = document.getElementById('profileEditForm');
-    if (profileEditForm) {
-      profileEditForm.addEventListener('submit', function(e) {
-        console.log('Profil düzenleme formu gönderiliyor...');
-        
-        // Form gönderim düğmesini devre dışı bırak ve yükleniyor göstergesi ekle
-        const submitButton = profileEditForm.querySelector('button[type="submit"]');
-        if (submitButton) {
-          submitButton.disabled = true;
-          submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Kaydediliyor...';
-        }
+    // Form gönderme sırasında yükleme durumu göster
+    const profileForm = document.getElementById('profileForm');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    
+    if (profileForm && saveProfileBtn) {
+      profileForm.addEventListener('submit', function() {
+        const spinner = saveProfileBtn.querySelector('.spinner-border');
+        spinner.classList.remove('d-none');
+        saveProfileBtn.disabled = true;
       });
     }
-    
-    // Counter animation for statistics
-    const counterElements = document.querySelectorAll('.counter-animation');
-    
-    counterElements.forEach(el => {
-      const target = parseInt(el.textContent, 10);
-      const duration = 1500; // Animation duration in milliseconds
-      const frameDuration = 1000/60; // 60fps
-      const totalFrames = Math.round(duration / frameDuration);
-      let frame = 0;
-      
-      // Starting value
-      el.textContent = '0';
-      
-      // Animation function
-      const counter = setInterval(() => {
-        frame++;
-        const progress = frame / totalFrames;
-        const currentCount = Math.round(progress * target);
-        
-        // Update count
-        if (currentCount <= target) {
-          el.textContent = currentCount;
-        }
-        
-        // End animation
-        if (frame === totalFrames) {
-          clearInterval(counter);
-          el.textContent = target;
-        }
-      }, frameDuration);
-    });
   });
 </script>
 {% endblock %}

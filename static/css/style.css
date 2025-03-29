@@ -766,7 +766,230 @@ footer::before {
   height: 180px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+/* Profil Sayfası - START */
+.profile-container {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.profile-avatar-container {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.4);
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-bg);
+  color: var(--secondary-text);
+}
+
+.profile-username {
+  color: var(--primary-text);
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-email {
+  color: var(--secondary-text);
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.profile-stats {
+  background-color: rgba(20, 20, 43, 0.5);
+  border-radius: 12px;
+  padding: 15px 10px;
+  margin: 20px 0;
+}
+
+.profile-stat {
+  text-align: center;
+  padding: 0 5px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--primary-text);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  margin-top: 5px;
+}
+
+.profile-rank {
+  margin: 20px 0;
+}
+
+.rank-badge {
+  background: var(--gradient-1);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.3);
+}
+
+.highest-score-display {
+  background: var(--gradient-3);
+  border-radius: 10px;
+  padding: 15px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(203, 105, 193, 0.2);
+}
+
+.highest-score-display .score-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.highest-score-display .score-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background-color: rgba(20, 20, 43, 0.5);
+  border-radius: 10px;
+  padding: 15px;
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+  background: var(--gradient-1);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  color: var(--secondary-text);
+  font-size: 0.85rem;
+  margin-bottom: 3px;
+}
+
+.stat-value {
+  color: var(--primary-text);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  color: var(--secondary-text);
+  padding: 20px;
+}
+
+.empty-state i {
+  color: var(--accent-color);
+  opacity: 0.6;
+}
+
+.profile-avatar-preview {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--accent-color);
+}
+
+.nav-tabs {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-tabs .nav-link {
+  color: var(--secondary-text);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 0;
+  margin-right: 5px;
+  position: relative;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--primary-text);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--accent-color);
+  background-color: transparent;
+  border: none;
+}
+
+.nav-tabs .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 3px 3px 0 0;
+}
+
+@media (max-width: 767px) {
+  .profile-stats .row .col {
+    padding: 0 5px;
+  }
+  
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .highest-score-display .score-value {
+    font-size: 2rem;
+  }
+}
+/* Profil Sayfası - END */ottom: 15px;
   border: 4px solid var(--accent-color);
   box-shadow: 0 0 25px rgba(106, 90, 224, 0.6);
   transition: all 0.3s ease;

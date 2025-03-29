@@ -14,8 +14,9 @@ class User(db.Model):
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     full_name = db.Column(db.String(100))
     age = db.Column(db.Integer)
+    birth_year = db.Column(db.Integer)
     bio = db.Column(db.Text)
-    avatar_url = db.Column(db.String(200))
+    avatar_url = db.Column(db.String(2000))  # Daha büyük boyut için
     location = db.Column(db.String(100))
     experience_points = db.Column(db.Integer, default=0)
     rank = db.Column(db.String(50), default='Başlangıç')
