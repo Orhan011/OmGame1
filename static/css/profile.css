@@ -702,6 +702,287 @@
   opacity: 0.7;
 }
 
+/* İstatistikler Sekmesi Stilleri */
+.stats-overview {
+  margin-bottom: 2.5rem;
+}
+
+.stat-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.15) 0%, rgba(var(--accent-color-rgb), 0.05) 100%);
+  border-radius: 1.2rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+  transform: rotate(30deg);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-color) 0%, rgba(var(--secondary-color-rgb), 0.8) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 16px rgba(var(--accent-color-rgb), 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-color);
+  margin-bottom: 0.3rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Oyun Modu Sekmeleri */
+.game-mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.game-tab {
+  padding: 0.8rem 1.5rem;
+  background: rgba(15, 20, 40, 0.5);
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.game-tab::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+
+.game-tab:hover {
+  background: rgba(var(--accent-color-rgb), 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: var(--text-color);
+}
+
+.game-tab:hover::before {
+  opacity: 1;
+}
+
+.game-tab.active {
+  background: linear-gradient(135deg, var(--accent-color) 0%, rgba(var(--secondary-color-rgb), 0.8) 100%);
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(var(--accent-color-rgb), 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+}
+
+/* Oyun İstatistikleri İçeriği */
+.game-stats-container {
+  position: relative;
+}
+
+.game-stats {
+  display: none;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.game-stats.active {
+  display: block;
+}
+
+.game-stats h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.game-stats h4 i {
+  font-size: 1.2rem;
+  background: rgba(var(--accent-color-rgb), 0.15);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.detail-item {
+  background: rgba(15, 20, 40, 0.3);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item:hover {
+  background: rgba(15, 20, 40, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.detail-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.game-stats h5 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  position: relative;
+  display: inline-block;
+}
+
+.game-stats h5::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.recent-games-table-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  background: rgba(15, 20, 40, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recent-games-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recent-games-table th {
+  text-align: left;
+  padding: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.recent-games-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.recent-games-table tr:last-child td {
+  border-bottom: none;
+}
+
+.recent-games-table tr:hover td {
+  background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .settings-form .form-control {
   width: 100%;
   padding: 1rem 1.2rem;

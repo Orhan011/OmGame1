@@ -702,6 +702,7 @@ def save_score():
         return jsonify({'success': True, 'message': 'Score saved successfully'})
 
 @app.route('/api/get-scores/<game_type>')
+@app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
 def get_scores(game_type):
     from sqlalchemy import func
     
