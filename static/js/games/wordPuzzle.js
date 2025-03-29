@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const RIDDLE_POINTS = 100; // Base points per riddle
   const ATTEMPT_BONUS = 50; // Bonus points per unused attempt
 
-  // Turkish riddles with answers
+  // Turkish riddles with answers - genişletilmiş bilmece listesi
   const riddles = [
     {
       text: "Bilmece: Başı tarak, ortası direk, sonu iplik.",
@@ -91,6 +91,86 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       text: "Bilmece: Dışı var, içi yok, tekmeyi yer, suçu yok.",
       answer: "top"
+    },
+    {
+      text: "Bilmece: Her sabah elden ele gezer, akşam olunca eve girer.",
+      answer: "gazete"
+    },
+    {
+      text: "Bilmece: Alçacık dallı, yemesi ballı.",
+      answer: "çilek"
+    },
+    {
+      text: "Bilmece: Bir küçücük kutucuk, içi dolu incicik.",
+      answer: "ağız"
+    },
+    {
+      text: "Bilmece: Benim bir oğlum var, kat kat gömlekli.",
+      answer: "soğan"
+    },
+    {
+      text: "Bilmece: Dal üstünde kilitli sandık.",
+      answer: "ceviz"
+    },
+    {
+      text: "Bilmece: Akşam baktım çok idi, sabah baktım yok idi.",
+      answer: "yıldız"
+    },
+    {
+      text: "Bilmece: Sarı sarkar, bal damlar.",
+      answer: "limon"
+    },
+    {
+      text: "Bilmece: On iki dal üzerinde otuz yaprak, her yaprağın bir yüzü ak bir yüzü kara.",
+      answer: "yıl"
+    },
+    {
+      text: "Bilmece: Açıkken doyar, kapalıyken acıkır.",
+      answer: "buzdolabı"
+    },
+    {
+      text: "Bilmece: Her rengi vardır, gözle görülmez.",
+      answer: "rüzgar"
+    },
+    {
+      text: "Bilmece: Benim bir oğlum var, hem evde büyür, hem dışarıda.",
+      answer: "buz"
+    },
+    {
+      text: "Bilmece: Dağ değildir, taş değildir, başa konur, baş değildir.",
+      answer: "şapka"
+    },
+    {
+      text: "Bilmece: Ben giderim o gider, arkamda tin tin eder.",
+      answer: "gölge"
+    },
+    {
+      text: "Bilmece: Yol üzerinde kırmızı minare.",
+      answer: "biber"
+    },
+    {
+      text: "Bilmece: Ağaç üstünde kilitli sandık.",
+      answer: "ceviz"
+    },
+    {
+      text: "Bilmece: Ufacık mermer taşı, içinde beyler aşı.",
+      answer: "fındık"
+    },
+    {
+      text: "Bilmece: Kanadı var kuş değil, boynuzu var koç değil.",
+      answer: "kelebek"
+    },
+    {
+      text: "Bilmece: Dokunsan ağlar, baksan güler.",
+      answer: "gitar"
+    },
+    {
+      text: "Bilmece: Yürür gider iz bırakmaz, karnı yarık kan damlamaz.",
+      answer: "gemi"
+    },
+    {
+      text: "Bilmece: Sırtında taşır evini, gezmesi sanki övünü.",
+      answer: "kaplumbağa"
     }
   ];
 
@@ -98,6 +178,12 @@ document.addEventListener('DOMContentLoaded', function() {
   startBtn.addEventListener('click', startGame);
   submitBtn.addEventListener('click', submitAnswer);
   passBtn.addEventListener('click', passRiddle);
+  
+  // İpucu butonu için olay dinleyicisi ekle
+  const hintButton = document.getElementById('hint-button');
+  if (hintButton) {
+    hintButton.addEventListener('click', showHint);
+  }
   
   // Enter key to submit answer
   wordInput.addEventListener('keypress', function(e) {
@@ -138,6 +224,60 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Oyunu başlatır
    */
+  // İpucu sayısı
+  let hintCount = 3;
+  // İpucu gösteriliyor mu?
+  let isHintShowing = false;
+  
+  /**
+   * İpucu gösterir - cevabın bir harfini rastgele gösterir
+   */
+  function showHint() {
+    if (!isGameActive || !currentRiddle || isHintShowing) return;
+    
+    // İpucu kalmadı mı kontrol et
+    if (hintCount <= 0) {
+      showMessage('İpucu hakkınız kalmadı!', 'warning');
+      return;
+    }
+    
+    // İpucu sayısını azalt
+    hintCount--;
+    
+    // İpucu sayısını gösteren butonu güncelle
+    const hintButton = document.getElementById('hint-button');
+    if (hintButton) {
+      hintButton.textContent = `İpucu (${hintCount})`;
+    }
+    
+    // Cevabın rastgele bir harfini seç
+    const answer = currentRiddle.answer;
+    const randomIndex = Math.floor(Math.random() * answer.length);
+    const hintLetter = answer[randomIndex];
+    
+    // İpucu mesajını göster
+    const hintDisplay = document.getElementById('hint-display');
+    if (hintDisplay) {
+      hintDisplay.innerHTML = `İpucu: Cevabın ${randomIndex + 1}. harfi "<span class="hint-letter">${hintLetter}</span>"`;
+      hintDisplay.style.display = 'block';
+      
+      // İpucu gösteriliyor durumunu işaretle
+      isHintShowing = true;
+      
+      // 5 saniye sonra ipucunu gizle
+      setTimeout(() => {
+        hintDisplay.style.display = 'none';
+        isHintShowing = false;
+      }, 5000);
+    }
+    
+    // İpucu kullanıldı mesajı göster
+    showMessage(`İpucu gösterildi! ${hintCount} ipucu hakkınız kaldı.`, 'info');
+    
+    // İpucu ses efekti
+    playSound('hint');
+  }
+  
   function startGame() {
     // Hide start screen, show game
     if (startScreen) startScreen.style.display = 'none';
@@ -156,6 +296,22 @@ document.addEventListener('DOMContentLoaded', function() {
     soundEnabled = true;
     currentRiddleIndex = 0;
     longestSolvedWord = '';
+    
+    // İpucu sayısını sıfırla
+    hintCount = 3;
+    isHintShowing = false;
+    
+    // İpucu butonunu güncelle
+    const hintButton = document.getElementById('hint-button');
+    if (hintButton) {
+      hintButton.textContent = `İpucu (${hintCount})`;
+    }
+    
+    // İpucu göstergesini temizle
+    const hintDisplay = document.getElementById('hint-display');
+    if (hintDisplay) {
+      hintDisplay.style.display = 'none';
+    }
     
     // Bilmeceleri karıştır
     shuffledRiddles = shuffleArray([...riddles]);

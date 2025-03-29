@@ -22,15 +22,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize the app with SQLAlchemy
 db.init_app(app)
 
-# Import routes (which uses models)
+# Initialize database
 with app.app_context():
     try:
         # Create all database tables
         db.create_all()
         app.logger.info("Database tables created successfully")
         
-        # Import routes after tables are created
-        import routes
+        # Main.py artık tüm route'ları içeriyor, routes.py kullanılmıyor
     except Exception as e:
         app.logger.error(f"Error during initialization: {e}")
         # Log the error but continue with app initialization

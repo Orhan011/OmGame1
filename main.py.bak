@@ -1,99 +1,107 @@
 import os
-import re
-import time
-import uuid
-import json
+import logging
 import random
 import secrets
-import logging
+import base64
+import uuid
+import smtplib
+from email.message import EmailMessage
 from datetime import datetime, timedelta
-
-from flask import Flask, request, session, redirect, url_for, render_template, make_response, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session, make_response
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-from app import app, db
-from models import User, Score, Article
-
-# Configure logging
-logger = logging.getLogger(__name__)
+# Setup logging
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-# Email verification
+# Email verification function
 def send_verification_email(to_email, verification_code):
     """
     Sends a verification email with the provided code
     
     Uses the configured Gmail account (orhanmedia0@gmail.com) to send verification emails
     """
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
+    # Gmail SMTP ayarları
+    SMTP_SERVER = "smtp.gmail.com"
+    SMTP_PORT = 587
+    SENDER_EMAIL = "orhanmedia0@gmail.com"  # Gönderici email adresi
     
-    # Gmail hesap bilgileri
-    sender_email = "orhanmedia0@gmail.com"
-    sender_password = os.environ.get("GMAIL_APP_PASSWORD")
+    # Normalde bu kısmı çevre değişkenlerinden alırız, ama şimdilik doğrudan kodda belirtiyoruz
+    # Gerçek uygulamada bu bilgilerin güvenli bir şekilde saklanması önemlidir!
+    smtp_password = os.environ.get('GMAIL_APP_PASSWORD')
     
-    if not sender_password:
-        logger.error("Gmail app password not found in environment variables")
-        raise ValueError("Email sending failed: Missing GMAIL_APP_PASSWORD environment variable")
+    # Create email message
+    msg = EmailMessage()
+    msg['Subject'] = 'Beyin Oyunları - Şifre Sıfırlama Kodu'
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = to_email
     
-    # Email içeriği
-    subject = "ZekaPark Şifre Sıfırlama Kodu"
-    message = f"""
+    # Email content
+    email_content = f"""
     <html>
-    <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">ZekaPark Şifre Sıfırlama</h2>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #2a3f5f; border-bottom: 2px solid #eee; padding-bottom: 10px;">Şifre Sıfırlama İsteği</h2>
             <p>Merhaba,</p>
-            <p>Şifre sıfırlama talebiniz için doğrulama kodunuz aşağıdadır:</p>
-            <div style="background-color: #3498db; color: white; font-size: 24px; padding: 10px; text-align: center; border-radius: 5px; margin: 20px 0;">
-                <strong>{verification_code}</strong>
+            <p>Beyin Oyunları hesabınız için bir şifre sıfırlama talebinde bulundunuz.</p>
+            <p>Şifrenizi sıfırlamak için aşağıdaki doğrulama kodunu kullanın:</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 4px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; color: #2a3f5f;">
+                {verification_code}
             </div>
-            <p>Bu kodu şifre sıfırlama ekranına giriniz. Eğer şifre sıfırlama talebinde bulunmadıysanız, bu email'i görmezden gelebilirsiniz.</p>
-            <p style="margin-top: 30px; font-size: 12px; color: #7f8c8d;">Bu otomatik bir email'dir, lütfen cevaplamayınız.</p>
+            <p style="margin-top: 20px;">Bu kodu kimseyle paylaşmayın. Eğer bu işlemi siz başlatmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+            <p>Doğrulama kodunun geçerlilik süresi 30 dakikadır.</p>
+            <p style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #777;">
+                Bu otomatik bir e-postadır, lütfen yanıtlamayın.
+            </p>
         </div>
     </body>
     </html>
     """
     
-    # Email oluştur
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = sender_email
-    msg['To'] = to_email
+    msg.set_content("Şifre sıfırlama kodunuz: " + verification_code)
+    msg.add_alternative(email_content, subtype='html')
     
-    # HTML içeriğini ekle
-    msg.attach(MIMEText(message, 'html'))
+    # Gmail App şifresi yoksa sadece loglama yap (geliştirme modunda)
+    if app.debug and not smtp_password:
+        logger.info(f"TEST MODU: {SENDER_EMAIL} adresinden {to_email} adresine email gönderilecekti. Kod: {verification_code}")
+        return
     
     try:
-        # Gmail SMTP sunucusuna bağlan
-        smtp_server = smtplib.SMTP('smtp.gmail.com', 587)
-        smtp_server.starttls()
-        
-        # Giriş yap
-        smtp_server.login(sender_email, sender_password)
-        
-        # Email'i gönder
-        smtp_server.sendmail(sender_email, to_email, msg.as_string())
-        
-        # Bağlantıyı kapat
-        smtp_server.quit()
-        
-        logger.info(f"Verification email sent to {to_email}")
-        return True
+        # Gmail SMTP sunucusuna bağlan ve email gönder
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # TLS güvenlik bağlantısı başlat
+            
+            # Gmail'e giriş yap (App Password kullanılmalı)
+            if smtp_password:
+                server.login(SENDER_EMAIL, smtp_password)
+                server.send_message(msg)
+                logger.info(f"Doğrulama kodu {to_email} adresine başarıyla gönderildi.")
+            else:
+                logger.warning("Gmail şifresi belirtilmemiş, email gönderimi atlanıyor.")
+                
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error(f"Email gönderme hatası: {e}")
         raise
 
-# Template utility function for getting current user
-@app.template_filter('get_user_avatar')
-def get_user_avatar(user_id):
-    user = User.query.get(user_id)
-    if user and user.avatar_url:
-        return user.avatar_url
-    return url_for('static', filename='images/default-avatar.png')
+# Create the Flask application
+app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "braingames_secret_key")
+
+# Add global template functions
+app.jinja_env.globals.update(min=min, max=max, now=datetime.now)
+
+# Configure the database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///braintraining.db")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
 
 @app.context_processor
 def utility_processor():
@@ -101,190 +109,208 @@ def utility_processor():
         if 'user_id' in session:
             return User.query.get(session['user_id'])
         return None
-    
-    return dict(get_current_user=get_current_user)
+    return dict(current_user=get_current_user())
 
-# Database initialization function
+# Define models
+class User(db.Model):
+    __tablename__ = 'users'  # Explicit table name to avoid reserved word conflicts
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_active = db.Column(db.DateTime, default=datetime.utcnow)
+    full_name = db.Column(db.String(100))
+    age = db.Column(db.Integer)
+    bio = db.Column(db.Text)
+    avatar_url = db.Column(db.String(200))
+    location = db.Column(db.String(100))
+    experience_points = db.Column(db.Integer, default=0)
+    rank = db.Column(db.String(50), default='Başlangıç')
+    total_games_played = db.Column(db.Integer, default=0)
+    highest_score = db.Column(db.Integer, default=0)
+    reset_token = db.Column(db.String(100))
+    reset_token_expiry = db.Column(db.DateTime)
+    scores = db.relationship('Score', backref='user', lazy=True)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+class Score(db.Model):
+    __tablename__ = 'scores'  # Explicit table name
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # wordPuzzle, memoryMatch, numberSequence, 3dRotation
+    score = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Score {self.game_type}: {self.score}>'
+
+class Article(db.Model):
+    __tablename__ = 'articles'  # Explicit table name
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(50), nullable=False)  # article or tip
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Article {self.title}>'
+
+# Initialize the database - no decorator, just create the function
 def initialize_database():
-    """Initialize the database with sample data"""
-    
-    # Create sample articles
-    if Article.query.count() == 0:
-        articles = [
-            Article(
-                title="ZekaPark'a Hoş Geldiniz",
-                content="""
-                <p>ZekaPark, beyninizi çalıştıracak ve bilişsel yeteneklerinizi geliştirecek bir platform olarak tasarlanmıştır.</p>
-                <p>Burada bulacağınız mini oyunlar ve bulmacalar; hafıza, mantık, dikkat ve problem çözme yeteneklerinizi geliştirmenize yardımcı olacaktır.</p>
-                <p>Yeni özellikler ve içerikler düzenli olarak eklenecektir, bizi takip etmeye devam edin!</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Beyin Egzersizlerinin Faydaları",
-                content="""
-                <p>Düzenli beyin egzersizleri yapmanın birçok faydası vardır:</p>
-                <ul>
-                    <li>Hafızanızı güçlendirir</li>
-                    <li>Odaklanma yeteneğinizi artırır</li>
-                    <li>Problem çözme becerilerinizi geliştirir</li>
-                    <li>Yaratıcılığınızı tetikler</li>
-                    <li>Yaşla birlikte oluşabilecek bilişsel gerilemeyi yavaşlatır</li>
-                </ul>
-                <p>ZekaPark'taki oyunları düzenli olarak oynayarak bu faydaları elde edebilirsiniz.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Daha İyi Konsantrasyon İçin İpuçları",
-                content="""
-                <ol>
-                    <li><strong>Yeterli Uyku:</strong> Düzenli ve kaliteli uyku, beyin fonksiyonlarınız için kritik öneme sahiptir.</li>
-                    <li><strong>Beslenme:</strong> Omega-3, antioksidanlar ve kompleks karbonhidratlar beyin sağlığınız için önemlidir.</li>
-                    <li><strong>Meditasyon:</strong> Günlük kısa meditasyon seansları odaklanma yeteneğinizi artırabilir.</li>
-                    <li><strong>Egzersiz:</strong> Fiziksel aktivite, beyninize oksijen akışını artırır ve bilişsel işlevleri destekler.</li>
-                    <li><strong>Mola Verin:</strong> Uzun süre aynı göreve odaklanmak yerine düzenli molalar verin.</li>
-                </ol>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Hafıza Geliştirme Teknikleri",
-                content="""
-                <h3>Hafızanızı geliştirmek için deneyebileceğiniz etkili teknikler:</h3>
-                <ul>
-                    <li><strong>Görselleştirme:</strong> Hatırlamak istediğiniz bilgiyi canlı görüntülerle ilişkilendirin.</li>
-                    <li><strong>Çağrışım:</strong> Yeni bilgileri, zaten bildiğiniz şeylerle ilişkilendirin.</li>
-                    <li><strong>Bölme:</strong> Uzun bilgi dizilerini daha küçük, yönetilebilir parçalara ayırın.</li>
-                    <li><strong>Tekrar:</strong> Aralıklı tekrar, bilgilerin uzun süreli hafızaya geçmesini sağlar.</li>
-                    <li><strong>Hikaye Tekniği:</strong> Hatırlanması gereken öğeleri bir hikaye içinde birleştirin.</li>
-                </ul>
-                <p>Bu teknikleri ZekaPark oyunlarında pratik ederek hafızanızı güçlendirebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Kelime Bulmaca İpuçları",
-                content="""
-                <h3>Kelime Bulmaca oyununda başarılı olmak için ipuçları:</h3>
-                <ol>
-                    <li>İpucu metnini dikkatlice okuyun ve anahtar kelimelere odaklanın.</li>
-                    <li>Harflerin sayısını dikkate alın ve buna göre muhtemel cevapları düşünün.</li>
-                    <li>Bilemediğiniz sorularda "Pas Geç" seçeneğini kullanarak zaman kaybetmeyin.</li>
-                    <li>Türkçe'de en sık kullanılan harfleri (e, a, i, n, r, s, t) düşünerek tahminlerde bulunun.</li>
-                    <li>Zamanınızı akıllıca kullanın - hızlı ama dikkatlice düşünün.</li>
-                </ol>
-                <p>Düzenli pratik yaparak kelime haznenizi ve bulmaca çözme becerilerinizi geliştirebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Etkili Hafıza Eşleştirme Stratejileri",
-                content="""
-                <h3>Hafıza Eşleştirme oyununda daha iyi performans için:</h3>
-                <ul>
-                    <li>Oyun başladığında, tüm kartlara kısaca göz atın ve konumlarını hafızanıza almaya çalışın.</li>
-                    <li>Stratejik olarak ilerleyin - rastgele kart açmak yerine belirli bir düzen takip edin.</li>
-                    <li>Açtığınız her kartın konumunu hafızanızda tutmaya çalışın.</li>
-                    <li>İlk turdaki amacınız mümkün olduğunca çok kartı görüntülemek olmalıdır.</li>
-                    <li>Görsel çağrışımlar yaratarak kartların konumlarını daha kolay hatırlayabilirsiniz.</li>
-                </ul>
-                <p>Beyin, desenler ve bağlantılar üzerinden daha kolay öğrenir. Bu stratejileri kullanarak hafıza kapasitenizi artırabilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Labirent Oyununda Başarılı Olma Taktikleri",
-                content="""
-                <h3>Labirent oyununda zorlanıyor musunuz? Bu taktikleri deneyin:</h3>
-                <ol>
-                    <li><strong>Sağ El Kuralı:</strong> Labirentte ilerlerken sürekli sağ (veya sol) duvarı takip edin.</li>
-                    <li><strong>Zihinsel Harita:</strong> İlerledikçe labirentin zihinsel bir haritasını oluşturmaya çalışın.</li>
-                    <li><strong>Çıkmaz Sokakları İşaretleyin:</strong> Zihinsel olarak, daha önce denediğiniz ve çıkmaz olan yolları işaretleyin.</li>
-                    <li><strong>Sistematik Yaklaşın:</strong> Rastgele hareket etmek yerine, sistematik bir yaklaşım benimseyin.</li>
-                    <li><strong>Sabırlı Olun:</strong> Labirent çözmek hız değil, strateji gerektirir.</li>
-                </ol>
-                <p>Bu taktikleri uygulayarak labirentleri daha hızlı ve etkili bir şekilde çözebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Puzzle Oyunu İçin Etkili Stratejiler",
-                content="""
-                <h3>Puzzle oyununda daha başarılı olmak için ipuçları:</h3>
-                <ul>
-                    <li>Önce kenar ve köşe parçalarını bularak çerçeveyi oluşturun.</li>
-                    <li>Parçaları renklere veya desenlere göre gruplandırın.</li>
-                    <li>Bir bölümü tamamladıktan sonra diğerine geçin.</li>
-                    <li>Zorlandığınız parçaları geçici olarak kenara ayırıp daha sonra tekrar deneyin.</li>
-                    <li>Düzenli molalar verin - bazen uzaklaşıp sonra geri dönmek yeni perspektifler kazandırabilir.</li>
-                </ul>
-                <p>Puzzle çözmek, görsel-uzamsal zeka ve problem çözme becerilerinizi geliştirir.</p>
-                """,
-                category="tip"
+    try:
+        logger.info("Creating database tables if they don't exist")
+        db.drop_all()
+        db.create_all()
+        
+        # Check if we need to add sample data
+        if User.query.filter_by(username="Anonymous").first() is None:
+            logger.info("Initializing database with default data")
+            
+            # Create a default user
+            default_user = User(
+                username="Anonymous",
+                email="anonymous@example.com",
+                password_hash=generate_password_hash("anonymous")
             )
-        ]
-        
-        for article in articles:
-            db.session.add(article)
-        
-        db.session.commit()
-        logger.info("Sample articles created")
-    
-    # Create admin user if no users exist
-    if User.query.count() == 0:
-        admin = User(
-            username="admin",
-            email="admin@example.com",
-            password_hash=generate_password_hash("admin123"),
-            full_name="Admin User",
-            age=30,
-            bio="Sistem yöneticisi",
-            rank="Yönetici",
-            experience_points=5000
-        )
-        db.session.add(admin)
-        db.session.commit()
-        logger.info("Admin user created")
+            db.session.add(default_user)
+            db.session.commit()  # Commit the user first to get a valid ID
+            
+            # Create some sample articles
+            articles = [
+                Article(
+                    title="Understanding Cognitive Function",
+                    content="Cognitive function encompasses several mental abilities including learning, thinking, reasoning, remembering, problem-solving, decision making, and attention. These processes are central to how we interact with the world around us. Regular brain training can help improve these functions over time, leading to better performance in daily tasks and academic or professional challenges.",
+                    category="article"
+                ),
+                Article(
+                    title="How Brain Training Works",
+                    content="Beyin eğitimi, nöroplastisite prensibi üzerinde çalışır - beyninizin yeni sinirsel bağlantılar oluşturarak kendini yeniden düzenleme yeteneğidir. Beyin eğitimi egzersizleriyle uğraştığınızda, aslında beyninize bir antrenman yaptırıyorsunuz. Fiziksel egzersizin kaslarınızı güçlendirmesi gibi, bilişsel egzersizler de sinir yollarını güçlendirerek zihinsel yeteneklerinizi potansiyel olarak geliştirebilir. İyileşmeleri görmek için tutarlı pratik yapmak önemlidir.",
+                    category="article"
+                ),
+                Article(
+                    title="Hafızanın Bilimi",
+                    content="Hafıza tek bir varlık değil, farklı türleri içeren karmaşık bir sistemdir: duyusal hafıza, kısa süreli (çalışma) hafıza ve uzun süreli hafıza. Hafıza oyunlarımız her türü hedefleyerek bilgi saklama ve hatırlama yeteneğinizi geliştirmenize yardımcı olur. Araştırmalar, düzenli hafıza egzersizlerinin yaşla ilgili gerilemeyi yavaşlatabileceğini ve çeşitli bilişsel görevlerde zihinsel performansı potansiyel olarak artırabileceğini gösteriyor.",
+                    category="article"
+                ),
+                Article(
+                    title="Hidrasyon ve Beyin Fonksiyonu",
+                    content="İyi hidrate kalmak, optimal beyin fonksiyonu için çok önemlidir. Hafif dehidrasyon bile dikkat, hafıza ve ruh hali dahil olmak üzere bilişsel performansı bozabilir. Beyin eğitimi egzersizleri sırasında en yüksek zihinsel performans için günde en az 8 bardak su içmeyi hedefleyin.",
+                    category="tip"
+                ),
+                Article(
+                    title="Uyku Kalitesi ve Bilişsel Performans",
+                    content="Kaliteli uyku, bilişsel işlem ve hafıza pekiştirmesi için gereklidir. Her gece kesintisiz 7-9 saat uyumayı hedefleyin. Düzenli bir uyku programı oluşturun ve yatmadan önce ekran süresini sınırlayarak, yatak odanızı serin ve karanlık tutarak huzurlu bir ortam yaratın.",
+                    category="tip"
+                ),
+                Article(
+                    title="Beyin Sağlığı için Beslenme",
+                    content="Ne yediğiniz beyninizin nasıl çalıştığını etkiler. Omega-3 yağ asitleri (balık, ceviz ve keten tohumu gibi), antioksidanlar (renkli meyve ve sebzeler) ve B vitaminleri (tam tahıllar, yumurta) açısından zengin gıdalar beyin sağlığını destekler. Bu beyin güçlendirici gıdaları günlük diyetinize dahil etmeyi düşünün.",
+                    category="tip"
+                ),
+                Article(
+                    title="Fiziksel Egzersiz ve Bilişsel İşlev",
+                    content="Düzenli fiziksel aktivite, beyne kan akışını artırır ve yeni beyin hücrelerinin oluşumunu teşvik eder. Günde sadece 30 dakikalık orta yoğunlukta egzersiz bile hafıza, dikkat ve problem çözme yeteneklerini geliştirebilir. Maksimum fayda için beyin eğitimini fiziksel egzersizle birleştirmeyi deneyin.",
+                    category="tip"
+                )
+            ]
+            
+            for article in articles:
+                db.session.add(article)
+            
+            db.session.commit()
+            logger.info("Database initialized with default data")
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}")
+        # Don't let initialization errors prevent the app from running
+        pass
 
-# Init database route
-@app.route('/init-db')
+# Create a route to handle database initialization
+@app.route('/initialize-db')
 def init_db_route():
     initialize_database()
     return 'Database initialized'
 
-# Routes for main pages
-@app.route('/')
-def index():
-    user = None
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user, current_user=user)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        if not email or not password:
-            flash('Lütfen email ve şifrenizi girin.', 'danger')
+# Home page with initialization
+# Eski login rotası commentlendi - 554. satırdaki login fonksiyonu kullanılacak
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         email = request.form.get('email')
+#         password = request.form.get('password')
+#         remember = request.form.get('remember')
+#         
+#         # Hata kontrolleri
+#         if not email or not password:
+#             flash('Lütfen email ve şifrenizi giriniz.', 'danger')
+#             return redirect(url_for('login'))
+#         
+#         # Kullanıcıyı e-posta adresine göre ara
+#         user = User.query.filter_by(email=email).first()
+#         
+#         # Debug bilgisi ekleyelim
+#         logger.debug(f"Login attempt for {email}. User found: {user is not None}")
+#         
+#         if not user:
+#             flash('Bu e-posta adresine sahip bir kullanıcı bulunamadı.', 'danger')
+#             return redirect(url_for('login'))
+#         
+#         # Şifre kontrolü
+#         try:
+#             is_valid = check_password_hash(user.password_hash, password)
+#             logger.debug(f"Password validation: {is_valid}")
+#             
+#             if is_valid:
+#                 session['user_id'] = user.id
+#                 session['username'] = user.username
+#                 
+#                 # Eğer "Beni hatırla" işaretlenmişse, email'i bir cookie'de saklayalım
+#                 if remember:
+#                     remember_cookie_duration = timedelta(days=30)  # 30 gün hatırla
+#                     resp = make_response(redirect(url_for('index')))
+#                     resp.set_cookie('remembered_email', email, max_age=remember_cookie_duration.total_seconds())
+#                     flash('Başarıyla giriş yaptınız!', 'success')
+#                     return resp
+#                 else:
+#                     # Eğer "Beni hatırla" işaretlenmemişse, varsa hatırlanan email'i silelim
+#                     resp = make_response(redirect(url_for('index')))
+#                     resp.delete_cookie('remembered_email')
+#                     flash('Başarıyla giriş yaptınız!', 'success')
+#                     return resp
+            else:
+                flash('Şifre doğru değil. Lütfen tekrar deneyin.', 'danger')
+                return redirect(url_for('login'))
+        except Exception as e:
+            logger.error(f"Error during password validation: {e}")
+            flash('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
             return redirect(url_for('login'))
-        
-        user = User.query.filter_by(email=email).first()
-        
-        if not user or not check_password_hash(user.password_hash, password):
-            flash('Geçersiz email veya şifre.', 'danger')
-            return redirect(url_for('login'))
-        
-        session['user_id'] = user.id
-        flash('Başarıyla giriş yaptınız!', 'success')
-        return redirect(url_for('index'))
     
     if session.get('user_id'):
         return redirect(url_for('index'))
-        
-    return render_template('login.html')
+    
+    # Hatırlanan bir email varsa login ekranında göster
+    remembered_email = request.cookies.get('remembered_email')
+            
+    return render_template('login.html', remembered_email=remembered_email)
+
+@app.route('/')
+# Bu eski index fonksiyonu kaldırıldı - @app.route ile tanımlanan index fonksiyonu kullanılacak
+# def index():
+#     # Check if user is logged in
+#     if not session.get('user_id'):
+#         return redirect(url_for('login'))
+#         
+#     try:
+#         db.create_all()
+#         if User.query.count() == 0:
+#             initialize_database()
+#     except Exception as e:
+#         logger.error(f"Error initializing on first request: {e}")
+#     
+#     user = User.query.get(session['user_id'])
+#     return render_template('index.html', user=user, current_user=user)
 
 @app.route('/profile')
 def profile():
@@ -311,111 +337,6 @@ def profile():
     
     return render_template('profile.html', user=user, user_scores=user_scores)
 
-# Game routes
-@app.route('/games/word-puzzle')
-def word_puzzle():
-    return render_template('games/wordPuzzle.html')
-
-@app.route('/games/memory-match')
-def memory_match():
-    return render_template('games/memoryMatch.html')
-
-@app.route('/games/labyrinth')
-def labyrinth():
-    return render_template('games/labyrinth.html')
-
-@app.route('/games/puzzle')
-def puzzle():
-    return render_template('games/puzzle.html')
-
-# Leaderboard
-@app.route('/leaderboard')
-def leaderboard():
-    word_puzzle_scores = Score.query.filter_by(game_type='wordPuzzle').order_by(Score.score.desc()).limit(10).all()
-    memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
-    labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
-    puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    
-    return render_template('leaderboard.html', 
-                          word_puzzle_scores=word_puzzle_scores,
-                          memory_match_scores=memory_match_scores,
-                          number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
-                          pattern_recognition_scores=puzzle_scores)
-
-# Articles
-@app.route('/articles')
-def articles():
-    articles = Article.query.filter_by(category='article').all()
-    return render_template('articles.html', articles=articles)
-
-# Tips
-@app.route('/tips')
-def tips():
-    tips = Article.query.filter_by(category='tip').all()
-    return render_template('tips.html', tips=tips)
-
-# User management routes
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        if not username or not email or not password:
-            flash('Tüm alanları doldurunuz.')
-            return redirect(url_for('register'))
-            
-        # Email validation
-        if not '@' in email or not '.' in email:
-            flash('Geçerli bir email adresi giriniz.')
-            return redirect(url_for('register'))
-            
-        email_domain = email.split('@')[1]
-        valid_domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com']
-        if email_domain not in valid_domains:
-            flash('Lütfen geçerli bir email servis sağlayıcısı kullanın (Gmail, Hotmail, Yahoo, Outlook).')
-            return redirect(url_for('register'))
-            
-        if User.query.filter_by(username=username).first():
-            flash('Bu kullanıcı adı zaten kullanılıyor.')
-            return redirect(url_for('register'))
-            
-        if User.query.filter_by(email=email).first():
-            flash('Bu email adresi zaten kullanılıyor.')
-            return redirect(url_for('register'))
-        
-        new_user = User(
-            username=username,
-            email=email,
-            password_hash=generate_password_hash(password)
-        )
-        
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            
-            session['user_id'] = new_user.id
-            session['username'] = new_user.username
-            flash('Kayıt başarılı! Hoş geldiniz!')
-            return redirect(url_for('index'))
-        except Exception as e:
-            db.session.rollback()
-            flash('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.')
-            return redirect(url_for('register'))
-    
-    if session.get('user_id'):
-        return redirect(url_for('index'))
-        
-    return render_template('register.html')
-
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    flash('Başarıyla çıkış yaptınız.')
-    return redirect(url_for('login'))
-
-# Profile management routes
 @app.route('/profile/update', methods=['POST'])
 def update_profile():
     if not session.get('user_id'):
@@ -508,10 +429,13 @@ def update_theme():
     
     user = User.query.get(session['user_id'])
     theme_preference = request.form.get('theme_preference')
+    theme_color = request.form.get('theme_color')
     
     # Update user's theme preference
-    if theme_preference in ['dark', 'light', 'contrast']:
+    if hasattr(user, 'theme_preference') and theme_preference in ['dark', 'light', 'contrast']:
         user.theme_preference = theme_preference
+    
+    # In the future, we can add theme_color to the User model and update it here
     
     try:
         db.session.commit()
@@ -530,22 +454,12 @@ def update_notifications():
     
     user = User.query.get(session['user_id'])
     email_notifications = 'email_notifications' in request.form
-    push_notifications = 'push_notifications' in request.form
+    achievement_notifications = 'achievement_notifications' in request.form
     
-    # Update notification settings
-    user.notification_settings = {
-        'email': email_notifications,
-        'push': push_notifications
-    }
+    # You can update notification_settings in the future if you add this field to the User model
+    # For now, we'll just show a success message
     
-    try:
-        db.session.commit()
-        flash('Bildirim ayarlarınız başarıyla güncellendi.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Error updating notifications: {e}")
-        flash('Bildirim ayarları güncellenirken bir hata oluştu.', 'danger')
-    
+    flash('Bildirim ayarlarınız başarıyla güncellendi.', 'success')
     return redirect(url_for('profile'))
 
 @app.route('/profile/deactivate', methods=['POST'])
@@ -553,20 +467,10 @@ def deactivate_account():
     if not session.get('user_id'):
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    
-    user.account_status = 'deactivated'
-    
-    try:
-        db.session.commit()
-        session.pop('user_id', None)
-        flash('Hesabınız başarıyla devre dışı bırakıldı.', 'success')
-        return redirect(url_for('login'))
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Error deactivating account: {e}")
-        flash('Hesap devre dışı bırakılırken bir hata oluştu.', 'danger')
-        return redirect(url_for('profile'))
+    # In a real app, you would set an account status field to 'inactive'
+    # For now, we'll just show a message
+    flash('Hesabınız geçici olarak devre dışı bırakıldı. Giriş yaparak tekrar aktive edebilirsiniz.', 'warning')
+    return redirect(url_for('logout'))
 
 @app.route('/profile/delete', methods=['POST'])
 def delete_account():
@@ -639,7 +543,170 @@ def update_avatar():
     
     return redirect(url_for('profile'))
 
-# Password reset routes
+# Temel rotaları buraya ekleyelim, diğer rotalar routes.py'de tanımlandı
+@app.route('/')
+def index():
+    user = None
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+    return render_template('index.html', user=user, current_user=user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not email or not password:
+            flash('Lütfen email ve şifrenizi girin.', 'danger')
+            return redirect(url_for('login'))
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if not user or not check_password_hash(user.password_hash, password):
+            flash('Geçersiz email veya şifre.', 'danger')
+            return redirect(url_for('login'))
+        
+        session['user_id'] = user.id
+        flash('Başarıyla giriş yaptınız!', 'success')
+        return redirect(url_for('index'))
+    
+    if session.get('user_id'):
+        return redirect(url_for('index'))
+        
+    return render_template('login.html')
+
+# Oyun rotaları
+@app.route('/games/word-puzzle')
+def word_puzzle():
+    return render_template('games/wordPuzzle.html')
+
+@app.route('/games/memory-match')
+def memory_match():
+    return render_template('games/memoryMatch.html')
+
+@app.route('/games/labyrinth')
+def labyrinth():
+    return render_template('games/labyrinth.html')
+
+@app.route('/games/puzzle')
+def puzzle():
+    return render_template('games/puzzle.html')
+
+# Leaderboard
+@app.route('/leaderboard')
+def leaderboard():
+    word_puzzle_scores = Score.query.filter_by(game_type='wordPuzzle').order_by(Score.score.desc()).limit(10).all()
+    memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
+    labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
+    puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
+    
+    return render_template('leaderboard.html', 
+                          word_puzzle_scores=word_puzzle_scores,
+                          memory_match_scores=memory_match_scores,
+                          number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
+                          pattern_recognition_scores=puzzle_scores)
+
+# Articles
+@app.route('/articles')
+def articles():
+    articles = Article.query.filter_by(category='article').all()
+    return render_template('articles.html', articles=articles)
+
+# Tips
+@app.route('/tips')
+def tips():
+    tips = Article.query.filter_by(category='tip').all()
+    return render_template('tips.html', tips=tips)
+
+# Profile route zaten 314. satırda tanımlandı, duplicate tanımlama yorum satırına çevrildi
+# @app.route('/profile')
+# def profile():
+#     if 'user_id' not in session:
+#         return redirect(url_for('login'))
+#     
+#     user = User.query.get(session['user_id'])
+#     if not user:
+#         session.pop('user_id', None)
+#         return redirect(url_for('login'))
+#     
+#     # Kullanıcının en yüksek skorlarını bul
+#     word_puzzle_score = Score.query.filter_by(user_id=user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
+#     memory_match_score = Score.query.filter_by(user_id=user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
+#     labyrinth_score = Score.query.filter_by(user_id=user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
+#     puzzle_score = Score.query.filter_by(user_id=user.id, game_type='puzzle').order_by(Score.score.desc()).first()
+#     
+#     user_scores = {
+#         'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
+#         'memoryMatch': memory_match_score.score if memory_match_score else 0,
+#         'labyrinth': labyrinth_score.score if labyrinth_score else 0,
+#         'puzzle': puzzle_score.score if puzzle_score else 0
+#     }
+#     
+#     return render_template('profile.html', user=user, user_scores=user_scores)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not username or not email or not password:
+            flash('Tüm alanları doldurunuz.')
+            return redirect(url_for('register'))
+            
+        # Email validation
+        if not '@' in email or not '.' in email:
+            flash('Geçerli bir email adresi giriniz.')
+            return redirect(url_for('register'))
+            
+        email_domain = email.split('@')[1]
+        valid_domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com']
+        if email_domain not in valid_domains:
+            flash('Lütfen geçerli bir email servis sağlayıcısı kullanın (Gmail, Hotmail, Yahoo, Outlook).')
+            return redirect(url_for('register'))
+            
+        if User.query.filter_by(username=username).first():
+            flash('Bu kullanıcı adı zaten kullanılıyor.')
+            return redirect(url_for('register'))
+            
+        if User.query.filter_by(email=email).first():
+            flash('Bu email adresi zaten kullanılıyor.')
+            return redirect(url_for('register'))
+        
+        new_user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password)
+        )
+        
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            
+            session['user_id'] = new_user.id
+            session['username'] = new_user.username
+            flash('Kayıt başarılı! Hoş geldiniz!')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.')
+            return redirect(url_for('register'))
+    
+    if session.get('user_id'):
+        return redirect(url_for('index'))
+        
+    return render_template('register.html')
+
+
+        
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Başarıyla çıkış yaptınız.')
+    return redirect(url_for('login'))
+
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
@@ -785,7 +852,7 @@ def reset_password():
     
     if request.method == 'POST':
         password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
+        confirm_password = request.form.get('confirm_password')  # Changed to match the form field name
         
         if not password or len(password) < 6:
             flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
@@ -908,10 +975,11 @@ def save_score():
     return jsonify(response_data)
 
 @app.route('/api/get-scores/<game_type>')
+@app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
 def get_scores(game_type):
     from sqlalchemy import func
     
-    # "all" özelliği eklenmiş - tüm oyunların verilerini getir
+    # "all" özellği eklenmiş - tüm oyunların verilerini getir
     if game_type == 'all':
         # Tüm oyun türleri için en yüksek skorları getir
         game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle']
@@ -963,7 +1031,7 @@ def get_scores(game_type):
             'word-puzzle': 'wordPuzzle',
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
-            'number-sequence': 'labyrinth',  # number-sequence de labyrinth'e yönlendiriliyor (geriye uyumluluk için)
+            'number-sequence': 'labyrinth',  # number-sequence da labyrinth'e yönlendiriliyor (geriye uyumluluk için)
             'puzzle': 'puzzle'
         }
         
@@ -999,21 +1067,32 @@ def get_scores(game_type):
             Score.score.desc()
         ).limit(10).all()
         
-        # Skor listesini hazırla
         score_list = []
         for score, user in scores:
             score_list.append({
                 'username': user.username if user else 'Anonymous',
                 'score': score.score,
-                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                'rank': user.rank
+                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S')
             })
         
         return jsonify(score_list)
 
-@app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
-def get_scores_alt(game_type):
-    return get_scores(game_type)
+# Initialize the database at startup
+with app.app_context():
+    try:
+        # Create tables
+        db.create_all()
+        logger.info("Tables created on startup")
+        
+        # Initialize data if needed
+        try:
+            if User.query.count() == 0:
+                initialize_database()
+        except Exception as e:
+            logger.error(f"Error initializing data: {e}")
+    except Exception as e:
+        logger.error(f"Error creating tables: {e}")
 
+# Start the application
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
