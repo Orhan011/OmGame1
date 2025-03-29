@@ -61,10 +61,19 @@
   
   <div class="settings-section">
     <div class="settings-tabs">
-      <div class="settings-tab active" data-tab="personal"><i class="fas fa-user"></i> Kişisel Bilgiler</div>
-      <div class="settings-tab" data-tab="security"><i class="fas fa-lock"></i> Güvenlik</div>
-      <div class="settings-tab" data-tab="account"><i class="fas fa-user-cog"></i> Hesap</div>
-      <div class="settings-tab" data-tab="avatar"><i class="fas fa-image"></i> Profil Fotoğrafı</div>
+      <div class="settings-tab active" data-tab="personal">
+        <span><i class="fas fa-user"></i> Kişisel Bilgiler</span>
+      </div>
+      <div class="settings-tab" data-tab="security">
+        <span><i class="fas fa-lock"></i> Güvenlik</span>
+      </div>
+      <div class="settings-tab" data-tab="account">
+        <span><i class="fas fa-user-cog"></i> Hesap</span>
+      </div>
+      <div class="settings-tab" data-tab="avatar">
+        <span><i class="fas fa-image"></i> Profil Fotoğrafı</span>
+      </div>
+      <div class="tab-indicator"></div>
     </div>
     
     <div class="settings-content active" id="personal-content">
@@ -280,23 +289,68 @@
       });
     });
     
-    // Ayarlar tablarını değiştirme
+    // Ayarlar tablarını değiştirme ve animasyonlu gösterge
     const settingsTabs = document.querySelectorAll('.settings-tab');
+    const tabIndicator = document.querySelector('.tab-indicator');
     
+    // İlk yüklemede tab göstergesini doğru konumlandır
+    function positionTabIndicator(activeTab) {
+      if (!tabIndicator) return;
+      
+      const tabLeft = activeTab.offsetLeft;
+      const tabWidth = activeTab.offsetWidth;
+      
+      // Tab göstergesini konumlandır
+      tabIndicator.style.width = `${tabWidth - 20}px`;
+      tabIndicator.style.left = `${tabLeft + 10}px`;
+    }
+    
+    // İlk sayfa yüklendiğinde aktif tab'a göre göstergeyi konumlandır
+    const initialActiveTab = document.querySelector('.settings-tab.active');
+    if (initialActiveTab) {
+      setTimeout(() => {
+        positionTabIndicator(initialActiveTab);
+      }, 100); // Sayfa tam yüklendikten sonra çalıştırmak için kısa bir gecikme
+    }
+    
+    // Tab değiştiğinde animasyonlar
     settingsTabs.forEach(tab => {
       tab.addEventListener('click', function() {
         const tabName = this.getAttribute('data-tab');
         
-        // Aktif tab'ı değiştir
+        // Aktif tab'ı değiştir ve göstergeyi animasyonla hareket ettir
         settingsTabs.forEach(t => t.classList.remove('active'));
         this.classList.add('active');
+        positionTabIndicator(this);
         
-        // İçerik alanlarını değiştir
-        document.querySelectorAll('.settings-content').forEach(content => {
-          content.classList.remove('active');
-        });
-        document.getElementById(`${tabName}-content`).classList.add('active');
+        // İçerik alanlarını değiştir - önce mevcut içeriği gizle
+        const currentContent = document.querySelector('.settings-content.active');
+        const newContent = document.getElementById(`${tabName}-content`);
+        
+        if (currentContent) {
+          currentContent.style.opacity = '0';
+          currentContent.style.transform = 'translateY(20px)';
+          
+          // Kısa bir gecikme sonrasında eski içeriği gizle ve yeni içeriği göster
+          setTimeout(() => {
+            document.querySelectorAll('.settings-content').forEach(content => {
+              content.classList.remove('active');
+            });
+            newContent.classList.add('active');
+          }, 300);
+        } else {
+          // İlk yükleme için doğrudan göster
+          newContent.classList.add('active');
+        }
       });
+    });
+    
+    // Pencere boyutu değiştiğinde tab göstergesini yeniden konumlandır
+    window.addEventListener('resize', () => {
+      const activeTab = document.querySelector('.settings-tab.active');
+      if (activeTab) {
+        positionTabIndicator(activeTab);
+      }
     });
   });
 </script>

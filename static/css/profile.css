@@ -311,56 +311,77 @@
 
 /* Settings Section */
 .settings-tabs {
+  --tab-highlight: rgba(var(--accent-color-rgb), 0.9);
   display: flex;
-  padding: 0.5rem;
-  margin-bottom: 2.5rem;
-  gap: 1rem;
+  padding: 0.7rem;
+  margin-bottom: 3rem;
+  gap: 0.5rem;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 3rem;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: rgba(15, 20, 40, 0.7);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   box-shadow: 
-    inset 0 2px 5px rgba(0, 0, 0, 0.1),
-    0 10px 30px rgba(0, 0, 0, 0.05);
+    0 15px 35px rgba(0, 0, 0, 0.2),
+    0 5px 15px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
-  z-index: 1;
+  z-index: 5;
+  transition: all 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
 }
 
 .settings-tabs::before {
   content: '';
   position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.2) 0%, rgba(var(--secondary-color-rgb), 0.1) 100%);
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.4) 0%, rgba(var(--secondary-color-rgb), 0.1) 100%);
   z-index: -1;
-  border-radius: 3.2rem;
-  opacity: 0.5;
-  filter: blur(8px);
+  border-radius: 1.8rem;
+  opacity: 0.6;
+  filter: blur(15px);
+  animation: pulseShadow 8s ease-in-out infinite alternate;
+}
+
+@keyframes pulseShadow {
+  0% { opacity: 0.4; filter: blur(15px); }
+  50% { opacity: 0.6; filter: blur(20px); }
+  100% { opacity: 0.4; filter: blur(15px); }
 }
 
 .settings-tabs::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Edge */
 }
 
+.settings-tabs:hover {
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
 .settings-tab {
-  padding: 1rem 2rem;
+  padding: 1.2rem 2.2rem;
   background-color: transparent;
-  border-radius: 2.5rem;
+  border-radius: 1.2rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 2px solid transparent;
+  transition: all 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
+  border: 1px solid transparent;
   position: relative;
   overflow: hidden;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.65);
   z-index: 1;
+  transform-style: preserve-3d;
+  perspective: 800px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .settings-tab::before {
@@ -370,87 +391,165 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.7) 0%, rgba(var(--accent-color-rgb), 0.4) 100%);
+  background: linear-gradient(135deg, var(--tab-highlight) 0%, rgba(var(--accent-color-rgb), 0.6) 100%);
   border-radius: inherit;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.05, 0.7, 0.1, 1);
   z-index: -1;
+  transform: translateZ(-10px);
 }
 
 .settings-tab::after {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-  transform: scale(1.5);
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.5s ease;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+  opacity: 0.1;
+  z-index: 1;
   pointer-events: none;
   border-radius: inherit;
-  z-index: 1;
+}
+
+/* Pseudo element for the shimmer effect */
+.settings-tab span {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.settings-tab span::after {
+  content: '';
+  position: absolute;
+  top: -250%;
+  left: -250%;
+  width: 600%;
+  height: 600%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.08) 45%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.08) 55%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .settings-tab.active {
-  background-color: rgba(var(--accent-color-rgb), 0.2);
+  background-color: rgba(var(--accent-color-rgb), 0.15);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(var(--accent-color-rgb), 0.2);
-  transform: translateY(-3px);
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 6px 12px rgba(var(--accent-color-rgb), 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px) translateZ(20px);
+  font-weight: 800;
 }
 
 .settings-tab.active::before {
   opacity: 1;
+  box-shadow:
+    0 0 25px rgba(var(--accent-color-rgb), 0.4),
+    0 0 12px rgba(var(--accent-color-rgb), 0.3);
 }
 
-.settings-tab.active::after {
+.settings-tab.active span::after {
   opacity: 1;
-  transform: scale(1);
+  animation: shimmer 2.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-250%) rotate(45deg); }
+  100% { transform: translateX(250%) rotate(45deg); }
 }
 
 .settings-tab:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-2px);
+  transform: translateY(-3px) translateZ(10px);
   color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.settings-tab:hover:not(.active)::after {
-  opacity: 0.5;
+.settings-tab:hover:not(.active) span::after {
+  opacity: 0.7;
+  animation: shimmer 3s infinite linear;
+}
+
+.settings-tab:active {
+  transform: translateY(-1px) translateZ(5px);
+  transition-duration: 0.1s;
 }
 
 .settings-tab i {
-  margin-right: 0.8rem;
-  font-size: 1.1rem;
+  margin-right: 1rem;
+  font-size: 1.2rem;
   position: relative;
   z-index: 2;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.05, 0.7, 0.1, 1);
   display: inline-block;
   vertical-align: middle;
   color: inherit;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .settings-tab.active i {
-  transform: scale(1.2);
+  transform: scale(1.3) translateZ(5px);
   color: #fff;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
 }
 
+/* Tab indicator (pill shape moving below tabs) */
+.tab-indicator {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(90deg, var(--tab-highlight) 0%, rgba(var(--secondary-color-rgb), 0.9) 100%);
+  bottom: 0;
+  border-radius: 2px;
+  transition: all 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
+  z-index: 0;
+  box-shadow: 
+    0 0 15px rgba(var(--accent-color-rgb), 0.8),
+    0 0 5px rgba(var(--accent-color-rgb), 0.4);
+  opacity: 0.85;
+}
+
+/* Animated content transitions */
 .settings-content {
   display: none;
+  transition: all 0.5s cubic-bezier(0.05, 0.7, 0.1, 1);
+  opacity: 0;
+  transform: translateY(20px);
+  perspective: 1000px;
 }
 
 .settings-content.active {
   display: block;
-  animation: fadeIn 0.4s ease;
+  animation: tabFadeIn 0.7s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes tabFadeIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px) rotateX(2deg);
+    filter: blur(5px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) rotateX(0);
+    filter: blur(0);
+  }
 }
 
 .settings-card {
