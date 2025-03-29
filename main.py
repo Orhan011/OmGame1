@@ -359,10 +359,10 @@ def profile():
     
     try:
         # Kullanıcının en yüksek skorlarını bul
-        word_puzzle_score = Score.query.filter_by(user_id=user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
-        memory_match_score = Score.query.filter_by(user_id=user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
-        labyrinth_score = Score.query.filter_by(user_id=user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
-        puzzle_score = Score.query.filter_by(user_id=user.id, game_type='puzzle').order_by(Score.score.desc()).first()
+        word_puzzle_score = Score.query.filter_by(user_id=current_user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
+        memory_match_score = Score.query.filter_by(user_id=current_user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
+        labyrinth_score = Score.query.filter_by(user_id=current_user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
+        puzzle_score = Score.query.filter_by(user_id=current_user.id, game_type='puzzle').order_by(Score.score.desc()).first()
         
         user_scores = {
             'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
@@ -372,12 +372,12 @@ def profile():
         }
         
         # Kullanıcı bilgilerini güncel tut
-        if not user.experience_points:
-            user.experience_points = 0
-        if not user.rank:
-            user.rank = 'Başlangıç'
-        if not user.total_games_played:
-            user.total_games_played = 0
+        if not current_user.experience_points:
+            current_user.experience_points = 0
+        if not current_user.rank:
+            current_user.rank = 'Başlangıç'
+        if not current_user.total_games_played:
+            current_user.total_games_played = 0
         db.session.commit()
         
         return render_template('profile.html', current_user=current_user, user=current_user, user_scores=user_scores)
