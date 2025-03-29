@@ -345,12 +345,14 @@ def update_profile():
             flash('Kullanıcı bulunamadı.', 'error')
             return redirect(url_for('login'))
             
-        # Form verilerini al
+        # Form verilerini al ve güncelle
         user.full_name = request.form.get('full_name', user.full_name)
         user.email = request.form.get('email', user.email)
+        user.location = request.form.get('location', user.location)
+        user.bio = request.form.get('bio', user.bio)
         user.last_active = datetime.utcnow()
         
-        logger.debug(f"Form verileri: full_name={user.full_name}, email={user.email}")
+        logger.debug(f"Form verileri: full_name={user.full_name}, email={user.email}, location={user.location}, bio={user.bio}")
         
         # Profil resmi yükleme işlemi
         profile_image = request.files.get('profile_image')

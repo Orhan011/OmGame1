@@ -148,6 +148,7 @@
       </div>
       <div class="modal-body">
         <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+          {{ user.id }}
           <div class="row">
             <!-- Sol Taraf - Profil Resmi -->
             <div class="col-md-5">
@@ -177,7 +178,7 @@
               <div class="profile-edit-form">
                 <div class="form-group mb-4">
                   <label class="form-label"><i class="fas fa-user"></i> Kullanıcı Adı</label>
-                  <input type="text" class="form-control form-control-lg" value="{{ user.username }}" disabled placeholder="Kullanıcı adınız" readonly>
+                  <input type="text" class="form-control form-control-lg" name="username" value="{{ user.username }}" disabled placeholder="Kullanıcı adınız" readonly>
                   <div class="form-text">Kullanıcı adınız değiştirilemez</div>
                 </div>
                 
@@ -188,7 +189,17 @@
                 
                 <div class="form-group mb-4">
                   <label class="form-label"><i class="fas fa-envelope"></i> E-mail</label>
-                  <input type="email" class="form-control form-control-lg" name="email" value="{{ user.email or '' }}" placeholder="E-mail adresiniz">
+                  <input type="email" class="form-control form-control-lg" name="email" value="{{ user.email }}" placeholder="E-mail adresiniz">
+                </div>
+
+                <div class="form-group mb-4">
+                  <label class="form-label"><i class="fas fa-map-marker-alt"></i> Konum</label>
+                  <input type="text" class="form-control form-control-lg" name="location" value="{{ user.location or '' }}" placeholder="Konumunuz">
+                </div>
+
+                <div class="form-group mb-4">
+                  <label class="form-label"><i class="fas fa-info-circle"></i> Hakkımda</label>
+                  <textarea class="form-control form-control-lg" name="bio" rows="3" placeholder="Kendiniz hakkında kısa bir bilgi">{{ user.bio or '' }}</textarea>
                 </div>
               </div>
             </div>
