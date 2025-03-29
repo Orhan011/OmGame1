@@ -11,44 +11,44 @@
   .profile-container {
     padding: 15px;
   }
-  
+
   .profile-upload-preview {
     width: 120px;
     height: 120px;
   }
-  
+
   .profile-edit-form .form-control {
     font-size: 16px; /* iOS'ta zoom sorununu önler */
     padding: 10px;
   }
-  
+
   .profile-edit-actions {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .profile-edit-actions button {
     width: 100%;
   }
-  
+
   .btn-upload, .btn-remove {
     padding: 12px;
     font-size: 14px;
   }
-  
+
   .modal-dialog {
     margin: 10px;
   }
-  
+
   .profile-avatar-container {
     width: 100px;
     height: 100px;
   }
-  
+
   .profile-stats .stat-value {
     font-size: 1.2rem;
   }
-  
+
   .profile-info-item {
     padding: 8px;
   }
@@ -59,15 +59,15 @@
   .profile-username {
     font-size: 1.5rem;
   }
-  
+
   .profile-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-avatar-overlay span {
     font-size: 12px;
   }
-  
+
   .info-icon {
     width: 32px;
     height: 32px;
@@ -163,6 +163,305 @@
   height: 20px;
 }
 
+.profile-container {
+  padding: 2rem 0;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+}
+
+.profile-card {
+  overflow: hidden;
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  color: white;
+}
+
+.profile-avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+}
+
+.profile-avatar-container:hover .profile-avatar-overlay {
+  opacity: 1;
+}
+
+.profile-username {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.profile-email {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  color: #6a5ae0;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rank-title {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.rank-badge {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+}
+
+/* Oyun İstatistikleri */
+.nav-tabs {
+  border-bottom: none;
+}
+
+.nav-tabs .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tabs .nav-link.active {
+  color: white;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+}
+
+.game-stats-header {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.highest-score-display {
+  text-align: center;
+}
+
+.highest-score-display .score-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #6a5ae0;
+  margin-bottom: 0.5rem;
+}
+
+.progress-container {
+  padding: 1rem;
+}
+
+.progress {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+}
+
+.progress-info {
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.table {
+  color: white;
+}
+
+.table th {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.score {
+  font-weight: 600;
+  color: #6a5ae0;
+}
+
+/* Modal Styles */
+.modal-content {
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-upload-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.profile-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+}
+
+.profile-upload-container:hover .upload-overlay {
+  opacity: 1;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .profile-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav-tabs .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .highest-score-display .score-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-username {
+    font-size: 1.5rem;
+  }
+
+  .stat-box {
+    padding: 0.75rem;
+  }
+
+  .game-stats-header {
+    padding: 1rem;
+  }
+}
+
 /* Profil Sayfası Ana İçerik Stilleri */
 .profile-username {
   color: var(--primary-text);
@@ -177,56 +476,14 @@
   margin-bottom: 20px;
 }
 
-.profile-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-
-.profile-avatar-container {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto;
-  position: relative;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease; 
-  cursor: pointer; 
-
-}
-
-.profile-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
 
 .profile-stats {
   background: rgba(106, 90, 224, 0.1);
   border-radius: 10px;
   padding: 20px;
   margin: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1); 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .profile-stat {
@@ -258,33 +515,6 @@
   color: white;
   font-size: 0.9rem;
   font-weight: bold;
-}
-
-.profile-avatar-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: 50%;
-  color: white;
-}
-
-.profile-avatar-container:hover .profile-avatar-overlay {
-  opacity: 1;
-}
-
-.profile-avatar-container:hover .profile-avatar,
-.profile-avatar-container:hover .profile-avatar-placeholder {
-  transform: scale(1.05);
-  border-color: #8a72f1;
 }
 
 .empty-state {
