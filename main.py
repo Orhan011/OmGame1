@@ -2,10 +2,13 @@ import os
 import logging
 import random
 import secrets
+import base64
+import uuid
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -320,11 +323,22 @@ def update_profile():
         
     user = User.query.get(session['user_id'])
     user.full_name = request.form.get('full_name')
-    user.age = request.form.get('age', type=int)
-    user.bio = request.form.get('bio')
-    user.avatar_url = request.form.get('avatar_url')
-    user.location = request.form.get('location')
+    user.email = request.form.get('email', user.email)
     user.last_active = datetime.utcnow()
+    
+    # Profil resmi yükleme işlemi
+    profile_image = request.files.get('profile_image')
+    if profile_image and profile_image.filename:
+        try:
+            # Base64 olarak kaydetme
+            image_data = profile_image.read()
+            encoded_image = base64.b64encode(image_data).decode('utf-8')
+            image_type = profile_image.content_type
+            user.avatar_url = f"data:{image_type};base64,{encoded_image}"
+            logger.info("Profil resmi başarıyla yüklendi")
+        except Exception as e:
+            logger.error(f"Profil resmi yüklenirken hata oluştu: {e}")
+            flash('Profil resmi yüklenirken bir hata oluştu.', 'danger')
     
     # Skorları güncelle
     highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar() or 0
