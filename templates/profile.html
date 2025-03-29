@@ -148,7 +148,7 @@
       </div>
       <div class="modal-body">
         <form id="profileEditForm" action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
-          {{ user.id }}
+          <input type="hidden" name="user_id" value="{{ user.id }}">
           <div class="row">
             <!-- Sol Taraf - Profil Resmi -->
             <div class="col-md-5">
@@ -327,6 +327,13 @@
     if (profileEditForm) {
       profileEditForm.addEventListener('submit', function(e) {
         console.log('Profil düzenleme formu gönderiliyor...');
+        
+        // Form gönderim düğmesini devre dışı bırak ve yükleniyor göstergesi ekle
+        const submitButton = profileEditForm.querySelector('button[type="submit"]');
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Kaydediliyor...';
+        }
       });
     }
     
