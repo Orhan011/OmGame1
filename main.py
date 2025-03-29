@@ -241,26 +241,49 @@ def login():
         password = request.form.get('password')
         remember = request.form.get('remember')
         
+        # Hata kontrolleri
+        if not email or not password:
+            flash('Lütfen email ve şifrenizi giriniz.', 'danger')
+            return redirect(url_for('login'))
+        
+        # Kullanıcıyı e-posta adresine göre ara
         user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password_hash, password):
-            session['user_id'] = user.id
-            session['username'] = user.username
+        
+        # Debug bilgisi ekleyelim
+        logger.debug(f"Login attempt for {email}. User found: {user is not None}")
+        
+        if not user:
+            flash('Bu e-posta adresine sahip bir kullanıcı bulunamadı.', 'danger')
+            return redirect(url_for('login'))
+        
+        # Şifre kontrolü
+        try:
+            is_valid = check_password_hash(user.password_hash, password)
+            logger.debug(f"Password validation: {is_valid}")
             
-            # Eğer "Beni hatırla" işaretlenmişse, email'i bir cookie'de saklayalım
-            if remember:
-                remember_cookie_duration = timedelta(days=30)  # 30 gün hatırla
-                resp = make_response(redirect(url_for('index')))
-                resp.set_cookie('remembered_email', email, max_age=remember_cookie_duration.total_seconds())
-                flash('Başarıyla giriş yaptınız!')
-                return resp
+            if is_valid:
+                session['user_id'] = user.id
+                session['username'] = user.username
+                
+                # Eğer "Beni hatırla" işaretlenmişse, email'i bir cookie'de saklayalım
+                if remember:
+                    remember_cookie_duration = timedelta(days=30)  # 30 gün hatırla
+                    resp = make_response(redirect(url_for('index')))
+                    resp.set_cookie('remembered_email', email, max_age=remember_cookie_duration.total_seconds())
+                    flash('Başarıyla giriş yaptınız!', 'success')
+                    return resp
+                else:
+                    # Eğer "Beni hatırla" işaretlenmemişse, varsa hatırlanan email'i silelim
+                    resp = make_response(redirect(url_for('index')))
+                    resp.delete_cookie('remembered_email')
+                    flash('Başarıyla giriş yaptınız!', 'success')
+                    return resp
             else:
-                # Eğer "Beni hatırla" işaretlenmemişse, varsa hatırlanan email'i silelim
-                resp = make_response(redirect(url_for('index')))
-                resp.delete_cookie('remembered_email')
-                flash('Başarıyla giriş yaptınız!')
-                return resp
-        else:
-            flash('Geçersiz email veya şifre.')
+                flash('Şifre doğru değil. Lütfen tekrar deneyin.', 'danger')
+                return redirect(url_for('login'))
+        except Exception as e:
+            logger.error(f"Error during password validation: {e}")
+            flash('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
             return redirect(url_for('login'))
     
     if session.get('user_id'):
