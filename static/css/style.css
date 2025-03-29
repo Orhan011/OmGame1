@@ -7841,6 +7841,20 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   backdrop-filter: blur(10px);
+  margin-top: 20px;
+  transform-origin: top center;
+  animation: modalSlideDown 0.3s ease-out;
+}
+
+@keyframes modalSlideDown {
+  from {
+    transform: translateY(-100%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .profile-modal-content .modal-header {
