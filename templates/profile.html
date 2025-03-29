@@ -59,8 +59,6 @@
     <div class="settings-tabs">
       <div class="settings-tab active" data-tab="personal"><i class="fas fa-user"></i> Kişisel Bilgiler</div>
       <div class="settings-tab" data-tab="security"><i class="fas fa-lock"></i> Güvenlik</div>
-      <div class="settings-tab" data-tab="appearance"><i class="fas fa-paint-brush"></i> Görünüm</div>
-      <div class="settings-tab" data-tab="notifications"><i class="fas fa-bell"></i> Bildirimler</div>
       <div class="settings-tab" data-tab="account"><i class="fas fa-user-cog"></i> Hesap</div>
       <div class="settings-tab" data-tab="avatar"><i class="fas fa-image"></i> Profil Fotoğrafı</div>
     </div>
@@ -123,77 +121,7 @@
       </div>
     </div>
     
-    <div class="settings-content" id="appearance-content">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="settings-card glass-effect">
-            <h3 class="settings-title"><i class="fas fa-palette"></i> Tema Ayarları</h3>
-            <form class="settings-form" method="POST" action="{{ url_for('update_theme') }}">
-              <h5>Tema Modu</h5>
-              <div class="theme-options">
-                <div class="theme-option dark {% if current_user.theme_preference == 'dark' %}active{% endif %}" data-theme="dark">
-                  <div class="theme-icon"><i class="fas fa-moon"></i></div>
-                  <div class="theme-title">Karanlık</div>
-                  <input type="radio" name="theme_preference" value="dark" {% if current_user.theme_preference == 'dark' %}checked{% endif %} style="display: none;">
-                </div>
-                <div class="theme-option light {% if current_user.theme_preference == 'light' %}active{% endif %}" data-theme="light">
-                  <div class="theme-icon"><i class="fas fa-sun"></i></div>
-                  <div class="theme-title">Aydınlık</div>
-                  <input type="radio" name="theme_preference" value="light" {% if current_user.theme_preference == 'light' %}checked{% endif %} style="display: none;">
-                </div>
-                <div class="theme-option contrast {% if current_user.theme_preference == 'contrast' %}active{% endif %}" data-theme="contrast">
-                  <div class="theme-icon"><i class="fas fa-adjust"></i></div>
-                  <div class="theme-title">Yüksek Kontrast</div>
-                  <input type="radio" name="theme_preference" value="contrast" {% if current_user.theme_preference == 'contrast' %}checked{% endif %} style="display: none;">
-                </div>
-              </div>
-              
-              <h5 class="mt-4">Tema Rengi</h5>
-              <div class="color-palette">
-                <div class="color-option active" data-color="#6a5ae0" style="background-color: #6a5ae0;"></div>
-                <div class="color-option" data-color="#ff4d6b" style="background-color: #ff4d6b;"></div>
-                <div class="color-option" data-color="#00c6ff" style="background-color: #00c6ff;"></div>
-                <div class="color-option" data-color="#ff9900" style="background-color: #ff9900;"></div>
-                <div class="color-option" data-color="#00d084" style="background-color: #00d084;"></div>
-                <div class="color-option" data-color="#8338ec" style="background-color: #8338ec;"></div>
-                <input type="hidden" name="theme_color" id="themeColor" value="#6a5ae0">
-              </div>
-              
-              <button type="submit" class="btn btn-primary mt-4">Tema Ayarlarını Kaydet</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="settings-content" id="notifications-content">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="settings-card glass-effect">
-            <h3 class="settings-title"><i class="fas fa-bell"></i> Bildirim Ayarları</h3>
-            <form class="settings-form" method="POST" action="{{ url_for('update_notifications') }}">
-              <label class="form-switch">
-                <span class="switch">
-                  <input type="checkbox" name="email_notifications" {% if current_user.notification_settings and current_user.notification_settings.email %}checked{% endif %}>
-                  <span class="slider"></span>
-                </span>
-                Email Bildirimleri
-              </label>
-              
-              <label class="form-switch">
-                <span class="switch">
-                  <input type="checkbox" name="achievement_notifications" {% if current_user.notification_settings and current_user.notification_settings.push %}checked{% endif %}>
-                  <span class="slider"></span>
-                </span>
-                Başarım Bildirimleri
-              </label>
-              
-              <button type="submit" class="btn btn-primary mt-3">Bildirim Ayarlarını Kaydet</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+
     
     <div class="settings-content" id="account-content">
       <div class="row">
