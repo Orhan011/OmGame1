@@ -109,18 +109,16 @@
 }
 
 .profile-container {
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 .glass-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 
@@ -132,8 +130,8 @@
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease; /* Added transition for smoother hover effect */
-  cursor: pointer; /* Added cursor pointer for better user experience */
+  transition: all 0.3s ease; 
+  cursor: pointer; 
 
 }
 
@@ -155,11 +153,11 @@
 
 .profile-stats {
   background: rgba(106, 90, 224, 0.1);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 20px;
   margin: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Retained original border */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Retained original border */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .profile-stat {
@@ -197,18 +195,17 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 50%;
   color: white;
-  font-size: 1.2rem;
 }
 
 .profile-avatar-container:hover .profile-avatar-overlay {
@@ -279,12 +276,17 @@
 }
 
 .stat-card {
-  background: rgba(30, 30, 55, 0.5);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 15px;
   display: flex;
   align-items: center;
   gap: 15px;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
 
 .stat-icon {
@@ -341,7 +343,7 @@
 
 /* Modal Styles */
 .modal-content {
-  background: rgba(30, 30, 50, 0.95);
+  background: rgba(30, 30, 30, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 15px;
@@ -385,4 +387,16 @@
     padding: 8px 12px;
     font-size: 0.9rem;
   }
+}
+
+.table {
+  color: white;
+}
+
+.table th {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+  border-color: rgba(255, 255, 255, 0.1);
 }
