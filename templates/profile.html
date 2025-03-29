@@ -21,25 +21,26 @@
       <div class="profile-details">
         <h1 class="profile-username">{{ current_user.username }}</h1>
         <div class="profile-rank">{{ current_user.rank }}</div>
-        <div class="profile-stats">
-          <div class="stat-row">
-            <div class="stat-item">
-              <div class="stat-value">{{ current_user.total_games_played }}</div>
-              <div class="stat-label">Oyun</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">{{ current_user.highest_score }}</div>
-              <div class="stat-label">En Yüksek Skor</div>
+        <div class="profile-progress-card">
+          <div class="profile-progress-header">
+            <div class="level-badge">{{ current_user.experience_points // 1000 + 1 }}</div>
+            <div class="progress-info">
+              <div class="progress-title">Seviye {{ current_user.experience_points // 1000 + 1 }}</div>
+              <div class="progress-subtitle">{{ current_user.rank }}</div>
             </div>
           </div>
-          <div class="stat-row">
-            <div class="stat-item">
-              <div class="stat-value">{{ current_user.win_count or 0 }}</div>
-              <div class="stat-label">Kazanma</div>
+          <div class="profile-exp-bar">
+            <div class="exp-progress" style="width: {{ (current_user.experience_points % 1000) / 10 }}%;"></div>
+            <div class="exp-text">{{ current_user.experience_points % 1000 }} / 1000 XP</div>
+          </div>
+          <div class="profile-stats-summary">
+            <div class="stats-summary-item">
+              <i class="fas fa-gamepad"></i> 
+              <span>{{ current_user.total_games_played }} Oyun</span>
             </div>
-            <div class="stat-item">
-              <div class="stat-value">{{ current_user.loss_count or 0 }}</div>
-              <div class="stat-label">Kaybetme</div>
+            <div class="stats-summary-item">
+              <i class="fas fa-trophy"></i> 
+              <span>{{ current_user.highest_score }} Puan</span>
             </div>
           </div>
         </div>
@@ -52,9 +53,7 @@
             {% endfor %}
           {% endif %}
         </div>
-        <div class="profile-exp-bar">
-          <div class="exp-progress" style="width: {{ (current_user.experience_points % 1000) / 10 }}%;"></div>
-        </div>
+
       </div>
     </div>
   </div>
@@ -118,36 +117,60 @@
           <div class="settings-card glass-effect">
             <h3 class="settings-title"><i class="fas fa-trophy"></i> Oyun İstatistikleri</h3>
             
-            <!-- Genel İstatistikler -->
-            <div class="stats-overview">
-              <div class="stat-cards-container">
-                <div class="stat-card">
-                  <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
-                  <div class="stat-info">
-                    <div class="stat-value">{{ current_user.total_games_played }}</div>
-                    <div class="stat-label">Toplam Oyun</div>
+            <!-- Kullanıcı İlerleme Kartı -->
+            <div class="player-stats-dashboard">
+              <div class="player-stats-header">
+                <div class="player-stats-title">
+                  <h4>Oyuncu İstatistikleri</h4>
+                  <p>Son Güncelleme: {{ now().strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+                <div class="player-level-info">
+                  <div class="player-level-badge">{{ current_user.experience_points // 1000 + 1 }}</div>
+                  <div class="player-rank">{{ current_user.rank }}</div>
+                </div>
+              </div>
+              
+              <div class="player-stats-grid">
+                <div class="player-stat-item">
+                  <div class="stat-icon-wrapper"><i class="fas fa-gamepad"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-title">Toplam Oyun</div>
+                    <div class="stat-value-lg">{{ current_user.total_games_played }}</div>
                   </div>
                 </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><i class="fas fa-medal"></i></div>
-                  <div class="stat-info">
-                    <div class="stat-value">{{ current_user.highest_score }}</div>
-                    <div class="stat-label">En Yüksek Skor</div>
+                
+                <div class="player-stat-item">
+                  <div class="stat-icon-wrapper"><i class="fas fa-medal"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-title">En Yüksek Skor</div>
+                    <div class="stat-value-lg">{{ current_user.highest_score }}</div>
                   </div>
                 </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><i class="fas fa-star"></i></div>
-                  <div class="stat-info">
-                    <div class="stat-value">{{ current_user.experience_points }}</div>
-                    <div class="stat-label">Toplam XP</div>
+                
+                <div class="player-stat-item">
+                  <div class="stat-icon-wrapper"><i class="fas fa-star"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-title">Toplam XP</div>
+                    <div class="stat-value-lg">{{ current_user.experience_points }}</div>
                   </div>
                 </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><i class="fas fa-award"></i></div>
-                  <div class="stat-info">
-                    <div class="stat-value">{{ current_user.rank }}</div>
-                    <div class="stat-label">Mevcut Rütbe</div>
+                
+                <div class="player-stat-item">
+                  <div class="stat-icon-wrapper"><i class="fas fa-trophy"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-title">Toplam Başarı</div>
+                    <div class="stat-value-lg">{{ current_user.badges|length if current_user.badges else 0 }}</div>
                   </div>
+                </div>
+              </div>
+              
+              <div class="player-exp-progress">
+                <div class="progress-text">
+                  <span>Seviye İlerlemesi</span>
+                  <span>{{ current_user.experience_points % 1000 }} / 1000 XP</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: {{ (current_user.experience_points % 1000) / 10 }}%;"></div>
                 </div>
               </div>
             </div>

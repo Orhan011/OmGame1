@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "braingames_secret_key")
 
 # Add global template functions
-app.jinja_env.globals.update(min=min, max=max)
+app.jinja_env.globals.update(min=min, max=max, now=datetime.now)
 
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///braintraining.db")
