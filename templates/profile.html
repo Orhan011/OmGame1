@@ -17,10 +17,10 @@
               </div>
             {% endif %}
           </div>
-          
+
           <h3 class="profile-username mb-2">{{ user.username }}</h3>
           <p class="profile-email mb-3">{{ user.email }}</p>
-          
+
           <div class="profile-stats mb-4">
             <div class="row g-0">
               <div class="col">
@@ -43,18 +43,18 @@
               </div>
             </div>
           </div>
-          
+
           <div class="profile-rank mb-4">
             <span class="rank-badge">{{ stats.rank }}</span>
           </div>
-          
+
           <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             <i class="fas fa-edit me-2"></i>Profili Düzenle
           </button>
         </div>
       </div>
     </div>
-    
+
     <!-- Sağ Taraf: Skorlar ve İstatistikler -->
     <div class="col-lg-8">
       <div class="card glass-card mb-4">
@@ -90,14 +90,14 @@
             </li>
             {% endfor %}
           </ul>
-          
+
           <div class="tab-content p-3" id="gameTabsContent">
             {% for game_type in game_types %}
             <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
                  id="{{ game_type }}-content" 
                  role="tabpanel" 
                  aria-labelledby="{{ game_type }}-tab">
-              
+
               <div class="game-score-summary mb-4">
                 <div class="row align-items-center">
                   <div class="col-md-4 text-center mb-3 mb-md-0">
@@ -119,9 +119,9 @@
                       {% else %}
                         {% set next_milestone = 2000 %}
                       {% endif %}
-                      
+
                       {% set progress = (scores[game_type].highest / next_milestone * 100)|int if scores[game_type].highest > 0 else 0 %}
-                      
+
                       <div class="progress-label d-flex justify-content-between mb-1">
                         <span>İlerleme</span>
                         <span>{{ progress }}%</span>
@@ -141,9 +141,9 @@
                   </div>
                 </div>
               </div>
-              
+
               <h5 class="mb-3"><i class="fas fa-history me-2"></i>Son Skorlar</h5>
-              
+
               {% if scores[game_type].recent %}
                 <div class="table-responsive">
                   <table class="table table-hover">
@@ -189,7 +189,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="card glass-card">
         <div class="card-header">
           <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>İstatistikler</h4>
@@ -207,7 +207,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-4">
               <div class="stat-card">
                 <div class="stat-icon">
@@ -219,7 +219,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-4">
               <div class="stat-card">
                 <div class="stat-icon">
@@ -231,7 +231,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-md-6 mb-4">
               <div class="stat-card">
                 <div class="stat-icon">
@@ -265,7 +265,7 @@
             <div class="col-md-4 border-end border-dark">
               <div class="profile-edit-avatar-container p-4">
                 <h6 class="text-center mb-4"><i class="fas fa-portrait me-2"></i>Profil Fotoğrafı</h6>
-                
+
                 <div class="profile-picture-upload">
                   <div class="profile-upload-preview rounded-circle mb-4">
                     {% if user.avatar_url %}
@@ -276,35 +276,35 @@
                       </div>
                       <img src="" alt="" id="avatarPreview" class="img-fluid profile-avatar d-none">
                     {% endif %}
-                    
+
                     <div class="avatar-overlay">
                       <i class="fas fa-camera"></i>
                     </div>
                   </div>
-                  
-                  <div class="profile-image-upload-controls">
-                    <label for="profile_image" class="btn btn-upload btn-sm">
+
+                  <div class="profile-image-upload-controls text-center">
+                    <label for="profile_image" class="btn btn-upload btn-sm mb-2">
                       <i class="fas fa-upload me-2"></i>Fotoğraf Yükle
                     </label>
                     <input type="file" id="profile_image" name="profile_image" accept="image/*" class="d-none">
-                    
-                    <button type="button" class="btn btn-outline-danger btn-sm" id="removePhotoBtn">
-                      <i class="fas fa-trash me-1"></i>Kaldır
+
+                    <button type="button" class="btn btn-outline-danger btn-sm d-block mx-auto" id="removePhotoBtn">
+                      <i class="fas fa-trash me-1"></i>Fotoğrafı Kaldır
                     </button>
                   </div>
                 </div>
-                
+
                 <small class="avatar-help-text text-center d-block mt-4">
                   <i class="fas fa-info-circle me-1"></i> Yükleyeceğiniz fotoğraf 500KB'dan küçük olmalıdır. JPG, PNG formatları desteklenir.
                 </small>
               </div>
             </div>
-            
+
             <!-- Sağ taraf: Diğer profil bilgileri -->
             <div class="col-md-8">
               <div class="profile-edit-form p-4">
                 <h6 class="mb-4"><i class="fas fa-id-card me-2"></i>Kişisel Bilgiler</h6>
-                
+
                 <div class="mb-4">
                   <label for="username" class="form-label">
                     <i class="fas fa-user me-2"></i>Kullanıcı Adı
@@ -318,18 +318,7 @@
                   </div>
                   <small class="form-text mt-1" id="usernameHelp">Kullanıcı adınız en az 3, en fazla 20 karakter olmalıdır.</small>
                 </div>
-                
-                <div class="mb-4">
-                  <label for="email" class="form-label">
-                    <i class="fas fa-envelope me-2"></i>E-posta Adresi
-                  </label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                    <input type="email" class="form-control" id="email" value="{{ user.email }}" disabled>
-                  </div>
-                  <small class="form-text mt-1">E-posta adresi değiştirilemez. Hesap doğrulama için gereklidir.</small>
-                </div>
-                
+
                 <div class="mb-4">
                   <label for="birth_year" class="form-label">
                     <i class="fas fa-birthday-cake me-2"></i>Doğum Yılı
@@ -340,7 +329,7 @@
                   </div>
                   <small class="form-text mt-1">İstatistikler için kullanılacaktır, zorunlu değildir.</small>
                 </div>
-                
+
                 <div class="profile-edit-actions text-end">
                   <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>İptal
@@ -369,29 +358,29 @@
     const avatarPreview = document.getElementById('avatarPreview');
     const avatarPlaceholder = document.getElementById('avatarPlaceholder');
     const removePhotoBtn = document.getElementById('removePhotoBtn');
-    
+
     // Yeni değişken - profil fotoğrafı kaldırıldı mı?
     let photoRemoved = false;
-    
+
     if (profileImage) {
       profileImage.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
           const file = e.target.files[0];
-          
+
           // Dosya boyutu kontrolü (500KB = 512000 bytes)
           if (file.size > 512000) {
             alert('Dosya boyutu çok büyük! Lütfen 500KB\'dan küçük bir dosya seçin.');
             return;
           }
-          
+
           // Dosya tipi kontrolü
           if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
             alert('Lütfen geçerli bir resim dosyası seçin (JPG, PNG veya GIF).');
             return;
           }
-          
+
           const reader = new FileReader();
-          
+
           reader.onload = function(e) {
             avatarPreview.src = e.target.result;
             avatarPreview.classList.remove('d-none');
@@ -401,12 +390,12 @@
             // Fotoğraf eklendiğinde, kaldırma işlemini sıfırla
             photoRemoved = false;
           };
-          
+
           reader.readAsDataURL(file);
         }
       });
     }
-    
+
     // Fotoğraf kaldırma butonu işlevselliği
     if (removePhotoBtn) {
       removePhotoBtn.addEventListener('click', function() {
@@ -415,19 +404,19 @@
           avatarPreview.classList.add('d-none');
           avatarPreview.src = '';
         }
-        
+
         if (avatarPlaceholder) {
           avatarPlaceholder.classList.remove('d-none');
         }
-        
+
         // Dosya seçim alanını sıfırla
         if (profileImage) {
           profileImage.value = '';
         }
-        
+
         // Fotoğrafın kaldırıldığını işaretle
         photoRemoved = true;
-        
+
         // Gizli input ekle - backend'e fotoğrafın kaldırıldığını bildirmek için
         let removePhotoInput = document.getElementById('remove_photo');
         if (!removePhotoInput) {
@@ -442,16 +431,16 @@
         }
       });
     }
-    
+
     // Kullanıcı adı doğrulama
     const usernameInput = document.getElementById('username');
     const usernameValidity = document.getElementById('usernameValidity');
     const usernameHelp = document.getElementById('usernameHelp');
-    
+
     if (usernameInput && usernameValidity) {
       usernameInput.addEventListener('input', function() {
         const username = this.value.trim();
-        
+
         if (username.length < 3) {
           usernameValidity.innerHTML = '<i class="fas fa-times-circle text-danger"></i>';
           usernameHelp.innerHTML = 'Kullanıcı adı en az 3 karakter olmalıdır.';
@@ -470,19 +459,19 @@
           usernameHelp.className = 'form-text mt-1 text-success';
         }
       });
-      
+
       // Sayfa yüklendiğinde de kontrolü yap
       usernameInput.dispatchEvent(new Event('input'));
     }
-    
+
     // Doğum yılı doğrulaması
     const birthYearInput = document.getElementById('birth_year');
-    
+
     if (birthYearInput) {
       birthYearInput.addEventListener('input', function() {
         const year = parseInt(this.value);
         const currentYear = new Date().getFullYear();
-        
+
         if (isNaN(year)) {
           // Değer boş veya sayısal değil
           this.setCustomValidity('');
@@ -495,29 +484,29 @@
         }
       });
     }
-    
+
     // Form gönderme sırasında yükleme durumu göster
     const profileForm = document.getElementById('profileForm');
     const saveProfileBtn = document.getElementById('saveProfileBtn');
-    
+
     if (profileForm && saveProfileBtn) {
       profileForm.addEventListener('submit', function(e) {
         // Form doğrulaması
         const username = usernameInput.value.trim();
-        
+
         if (username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
           e.preventDefault();
           alert('Lütfen geçerli bir kullanıcı adı giriniz.');
           return false;
         }
-        
+
         // Yükleme durumunu göster
         const spinner = saveProfileBtn.querySelector('.spinner-border');
         spinner.classList.remove('d-none');
         saveProfileBtn.disabled = true;
       });
     }
-    
+
     // Profil resmi yükleme butonu için hover efekti
     const profileUploadPreview = document.querySelector('.profile-upload-preview');
     if (profileUploadPreview) {
@@ -527,7 +516,7 @@
         }
       });
     }
-    
+
     // Tab değişiminde aktif sekmeyi URL'ye ekle
     const gameTabs = document.querySelectorAll('#gameTabs .nav-link');
     if (gameTabs.length > 0) {
@@ -537,7 +526,7 @@
           history.replaceState(null, null, '#' + gameType);
         });
       });
-      
+
       // Sayfa yüklendiğinde URL'de sekme varsa ona git
       if (location.hash) {
         const tabId = location.hash.substring(1) + '-tab';

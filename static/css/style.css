@@ -1057,7 +1057,67 @@ footer::before {
 }
 
 .profile-edit-modal .modal-body {
-  padding: 25px;
+  padding: 0;
+}
+
+.profile-edit-modal .profile-upload-preview {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--accent-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-edit-modal .profile-upload-preview:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.profile-edit-modal .avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-edit-modal .avatar-overlay i {
+  color: white;
+  font-size: 2rem;
+}
+
+.profile-edit-modal .btn-upload {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.profile-edit-modal .btn-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.3);
+}
+
+.profile-edit-modal .validity-indicator {
+  display: inline-block;
+  width: 24px;
+  text-align: center;
+}
+
+.profile-edit-modal .input-group-text {
+  background: rgba(20, 20, 35, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--accent-color);
 }
 
 .profile-edit-avatar-container {
