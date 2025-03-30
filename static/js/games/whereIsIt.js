@@ -15,22 +15,83 @@ document.addEventListener('DOMContentLoaded', function() {
   const gameOverBtn = document.getElementById('game-over-btn');
   const progressBar = document.getElementById('progress-bar');
 
-  // Oyun ses efektleri
-  const sounds = {
-    correct: new Audio('/static/sounds/correct.mp3'),
-    wrong: new Audio('/static/sounds/wrong.mp3'),
-    click: new Audio('/static/sounds/click.mp3'),
-    success: new Audio('/static/sounds/success.mp3'),
-    gameOver: new Audio('/static/sounds/game-over.mp3')
-  };
+  // Ses efektleri için yapı
+  const sounds = {};
+  let soundsLoaded = false;
+  let soundEnabled = true;
 
-  // Ses oynatma fonksiyonu
-  function playSound(sound) {
+  // Sesleri pre-load etme
+  function loadSounds() {
     try {
-      sounds[sound].currentTime = 0;
-      sounds[sound].play().catch(err => console.log("Sound play error:", err));
+      sounds.correct = new Audio('/static/sounds/correct.mp3');
+      sounds.wrong = new Audio('/static/sounds/wrong.mp3');
+      sounds.click = new Audio('/static/sounds/click.mp3');
+      sounds.success = new Audio('/static/sounds/success.mp3');
+      sounds.gameOver = new Audio('/static/sounds/game-over.mp3');
+      
+      soundsLoaded = true;
+      return true;
     } catch (error) {
-      console.log("Sound play error:", error);
+      console.log("Ses yüklenirken hata oluştu:", error);
+      soundsLoaded = false;
+      return false;
+    }
+  }
+
+  // Sesler en başta yüklensin
+  loadSounds();
+
+  // Ses açma/kapama butonu ekle
+  const gameHeader = document.createElement('div');
+  gameHeader.className = 'game-header';
+  gameHeader.innerHTML = `
+    <div class="game-controls-top">
+      <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
+        <i class="fas fa-volume-up"></i>
+      </button>
+    </div>
+  `;
+  gameContainer.insertBefore(gameHeader, gameContainer.firstChild);
+
+  // Ses açma/kapama olayı
+  const soundToggleBtn = document.getElementById('sound-toggle');
+  soundToggleBtn.addEventListener('click', function() {
+    soundEnabled = !soundEnabled;
+    
+    if (soundEnabled) {
+      soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      soundToggleBtn.classList.add('active');
+    } else {
+      soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      soundToggleBtn.classList.remove('active');
+    }
+  });
+
+  // Ses oynatma fonksiyonu (güvenli)
+  function playSound(sound) {
+    if (!soundEnabled || !soundsLoaded) return;
+    
+    try {
+      // Ses arayüz tarafından başlatılmış olmalı
+      if (sounds[sound].paused) {
+        sounds[sound].currentTime = 0;
+        const playPromise = sounds[sound].play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log("Ses çalma hatası (normal):", error);
+          });
+        }
+      } else {
+        // Zaten çalıyorsa, yeni bir ses örneği oluştur
+        const tempSound = new Audio(sounds[sound].src);
+        tempSound.volume = 0.5;
+        tempSound.play().catch(err => {
+          console.log("Geçici ses çalma hatası (normal):", err);
+        });
+      }
+    } catch (error) {
+      console.log("Genel ses hatası:", error);
     }
   }
 
@@ -53,7 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
     ],
     currentCharacter: null,
     maxRounds: 10,
-    difficulty: 'MEDIUM'
+    difficulty: 'MEDIUM',
+    roundResults: [] // Her turun sonuçlarını takip etmek için
   };
 
   // Zorluk ayarları
@@ -114,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Oyun durumunu sıfırla
     gameState.currentRound = 0;
     gameState.score = 0;
+    gameState.roundResults = []; // Tur sonuçlarını sıfırla
     scoreDisplay.textContent = '0';
     roundDisplay.textContent = '1/' + gameState.maxRounds;
 
@@ -213,6 +276,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Doğru yeri göster
     showTargetMarker(gameState.currentCharacter.x, gameState.currentCharacter.y, true);
+    
+    // Sonucu kaydet
+    gameState.roundResults.push({
+      round: gameState.currentRound,
+      correct: true,
+      score: roundScore
+    });
 
     // Sonuç mesajını göster
     resultMessage.textContent = 'Harika! Doğru yeri buldunuz.';
@@ -254,6 +324,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Doğru yeri göster
     showTargetMarker(gameState.currentCharacter.x, gameState.currentCharacter.y, true);
+    
+    // Sonucu kaydet
+    gameState.roundResults.push({
+      round: gameState.currentRound,
+      correct: false,
+      score: 0
+    });
 
     // Sonuç mesajını göster
     resultMessage.textContent = 'Süre Doldu!';
@@ -294,7 +371,70 @@ document.addEventListener('DOMContentLoaded', function() {
   // Oyunu bitir ve puanı gönder
   function finishGame() {
     playSound('success');
-
+    
+    // Doğru yüzdesini hesapla
+    let correctAnswers = 0;
+    for (let i = 0; i < gameState.currentRound; i++) {
+      if (i < gameState.roundResults.length && gameState.roundResults[i].correct) {
+        correctAnswers++;
+      }
+    }
+    
+    // Sonuç ekranını güncelle
+    const gameResults = document.getElementById('game-results');
+    document.getElementById('final-score').textContent = gameState.score;
+    document.getElementById('correct-answers').textContent = correctAnswers;
+    document.getElementById('completed-rounds').textContent = gameState.currentRound;
+    
+    // Yıldız derecesi hesapla
+    const maxStars = 5;
+    let starsCount = 0;
+    
+    if (gameState.difficulty === 'EASY') {
+      starsCount = Math.ceil((gameState.score / 1000) * maxStars);
+    } else if (gameState.difficulty === 'MEDIUM') {
+      starsCount = Math.ceil((gameState.score / 1500) * maxStars);
+    } else { // HARD
+      starsCount = Math.ceil((gameState.score / 2000) * maxStars);
+    }
+    
+    starsCount = Math.min(starsCount, maxStars);
+    
+    // Yıldızları güncelle
+    const ratingStarsElement = document.getElementById('rating-stars');
+    ratingStarsElement.innerHTML = '';
+    
+    for (let i = 0; i < maxStars; i++) {
+      const starIcon = document.createElement('i');
+      starIcon.className = i < starsCount ? 'fas fa-star' : 'far fa-star';
+      ratingStarsElement.appendChild(starIcon);
+    }
+    
+    // Derecelendirme metnini güncelle
+    const ratingText = document.getElementById('rating-text');
+    if (starsCount <= 1) {
+      ratingText.textContent = 'Başlangıç';
+    } else if (starsCount === 2) {
+      ratingText.textContent = 'İyi';
+    } else if (starsCount === 3) {
+      ratingText.textContent = 'Harika';
+    } else if (starsCount === 4) {
+      ratingText.textContent = 'Mükemmel';
+    } else {
+      ratingText.textContent = 'Efsanevi!';
+    }
+    
+    // Tekrar oyna butonu olayı
+    document.getElementById('play-again').addEventListener('click', function() {
+      gameResults.style.display = 'none';
+      gameContainer.style.display = 'block';
+      startGame();
+    });
+    
+    // Oyun sonuç ekranını göster
+    gameContainer.style.display = 'none';
+    gameResults.style.display = 'block';
+    
     // Skoru sunucuya gönder
     fetch('/save_score', {
       method: 'POST',
@@ -313,10 +453,5 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
       console.error('Skor kaydedilirken hata oluştu:', error);
     });
-
-    // Ana sayfaya dön
-    setTimeout(function() {
-      window.location.href = '/leaderboard?game=whereIsIt';
-    }, 1500);
   }
 });

@@ -573,21 +573,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Ses çal
+  // Ses sistemi
+  const sounds = {};
+  let soundsLoaded = false;
+  
+  // Sesleri yükle
+  function loadSounds() {
+    try {
+      sounds.number = new Audio('/static/sounds/number.mp3');
+      sounds.click = new Audio('/static/sounds/click.mp3');
+      sounds.correct = new Audio('/static/sounds/correct.mp3');
+      sounds.wrong = new Audio('/static/sounds/wrong.mp3');
+      sounds.levelUp = new Audio('/static/sounds/level-up.mp3');
+      
+      // Sesleri önceden başlat (bir kullanıcı etkileşimi sırasında)
+      soundToggleBtn.addEventListener('mousedown', function() {
+        sounds.click.volume = 0;
+        sounds.click.play().catch(e => {});
+      }, { once: true });
+      
+      soundsLoaded = true;
+      return true;
+    } catch (error) {
+      console.log("Ses yükleme hatası:", error);
+      soundsLoaded = false;
+      return false;
+    }
+  }
+  
+  // Sesleri yükle
+  loadSounds();
+  
+  // Ses çal (güvenli)
   function playSound(soundName) {
-    if (!soundEnabled) return;
+    if (!soundEnabled || !soundsLoaded || !sounds[soundName]) return;
     
-    const sounds = {
-      number: new Audio('/static/sounds/number.mp3'),
-      click: new Audio('/static/sounds/click.mp3'),
-      correct: new Audio('/static/sounds/correct.mp3'),
-      wrong: new Audio('/static/sounds/wrong.mp3'),
-      levelUp: new Audio('/static/sounds/level-up.mp3')
-    };
-    
-    if (sounds[soundName]) {
-      sounds[soundName].volume = 0.5;
-      sounds[soundName].play().catch(e => console.log('Sound play error:', e));
+    try {
+      // Her durumda yeni ses objeleri oluştur
+      const tempSound = new Audio(sounds[soundName].src);
+      tempSound.volume = 0.5;
+      
+      const playPromise = tempSound.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          // Bir kullanıcı etkileşimi gerektiğinde ses çalmaya çalışırsa hata verebilir
+          // Bu beklenen bir durum, sessizce devam et
+        });
+      }
+    } catch (error) {
+      // Ses çalma hatası, sessizce devam et
     }
   }
   
@@ -1458,13 +1492,66 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Oyunu bitir
   function finishGame() {
+    // Sonuç ekranını hazırla
+    const gameResults = document.getElementById('game-results');
+    if (gameResults) {
+      const finalScore = gameState.score;
+      const resultsHTML = `
+        <div class="result-card">
+          <h3>Oyun Bitti!</h3>
+          <div class="result-details">
+            <p>Skorunuz: <strong>${finalScore}</strong></p>
+            <p>Ulaştığınız seviye: <strong>${gameState.level}</strong></p>
+            <p>Doğru sayı: <strong>${gameState.correctAnswers}</strong></p>
+          </div>
+          <div class="rating">
+            <div id="rating-stars">
+              ${getRatingStars(finalScore)}
+            </div>
+            <p id="rating-text">${getRatingText(finalScore)}</p>
+          </div>
+          <div class="game-results-footer">
+            <button id="play-again" class="btn btn-primary btn-lg"><i class="fas fa-redo me-2"></i>Tekrar Oyna</button>
+            <a href="/" id="go-home" class="btn btn-outline-primary btn-lg"><i class="fas fa-home me-2"></i>Ana Sayfa</a>
+          </div>
+        </div>
+      `;
+      
+      gameResults.innerHTML = resultsHTML;
+      document.getElementById('game-container').style.display = 'none';
+      gameResults.style.display = 'block';
+      
+      // Tekrar oyna butonu etkinleştirme
+      document.getElementById('play-again').addEventListener('click', () => {
+        gameResults.style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        resetGame();
+        startGame();
+      });
+    }
+    
     // Skoru sunucuya gönder
     saveScore();
+  }
+  
+  function getRatingStars(score) {
+    const maxStars = 5;
+    const starsCount = Math.min(Math.ceil(score / 200), maxStars);
     
-    // Ana sayfaya dön
-    setTimeout(function() {
-      window.location.href = '/leaderboard?game=numberChain';
-    }, 1000);
+    let starsHTML = '';
+    for (let i = 0; i < maxStars; i++) {
+      starsHTML += `<i class="${i < starsCount ? 'fas' : 'far'} fa-star"></i>`;
+    }
+    
+    return starsHTML;
+  }
+  
+  function getRatingText(score) {
+    if (score < 200) return 'Başlangıç';
+    if (score < 400) return 'İyi';
+    if (score < 600) return 'Harika';
+    if (score < 800) return 'Mükemmel';
+    return 'Efsanevi!';
   }
   
   // Skoru kaydet

@@ -66,6 +66,152 @@
   100% { box-shadow: 0 0 0 0 rgba(255, 77, 107, 0); }
 }
 
+/* Gelişmiş Başla Butonu Stilleri */
+.game-start-btn {
+  background: linear-gradient(135deg, #6a5ae0, #5050c5);
+  border: none;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px auto;
+  min-width: 200px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(106, 90, 224, 0.3);
+}
+
+.game-start-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: -1;
+}
+
+.game-start-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(106, 90, 224, 0.4);
+  background: linear-gradient(135deg, #7665e6, #5a5ad0);
+}
+
+.game-start-btn:hover:before {
+  transform: translateX(100%);
+}
+
+.game-start-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 10px rgba(106, 90, 224, 0.2);
+}
+
+.game-start-btn i {
+  font-size: 1.3rem;
+}
+
+.game-start-btn.pulse-animation {
+  animation: pulse 1.5s infinite, gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Oyun zorluk seviyesi seçici */
+.game-level-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.level-label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.level-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.level-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.level-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.level-btn.active {
+  background: rgba(106, 90, 224, 0.2);
+  border-color: #6a5ae0;
+  color: #6a5ae0;
+}
+
+/* Oyun kontrol butonları */
+.game-control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.game-control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.game-control-btn.active {
+  color: #6a5ae0;
+  background: rgba(106, 90, 224, 0.2);
+}
+
+.game-controls-top {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.game-header {
+  margin-bottom: 15px;
+}
+
 /* Where Is It (Kim Nerede) Oyun Stilleri */
 .where-is-it-game-container {
   border-radius: 15px;
@@ -226,7 +372,7 @@
   opacity: 1;
 }
 
-.game-results-card {
+.game-results, .game-results-card {
   background-color: rgba(26, 26, 46, 0.8);
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -235,6 +381,7 @@
   -webkit-backdrop-filter: blur(10px);
   max-width: 600px;
   margin: 0 auto;
+  padding: 25px;
 }
 
 .game-results-header {
@@ -242,6 +389,7 @@
   padding: 20px 25px;
   text-align: center;
   position: relative;
+  margin: -25px -25px 25px -25px;
 }
 
 .result-badge {
@@ -268,10 +416,23 @@
   padding: 25px;
 }
 
-.results-stats {
+.results-stats, .result-details {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  gap: 15px;
   margin-bottom: 25px;
+}
+
+.result-details p {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-details strong {
+  color: rgba(var(--accent-rgb), 1);
+  font-size: 1.1em;
 }
 
 .result-stat {
@@ -297,19 +458,19 @@
   letter-spacing: 1px;
 }
 
-.results-rating {
+.results-rating, .rating {
   text-align: center;
-  margin: 0px 0 20px;
+  margin: 20px 0;
 }
 
-.rating-stars {
+.rating-stars, #rating-stars {
   font-size: 1.5rem;
   letter-spacing: 5px;
   margin-bottom: 10px;
   color: #f0ad4e;
 }
 
-.rating-text {
+.rating-text, #rating-text {
   font-size: 1.1rem;
   font-weight: 500;
   color: #f0ad4e;
@@ -342,13 +503,12 @@
   justify-content: center;
   gap: 15px;
   margin-top: 20px;
-  padding: 0 25px 20px;
 }
 
 .game-share-section {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 20px;
-  padding: 20px 25px;
+  padding: 20px 0 0;
   text-align: center;
 }
 
@@ -380,6 +540,28 @@
 .share-btn:hover {
   background-color: rgba(106, 90, 224, 0.5);
   transform: translateY(-3px);
+}
+
+.result-card {
+  background: linear-gradient(to bottom, rgba(40, 40, 80, 0.7), rgba(30, 30, 60, 0.7));
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-card h3 {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.result-card p {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }
 
 /* Duraklat Menüsü */
