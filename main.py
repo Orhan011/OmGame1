@@ -738,8 +738,8 @@ def forgot_password():
             flash('Bu email adresi ile kayıtlı bir kullanıcı bulunamadı.', 'danger')
             return redirect(url_for('forgot_password'))
         
-        # Generate a random 6-digit verification code
-        verification_code = ''.join(random.choices('0123456789', k=6))
+        # Generate a random 4-digit verification code
+        verification_code = ''.join(random.choices('0123456789', k=4))
         token_expiry = datetime.utcnow() + timedelta(minutes=30)  # Token valid for 30 minutes
         
         # Save the verification code and expiry in the user's record
@@ -800,13 +800,13 @@ def reset_code():
         if not verification_code:
             # Try to get individual digits and combine them
             code_parts = []
-            for i in range(1, 7):
+            for i in range(1, 5):
                 digit = request.form.get(f'code{i}', '')
                 if not digit:
                     break
                 code_parts.append(digit)
             
-            if len(code_parts) == 6:
+            if len(code_parts) == 4:
                 verification_code = ''.join(code_parts)
         
         user = User.query.filter_by(email=email).first()
