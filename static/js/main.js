@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
-  
+
   // Setup button loading animations
   setupButtonLoadingStates();
-  
+
   // Save game score
   window.saveScore = function(gameType, score) {
     fetch('/api/save-score', {
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
-      
+
       // Show success message
       const toast = document.createElement('div');
       toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3';
@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       document.body.appendChild(toast);
-      
+
       const bsToast = new bootstrap.Toast(toast);
       bsToast.show();
-      
+
       // Auto-remove toast after it's hidden
       toast.addEventListener('hidden.bs.toast', function() {
         document.body.removeChild(toast);
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => {
       console.error('Error saving score:', error);
-      
+
       // Show error message
       const toast = document.createElement('div');
       toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed bottom-0 end-0 m-3';
@@ -66,22 +66,22 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       document.body.appendChild(toast);
-      
+
       const bsToast = new bootstrap.Toast(toast);
       bsToast.show();
-      
+
       // Auto-remove toast after it's hidden
       toast.addEventListener('hidden.bs.toast', function() {
         document.body.removeChild(toast);
       });
     });
   };
-  
+
   // Load leaderboard data
   window.loadLeaderboard = function(gameType, elementId) {
     const leaderboardElement = document.getElementById(elementId);
     if (!leaderboardElement) return;
-    
+
     fetch(`/api/get-scores/${gameType}`)
       .then(response => response.json())
       .then(data => {
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </thead>
             <tbody>
         `;
-        
+
         if (data.length === 0) {
           html += `
             <tr>
@@ -116,12 +116,12 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
           });
         }
-        
+
         html += `
             </tbody>
           </table>
         `;
-        
+
         leaderboardElement.innerHTML = html;
       })
       .catch(error => {
@@ -133,18 +133,18 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
       });
   };
-  
+
   // Helper function for timer
   window.startTimer = function(durationInSeconds, displayElement, onTimeUp) {
     let timer = durationInSeconds;
     const display = document.getElementById(displayElement);
     if (!display) return;
-    
+
     display.textContent = formatTime(timer);
-    
+
     const interval = setInterval(function() {
       timer--;
-      
+
       if (timer < 0) {
         clearInterval(interval);
         if (typeof onTimeUp === 'function') {
@@ -152,10 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return;
       }
-      
+
       display.textContent = formatTime(timer);
     }, 1000);
-    
+
     return {
       stop: function() {
         clearInterval(interval);
@@ -165,13 +165,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     };
   };
-  
+
   function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
-  
+
   // Button Loading Animation Functionality
   function setupButtonLoadingStates() {
     document.querySelectorAll('.btn').forEach(button => {
@@ -185,28 +185,28 @@ document.addEventListener('DOMContentLoaded', function() {
               this.hasAttribute('data-bs-dismiss')) {
             return;
           }
-          
+
           // Don't add loading to buttons that are links with href
           if (this.tagName === 'A' && this.hasAttribute('href') && 
               !this.href.includes('javascript:void')) {
             return;
           }
-          
+
           // Store the original content if not already stored
           if (!this.dataset.originalHtml) {
             this.dataset.originalHtml = this.innerHTML;
           }
-          
+
           // Add loading spinner
           this.classList.add('btn-loading');
           const originalHtml = this.dataset.originalHtml;
-          
+
           // Create spinner and text wrapper
           this.innerHTML = `
             <span class="btn-spinner"></span>
             <span class="btn-text">${originalHtml}</span>
           `;
-          
+
           // Return to original state after some time (failsafe)
           setTimeout(() => {
             if (this.classList.contains('btn-loading')) {
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
     profileButton.addEventListener('click', function() {
       const modal = new bootstrap.Modal(profileModal);
       modal.show();
-      
+
       if (!isContentLoaded) {
         // Delay content loading slightly to ensure smooth modal animation
         setTimeout(() => {
@@ -246,13 +246,13 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   const userProfileMini = document.getElementById('userProfileMini');
   const userProfileDropdown = document.getElementById('userProfileDropdown');
-  
+
   if (userProfileMini && userProfileDropdown) {
     userProfileMini.addEventListener('click', function(event) {
       event.stopPropagation();
       userProfileDropdown.classList.toggle('show');
     });
-    
+
     // Sayfa herhangi bir yerine tıklandığında menüyü kapat
     document.addEventListener('click', function(event) {
       if (userProfileDropdown.classList.contains('show') && 
@@ -263,3 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+function toggleProfilePanel() {
+  const panel = document.getElementById('profile-panel');
+
+  if (panel) {
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      panel.style.display = 'block';
+      panel.style.position = 'absolute';
+      panel.style.top = '0';
+      panel.style.zIndex = '1000';
+    }
+  }
+}

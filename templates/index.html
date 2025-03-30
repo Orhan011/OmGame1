@@ -8,9 +8,9 @@
   {% if session.get('user_id') %}
     <div class="user-profile-mini" id="userProfileMini">
       {% if session.get('avatar_url') %}
-        <img src="{{ session.get('avatar_url') }}" alt="Profil" class="mini-avatar-img">
+        <img src="{{ session.get('avatar_url') }}" alt="Profil" class="mini-avatar-img" style="border: none;">
       {% else %}
-        <div class="mini-avatar-circle">{{ session.get('username', '')[0]|upper }}</div>
+        <div class="mini-avatar-circle" style="border: none;">{{ session.get('username', '')[0]|upper }}</div>
       {% endif %}
     </div>
     <div class="user-profile-dropdown" id="userProfileDropdown">
