@@ -8203,24 +8203,26 @@ main {
 .game-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  padding: 20px;
+  gap: 20px;
+  padding: 15px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .game-card {
   background: rgba(20, 20, 40, 0.8);
-  border-radius: 20px;
+  border-radius: 15px;
   overflow: hidden;
   transition: transform 0.3s ease;
   border: 1px solid rgba(106, 90, 205, 0.2);
   aspect-ratio: 16/9;
-  padding: 20px;
+  padding: 15px;
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
+  min-height: 180px;
 }
 
 .game-card:hover {
@@ -8230,29 +8232,73 @@ main {
 
 .game-icon {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 15px;
+  left: 15px;
   color: rgb(106, 90, 205);
-  font-size: 2rem;
+  font-size: 1.8rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 12px;
 }
 
 .game-title {
   color: #fff;
-  font-size: 1.4rem;
-  margin-top: 20px;
+  font-size: 1.2rem;
+  margin-top: 10px;
   text-align: center;
   width: 100%;
+  padding: 0 40px;
 }
 
 .game-btn {
-  margin-top: auto;
   background: linear-gradient(45deg, #6a5acd, #9370db);
   color: white;
-  padding: 10px 30px;
-  border-radius: 25px;
+  padding: 8px 25px;
+  border-radius: 20px;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px;
+  }
+  
+  .game-card {
+    min-height: 140px;
+    padding: 12px;
+  }
+  
+  .game-icon {
+    font-size: 1.4rem;
+    padding: 8px;
+  }
+  
+  .game-title {
+    font-size: 1rem;
+    padding: 0 30px;
+  }
+  
+  .game-btn {
+    padding: 6px 20px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .game-card {
+    min-height: 120px;
+  }
 }
 
 .game-btn:hover {
