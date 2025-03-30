@@ -48,3 +48,329 @@ const ROWS = 20;
 // Tetris oyun mantığı buraya eklenecek
 </script>
 {% endblock %}
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="game-container">
+  <div class="tetris-stats">
+    <div>Score: <span id="score">0</span></div>
+    <div>Level: <span id="level">1</span></div>
+    <div>Lines: <span id="lines">0</span></div>
+  </div>
+  <canvas id="tetris" width="240" height="400"></canvas>
+  <div class="game-controls">
+    <button id="startGame" class="btn btn-primary">Başlat</button>
+    <button id="pauseGame" class="btn btn-warning">Duraklat</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+#tetris {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--accent-color);
+  border-radius: 10px;
+}
+
+.tetris-stats {
+  font-size: 20px;
+  color: var(--accent-color);
+  display: flex;
+  gap: 20px;
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const canvas = document.getElementById('tetris');
+const ctx = canvas.getContext('2d');
+const scoreElement = document.getElementById('score');
+const levelElement = document.getElementById('level');
+const linesElement = document.getElementById('lines');
+const startBtn = document.getElementById('startGame');
+const pauseBtn = document.getElementById('pauseGame');
+
+const scale = 20;
+const rows = 20;
+const cols = 12;
+
+let score = 0;
+let level = 1;
+let lines = 0;
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+let gameLoop;
+let isPaused = false;
+
+const pieces = [
+  [[1,1,1,1]],
+  [[1,1],[1,1]],
+  [[1,1,1],[0,1,0]],
+  [[1,1,1],[1,0,0]],
+  [[1,1,1],[0,0,1]],
+  [[1,1,0],[0,1,1]],
+  [[0,1,1],[1,1,0]]
+];
+
+const colors = [
+  '#FF0D72',
+  '#0DC2FF',
+  '#0DFF72',
+  '#F538FF',
+  '#FF8E0D',
+  '#FFE138',
+  '#3877FF'
+];
+
+let piece = {
+  pos: {x: 0, y: 0},
+  matrix: null,
+  color: null
+};
+
+let arena = createMatrix(cols, rows);
+
+function createMatrix(w, h) {
+  const matrix = [];
+  while(h--) {
+    matrix.push(new Array(w).fill(0));
+  }
+  return matrix;
+}
+
+function collide(arena, piece) {
+  const [m, o] = [piece.matrix, piece.pos];
+  for(let y = 0; y < m.length; y++) {
+    for(let x = 0; x < m[y].length; x++) {
+      if(m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function merge(arena, piece) {
+  piece.matrix.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if(value !== 0) {
+        arena[y + piece.pos.y][x + piece.pos.x] = value;
+      }
+    });
+  });
+}
+
+function rotate(matrix) {
+  const N = matrix.length;
+  const result = createMatrix(N, N);
+  for(let y = 0; y < N; y++) {
+    for(let x = 0; x < N; x++) {
+      result[x][N - 1 - y] = matrix[y][x];
+    }
+  }
+  return result;
+}
+
+function playerRotate() {
+  const pos = piece.pos.x;
+  let offset = 1;
+  const matrix = rotate(piece.matrix);
+  piece.matrix = matrix;
+  
+  while(collide(arena, piece)) {
+    piece.pos.x += offset;
+    offset = -(offset + (offset > 0 ? 1 : -1));
+    if(offset > matrix[0].length) {
+      piece.matrix = matrix;
+      piece.pos.x = pos;
+      return;
+    }
+  }
+}
+
+function playerMove(dir) {
+  piece.pos.x += dir;
+  if(collide(arena, piece)) {
+    piece.pos.x -= dir;
+  }
+}
+
+function playerDrop() {
+  piece.pos.y++;
+  if(collide(arena, piece)) {
+    piece.pos.y--;
+    merge(arena, piece);
+    pieceReset();
+    arenaSweep();
+    updateScore();
+  }
+  dropCounter = 0;
+}
+
+function pieceReset() {
+  const pieces = 'ILJOTSZ';
+  piece.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+  piece.pos.y = 0;
+  piece.pos.x = (arena[0].length / 2 | 0) - (piece.matrix[0].length / 2 | 0);
+  
+  if(collide(arena, piece)) {
+    arena.forEach(row => row.fill(0));
+    gameOver();
+  }
+}
+
+function createPiece(type) {
+  switch(type) {
+    case 'T': return [[0,0,0], [1,1,1], [0,1,0]];
+    case 'O': return [[1,1], [1,1]];
+    case 'L': return [[0,1,0], [0,1,0], [0,1,1]];
+    case 'J': return [[0,1,0], [0,1,0], [1,1,0]];
+    case 'I': return [[0,1,0,0], [0,1,0,0], [0,1,0,0], [0,1,0,0]];
+    case 'S': return [[0,1,1], [1,1,0], [0,0,0]];
+    case 'Z': return [[1,1,0], [0,1,1], [0,0,0]];
+  }
+}
+
+function arenaSweep() {
+  let rowCount = 1;
+  outer: for(let y = arena.length - 1; y > 0; --y) {
+    for(let x = 0; x < arena[y].length; ++x) {
+      if(arena[y][x] === 0) {
+        continue outer;
+      }
+    }
+    const row = arena.splice(y, 1)[0].fill(0);
+    arena.unshift(row);
+    ++y;
+    lines += rowCount;
+    score += rowCount * 100;
+    rowCount *= 2;
+    
+    if(lines % 10 === 0) {
+      level++;
+      dropInterval = Math.max(50, 1000 - (level * 50));
+    }
+  }
+}
+
+function updateScore() {
+  scoreElement.textContent = score;
+  levelElement.textContent = level;
+  linesElement.textContent = lines;
+}
+
+function draw() {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  drawMatrix(arena, {x: 0, y: 0});
+  drawMatrix(piece.matrix, piece.pos);
+}
+
+function drawMatrix(matrix, offset) {
+  matrix.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if(value !== 0) {
+        ctx.fillStyle = colors[value - 1];
+        ctx.fillRect((x + offset.x) * scale, (y + offset.y) * scale, scale - 1, scale - 1);
+      }
+    });
+  });
+}
+
+function gameOver() {
+  cancelAnimationFrame(gameLoop);
+  saveScore(score);
+  alert(`Oyun Bitti! Skorunuz: ${score}`);
+  resetGame();
+}
+
+function resetGame() {
+  arena.forEach(row => row.fill(0));
+  score = 0;
+  lines = 0;
+  level = 1;
+  dropInterval = 1000;
+  updateScore();
+}
+
+function update(time = 0) {
+  if(!isPaused) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+    dropCounter += deltaTime;
+    
+    if(dropCounter > dropInterval) {
+      playerDrop();
+    }
+    
+    draw();
+  }
+  gameLoop = requestAnimationFrame(update);
+}
+
+function saveScore(score) {
+  fetch('/api/save-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      score: score,
+      gameType: 'tetris'
+    })
+  });
+}
+
+document.addEventListener('keydown', event => {
+  if(!isPaused) {
+    switch(event.keyCode) {
+      case 37: // left
+        playerMove(-1);
+        break;
+      case 39: // right
+        playerMove(1);
+        break;
+      case 40: // down
+        playerDrop();
+        break;
+      case 38: // up
+        playerRotate();
+        break;
+    }
+  }
+});
+
+startBtn.addEventListener('click', () => {
+  if(!gameLoop) {
+    pieceReset();
+    update();
+  }
+});
+
+pauseBtn.addEventListener('click', () => {
+  isPaused = !isPaused;
+  pauseBtn.textContent = isPaused ? 'Devam Et' : 'Duraklat';
+});
+
+// Initial setup
+pieceReset();
+updateScore();
+</script>
+{% endblock %}
