@@ -96,7 +96,7 @@ function loadArticleContent() {
     
     {% if session.get('user_id') %}
     <div class="user-profile-corner mx-auto">
-      <div class="navbar-avatar" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
+      <div class="navbar-avatar navbar-avatar-elevated" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
         {% if get_avatar_url() %}
           <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="avatar-img">
         {% else %}

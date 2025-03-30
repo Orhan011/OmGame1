@@ -7,20 +7,36 @@
   z-index: 1060;
   display: flex;
   justify-content: center;
+  top: 10px;
 }
 
 .navbar-avatar {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-color), #5a4bd1);
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-avatar-elevated {
+  animation: pulse-avatar 2s infinite ease-in-out;
+}
+
+@keyframes pulse-avatar {
+  0% { box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3); transform: scale(1); }
+  50% { box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5); transform: scale(1.05); }
+  100% { box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3); transform: scale(1); }
 }
 
 .navbar-avatar:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 8px 25px rgba(106, 90, 224, 0.5);
 }
 
 @media (max-width: 991px) {
