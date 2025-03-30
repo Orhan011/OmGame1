@@ -25,19 +25,23 @@ def send_verification_email(to_email, verification_code):
     """
     Sends a verification email with the provided code
     
-    Uses the configured Gmail account (orhanmedia0@gmail.com) to send verification emails
+    Uses the configured Gmail account (omgameee@gmail.com) to send verification emails
     """
     import smtplib
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
+    import ssl
     
     # Gmail hesap bilgileri
     sender_email = "omgameee@gmail.com"
-    sender_password = "htvh fmfz eeic kkls"  # Uygulama şifresi doğrudan kullanılıyor
+    sender_password = "htvh fmfz eeic kkls"
     
     if not sender_password:
-        logger.error("Gmail app password not found in environment variables")
-        raise ValueError("Email sending failed: Missing GMAIL_APP_PASSWORD environment variable")
+        logger.error("Gmail app password not found")
+        raise ValueError("Email sending failed: Missing Gmail password")
+        
+    # SSL context oluştur
+    context = ssl.create_default_context()
     
     # Email içeriği
     subject = "ZekaPark Şifre Sıfırlama Kodu"
@@ -68,24 +72,29 @@ def send_verification_email(to_email, verification_code):
     msg.attach(MIMEText(message, 'html'))
     
     try:
+        logger.info(f"Attempting to send verification email to {to_email}")
+        
         # Gmail SMTP sunucusuna bağlan
-        smtp_server = smtplib.SMTP('smtp.gmail.com', 587)
-        smtp_server.starttls()
-        
-        # Giriş yap
-        smtp_server.login(sender_email, sender_password)
-        
-        # Email'i gönder
-        smtp_server.sendmail(sender_email, to_email, msg.as_string())
-        
-        # Bağlantıyı kapat
-        smtp_server.quit()
-        
-        logger.info(f"Verification email sent to {to_email}")
-        return True
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp_server:
+            # Giriş yap
+            smtp_server.login(sender_email, sender_password)
+            logger.info("Successfully logged in to SMTP server")
+            
+            # Email'i gönder
+            smtp_server.sendmail(sender_email, to_email, msg.as_string())
+            logger.info(f"Verification email successfully sent to {to_email}")
+            
+            return True
+            
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"SMTP Authentication failed: {e}")
+        raise ValueError("Email gönderimi başarısız: Gmail kimlik doğrulama hatası")
+    except smtplib.SMTPException as e:
+        logger.error(f"SMTP error occurred: {e}")
+        raise ValueError(f"Email gönderimi başarısız: SMTP hatası - {str(e)}")
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
-        raise
+        logger.error(f"Unexpected error in email sending: {e}")
+        raise ValueError(f"Email gönderimi başarısız: {str(e)}")
 
 # Template utility function for getting current user
 @app.template_filter('get_user_avatar')
