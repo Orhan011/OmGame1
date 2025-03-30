@@ -1126,6 +1126,11 @@ def save_score():
     if not user:
         return jsonify({'success': False, 'message': 'User not found'})
     
+    # game_type parametresini kontrol et (hem game_type hem de gameType'ı destekle)
+    game_type = data.get('game_type', data.get('gameType', None))
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Game type not provided'})
+    
     # XP ve seviye hesaplamaları için değerler
     original_level = user.experience_points // 1000 + 1
     xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
@@ -1135,7 +1140,7 @@ def save_score():
     # Önce mevcut skoru kontrol et
     existing_score = Score.query.filter_by(
         user_id=user_id,
-        game_type=data['gameType']
+        game_type=game_type
     ).first()
     
     if existing_score:
@@ -1158,7 +1163,7 @@ def save_score():
         # İlk kez oynuyorsa yeni skor kaydı oluştur
         new_score = Score(
             user_id=user_id,
-            game_type=data['gameType'],
+            game_type=game_type,
             score=data['score']
         )
         
@@ -1216,7 +1221,7 @@ def get_scores(game_type):
     # "all" özelliği eklenmiş - tüm oyunların verilerini getir
     if game_type == 'all':
         # Tüm oyun türleri için en yüksek skorları getir
-        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle']
+        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'brainRhythm', 'mindMap']
         all_scores = {}
         
         for internal_game_type in game_types:
@@ -1266,7 +1271,12 @@ def get_scores(game_type):
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
             'number-sequence': 'labyrinth',  # number-sequence de labyrinth'e yönlendiriliyor (geriye uyumluluk için)
-            'puzzle': 'puzzle'
+            'puzzle': 'puzzle',
+            'brain-rhythm': 'brainRhythm',
+            'mind-map': 'mindMap',
+            # Ayrıca direkt olarak da erişilebilsin
+            'brainRhythm': 'brainRhythm',
+            'mindMap': 'mindMap'
         }
         
         internal_game_type = game_type_map.get(game_type)

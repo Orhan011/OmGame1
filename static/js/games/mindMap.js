@@ -1,13 +1,17 @@
 /**
- * Zihin Haritası Oyunu - 1.0
+ * Zihin Haritası Oyunu - 2.0
  * 
- * Kullanıcının uzamsal belleğini ve bilişsel haritalama becerilerini geliştiren oyun.
+ * Kullanıcının uzamsal belleğini ve bilişsel haritalama becerilerini geliştiren profesyonel oyun.
  * 
  * Özellikler:
- * - Farklı zorluk seviyelerinde artan kart sayısı
- * - Mekânsal hafıza egzersizi
+ * - Farklı zorluk seviyelerinde artan kart sayısı ve grid boyutu
+ * - Gelişmiş mekânsal hafıza egzersizi
  * - Görsel algı ve uzamsal zeka geliştirme
- * - İlerleme ve başarı sistemi
+ * - İlerleme, başarı ve ödül sistemi
+ * - İnteraktif görsel geri bildirim ve animasyonlar
+ * - Performans analizi ve puan bazlı değerlendirme
+ * - Adaptif zorluk seviyeleri
+ * - Duyarlı (responsive) tasarım ve erişilebilirlik
  */
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,13 +1,16 @@
 /**
- * Beyin Ritmi Oyunu - 1.0
+ * Beyin Ritmi Oyunu - 2.0
  * 
- * Ritim ve bellek becerilerini geliştiren interaktif bir oyun.
+ * Ritim algısı ve işitsel hafızayı geliştiren profesyonel interaktif oyun.
  * 
  * Özellikler:
  * - Artan zorluk seviyelerinde ritim dizileri
- * - Görsel ve işitsel geribildirim
- * - Reaksiyon süresi ölçümü
- * - Puan ve başarı sistemi
+ * - Gelişmiş görsel ve işitsel geribildirim
+ * - Reaksiyon süresi ölçümü ve analizi
+ * - Gelişmiş puan sistemi ve başarı mekanizması
+ * - Görsel efektler ve animasyonlar
+ * - Uyarlanabilir zorluk seviyesi
+ * - Responsive tasarım ve erişilebilirlik
  */
 
 document.addEventListener('DOMContentLoaded', function() {
