@@ -7,6 +7,44 @@
   --z-index-higher: 1000;
   --z-index-highest: 9999;
   --z-index-modal: 10000;
+  
+  /* Modern renk paleti */
+  --primary-color: #6a5ae0;
+  --primary-light: #9f8aff;
+  --primary-dark: #4d3fc0;
+  --accent-color: #00c6ff;
+  --accent-light: #5adfff;
+  --accent-dark: #0095e0;
+  --success-color: #34c759;
+  --warning-color: #ffcc00;
+  --danger-color: #ff3b30;
+  --text-light: #f8f9fa;
+  --text-dark: #212529;
+  --card-bg: rgba(15, 20, 40, 0.7);
+  --surface-bg: rgba(30, 35, 60, 0.8);
+  
+  /* RGB versiyonları (CSS değişkenleri için) */
+  --primary-color-rgb: 106, 90, 224;
+  --primary-light-rgb: 159, 138, 255;
+  --primary-dark-rgb: 77, 63, 192;
+  --accent-color-rgb: 0, 198, 255;
+  --accent-light-rgb: 90, 223, 255;
+  --accent-dark-rgb: 0, 149, 224;
+  --success-color-rgb: 52, 199, 89;
+  --warning-color-rgb: 255, 204, 0;
+  --danger-color-rgb: 255, 59, 48;
+  
+  /* Gölgeler */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.15);
+  
+  /* Animasyon zamanlamaları */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+  --timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Ensure avatar is always visible at the highest level */
@@ -79,23 +117,55 @@
 }
 
 .profile-header {
-  background: linear-gradient(135deg, #6a5ae0 0%, #9f8aff 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border-radius: 1.5rem;
   padding: 3rem 2.5rem;
   margin-bottom: 3rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal) var(--timing-function);
   animation: fadeIn 0.8s ease-out;
   transform-style: preserve-3d;
   perspective: 1000px;
-  z-index: 1; /* Ana header için düşük z-index */
+  z-index: 1; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.profile-header::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.03) 5px,
+    rgba(255, 255, 255, 0.05) 5px,
+    rgba(255, 255, 255, 0.05) 10px
+  );
+  transform: rotate(15deg);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .profile-header:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-xl);
 }
 
 /* Tüm dekoratif öğeleri kaldırdık */
