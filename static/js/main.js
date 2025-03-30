@@ -7,6 +7,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Setup button loading animations
   setupButtonLoadingStates();
+  
+  // Kısayol panelini kapat - dışa tıklandığında
+  document.addEventListener('click', function(e) {
+    const shortcutPanel = document.getElementById('shortcutPanel');
+    const profileShortcut = document.querySelector('.profile-shortcut-avatar-wrapper');
+    
+    if (shortcutPanel && 
+        shortcutPanel.style.display === 'block' && 
+        !shortcutPanel.contains(e.target) && 
+        profileShortcut && 
+        !profileShortcut.contains(e.target)) {
+      shortcutPanel.style.display = 'none';
+    }
+  });
 
   // Save game score
   window.saveScore = function(gameType, score) {
@@ -282,4 +296,17 @@ function toggleProfilePanel(event) {
   
   // Panel sınıfını değiştir (CSS geçişleri için)
   panel.classList.toggle('active');
+}
+
+// Kısayol panelini aç/kapat
+function toggleShortcutPanel(event) {
+  event.stopPropagation();
+  const panel = document.getElementById('shortcutPanel');
+  if (!panel) return;
+  
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = 'block';
+  }
 }
