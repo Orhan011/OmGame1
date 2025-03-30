@@ -431,8 +431,21 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function generateAnswerOptions() {
+    answerOptions.innerHTML = '';
+    
     // Create array with the correct answer and some wrong answers
     const correctAnswer = gameState.correctAnswer;
+    
+    // Setup number input controls for manual entry
+    const numberControls = document.getElementById('number-controls');
+    const numberInput = document.getElementById('number-input');
+    const decreaseBtn = document.getElementById('decrease-btn');
+    const increaseBtn = document.getElementById('increase-btn');
+    const submitAnswer = document.getElementById('submit-answer');
+    
+    // Reset input value
+    numberInput.value = 0;
+    numberControls.style.display = 'flex';
     
     // Generate reasonable wrong answers based on the pattern
     const wrongAnswers = [];
@@ -456,7 +469,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const allOptions = [correctAnswer, ...wrongAnswers];
     gameState.options = shuffleArray(allOptions);
     
-    // Display options
+    // Setup event listeners for number controls
+    decreaseBtn.addEventListener('click', () => {
+      const currentValue = parseInt(numberInput.value);
+      if (currentValue > 0) {
+        numberInput.value = currentValue - 1;
+      }
+      playSound('click');
+    });
+    
+    increaseBtn.addEventListener('click', () => {
+      const currentValue = parseInt(numberInput.value);
+      numberInput.value = currentValue + 1;
+      playSound('click');
+    });
+    
+    // Allow number entry through input field
+    numberInput.addEventListener('change', () => {
+      // Keep input in reasonable range
+      const value = parseInt(numberInput.value);
+      if (isNaN(value) || value < 0) {
+        numberInput.value = 0;
+      } else if (value > 999) {
+        numberInput.value = 999;
+      }
+    });
+    
+    // Submit button
+    submitAnswer.addEventListener('click', () => {
+      if (gameState.isPaused) return;
+      
+      const answer = parseInt(numberInput.value);
+      if (!isNaN(answer)) {
+        checkAnswer(answer);
+      }
+      playSound('click');
+    });
+    
+    // Display options as buttons for quick selection
     gameState.options.forEach(option => {
       const optionElement = document.createElement('div');
       optionElement.className = 'answer-option';
@@ -465,6 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
       optionElement.addEventListener('click', () => {
         if (gameState.isPaused) return;
         
+        numberInput.value = option; // Set the input value to selected option
         checkAnswer(option);
       });
       
