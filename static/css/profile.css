@@ -44,7 +44,7 @@
 .profile-avatar {
   margin-bottom: -50px;
   position: relative;
-  z-index: 9999; /* Z-index değerini maksimize ettik */
+  z-index: 100000; /* Z-index değerini daha da yükseltildi */
 }
 
 .profile-avatar img, 
@@ -57,7 +57,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
   position: relative;
-  z-index: 9999; /* Resmin kendisi için de maksimum z-index */
+  z-index: 100000; /* Resmin kendisi için de çok yüksek z-index */
 }
 
 .profile-avatar img:hover,
@@ -100,9 +100,14 @@
 
 /* Tüm dekoratif öğeleri kaldırdık */
 .profile-header::before,
-.profile-header::after {
-  content: none; /* Tüm arkaplan çizgilerini tamamen kaldırdık */
-  display: none;
+.profile-header::after,
+.profile-avatar::before,
+.profile-avatar::after,
+.profile-info::before,
+.profile-info::after {
+  content: none !important; /* Tüm arkaplan çizgilerini tamamen kaldırdık */
+  display: none !important;
+  background: none !important;
 }
 
 @keyframes shimmer {
