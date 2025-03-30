@@ -178,13 +178,13 @@ document.addEventListener('DOMContentLoaded', function() {
   startBtn.addEventListener('click', startGame);
   submitBtn.addEventListener('click', submitAnswer);
   passBtn.addEventListener('click', passRiddle);
-  
+
   // İpucu butonu için olay dinleyicisi ekle
   const hintButton = document.getElementById('hint-button');
   if (hintButton) {
     hintButton.addEventListener('click', showHint);
   }
-  
+
   // Enter key to submit answer
   wordInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
@@ -228,56 +228,56 @@ document.addEventListener('DOMContentLoaded', function() {
   let hintCount = 3;
   // İpucu gösteriliyor mu?
   let isHintShowing = false;
-  
+
   /**
    * İpucu gösterir - cevabın bir harfini rastgele gösterir
    */
   function showHint() {
     if (!isGameActive || !currentRiddle || isHintShowing) return;
-    
+
     // İpucu kalmadı mı kontrol et
     if (hintCount <= 0) {
       showMessage('İpucu hakkınız kalmadı!', 'warning');
       return;
     }
-    
+
     // İpucu sayısını azalt
     hintCount--;
-    
+
     // İpucu sayısını gösteren butonu güncelle
     const hintButton = document.getElementById('hint-button');
     if (hintButton) {
       hintButton.textContent = `İpucu (${hintCount})`;
     }
-    
+
     // Cevabın rastgele bir harfini seç
     const answer = currentRiddle.answer;
     const randomIndex = Math.floor(Math.random() * answer.length);
     const hintLetter = answer[randomIndex];
-    
+
     // İpucu mesajını göster
     const hintDisplay = document.getElementById('hint-display');
     if (hintDisplay) {
       hintDisplay.innerHTML = `İpucu: Cevabın ${randomIndex + 1}. harfi "<span class="hint-letter">${hintLetter}</span>"`;
       hintDisplay.style.display = 'block';
-      
+
       // İpucu gösteriliyor durumunu işaretle
       isHintShowing = true;
-      
+
       // 5 saniye sonra ipucunu gizle
       setTimeout(() => {
         hintDisplay.style.display = 'none';
         isHintShowing = false;
       }, 5000);
     }
-    
+
     // İpucu kullanıldı mesajı göster
     showMessage(`İpucu gösterildi! ${hintCount} ipucu hakkınız kaldı.`, 'info');
-    
+
     // İpucu ses efekti
     playSound('hint');
   }
-  
+
   function startGame() {
     // Hide start screen, show game
     if (startScreen) startScreen.style.display = 'none';
@@ -296,23 +296,23 @@ document.addEventListener('DOMContentLoaded', function() {
     soundEnabled = true;
     currentRiddleIndex = 0;
     longestSolvedWord = '';
-    
+
     // İpucu sayısını sıfırla
     hintCount = 3;
     isHintShowing = false;
-    
+
     // İpucu butonunu güncelle
     const hintButton = document.getElementById('hint-button');
     if (hintButton) {
       hintButton.textContent = `İpucu (${hintCount})`;
     }
-    
+
     // İpucu göstergesini temizle
     const hintDisplay = document.getElementById('hint-display');
     if (hintDisplay) {
       hintDisplay.style.display = 'none';
     }
-    
+
     // Bilmeceleri karıştır
     shuffledRiddles = shuffleArray([...riddles]);
 
@@ -353,22 +353,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Reset attempts
     remainingAttempts = MAX_ATTEMPTS_PER_RIDDLE;
     attemptsLeft.textContent = remainingAttempts;
-    
+
     // Clear feedback
     letterMatches.innerHTML = '';
     feedbackContainer.style.display = 'none';
-    
+
     // Get current riddle
     currentRiddle = shuffledRiddles[currentRiddleIndex];
-    
+
     // Update UI
     riddleNumber.textContent = currentRiddleIndex + 1;
     riddleText.textContent = currentRiddle.text;
-    
+
     // Clear input
     wordInput.value = '';
     wordInput.focus();
-    
+
     // Animate riddle card
     const riddleCard = document.querySelector('.riddle-card');
     riddleCard.classList.add('animate__animated', 'animate__fadeIn');
@@ -382,14 +382,14 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function submitAnswer() {
     if (!isGameActive || !currentRiddle) return;
-    
+
     const answer = wordInput.value.trim().toLowerCase();
-    
+
     if (answer.length === 0) {
       showMessage('Lütfen bir cevap girin', 'warning');
       return;
     }
-    
+
     // Doğru cevap verildi mi?
     if (answer === currentRiddle.answer) {
       handleCorrectAnswer();
@@ -405,24 +405,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Puan hesapla (kalan deneme hakkına göre bonus)
     const attemptBonus = remainingAttempts * ATTEMPT_BONUS;
     const totalPoints = RIDDLE_POINTS + attemptBonus;
-    
+
     // Puanı ve çözülen kelime sayısını güncelle
     score += totalPoints;
     solvedWords.push(currentRiddle.answer);
-    
+
     // En uzun kelimeyi takip et
     if (currentRiddle.answer.length > (longestSolvedWord?.length || 0)) {
       longestSolvedWord = currentRiddle.answer;
     }
-    
+
     // Ekranı güncelle
     updateScoreDisplay();
     updateSolvedRiddlesDisplay();
-    
+
     // Animasyon ve geri bildirim
     showMessage(`Doğru Cevap! +${totalPoints} puan kazandınız (${attemptBonus} bonus)`, 'success');
     playSound('correct');
-    
+
     // Bir sonraki bilmeceye geç
     currentRiddleIndex++;
     setTimeout(showNextRiddle, 1500);
@@ -435,25 +435,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kalan deneme hakkını azalt
     remainingAttempts--;
     attemptsLeft.textContent = remainingAttempts;
-    
+
     // Hak biterse bir sonraki bilmeceye geç
     if (remainingAttempts <= 0) {
       showMessage(`Üzgünüm, doğru cevap: "${currentRiddle.answer}" idi.`, 'danger');
       playSound('fail');
-      
+
       // Bir sonraki bilmeceye geç
       currentRiddleIndex++;
       setTimeout(showNextRiddle, 2000);
       return;
     }
-    
+
     // Cevaptaki doğru harfleri göster
     showLetterMatches(answer, currentRiddle.answer);
-    
+
     // Geri bildirim göster
     showMessage(`Yanlış cevap. ${remainingAttempts} hakkınız kaldı.`, 'warning');
     playSound('wrong');
-    
+
     // Input'u temizle
     wordInput.value = '';
     wordInput.focus();
@@ -466,23 +466,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Geri bildirim panelini göster
     feedbackContainer.style.display = 'block';
     letterMatches.innerHTML = '';
-    
+
     // Kullanıcının cevabındaki harfleri kontrol et
     const userLetters = userAnswer.split('');
     const correctLetters = correctAnswer.split('');
-    
+
     // Her bir harf için eşleşme kontrolü
     userLetters.forEach(letter => {
       const letterElement = document.createElement('div');
       letterElement.textContent = letter;
       letterElement.className = 'letter-match';
-      
+
       if (correctLetters.includes(letter)) {
         letterElement.classList.add('correct');
       } else {
         letterElement.classList.add('wrong');
       }
-      
+
       letterMatches.appendChild(letterElement);
     });
   }
@@ -492,10 +492,10 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function passRiddle() {
     if (!isGameActive || !currentRiddle) return;
-    
+
     showMessage(`Pas geçildi. Doğru cevap: "${currentRiddle.answer}" idi.`, 'info');
     playSound('pass');
-    
+
     // Bir sonraki bilmeceye geç
     currentRiddleIndex++;
     setTimeout(showNextRiddle, 1500);
@@ -509,17 +509,17 @@ document.addEventListener('DOMContentLoaded', function() {
       solvedRiddles.innerHTML = '<p class="text-secondary">Henüz bilmece çözülmedi.</p>';
       return;
     }
-    
+
     // Çözülen bilmeceleri göster
     solvedRiddles.innerHTML = '';
-    
+
     solvedWords.forEach(word => {
       const wordElement = document.createElement('span');
       wordElement.className = 'word-tag';
       wordElement.textContent = word;
       solvedRiddles.appendChild(wordElement);
     });
-    
+
     // Çözülen bilmece sayısını güncelle
     if (wordCounter) {
       wordCounter.textContent = solvedWords.length;
@@ -546,20 +546,20 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function startTimer(seconds) {
     remainingTime = seconds;
-    
+
     // Zamanlayıcıyı göster
     updateTimerDisplay();
-    
+
     // Önceki zamanlayıcıyı temizle
     if (timerInterval) clearInterval(timerInterval);
-    
+
     // Yeni zamanlayıcıyı başlat
     timerInterval = setInterval(() => {
       if (isPaused) return;
-      
+
       remainingTime--;
       updateTimerDisplay();
-      
+
       if (remainingTime <= 0) {
         clearInterval(timerInterval);
         endGame(false);
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
     timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    
+
     // Son 10 saniyede kırmızı yap
     if (remainingTime <= 10) {
       timerDisplay.classList.add('text-danger');
@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function playSound(soundType) {
     if (!soundEnabled) return;
-    
+
     // Ses efektleri burada çalınabilir
     // Bu basit bir demo olduğu için şimdilik boş bırakıyoruz
   }
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function endGame(completed = false) {
     isGameActive = false;
-    
+
     // Zamanlayıcıyı durdur
     if (timerInterval) {
       clearInterval(timerInterval);
@@ -641,43 +641,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // İstatistikleri hesapla
     const gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
     const wordsCount = solvedWords.length;
-    
+
     // İstatistikleri güncelle
     finalScoreDisplay.textContent = score;
     wordsFoundCount.textContent = wordsCount;
     longestWordDisplay.textContent = longestSolvedWord || '-';
-    
+
     // Derecelendirmeyi güncelle
     updateRatingDisplay();
-    
+
     // Oyun sonu ekranını göster
     gameContainer.style.display = 'none';
     gameOverContainer.style.display = 'block';
-    
+
     // Animasyon ekle
     gameOverContainer.classList.add('fade-in');
-    
+
     // Skoru kaydet
     if (window.saveScore) {
       window.saveScore('wordPuzzle', score);
     }
-    
+
     // Yeniden oynama düğmesine olay dinleyici ekle
     const playAgainBtn = document.getElementById('play-again');
     if (playAgainBtn) {
       // Önceki olay dinleyicileri temizle
       const newPlayAgainBtn = playAgainBtn.cloneNode(true);
       playAgainBtn.parentNode.replaceChild(newPlayAgainBtn, playAgainBtn);
-      
+
       // Yeni olay dinleyici ekle
       newPlayAgainBtn.addEventListener('click', startGame);
     }
-    
+
     // Paylaşım düğmelerine olay dinleyici ekle
     if (copyScoreBtn) {
       copyScoreBtn.addEventListener('click', copyScore);
     }
-    
+
     if (shareScoreBtn) {
       shareScoreBtn.addEventListener('click', shareScore);
     }
@@ -689,14 +689,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateRatingDisplay() {
     const stars = document.querySelectorAll('.rating-stars i');
     let rating = 0;
-    
+
     // Skora göre derecelendirme
     if (score >= 800) rating = 5;
     else if (score >= 600) rating = 4;
     else if (score >= 400) rating = 3;
     else if (score >= 200) rating = 2;
     else rating = 1;
-    
+
     // Yıldızları güncelle
     stars.forEach((star, index) => {
       if (index < rating) {
@@ -705,14 +705,14 @@ document.addEventListener('DOMContentLoaded', function() {
         star.className = 'far fa-star';
       }
     });
-    
+
     // Derecelendirme metnini güncelle
     let ratingDescription = 'Başlangıç';
     if (rating === 5) ratingDescription = 'Efsanevi!';
     else if (rating === 4) ratingDescription = 'Çok İyi!';
     else if (rating === 3) ratingDescription = 'İyi!';
     else if (rating === 2) ratingDescription = 'İdare Eder';
-    
+
     if (ratingText) {
       ratingText.textContent = ratingDescription;
     }
@@ -723,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function copyScore() {
     const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${solvedWords.length} bilmece çözdüm ve en uzun cevabım: ${longestSolvedWord || '-'}`;
-    
+
     navigator.clipboard.writeText(scoreText)
       .then(() => {
         showMessage('Skor kopyalandı!', 'success');
@@ -739,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function shareScore() {
     const scoreText = `Kelime Bulmaca oyununda ${score} puan kazandım! ${solvedWords.length} bilmece çözdüm ve en uzun cevabım: ${longestSolvedWord || '-'}`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'Beyin Egzersizi Oyun Skoru',
@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function showMessage(message, type) {
     const alertContainer = document.getElementById('alert-container');
-    
+
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
     alert.role = 'alert';
@@ -764,9 +764,9 @@ document.addEventListener('DOMContentLoaded', function() {
       ${message}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    
+
     alertContainer.appendChild(alert);
-    
+
     // 5 saniye sonra otomatik kapat
     setTimeout(() => {
       if (alert.parentNode === alertContainer) {
@@ -790,4 +790,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return array;
   }
+
+  function saveScore(score) {
+    fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            score: score,
+            game_type: 'wordPuzzle'
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Score saved successfully!');
+
+            // Display XP gain if applicable
+            if (data.xp_gained) {
+                showXPGain(data.xp_gained);
+
+                // If player leveled up, show celebration
+                if (data.is_level_up) {
+                    showLevelUp(data.level);
+                }
+            }
+        } else {
+            console.log('Failed to save score:', data.message);
+
+            // If login is required, show login modal
+            if (data.message === 'Login required' && data.redirect) {
+                if (confirm('Skorunuzu kaydetmek için giriş yapmanız gerekiyor. Giriş sayfasına yönlendirilmek ister misiniz?')) {
+                    window.location.href = data.redirect;
+                }
+            }
+        }
+    })
+    .catch((error) => {
+        console.error('Error saving score:', error);
+    });
+}
 });
