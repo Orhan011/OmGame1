@@ -85,44 +85,46 @@
         <div class="quick-stats glass-effect">
           <h3 class="section-title"><i class="fas fa-chart-line"></i> İstatistikler</h3>
           
-          <div class="stats-grid">
-            <div class="stat-grid-item">
-              <div class="stat-icon">
-                <i class="fas fa-brain"></i>
+          <div class="stats-bubbles">
+            <div class="row">
+              <div class="col-6 mb-2">
+                <div class="stat-bubble">
+                  <div class="stat-icon">
+                    <i class="fas fa-brain"></i>
+                  </div>
+                  <div class="stat-value">{{ user_scores.wordPuzzle }}</div>
+                  <div class="stat-label">Kelime Bulmaca</div>
+                </div>
               </div>
-              <div class="stat-content">
-                <div class="stat-value">{{ user_scores.wordPuzzle }}</div>
-                <div class="stat-label">Kelime Bulmaca</div>
+              
+              <div class="col-6 mb-2">
+                <div class="stat-bubble">
+                  <div class="stat-icon">
+                    <i class="fas fa-memory"></i>
+                  </div>
+                  <div class="stat-value">{{ user_scores.memoryMatch }}</div>
+                  <div class="stat-label">Hafıza Oyunu</div>
+                </div>
               </div>
-            </div>
-            
-            <div class="stat-grid-item">
-              <div class="stat-icon">
-                <i class="fas fa-memory"></i>
+              
+              <div class="col-6">
+                <div class="stat-bubble">
+                  <div class="stat-icon">
+                    <i class="fas fa-map-signs"></i>
+                  </div>
+                  <div class="stat-value">{{ user_scores.labyrinth }}</div>
+                  <div class="stat-label">Labirent</div>
+                </div>
               </div>
-              <div class="stat-content">
-                <div class="stat-value">{{ user_scores.memoryMatch }}</div>
-                <div class="stat-label">Hafıza Oyunu</div>
-              </div>
-            </div>
-            
-            <div class="stat-grid-item">
-              <div class="stat-icon">
-                <i class="fas fa-map-signs"></i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-value">{{ user_scores.labyrinth }}</div>
-                <div class="stat-label">Labirent</div>
-              </div>
-            </div>
-            
-            <div class="stat-grid-item">
-              <div class="stat-icon">
-                <i class="fas fa-puzzle-piece"></i>
-              </div>
-              <div class="stat-content">
-                <div class="stat-value">{{ user_scores.puzzle }}</div>
-                <div class="stat-label">Bulmaca</div>
+              
+              <div class="col-6">
+                <div class="stat-bubble">
+                  <div class="stat-icon">
+                    <i class="fas fa-puzzle-piece"></i>
+                  </div>
+                  <div class="stat-value">{{ user_scores.puzzle }}</div>
+                  <div class="stat-label">Bulmaca</div>
+                </div>
               </div>
             </div>
           </div>
@@ -148,19 +150,28 @@
       <div class="profile-content">
         <!-- Üst Sekmeler -->
         <div class="profile-tabs glass-effect">
-          <div class="nav nav-tabs" id="profile-tab" role="tablist">
-            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
-              <i class="fas fa-user-edit"></i> Kişisel Bilgiler
+          <div class="modern-tabs" id="profile-tab" role="tablist">
+            <button class="modern-tab active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+              <span class="tab-icon"><i class="fas fa-user-edit"></i></span>
+              <span class="tab-text">Kişisel Bilgiler</span>
             </button>
-            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
-              <i class="fas fa-lock"></i> Güvenlik
+            
+            <button class="modern-tab" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+              <span class="tab-icon"><i class="fas fa-lock"></i></span>
+              <span class="tab-text">Güvenlik</span>
             </button>
-            <button class="nav-link" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar" type="button" role="tab" aria-controls="avatar" aria-selected="false">
-              <i class="fas fa-user-circle"></i> Profil Fotoğrafı
+            
+            <button class="modern-tab" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar" type="button" role="tab" aria-controls="avatar" aria-selected="false">
+              <span class="tab-icon"><i class="fas fa-user-circle"></i></span>
+              <span class="tab-text">Profil Fotoğrafı</span>
             </button>
-            <button class="nav-link" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab" aria-controls="account" aria-selected="false">
-              <i class="fas fa-cog"></i> Hesap
+            
+            <button class="modern-tab" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab" aria-controls="account" aria-selected="false">
+              <span class="tab-icon"><i class="fas fa-cog"></i></span>
+              <span class="tab-text">Hesap</span>
             </button>
+            
+            <div class="tab-indicator"></div>
           </div>
         </div>
         
@@ -341,38 +352,46 @@
         <div class="recent-activity glass-effect">
           <h3 class="section-title"><i class="fas fa-history"></i> Son Aktiviteler</h3>
           
-          <div class="activity-timeline">
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="fas fa-gamepad"></i>
+          <div class="activity-bubbles">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="activity-bubble">
+                  <div class="activity-icon">
+                    <i class="fas fa-gamepad"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">Kelime Bulmaca</div>
+                    <div class="activity-score">+{{ user_scores.wordPuzzle }}</div>
+                    <div class="activity-time">1 saat önce</div>
+                  </div>
+                </div>
               </div>
-              <div class="activity-content">
-                <div class="activity-title">Kelime Bulmaca oynadınız</div>
-                <div class="activity-time">1 saat önce</div>
+              
+              <div class="col-md-4 mb-3">
+                <div class="activity-bubble">
+                  <div class="activity-icon">
+                    <i class="fas fa-puzzle-piece"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">Hafıza Kartları</div>
+                    <div class="activity-score">+{{ user_scores.memoryMatch }}</div>
+                    <div class="activity-time">2 gün önce</div>
+                  </div>
+                </div>
               </div>
-              <div class="activity-score">+{{ user_scores.wordPuzzle }} puan</div>
-            </div>
-            
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="fas fa-puzzle-piece"></i>
+              
+              <div class="col-md-4 mb-3">
+                <div class="activity-bubble">
+                  <div class="activity-icon">
+                    <i class="fas fa-map-signs"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">Labirent</div>
+                    <div class="activity-score">+{{ user_scores.labyrinth }}</div>
+                    <div class="activity-time">3 gün önce</div>
+                  </div>
+                </div>
               </div>
-              <div class="activity-content">
-                <div class="activity-title">Hafıza Kartları oynadınız</div>
-                <div class="activity-time">2 gün önce</div>
-              </div>
-              <div class="activity-score">+{{ user_scores.memoryMatch }} puan</div>
-            </div>
-            
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="fas fa-map-signs"></i>
-              </div>
-              <div class="activity-content">
-                <div class="activity-title">Labirent oynadınız</div>
-                <div class="activity-time">3 gün önce</div>
-              </div>
-              <div class="activity-score">+{{ user_scores.labyrinth }} puan</div>
             </div>
           </div>
         </div>
@@ -511,10 +530,39 @@
       });
     }
     
-    // Tab değişiminde animasyon efektleri
-    const tabLinks = document.querySelectorAll('.nav-link');
-    tabLinks.forEach(tab => {
+    // Modern Tab İşlevselliği
+    const modernTabs = document.querySelectorAll('.modern-tab');
+    const tabIndicator = document.querySelector('.tab-indicator');
+    
+    // Tab göstergesini konumlandır
+    function positionTabIndicator(activeTab) {
+      if (!tabIndicator || !activeTab) return;
+      
+      const tabRect = activeTab.getBoundingClientRect();
+      const tabContainerRect = activeTab.parentNode.getBoundingClientRect();
+      
+      // Göstergeyi aktif tab'ın altında konumlandır
+      tabIndicator.style.width = `${tabRect.width}px`;
+      tabIndicator.style.left = `${tabRect.left - tabContainerRect.left}px`;
+    }
+    
+    // İlk yüklemede tab göstergesini konumlandır
+    setTimeout(() => {
+      const activeTab = document.querySelector('.modern-tab.active');
+      positionTabIndicator(activeTab);
+    }, 100);
+    
+    // Tab değişimini yönet
+    modernTabs.forEach(tab => {
       tab.addEventListener('click', function() {
+        // Aktif tab'ı değiştir
+        modernTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Tab göstergesini animasyonla hareket ettir
+        positionTabIndicator(this);
+        
+        // Tab içeriğini canlandır
         setTimeout(() => {
           const activePane = document.querySelector('.tab-pane.show.active');
           if (activePane) {
