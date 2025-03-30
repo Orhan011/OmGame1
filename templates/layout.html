@@ -68,16 +68,42 @@ function loadArticleContent() {
       <span></span>
     </div>
   </button>
-  {% if session.get('user_id') %}
-  <div class="user-profile-corner">
-    <div class="navbar-avatar" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
-      {% if get_avatar_url() %}
-        <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="avatar-img">
-      {% else %}
-        <div class="avatar-placeholder">{{ get_user_data().username[0]|upper }}</div>
-      {% endif %}
-    </div>
-    <div class="profile-panel" id="profilePanel">
+  
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
+          <i class="fas fa-home nav-icon"></i>Anasayfa
+        </a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {% if '/games/' in request.path %}active{% endif %}" href="#" id="gamesDropdown" data-bs-toggle="dropdown">
+          <i class="fas fa-gamepad nav-icon"></i>Oyunlar
+        </a>
+        <ul class="dropdown-menu glass-dropdown">
+          <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('labyrinth') }}"><i class="fas fa-route me-2"></i>Labirent</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
+      <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
+    </ul>
+    
+    {% if session.get('user_id') %}
+    <div class="user-profile-corner mx-auto">
+      <div class="navbar-avatar" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
+        {% if get_avatar_url() %}
+          <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="avatar-img">
+        {% else %}
+          <div class="avatar-placeholder">{{ get_user_data().username[0]|upper }}</div>
+        {% endif %}
+      </div>
+      <div class="profile-panel" id="profilePanel">
       <div class="profile-panel-header">
         <div class="profile-panel-avatar">
           {% if get_avatar_url() %}
@@ -120,29 +146,7 @@ function loadArticleContent() {
   </div>
   {% endif %}
   
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item">
-        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
-          <i class="fas fa-home nav-icon"></i>Anasayfa
-        </a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle {% if '/games/' in request.path %}active{% endif %}" href="#" id="gamesDropdown" data-bs-toggle="dropdown">
-          <i class="fas fa-gamepad nav-icon"></i>Oyunlar
-        </a>
-        <ul class="dropdown-menu glass-dropdown">
-          <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('labyrinth') }}"><i class="fas fa-route me-2"></i>Labirent</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
-        </ul>
-      </li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a></li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
+  <ul class="navbar-nav ms-auto">
       {% if not session.get('user_id') %}
         <li class="nav-item"><a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt nav-icon"></i>Giriş Yap</a></li>
         <li class="nav-item"><a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}"><i class="fas fa-user-plus nav-icon"></i>Kayıt Ol</a></li>
