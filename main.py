@@ -32,7 +32,7 @@ def send_verification_email(to_email, verification_code):
     from email.mime.multipart import MIMEMultipart
     
     # Gmail hesap bilgileri
-    sender_email = "orhanmedia0@gmail.com"
+    sender_email = "omgameee@gmail.com"
     sender_password = os.environ.get("GMAIL_APP_PASSWORD")
     
     if not sender_password:
