@@ -96,6 +96,29 @@ function loadArticleContent() {
         <li class="nav-item"><a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}"><i class="fas fa-user-plus nav-icon"></i>Kayıt Ol</a></li>
       {% endif %}
     </ul>
+    
+    {% if session.get('user_id') %}
+    <div class="navbar-nav">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" data-bs-toggle="dropdown">
+          <div class="navbar-avatar me-2">
+            {% if get_avatar_url() %}
+              <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="avatar-img">
+            {% else %}
+              <div class="avatar-placeholder">{{ get_user_data().username[0]|upper }}</div>
+            {% endif %}
+          </div>
+          <span>{{ get_user_data().username }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end glass-dropdown">
+          <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user-circle me-2"></i>Profil</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skorlarım</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
+        </ul>
+      </li>
+    </div>
+    {% endif %}
   </div>
 </div>
 </nav>

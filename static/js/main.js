@@ -242,46 +242,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Mini profil ve dropdown işlevselliği
+// Modern profil ve dropdown işlevselliği
 document.addEventListener('DOMContentLoaded', function() {
-  const userProfileMini = document.getElementById('userProfileMini');
-  const userProfileDropdown = document.getElementById('userProfileDropdown');
-
-  if (userProfileMini && userProfileDropdown) {
-    userProfileMini.addEventListener('click', function(event) {
-      event.stopPropagation();
-      userProfileDropdown.classList.toggle('show');
-    });
-
-    // Sayfa herhangi bir yerine tıklandığında menüyü kapat
-    document.addEventListener('click', function(event) {
-      if (userProfileDropdown.classList.contains('show') && 
-          !userProfileMini.contains(event.target) && 
-          !userProfileDropdown.contains(event.target)) {
-        userProfileDropdown.classList.remove('show');
-      }
-    });
+  // Sayfa yüklendiğinde profil menüsünü gizle
+  const dropdown = document.getElementById('userProfileDropdown');
+  if (dropdown) {
+    dropdown.style.display = 'none';
   }
+  
+  // Tıklama dışında profil menüsünü kapatma işlevi için global event listener
+  document.addEventListener('click', function(event) {
+    const userProfileMini = document.getElementById('userProfileMini');
+    const userProfileDropdown = document.getElementById('userProfileDropdown');
+    
+    if (userProfileDropdown && userProfileDropdown.style.display === 'block' && 
+        userProfileMini && !userProfileMini.contains(event.target) && 
+        !userProfileDropdown.contains(event.target)) {
+      userProfileDropdown.style.display = 'none';
+    }
+  });
 });
 
-function toggleProfilePanel() {
-  const panel = document.getElementById('profile-panel');
-
-  if (panel) {
-    if (panel.style.display === 'block') {
-      panel.style.display = 'none';
-    } else {
-      panel.style.display = 'block';
-      panel.style.position = 'absolute';
-      panel.style.top = '60px';
-      panel.style.right = '10px';
-      panel.style.zIndex = '999999'; // z-index değerini daha da yükselttik
-      panel.style.background = 'rgba(30, 30, 50, 0.98)';
-      panel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-      panel.style.borderRadius = '8px';
-      panel.style.boxShadow = '0 5px 25px rgba(0, 0, 0, 0.5)';
-      panel.style.padding = '10px';
-      panel.style.minWidth = '200px';
-    }
+// Modern profil panelini aç/kapat
+function toggleProfilePanel(event) {
+  const dropdown = document.getElementById('userProfileDropdown');
+  if (!dropdown) return;
+  
+  const isShowing = dropdown.style.display === 'block';
+  
+  // Olay yayılımını durdur
+  if (event) event.stopPropagation();
+  
+  if (isShowing) {
+    dropdown.style.display = 'none';
+  } else {
+    dropdown.style.display = 'block';
+    
+    // Animasyon sınıfı ekleme (CSS'te tanımlanmış animasyon varsa)
+    dropdown.style.animation = 'dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
   }
 }

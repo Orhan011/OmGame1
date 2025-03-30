@@ -4,26 +4,34 @@
 <section class="hero-section">
 <div class="row align-items-center">
 <div class="col-lg-12 text-center position-relative">
-<div class="card-back">
-  {% if session.get('user_id') %}
-    <div class="user-profile-mini" id="userProfileMini" onclick="toggleProfilePanel()">
-      {% if session.get('avatar_url') %}
-        <img src="{{ session.get('avatar_url') }}" alt="Profil" class="mini-avatar-img" style="border: none;">
-      {% else %}
-        <div class="mini-avatar-circle" style="border: none;">{{ session.get('username', '')[0]|upper }}</div>
-      {% endif %}
+{% if session.get('user_id') %}
+  <div class="modern-profile-floating" id="userProfileMini" onclick="toggleProfilePanel(event)">
+    {% if get_avatar_url() %}
+      <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="modern-avatar-img">
+    {% else %}
+      <div class="modern-avatar-placeholder">{{ get_user_data().username[0]|upper }}</div>
+    {% endif %}
+    <div class="profile-pulse-effect"></div>
+  </div>
+  <div class="modern-profile-dropdown" id="userProfileDropdown">
+    <div class="dropdown-header">
+      <div class="dropdown-user-info">
+        <h4>{{ get_user_data().username }}</h4>
+        <span class="badge bg-primary">{{ get_current_user().rank }}</span>
+      </div>
     </div>
-    <div class="user-profile-dropdown" id="userProfileDropdown">
-      <a href="{{ url_for('profile') }}" class="dropdown-item">
-        <i class="fas fa-user me-2"></i>Profil
-      </a>
-      <div class="dropdown-divider"></div>
-      <a href="{{ url_for('logout') }}" class="dropdown-item">
-        <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
-      </a>
-    </div>
-  {% endif %}
-</div>
+    <a href="{{ url_for('profile') }}" class="dropdown-menu-item">
+      <i class="fas fa-user-circle me-2"></i>Profil
+    </a>
+    <a href="{{ url_for('leaderboard') }}" class="dropdown-menu-item">
+      <i class="fas fa-trophy me-2"></i>Skorlar
+    </a>
+    <div class="dropdown-divider"></div>
+    <a href="{{ url_for('logout') }}" class="dropdown-menu-item">
+      <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+    </a>
+  </div>
+{% endif %}
 <div class="card">
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
   <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>

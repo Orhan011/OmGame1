@@ -99,10 +99,18 @@ def send_verification_email(to_email, verification_code):
 # Template utility function for getting current user
 @app.template_filter('get_user_avatar')
 def get_user_avatar(user_id):
+    """
+    Kullanıcının profil fotoğrafının URL'sini döndürür.
+    Profil fotoğrafı yoksa varsayılan avatar URL'sini döndürür.
+    
+    URL'leri frontend'de kullanmak için hazır hale getirir.
+    """
     user = User.query.get(user_id)
     if user and user.avatar_url:
+        # Avatar URL'si zaten statik klasöründe bir yolu işaret ediyorsa,
+        # doğrudan bu yolu dön (url_for ile sarmalamadan)
         return user.avatar_url
-    return url_for('static', filename='images/default-avatar.png')
+    return 'images/default-avatar.png'  # Varsayılan avatar
 
 @app.context_processor
 def utility_processor():
@@ -111,7 +119,26 @@ def utility_processor():
             return User.query.get(session['user_id'])
         return None
     
-    return dict(get_current_user=get_current_user)
+    def get_user_data():
+        """Session'daki kullanıcı bilgilerini döndürür"""
+        if 'user_id' in session:
+            return {
+                'user_id': session.get('user_id'),
+                'username': session.get('username'),
+                'avatar_url': session.get('avatar_url', 'images/default-avatar.png')
+            }
+        return None
+    
+    def get_avatar_url():
+        """Kullanıcının avatar URL'sini döndürür"""
+        return session.get('avatar_url', 'images/default-avatar.png')
+    
+    # Tüm yardımcı fonksiyonları şablonlarda kullanılabilir hale getir
+    return dict(
+        get_current_user=get_current_user,
+        get_user_data=get_user_data,
+        get_avatar_url=get_avatar_url
+    )
 
 # Database initialization function
 def initialize_database():
@@ -540,7 +567,16 @@ def login():
             flash('Geçersiz email veya şifre.', 'danger')
             return redirect(url_for('login'))
         
+        # Kullanıcı oturum bilgilerini kaydet
         session['user_id'] = user.id
+        session['username'] = user.username
+        
+        # Avatar URL'sini session'a kaydet
+        if user.avatar_url:
+            session['avatar_url'] = user.avatar_url
+        else:
+            session['avatar_url'] = 'images/default-avatar.png'
+            
         flash('Başarıyla giriş yaptınız!', 'success')
         return redirect(url_for('index'))
     
@@ -692,6 +728,7 @@ def register():
             
             session['user_id'] = new_user.id
             session['username'] = new_user.username
+            session['avatar_url'] = 'images/default-avatar.png'  # Varsayılan avatar
             flash('Kayıt başarılı! Hoş geldiniz!')
             return redirect(url_for('index'))
         except Exception as e:
@@ -706,7 +743,8 @@ def register():
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    # Tüm oturum verilerini temizle
+    session.clear()
     flash('Başarıyla çıkış yaptınız.')
     return redirect(url_for('login'))
 
@@ -854,7 +892,8 @@ def deactivate_account():
     
     try:
         db.session.commit()
-        session.pop('user_id', None)
+        # Tüm oturum verilerini temizle
+        session.clear()
         flash('Hesabınız başarıyla devre dışı bırakıldı.', 'success')
         return redirect(url_for('login'))
     except Exception as e:
@@ -902,6 +941,8 @@ def update_avatar():
         user.avatar_url = avatar_path
         try:
             db.session.commit()
+            # Session'da avatar URL'sini de güncelle
+            session['avatar_url'] = avatar_path
             flash('Profil fotoğrafınız başarıyla güncellendi.', 'success')
         except Exception as e:
             db.session.rollback()
@@ -936,6 +977,8 @@ def update_avatar():
             avatar_path = f'images/avatars/{filename}'
             user.avatar_url = avatar_path
             db.session.commit()
+            # Session'da avatar URL'sini de güncelle
+            session['avatar_url'] = avatar_path
             flash('Profil fotoğrafınız başarıyla yüklendi.', 'success')
         except Exception as e:
             logger.error(f"Error saving avatar: {e}")
