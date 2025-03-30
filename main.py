@@ -145,6 +145,88 @@ def initialize_database():
                 category="article"
             ),
             Article(
+                title="Nöroplastisite ve Beyin Gelişimi",
+                content="""
+                <h3>Beynin Kendini Yenileme Gücü</h3>
+                <p>Nöroplastisite, beynin yaşam boyu kendini yenileme ve yeniden yapılandırma yeteneğidir. Bu, yeni nöral bağlantılar oluşturarak ve mevcut olanları güçlendirerek gerçekleşir.</p>
+                <p>Temel nöroplastisite prensipleri:</p>
+                <ul>
+                    <li><strong>Kullan ya da Kaybet:</strong> Kullanılmayan beyin bölgeleri zayıflarken, aktif olarak kullanılanlar güçlenir.</li>
+                    <li><strong>Yoğunluk Önemlidir:</strong> Düzenli ve yoğun pratik, beyin bağlantılarını daha hızlı güçlendirir.</li>
+                    <li><strong>Zorluk Seviyesi:</strong> Mevcut beceri seviyenizin biraz üzerinde çalışmak, beyin gelişimini en üst düzeye çıkarır.</li>
+                    <li><strong>Çeşitlilik:</strong> Farklı beyin alanlarını çalıştıran çeşitli aktiviteler, genel bilişsel sağlık için önemlidir.</li>
+                </ul>
+                <p>ZekaPark'taki farklı oyun türleri, nöroplastisiteyi desteklemek ve beyninizin farklı bölgelerini aktif tutmak için özel olarak tasarlanmıştır.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Bilişsel Rezerv Nedir ve Nasıl Geliştirilir?",
+                content="""
+                <h3>Zihinsel Sağlığınız İçin Bilişsel Rezerv</h3>
+                <p>Bilişsel rezerv, beynin yaşlanma ve hastalık etkilerine karşı koruyucu bir tampon görevi gören zihinsel kapasitedir. Yaş ilerledikçe ve hatta Alzheimer gibi hastalıklar gelişse bile, daha yüksek bilişsel rezerve sahip kişiler daha iyi bilişsel işleyiş gösterebilir.</p>
+                
+                <h4>Bilişsel rezervi geliştirmek için:</h4>
+                <ul>
+                    <li><strong>Sürekli Öğrenme:</strong> Yeni beceriler edinmek, dil öğrenmek veya bir enstrüman çalmak beyin bağlantılarını zenginleştirir.</li>
+                    <li><strong>Zihinsel Zorluklar:</strong> Bulmacalar, strateji oyunları ve diğer zihinsel meydan okumalar beyni aktif tutar.</li>
+                    <li><strong>Sosyal Etkileşim:</strong> Sosyal ilişkiler beyin sağlığını destekler ve yalnızlığın olumsuz etkilerini azaltır.</li>
+                    <li><strong>Fiziksel Egzersiz:</strong> Düzenli egzersiz, beyne kan akışını artırır ve hafıza ile öğrenmeyi geliştiren nörotrofinleri uyarır.</li>
+                    <li><strong>Kaliteli Uyku:</strong> Yeterli uyku, hafızanın pekiştirilmesi ve beyin toksinlerinin temizlenmesi için gereklidir.</li>
+                </ul>
+                <p>ZekaPark'ta düzenli bilişsel alıştırmalar yaparak bilişsel rezervinizi güçlendirebilirsiniz.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Beyin Gücünü En Üst Düzeye Çıkaran Beslenme Stratejileri",
+                content="""
+                <h3>Beyniniz İçin Süper Yakıtlar</h3>
+                <p>Beyin, vücudun en aktif organlarından biridir ve tüm enerjimizin yaklaşık %20'sini tüketir. Doğru beslenme, optimal beyin performansı için hayati öneme sahiptir.</p>
+                
+                <h4>Beyin sağlığını destekleyen besinler:</h4>
+                <ul>
+                    <li><strong>Yağlı Balıklar:</strong> Somon, sardalya ve uskumru gibi balıklar, beyin hücresi zarlarının yapı taşı olan omega-3 yağ asitleri açısından zengindir.</li>
+                    <li><strong>Fındık ve Tohumlar:</strong> Ceviz, badem ve keten tohumu gibi besinler E vitamini, antioksidanlar ve sağlıklı yağlar içerir.</li>
+                    <li><strong>Koyu Yeşil Yapraklı Sebzeler:</strong> Ispanak ve lahana gibi sebzeler, beyin fonksiyonu için önemli olan folat, E vitamini ve K vitamini içerir.</li>
+                    <li><strong>Yaban Mersini ve Diğer Meyveler:</strong> Antioksidanlarla dolu olan bu meyveler, beyin hücrelerini oksidatif stresten korur.</li>
+                    <li><strong>Tam Tahıllar:</strong> Kompleks karbonhidratlar, beyninize sabit bir enerji kaynağı sağlar.</li>
+                    <li><strong>Zerdeçal ve Tarçın:</strong> Bu baharatlar güçlü anti-enflamatuar özelliklere sahiptir ve nöron sağlığını destekleyebilir.</li>
+                    <li><strong>Koyu Çikolata:</strong> Flavonoidler içeren koyu çikolata, beyin kan akışını artırabilir.</li>
+                </ul>
+                <p>Beyninizi beslemek için bu besinleri düzenli olarak tüketmeyi ve işlenmiş gıdaları, rafine şekerleri ve trans yağları sınırlandırmayı hedefleyin.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Stresin Beyin Üzerindeki Etkileri ve Yönetimi",
+                content="""
+                <h3>Stres ve Bilişsel Performans</h3>
+                <p>Kısa süreli stres, odaklanmayı ve performansı artırabilirken, kronik stres beyin yapısını ve işlevini olumsuz etkileyebilir.</p>
+                
+                <h4>Kronik stresin beyin üzerindeki etkileri:</h4>
+                <ul>
+                    <li>Hipokampusta (hafıza merkezi) hacim kaybı</li>
+                    <li>Nöron bağlantılarının azalması</li>
+                    <li>Kortizon seviyelerinin yükselmesi ve hafıza üzerinde olumsuz etki</li>
+                    <li>Beyin kimyasalları dengesi üzerinde bozucu etki</li>
+                    <li>Prefrontal korteksin (karar verme merkezi) işlevinde azalma</li>
+                </ul>
+                
+                <h4>Stres yönetimi teknikleri:</h4>
+                <ul>
+                    <li><strong>Derin Nefes Egzersizleri:</strong> Günde birkaç dakika derin nefes alıp vermek, sempatik sinir sistemini sakinleştirebilir.</li>
+                    <li><strong>Meditasyon ve Mindfulness:</strong> Bu pratikler, beynin stres tepkisini düzenleyen bölgelerini güçlendirir.</li>
+                    <li><strong>Düzenli Fiziksel Aktivite:</strong> Egzersiz, stresi azaltan endorfinlerin salınımını tetikler.</li>
+                    <li><strong>Yeterli Uyku:</strong> Kaliteli uyku, stres hormonlarını düzenler ve duygusal dengeyi destekler.</li>
+                    <li><strong>Sosyal Bağlantılar:</strong> Destekleyici ilişkiler, stres tepkilerini hafifletebilir.</li>
+                    <li><strong>Eğlenceli Aktiviteler:</strong> ZekaPark'taki beyin oyunları gibi eğlenceli aktiviteler, zihinsel molanın bir formudur ve stresi azaltabilir.</li>
+                </ul>
+                <p>Düzenli stres yönetimi, bilişsel sağlığınızı korumanın ve ZekaPark oyunlarında optimal performans göstermenin anahtarıdır.</p>
+                """,
+                category="article"
+            ),
+            Article(
                 title="Daha İyi Konsantrasyon İçin İpuçları",
                 content="""
                 <ol>
@@ -154,6 +236,25 @@ def initialize_database():
                     <li><strong>Egzersiz:</strong> Fiziksel aktivite, beyninize oksijen akışını artırır ve bilişsel işlevleri destekler.</li>
                     <li><strong>Mola Verin:</strong> Uzun süre aynı göreve odaklanmak yerine düzenli molalar verin.</li>
                 </ol>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Bilişsel Becerileri Geliştirmenin Günlük Yaşama Etkileri",
+                content="""
+                <h3>Oyunlar Ötesinde Faydalar</h3>
+                <p>Beyin egzersizlerinin yararları sadece oyun performansınızla sınırlı değildir. Geliştirdiğiniz bilişsel beceriler, günlük yaşamın çeşitli alanlarında da size avantaj sağlar.</p>
+                
+                <h4>Gelişmiş bilişsel becerilerin günlük yaşamdaki yansımaları:</h4>
+                <ul>
+                    <li><strong>İş ve Akademik Performans:</strong> Daha hızlı öğrenme, daha iyi problem çözme ve gelişmiş kritik düşünme becerileri.</li>
+                    <li><strong>Günlük Görevler:</strong> Alışveriş listesini hatırlama, randevulara zamanında gitme ve çoklu görevleri daha verimli yönetme.</li>
+                    <li><strong>İletişim:</strong> Daha iyi dinleme, daha keskin sözel beceriler ve daha iyi sosyal ipuçları algılama.</li>
+                    <li><strong>Yaratıcılık:</strong> Daha geniş düşünme, farklı bakış açıları geliştirme ve daha yenilikçi çözümler bulma.</li>
+                    <li><strong>Duygusal Zeka:</strong> Duyguları daha iyi tanıma, dürtüleri kontrol etme ve stresle başa çıkma yeteneği.</li>
+                    <li><strong>Yaşla İlgili Gerilemeye Karşı Koruma:</strong> Bilişsel rezerv oluşturarak yaşlanmanın etkilerine karşı direnç geliştirme.</li>
+                </ul>
+                <p>ZekaPark'ta düzenli olarak egzersiz yapmak, beyninizin "kas belleğini" geliştirerek bu becerileri günlük yaşamınıza daha kolay aktarmanızı sağlar.</p>
                 """,
                 category="article"
             ),
@@ -169,6 +270,42 @@ def initialize_database():
                     <li><strong>Hikaye Tekniği:</strong> Hatırlanması gereken öğeleri bir hikaye içinde birleştirin.</li>
                 </ul>
                 <p>Bu teknikleri ZekaPark oyunlarında pratik ederek hafızanızı güçlendirebilirsiniz.</p>
+                """,
+                category="tip"
+            ),
+            Article(
+                title="Zihinsel Dayanıklılık Geliştirme",
+                content="""
+                <h3>Zorluklarla Başa Çıkma Kapasitesini Artırmak</h3>
+                <p>Zihinsel dayanıklılık, bilişsel zorluklarla karşılaştığınızda pes etmeden devam etme yeteneğidir. Bu özellik, tüm beyin egzersizlerinde ve gerçek yaşam zorluklarında başarı için kritiktir.</p>
+                
+                <h4>Zihinsel dayanıklılığı geliştirme stratejileri:</h4>
+                <ul>
+                    <li><strong>Zorluk Seviyesini Kademeli Artırın:</strong> Kendinizi konfor alanınızın biraz dışına çıkaran, ama tamamen bunaltmayan zorluklarla düzenli olarak meydan okuyun.</li>
+                    <li><strong>Hatalardan Öğrenin:</strong> Her başarısızlığı öğrenme fırsatı olarak görün ve neyin işe yaramadığını analiz edin.</li>
+                    <li><strong>Olumlu İç Konuşma:</strong> Kendinizle konuşma şeklinize dikkat edin. "Yapamam" yerine "Henüz yapamıyorum, ama pratikle gelişeceğim" demeyi deneyin.</li>
+                    <li><strong>Mikro-Hedefler Belirleyin:</strong> Büyük zorlukları daha küçük, ulaşılabilir adımlara bölün.</li>
+                    <li><strong>Başarılarınızı Takdir Edin:</strong> Küçük ilerlemeleri bile kutlayın ve kendinizi düzenli olarak ödüllendirin.</li>
+                </ul>
+                <p>ZekaPark'taki oyunları oynarken, zor bölümlerde pes etmeyip stratejinizi ayarlayarak zihinsel dayanıklılığınızı geliştirebilirsiniz. Bu yetenek zamanla gelişir ve günlük yaşamınızdaki engelleri aşmanıza da yardımcı olur.</p>
+                """,
+                category="tip"
+            ),
+            Article(
+                title="Bilişsel Egzersizlerde İlerleme İzleme",
+                content="""
+                <h3>Gelişiminizi Ölçme ve Optimize Etme</h3>
+                <p>Bilişsel egzersizlerden maksimum faydayı sağlamak için ilerlemenizi izlemek ve pratiklerinizi buna göre ayarlamak önemlidir.</p>
+                
+                <h4>Etkili ilerleme izleme yöntemleri:</h4>
+                <ul>
+                    <li><strong>Tutarlı Ölçümler:</strong> ZekaPark'taki oyun skorlarınızı düzenli olarak takip edin. Puanlarınızdaki artış, bilişsel performansınızın geliştiğini gösterir.</li>
+                    <li><strong>Zorluk Seviyesini Ayarlama:</strong> Skorlarınız yükseldiğinde zorluk seviyesini artırın, ancak sürekli başarısızlık yaşıyorsanız geçici olarak daha basit seviyelere dönün.</li>
+                    <li><strong>Çeşitli Becerileri Dengeleme:</strong> Tüm bilişsel alanları geliştirmek için farklı oyun türlerinde pratik yapın ve hangilerinde daha çok gelişmeye ihtiyacınız olduğunu belirleyin.</li>
+                    <li><strong>Günlük Tutma:</strong> Her seanstan sonra nasıl hissettiğinizi, ne kadar süre oynadığınızı ve karşılaştığınız zorlukları not edin.</li>
+                    <li><strong>Platoları Tanıma:</strong> İlerlemeniz durduğunda, farklı stratejiler deneyin veya geçici olarak başka bir oyun türüne geçin.</li>
+                </ul>
+                <p>ZekaPark profilinizde görüntülenen istatistikler, gelişiminizi izlemeniz ve egzersiz rejiminizi optimize etmeniz için güçlü bir araçtır.</p>
                 """,
                 category="tip"
             ),
@@ -203,6 +340,24 @@ def initialize_database():
                 category="tip"
             ),
             Article(
+                title="Bilişsel Esnekliği Geliştirme",
+                content="""
+                <h3>Zihinsel Çeviklik İçin Stratejiler</h3>
+                <p>Bilişsel esneklik, düşünce ve stratejilerinizi değişen durumlara uyarlama yeteneğidir. Bu beceri, problem çözme, yaratıcılık ve değişimle başa çıkma için kritik öneme sahiptir.</p>
+                
+                <h4>Bilişsel esnekliği geliştirme yolları:</h4>
+                <ul>
+                    <li><strong>Farklı Stratejiler Deneyin:</strong> ZekaPark oyunlarında aynı seviyeyi tamamlamak için çeşitli yaklaşımlar kullanın.</li>
+                    <li><strong>Düzenli Olarak Yeni Şeyler Öğrenin:</strong> Beyninizi yeni bilgileri işlemeye ve entegre etmeye zorlayın.</li>
+                    <li><strong>Konfor Alanınızdan Çıkın:</strong> Alışık olmadığınız zorlukları kabul edin ve yeni yollar denemeye istekli olun.</li>
+                    <li><strong>Perspektif Değiştirin:</strong> Bir probleme farklı açılardan bakmayı alışkanlık haline getirin.</li>
+                    <li><strong>Rutinlerinizi Değiştirin:</strong> Günlük alışkanlıklarınızda küçük değişiklikler yaparak beyninizi uyanık tutun.</li>
+                </ul>
+                <p>ZekaPark'taki farklı oyun türleri arasında düzenli olarak geçiş yapmak, bilişsel esnekliğinizi güçlendirmenin etkili bir yoludur. Bu esneklik, günlük yaşamda daha iyi uyum sağlamanıza ve problem çözmede daha yaratıcı olmanıza yardımcı olur.</p>
+                """,
+                category="tip"
+            ),
+            Article(
                 title="Labirent Oyununda Başarılı Olma Taktikleri",
                 content="""
                 <h3>Labirent oyununda zorlanıyor musunuz? Bu taktikleri deneyin:</h3>
@@ -218,6 +373,24 @@ def initialize_database():
                 category="tip"
             ),
             Article(
+                title="Beyin Egzersizlerinde Tutarlılığın Önemi",
+                content="""
+                <h3>Düzenli Pratik, Kalıcı Kazanımlar</h3>
+                <p>Beyni güçlendirmek vücut geliştirmeye benzer - tek bir yoğun egzersiz değil, düzenli ve tutarlı pratik en iyi sonuçları verir.</p>
+                
+                <h4>Etkili bir bilişsel antrenman rutini oluşturmak için:</h4>
+                <ul>
+                    <li><strong>Günlük Alışkanlık Geliştirin:</strong> Her gün belirli bir zamanda kısa bile olsa beyin egzersizleri yapmak, uzun vadeli gelişim için kritiktir.</li>
+                    <li><strong>Süreyi Kademeli Olarak Artırın:</strong> Başlangıçta günde 5-10 dakika ile başlayın, zamanla bu süreyi artırın.</li>
+                    <li><strong>Denge Kurun:</strong> Hafıza, dikkat, problem çözme ve mantıksal düşünme dahil farklı bilişsel becerileri çalıştırın.</li>
+                    <li><strong>İlerlemenizi İzleyin:</strong> Düzenli olarak performansınızı kaydedin, böylece gelişiminizi görebilirsiniz.</li>
+                    <li><strong>"Hepsini Birden" Yaklaşımından Kaçının:</strong> Bir günde saatlerce pratik yapmak yerine, düzenli kısa seanslar tercih edin.</li>
+                </ul>
+                <p>ZekaPark'ta günlük oturum hedefleri belirlemek ve bunları takip etmek, bilişsel gelişiminizi hızlandırabilir ve beyin sağlığınıza uzun vadeli yatırım yapmanızı sağlar.</p>
+                """,
+                category="tip"
+            ),
+            Article(
                 title="Puzzle Oyunu İçin Etkili Stratejiler",
                 content="""
                 <h3>Puzzle oyununda daha başarılı olmak için ipuçları:</h3>
@@ -229,6 +402,26 @@ def initialize_database():
                     <li>Düzenli molalar verin - bazen uzaklaşıp sonra geri dönmek yeni perspektifler kazandırabilir.</li>
                 </ul>
                 <p>Puzzle çözmek, görsel-uzamsal zeka ve problem çözme becerilerinizi geliştirir.</p>
+                """,
+                category="tip"
+            ),
+            Article(
+                title="Beyin Sisi ile Başa Çıkma Yöntemleri",
+                content="""
+                <h3>Zihinsel Netlik İçin Stratejiler</h3>
+                <p>Beyin sisi veya bilişsel bulanıklık, konsantre olma zorluğu, zihinsel yorgunluk ve düşünme hızında azalma ile kendini gösterir. Bu durum, stres, yetersiz uyku, beslenme eksiklikleri veya sağlık sorunları nedeniyle ortaya çıkabilir.</p>
+                
+                <h4>Beyin sisini azaltmak için etkili yöntemler:</h4>
+                <ul>
+                    <li><strong>Hidrasyon:</strong> Hafif dehidratasyon bile bilişsel performansı etkileyebilir. Gün boyunca yeterli su için.</li>
+                    <li><strong>Düzenli Egzersiz:</strong> 20-30 dakikalık orta yoğunlukta aktivite, beyne kan akışını artırır ve netliği geliştirir.</li>
+                    <li><strong>Beyin Dinlenme Molaları:</strong> Pomodoro tekniği gibi yöntemlerle düzenli kısa molalar verin.</li>
+                    <li><strong>Çoklu Görev Yapmaktan Kaçının:</strong> Bir seferde bir işe odaklanın, sürekli görev değiştirmek zihinsel yorgunluğu artırır.</li>
+                    <li><strong>Uyku Hijyeni:</strong> Kaliteli ve yeterli uyku, bilişsel fonksiyonların yenilenmesi için şarttır.</li>
+                    <li><strong>Mindfulness:</strong> 5-10 dakikalık meditasyon, zihinsel netliği önemli ölçüde artırabilir.</li>
+                    <li><strong>Beslenme Düzeni:</strong> Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
+                </ul>
+                <p>ZekaPark oyunlarını oynamak için kendinizi en iyi hissettiğiniz zamanları seçin. Düzenli bilişsel egzersizler, beyin sisine karşı genel direncin artmasına yardımcı olabilir.</p>
                 """,
                 category="tip"
             )

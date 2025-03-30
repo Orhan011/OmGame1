@@ -3058,6 +3058,34 @@ main {
   }
 }
 
+/* Yan panel kaydırma özellikleri */
+.mobile-menu {
+  max-height: 85vh; /* Ekran yüksekliğinin %85'i kadar maksimum yükseklik */
+  overflow-y: auto; /* Dikey kaydırma etkinleştir */
+  -webkit-overflow-scrolling: touch; /* iOS için pürüzsüz kaydırma */
+  scrollbar-width: thin; /* İnce kaydırma çubuğu */
+  scrollbar-color: rgba(106, 90, 224, 0.5) rgba(30, 30, 60, 0.2); /* Kaydırma çubuğu rengi */
+}
+
+/* Kaydırma çubuğu stilleri */
+.mobile-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.mobile-menu::-webkit-scrollbar-track {
+  background: rgba(30, 30, 60, 0.2);
+  border-radius: 10px;
+}
+
+.mobile-menu::-webkit-scrollbar-thumb {
+  background: rgba(106, 90, 224, 0.5);
+  border-radius: 10px;
+}
+
+.mobile-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(106, 90, 224, 0.8);
+}
+
 /* Portrait mobile viewport fixes */
 @media (max-width: 380px) {
   .navbar-brand .brain-icon {
