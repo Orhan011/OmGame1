@@ -6579,8 +6579,7 @@ main {
 
 .profile-menu {
   position: relative;
-  margin-left: auto;
-  z-index: 1000;
+  margin-left: 15px;
 }
 
 .profile-image {

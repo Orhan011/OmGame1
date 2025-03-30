@@ -57,20 +57,17 @@ function loadArticleContent() {
 
 <nav class="navbar navbar-expand-lg navbar-dark">
 <div class="container">
-  <div class="d-flex justify-content-between align-items-center w-100">
-    <div class="d-flex align-items-center">
-      <a class="navbar-brand" href="{{ url_for('index') }}">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
-        <span class="brand-text">OmGame</span>
-      </a>
-    </div>
-    {% if session.get('user_id') %}
-    <div class="profile-menu ms-auto">
-      <div class="profile-image-small" data-bs-toggle="dropdown">
+  <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
+    <span class="brand-text">OmGame</span>
+  </a>
+  {% if session.get('user_id') %}
+    <div class="profile-menu">
+      <div class="profile-image" data-bs-toggle="dropdown">
         {% if session.get('avatar_url') %}
-          <img src="{{ session.get('avatar_url') }}" alt="Profil" class="avatar-img-small">
+          <img src="{{ session.get('avatar_url') }}" alt="Profil" class="avatar-img">
         {% else %}
-          <div class="avatar-circle-small">{{ session.get('username', '')[0]|upper }}</div>
+          <div class="avatar-circle">{{ session.get('username', '')[0]|upper }}</div>
         {% endif %}
       </div>
       <div class="dropdown-menu profile-dropdown">
@@ -83,7 +80,7 @@ function loadArticleContent() {
         </a>
       </div>
     </div>
-    {% endif %}
+  {% endif %}
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <div class="menu-icon">
       <span></span>
