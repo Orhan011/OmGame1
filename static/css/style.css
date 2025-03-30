@@ -8545,6 +8545,20 @@ main {
   margin: 0.3rem 0;
 }
 
+.card-back {
+  position: absolute;
+  top: 10px;
+  width: calc(100% - 30px);
+  height: calc(100% - 20px);
+  background-color: rgba(24, 24, 45, 0.4);
+  border-radius: 40px;
+  z-index: 1;
+  transform: translateY(-5px);
+  left: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 .card {
   position: relative;
+  z-index: 2;
 }

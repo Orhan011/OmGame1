@@ -3,8 +3,8 @@
 {% block content %}
 <section class="hero-section">
 <div class="row align-items-center">
-<div class="col-lg-12 text-center">
-<div class="card">
+<div class="col-lg-12 text-center position-relative">
+<div class="card-back">
   {% if session.get('user_id') %}
     <div class="user-profile-mini" id="userProfileMini">
       {% if session.get('avatar_url') %}
@@ -23,6 +23,8 @@
       </a>
     </div>
   {% endif %}
+</div>
+<div class="card">
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
   <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>
   <div class="d-flex justify-content-center flex-wrap">
