@@ -242,3 +242,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+// Mini profil ve dropdown işlevselliği
+document.addEventListener('DOMContentLoaded', function() {
+  const userProfileMini = document.getElementById('userProfileMini');
+  const userProfileDropdown = document.getElementById('userProfileDropdown');
+  
+  if (userProfileMini && userProfileDropdown) {
+    userProfileMini.addEventListener('click', function(event) {
+      event.stopPropagation();
+      userProfileDropdown.classList.toggle('show');
+    });
+    
+    // Sayfa herhangi bir yerine tıklandığında menüyü kapat
+    document.addEventListener('click', function(event) {
+      if (userProfileDropdown.classList.contains('show') && 
+          !userProfileMini.contains(event.target) && 
+          !userProfileDropdown.contains(event.target)) {
+        userProfileDropdown.classList.remove('show');
+      }
+    });
+  }
+});

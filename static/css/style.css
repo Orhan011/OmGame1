@@ -8463,3 +8463,88 @@ main {
     font-size: 0.7rem;
   }
 }
+/* Mini profil resmi stilleri */
+.user-profile-mini {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mini-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.mini-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.user-profile-mini:hover .mini-avatar-img,
+.user-profile-mini:hover .mini-avatar-circle {
+  transform: scale(1.1);
+  border-color: white;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.user-profile-dropdown {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  background: rgba(30, 30, 45, 0.95);
+  border-radius: 10px;
+  padding: 0.5rem 0;
+  min-width: 200px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.user-profile-dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.user-profile-dropdown .dropdown-item {
+  color: white;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.user-profile-dropdown .dropdown-item:hover {
+  background: rgba(106, 90, 224, 0.2);
+}
+
+.user-profile-dropdown .dropdown-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0.3rem 0;
+}
+
+.card {
+  position: relative;
+}

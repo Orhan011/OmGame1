@@ -61,26 +61,6 @@ function loadArticleContent() {
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
     <span class="brand-text">OmGame</span>
   </a>
-  {% if session.get('user_id') %}
-    <div class="profile-menu">
-      <div class="profile-image" data-bs-toggle="dropdown">
-        {% if session.get('avatar_url') %}
-          <img src="{{ session.get('avatar_url') }}" alt="Profil" class="avatar-img">
-        {% else %}
-          <div class="avatar-circle">{{ session.get('username', '')[0]|upper }}</div>
-        {% endif %}
-      </div>
-      <div class="dropdown-menu profile-dropdown">
-        <a href="{{ url_for('profile') }}" class="dropdown-item">
-          <i class="fas fa-user me-2"></i>Profil
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="{{ url_for('logout') }}" class="dropdown-item">
-          <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
-        </a>
-      </div>
-    </div>
-  {% endif %}
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <div class="menu-icon">
       <span></span>
