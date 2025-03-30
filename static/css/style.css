@@ -658,6 +658,27 @@ footer::before {
 /* Social media links in footer */
 .social-media {
   margin-top: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.social-media .social-icon {
+  font-size: 24px;
+  color: #fff;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.social-media .social-icon:hover {
+  color: var(--accent-color);
+  transform: translateY(-3px);
+}
+
+.social-media .fa-instagram {
+  background: -webkit-linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+} 15px;
 }
 
 .social-link {
