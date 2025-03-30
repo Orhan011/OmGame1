@@ -791,3 +791,409 @@ document.addEventListener('DOMContentLoaded', function() {
     return array;
   }
 });
+// Kelime Bulmaca Oyunu
+document.addEventListener('DOMContentLoaded', function() {
+  const startButton = document.getElementById('start-game');
+  const startScreen = document.getElementById('start-screen');
+  const gameContainer = document.getElementById('game-container');
+  const timerDisplay = document.getElementById('timer-display');
+  const scoreDisplay = document.getElementById('score-display');
+  const wordsCounter = document.getElementById('words-counter');
+  const letterContainer = document.getElementById('letter-grid');
+  const inputField = document.getElementById('word-input');
+  const submitBtn = document.getElementById('submit-word');
+  const wordsList = document.getElementById('found-words-list');
+  const resultScreen = document.getElementById('result-screen');
+  const finalScore = document.getElementById('final-score');
+  const foundWordsCount = document.getElementById('found-words-count');
+  const restartButton = document.getElementById('restart-game');
+  const wordInput = document.getElementById('word-input');
+  const wordSuggestions = document.getElementById('word-suggestions');
+  
+  // Ses efektleri
+  const sounds = {
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3'),
+    click: new Audio('/static/sounds/click.mp3'),
+    success: new Audio('/static/sounds/success.mp3'),
+    gameOver: new Audio('/static/sounds/game-over.mp3')
+  };
+
+  // Ses oynatma fonksiyonu
+  function playSound(sound) {
+    try {
+      sounds[sound].currentTime = 0;
+      sounds[sound].play().catch(err => console.log("Sound play error:", err));
+    } catch (error) {
+      console.log("Sound play error:", error);
+    }
+  }
+  
+  // Türkçe kelime veri tabanı (örnek)
+  const turkishWords = [
+    "araba", "kalem", "kitap", "masa", "kapı", "pencere", "deniz", "güneş",
+    "orman", "dağ", "nehir", "göl", "kedi", "köpek", "kuş", "ağaç", "çiçek",
+    "yol", "su", "hava", "ateş", "toprak", "yemek", "ekmek", "peynir", "süt",
+    "çay", "kahve", "sabah", "öğle", "akşam", "gece", "yıldız", "ay", "meyve",
+    "sebze", "elma", "armut", "portakal", "limon", "kiraz", "üzüm", "karpuz",
+    "okul", "öğretmen", "öğrenci", "sınıf", "ders", "sınav", "kalem", "defter",
+    "silgi", "tahta", "renk", "mavi", "kırmızı", "yeşil", "sarı", "siyah", "beyaz",
+    "gri", "mor", "pembe", "turuncu", "kahverengi", "aile", "anne", "baba", "kardeş",
+    "abla", "ağabey", "dede", "nine", "amca", "dayı", "teyze", "hala", "sevgi", "mutluluk",
+    "hüzün", "korku", "endişe", "merak", "heyecan", "zaman", "saat", "dakika", "saniye",
+    "gün", "hafta", "ay", "yıl", "mevsim", "ilkbahar", "yaz", "sonbahar", "kış", "hava",
+    "yağmur", "kar", "dolu", "sis", "bulut", "rüzgar", "fırtına", "gökkuşağı", "şimşek",
+    "gök gürültüsü", "yıldırım", "güneş", "ay", "gezegen", "yıldız", "evren", "dünya"
+  ];
+  
+  // Oyun durumu
+  let gameState = {
+    letters: [],
+    timer: 90,
+    score: 0,
+    foundWords: [],
+    isPlaying: false,
+    letterCount: 9
+  };
+  
+  // Türkçe karakter seti (sesli ve sessiz harfler)
+  const vowels = ['A', 'E', 'I', 'İ', 'O', 'Ö', 'U', 'Ü'];
+  const consonants = ['B', 'C', 'Ç', 'D', 'F', 'G', 'Ğ', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'Ş', 'T', 'V', 'Y', 'Z'];
+  
+  // Oyunu başlat
+  startButton.addEventListener('click', function() {
+    playSound('click');
+    startScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+    startGame();
+  });
+  
+  // Kelime gönder butonu
+  submitBtn.addEventListener('click', function() {
+    checkWord();
+  });
+  
+  // Enter tuşuyla kelime gönderme
+  inputField.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkWord();
+    }
+  });
+  
+  // Oyunu yeniden başlat
+  restartButton.addEventListener('click', function() {
+    playSound('click');
+    resultScreen.style.display = 'none';
+    startGame();
+  });
+  
+  // Harf tıklama
+  function setupLetterClicks() {
+    const letterButtons = document.querySelectorAll('.letter-btn');
+    letterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const letter = this.textContent;
+        inputField.value += letter;
+        playSound('click');
+        updateWordSuggestions();
+      });
+    });
+  }
+  
+  // Kelime önerilerini güncelle
+  function updateWordSuggestions() {
+    const currentInput = wordInput.value.toLowerCase();
+    
+    if (currentInput.length < 2) {
+      wordSuggestions.innerHTML = '';
+      return;
+    }
+    
+    // Mevcut harflerle oluşturulabilecek tüm olası kelimeler
+    const availableLetters = gameState.letters.map(letter => letter.toLowerCase());
+    const possibleWords = turkishWords.filter(word => {
+      // Girilen önek ile başlayan kelimeleri kontrol et
+      if (!word.startsWith(currentInput)) return false;
+      
+      // Kelimenin harflerinin mevcut harflerle oluşturulabilir olduğunu kontrol et
+      const letters = [...availableLetters]; // Mevcut harflerin bir kopyası
+      for (const char of word) {
+        const index = letters.indexOf(char);
+        if (index === -1) return false;
+        letters.splice(index, 1);
+      }
+      
+      return true;
+    });
+    
+    // En fazla 5 öneri göster
+    const suggestions = possibleWords.slice(0, 5);
+    
+    wordSuggestions.innerHTML = '';
+    suggestions.forEach(word => {
+      if (!gameState.foundWords.includes(word)) {
+        const suggestionElement = document.createElement('div');
+        suggestionElement.className = 'word-suggestion';
+        suggestionElement.textContent = word;
+        suggestionElement.addEventListener('click', () => {
+          wordInput.value = word;
+          checkWord();
+        });
+        wordSuggestions.appendChild(suggestionElement);
+      }
+    });
+  }
+  
+  // Kelime ekle ve temizle
+  wordInput.addEventListener('input', updateWordSuggestions);
+  
+  // Harf oluştur
+  function generateLetters() {
+    // En az 3 sesli harf ve 6 sessiz harf olacak şekilde ayarla
+    let newLetters = [];
+    
+    // 3 sesli harf ekle
+    for (let i = 0; i < 3; i++) {
+      const randomVowel = vowels[Math.floor(Math.random() * vowels.length)];
+      newLetters.push(randomVowel);
+    }
+    
+    // 6 sessiz harf ekle
+    for (let i = 0; i < 6; i++) {
+      const randomConsonant = consonants[Math.floor(Math.random() * consonants.length)];
+      newLetters.push(randomConsonant);
+    }
+    
+    // Karıştır
+    for (let i = newLetters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newLetters[i], newLetters[j]] = [newLetters[j], newLetters[i]];
+    }
+    
+    return newLetters;
+  }
+  
+  // Harfleri ekrana yerleştir
+  function renderLetters() {
+    letterContainer.innerHTML = '';
+    
+    gameState.letters.forEach(letter => {
+      const letterBtn = document.createElement('button');
+      letterBtn.className = 'letter-btn';
+      letterBtn.textContent = letter;
+      letterContainer.appendChild(letterBtn);
+    });
+    
+    setupLetterClicks();
+  }
+  
+  // Zamanlayıcı başlat
+  function startTimer() {
+    const timer = setInterval(() => {
+      if (!gameState.isPlaying) {
+        clearInterval(timer);
+        return;
+      }
+      
+      gameState.timer--;
+      timerDisplay.textContent = formatTime(gameState.timer);
+      
+      if (gameState.timer <= 0) {
+        clearInterval(timer);
+        endGame();
+      }
+    }, 1000);
+  }
+  
+  // Zamanı formatla (1:30 gibi)
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+  
+  // Kelimeyi kontrol et
+  function checkWord() {
+    const word = inputField.value.trim().toLowerCase();
+    
+    if (word.length < 3) {
+      showMessage('En az 3 harfli kelime girin', 'warning');
+      return;
+    }
+    
+    if (gameState.foundWords.includes(word)) {
+      showMessage('Bu kelimeyi zaten buldunuz', 'warning');
+      inputField.value = '';
+      return;
+    }
+    
+    // Kelime gerçekten var mı kontrol et
+    if (!turkishWords.includes(word)) {
+      playSound('wrong');
+      showMessage('Geçerli bir kelime değil', 'error');
+      inputField.value = '';
+      return;
+    }
+    
+    // Harflerin uygunluğunu kontrol et
+    const availableLetters = [...gameState.letters.map(l => l.toLowerCase())];
+    const isValidWord = [...word].every(char => {
+      const index = availableLetters.indexOf(char);
+      if (index !== -1) {
+        availableLetters.splice(index, 1);
+        return true;
+      }
+      return false;
+    });
+    
+    if (!isValidWord) {
+      playSound('wrong');
+      showMessage('Bu kelime verilen harflerle oluşturulamaz', 'error');
+      inputField.value = '';
+      return;
+    }
+    
+    // Kelimeyi ekle ve puanı güncelle
+    playSound('correct');
+    gameState.foundWords.push(word);
+    
+    // Puanlama (kelime uzunluğuna göre)
+    const wordScore = calculateWordScore(word);
+    gameState.score += wordScore;
+    
+    // Ekranı güncelle
+    scoreDisplay.textContent = gameState.score;
+    wordsCounter.textContent = gameState.foundWords.length;
+    
+    // Kelimeyi listeye ekle
+    addWordToList(word, wordScore);
+    
+    // Giriş alanını temizle
+    inputField.value = '';
+    wordSuggestions.innerHTML = '';
+    
+    showMessage(`"${word}" kelimesi bulundu: +${wordScore} puan`, 'success');
+  }
+  
+  // Kelime puanını hesapla
+  function calculateWordScore(word) {
+    // Temel puan: kelime uzunluğunun karesi
+    let score = Math.pow(word.length, 2);
+    
+    // Bonus: Ç, Ğ, İ, Ö, Ş, Ü gibi özel Türkçe harfler için +2 puan
+    const specialChars = ['ç', 'ğ', 'ı', 'i̇', 'ö', 'ş', 'ü'];
+    for (const char of word) {
+      if (specialChars.includes(char)) {
+        score += 2;
+      }
+    }
+    
+    return score;
+  }
+  
+  // Bulunan kelimeyi listeye ekle
+  function addWordToList(word, score) {
+    const wordItem = document.createElement('div');
+    wordItem.className = 'found-word-item';
+    
+    const wordText = document.createElement('span');
+    wordText.className = 'word-text';
+    wordText.textContent = word;
+    
+    const wordScore = document.createElement('span');
+    wordScore.className = 'word-score';
+    wordScore.textContent = `+${score}`;
+    
+    wordItem.appendChild(wordText);
+    wordItem.appendChild(wordScore);
+    
+    wordsList.appendChild(wordItem);
+    
+    // Kaydırma çubuğunu en alta getir
+    wordsList.scrollTop = wordsList.scrollHeight;
+  }
+  
+  // Mesaj göster
+  function showMessage(text, type = 'info') {
+    const messageContainer = document.getElementById('message-container');
+    const message = document.createElement('div');
+    message.className = `message message-${type}`;
+    message.textContent = text;
+    
+    messageContainer.appendChild(message);
+    
+    // 3 saniye sonra kaybolsun
+    setTimeout(() => {
+      message.classList.add('fade-out');
+      setTimeout(() => {
+        messageContainer.removeChild(message);
+      }, 500);
+    }, 3000);
+  }
+  
+  // Oyunu başlat
+  function startGame() {
+    // Oyun durumunu sıfırla
+    gameState.letters = generateLetters();
+    gameState.timer = 90;
+    gameState.score = 0;
+    gameState.foundWords = [];
+    gameState.isPlaying = true;
+    
+    // Ekranı güncelle
+    timerDisplay.textContent = formatTime(gameState.timer);
+    scoreDisplay.textContent = '0';
+    wordsCounter.textContent = '0';
+    wordsList.innerHTML = '';
+    gameContainer.style.display = 'block';
+    resultScreen.style.display = 'none';
+    
+    // Harfleri yerleştir
+    renderLetters();
+    
+    // Zamanlayıcıyı başlat
+    startTimer();
+    
+    // Input alanını temizle ve odaklan
+    inputField.value = '';
+    inputField.focus();
+  }
+  
+  // Oyunu bitir
+  function endGame() {
+    playSound('gameOver');
+    gameState.isPlaying = false;
+    
+    // Sonuç ekranını hazırla
+    finalScore.textContent = gameState.score;
+    foundWordsCount.textContent = gameState.foundWords.length;
+    
+    // Sonuç ekranını göster
+    gameContainer.style.display = 'none';
+    resultScreen.style.display = 'block';
+    
+    // Skoru kaydet
+    saveScore();
+  }
+  
+  // Skoru sunucuya gönder
+  function saveScore() {
+    fetch('/save_score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'wordPuzzle',
+        score: gameState.score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Skor kaydedildi:', data);
+    })
+    .catch(error => {
+      console.error('Skor kaydedilirken hata oluştu:', error);
+    });
+  }
+});

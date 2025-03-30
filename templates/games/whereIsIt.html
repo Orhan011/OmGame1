@@ -1,61 +1,65 @@
 {% extends "layout.html" %}
 
-{% block title %}Kim Nerede? Oyunu{% endblock %}
+{% block title %}Kim Nerede Oyunu{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h1 class="game-title text-center mb-4">Kim Nerede?</h1>
-  
-  <!-- Oyun İstatistikleri Bölümü -->
+  <h1 class="game-title text-center">Kim Nerede?</h1>
+
+  <!-- Oyun İstatistikleri -->
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-hourglass-half"></i>
-      <div class="game-stat-value" id="timer-display">0</div>
+      <div class="game-stat-value" id="timer-display">20</div>
       <div class="game-stat-label">SÜRE</div>
     </div>
-    
+
     <div class="game-stat-item">
-      <i class="fas fa-thumbtack"></i>
-      <div class="game-stat-value" id="level-display">1</div>
-      <div class="game-stat-label">SEVİYE</div>
-    </div>
-    
-    <div class="game-stat-item">
-      <i class="fas fa-check-circle"></i>
-      <div class="game-stat-value" id="correct-display">0</div>
-      <div class="game-stat-label">DOĞRU</div>
+      <i class="fas fa-flag-checkered"></i>
+      <div class="game-stat-value" id="round-display">0/10</div>
+      <div class="game-stat-label">TUR</div>
     </div>
   </div>
-  
+
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <!-- Intro Section -->
-      <div class="glass-panel where-is-it-intro mb-4" id="intro-section">
+      <!-- Başlangıç Ekranı -->
+      <div class="game-instructions" id="start-screen">
         <div class="row align-items-center">
           <div class="col-md-8">
-            <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-search-location me-2"></i>Nasıl Oynanır?</h4>
-              <p>Nesnelerin yerlerini hafızanda tut ve kısa bir süre sonra aynı yerlere tıkla. Doğru hatırladığın her nesne için puan kazanırsın. Seviye atladıkça zorlaşacak!</p>
-              <div class="memory-tips">
-                <div class="tip-badge">
-                  <i class="fas fa-lightbulb"></i>
-                  <span>İpucu: Nesnelerin yerleşimi için görsel desenleri ezberle</span>
-                </div>
+            <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
+            <p>Bu oyunda, gösterilen kişilerin haritadaki konumunu bulmaya çalışacaksınız. Doğru konumu ne kadar hızlı bulursanız, o kadar çok puan kazanırsınız!</p>
+            <div class="rule-list mt-3">
+              <div class="rule-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Gösterilen karakteri haritada nerede olduğunu tahmin edin</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-clock"></i>
+                <span>Her tur için sınırlı süreniz var</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-bolt"></i>
+                <span>Hızlı ve doğru tahminler daha çok puan kazandırır</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Yanlış tıklamalar ceza puanı getirebilir</span>
               </div>
             </div>
           </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
             <div class="memory-levels-selector">
               <div class="level-label">Zorluk</div>
               <div class="level-buttons">
-                <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
+                <button id="level-easy" class="level-btn" data-level="EASY">Kolay</button>
+                <button id="level-medium" class="level-btn active" data-level="MEDIUM">Orta</button>
                 <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
               </div>
             </div>
@@ -65,252 +69,194 @@
           </div>
         </div>
       </div>
-      
-      <!-- Game Container -->
-      <div id="game-container" class="where-is-it-game-container glass-effect" style="display: none;">
-        <!-- Game Header -->
-        <div class="game-header">
-          <div class="level-indicator" id="level-indicator">
-            <span>Seviye <span id="current-level">1</span></span>
-          </div>
-          
-          <div class="game-controls-top">
-            <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
-              <i class="fas fa-pause"></i>
-            </button>
-            <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
-              <i class="fas fa-volume-up"></i>
-            </button>
+
+      <!-- Oyun Alanı -->
+      <div id="game-container" class="where-is-it-container glass-effect" style="display: none;">
+        <div class="character-info-panel">
+          <img id="character-image" src="/static/images/whereIsIt/char1.png" alt="Karakter" class="character-avatar">
+          <div class="character-name-container">
+            <span>Kim Nerede:</span>
+            <h3 id="character-name">Mehmet</h3>
           </div>
         </div>
-        
-        <!-- Alert Container -->
-        <div id="alert-container" class="where-is-it-alert"></div>
-        
-        <!-- Game Board -->
-        <div class="where-is-it-board-container">
-          <div id="memory-phase-message" class="phase-message">
-            <h3>Nesneleri Hafızana Al</h3>
-            <div id="memorize-countdown">3</div>
-          </div>
-          
-          <div id="recall-phase-message" class="phase-message" style="display: none;">
-            <h3>Nesnelerin Yerlerini Hatırla</h3>
-            <div class="small-text">Nesnelerin olduğu yerlere tıkla</div>
-          </div>
-          
-          <div id="where-is-it-grid" class="where-is-it-grid"></div>
+
+        <div class="progress timer-progress">
+          <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
         </div>
-        
-        <!-- Progress Bar -->
-        <div class="game-progress">
-          <div class="progress-label">İlerleme: <span id="progress-percent">0%</span></div>
-          <div class="progress">
-            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-          </div>
+
+        <div id="map-container" class="game-map">
+          <img src="/static/images/whereIsIt/map.png" alt="Harita" class="map-image">
+          <!-- Hedef işaretçileri buraya dinamik olarak eklenecek -->
         </div>
-      </div>
-      
-      <!-- Game Over Container -->
-      <div id="game-over-container" class="game-results-container" style="display: none;">
-        <div class="game-results-card">
-          <div class="game-results-header">
-            <span class="result-badge">
-              <i class="fas fa-flag-checkered"></i>
-            </span>
-            <h2 class="mb-0" id="game-result-title">Oyun Tamamlandı!</h2>
-          </div>
-          
-          <div class="game-results-body">
-            <div class="results-stats">
-              <div class="result-stat">
-                <i class="fas fa-trophy"></i>
-                <div class="result-stat-value">
-                  <span id="final-score">0</span>
-                </div>
-                <div class="result-stat-label">Toplam Puan</div>
-              </div>
-              
-              <div class="result-stat">
-                <i class="fas fa-check-circle"></i>
-                <div class="result-stat-value">
-                  <span id="final-correct">0</span>
-                </div>
-                <div class="result-stat-label">Doğru Sayısı</div>
-              </div>
-              
-              <div class="result-stat">
-                <i class="fas fa-thumbtack"></i>
-                <div class="result-stat-value">
-                  <span id="final-level">0</span>
-                </div>
-                <div class="result-stat-label">Ulaşılan Seviye</div>
-              </div>
+
+        <!-- Sonuç Popup -->
+        <div id="result-popup" class="result-popup" style="display: none;">
+          <div class="result-content">
+            <h3 id="result-message" class="text-success">Harika! Doğru yeri buldunuz.</h3>
+            <p id="result-score">+100 puan kazandınız!</p>
+            <div class="result-buttons">
+              <button id="next-round-btn" class="btn btn-primary"><i class="fas fa-forward me-2"></i>Sonraki Tur</button>
+              <button id="game-over-btn" class="btn btn-success" style="display: none;"><i class="fas fa-check-circle me-2"></i>Oyunu Bitir</button>
             </div>
-            
-            <div class="results-rating">
-              <div class="rating-stars" id="rating-stars">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-              </div>
-              <div class="rating-text" id="rating-text">İyi!</div>
-            </div>
-            
-            <div class="game-achievement" id="game-achievement" style="display: none;">
-              <div class="achievement-icon">
-                <i class="fas fa-award"></i>
-              </div>
-              <div class="achievement-text">
-                <div class="achievement-title">Başarım Kazanıldı!</div>
-                <div class="achievement-name" id="achievement-name">Hafıza Ustası</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="game-results-footer">
-            <button id="play-again" class="btn btn-primary btn-lg">
-              <i class="fas fa-redo me-2"></i>Tekrar Oyna
-            </button>
-            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-trophy me-2"></i>Skor Tablosu
-            </a>
-          </div>
-          
-          <div class="game-share-section">
-            <p>Skorunuzu paylaşın:</p>
-            <div class="share-buttons">
-              <button class="share-btn" title="Kopyala" id="copy-score">
-                <i class="fas fa-copy"></i>
-              </button>
-              <button class="share-btn" title="Paylaş" id="share-score">
-                <i class="fas fa-share-alt"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Pause Menu Overlay -->
-      <div id="pause-overlay" class="pause-overlay" style="display: none;">
-        <div class="pause-card">
-          <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
-          <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
-          <div class="pause-menu-buttons">
-            <button id="resume-game" class="btn btn-primary">
-              <i class="fas fa-play me-2"></i>Devam Et
-            </button>
-            <button id="restart-game" class="btn btn-outline-primary">
-              <i class="fas fa-redo me-2"></i>Yeniden Başlat
-            </button>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-              <i class="fas fa-home me-2"></i>Ana Sayfa
-            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
-{% endblock %}
-{% extends "layout.html" %}
+<style>
+.where-is-it-container {
+  padding: 20px;
+  position: relative;
+  min-height: 600px;
+}
 
-{% block title %}Kim Nerede? Oyunu{% endblock %}
+.character-info-panel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 15px;
+  border-radius: 10px;
+}
 
-{% block content %}
-<div class="container">
-  <h1 class="game-title text-center mb-4">Kim Nerede?</h1>
-  
-  <!-- Oyun İstatistikleri Bölümü -->
-  <div class="game-stats-container">
-    <div class="game-stat-item">
-      <i class="fas fa-trophy"></i>
-      <div class="game-stat-value" id="score-display">0</div>
-      <div class="game-stat-label">PUAN</div>
-    </div>
-    
-    <div class="game-stat-item">
-      <i class="fas fa-hourglass-half"></i>
-      <div class="game-stat-value" id="timer-display">0</div>
-      <div class="game-stat-label">SÜRE</div>
-    </div>
-    
-    <div class="game-stat-item">
-      <i class="fas fa-thumbtack"></i>
-      <div class="game-stat-value" id="level-display">1</div>
-      <div class="game-stat-label">SEVİYE</div>
-    </div>
-    
-    <div class="game-stat-item">
-      <i class="fas fa-check-circle"></i>
-      <div class="game-stat-value" id="correct-display">0</div>
-      <div class="game-stat-label">DOĞRU</div>
-    </div>
-  </div>
-  
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <!-- Intro Section -->
-      <div class="glass-panel where-is-it-intro mb-4" id="intro-section">
-        <div class="row align-items-center">
-          <div class="col-md-8">
-            <h2>Oyun Nasıl Oynanır?</h2>
-            <p>Belirli nesnelerin konumunu hafızanızda tutun ve daha sonra bu nesneleri doğru konumda bulun.</p>
-            <div class="rules-container mt-3">
-              <div class="rule-item">
-                <i class="fas fa-eye"></i>
-                <span>Ekranda beliren nesnelerin konumlarını ezberleyin</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-search"></i>
-                <span>Nesneler gizlendiğinde, doğru konumlara tıklayın</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-level-up-alt"></i>
-                <span>Her seviyede zorluk artar ve daha fazla nesne bulmak zorunda kalırsınız</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-hourglass-half"></i>
-                <span>Süre bitmeden tüm nesneleri bulmaya çalışın</span>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
-            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
-              <i class="fas fa-play me-2"></i>Oyunu Başlat
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Game Section -->
-      <div class="glass-panel where-is-it-game-container" id="game-section" style="display: none;">
-        <div class="where-is-it-board-container">
-          <div class="where-is-it-grid"></div>
-        </div>
-        
-        <div class="game-controls">
-          <button id="pause-game" class="btn-game">
-            <i class="fas fa-pause me-2"></i>Duraklat
-          </button>
-          <button id="restart-game" class="btn-game">
-            <i class="fas fa-sync-alt me-2"></i>Yeniden Başlat
-          </button>
-          <button id="sound-toggle" class="btn-game">
-            <i class="fas fa-volume-up me-2"></i>Ses
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+.character-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
 
-<!-- Oyun script'ini dahil et -->
-<script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
+.character-name-container {
+  margin-left: 15px;
+}
+
+.character-name-container span {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+}
+
+.character-name-container h3 {
+  font-size: 1.6rem;
+  margin: 0;
+  font-weight: 600;
+  color: white;
+}
+
+.timer-progress {
+  height: 10px;
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.game-map {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: crosshair;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.target-marker {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.target-marker.correct {
+  background-color: rgba(46, 204, 113, 0.7);
+  border: 2px solid #27ae60;
+}
+
+.target-marker.wrong {
+  background-color: rgba(231, 76, 60, 0.7);
+  border: 2px solid #c0392b;
+}
+
+.marker-pulse {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: inherit;
+  opacity: 0.7;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.result-popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: 10px;
+}
+
+.result-content {
+  background: linear-gradient(135deg, rgba(40, 40, 80, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 80%;
+  max-width: 400px;
+}
+
+.result-content h3 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.result-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.result-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+</style>
+
+<script src="/static/js/games/whereIsIt.js"></script>
 {% endblock %}

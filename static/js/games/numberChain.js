@@ -929,3 +929,617 @@ document.addEventListener('DOMContentLoaded', function() {
   addStyles();
   adjustLayout();
 });
+// Sayı Zinciri (Number Chain) Oyunu
+document.addEventListener('DOMContentLoaded', function() {
+  const startButton = document.getElementById('start-game');
+  const startScreen = document.getElementById('start-screen');
+  const gameContainer = document.getElementById('game-container');
+  const levelDisplays = document.querySelectorAll('.level-btn');
+  const timerDisplay = document.getElementById('timer-display');
+  const scoreDisplay = document.getElementById('score-display');
+  const sequenceDisplay = document.getElementById('sequence-display');
+  const userInputContainer = document.getElementById('user-input-container');
+  const levelElement = document.getElementById('level-display');
+  const resultContainer = document.getElementById('result-container');
+  const resultMessage = document.getElementById('result-message');
+  const resultScore = document.getElementById('result-score');
+  const nextLevelBtn = document.getElementById('next-level-btn');
+  const gameOverBtn = document.getElementById('game-over-btn');
+  
+  // Ses efektleri
+  const sounds = {
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3'),
+    click: new Audio('/static/sounds/click.mp3'),
+    success: new Audio('/static/sounds/success.mp3'),
+    gameOver: new Audio('/static/sounds/game-over.mp3'),
+    number: new Audio('/static/sounds/number.mp3')
+  };
+
+  // Ses oynatma fonksiyonu
+  function playSound(sound) {
+    try {
+      sounds[sound].currentTime = 0;
+      sounds[sound].play().catch(err => console.log("Sound play error:", err));
+    } catch (error) {
+      console.log("Sound play error:", error);
+    }
+  }
+  
+  // Oyun durumu
+  let gameState = {
+    isPlaying: false,
+    level: 1,
+    score: 0,
+    currentSequence: [],
+    userSequence: [],
+    showingSequence: false,
+    inputEnabled: false,
+    difficulty: 'EASY',
+    lives: 3,
+    maxLevel: 20
+  };
+  
+  // Zorluk ayarları
+  const difficultySettings = {
+    EASY: {
+      initialLength: 3,
+      timePerNumber: 1000,
+      scoreMultiplier: 1,
+      maxNumbers: 10, // Bir seviyede gösterilecek max sayı
+      numbersPerLevel: 1 // Her seviyede kaç sayı eklenecek
+    },
+    MEDIUM: {
+      initialLength: 4,
+      timePerNumber: 800,
+      scoreMultiplier: 1.5,
+      maxNumbers: 12,
+      numbersPerLevel: 1
+    },
+    HARD: {
+      initialLength: 5,
+      timePerNumber: 600,
+      scoreMultiplier: 2,
+      maxNumbers: 15,
+      numbersPerLevel: 2
+    }
+  };
+  
+  // Zorluk seviyesi butonları
+  levelDisplays.forEach(button => {
+    button.addEventListener('click', function() {
+      levelDisplays.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      gameState.difficulty = this.getAttribute('data-level');
+      playSound('click');
+    });
+  });
+  
+  // Oyunu başlat butonu
+  startButton.addEventListener('click', function() {
+    playSound('click');
+    startGame();
+  });
+  
+  // Sonraki seviye butonu
+  nextLevelBtn.addEventListener('click', function() {
+    playSound('click');
+    startNextLevel();
+  });
+  
+  // Oyun sonu butonu
+  gameOverBtn.addEventListener('click', function() {
+    playSound('click');
+    finishGame();
+  });
+  
+  // Oyunu başlat
+  function startGame() {
+    // Oyun durumunu sıfırla
+    gameState.isPlaying = true;
+    gameState.level = 1;
+    gameState.score = 0;
+    gameState.userSequence = [];
+    gameState.lives = 3;
+    
+    // Ekranı güncelle
+    startScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+    resultContainer.style.display = 'none';
+    
+    levelElement.textContent = '1';
+    updateScoreDisplay();
+    updateLivesDisplay();
+    
+    // İlk seviyeyi başlat
+    startLevel();
+  }
+  
+  // Seviyeyi başlat
+  function startLevel() {
+    // Seviye ekranını güncelle
+    levelElement.textContent = gameState.level;
+    
+    // Zorluk ayarlarını al
+    const settings = difficultySettings[gameState.difficulty];
+    
+    // Seviye uzunluğunu hesapla (başlangıç + seviye * artış)
+    const additionalNumbers = (gameState.level - 1) * settings.numbersPerLevel;
+    const sequenceLength = Math.min(
+      settings.initialLength + additionalNumbers,
+      settings.maxNumbers
+    );
+    
+    // Yeni dizi oluştur
+    gameState.currentSequence = generateSequence(sequenceLength);
+    gameState.userSequence = [];
+    
+    // Sayı ekranını temizle
+    sequenceDisplay.innerHTML = '';
+    userInputContainer.innerHTML = '';
+    
+    // Diziyi göster
+    showSequence();
+  }
+  
+  // Diziyi göster
+  function showSequence() {
+    gameState.showingSequence = true;
+    gameState.inputEnabled = false;
+    
+    // Arka planı karartma efekti
+    sequenceDisplay.classList.add('sequence-active');
+    
+    // "Sırayı İzleyin" mesajını göster
+    const watchMessage = document.createElement('div');
+    watchMessage.className = 'watch-message';
+    watchMessage.innerHTML = '<i class="fas fa-eye"></i> Sırayı İzleyin';
+    sequenceDisplay.appendChild(watchMessage);
+    
+    // Sayma animasyonu
+    let countdownValue = 3;
+    const countdownElement = document.createElement('div');
+    countdownElement.className = 'countdown';
+    countdownElement.textContent = countdownValue;
+    sequenceDisplay.appendChild(countdownElement);
+    
+    const countdownInterval = setInterval(() => {
+      countdownValue--;
+      countdownElement.textContent = countdownValue;
+      
+      if (countdownValue === 0) {
+        clearInterval(countdownInterval);
+        
+        // Mesajları kaldır
+        sequenceDisplay.innerHTML = '';
+        
+        // Diziyi göstermeye başla
+        showSequenceNumbers();
+      }
+    }, 1000);
+  }
+  
+  // Dizi sayılarını sırayla göster
+  function showSequenceNumbers() {
+    // Sayıları gösterme zamanı
+    const settings = difficultySettings[gameState.difficulty];
+    const displayTime = settings.timePerNumber;
+    
+    gameState.currentSequence.forEach((number, index) => {
+      setTimeout(() => {
+        // Önceki sayıyı temizle
+        sequenceDisplay.innerHTML = '';
+        
+        // Sayıyı göster
+        const numberElement = document.createElement('div');
+        numberElement.className = 'sequence-number';
+        numberElement.textContent = number;
+        sequenceDisplay.appendChild(numberElement);
+        
+        // Sayı sesi çal
+        playSound('number');
+        
+        // Son sayıdan sonra giriş moduna geç
+        if (index === gameState.currentSequence.length - 1) {
+          setTimeout(() => {
+            sequenceDisplay.innerHTML = '';
+            sequenceDisplay.classList.remove('sequence-active');
+            setupUserInput();
+          }, displayTime);
+        }
+      }, index * displayTime);
+    });
+  }
+  
+  // Kullanıcı giriş alanını hazırla
+  function setupUserInput() {
+    gameState.showingSequence = false;
+    gameState.inputEnabled = true;
+    
+    // Giriş mesajı
+    const inputMessage = document.createElement('div');
+    inputMessage.className = 'input-message';
+    inputMessage.innerHTML = '<i class="fas fa-keyboard"></i> Gördüğünüz Sayıları Sırayla Girin';
+    sequenceDisplay.appendChild(inputMessage);
+    
+    // Sayı tuşlarını oluştur (1-9, 0)
+    const numberPad = document.createElement('div');
+    numberPad.className = 'number-pad';
+    
+    for (let i = 1; i <= 9; i++) {
+      createNumberButton(i, numberPad);
+    }
+    
+    createNumberButton(0, numberPad);
+    
+    userInputContainer.appendChild(numberPad);
+    
+    // Mevcut kullanıcı sırası ekranı
+    const userSequenceDisplay = document.createElement('div');
+    userSequenceDisplay.className = 'user-sequence-display';
+    userSequenceDisplay.id = 'user-sequence-display';
+    userInputContainer.appendChild(userSequenceDisplay);
+    
+    // Silme ve tamamlama butonları
+    const controlButtons = document.createElement('div');
+    controlButtons.className = 'control-buttons';
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'control-button delete-btn';
+    deleteButton.innerHTML = '<i class="fas fa-backspace"></i>';
+    deleteButton.addEventListener('click', function() {
+      if (!gameState.inputEnabled) return;
+      
+      playSound('click');
+      
+      if (gameState.userSequence.length > 0) {
+        gameState.userSequence.pop();
+        updateUserSequenceDisplay();
+      }
+    });
+    
+    const submitButton = document.createElement('button');
+    submitButton.className = 'control-button submit-btn';
+    submitButton.innerHTML = '<i class="fas fa-check"></i>';
+    submitButton.addEventListener('click', function() {
+      if (!gameState.inputEnabled) return;
+      
+      // Kullanıcı doğru sayıda rakam girdiyse kontrolü yap
+      if (gameState.userSequence.length === gameState.currentSequence.length) {
+        checkSequence();
+      } else {
+        showMessage('Tüm sayıları girmeniz gerekiyor!', 'warning');
+      }
+    });
+    
+    controlButtons.appendChild(deleteButton);
+    controlButtons.appendChild(submitButton);
+    
+    userInputContainer.appendChild(controlButtons);
+    
+    // Ayrıca klavye desteği ekle
+    document.addEventListener('keydown', handleKeyPress);
+  }
+  
+  // Sayı tuşu oluştur
+  function createNumberButton(number, container) {
+    const button = document.createElement('button');
+    button.className = 'number-button';
+    button.textContent = number;
+    
+    button.addEventListener('click', function() {
+      if (!gameState.inputEnabled) return;
+      
+      // Kullanıcı dizisi dolu değilse sayıyı ekle
+      if (gameState.userSequence.length < gameState.currentSequence.length) {
+        gameState.userSequence.push(number);
+        playSound('click');
+        updateUserSequenceDisplay();
+        
+        // Eğer tüm sayılar girildiyse otomatik kontrol et
+        if (gameState.userSequence.length === gameState.currentSequence.length) {
+          checkSequence();
+        }
+      }
+    });
+    
+    container.appendChild(button);
+  }
+  
+  // Klavye tuşları ile oynama desteği
+  function handleKeyPress(event) {
+    if (!gameState.inputEnabled) return;
+    
+    // Sayı tuşları (0-9)
+    if (event.key >= '0' && event.key <= '9') {
+      const number = parseInt(event.key);
+      
+      if (gameState.userSequence.length < gameState.currentSequence.length) {
+        gameState.userSequence.push(number);
+        playSound('click');
+        updateUserSequenceDisplay();
+        
+        // Eğer tüm sayılar girildiyse otomatik kontrol et
+        if (gameState.userSequence.length === gameState.currentSequence.length) {
+          checkSequence();
+        }
+      }
+    }
+    
+    // Backspace tuşu
+    else if (event.key === 'Backspace') {
+      if (gameState.userSequence.length > 0) {
+        gameState.userSequence.pop();
+        playSound('click');
+        updateUserSequenceDisplay();
+      }
+    }
+    
+    // Enter tuşu
+    else if (event.key === 'Enter') {
+      if (gameState.userSequence.length === gameState.currentSequence.length) {
+        checkSequence();
+      } else {
+        showMessage('Tüm sayıları girmeniz gerekiyor!', 'warning');
+      }
+    }
+  }
+  
+  // Kullanıcı dizisi ekranını güncelle
+  function updateUserSequenceDisplay() {
+    const display = document.getElementById('user-sequence-display');
+    display.innerHTML = '';
+    
+    gameState.userSequence.forEach(number => {
+      const digit = document.createElement('span');
+      digit.className = 'user-digit';
+      digit.textContent = number;
+      display.appendChild(digit);
+    });
+  }
+  
+  // Diziyi kontrol et
+  function checkSequence() {
+    gameState.inputEnabled = false;
+    document.removeEventListener('keydown', handleKeyPress);
+    
+    // Doğru mu kontrol et
+    let isCorrect = true;
+    
+    for (let i = 0; i < gameState.currentSequence.length; i++) {
+      if (gameState.userSequence[i] !== gameState.currentSequence[i]) {
+        isCorrect = false;
+        break;
+      }
+    }
+    
+    // Temizle
+    userInputContainer.innerHTML = '';
+    
+    if (isCorrect) {
+      handleCorrectSequence();
+    } else {
+      handleWrongSequence();
+    }
+  }
+  
+  // Doğru dizi
+  function handleCorrectSequence() {
+    playSound('correct');
+    
+    // Puan hesapla
+    const settings = difficultySettings[gameState.difficulty];
+    const basePoints = gameState.currentSequence.length * 10;
+    const levelBonus = gameState.level * 5;
+    const difficultyBonus = Math.round(basePoints * (settings.scoreMultiplier - 1));
+    
+    const totalPoints = basePoints + levelBonus + difficultyBonus;
+    gameState.score += totalPoints;
+    
+    updateScoreDisplay();
+    
+    // Başarı mesajı
+    showSuccessMessage(totalPoints);
+    
+    // Son seviyeye ulaşıldı mı kontrol et
+    if (gameState.level >= gameState.maxLevel) {
+      showGameComplete();
+    } else {
+      // Sonraki seviye butonu
+      nextLevelBtn.style.display = 'block';
+      gameOverBtn.style.display = 'none';
+      resultContainer.style.display = 'flex';
+    }
+  }
+  
+  // Yanlış dizi
+  function handleWrongSequence() {
+    playSound('wrong');
+    
+    // Can azalt
+    gameState.lives--;
+    updateLivesDisplay();
+    
+    if (gameState.lives <= 0) {
+      // Oyun bitti
+      showGameOver();
+    } else {
+      // Başarısız mesajı
+      showFailureMessage();
+      
+      // Aynı seviyeyi tekrar dene
+      setTimeout(() => {
+        sequenceDisplay.innerHTML = '';
+        // Aynı seviyeyi başlat
+        startLevel();
+      }, 2000);
+    }
+  }
+  
+  // Başarı mesajı göster
+  function showSuccessMessage(points) {
+    resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> Mükemmel! Doğru sıra!`;
+    resultScore.innerHTML = `+${points} puan kazandınız!`;
+    
+    if (gameState.level < gameState.maxLevel) {
+      nextLevelBtn.innerHTML = `<i class="fas fa-arrow-right"></i> ${gameState.level + 1}. Seviyeye Geç`;
+    } else {
+      nextLevelBtn.innerHTML = `<i class="fas fa-check"></i> Oyunu Tamamla`;
+    }
+  }
+  
+  // Başarısız mesajı göster
+  function showFailureMessage() {
+    sequenceDisplay.innerHTML = '';
+    
+    const failureMessage = document.createElement('div');
+    failureMessage.className = 'failure-message';
+    failureMessage.innerHTML = `<i class="fas fa-times-circle"></i> Yanlış sıra!<br><span>Kalan Can: ${gameState.lives}</span>`;
+    sequenceDisplay.appendChild(failureMessage);
+    
+    // Doğru sırayı göster
+    const correctSequence = document.createElement('div');
+    correctSequence.className = 'correct-sequence';
+    
+    const sequenceTitle = document.createElement('div');
+    sequenceTitle.className = 'sequence-title';
+    sequenceTitle.textContent = 'Doğru Sıra:';
+    correctSequence.appendChild(sequenceTitle);
+    
+    const sequenceNumbers = document.createElement('div');
+    sequenceNumbers.className = 'sequence-numbers';
+    
+    gameState.currentSequence.forEach(number => {
+      const digit = document.createElement('span');
+      digit.className = 'correct-digit';
+      digit.textContent = number;
+      sequenceNumbers.appendChild(digit);
+    });
+    
+    correctSequence.appendChild(sequenceNumbers);
+    sequenceDisplay.appendChild(correctSequence);
+  }
+  
+  // Oyun tamamlandı mesajı
+  function showGameComplete() {
+    playSound('success');
+    
+    resultMessage.innerHTML = `<i class="fas fa-trophy"></i> Tebrikler! Tüm Seviyeleri Tamamladınız!`;
+    resultScore.innerHTML = `Toplam Puanınız: ${gameState.score}`;
+    
+    nextLevelBtn.style.display = 'none';
+    gameOverBtn.style.display = 'block';
+    gameOverBtn.innerHTML = `<i class="fas fa-check"></i> Oyunu Bitir`;
+    
+    resultContainer.style.display = 'flex';
+  }
+  
+  // Oyun bitti mesajı
+  function showGameOver() {
+    playSound('gameOver');
+    
+    resultMessage.innerHTML = `<i class="fas fa-heart-broken"></i> Oyun Bitti!`;
+    resultScore.innerHTML = `Toplam Puanınız: ${gameState.score}`;
+    
+    nextLevelBtn.style.display = 'none';
+    gameOverBtn.style.display = 'block';
+    gameOverBtn.innerHTML = `<i class="fas fa-check"></i> Oyunu Bitir`;
+    
+    resultContainer.style.display = 'flex';
+  }
+  
+  // Sonraki seviyeyi başlat
+  function startNextLevel() {
+    gameState.level++;
+    resultContainer.style.display = 'none';
+    startLevel();
+  }
+  
+  // Oyunu bitir
+  function finishGame() {
+    // Skoru sunucuya gönder
+    saveScore();
+    
+    // Ana sayfaya dön
+    setTimeout(function() {
+      window.location.href = '/leaderboard?game=numberChain';
+    }, 1000);
+  }
+  
+  // Skoru kaydet
+  function saveScore() {
+    fetch('/save_score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'numberChain',
+        score: gameState.score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Skor kaydedildi:', data);
+    })
+    .catch(error => {
+      console.error('Skor kaydedilirken hata oluştu:', error);
+    });
+  }
+  
+  // Skor ekranını güncelle
+  function updateScoreDisplay() {
+    scoreDisplay.textContent = gameState.score;
+  }
+  
+  // Can ekranını güncelle
+  function updateLivesDisplay() {
+    const livesContainer = document.querySelector('.lives-display');
+    
+    if (livesContainer) {
+      livesContainer.innerHTML = '';
+      
+      for (let i = 0; i < gameState.lives; i++) {
+        const heartIcon = document.createElement('i');
+        heartIcon.className = 'fas fa-heart';
+        livesContainer.appendChild(heartIcon);
+      }
+    }
+  }
+  
+  // Rastgele sayı dizisi oluştur
+  function generateSequence(length) {
+    const sequence = [];
+    
+    for (let i = 0; i < length; i++) {
+      const digit = Math.floor(Math.random() * 10); // 0-9 arası sayılar
+      sequence.push(digit);
+    }
+    
+    return sequence;
+  }
+  
+  // Mesaj göster
+  function showMessage(text, type = 'info') {
+    const messageContainer = document.getElementById('message-container');
+    
+    if (!messageContainer) return;
+    
+    const message = document.createElement('div');
+    message.className = `message message-${type}`;
+    message.textContent = text;
+    
+    messageContainer.appendChild(message);
+    
+    // 3 saniye sonra kaybolsun
+    setTimeout(() => {
+      message.classList.add('fade-out');
+      setTimeout(() => {
+        if (messageContainer.contains(message)) {
+          messageContainer.removeChild(message);
+        }
+      }, 500);
+    }, 3000);
+  }
+});
