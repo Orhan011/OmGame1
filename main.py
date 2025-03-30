@@ -897,7 +897,9 @@ def update_avatar():
     # Check if user selected a preset avatar
     selected_avatar = request.form.get('selected_avatar')
     if selected_avatar:
-        user.avatar_url = url_for('static', filename=f'images/avatars/{selected_avatar}')
+        # Tam URL yerine dosya yolunu saklayalım (daha güvenilir)
+        avatar_path = f'images/avatars/{selected_avatar}'
+        user.avatar_url = avatar_path
         try:
             db.session.commit()
             flash('Profil fotoğrafınız başarıyla güncellendi.', 'success')
@@ -921,11 +923,18 @@ def update_avatar():
     if file:
         # Generate a secure filename
         filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+        # Klasör yoksa oluştur
+        avatar_dir = os.path.join('static', 'images', 'avatars')
+        if not os.path.exists(avatar_dir):
+            os.makedirs(avatar_dir)
+            
         # Save to avatars directory
-        file_path = os.path.join('static', 'images', 'avatars', filename)
+        file_path = os.path.join(avatar_dir, filename)
         try:
             file.save(file_path)
-            user.avatar_url = url_for('static', filename=f'images/avatars/{filename}')
+            # Tam URL yerine dosya yolunu saklayalım (daha güvenilir)
+            avatar_path = f'images/avatars/{filename}'
+            user.avatar_url = avatar_path
             db.session.commit()
             flash('Profil fotoğrafınız başarıyla yüklendi.', 'success')
         except Exception as e:

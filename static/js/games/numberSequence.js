@@ -452,14 +452,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate reasonable wrong answers based on the pattern
     const wrongAnswers = [];
-    const offsets = [-5, -3, -2, -1, +1, +2, +3, +5]; // Offsets for wrong answers
+    const offsets = [-7, -5, -4, -3, -2, -1, +1, +2, +3, +4, +5, +7]; // Daha geniş offset seçenekleri
     
-    for (let i = 0; i < 3; i++) {
+    // Yanlış cevap sayısını zorluk seviyesine göre belirle
+    const wrongAnswerCount = gameState.difficulty === 'easy' ? 4 :
+                              gameState.difficulty === 'medium' ? 5 : 6;
+    
+    for (let i = 0; i < wrongAnswerCount; i++) {
       let wrongAnswer;
+      let attemptCount = 0;
+      
       do {
+        attemptCount++;
+        // Uygun bir offset seç
         const offset = offsets[Math.floor(Math.random() * offsets.length)];
-        wrongAnswer = correctAnswer + offset;
-        // Ensure wrong answer is positive and not already in the list
+        
+        // Eğer ileri seviye ise, daha karmaşık yanlış cevaplar da ekle
+        if (gameState.level > 3 && gameState.difficulty === 'hard' && Math.random() > 0.5) {
+          const sequenceLength = gameState.currentSequence.length;
+          const patternInd = getRandomInt(0, sequenceLength - 1);
+          if (patternInd !== gameState.missingIndex) {
+            wrongAnswer = gameState.currentSequence[patternInd];
+          } else {
+            wrongAnswer = correctAnswer + offset;
+          }
+        } else {
+          wrongAnswer = correctAnswer + offset;
+        }
+        
+        // Yanlış cevap listesinde fazla deneme yaparsa çık
+        if (attemptCount > 20) {
+          if (wrongAnswer > 0 && wrongAnswer !== correctAnswer) {
+            break;
+          }
+          // Rastgele bir sayı üret
+          wrongAnswer = Math.abs(correctAnswer + getRandomInt(-10, 10));
+          if (wrongAnswer === correctAnswer) wrongAnswer += 1;
+          break;
+        }
+        
+        // Cevabın uygun olup olmadığını kontrol et
         if (wrongAnswer > 0 && !wrongAnswers.includes(wrongAnswer) && wrongAnswer !== correctAnswer) {
           break;
         }

@@ -60,13 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const scoreDisplay = document.getElementById('score-display');
   const itemsDisplay = document.getElementById('items-display');
   
-  // Ses efektleri
-  const sounds = {
-    collect: new Audio('/static/sounds/collect.mp3'),
-    complete: new Audio('/static/sounds/complete.mp3'),
-    move: new Audio('/static/sounds/move.mp3'),
-    gameOver: new Audio('/static/sounds/gameover.mp3')
-  };
+  // Ses efektleri - lazım olduğunda yükleyelim (hata önleyici)
+  let sounds = {};
   
   // Oyunu başlat
   initEventListeners();
@@ -199,6 +194,35 @@ document.addEventListener('DOMContentLoaded', function() {
   function startGame() {
     hideGameMenu();
     initThreeJS();
+    
+    // Sesleri şimdi yükleyelim (istek üzerine yükleme - daha güvenilir)
+    try {
+      sounds = {
+        collect: new Audio('/static/sounds/collect.mp3'),
+        complete: new Audio('/static/sounds/complete.mp3'),
+        move: new Audio('/static/sounds/move.mp3'),
+        gameOver: new Audio('/static/sounds/gameover.mp3')
+      };
+      
+      // Sesleri ön yükle
+      Object.values(sounds).forEach(sound => {
+        sound.load();
+        // Mobil cihazlar için otomatik oynatma kısıtlamalarını aşmak için
+        sound.volume = 0;
+        sound.play().then(() => {
+          sound.pause();
+          sound.currentTime = 0;
+          sound.volume = 1;
+        }).catch(e => {
+          console.log('Sesler daha sonra yüklenecek:', e);
+          // Hata olması normaldir, kullanıcı etkileşimi gerekebilir
+        });
+      });
+    } catch (e) {
+      console.log('Ses yüklenirken hata oluştu, oyun devam edecek:', e);
+      // Hata olsa bile oyun çalışmaya devam etsin
+    }
+    
     resetGame();
     generateMaze();
     buildMaze3D();
