@@ -11,9 +11,9 @@
 <div class="container profile-page">
   <div class="profile-avatar" style="position: relative; z-index: 100; margin-bottom: -50px; text-align: center;">
   {% if current_user.avatar_url %}
-    <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }} Avatar" style="border: 4px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);">
+    <img src="{{ current_user.avatar_url }}" alt="{{ current_user.username }} Avatar" style="border: 4px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); position: relative; z-index: 9999;">
   {% else %}
-    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; margin: 0 auto; border: 4px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);">
+    <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; margin: 0 auto; border: 4px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); position: relative; z-index: 9999;">
       {{ current_user.username[0]|upper }}
     </div>
   {% endif %}
