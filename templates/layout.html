@@ -56,12 +56,10 @@ function loadArticleContent() {
 <!-- Arka plandaki şekiller kaldırıldı -->
 
 <nav class="navbar navbar-expand-lg navbar-dark">
-<div class="container position-relative">
+<div class="container">
   <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
     <span class="brand-text">OmGame</span>
-  </a>
-  <a href="{{ url_for('index') }}" class="center-logo">
-    <img src="{{ url_for('static', filename='images/logo-gold.png') }}" alt="OmGame Logo" class="navbar-logo-center">
   </a>
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <div class="menu-icon">
