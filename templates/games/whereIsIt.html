@@ -219,3 +219,98 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
 {% endblock %}
+{% extends "layout.html" %}
+
+{% block title %}Kim Nerede? Oyunu{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="game-title text-center mb-4">Kim Nerede?</h1>
+  
+  <!-- Oyun İstatistikleri Bölümü -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-hourglass-half"></i>
+      <div class="game-stat-value" id="timer-display">0</div>
+      <div class="game-stat-label">SÜRE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-thumbtack"></i>
+      <div class="game-stat-value" id="level-display">1</div>
+      <div class="game-stat-label">SEVİYE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-check-circle"></i>
+      <div class="game-stat-value" id="correct-display">0</div>
+      <div class="game-stat-label">DOĞRU</div>
+    </div>
+  </div>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Intro Section -->
+      <div class="glass-panel where-is-it-intro mb-4" id="intro-section">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h2>Oyun Nasıl Oynanır?</h2>
+            <p>Belirli nesnelerin konumunu hafızanızda tutun ve daha sonra bu nesneleri doğru konumda bulun.</p>
+            <div class="rules-container mt-3">
+              <div class="rule-item">
+                <i class="fas fa-eye"></i>
+                <span>Ekranda beliren nesnelerin konumlarını ezberleyin</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-search"></i>
+                <span>Nesneler gizlendiğinde, doğru konumlara tıklayın</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-level-up-alt"></i>
+                <span>Her seviyede zorluk artar ve daha fazla nesne bulmak zorunda kalırsınız</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-hourglass-half"></i>
+                <span>Süre bitmeden tüm nesneleri bulmaya çalışın</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
+              <i class="fas fa-play me-2"></i>Oyunu Başlat
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Game Section -->
+      <div class="glass-panel where-is-it-game-container" id="game-section" style="display: none;">
+        <div class="where-is-it-board-container">
+          <div class="where-is-it-grid"></div>
+        </div>
+        
+        <div class="game-controls">
+          <button id="pause-game" class="btn-game">
+            <i class="fas fa-pause me-2"></i>Duraklat
+          </button>
+          <button id="restart-game" class="btn-game">
+            <i class="fas fa-sync-alt me-2"></i>Yeniden Başlat
+          </button>
+          <button id="sound-toggle" class="btn-game">
+            <i class="fas fa-volume-up me-2"></i>Ses
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Oyun script'ini dahil et -->
+<script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
+{% endblock %}

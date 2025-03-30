@@ -716,3 +716,254 @@ document.addEventListener('DOMContentLoaded', function() {
   // Oyunu başlat
   initEventListeners();
 });
+// Kim Nerede Oyunu JavaScript
+document.addEventListener("DOMContentLoaded", function() {
+  // Ana değişkenler
+  const gridContainer = document.querySelector('.where-is-it-grid');
+  const scoreDisplay = document.getElementById('score-display');
+  const timerDisplay = document.getElementById('timer-display');
+  const levelDisplay = document.getElementById('level-display');
+  const correctDisplay = document.getElementById('correct-display');
+  const startButton = document.getElementById('start-game');
+  const introSection = document.getElementById('intro-section');
+  const gameSection = document.getElementById('game-section');
+  
+  // Oyun durumu
+  let gameState = {
+    score: 0,
+    level: 1,
+    timeLeft: 60,
+    correctItems: 0,
+    targetItems: [],
+    currentTargetIndex: 0,
+    timerInterval: null,
+    isGameRunning: false,
+    gridSize: 3, // 3x3 ızgara
+    icons: ['🍎', '🍌', '🍒', '🍓', '🍉', '🍊', '🍋', '🍍', '🥝', '🥥', '🍇', '🍐', '🥑', '🥭']
+  };
+
+  // Sesleri önceden yükle
+  const sounds = {
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3'),
+    levelUp: new Audio('/static/sounds/level-up.mp3'),
+    gameOver: new Audio('/static/sounds/game-over.mp3'),
+    click: new Audio('/static/sounds/click.mp3'),
+    background: new Audio('/static/sounds/background-game.mp3')
+  };
+
+  // Oyunu başlat
+  function startGame() {
+    if (startButton) {
+      startButton.addEventListener('click', () => {
+        introSection.style.display = 'none';
+        gameSection.style.display = 'block';
+        
+        // Oyun durumunu sıfırla
+        resetGameState();
+        // Oyunu başlat
+        initializeGame();
+      });
+    }
+    
+    // Grid hücrelerine tıklama olayı ekle
+    if (gridContainer) {
+      gridContainer.addEventListener('click', handleGridClick);
+    }
+  }
+
+  // Izgara tıklamasını işle
+  function handleGridClick(event) {
+    if (!gameState.isGameRunning) return;
+    
+    const clickedCell = event.target.closest('.grid-cell');
+    if (!clickedCell) return;
+    
+    const cellIndex = parseInt(clickedCell.dataset.index);
+    
+    // Doğru hücreye tıklanıp tıklanmadığını kontrol et
+    if (cellIndex === gameState.targetItems[gameState.currentTargetIndex]) {
+      // Doğru tıklama
+      clickedCell.classList.add('correct');
+      sounds.correct.play();
+      
+      gameState.score += 10 * gameState.level;
+      gameState.correctItems++;
+      gameState.currentTargetIndex++;
+      
+      updateGameStats();
+      
+      // Tüm hedefler bulundu mu kontrol et
+      if (gameState.currentTargetIndex >= gameState.targetItems.length) {
+        levelUp();
+      }
+    } else {
+      // Yanlış tıklama
+      clickedCell.classList.add('wrong');
+      setTimeout(() => {
+        clickedCell.classList.remove('wrong');
+      }, 500);
+      
+      sounds.wrong.play();
+      gameState.score = Math.max(0, gameState.score - 5);
+      updateGameStats();
+    }
+  }
+
+  // Oyun durumunu güncelle
+  function updateGameStats() {
+    scoreDisplay.textContent = gameState.score;
+    levelDisplay.textContent = gameState.level;
+    timerDisplay.textContent = gameState.timeLeft;
+    correctDisplay.textContent = gameState.correctItems;
+  }
+
+  // Oyun durumunu sıfırla
+  function resetGameState() {
+    gameState.score = 0;
+    gameState.level = 1;
+    gameState.timeLeft = 60;
+    gameState.correctItems = 0;
+    gameState.targetItems = [];
+    gameState.currentTargetIndex = 0;
+    gameState.isGameRunning = true;
+    
+    // Timer'ı temizle
+    if (gameState.timerInterval) {
+      clearInterval(gameState.timerInterval);
+    }
+    
+    updateGameStats();
+  }
+
+  // Oyunu başlat
+  function initializeGame() {
+    // Izgarayı oluştur
+    createGrid();
+    
+    // Hedefleri seç
+    selectTargetItems();
+    
+    // Zamanlayıcıyı başlat
+    startTimer();
+    
+    // Arka plan müziğini başlat
+    sounds.background.loop = true;
+    sounds.background.volume = 0.3;
+    sounds.background.play().catch(err => console.log("Audio play failed:", err));
+  }
+
+  // Izgarayı oluştur
+  function createGrid() {
+    if (!gridContainer) return;
+    
+    gridContainer.innerHTML = '';
+    
+    const totalCells = gameState.gridSize * gameState.gridSize;
+    
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.dataset.index = i;
+      
+      // Rastgele bir simge seç
+      const randomIcon = gameState.icons[Math.floor(Math.random() * gameState.icons.length)];
+      const iconElement = document.createElement('span');
+      iconElement.className = 'item';
+      iconElement.textContent = randomIcon;
+      
+      cell.appendChild(iconElement);
+      gridContainer.appendChild(cell);
+    }
+  }
+
+  // Hedef öğeleri seç
+  function selectTargetItems() {
+    const totalCells = gameState.gridSize * gameState.gridSize;
+    const targetCount = Math.min(3, Math.max(1, Math.floor(gameState.level / 2) + 1));
+    
+    gameState.targetItems = [];
+    gameState.currentTargetIndex = 0;
+    
+    // Rastgele hedefler seç
+    while (gameState.targetItems.length < targetCount) {
+      const randomIndex = Math.floor(Math.random() * totalCells);
+      if (!gameState.targetItems.includes(randomIndex)) {
+        gameState.targetItems.push(randomIndex);
+      }
+    }
+    
+    // Hedefleri göster
+    highlightTargets();
+  }
+
+  // Hedefleri göster
+  function highlightTargets() {
+    // Tüm hücreleri seç
+    const cells = document.querySelectorAll('.grid-cell');
+    
+    // Hedefleri vurgula
+    gameState.targetItems.forEach(index => {
+      cells[index].classList.add('has-item');
+    });
+    
+    // 3 saniye sonra hedefleri gizle
+    setTimeout(() => {
+      gameState.targetItems.forEach(index => {
+        cells[index].classList.remove('has-item');
+      });
+    }, 3000);
+  }
+
+  // Zamanlayıcıyı başlat
+  function startTimer() {
+    gameState.timerInterval = setInterval(() => {
+      gameState.timeLeft--;
+      timerDisplay.textContent = gameState.timeLeft;
+      
+      if (gameState.timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  // Seviye atla
+  function levelUp() {
+    sounds.levelUp.play();
+    
+    gameState.level++;
+    
+    // Sonraki seviye için zaman ekle
+    gameState.timeLeft += 30;
+    
+    // Istatistikleri güncelle
+    updateGameStats();
+    
+    // Grid boyutunu arttır (maksimum 5x5)
+    if (gameState.level % 2 === 0 && gameState.gridSize < 5) {
+      gameState.gridSize++;
+    }
+    
+    // Bir sonraki seviyeyi başlat
+    createGrid();
+    selectTargetItems();
+  }
+
+  // Oyunu bitir
+  function endGame() {
+    gameState.isGameRunning = false;
+    
+    clearInterval(gameState.timerInterval);
+    sounds.background.pause();
+    sounds.gameOver.play();
+    
+    alert(`Oyun bitti! Toplam skorunuz: ${gameState.score}`);
+    
+    // Giriş ekranını tekrar göster
+    introSection.style.display = 'block';
+    gameSection.style.display = 'none';
+  }
+
+  // Oyunu başlat
+  startGame();
+});
