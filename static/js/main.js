@@ -274,7 +274,7 @@ function toggleProfilePanel() {
       panel.style.display = 'block';
       panel.style.position = 'absolute';
       panel.style.top = '0';
-      panel.style.zIndex = '9999'; // z-index değerini yükselttik
+      panel.style.zIndex = '10000'; // z-index değerini maksimuma çıkardık
     }
   }
 }
