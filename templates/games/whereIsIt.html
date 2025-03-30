@@ -83,6 +83,9 @@
           <a href="/" class="game-control-btn" title="Ana Sayfaya Dön">
             <i class="fas fa-home"></i>
           </a>
+          <div class="game-controls">
+            <button id="hint-button" class="btn btn-info btn-sm">İpucu (3)</button>
+          </div>
         </div>
 
         <div class="character-info-panel">
@@ -96,6 +99,8 @@
         <div class="progress timer-progress">
           <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
         </div>
+
+        <div id="hint-display"></div>
 
         <div id="map-container" class="game-map">
           <!-- SVG Harita buraya yüklenecek -->
@@ -322,6 +327,18 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+.game-controls {
+  margin-left: auto; /* Push to the right */
+}
+
+#hint-display {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  color: white;
 }
 </style>
 
