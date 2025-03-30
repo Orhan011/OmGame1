@@ -24,6 +24,54 @@
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Ana Sayfa Profil Kısayolu */
+.profile-shortcut-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+}
+
+.profile-shortcut-button {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--accent-color), #5a4bd1);
+  padding: 8px 15px;
+  border-radius: 30px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.profile-shortcut-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.profile-shortcut-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.profile-shortcut-placeholder {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+}
+
 .navbar-avatar-elevated {
   animation: pulse-avatar 2s infinite ease-in-out;
 }
