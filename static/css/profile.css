@@ -1,3 +1,32 @@
+
+/* Enhanced profile avatar styles */
+.profile-avatar {
+  margin-bottom: -50px;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-header {
+  padding-top: 60px !important;
+}
+
+
 /* Profile Page Styling */
 .profile-page {
   padding: 2.5rem 0;
