@@ -8466,7 +8466,7 @@ main {
 /* Mini profil resmi stilleri */
 .user-profile-mini {
   position: absolute;
-  top: 15px;
+  top: 5px;
   left: 15px;
   z-index: 10;
   cursor: pointer;
@@ -8547,7 +8547,7 @@ main {
 
 .card-back {
   position: absolute;
-  top: 10px;
+  top: -15px;
   width: calc(100% - 30px);
   height: calc(100% - 20px);
   background-color: rgba(24, 24, 45, 0.4);
