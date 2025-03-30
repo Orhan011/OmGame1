@@ -125,6 +125,40 @@
   animation: pulse 1.5s infinite, gradientShift 3s ease infinite;
 }
 
+/* Standart Başla Butonu - Sabit ve Yuvarlak Köşeli*/
+.standard-start-btn {
+  background-color: #6a5ae0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+  width: 200px;
+  box-shadow: 0 4px 10px rgba(106, 90, 224, 0.3);
+  transition: all 0.3s ease;
+}
+
+.standard-start-btn:hover {
+  background-color: #7665e6;
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.4);
+}
+
+.standard-start-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 5px rgba(106, 90, 224, 0.2);
+}
+
+.standard-start-btn i {
+  font-size: 1.1rem;
+}
+
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -206,6 +240,35 @@
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 15px;
+}
+
+/* Geri Düğmesi */
+.back-button {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.back-button:active {
+  transform: translateY(0);
 }
 
 .game-header {

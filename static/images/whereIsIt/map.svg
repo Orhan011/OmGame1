@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Arka plan -->
+  <rect x="0" y="0" width="800" height="600" fill="#e6f7ff" />
+  
+  <!-- Deniz -->
+  <path d="M0,400 Q200,380 400,420 T800,400 V600 H0 Z" fill="#a3d5ff" />
+  
+  <!-- Parklar ve Yeşil Alanlar -->
+  <ellipse cx="150" cy="180" rx="80" ry="70" fill="#99cc99" />
+  <ellipse cx="650" cy="150" rx="100" ry="80" fill="#99cc99" />
+  <ellipse cx="400" cy="500" rx="120" ry="60" fill="#99cc99" />
+  
+  <!-- Ana Caddeler -->
+  <line x1="0" y1="250" x2="800" y2="250" stroke="#cccccc" stroke-width="30" />
+  <line x1="200" y1="0" x2="200" y2="600" stroke="#cccccc" stroke-width="20" />
+  <line x1="500" y1="0" x2="500" y2="600" stroke="#cccccc" stroke-width="20" />
+  <line x1="0" y1="450" x2="800" y2="450" stroke="#cccccc" stroke-width="20" />
+  
+  <!-- Binalar - Şehir Merkezi -->
+  <rect x="220" y="50" width="40" height="40" fill="#ff9999" />
+  <rect x="270" y="60" width="60" height="30" fill="#cc99ff" />
+  <rect x="340" y="40" width="30" height="50" fill="#ffcc99" />
+  <rect x="380" y="70" width="45" height="45" fill="#9999ff" />
+  <rect x="440" y="55" width="35" height="60" fill="#ff99cc" />
+  
+  <!-- Şehir Merkezi - Üst bölüm -->
+  <rect x="220" y="120" width="260" height="100" fill="#e6e6e6" />
+  <rect x="240" y="140" width="20" height="30" fill="#ffffff" />
+  <rect x="280" y="140" width="20" height="30" fill="#ffffff" />
+  <rect x="320" y="140" width="60" height="60" fill="#ffffff" />
+  <rect x="400" y="140" width="20" height="30" fill="#ffffff" />
+  <rect x="440" y="140" width="20" height="60" fill="#ffffff" />
+  
+  <!-- Şehir Merkezi - Alt bölüm -->
+  <rect x="540" y="280" width="180" height="140" fill="#e6e6e6" />
+  <rect x="560" y="310" width="30" height="40" fill="#ffffff" />
+  <rect x="610" y="310" width="40" height="80" fill="#ffffff" />
+  <rect x="670" y="310" width="30" height="40" fill="#ffffff" />
+  
+  <!-- Alışveriş Merkezi -->
+  <rect x="300" y="300" width="150" height="100" fill="#ffcccc" />
+  <rect x="320" y="330" width="30" height="30" fill="#ffffff" />
+  <rect x="370" y="330" width="30" height="30" fill="#ffffff" />
+  <rect x="420" y="330" width="20" height="50" fill="#ffffff" />
+  
+  <!-- Stadyum -->
+  <ellipse cx="100" cy="350" rx="70" ry="50" fill="#ccccff" />
+  <ellipse cx="100" cy="350" rx="50" ry="30" fill="#ffffff" stroke="#ccccff" stroke-width="2" />
+  
+  <!-- Yollar & Kaldırımlar -->
+  <line x1="100" y1="250" x2="100" y2="450" stroke="#d9d9d9" stroke-width="10" />
+  <line x1="350" y1="250" x2="350" y2="450" stroke="#d9d9d9" stroke-width="10" />
+  <line x1="650" y1="250" x2="650" y2="450" stroke="#d9d9d9" stroke-width="10" />
+  
+  <!-- Küçük Detaylar - Ağaçlar -->
+  <circle cx="150" cy="180" r="5" fill="#006600" />
+  <circle cx="170" cy="160" r="5" fill="#006600" />
+  <circle cx="130" cy="160" r="5" fill="#006600" />
+  <circle cx="190" cy="190" r="5" fill="#006600" />
+  <circle cx="110" cy="190" r="5" fill="#006600" />
+  
+  <circle cx="650" cy="150" r="5" fill="#006600" />
+  <circle cx="670" cy="130" r="5" fill="#006600" />
+  <circle cx="630" cy="130" r="5" fill="#006600" />
+  <circle cx="690" cy="160" r="5" fill="#006600" />
+  <circle cx="610" cy="160" r="5" fill="#006600" />
+  
+  <circle cx="400" cy="500" r="5" fill="#006600" />
+  <circle cx="420" cy="480" r="5" fill="#006600" />
+  <circle cx="380" cy="480" r="5" fill="#006600" />
+  <circle cx="440" cy="510" r="5" fill="#006600" />
+  <circle cx="360" cy="510" r="5" fill="#006600" />
+  
+  <!-- Köprü -->
+  <rect x="350" y="400" width="100" height="20" fill="#f2f2f2" stroke="#999999" stroke-width="2" />
+  
+  <!-- Etiketler - Konumlar -->
+  <text x="150" y="180" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">PARK</text>
+  <text x="650" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">ORMAN</text>
+  <text x="350" y="170" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">OKUL</text>
+  <text x="100" y="350" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">STADYUM</text>
+  <text x="375" y="350" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">AVM</text>
+  <text x="630" y="350" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">MÜZE</text>
+  <text x="400" y="500" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">PLAJ</text>
+</svg>
