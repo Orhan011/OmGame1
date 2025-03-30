@@ -86,34 +86,34 @@
           <h3 class="section-title"><i class="fas fa-chart-line"></i> İstatistikler</h3>
           
           <div class="stats-bubbles">
-            <div class="row">
-              <div class="col-6 mb-2">
+            <div class="row g-2">
+              <div class="col-6">
                 <div class="stat-bubble">
                   <div class="stat-icon">
-                    <i class="fas fa-brain"></i>
+                    <i class="fas fa-gamepad"></i>
                   </div>
-                  <div class="stat-value">{{ user_scores.wordPuzzle }}</div>
-                  <div class="stat-label">Kelime Bulmaca</div>
-                </div>
-              </div>
-              
-              <div class="col-6 mb-2">
-                <div class="stat-bubble">
-                  <div class="stat-icon">
-                    <i class="fas fa-memory"></i>
-                  </div>
-                  <div class="stat-value">{{ user_scores.memoryMatch }}</div>
-                  <div class="stat-label">Hafıza Oyunu</div>
+                  <div class="stat-value">6</div>
+                  <div class="stat-label">OYUN</div>
                 </div>
               </div>
               
               <div class="col-6">
                 <div class="stat-bubble">
                   <div class="stat-icon">
-                    <i class="fas fa-map-signs"></i>
+                    <i class="fas fa-trophy"></i>
                   </div>
-                  <div class="stat-value">{{ user_scores.labyrinth }}</div>
-                  <div class="stat-label">Labirent</div>
+                  <div class="stat-value">612</div>
+                  <div class="stat-label">EN YÜKSEK SKOR</div>
+                </div>
+              </div>
+              
+              <div class="col-6">
+                <div class="stat-bubble">
+                  <div class="stat-icon">
+                    <i class="fas fa-brain"></i>
+                  </div>
+                  <div class="stat-value">{{ user_scores.wordPuzzle }}</div>
+                  <div class="stat-label">KELİME BULMACA</div>
                 </div>
               </div>
               
@@ -123,7 +123,7 @@
                     <i class="fas fa-puzzle-piece"></i>
                   </div>
                   <div class="stat-value">{{ user_scores.puzzle }}</div>
-                  <div class="stat-label">Bulmaca</div>
+                  <div class="stat-label">BULMACA</div>
                 </div>
               </div>
             </div>
@@ -353,43 +353,37 @@
           <h3 class="section-title"><i class="fas fa-history"></i> Son Aktiviteler</h3>
           
           <div class="activity-bubbles">
-            <div class="row">
-              <div class="col-md-4 mb-3">
+            <div class="row g-2">
+              <div class="col-md-4">
                 <div class="activity-bubble">
                   <div class="activity-icon">
                     <i class="fas fa-gamepad"></i>
                   </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Kelime Bulmaca</div>
-                    <div class="activity-score">+{{ user_scores.wordPuzzle }}</div>
-                    <div class="activity-time">1 saat önce</div>
-                  </div>
+                  <div class="activity-title">KELİME BULMACA</div>
+                  <div class="activity-score">+{{ user_scores.wordPuzzle }}</div>
+                  <div class="activity-time">1 saat önce</div>
                 </div>
               </div>
               
-              <div class="col-md-4 mb-3">
+              <div class="col-md-4">
                 <div class="activity-bubble">
                   <div class="activity-icon">
                     <i class="fas fa-puzzle-piece"></i>
                   </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Hafıza Kartları</div>
-                    <div class="activity-score">+{{ user_scores.memoryMatch }}</div>
-                    <div class="activity-time">2 gün önce</div>
-                  </div>
+                  <div class="activity-title">HAFIZA KARTLARI</div>
+                  <div class="activity-score">+{{ user_scores.memoryMatch }}</div>
+                  <div class="activity-time">2 gün önce</div>
                 </div>
               </div>
               
-              <div class="col-md-4 mb-3">
+              <div class="col-md-4">
                 <div class="activity-bubble">
                   <div class="activity-icon">
                     <i class="fas fa-map-signs"></i>
                   </div>
-                  <div class="activity-content">
-                    <div class="activity-title">Labirent</div>
-                    <div class="activity-score">+{{ user_scores.labyrinth }}</div>
-                    <div class="activity-time">3 gün önce</div>
-                  </div>
+                  <div class="activity-title">LABİRENT</div>
+                  <div class="activity-score">+{{ user_scores.labyrinth }}</div>
+                  <div class="activity-time">3 gün önce</div>
                 </div>
               </div>
             </div>
