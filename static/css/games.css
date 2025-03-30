@@ -1,0 +1,463 @@
+/* Ortak Oyun Stilleri */
+:root {
+  --primary-rgb: 92, 184, 92;
+  --accent-rgb: 106, 90, 224;
+  --warning-rgb: 240, 173, 78;
+  --danger-rgb: 217, 83, 79;
+  --info-rgb: 91, 192, 222;
+}
+
+/* Oyun İstatistikleri */
+.game-stats-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 80px;
+  margin: 0 5px;
+}
+
+.game-stat-item i {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  color: var(--accent-color);
+}
+
+.game-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.game-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+
+/* Düğme Animasyonları */
+.pulse-animation {
+  animation: pulse 1.5s infinite;
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+  transform: translateZ(0);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 107, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 77, 107, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 107, 0); }
+}
+
+/* Where Is It (Kim Nerede) Oyun Stilleri */
+.where-is-it-game-container {
+  border-radius: 15px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.where-is-it-board-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 400px;
+  margin: 20px 0;
+}
+
+.where-is-it-grid {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.grid-cell {
+  width: 80px;
+  height: 80px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.grid-cell:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.grid-cell.has-item {
+  background-color: rgba(92, 184, 92, 0.15);
+}
+
+.grid-cell .item {
+  font-size: 2rem;
+  transition: opacity 0.3s ease;
+}
+
+.grid-cell.selected {
+  pointer-events: none;
+}
+
+.grid-cell.correct {
+  background-color: rgba(92, 184, 92, 0.3);
+  transform: scale(1.05);
+}
+
+.grid-cell.wrong {
+  background-color: rgba(217, 83, 79, 0.3);
+  animation: shake 0.5s;
+}
+
+.phase-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  z-index: 5;
+  border-radius: 10px;
+}
+
+.phase-message h3 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.phase-message .small-text {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+#memorize-countdown {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-top: 10px;
+  color: var(--primary-color);
+}
+
+.level-indicator {
+  background-color: rgba(92, 184, 92, 0.2);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.points-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #5cb85c;
+  font-weight: bold;
+  font-size: 1.2rem;
+  animation: pointsFloat 1s forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes pointsFloat {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Sonuç ekranı stilleri */
+.game-results-container {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.game-results-container.show {
+  display: block;
+  opacity: 1;
+}
+
+.game-results-card {
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.game-results-header {
+  background: linear-gradient(135deg, rgba(106, 90, 224, 0.8), rgba(159, 138, 255, 0.8));
+  padding: 20px 25px;
+  text-align: center;
+  position: relative;
+}
+
+.result-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.result-badge i {
+  font-size: 1.7rem;
+  color: #6a5ae0;
+}
+
+.game-results-body {
+  padding: 25px;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 25px;
+}
+
+.result-stat {
+  text-align: center;
+}
+
+.result-stat i {
+  font-size: 1.5rem;
+  color: #6a5ae0;
+  margin-bottom: 10px;
+}
+
+.result-stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.result-stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.results-rating {
+  text-align: center;
+  margin: 0px 0 20px;
+}
+
+.rating-stars {
+  font-size: 1.5rem;
+  letter-spacing: 5px;
+  margin-bottom: 10px;
+  color: #f0ad4e;
+}
+
+.rating-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #f0ad4e;
+}
+
+.game-achievement {
+  display: flex;
+  align-items: center;
+  background-color: rgba(106, 90, 224, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  border-left: 3px solid #6a5ae0;
+}
+
+.achievement-icon {
+  font-size: 2rem;
+  color: #6a5ae0;
+  margin-right: 15px;
+}
+
+.achievement-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #6a5ae0;
+}
+
+.game-results-footer {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 0 25px 20px;
+}
+
+.game-share-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 20px;
+  padding: 20px 25px;
+  text-align: center;
+}
+
+.game-share-section p {
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.share-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+  background-color: rgba(106, 90, 224, 0.5);
+  transform: translateY(-3px);
+}
+
+/* Duraklat Menüsü */
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.pause-card {
+  background-color: rgba(33, 33, 61, 0.9);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+}
+
+.pause-card h3 {
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+  color: white;
+}
+
+.pause-card p {
+  margin-bottom: 25px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pause-menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Duyarlı Tasarım */
+@media (max-width: 576px) {
+  .where-is-it-grid {
+    grid-gap: 5px;
+  }
+  
+  .grid-cell {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .grid-cell .item {
+    font-size: 1.5rem;
+  }
+  
+  .game-results-card {
+    width: 95%;
+  }
+  
+  .results-stats {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .result-stat {
+    flex: 1 0 40%;
+  }
+  
+  .game-results-footer {
+    flex-direction: column;
+  }
+  
+  .pause-card {
+    padding: 20px;
+  }
+}

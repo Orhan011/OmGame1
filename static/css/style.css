@@ -5058,6 +5058,9 @@ main {
 /* Pulse animation */
 .pulse-animation {
   animation: pulse 1.5s infinite;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
 @keyframes pulse {
