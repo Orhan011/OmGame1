@@ -71,11 +71,7 @@ function loadArticleContent() {
   {% if session.get('user_id') %}
   <div class="user-profile-corner">
     <div class="navbar-avatar" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
-      {% if get_avatar_url() %}
-        <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="avatar-img">
-      {% else %}
-        <div class="avatar-placeholder">{{ get_user_data().username[0]|upper }}</div>
-      {% endif %}
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="logo-top-img">
     </div>
     <div class="profile-panel" id="profilePanel">
       <div class="profile-panel-header">

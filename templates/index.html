@@ -7,6 +7,16 @@
 <div class="card">
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
   <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>
+  {% if session.get('user_id') %}
+  <div class="profile-preview-wrapper mb-3">
+    {% if get_avatar_url() %}
+      <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="profile-preview-avatar">
+    {% else %}
+      <div class="profile-preview-placeholder">{{ get_user_data().username[0]|upper }}</div>
+    {% endif %}
+    <span class="profile-preview-username">{{ get_user_data().username }}</span>
+  </div>
+  {% endif %}
   <div class="d-flex justify-content-center flex-wrap">
     <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Hemen Başla</a>
     <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Detaylar</a>
