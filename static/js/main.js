@@ -242,43 +242,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Modern profil ve dropdown işlevselliği
+// Yeni profil paneli işlevselliği
 document.addEventListener('DOMContentLoaded', function() {
-  // Sayfa yüklendiğinde profil menüsünü gizle
-  const dropdown = document.getElementById('userProfileDropdown');
-  if (dropdown) {
-    dropdown.style.display = 'none';
-  }
-  
   // Tıklama dışında profil menüsünü kapatma işlevi için global event listener
   document.addEventListener('click', function(event) {
-    const userProfileMini = document.getElementById('userProfileMini');
-    const userProfileDropdown = document.getElementById('userProfileDropdown');
+    const topLeftAvatar = document.getElementById('topLeftAvatar');
+    const profilePanel = document.getElementById('profilePanel');
     
-    if (userProfileDropdown && userProfileDropdown.style.display === 'block' && 
-        userProfileMini && !userProfileMini.contains(event.target) && 
-        !userProfileDropdown.contains(event.target)) {
-      userProfileDropdown.style.display = 'none';
+    if (profilePanel && profilePanel.classList.contains('active') && 
+        topLeftAvatar && !topLeftAvatar.contains(event.target) && 
+        !profilePanel.contains(event.target)) {
+      profilePanel.classList.remove('active');
     }
   });
 });
 
-// Modern profil panelini aç/kapat
+// Profil panelini aç/kapat
 function toggleProfilePanel(event) {
-  const dropdown = document.getElementById('userProfileDropdown');
-  if (!dropdown) return;
-  
-  const isShowing = dropdown.style.display === 'block';
+  const panel = document.getElementById('profilePanel');
+  if (!panel) return;
   
   // Olay yayılımını durdur
   if (event) event.stopPropagation();
   
-  if (isShowing) {
-    dropdown.style.display = 'none';
-  } else {
-    dropdown.style.display = 'block';
-    
-    // Animasyon sınıfı ekleme (CSS'te tanımlanmış animasyon varsa)
-    dropdown.style.animation = 'dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-  }
+  // Panel sınıfını değiştir (CSS geçişleri için)
+  panel.classList.toggle('active');
 }

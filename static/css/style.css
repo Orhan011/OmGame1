@@ -8753,3 +8753,140 @@ main {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+/* Yeni profil paneli stilleri */
+.user-profile-corner {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 1050;
+}
+
+#topLeftAvatar {
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--accent-color);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#topLeftAvatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.profile-panel {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 280px;
+  background: rgba(30, 35, 40, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transform-origin: top left;
+  transform: scale(0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 1055;
+}
+
+.profile-panel.active {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.profile-panel-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to right, rgba(40, 45, 50, 0.8), rgba(60, 65, 70, 0.8));
+}
+
+.profile-panel-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-lg {
+  font-size: 1.8rem;
+}
+
+.profile-panel-info {
+  flex: 1;
+}
+
+.profile-panel-info h4 {
+  font-size: 1.2rem;
+  margin: 0 0 5px 0;
+  color: white;
+}
+
+.profile-exp-info {
+  margin-top: 8px;
+}
+
+.exp-bar {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.exp-bar-progress {
+  height: 100%;
+  background: linear-gradient(to right, var(--accent-color), #4fd1c5);
+  border-radius: 3px;
+}
+
+.exp-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-panel-body {
+  padding: 10px 0;
+}
+
+.profile-panel-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.profile-panel-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.profile-panel-item i {
+  margin-right: 15px;
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  color: var(--accent-color);
+}
+
+.profile-panel-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+}
