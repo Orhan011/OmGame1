@@ -405,17 +405,7 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
-@app.route('/games/tetris')
-def tetris():
-    return render_template('games/tetris.html')
 
-@app.route('/games/breakout')
-def breakout():
-    return render_template('games/breakout.html')
-
-@app.route('/games/snake')
-def snake():
-    return render_template('games/snake.html')
 
 # Leaderboard
 @app.route('/leaderboard')
@@ -1062,10 +1052,7 @@ def get_scores(game_type):
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
             'number-sequence': 'labyrinth',  # number-sequence de labyrinth'e yönlendiriliyor (geriye uyumluluk için)
-            'puzzle': 'puzzle',
-            'tetris': 'tetris',
-            'breakout': 'breakout', 
-            'snake': 'snake'
+            'puzzle': 'puzzle'
         }
         
         internal_game_type = game_type_map.get(game_type)
