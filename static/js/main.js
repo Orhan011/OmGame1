@@ -265,11 +265,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleProfilePanel() {
-  const dropdown = document.getElementById('userProfileDropdown');
+  const panel = document.getElementById('profile-panel');
 
-  if (dropdown) {
-    dropdown.classList.toggle('show');
-  }
+  if (panel) {
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      panel.style.display = 'block';
+      panel.style.position = 'absolute';
+      panel.style.top = '0';
+      panel.style.zIndex = '1000';
     }
   }
 }
