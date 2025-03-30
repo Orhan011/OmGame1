@@ -33,7 +33,7 @@ def send_verification_email(to_email, verification_code):
     
     # Gmail hesap bilgileri
     sender_email = "omgameee@gmail.com"
-    sender_password = os.environ.get("GMAIL_APP_PASSWORD")
+    sender_password = "htvh fmfz eeic kkls"  # Uygulama şifresi doğrudan kullanılıyor
     
     if not sender_password:
         logger.error("Gmail app password not found in environment variables")
