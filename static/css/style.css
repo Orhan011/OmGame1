@@ -8203,7 +8203,7 @@ main {
 .game-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
+  gap: 20px;
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -8212,10 +8212,67 @@ main {
 .game-card {
   background: rgba(20, 20, 40, 0.8);
   border-radius: 15px;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  min-height: 200px;
+  position: relative;
   border: 1px solid rgba(106, 90, 205, 0.2);
-  min-height: 280px;
+}
+
+.game-logo {
+  font-size: 2.5rem;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+}
+
+.game-name {
+  font-size: 1.4rem;
+  color: #fff;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.game-play {
+  margin-top: auto;
+}
+
+.game-btn {
+  background: linear-gradient(45deg, #6a5acd, #9370db);
+  color: white;
+  padding: 10px 30px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.game-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(45deg, #9370db, #6a5acd);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .game-card {
+    min-height: 180px;
+  }
+  
+  .game-logo {
+    font-size: 2rem;
+  }
+  
+  .game-name {
+    font-size: 1.2rem;
+  }
 }
 
 .game-card-inner {
