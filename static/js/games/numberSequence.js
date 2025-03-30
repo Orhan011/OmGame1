@@ -58,9 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
     solveTime: 30000, // Time to solve in milliseconds
     sequenceLength: 5, // Starting sequence length
     currentPattern: null, // Current pattern type
+    wrongAttempts: 0, // Keep track of wrong answer attempts
     usedHint: false, // If hint was used in current level
     currentPatternDescription: '', // Description of current pattern
-    options: [] // Answer options
+    options: [], // Answer options
+    wrongAnswerCount: 0, // Yanlış cevap sayısı
+    maxWrongAnswers: 2 // Maksimum yanlış cevap sayısı
   };
 
   // Pattern types and their generators
@@ -527,16 +530,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectedAnswer === gameState.correctAnswer) {
       // Correct answer
       const correctOption = document.querySelector(`.answer-option:nth-child(${gameState.options.indexOf(selectedAnswer) + 1})`);
-      correctOption.classList.add('correct');
+      if (correctOption) {
+        correctOption.classList.add('correct');
+      }
       
       // Highlight the sequence number
       const questionMark = document.querySelector('.question-mark');
-      questionMark.textContent = selectedAnswer;
-      questionMark.classList.remove('question-mark');
-      questionMark.classList.add('sequence-number');
-      questionMark.classList.add('highlight');
+      if (questionMark) {
+        questionMark.textContent = selectedAnswer;
+        questionMark.classList.remove('question-mark');
+        questionMark.classList.add('sequence-number');
+        questionMark.classList.add('highlight');
+      }
       
       playSound('correct');
+      
+      // Sıfırla yanlış cevap sayısını
+      gameState.wrongAnswerCount = 0;
       
       // Calculate score based on time remaining and difficulty
       const timeBonus = Math.ceil(gameState.timeRemaining * 5);
@@ -585,9 +595,15 @@ document.addEventListener('DOMContentLoaded', function() {
         nextLevel();
       }, 1500);
     } else {
-      // Wrong answer
+      // Wrong answer - increment wrong answer counter
+      gameState.wrongAnswerCount++;
+      
+      // Find the wrong option if it exists
       const wrongOption = document.querySelector(`.answer-option:nth-child(${gameState.options.indexOf(selectedAnswer) + 1})`);
-      wrongOption.classList.add('incorrect');
+      if (wrongOption) {
+        wrongOption.classList.add('incorrect');
+      }
+      
       playSound('incorrect');
       
       // Reduce score (if greater than 0)
@@ -595,10 +611,46 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.score = Math.max(0, gameState.score - penaltyPoints);
       updateScoreDisplay();
       
-      // Remove incorrect class after a short delay
-      setTimeout(() => {
-        wrongOption.classList.remove('incorrect');
-      }, 500);
+      // Check if we've reached maximum wrong answers
+      if (gameState.wrongAnswerCount >= gameState.maxWrongAnswers) {
+        // Reset wrong answer counter
+        gameState.wrongAnswerCount = 0;
+        
+        // Show a message that we're changing the question
+        const changeMessage = document.createElement('div');
+        changeMessage.className = 'change-question-message';
+        changeMessage.textContent = '2 yanlış cevap verdiniz. Yeni soru geliyor...';
+        changeMessage.style.position = 'absolute';
+        changeMessage.style.top = '50%';
+        changeMessage.style.left = '50%';
+        changeMessage.style.transform = 'translate(-50%, -50%)';
+        changeMessage.style.background = 'rgba(255, 59, 48, 0.9)';
+        changeMessage.style.color = 'white';
+        changeMessage.style.padding = '15px 20px';
+        changeMessage.style.borderRadius = '8px';
+        changeMessage.style.fontWeight = 'bold';
+        changeMessage.style.zIndex = '100';
+        
+        gameBoard.appendChild(changeMessage);
+        
+        // Clear any timer
+        if (gameState.timer) {
+          clearInterval(gameState.timer);
+        }
+        
+        // Wait a moment and then generate a new question
+        setTimeout(() => {
+          gameBoard.removeChild(changeMessage);
+          startLevel(); // Generate a new question
+        }, 1500);
+      } else {
+        // If not max wrong answers yet, just remove the incorrect class after a delay
+        setTimeout(() => {
+          if (wrongOption) {
+            wrongOption.classList.remove('incorrect');
+          }
+        }, 500);
+      }
     }
   }
 

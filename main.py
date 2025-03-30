@@ -607,9 +607,10 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
-@app.route('/games/visual-attention')
-def visual_attention():
-    return render_template('games/visualAttention.html')
+# Removed Visual Attention game as requested
+# @app.route('/games/visual-attention')
+# def visual_attention():
+#     return render_template('games/visualAttention.html')
 
 @app.route('/games/number-sequence')
 def number_sequence():
@@ -623,7 +624,8 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
+    # Görsel Dikkat oyunu kaldırıldı
+    # visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
@@ -631,7 +633,8 @@ def leaderboard():
                           memory_match_scores=memory_match_scores,
                           labyrinth_scores=labyrinth_scores,
                           puzzle_scores=puzzle_scores,
-                          visual_attention_scores=visual_attention_scores,
+                          # Görsel Dikkat oyunu kaldırıldı
+                          # visual_attention_scores=visual_attention_scores,
                           number_sequence_scores=number_sequence_scores)
 
 # Articles
