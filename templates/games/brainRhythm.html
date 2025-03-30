@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
+<style>
+  .drum-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 600px;
+    margin: 20px auto;
+  }
+  
+  .drum-btn {
+    width: 100%;
+    height: 150px;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+  }
+  
+  .drum-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+  
+  .drum-btn.active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+  
+  .sequence-display {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 50px;
+    margin: 20px 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+  
+  .sequence-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 5px;
+    display: inline-block;
+  }
+  
+  .message {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+    display: none;
+  }
+  
+  .message.info {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #0d6efd;
+  }
+  
+  .message.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+  }
+  
+  .message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+  }
+  
+  .sound-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  @media (max-width: 576px) {
+    .drum-btn {
+      height: 120px;
+    }
+    
+    .drum-container {
+      gap: 10px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container" id="brainRhythmGame">
+  <div class="game-header glass-panel">
+    <h1 class="game-title">
+      <i class="fas fa-music"></i> Beyin Ritmi
+    </h1>
+    <p class="game-subtitle">İşitsel hafızanızı geliştiren ritmik bellek oyunu</p>
+  </div>
+  
+  <!-- Oyun Menüsü -->
+  <div id="brainRhythmMenu" class="game-settings glass-panel">
+    <div class="settings-row">
+      <div class="settings-col">
+        <h3 class="settings-title">
+          <i class="fas fa-info-circle"></i> Nasıl Oynanır?
+        </h3>
+        <div class="info-content">
+          <p>Beyin Ritmi, işitsel belleğinizi ve odaklanma yeteneğinizi geliştiren bir beyin egzersizi oyunudur.</p>
+          <p>Oyunun kuralları:</p>
+          <ul>
+            <li><strong>Ritmi İzleyin:</strong> Renkli davulların çalınma sırasını dikkatle izleyin ve dinleyin.</li>
+            <li><strong>Tekrar Edin:</strong> Aynı ritim sırasını hafızanızda tutarak tekrar etmeye çalışın.</li>
+            <li><strong>Seviye Atlayın:</strong> Her başarılı dizi, sizi bir sonraki zorluğa taşıyacaktır.</li>
+            <li><strong>Süreyi Akıllıca Kullanın:</strong> Her seviye için sınırlı süreniz var, başarılı olduğunuzda ekstra süre kazanırsınız.</li>
+          </ul>
+          <p>Bu oyun şunları geliştirir:</p>
+          <ul>
+            <li>İşitsel hafıza ve sıralama becerisi</li>
+            <li>Ritim algısı ve müzikal yetenek</li>
+            <li>Odaklanma ve dikkat süresi</li>
+            <li>Duyusal-motor koordinasyon</li>
+            <li>Tepki süresi ve hız</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="settings-col">
+        <h3 class="settings-title">
+          <i class="fas fa-sliders-h"></i> Zorluk Seviyesi
+        </h3>
+        <div class="settings-options">
+          <button class="difficulty-option" data-difficulty="1">
+            <i class="fas fa-signal"></i> Kolay
+          </button>
+          <button class="difficulty-option" data-difficulty="2">
+            <i class="fas fa-signal"></i> Normal
+          </button>
+          <button class="difficulty-option" data-difficulty="3">
+            <i class="fas fa-signal"></i> Zor
+          </button>
+          <button class="difficulty-option" data-difficulty="4">
+            <i class="fas fa-signal"></i> Uzman
+          </button>
+        </div>
+        
+        <div class="mt-4 text-center">
+          <button id="brainRhythmStartBtn" class="btn btn-lg btn-primary">
+            <i class="fas fa-play"></i> Oyunu Başlat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Oyun Alanı -->
+  <div id="brainRhythmGameplay" class="game-play glass-panel">
+    <button id="brainRhythmSoundToggle" class="sound-toggle">
+      <i class="fas fa-volume-up"></i>
+    </button>
+    
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-label">Puan</div>
+        <div id="brainRhythmScore" class="stat-value">0</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">Seviye</div>
+        <div id="brainRhythmLevel" class="stat-value">1</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">Süre</div>
+        <div id="brainRhythmTimer" class="stat-value">0:30</div>
+      </div>
+    </div>
+    
+    <div id="brainRhythmMessage" class="message"></div>
+    
+    <div id="sequenceDisplay" class="sequence-display"></div>
+    
+    <div class="drum-container">
+      <button class="drum-btn"></button>
+      <button class="drum-btn"></button>
+      <button class="drum-btn"></button>
+      <button class="drum-btn"></button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/brainRhythm.js') }}"></script>
+{% endblock %}

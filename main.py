@@ -607,6 +607,14 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
+@app.route('/games/brain-rhythm')
+def brain_rhythm():
+    return render_template('games/brainRhythm.html')
+
+@app.route('/games/mind-map')
+def mind_map():
+    return render_template('games/mindMap.html')
+
 
 
 # Leaderboard
@@ -616,12 +624,16 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
+    brain_rhythm_scores = Score.query.filter_by(game_type='brainRhythm').order_by(Score.score.desc()).limit(10).all()
+    mind_map_scores = Score.query.filter_by(game_type='mindMap').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
                           number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
-                          pattern_recognition_scores=puzzle_scores)
+                          pattern_recognition_scores=puzzle_scores,
+                          brain_rhythm_scores=brain_rhythm_scores,
+                          mind_map_scores=mind_map_scores)
 
 # Articles
 @app.route('/articles')

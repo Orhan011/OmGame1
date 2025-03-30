@@ -1,0 +1,228 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
+<style>
+  .grid-container {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+  }
+  
+  .grid-cell {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .grid-cell:hover {
+    background-color: rgba(100, 100, 255, 0.1);
+  }
+  
+  .grid-cell.target {
+    background-color: rgba(255, 215, 0, 0.7);
+    animation: pulse 1.5s infinite alternate;
+  }
+  
+  .grid-cell.target-reveal {
+    background-color: rgba(173, 216, 230, 0.5);
+    border: 1px solid rgba(0, 0, 255, 0.3);
+  }
+  
+  .grid-cell.correct {
+    background-color: rgba(0, 255, 0, 0.3);
+    animation: correct-animation 0.5s;
+  }
+  
+  .grid-cell.wrong {
+    background-color: rgba(255, 0, 0, 0.3);
+    animation: wrong-animation 0.5s;
+  }
+  
+  .message {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+    display: none;
+  }
+  
+  .message.info {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #0d6efd;
+  }
+  
+  .message.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+  }
+  
+  .message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+  }
+  
+  .lives {
+    letter-spacing: 5px;
+    color: #ff5252;
+  }
+  
+  .sound-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+    }
+    100% {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+  }
+  
+  @keyframes correct-animation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes wrong-animation {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  
+  @media (max-width: 768px) {
+    .grid-container {
+      max-width: 400px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .grid-container {
+      max-width: 320px;
+      gap: 5px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container" id="mindMapGame">
+  <div class="game-header glass-panel">
+    <h1 class="game-title">
+      <i class="fas fa-map-marked-alt"></i> Zihin Haritası
+    </h1>
+    <p class="game-subtitle">Uzamsal hafıza ve görsel algıyı geliştiren konum hafıza oyunu</p>
+  </div>
+  
+  <!-- Oyun Menüsü -->
+  <div id="mindMapMenu" class="game-settings glass-panel">
+    <div class="settings-row">
+      <div class="settings-col">
+        <h3 class="settings-title">
+          <i class="fas fa-info-circle"></i> Nasıl Oynanır?
+        </h3>
+        <div class="info-content">
+          <p>Zihin Haritası, konumsal hafızanızı ve bilişsel haritalama becerilerinizi geliştiren bir beyin egzersizi oyunudur.</p>
+          <p>Oyunun kuralları:</p>
+          <ul>
+            <li><strong>Haritayı Ezberleyin:</strong> Kısa süreliğine ekranda beliren hedef konumları hafızaya alın.</li>
+            <li><strong>Sırayla Seçin:</strong> Hedeflerin göründüğü aynı sırayla konumları seçmeye çalışın.</li>
+            <li><strong>Dikkatli Olun:</strong> Yanlış konumlar seçmek canınızı azaltır ve oyun 3 hata sonunda sona erer.</li>
+          </ul>
+          <p>Bu oyun şunları geliştirir:</p>
+          <ul>
+            <li>Konumsal hafıza ve uzamsal zeka</li>
+            <li>Görsel algı ve geometrik düşünme</li>
+            <li>Haritalama ve navigasyon becerileri</li>
+            <li>İşlem hafızası ve bilişsel esneklik</li>
+            <li>Sıralama hafızası ve görsel düzenleme becerileri</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="settings-col">
+        <h3 class="settings-title">
+          <i class="fas fa-sliders-h"></i> Zorluk Seviyesi
+        </h3>
+        <div class="settings-options">
+          <button class="difficulty-option" data-difficulty="1">
+            <i class="fas fa-signal"></i> Kolay
+          </button>
+          <button class="difficulty-option" data-difficulty="2">
+            <i class="fas fa-signal"></i> Normal
+          </button>
+          <button class="difficulty-option" data-difficulty="3">
+            <i class="fas fa-signal"></i> Zor
+          </button>
+          <button class="difficulty-option" data-difficulty="4">
+            <i class="fas fa-signal"></i> Uzman
+          </button>
+        </div>
+        
+        <div class="mt-4 text-center">
+          <button id="mindMapStartBtn" class="btn btn-lg btn-primary">
+            <i class="fas fa-play"></i> Oyunu Başlat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Oyun Alanı -->
+  <div id="mindMapGameplay" class="game-play glass-panel">
+    <button id="mindMapSoundToggle" class="sound-toggle">
+      <i class="fas fa-volume-up"></i>
+    </button>
+    
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-label">Puan</div>
+        <div id="mindMapScore" class="stat-value">0</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">Seviye</div>
+        <div id="mindMapLevel" class="stat-value">1</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">Kalan Can</div>
+        <div id="mindMapLives" class="stat-value lives">
+          <i class="fas fa-heart"></i><i class="fas fa-heart"></i><i class="fas fa-heart"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div id="mindMapMessage" class="message"></div>
+    
+    <div id="gridContainer" class="grid-container"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/mindMap.js') }}"></script>
+{% endblock %}
