@@ -57,12 +57,15 @@ function loadArticleContent() {
 
 <nav class="navbar navbar-expand-lg navbar-dark">
 <div class="container">
-  <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
-    <span class="brand-text">OmGame</span>
-  </a>
-  {% if session.get('user_id') %}
-    <div class="profile-menu">
+  <div class="d-flex justify-content-between align-items-center w-100">
+    <div class="d-flex align-items-center">
+      <a class="navbar-brand" href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
+        <span class="brand-text">OmGame</span>
+      </a>
+    </div>
+    {% if session.get('user_id') %}
+    <div class="profile-menu ms-auto">
       <div class="profile-image" data-bs-toggle="dropdown">
         {% if session.get('avatar_url') %}
           <img src="{{ session.get('avatar_url') }}" alt="Profil" class="avatar-img">
