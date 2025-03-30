@@ -458,7 +458,21 @@
   </div>
   
   <div class="instructions-content" id="instructions">
-    <h3 class="instructions-title">Nasıl Oynanır?</h3>
+    <h3 class="instructions-title">Sayı Dizisi Egzersizi</h3>
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/number-sequence-icon.svg') }}" alt="Sayı Dizisi İkonu" style="width: 120px; height: 120px;" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIj48cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcng9IjEwIiBmaWxsPSIjNUI0MkYzIiBmaWxsLW9wYWNpdHk9IjAuMiIvPjx0ZXh0IHg9IjQxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4xPC90ZXh0Pjx0ZXh0IHg9IjQxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4yPC90ZXh0Pjx0ZXh0IHg9IjQxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4zPC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4zPC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj41PC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj43PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj43PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4/PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4xNTwvdGV4dD48L3N2Zz4='">
+    </div>
+    
+    <div class="mb-4">
+      <div class="card mb-3 p-3" style="background-color: rgba(91, 66, 243, 0.1); border: 1px solid rgba(91, 66, 243, 0.2); border-radius: 10px;">
+        <p class="mb-0" style="color: #e6e6ff; font-weight: 500;">
+          Matematiksel örüntüleri tanıma ve analiz etme becerisi, beynimizin mantıksal düşünme ve problem çözme yeteneklerini güçlendirir. Bu egzersiz, örüntü tanıma ve matematiksel akıl yürütme becerilerinizi geliştirecek.
+        </p>
+      </div>
+    </div>
+    
+    <h4 class="instructions-title" style="font-size: 1.1rem;">Nasıl Oynanır?</h4>
     <ul class="instructions-list">
       <li>Bir sayı dizisi gösterilecek, dizi belirli bir örüntü veya kurala göre oluşturulmuştur.</li>
       <li>Sizin göreviniz, dizideki eksik sayıyı bularak boşluğu doldurmaktır.</li>
@@ -466,8 +480,33 @@
       <li>Doğru cevapları ne kadar hızlı bulursanız o kadar çok puan kazanırsınız.</li>
       <li>İpucu butonu ile örüntü hakkında yardım alabilirsiniz, fakat bu puan kaybına neden olur.</li>
     </ul>
-    <div class="text-center">
-      <button class="btn-game" id="start-game">Oyunu Başlat</button>
+    
+    <div class="row text-center mt-4">
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-brain" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Analitik</strong><br>Düşünme</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-calculator" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Matematiksel</strong><br>Beceri</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-lightbulb" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Problem</strong><br>Çözme</p>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn-game" id="start-game">
+        <i class="fas fa-play-circle me-2"></i>
+        Oyunu Başlat
+      </button>
     </div>
   </div>
   

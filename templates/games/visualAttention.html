@@ -364,7 +364,21 @@
   </div>
   
   <div class="instructions-content" id="instructions">
-    <h3 class="instructions-title">Nasıl Oynanır?</h3>
+    <h3 class="instructions-title">Görsel Dikkat Egzersizi</h3>
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/visual-attention-icon.svg') }}" alt="Görsel Dikkat İkonu" style="width: 120px; height: 120px;" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MCIgZmlsbD0iIzVCNDJGMyIgZmlsbC1vcGFjaXR5PSIwLjIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIzNSIgc3Ryb2tlPSIjNUI0MkYzIiBzdHJva2Utd2lkdGg9IjMiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIxNSIgZmlsbD0iIzVCNDJGMyIvPjxwYXRoIGQ9Ik02MCAyMFY1TTYwIDExNVYxMDAiIHN0cm9rZT0iIzVCNDJGMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTEwMCA2MEgxMTVNNSA2MEgyMCIgc3Ryb2tlPSIjNUI0MkYzIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNODUuODU4NSAzNC4xNDIyTDk3LjA3MTEgMjIuOTI5M001IG0xNy45MjkzIDc0LjE0MUwyMi45MjkzIDg1Ljg1ODQiIHN0cm9rZT0iIzVCNDJGMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTg1Ljg1ODUgODUuODU3OEw5Ny4wNzExIDk3LjA3MDdNMjIuOTI5MyAzNC4xNDIyTDExLjcxNiAyMi45MjkzIiBzdHJva2U9IiM1QjQyRjMiIHN0cm9rZS13aWR0aD0iMyIvPjwvc3ZnPg=='">
+    </div>
+    
+    <div class="mb-4">
+      <div class="card mb-3 p-3" style="background-color: rgba(91, 66, 243, 0.1); border: 1px solid rgba(91, 66, 243, 0.2); border-radius: 10px;">
+        <p class="mb-0" style="color: #e6e6ff; font-weight: 500;">
+          Görsel dikkat beceriniz, çevrenizden gelen bilgileri hızlı ve doğru şekilde işleme yeteneğinizdir. Bu beceriyi geliştirmek, günlük yaşamda daha iyi konsantrasyon ve detayları fark etme yeteneği kazandırır.
+        </p>
+      </div>
+    </div>
+    
+    <h4 class="instructions-title" style="font-size: 1.1rem;">Nasıl Oynanır?</h4>
     <ul class="instructions-list">
       <li>Ekranda belirli bir süre için bir desen kümesi gösterilecek.</li>
       <li>Daha sonra desenler gizlenecek ve bir desen eksik olacak.</li>
@@ -372,8 +386,33 @@
       <li>Ne kadar hızlı ve doğru yanıt verirseniz o kadar çok puan kazanırsınız.</li>
       <li>Her seviye geçtiğinizde zorluk artar (daha fazla desen ve daha az süre).</li>
     </ul>
-    <div class="text-center">
-      <button class="btn-game" id="start-game">Oyunu Başlat</button>
+    
+    <div class="row text-center mt-4">
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-brain" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Dikkat</strong><br>Geliştir</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-eye" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Görsel Bellek</strong><br>Güçlendir</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-tachometer-alt" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Tepki Hızı</strong><br>Artır</p>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn-game" id="start-game">
+        <i class="fas fa-play-circle me-2"></i>
+        Oyunu Başlat
+      </button>
     </div>
   </div>
   

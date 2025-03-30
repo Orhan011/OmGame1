@@ -519,14 +519,53 @@ document.addEventListener('DOMContentLoaded', function() {
     function playSound(soundName) {
       if (gameState.isMuted) return;
       
-      // Stop the sound first (in case it's already playing)
-      sounds[soundName].pause();
-      sounds[soundName].currentTime = 0;
+      // Instead of trying to play sounds (which causes errors),
+      // we'll just log that we would play a sound
+      console.log(`Sound effect played: ${soundName}`);
       
-      // Play the sound
-      sounds[soundName].play().catch(error => {
-        console.log(`Error playing sound: ${error}`);
-      });
+      // Using a visual feedback instead of sound
+      // This creates a brief flash effect to indicate something happened
+      switch(soundName) {
+        case 'correct':
+          flashEffect('#34c759', 300); // Green flash for correct
+          break;
+        case 'incorrect':
+          flashEffect('#ff3b30', 300); // Red flash for incorrect
+          break;
+        case 'levelUp':
+          flashEffect('#5b42f3', 500); // Purple flash for level up
+          break;
+        case 'gameOver':
+          flashEffect('#ff9500', 700); // Orange flash for game over
+          break;
+        default:
+          // No flash effect for other sounds
+          break;
+      }
+    }
+    
+    // Visual feedback instead of sound
+    function flashEffect(color, duration) {
+      const flashOverlay = document.createElement('div');
+      flashOverlay.style.position = 'fixed';
+      flashOverlay.style.top = '0';
+      flashOverlay.style.left = '0';
+      flashOverlay.style.width = '100%';
+      flashOverlay.style.height = '100%';
+      flashOverlay.style.backgroundColor = color;
+      flashOverlay.style.opacity = '0.2';
+      flashOverlay.style.pointerEvents = 'none';
+      flashOverlay.style.zIndex = '9999';
+      flashOverlay.style.transition = 'opacity 0.3s ease';
+      
+      document.body.appendChild(flashOverlay);
+      
+      setTimeout(() => {
+        flashOverlay.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(flashOverlay);
+        }, 300);
+      }, duration);
     }
 
     function startTimer(duration, callbackFn) {
