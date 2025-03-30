@@ -607,14 +607,13 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
-@app.route('/games/brain-rhythm')
-def brain_rhythm():
-    return render_template('games/brainRhythm.html')
+@app.route('/games/visual-attention')
+def visual_attention():
+    return render_template('games/visualAttention.html')
 
-@app.route('/games/mind-map')
-def mind_map():
-    return render_template('games/mindMap.html')
-
+@app.route('/games/number-sequence')
+def number_sequence():
+    return render_template('games/numberSequence.html')
 
 
 # Leaderboard
@@ -624,16 +623,16 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    brain_rhythm_scores = Score.query.filter_by(game_type='brainRhythm').order_by(Score.score.desc()).limit(10).all()
-    mind_map_scores = Score.query.filter_by(game_type='mindMap').order_by(Score.score.desc()).limit(10).all()
+    visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
+    number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
                           memory_match_scores=memory_match_scores,
-                          number_sequence_scores=labyrinth_scores, # Labirent oyunu skorları
-                          pattern_recognition_scores=puzzle_scores,
-                          brain_rhythm_scores=brain_rhythm_scores,
-                          mind_map_scores=mind_map_scores)
+                          labyrinth_scores=labyrinth_scores,
+                          puzzle_scores=puzzle_scores,
+                          visual_attention_scores=visual_attention_scores,
+                          number_sequence_scores=number_sequence_scores)
 
 # Articles
 @app.route('/articles')
@@ -1221,7 +1220,7 @@ def get_scores(game_type):
     # "all" özelliği eklenmiş - tüm oyunların verilerini getir
     if game_type == 'all':
         # Tüm oyun türleri için en yüksek skorları getir
-        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'brainRhythm', 'mindMap']
+        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'visualAttention', 'numberSequence']
         all_scores = {}
         
         for internal_game_type in game_types:
@@ -1270,13 +1269,9 @@ def get_scores(game_type):
             'word-puzzle': 'wordPuzzle',
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
-            'number-sequence': 'labyrinth',  # number-sequence de labyrinth'e yönlendiriliyor (geriye uyumluluk için)
             'puzzle': 'puzzle',
-            'brain-rhythm': 'brainRhythm',
-            'mind-map': 'mindMap',
-            # Ayrıca direkt olarak da erişilebilsin
-            'brainRhythm': 'brainRhythm',
-            'mindMap': 'mindMap'
+            'visual-attention': 'visualAttention',
+            'number-sequence': 'numberSequence'
         }
         
         internal_game_type = game_type_map.get(game_type)
