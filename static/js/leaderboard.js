@@ -69,7 +69,14 @@ function displayScoresForGameType(gameType) {
     'labyrinth': 'labyrinth',
     'puzzle': 'puzzle',
     'number-sequence': 'numberSequence',
-    '3d-rotation': '3dRotation'
+    '3d-rotation': '3dRotation',
+    
+    // Yeni Hafıza Güçlendirme Oyunları
+    'where-is-it': 'whereIsIt',
+    'memory-cards': 'memoryCards',
+    'number-chain': 'numberChain',
+    'audio-memory': 'audioMemory',
+    'n-back': 'nBack'
   };
   
   const internalGameType = gameTypeMap[gameType];
