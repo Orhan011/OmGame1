@@ -405,6 +405,18 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
+@app.route('/games/tetris')
+def tetris():
+    return render_template('games/tetris.html')
+
+@app.route('/games/breakout')
+def breakout():
+    return render_template('games/breakout.html')
+
+@app.route('/games/snake')
+def snake():
+    return render_template('games/snake.html')
+
 # Leaderboard
 @app.route('/leaderboard')
 def leaderboard():

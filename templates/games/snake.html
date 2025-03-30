@@ -1,0 +1,39 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Snake{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <div class="snake-container">
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+      <p>Skor: <span id="snakeScore">0</span></p>
+      <p>En Yüksek Skor: <span id="highScore">0</span></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.snake-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+canvas {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--accent-color);
+  border-radius: 10px;
+}
+
+.controls {
+  text-align: center;
+  color: var(--primary-text);
+  font-size: 1.2rem;
+}
+</style>
+{% endblock %}

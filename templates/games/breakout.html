@@ -1,0 +1,31 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Breakout{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <canvas id="breakout" width="480" height="320"></canvas>
+  <div class="game-controls">
+    <p>Skor: <span id="breakoutScore">0</span></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+canvas {
+  background: linear-gradient(45deg, #1a1a2e, #16213e);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.3);
+}
+
+.game-controls {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--primary-text);
+  font-size: 1.2rem;
+}
+</style>
+{% endblock %}
+{% endblock %}
