@@ -19,66 +19,65 @@
 <section class="mt-4">
 <h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
 <div class="game-grid">
+  <!-- Kelime Bulmaca -->
   <div class="game-card">
-    <div class="game-logo">
-      <i class="fas fa-font"></i>
-    </div>
-    <div class="game-content">
-      <div class="game-name">Kelime Bulmaca</div>
-      <div class="game-play">
-        <a href="{{ url_for('word_puzzle') }}" class="game-btn">OYNA</a>
-      </div>
+    <div class="game-card-content">
+      <div class="game-icon"><i class="fas fa-font"></i></div>
+      <h3>Kelime Bulmaca</h3>
+      <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
+      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
     </div>
   </div>
 
+  <!-- Hafıza Kartları -->
   <div class="game-card">
-    <div class="game-card-inner">
+    <div class="game-card-content">
       <div class="game-icon"><i class="fas fa-clone"></i></div>
-      <div class="game-content">
-        <h3 class="game-title">Hafıza Kartları</h3>
-        <p class="game-description">Eşleşen kartları bul ve hafızanı test et.</p>
-      </div>
-      <a href="{{ url_for('memory_match') }}" class="game-btn">OYNA</a>
+      <h3>Hafıza Kartları</h3>
+      <p>Eşleşen kartları bul ve hafızanı test et.</p>
+      <a href="{{ url_for('memory_match') }}" class="game-btn">Oyna</a>
     </div>
   </div>
 
-<div class="game-card">
-<div class="game-card-content">
-<div class="game-icon"><i class="fas fa-route"></i></div>
-<h3>Labirent</h3>
-<p>Çıkış yolunu bul ve stratejik düşün.</p>
-<a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
-</div>
-</div>
+  <!-- Labirent -->
+  <div class="game-card">
+    <div class="game-card-content">
+      <div class="game-icon"><i class="fas fa-route"></i></div>
+      <h3>Labirent</h3>
+      <p>Çıkış yolunu bul ve stratejik düşün.</p>
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+    </div>
+  </div>
 
-<div class="game-card">
-<div class="game-card-content">
-<div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
-<h3>Yapboz</h3>
-<p>Parçaları birleştir ve görsel zekânı geliştir.</p>
-<a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
-</div>
-</div>
+  <!-- Yapboz -->
+  <div class="game-card">
+    <div class="game-card-content">
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+      <h3>Yapboz</h3>
+      <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+    </div>
+  </div>
 
-<div class="game-card">
-<div class="game-card-content">
-<div class="game-icon"><i class="fas fa-eye"></i></div>
-<h3>Görsel Dikkat</h3>
-<p>Örüntüleri bul ve dikkatini test et.</p>
-<a href="{{ url_for('visual_attention') }}" class="game-btn">Oyna</a>
-</div>
-</div>
+  <!-- Görsel Dikkat -->
+  <div class="game-card">
+    <div class="game-card-content">
+      <div class="game-icon"><i class="fas fa-eye"></i></div>
+      <h3>Görsel Dikkat</h3>
+      <p>Örüntüleri bul ve dikkatini test et.</p>
+      <a href="{{ url_for('visual_attention') }}" class="game-btn">Oyna</a>
+    </div>
+  </div>
 
-<div class="game-card">
-<div class="game-card-content">
-<div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
-<h3>Sayı Dizisi</h3>
-<p>Sayı örüntülerini keşfet ve analitik düşün.</p>
-<a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
-</div>
-</div>
-
-
+  <!-- Sayı Dizisi -->
+  <div class="game-card">
+    <div class="game-card-content">
+      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+      <h3>Sayı Dizisi</h3>
+      <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+    </div>
+  </div>
 </div>
 </section>
 
