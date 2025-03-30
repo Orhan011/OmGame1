@@ -6215,6 +6215,86 @@ main {
   }
 }
 
+/* Standart Başlatma ve Geri Butonları */
+.standard-start-btn {
+  background: linear-gradient(135deg, #6a5ae0, #5246c0);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(106, 90, 224, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.standard-start-btn:hover {
+  background: linear-gradient(135deg, #7a6aff, #6255e0);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.5);
+  transform: translateY(-2px);
+}
+
+.standard-back-btn {
+  background: linear-gradient(135deg, #adb5bd, #868e96);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+}
+
+.standard-back-btn:hover {
+  background: linear-gradient(135deg, #868e96, #6c757d);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  color: white;
+}
+
+/* Türkiye Haritası Stilleri */
+.map-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: rgba(25, 25, 50, 0.5);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  height: 450px;
+  position: relative;
+}
+
+.map-container svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.highlighted-region {
+  fill: #6a5ae0 !important;
+  stroke-width: 2px;
+  animation: pulse 1.5s infinite;
+}
+
+.correct-region {
+  fill: #28a745 !important;
+  stroke: #28a745;
+  stroke-width: 2px;
+}
+
+.incorrect-region {
+  fill: #dc3545 !important;
+  stroke: #dc3545;
+  stroke-width: 1px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
 
 /* Örüntü Tanıma Oyunu - Yeni Tasarım */
 .pattern-game-wrapper {

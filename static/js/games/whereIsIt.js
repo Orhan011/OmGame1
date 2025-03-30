@@ -14,11 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const nextRoundBtn = document.getElementById('next-round-btn');
   const gameOverBtn = document.getElementById('game-over-btn');
   const progressBar = document.getElementById('progress-bar');
+  const backBtn = document.querySelector('.standard-back-btn');
 
   // Ses efektleri için yapı
   const sounds = {};
   let soundsLoaded = false;
-  let soundEnabled = true;
+  let soundEnabled = true;e;
 
   // Sesleri pre-load etme
   function loadSounds() {
@@ -37,7 +38,36 @@ document.addEventListener('DOMContentLoaded', function() {
       return false;
     }
   }
-
+  
+  // SVG harita yükle
+  function loadMap() {
+    const mapContainer = document.getElementById('map-container');
+    if (!mapContainer) return;
+    
+    fetch('/static/images/turkey-map.svg')
+      .then(response => response.text())
+      .then(svgContent => {
+        mapContainer.innerHTML = svgContent;
+        
+        // Bölgelere tıklama olayı ekle
+        setTimeout(() => {
+          const regions = mapContainer.querySelectorAll('.region');
+          regions.forEach(region => {
+            region.addEventListener('click', function(e) {
+              if (gameState.isAnswerPhase) {
+                const regionId = this.id;
+                checkAnswer(regionId);
+              }
+            });
+          });
+        }, 100);
+      })
+      .catch(error => {
+        console.error('Harita yüklenirken hata oluştu:', error);
+        mapContainer.innerHTML = '<div class="alert alert-danger">Harita yüklenemedi</div>';
+      });
+  }
+  
   // Sesler en başta yüklensin
   loadSounds();
 
@@ -64,6 +94,195 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
       soundToggleBtn.classList.remove('active');
+    }
+  });
+  
+  // Oyun durumu
+  const gameState = {
+    round: 0,
+    maxRounds: 10,
+    score: 0,
+    timer: 20,
+    interval: null,
+    isAnswerPhase: false,
+    correctRegion: '',
+    characters: [
+      { name: 'İstanbul', regionId: 'istanbul', image: '/static/images/characters/istanbul.jpg' },
+      { name: 'Ankara', regionId: 'ankara', image: '/static/images/characters/ankara.jpg' },
+      { name: 'İzmir', regionId: 'izmir', image: '/static/images/characters/izmir.jpg' },
+      { name: 'Antalya', regionId: 'antalya', image: '/static/images/characters/antalya.jpg' },
+      { name: 'Trabzon', regionId: 'trabzon', image: '/static/images/characters/trabzon.jpg' },
+      { name: 'Diyarbakır', regionId: 'diyarbakir', image: '/static/images/characters/diyarbakir.jpg' },
+      { name: 'Bursa', regionId: 'bursa', image: '/static/images/characters/bursa.jpg' },
+      { name: 'Konya', regionId: 'konya', image: '/static/images/characters/konya.jpg' },
+      { name: 'Adana', regionId: 'adana', image: '/static/images/characters/adana.jpg' },
+      { name: 'Samsun', regionId: 'samsun', image: '/static/images/characters/samsun.jpg' }
+    ]
+  };
+  
+  // Oyunu başlat butonu
+  if (startButton) {
+    startButton.addEventListener('click', function() {
+      if (startScreen) startScreen.style.display = 'none';
+      if (gameContainer) gameContainer.style.display = 'block';
+      
+      // SVG haritasını yükle
+      loadMap();
+      
+      // İlk turu başlat
+      startNewRound();
+      
+      // Ses çal
+      playSound('click');
+    });
+  }
+  
+  // Yeni tur başlat
+  function startNewRound() {
+    gameState.round++;
+    gameState.isAnswerPhase = true;
+    
+    // Tur göstergesini güncelle
+    if (roundDisplay) {
+      roundDisplay.textContent = gameState.round + '/' + gameState.maxRounds;
+    }
+    
+    // Karakteri seç
+    const characterIndex = gameState.round - 1;
+    const currentCharacter = gameState.characters[characterIndex];
+    gameState.correctRegion = currentCharacter.regionId;
+    
+    // Karakter görselini göster
+    if (characterImage) {
+      characterImage.innerHTML = `
+        <img src="${currentCharacter.image}" alt="${currentCharacter.name}" onerror="this.src='/static/images/placeholder.jpg'">
+        <div class="character-name">${currentCharacter.name}</div>
+      `;
+    }
+    
+    // Süreyi başlat
+    gameState.timer = 20;
+    if (timerDisplay) timerDisplay.textContent = gameState.timer;
+    
+    if (gameState.interval) {
+      clearInterval(gameState.interval);
+    }
+    
+    gameState.interval = setInterval(function() {
+      gameState.timer--;
+      if (timerDisplay) timerDisplay.textContent = gameState.timer;
+      
+      // İlerleme çubuğunu güncelle
+      const progress = (gameState.timer / 20) * 100;
+      if (progressBar) progressBar.style.width = progress + '%';
+      
+      if (gameState.timer <= 0) {
+        clearInterval(gameState.interval);
+        checkAnswer('');  // Zaman dolduğunda otomatik "yanlış" cevap
+      }
+    }, 1000);
+  }
+  
+  // Cevabı kontrol et
+  function checkAnswer(regionId) {
+    if (!gameState.isAnswerPhase) return;
+    gameState.isAnswerPhase = false;
+    
+    clearInterval(gameState.interval);
+    
+    const mapContainer = document.getElementById('map-container');
+    const regions = mapContainer.querySelectorAll('.region');
+    
+    // Doğru bölge vurgulanır
+    const correctRegion = document.getElementById(gameState.correctRegion);
+    
+    if (regionId === gameState.correctRegion) {
+      // Doğru cevap
+      playSound('correct');
+      
+      // Kalan zamana göre puan hesapla (en fazla 100)
+      const timeBonus = gameState.timer * 5;
+      const roundScore = Math.min(100, 50 + timeBonus);
+      gameState.score += roundScore;
+      
+      if (correctRegion) correctRegion.classList.add('correct-region');
+      if (resultMessage) resultMessage.textContent = 'Doğru!';
+      if (resultScore) resultScore.textContent = '+' + roundScore;
+      if (scoreDisplay) scoreDisplay.textContent = gameState.score;
+    } else {
+      // Yanlış cevap
+      playSound('wrong');
+      
+      // Seçilen bölgeyi işaretle (eğer seçildiyse)
+      if (regionId) {
+        const selectedRegion = document.getElementById(regionId);
+        if (selectedRegion) selectedRegion.classList.add('incorrect-region');
+      }
+      
+      // Doğru bölgeyi işaretle
+      if (correctRegion) correctRegion.classList.add('correct-region');
+      
+      if (resultMessage) resultMessage.textContent = 'Yanlış!';
+      if (resultScore) resultScore.textContent = '+0';
+    }
+    
+    // Sonuç popup'ını göster
+    if (resultPopup) resultPopup.style.display = 'flex';
+    
+    // Son tur ise "Bitir" butonunu göster
+    if (gameState.round >= gameState.maxRounds) {
+      if (nextRoundBtn) nextRoundBtn.style.display = 'none';
+      if (gameOverBtn) gameOverBtn.style.display = 'block';
+    } else {
+      if (nextRoundBtn) nextRoundBtn.style.display = 'block';
+      if (gameOverBtn) gameOverBtn.style.display = 'none';
+    }
+  }
+  
+  // Sonraki tur butonu
+  if (nextRoundBtn) {
+    nextRoundBtn.addEventListener('click', function() {
+      if (resultPopup) resultPopup.style.display = 'none';
+      
+      // Haritayı temizle
+      const mapContainer = document.getElementById('map-container');
+      const regions = mapContainer.querySelectorAll('.region');
+      regions.forEach(region => {
+        region.classList.remove('correct-region', 'incorrect-region', 'highlighted-region');
+      });
+      
+      // Sonraki turu başlat
+      startNewRound();
+      
+      // Ses çal
+      playSound('click');
+    });
+  }
+  
+  // Oyunu bitir butonu
+  if (gameOverBtn) {
+    gameOverBtn.addEventListener('click', function() {
+      // Skor kaydetme işlemleri buraya eklenebilir
+      
+      // Ana sayfaya dön
+      window.location.href = '/';
+      
+      // Ses çal
+      playSound('success');
+    });
+  }
+  
+  // Ses çalma fonksiyonu
+  function playSound(soundName) {
+    try {
+      if (soundEnabled && soundsLoaded && sounds[soundName]) {
+        sounds[soundName].currentTime = 0;
+        sounds[soundName].play();
+      }
+    } catch (error) {
+      console.log("Sound play error:", error);
+    }
+  }
     }
   });
 

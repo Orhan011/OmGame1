@@ -1,0 +1,99 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <style>
+    .region {
+      fill: #e0e0e0;
+      stroke: #ffffff;
+      stroke-width: 1;
+      transition: fill 0.3s;
+    }
+    .region:hover {
+      fill: #a0a0a0;
+      cursor: pointer;
+    }
+    .region-label {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+  </style>
+  
+  <!-- Marmara Bölgesi -->
+  <path id="istanbul" class="region" d="M250,120 L280,110 L300,125 L275,140 L250,120" data-name="İstanbul" />
+  <path id="bursa" class="region" d="M220,150 L270,150 L290,180 L260,200 L220,170 L220,150" data-name="Bursa" />
+  <path id="edirne" class="region" d="M170,100 L210,90 L230,120 L200,130 L170,100" data-name="Edirne" />
+  <path id="tekirdag" class="region" d="M200,130 L230,120 L250,140 L220,150 L200,130" data-name="Tekirdağ" />
+  
+  <!-- Ege Bölgesi -->
+  <path id="izmir" class="region" d="M190,210 L220,200 L250,220 L220,240 L190,210" data-name="İzmir" />
+  <path id="aydin" class="region" d="M190,240 L220,240 L240,260 L210,270 L190,240" data-name="Aydın" />
+  <path id="mugla" class="region" d="M190,270 L220,270 L240,300 L200,310 L190,270" data-name="Muğla" />
+  <path id="denizli" class="region" d="M230,240 L260,240 L280,270 L250,280 L230,240" data-name="Denizli" />
+  
+  <!-- Akdeniz Bölgesi -->
+  <path id="antalya" class="region" d="M260,300 L300,290 L320,320 L280,330 L260,300" data-name="Antalya" />
+  <path id="mersin" class="region" d="M330,290 L370,280 L390,310 L350,320 L330,290" data-name="Mersin" />
+  <path id="adana" class="region" d="M370,280 L400,270 L420,300 L390,310 L370,280" data-name="Adana" />
+  <path id="hatay" class="region" d="M400,310 L430,300 L450,330 L420,340 L400,310" data-name="Hatay" />
+  
+  <!-- İç Anadolu Bölgesi -->
+  <path id="ankara" class="region" d="M330,180 L370,170 L390,200 L350,210 L330,180" data-name="Ankara" />
+  <path id="konya" class="region" d="M300,230 L340,220 L360,250 L320,260 L300,230" data-name="Konya" />
+  <path id="kayseri" class="region" d="M380,220 L420,210 L440,240 L400,250 L380,220" data-name="Kayseri" />
+  <path id="sivas" class="region" d="M420,170 L460,160 L480,190 L440,200 L420,170" data-name="Sivas" />
+  
+  <!-- Karadeniz Bölgesi -->
+  <path id="samsun" class="region" d="M400,120 L440,110 L460,140 L420,150 L400,120" data-name="Samsun" />
+  <path id="trabzon" class="region" d="M470,130 L510,120 L530,150 L490,160 L470,130" data-name="Trabzon" />
+  <path id="rize" class="region" d="M510,120 L550,110 L570,140 L530,150 L510,120" data-name="Rize" />
+  <path id="zonguldak" class="region" d="M320,130 L360,120 L380,150 L340,160 L320,130" data-name="Zonguldak" />
+  
+  <!-- Doğu Anadolu Bölgesi -->
+  <path id="erzurum" class="region" d="M500,170 L540,160 L560,190 L520,200 L500,170" data-name="Erzurum" />
+  <path id="van" class="region" d="M580,200 L620,190 L640,220 L600,230 L580,200" data-name="Van" />
+  <path id="malatya" class="region" d="M450,240 L490,230 L510,260 L470,270 L450,240" data-name="Malatya" />
+  <path id="elazig" class="region" d="M490,220 L530,210 L550,240 L510,250 L490,220" data-name="Elazığ" />
+  
+  <!-- Güneydoğu Anadolu Bölgesi -->
+  <path id="gaziantep" class="region" d="M450,280 L490,270 L510,300 L470,310 L450,280" data-name="Gaziantep" />
+  <path id="diyarbakir" class="region" d="M520,250 L560,240 L580,270 L540,280 L520,250" data-name="Diyarbakır" />
+  <path id="mardin" class="region" d="M540,280 L580,270 L600,300 L560,310 L540,280" data-name="Mardin" />
+  <path id="sanliurfa" class="region" d="M490,280 L530,270 L550,300 L510,310 L490,280" data-name="Şanlıurfa" />
+  
+  <!-- Etiketler -->
+  <text x="275" y="125" class="region-label">İstanbul</text>
+  <text x="255" y="170" class="region-label">Bursa</text>
+  <text x="200" y="110" class="region-label">Edirne</text>
+  <text x="225" y="135" class="region-label">Tekirdağ</text>
+  <text x="220" y="220" class="region-label">İzmir</text>
+  <text x="215" y="255" class="region-label">Aydın</text>
+  <text x="215" y="290" class="region-label">Muğla</text>
+  <text x="255" y="260" class="region-label">Denizli</text>
+  <text x="290" y="310" class="region-label">Antalya</text>
+  <text x="360" y="300" class="region-label">Mersin</text>
+  <text x="395" y="290" class="region-label">Adana</text>
+  <text x="425" y="320" class="region-label">Hatay</text>
+  <text x="360" y="190" class="region-label">Ankara</text>
+  <text x="330" y="240" class="region-label">Konya</text>
+  <text x="410" y="230" class="region-label">Kayseri</text>
+  <text x="450" y="180" class="region-label">Sivas</text>
+  <text x="430" y="130" class="region-label">Samsun</text>
+  <text x="500" y="140" class="region-label">Trabzon</text>
+  <text x="540" y="130" class="region-label">Rize</text>
+  <text x="340" y="140" class="region-label">Zonguldak</text>
+  <text x="530" y="180" class="region-label">Erzurum</text>
+  <text x="610" y="210" class="region-label">Van</text>
+  <text x="480" y="250" class="region-label">Malatya</text>
+  <text x="520" y="230" class="region-label">Elazığ</text>
+  <text x="480" y="290" class="region-label">Gaziantep</text>
+  <text x="550" y="260" class="region-label">Diyarbakır</text>
+  <text x="570" y="290" class="region-label">Mardin</text>
+  <text x="520" y="290" class="region-label">Şanlıurfa</text>
+  
+  <!-- Denizler -->
+  <text x="150" y="70" class="region-label" style="font-size: 14px;">Karadeniz</text>
+  <text x="120" y="200" class="region-label" style="font-size: 14px;">Ege Denizi</text>
+  <text x="300" y="350" class="region-label" style="font-size: 14px;">Akdeniz</text>
+</svg>

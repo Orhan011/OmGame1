@@ -73,6 +73,18 @@
 
       <!-- Oyun Alanı -->
       <div id="game-container" class="where-is-it-container glass-effect" style="display: none;">
+        <div class="game-controls-top">
+          <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
+            <i class="fas fa-pause"></i>
+          </button>
+          <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
+            <i class="fas fa-volume-up"></i>
+          </button>
+          <a href="/" class="game-control-btn" title="Ana Sayfaya Dön">
+            <i class="fas fa-home"></i>
+          </a>
+        </div>
+
         <div class="character-info-panel">
           <img id="character-image" src="/static/images/whereIsIt/char1.png" alt="Karakter" class="character-avatar">
           <div class="character-name-container">
@@ -86,8 +98,13 @@
         </div>
 
         <div id="map-container" class="game-map">
-          <img src="/static/images/whereIsIt/map.svg" alt="Harita" class="map-image">
-          <!-- Hedef işaretçileri buraya dinamik olarak eklenecek -->
+          <!-- SVG Harita buraya yüklenecek -->
+          <div class="loading-map">
+            <div class="spinner-border text-light" role="status">
+              <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <p class="mt-2">Harita yükleniyor...</p>
+          </div>
         </div>
 
         <!-- Sonuç Popup -->
@@ -102,7 +119,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Oyun Sonuç Ekranı -->
       <div id="game-results" class="game-results glass-effect" style="display: none;">
         <div class="result-card">
@@ -278,6 +295,33 @@
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+
+.game-controls-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.game-control-btn {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.game-control-btn.active i {
+  color: #28a745;
+}
+
+.loading-map {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 </style>
 
