@@ -1062,7 +1062,10 @@ def get_scores(game_type):
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
             'number-sequence': 'labyrinth',  # number-sequence de labyrinth'e yönlendiriliyor (geriye uyumluluk için)
-            'puzzle': 'puzzle'
+            'puzzle': 'puzzle',
+            'tetris': 'tetris',
+            'breakout': 'breakout', 
+            'snake': 'snake'
         }
         
         internal_game_type = game_type_map.get(game_type)
