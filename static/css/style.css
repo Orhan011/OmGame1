@@ -8212,11 +8212,10 @@ main {
 .game-card {
   background: rgba(20, 20, 40, 0.8);
   border-radius: 20px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
+  padding: 25px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
   aspect-ratio: 1;
   width: 100%;
   position: relative;
@@ -8224,16 +8223,27 @@ main {
 }
 
 .game-logo {
-  font-size: 2rem;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 2.2rem;
   color: var(--accent-color);
-  margin-bottom: 8px;
+}
+
+.game-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
 }
 
 .game-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: #fff;
   text-align: center;
-  margin: 8px 0;
+  font-weight: 600;
 }
 
 .game-play {
