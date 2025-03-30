@@ -8202,9 +8202,106 @@ main {
 }
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.game-card {
+  background: rgba(20, 20, 40, 0.8);
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(106, 90, 205, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(106, 90, 205, 0.4);
+}
+
+.card-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.8rem;
+  color: white;
+}
+
+.game-card h3 {
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.game-card p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
+}
+
+.game-btn {
+  display: inline-block;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  color: white;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.game-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+  
+  .game-card {
+    padding: 1.2rem;
+  }
+  
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .game-card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .game-card p {
+    font-size: 0.8rem;
+  }
+  
+  .game-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .game-card {
