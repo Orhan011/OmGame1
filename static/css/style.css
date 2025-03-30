@@ -693,6 +693,102 @@ footer::before {
   margin: 25px 0 20px;
 }
 
+/* Oyun Baloncukları - Yeni Stil */
+.game-bubble {
+  display: flex;
+  background: rgba(25, 25, 45, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.game-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 30%, rgba(106, 90, 224, 0.1), transparent 60%);
+  pointer-events: none;
+}
+
+.game-bubble:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border-color: rgba(106, 90, 224, 0.4);
+}
+
+.game-icon-container {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(106, 90, 224, 0.2), rgba(140, 102, 255, 0.2));
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-icon-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+}
+
+.game-icon {
+  font-size: 3rem;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+  transition: all 0.3s ease;
+}
+
+.game-bubble:hover .game-icon {
+  transform: scale(1.1);
+  color: #8C66FF;
+}
+
+.game-info {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  margin-bottom: 10px;
+}
+
+.game-desc {
+  font-size: 0.95rem;
+  color: var(--secondary-text);
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+  .game-bubble {
+    flex-direction: column;
+  }
+  
+  .game-icon-container {
+    width: 100%;
+    height: 100px;
+  }
+}
+
 /* Social icons and badges */
 .social-icon {
   color: var(--secondary-text);

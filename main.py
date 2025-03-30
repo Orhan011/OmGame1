@@ -607,9 +607,7 @@ def labyrinth():
 def puzzle():
     return render_template('games/puzzle.html')
 
-@app.route('/games/visual-attention')
-def visual_attention():
-    return render_template('games/visualAttention.html')
+# Görsel Dikkat Oyunu Kaldırıldı
 
 @app.route('/games/number-sequence')
 def number_sequence():
@@ -623,7 +621,7 @@ def leaderboard():
     memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
     labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
     puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
+    # Görsel Dikkat oyunu kaldırıldı
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
@@ -631,7 +629,6 @@ def leaderboard():
                           memory_match_scores=memory_match_scores,
                           labyrinth_scores=labyrinth_scores,
                           puzzle_scores=puzzle_scores,
-                          visual_attention_scores=visual_attention_scores,
                           number_sequence_scores=number_sequence_scores)
 
 # Articles
@@ -1220,7 +1217,7 @@ def get_scores(game_type):
     # "all" özelliği eklenmiş - tüm oyunların verilerini getir
     if game_type == 'all':
         # Tüm oyun türleri için en yüksek skorları getir
-        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'visualAttention', 'numberSequence']
+        game_types = ['wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'numberSequence']
         all_scores = {}
         
         for internal_game_type in game_types:
@@ -1270,7 +1267,6 @@ def get_scores(game_type):
             'memory-match': 'memoryMatch',
             'labyrinth': 'labyrinth',
             'puzzle': 'puzzle',
-            'visual-attention': 'visualAttention',
             'number-sequence': 'numberSequence'
         }
         
