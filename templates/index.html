@@ -19,14 +19,14 @@
 <section class="mt-4">
 <h2 class="text-center mb-4">Beyin Egzersizi Oyunları</h2>
 <div class="row">
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 mb-3">
     <div class="game-bubble">
       <div class="game-icon-container">
         <i class="fas fa-font game-icon"></i>
       </div>
       <div class="game-info">
         <h3 class="game-title">Kelime Bulmaca</h3>
-        <p class="game-desc">Verilen harflerden anlamlı kelimeler oluşturarak kelime haznenizi ve dilsel yeteneklerinizi test edin.</p>
+        <p class="game-desc">Verilen harflerden anlamlı kelimeler oluşturarak kelime haznenizi geliştirin.</p>
         <a href="{{ url_for('word_puzzle') }}" class="btn-game">
           <i class="fas fa-play-circle"></i> Oyna
         </a>
@@ -34,14 +34,14 @@
     </div>
   </div>
 
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 mb-3">
     <div class="game-bubble">
       <div class="game-icon-container">
         <i class="fas fa-clone game-icon"></i>
       </div>
       <div class="game-info">
         <h3 class="game-title">Hafıza Kartları</h3>
-        <p class="game-desc">Görsel hafızanızı test etmek için eşleşen kart çiftlerini mümkün olduğunca hızlı bulun.</p>
+        <p class="game-desc">Eşleşen kart çiftlerini bularak görsel hafızanızı test edin.</p>
         <a href="{{ url_for('memory_match') }}" class="btn-game">
           <i class="fas fa-play-circle"></i> Oyna
         </a>
@@ -49,14 +49,14 @@
     </div>
   </div>
 
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 mb-3">
     <div class="game-bubble">
       <div class="game-icon-container">
         <i class="fas fa-route game-icon"></i>
       </div>
       <div class="game-info">
         <h3 class="game-title">Labirent</h3>
-        <p class="game-desc">Girişten çıkışa giden yolu bul, stratejik düşünme ve uzamsal algı becerilerini test et.</p>
+        <p class="game-desc">Çıkış yolunu bularak uzamsal algı becerilerinizi test edin.</p>
         <a href="{{ url_for('labyrinth') }}" class="btn-game">
           <i class="fas fa-play-circle"></i> Oyna
         </a>
@@ -64,14 +64,14 @@
     </div>
   </div>
 
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 mb-3">
     <div class="game-bubble">
       <div class="game-icon-container">
         <i class="fas fa-puzzle-piece game-icon"></i>
       </div>
       <div class="game-info">
         <h3 class="game-title">Yapboz</h3>
-        <p class="game-desc">Parçalanmış görselleri doğru şekilde birleştirerek görsel-uzamsal zekânızı geliştirin.</p>
+        <p class="game-desc">Görsel-uzamsal zekânızı geliştirerek parçaları birleştirin.</p>
         <a href="{{ url_for('puzzle') }}" class="btn-game">
           <i class="fas fa-play-circle"></i> Oyna
         </a>
@@ -79,17 +79,30 @@
     </div>
   </div>
 
-  <div class="col-md-6 mb-4">
+  <div class="col-md-6 mb-3">
     <div class="game-bubble">
       <div class="game-icon-container">
         <i class="fas fa-sort-numeric-up game-icon"></i>
       </div>
       <div class="game-info">
         <h3 class="game-title">Sayı Dizisi</h3>
-        <p class="game-desc">Matematiksel örüntüleri keşfedin, dizilerdeki eksik sayıları bularak analitik düşünme becerinizi geliştirin.</p>
+        <p class="game-desc">Matematiksel örüntüleri keşfederek analitik düşünme becerinizi geliştirin.</p>
         <a href="{{ url_for('number_sequence') }}" class="btn-game">
           <i class="fas fa-play-circle"></i> Oyna
         </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Yeni oyunlar buraya eklenecek -->
+  <div class="col-md-6 mb-3">
+    <div class="game-bubble" style="background: rgba(40, 40, 60, 0.4); border-style: dashed;">
+      <div class="game-icon-container" style="background: rgba(106, 90, 224, 0.1);">
+        <i class="fas fa-plus game-icon" style="opacity: 0.6;"></i>
+      </div>
+      <div class="game-info">
+        <h3 class="game-title">Yakında</h3>
+        <p class="game-desc">Yeni oyunlar yakında eklenecek...</p>
       </div>
     </div>
   </div>
