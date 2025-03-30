@@ -693,55 +693,42 @@ footer::before {
   margin: 25px 0 20px;
 }
 
-/* Oyun Baloncukları - Modern Stil (Görseldeki gibi) */
+/* Oyun Baloncukları - Yeni Profesyonel Stil (Görseldeki gibi) */
 .game-bubble {
   display: flex;
   flex-direction: column;
-  background: rgba(25, 25, 50, 0.5);
-  border-radius: 20px;
-  border: 1px solid rgba(106, 90, 224, 0.15);
+  background: rgba(26, 27, 42, 0.85);
+  border-radius: 12px;
+  border: 1px solid rgba(30, 30, 50, 0.5);
   overflow: hidden;
   transition: all 0.3s ease;
   height: 100%;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   position: relative;
-  min-height: 120px;
-  margin-bottom: 15px;
-}
-
-.game-bubble::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 20% 30%, rgba(106, 90, 224, 0.04), transparent 70%);
-  pointer-events: none;
+  padding: 0;
+  min-height: 200px;
 }
 
 .game-bubble:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
-  border-color: rgba(106, 90, 224, 0.3);
+  border-color: rgba(140, 102, 255, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .game-icon-container {
-  width: 70px;
-  height: 70px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 20px auto 5px;
-  border-radius: 12px;
-  background: rgba(106, 90, 224, 0.15);
+  margin: 20px auto 10px;
+  border-radius: 10px;
+  background: rgba(110, 90, 220, 0.15);
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .game-icon {
-  font-size: 2.2rem;
-  color: #8C66FF;
+  font-size: 1.5rem;
+  color: #9C7BFF;
   transition: all 0.3s ease;
 }
 
@@ -749,88 +736,93 @@ footer::before {
   transform: scale(1.1);
 }
 
-.game-info {
-  padding: 10px 15px 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
-}
-
 .game-title {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: #8C66FF;
-  margin-bottom: 8px;
+  color: #9C7BFF;
+  margin: 5px 0 10px;
+  text-align: center;
   position: relative;
   display: inline-block;
+  align-self: center;
 }
 
 .game-title::after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: -8px;
   left: 0;
   width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, rgba(140, 102, 255, 0), rgba(140, 102, 255, 0.8), rgba(140, 102, 255, 0));
+  height: 2px;
+  background: #9C7BFF;
+  border-radius: 2px;
 }
 
 .game-desc {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 15px;
+  margin: 15px 15px 20px;
+  text-align: center;
   flex-grow: 1;
   line-height: 1.4;
 }
 
 .btn-game {
-  background: rgba(140, 102, 255, 0.8);
+  background: #8366FF;
   color: white;
   border: none;
-  border-radius: 50px;
-  padding: 10px 25px;
-  font-size: 1rem;
+  border-radius: 5px;
+  padding: 10px 0;
+  font-size: 0.9rem;
   font-weight: 500;
-  transition: all 0.3s ease;
-  display: inline-flex;
+  transition: all 0.2s ease;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 10px rgba(140, 102, 255, 0.3);
+  justify-content: center;
+  width: 100%;
+  gap: 5px;
+  text-decoration: none;
+  margin-top: auto;
 }
 
 .btn-game:hover {
-  background: rgba(140, 102, 255, 1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(140, 102, 255, 0.4);
+  background: #926AFF;
+  color: white;
+  text-decoration: none;
+}
+
+.btn-game i {
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {
   .game-bubble {
-    min-height: auto;
+    min-height: 200px;
+    padding: 20px 15px 15px;
   }
   
   .game-icon-container {
-    width: 60px;
-    height: 60px;
-    margin: 15px auto 5px;
+    width: 45px;
+    height: 45px;
+    margin-bottom: 15px;
   }
   
   .game-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
   
   .game-title {
     font-size: 1.2rem;
+    margin-bottom: 18px;
   }
   
   .game-desc {
     font-size: 0.85rem;
+    margin-bottom: 15px;
   }
   
   .btn-game {
-    padding: 8px 20px;
+    padding: 10px 0;
     font-size: 0.9rem;
   }
 }
