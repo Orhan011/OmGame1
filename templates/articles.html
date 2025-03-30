@@ -1,17 +1,17 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container py-4">
   <h1 class="articles-title text-center mb-4">Beyin Gelişimi Makaleleri</h1>
   
   <div class="row justify-content-center">
     <div class="col-lg-8">
-      <div class="game-instructions mb-5">
-        <p>Beyin işlevi, bilişsel gelişim ve beyin eğitimi oyunlarımızın arkasındaki bilim hakkındaki bilgilendirici makaleler koleksiyonumuzu keşfedin.</p>
+      <div class="game-instructions mb-5 p-4 rounded shadow-sm">
+        <p class="lead text-center">Beyin işlevi, bilişsel gelişim ve beyin eğitimi oyunlarımızın arkasındaki bilim hakkındaki bilgilendirici makaleler koleksiyonumuzu keşfedin.</p>
       </div>
       
       {% for article in articles %}
-      <div class="article-container mb-5">
+      <div class="article-container mb-5 animate__animated animate__fadeIn">
         <h2 class="article-title">{{ article.title }}</h2>
         <div class="article-content">
           {{ article.content|safe }}
@@ -20,12 +20,35 @@
       </div>
       {% endfor %}
       
-      <div class="text-center mt-5">
-        <a href="{{ url_for('tips') }}" class="btn btn-primary">
-          <i class="fas fa-lightbulb me-1"></i>Performans İpuçlarını Görüntüle
-        </a>
+      <div class="card bg-dark text-center mt-5 p-4 shadow">
+        <div class="card-body">
+          <h3 class="card-title">Beyin Gelişiminizi Destekleyin</h3>
+          <p class="card-text">Öğrendiğiniz bilgileri pratik etmek için oyunlarımızı deneyin ve becerilerinizi geliştirin!</p>
+          <div class="mt-3">
+            <a href="{{ url_for('tips') }}" class="btn btn-primary me-2">
+              <i class="fas fa-lightbulb me-1"></i>Performans İpuçları
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-light">
+              <i class="fas fa-gamepad me-1"></i>Oyunları Keşfet
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sayfa yüklendiğinde makaleleri görünür yap
+    const articles = document.querySelectorAll('.article-container');
+    articles.forEach((article, index) => {
+      setTimeout(() => {
+        article.classList.add('show');
+      }, index * 100);
+    });
+  });
+</script>
 {% endblock %}

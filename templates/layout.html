@@ -23,7 +23,22 @@ document.addEventListener("DOMContentLoaded", function() {
       menu.classList.add('mobile-menu');
     });
   }
+  
+  // Offcanvas panelleri için kaydırma özelliğini etkinleştir
+  const offcanvasPanels = document.querySelectorAll('.offcanvas');
+  if (offcanvasPanels) {
+    offcanvasPanels.forEach(panel => {
+      panel.style.overflowY = 'auto';
+      panel.style.maxHeight = '100vh';
+    });
+  }
 });
+
+// Makale ve ipucu içeriklerini dinamik olarak yükleme işlevi
+function loadArticleContent() {
+  // Burada AJAX ile içerik yüklenebilir
+  console.log("İçerik yükleniyor...");
+}
 </script>
 
 <!-- THREE.js ve ilgili kütüphaneler -->
