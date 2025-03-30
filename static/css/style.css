@@ -27,7 +27,7 @@
 /* Ana Sayfa Profil Kısayolu */
 .profile-shortcut-container {
   position: absolute;
-  top: 20px;
+  top: 30px;
   left: 20px;
   z-index: 100;
 }
