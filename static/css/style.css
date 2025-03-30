@@ -8211,28 +8211,28 @@ main {
 
 .game-card {
   background: rgba(20, 20, 40, 0.8);
-  border-radius: 15px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  min-height: 200px;
+  gap: 10px;
+  min-height: 160px;
   position: relative;
   border: 1px solid rgba(106, 90, 205, 0.2);
 }
 
 .game-logo {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: var(--accent-color);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .game-name {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: #fff;
   text-align: center;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 .game-play {
