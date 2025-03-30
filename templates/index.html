@@ -20,6 +20,33 @@
 <h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
 <div class="game-grid">
 <div class="game-card">
+  <div class="card-icon">A</div>
+  <h3>Kelime Bulmaca</h3>
+  <p>Verilen harflerden anlamlı kelimeler oluştur.</p>
+  <a href="{{ url_for('word_puzzle') }}" class="game-btn">OYNA</a>
+</div>
+
+<div class="game-card">
+  <div class="card-icon"><i class="fas fa-clone"></i></div>
+  <h3>Hafıza Kartları</h3>
+  <p>Eşleşen kartları bul ve hafızanı test et.</p>
+  <a href="{{ url_for('memory_match') }}" class="game-btn">OYNA</a>
+</div>
+
+<div class="game-card">
+  <div class="card-icon"><i class="fas fa-route"></i></div>
+  <h3>Labirent</h3>
+  <p>Çıkış yolunu bul ve stratejik düşün.</p>
+  <a href="{{ url_for('labyrinth') }}" class="game-btn">OYNA</a>
+</div>
+
+<div class="game-card">
+  <div class="card-icon"><i class="fas fa-puzzle-piece"></i></div>
+  <h3>Yapboz</h3>
+  <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+  <a href="{{ url_for('puzzle') }}" class="game-btn">OYNA</a>
+</div>
+<div class="game-card">
 <div class="game-card-content">
 <div class="game-icon"><i class="fas fa-font"></i></div>
 <h3>Kelime Bulmaca</h3>
