@@ -652,6 +652,26 @@ def puzzle():
 def number_sequence():
     return render_template('games/numberSequence.html')
 
+# Yeni Hafıza Güçlendirme Oyunları
+@app.route('/games/where-is-it')
+def where_is_it():
+    return render_template('games/whereIsIt.html')
+
+@app.route('/games/memory-cards')
+def memory_cards():
+    return render_template('games/memoryCards.html')
+
+@app.route('/games/number-chain')
+def number_chain():
+    return render_template('games/numberChain.html')
+
+@app.route('/games/audio-memory')
+def audio_memory():
+    return render_template('games/audioMemory.html')
+
+@app.route('/games/n-back')
+def n_back():
+    return render_template('games/nBack.html')
 
 # Leaderboard
 @app.route('/leaderboard')
