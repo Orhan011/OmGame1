@@ -31,44 +31,25 @@
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <!-- Başlangıç Ekranı -->
-      <div class="game-instructions" id="start-screen">
-        <div class="row align-items-center">
-          <div class="col-md-8">
-            <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
-            <p>Bu oyunda, gösterilen kişilerin haritadaki konumunu bulmaya çalışacaksınız. Doğru konumu ne kadar hızlı bulursanız, o kadar çok puan kazanırsınız!</p>
-            <div class="rule-list mt-3">
-              <div class="rule-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Gösterilen karakteri haritada nerede olduğunu tahmin edin</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-clock"></i>
-                <span>Her tur için sınırlı süreniz var</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-bolt"></i>
-                <span>Hızlı ve doğru tahminler daha çok puan kazandırır</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Yanlış tıklamalar ceza puanı getirebilir</span>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn active" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="standard-start-btn">
-              <i class="fas fa-play me-2"></i>Oyunu Başlat
-            </button>
+      <div id="start-screen" class="start-screen glass-effect">
+        <div class="game-logo">
+          <i class="fas fa-map-marked-alt"></i>
+          <h2>Kim Nerede?</h2>
+        </div>
+        <p class="game-description">Haritada gösterilen karakterlerin bulunduğu şehirleri bul!</p>
+
+        <div class="difficulty-selector">
+          <span>Zorluk:</span>
+          <div class="btn-group">
+            <button class="difficulty-btn active" data-difficulty="EASY">Kolay</button>
+            <button class="difficulty-btn" data-difficulty="MEDIUM">Orta</button>
+            <button class="difficulty-btn" data-difficulty="HARD">Zor</button>
           </div>
         </div>
+
+        <button id="start-game" class="btn btn-primary btn-lg start-btn">
+          <i class="fas fa-play-circle"></i> Oyunu Başlat
+        </button>
       </div>
 
       <!-- Oyun Alanı -->
