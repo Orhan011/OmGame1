@@ -67,7 +67,9 @@ function displayScoresForGameType(gameType) {
     'word-puzzle': 'wordPuzzle',
     'memory-match': 'memoryMatch',
     'labyrinth': 'labyrinth',
-    'puzzle': 'puzzle'
+    'puzzle': 'puzzle',
+    'number-sequence': 'numberSequence',
+    '3d-rotation': '3dRotation'
   };
   
   const internalGameType = gameTypeMap[gameType];

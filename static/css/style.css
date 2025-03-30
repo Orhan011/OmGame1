@@ -8222,10 +8222,12 @@ main {
   width: 100%;
   position: relative;
   border: 1px solid rgba(106, 90, 205, 0.2);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   text-align: center;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   
   /* Arka plan süslemeleri */
   background-image: linear-gradient(145deg, rgba(40, 40, 55, 0.9), rgba(30, 30, 45, 0.8));
@@ -8245,6 +8247,29 @@ main {
   min-width: 60px;
   height: 60px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sparkle effect for icons */
+.game-icon:before {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: skewX(-30deg);
+  filter: blur(3px);
+  left: -40px;
+  top: 0;
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.game-card:hover .game-icon:before {
+  left: 140%;
+  opacity: 1;
+  transition: all 0.5s ease;
 }
 
 .game-info {
@@ -8295,13 +8320,14 @@ main {
 }
 
 .game-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-8px) rotate3d(1, 5, 0, 5deg);
   border-color: rgba(106, 90, 205, 0.5);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(106, 90, 205, 0.3);
 }
 
 .game-card:hover .game-icon {
-  transform: scale(1.05);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 10px rgba(106, 90, 205, 0.4);
 }
 
 /* Responsive düzenlemeler */

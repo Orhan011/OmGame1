@@ -8,11 +8,11 @@
   </div>
 
   <div class="game-filter">
-    <button class="game-filter-btn active" data-game="wordPuzzle">
+    <button class="game-filter-btn active" data-game="word-puzzle">
       <i class="fas fa-font"></i>
       Kelime Bulmaca
     </button>
-    <button class="game-filter-btn" data-game="memoryMatch">
+    <button class="game-filter-btn" data-game="memory-match">
       <i class="fas fa-brain"></i>
       Hafıza Kartları
     </button>
@@ -25,14 +25,18 @@
       Yapboz
     </button>
     <!-- Görsel Dikkat oyunu kaldırıldı
-    <button class="game-filter-btn" data-game="visualAttention">
+    <button class="game-filter-btn" data-game="visual-attention">
       <i class="fas fa-eye"></i>
       Görsel Dikkat
     </button>
     -->
-    <button class="game-filter-btn" data-game="numberSequence">
+    <button class="game-filter-btn" data-game="number-sequence">
       <i class="fas fa-sort-numeric-up"></i>
       Sayı Dizisi
+    </button>
+    <button class="game-filter-btn" data-game="3d-rotation">
+      <i class="fas fa-cube"></i>
+      3D Rotasyon
     </button>
   </div>
 
@@ -51,75 +55,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const scoresContainer = document.getElementById('scores-container');
-  const gameButtons = document.querySelectorAll('.game-filter-btn');
-  let currentGame = 'puzzle'; // Varsayılan olarak puzzle seçili
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleString('tr-TR');
-  }
-
-  async function loadScores(gameType) {
-    try {
-      const scoresContainer = document.getElementById('scores-container');
-      scoresContainer.innerHTML = '<div class="loading">Yükleniyor...</div>';
-
-      const response = await fetch(`/api/get-scores/${gameType}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Yüklenen skorlar:', data);
-
-      let scores = Array.isArray(data) ? data : data[gameType] || [];
-
-      if (!scores || scores.length === 0) {
-        scoresContainer.innerHTML = '<div class="no-scores">Henüz skor kaydı bulunmuyor.</div>';
-        return;
-      }
-
-      let html = '';
-      scores.forEach((score, index) => {
-        const rowClass = index < 3 ? 'table-row top-rank' : 'table-row';
-        html += `
-          <div class="${rowClass}">
-            <div class="rank-cell">${index + 1}</div>
-            <div class="username-cell">${score.username || 'Anonim'}</div>
-            <div class="score-cell">${score.score}</div>
-            <div class="date-cell">${formatDate(score.timestamp)}</div>
-          </div>
-        `;
-      });
-
-      scoresContainer.innerHTML = html;
-
-    } catch (error) {
-      console.error('Error loading scores:', error);
-      scoresContainer.innerHTML = `
-        <div class="error">
-          Skorlar yüklenirken bir hata oluştu.<br>
-          <button onclick="loadScores('${gameType}')" class="game-filter-btn" style="margin-top: 10px;">
-            Tekrar Dene
-          </button>
-        </div>`;
-    }
-  }
-
-  gameButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      gameButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      currentGame = button.dataset.game;
-      loadScores(currentGame);
-    });
-  });
-
-  // Load initial scores
-  loadScores(currentGame);
-});
-</script>
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}
