@@ -273,8 +273,15 @@ function toggleProfilePanel() {
     } else {
       panel.style.display = 'block';
       panel.style.position = 'absolute';
-      panel.style.top = '0';
-      panel.style.zIndex = '10000'; // z-index değerini maksimuma çıkardık
+      panel.style.top = '60px';
+      panel.style.right = '10px';
+      panel.style.zIndex = '999999'; // z-index değerini daha da yükselttik
+      panel.style.background = 'rgba(30, 30, 50, 0.98)';
+      panel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+      panel.style.borderRadius = '8px';
+      panel.style.boxShadow = '0 5px 25px rgba(0, 0, 0, 0.5)';
+      panel.style.padding = '10px';
+      panel.style.minWidth = '200px';
     }
   }
 }

@@ -6,7 +6,7 @@
 <div class="col-lg-12 text-center position-relative">
 <div class="card-back">
   {% if session.get('user_id') %}
-    <div class="user-profile-mini" id="userProfileMini">
+    <div class="user-profile-mini" id="userProfileMini" onclick="toggleProfilePanel()">
       {% if session.get('avatar_url') %}
         <img src="{{ session.get('avatar_url') }}" alt="Profil" class="mini-avatar-img" style="border: none;">
       {% else %}

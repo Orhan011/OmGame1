@@ -103,11 +103,21 @@
 .profile-header::after,
 .profile-avatar::before,
 .profile-avatar::after,
+.profile-avatar:before,
+.profile-avatar:after,
 .profile-info::before,
-.profile-info::after {
+.profile-info::after,
+.profile-info:before,
+.profile-info:after,
+.profile-header:before,
+.profile-header:after,
+*::before,
+*::after {
   content: none !important; /* Tüm arkaplan çizgilerini tamamen kaldırdık */
   display: none !important;
   background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 @keyframes shimmer {
