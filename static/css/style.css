@@ -8218,9 +8218,9 @@ main {
   aspect-ratio: 16/9;
   padding: 20px;
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .game-card:hover {
@@ -8230,36 +8230,29 @@ main {
 
 .game-icon {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 20px;
+  left: 20px;
   color: rgb(106, 90, 205);
   font-size: 2rem;
-  background: rgba(20, 20, 40, 0.6);
-  padding: 10px;
-  border-radius: 12px;
 }
 
 .game-title {
   color: #fff;
   font-size: 1.4rem;
+  margin-top: 20px;
   text-align: center;
   width: 100%;
-  margin-top: 15px;
-  padding: 0 40px;
 }
 
 .game-btn {
+  margin-top: auto;
   background: linear-gradient(45deg, #6a5acd, #9370db);
   color: white;
-  padding: 12px 40px;
+  padding: 10px 30px;
   border-radius: 25px;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
-  text-align: center;
-  margin: 0 auto;
-  display: block;
-  width: fit-content;
 }
 
 .game-btn:hover {
