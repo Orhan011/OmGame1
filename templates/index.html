@@ -28,58 +28,48 @@
 </div>
 </div>
 
-<div class="col-md-6 mb-3">
-<div class="card h-100">
-<div class="card-body text-center p-3">
-<i class="fas fa-clone feature-icon mb-2"></i>
-<h3 class="card-title h5">Hafıza Kartları</h3>
-<p class="card-text small">Eşleşen kartları bul ve hafızanı test et.</p>
-<a href="{{ url_for('memory_match') }}" class="btn btn-primary btn-sm">Oyna</a>
-</div>
-</div>
-</div>
-
-<div class="col-md-6 mb-3">
-<div class="card h-100">
-<div class="card-body text-center p-3">
-<i class="fas fa-route feature-icon mb-2"></i>
-<h3 class="card-title h5">Labirent</h3>
-<p class="card-text small">Çıkış yolunu bul ve stratejik düşün.</p>
-<a href="{{ url_for('labyrinth') }}" class="btn btn-primary btn-sm">Oyna</a>
-</div>
+<div class="game-card">
+<div class="game-card-content">
+<div class="game-icon"><i class="fas fa-clone"></i></div>
+<h3>Hafıza Kartları</h3>
+<p>Eşleşen kartları bul ve hafızanı test et.</p>
+<a href="{{ url_for('memory_match') }}" class="game-btn">OYNA</a>
 </div>
 </div>
 
-<div class="col-md-6 mb-3">
-<div class="card h-100">
-<div class="card-body text-center p-3">
-<i class="fas fa-puzzle-piece feature-icon mb-2"></i>
-<h3 class="card-title h5">Yapboz</h3>
-<p class="card-text small">Parçaları birleştir ve görsel zekânı geliştir.</p>
-<a href="{{ url_for('puzzle') }}" class="btn btn-primary btn-sm">Oyna</a>
-</div>
-</div>
-</div>
-
-<div class="col-md-6 mb-3">
-<div class="card h-100">
-<div class="card-body text-center p-3">
-<i class="fas fa-eye feature-icon mb-2"></i>
-<h3 class="card-title h5">Görsel Dikkat</h3>
-<p class="card-text small">Örüntüleri bul ve dikkatini test et.</p>
-<a href="{{ url_for('visual_attention') }}" class="btn btn-primary btn-sm">Oyna</a>
-</div>
+<div class="game-card">
+<div class="game-card-content">
+<div class="game-icon"><i class="fas fa-route"></i></div>
+<h3>Labirent</h3>
+<p>Çıkış yolunu bul ve stratejik düşün.</p>
+<a href="{{ url_for('labyrinth') }}" class="game-btn">OYNA</a>
 </div>
 </div>
 
-<div class="col-md-6 mb-3">
-<div class="card h-100">
-<div class="card-body text-center p-3">
-<i class="fas fa-sort-numeric-up feature-icon mb-2"></i>
-<h3 class="card-title h5">Sayı Dizisi</h3>
-<p class="card-text small">Sayı örüntülerini keşfet ve analitik düşün.</p>
-<a href="{{ url_for('number_sequence') }}" class="btn btn-primary btn-sm">Oyna</a>
+<div class="game-card">
+<div class="game-card-content">
+<div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+<h3>Yapboz</h3>
+<p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+<a href="{{ url_for('puzzle') }}" class="game-btn">OYNA</a>
 </div>
+</div>
+
+<div class="game-card">
+<div class="game-card-content">
+<div class="game-icon"><i class="fas fa-eye"></i></div>
+<h3>Görsel Dikkat</h3>
+<p>Örüntüleri bul ve dikkatini test et.</p>
+<a href="{{ url_for('visual_attention') }}" class="game-btn">OYNA</a>
+</div>
+</div>
+
+<div class="game-card">
+<div class="game-card-content">
+<div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+<h3>Sayı Dizisi</h3>
+<p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+<a href="{{ url_for('number_sequence') }}" class="game-btn">OYNA</a>
 </div>
 </div>
 
