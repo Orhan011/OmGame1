@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
       panel.style.maxHeight = '100vh';
     });
   }
-  
+
   // Bootstrap dropdown'ları initialize et
   const dropdownElements = document.querySelectorAll('.dropdown-toggle');
   if (dropdownElements.length > 0) {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
       new bootstrap.Dropdown(element);
     });
   }
-  
+
   // Profil dropdown'u için özel event listener ekle
   const userDropdown = document.getElementById('userDropdown');
   if (userDropdown) {
