@@ -227,20 +227,27 @@
 }
 
 .player-avatar {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, rgba(106, 90, 224, 0.4), rgba(120, 104, 230, 0.4));
   border-radius: 50%;
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #ffffff;
   font-weight: 700;
-  font-size: 1.2rem;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+  font-size: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  position: relative;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.avatar-content {
+  opacity: 1;
+  transform: scale(1.1);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .score-cell {
@@ -452,12 +459,10 @@
   color: rgba(255, 255, 255, 0.6);
   margin-top: 2px;
 }
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
 .rank-number {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 700;
+  color: #a6a6c0;
   position: relative;
   z-index: 2;
 }

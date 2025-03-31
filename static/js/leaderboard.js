@@ -75,8 +75,7 @@ function displayLeaderboard(scores) {
           </div>
           <div class="player-info">
             <div class="player-name">${player.username}</div>
-            <div class="player-rank"><span>${player.rank || 'Başlangıç'}</span></div>
-          </div>
+            <div class="player-rank"></div> </div>
         </div>
         <div class="score-cell">
           <div class="score-container">
@@ -95,3 +94,32 @@ function displayLeaderboard(scores) {
 
   leaderboardContainer.innerHTML = html;
 }
+
+// Toplam skorları hesapla
+function calculateTotalScores(scoresData) {
+    const players = {};
+
+    // Tüm oyun kategorilerini döngüye alarak oyuncuların toplam puanlarını hesapla
+    Object.values(scoresData).forEach(gameScores => {
+      if (Array.isArray(gameScores)) {
+        gameScores.forEach(score => {
+          const playerId = score.user_id;
+          if (!players[playerId]) {
+            players[playerId] = {
+              user_id: playerId,
+              username: score.username,
+              rank: score.rank,
+              total_score: 0
+            };
+          }
+
+          // Skor değeri kontrol ediliyor ve toplama ekleniyor
+          const scoreValue = parseInt(score.score) || 0;
+          players[playerId].total_score += scoreValue;
+        });
+      }
+    });
+
+    // Oyuncuları diziye dönüştür ve puana göre sırala
+    return Object.values(players).sort((a, b) => b.total_score - a.total_score);
+  }
