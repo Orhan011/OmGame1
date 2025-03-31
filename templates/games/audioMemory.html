@@ -1,44 +1,58 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
 {% block title %}Sesli Hafıza Oyunu{% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
-  <div class="row">
-    <div class="col-12">
-      <div class="game-intro-section memory-intro" id="intro-section">
-        <div class="row align-items-center">
-          <div class="col-12 text-center mb-4">
-            <h1 class="game-title">
-              <i class="fas fa-music me-2"></i>Sesli Hafıza Oyunu
-            </h1>
-            <p class="game-subtitle">İşitsel hafızanızı güçlendirin</p>
-          </div>
-        </div>
+<div class="container">
+  <h1 class="game-title text-center mb-4">Sesli Hafıza</h1>
 
-        <div class="row align-items-center mt-3">
-          <div class="col-md-8">
+  <!-- Oyun İstatistikleri Bölümü -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+
+    <div class="game-stat-item">
+      <i class="fas fa-brain"></i>
+      <div class="game-stat-value" id="level-display">1</div>
+      <div class="game-stat-label">SEVİYE</div>
+    </div>
+
+    <div class="game-stat-item">
+      <i class="fas fa-music"></i>
+      <div class="game-stat-value" id="sequence-length">3</div>
+      <div class="game-stat-label">SES</div>
+    </div>
+
+    <div class="game-stat-item">
+      <i class="fas fa-check-circle"></i>
+      <div class="game-stat-value" id="correct-display">0</div>
+      <div class="game-stat-label">DOĞRU</div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Intro Section -->
+      <div class="glass-panel audio-memory-intro mb-4" id="intro-section">
+        <div class="row align-items-center">
+          <div class="col-md-7">
             <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-headphones me-2"></i>Nasıl Oynanır?</h4>
-              <p>Duyduğunuz sesleri aynı sırayla tekrarlayın. Her başarılı turda dizi uzayacak. Ne kadar uzun diziyi hatırlayabilirsiniz?</p>
+              <h4 class="instruction-title"><i class="fas fa-music me-2"></i>Nasıl Oynanır?</h4>
+              <p>Bu oyunda duyduğunuz ses dizilerini doğru sırayla tekrar etmeniz gerekiyor. Her seviyede zorlaşan ses dizilerini hatırlayarak işitsel hafızanızı test edin.</p>
               <div class="memory-tips">
                 <div class="tip-badge">
                   <i class="fas fa-lightbulb"></i>
-                  <span>İpucu: Sesleri duyduğunuzda içinizden tekrarlayın ve bir ritim şeklinde hatırlamaya çalışın</span>
+                  <span>Sesli diziyi dikkatlice dinleyin ve aynı sırayla tekrarlayın!</span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="btn btn-primary btn-lg pulse-animation mt-3">
+          <div class="col-md-5 text-center text-md-end mt-3 mt-md-0">
+            <img src="{{ url_for('static', filename='images/audio-memory.svg') }}" alt="Sesli Hafıza" class="img-fluid game-intro-image mb-3" style="max-height: 180px;">
+            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
               <i class="fas fa-play me-2"></i>Oyunu Başlat
             </button>
           </div>
@@ -46,21 +60,10 @@
       </div>
 
       <!-- Game Container -->
-      <div id="game-container" class="audio-memory-container glass-effect" style="display: none;">
-        <!-- Game Header -->
+      <div class="glass-panel game-panel mb-4" id="game-container" style="display: none;">
         <div class="game-header">
-          <div class="score-panel">
-            <div class="score">
-              <i class="fas fa-star"></i>
-              <span id="score-display">0</span>
-            </div>
-            <div class="correct">
-              <i class="fas fa-check"></i>
-              <span id="correct-display">0</span>
-            </div>
-            <div class="level-indicator">
-              <span>Seviye <span id="level-display">1</span></span>
-            </div>
+          <div class="level-indicator" id="level-indicator">
+            <span>Seviye <span id="current-level">1</span></span>
           </div>
 
           <div class="game-controls-top">
@@ -73,111 +76,244 @@
           </div>
         </div>
 
-        <!-- Alert Container -->
         <div id="alert-container" class="audio-memory-alert"></div>
 
-        <!-- Audio Memory Game Board -->
-        <div id="audio-memory-board" class="audio-memory-board">
-          <div class="sequence-status">
-            <div id="countdown-display" class="countdown-display" style="display: none;">3</div>
-            <div id="listen-message" class="listen-message" style="display: none;">Dinleyin...</div>
-            <div id="recall-message" class="recall-message" style="display: none;">Sırayı tekrarlayın!</div>
-          </div>
-
-          <div class="audio-memory-play-container">
-            <div id="audio-pads-grid" class="audio-pads-grid">
-              <!-- Tuşlar JavaScript ile eklenecek -->
-            </div>
-          </div>
+        <div id="audio-buttons" class="audio-button-container">
+          <!-- Butonlar JavaScript ile oluşturulacak -->
         </div>
 
-        <!-- Progress Bar -->
-        <div class="game-progress">
-          <div class="progress-label">İlerleme: <span id="progress-percent">0%</span></div>
-          <div class="progress">
-            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-          </div>
+        <div class="game-instructions text-center mt-4">
+          <p id="game-status">Ses dizisini dinleyin ve aynı sırayla tekrarlayın!</p>
         </div>
       </div>
 
       <!-- Game Over Container -->
       <div id="game-over-container" class="game-results-container" style="display: none;">
-        <div class="game-over-card">
-          <div class="game-over-header">
-            <h2 class="results-title"><i class="fas fa-trophy me-2"></i>Tebrikler!</h2>
-            <p class="results-subtitle">İşitsel hafızanız harika çalışıyor.</p>
-          </div>
-
-          <div class="results-details">
-            <div class="result-item">
-              <span class="result-label">Toplam Puan:</span>
-              <span id="final-score" class="result-value">0</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Doğru Diziler:</span>
-              <span id="final-correct" class="result-value">0</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">En Uzun Dizi:</span>
-              <span id="final-longest" class="result-value">0</span>
-            </div>
-
-            <div class="results-rating">
-              <div class="rating-stars">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-              </div>
-              <div class="rating-text" id="rating-text">İyi!</div>
-            </div>
-          </div>
-
-          <div class="memory-results-footer">
-            <button id="play-again" class="btn btn-primary btn-lg">
-              <i class="fas fa-redo me-2"></i>Tekrar Oyna
-            </button>
-            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-trophy me-2"></i>Skor Tablosu
-            </a>
+        <div class="results-header">
+          <h2 class="results-title">Oyun Bitti</h2>
+          <div class="results-icon">
+            <i class="fas fa-music"></i>
           </div>
         </div>
 
-        <div class="memory-share-section">
-          <p>Skorunuzu paylaşın:</p>
-          <div class="share-buttons">
-            <button class="share-btn" title="Kopyala" id="copy-score">
-              <i class="fas fa-copy"></i>
-            </button>
-            <button class="share-btn" title="Paylaş" id="share-score">
-              <i class="fas fa-share-alt"></i>
-            </button>
+        <div class="results-stats">
+          <div class="result-stat">
+            <div class="result-value" id="final-score">0</div>
+            <div class="result-label">PUAN</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-value" id="final-level">1</div>
+            <div class="result-label">SEVİYE</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-value" id="max-sequence">3</div>
+            <div class="result-label">MAKSİMUM SES</div>
           </div>
         </div>
-      </div>
 
-      <!-- Pause Menu Overlay -->
-      <div id="pause-overlay" class="pause-overlay" style="display: none;">
-        <div class="pause-card">
-          <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
-          <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
-          <div class="pause-menu-buttons">
-            <button id="resume-game" class="btn btn-primary">
-              <i class="fas fa-play me-2"></i>Devam Et
-            </button>
-            <button id="restart-game" class="btn btn-outline-primary">
-              <i class="fas fa-redo me-2"></i>Yeniden Başlat
-            </button>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-              <i class="fas fa-home me-2"></i>Ana Sayfa
-            </a>
-          </div>
+        <div class="results-message" id="result-message">
+          Tebrikler! İşitsel hafızanız ortalamadan daha iyi.
+        </div>
+
+        <div class="results-actions">
+          <button id="play-again" class="btn btn-primary">
+            <i class="fas fa-redo me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-home me-2"></i>Ana Sayfa
+          </a>
         </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+<style>
+  .audio-button-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 0 auto;
+    max-width: 400px;
+  }
+
+  .audio-button {
+    width: 100%;
+    padding-bottom: 100%; /* Kare oluştur */
+    position: relative;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .audio-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .audio-button.active {
+    transform: scale(0.95);
+    filter: brightness(1.3);
+  }
+
+  .final-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+  }
+
+  .final-stat-item {
+    text-align: center;
+  }
+
+  .final-stat-item i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #FFD700;
+  }
+
+  .final-stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .final-stat-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  .game-controls {
+    margin-top: 20px;
+  }
+  .pulse-animation {
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .game-results-container {
+    text-align: center;
+  }
+
+  .results-header {
+    margin-bottom: 20px;
+  }
+
+  .results-title {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+
+  .results-icon {
+    font-size: 4em;
+    color: #FFD700;
+  }
+
+  .results-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+
+  .result-stat {
+    text-align: center;
+  }
+
+  .result-value {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .result-label {
+    font-size: 1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .results-message {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+
+  .results-actions {
+    margin-top: 20px;
+  }
+
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .level-indicator {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  .game-controls-top {
+    display: flex;
+    gap: 10px;
+  }
+
+  .game-control-btn {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+
+  .game-control-btn.active i {
+    color: #007bff;
+  }
+  .game-control-btn i{
+    color:grey;
+  }
+  .audio-memory-alert{
+    margin-bottom: 15px;
+  }
+  .memory-tips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .tip-badge {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .tip-badge i {
+    color: #17a2b8;
+  }
+
+</style>
 {% endblock %}
 
 {% block scripts %}
