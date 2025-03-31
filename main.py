@@ -1587,7 +1587,7 @@ def get_leaderboard_data(game_type):
                 'level': calculate_level(score.score),  # Puana göre seviye hesapla
                 'experience_points': user.experience_points if user else 0,
                 'total_games_played': user.total_games_played if user else 0,
-                'avatar_url': user.avatar_url if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
+                'avatar_url': f"/static/{user.avatar_url}" if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
             })
 
         return score_list

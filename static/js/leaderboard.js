@@ -150,10 +150,28 @@ document.addEventListener('DOMContentLoaded', function() {
       // Sıralama bloğu
       const rankBlock = document.createElement('div');
       rankBlock.className = 'rank-block';
+      
+      // Top 3 için özel stiller ve taç ikonu
       if (index < 3) {
         rankBlock.classList.add(`rank-${index + 1}`);
+        
+        // Top 3 için taç/madalya ikonları
+        let trophyIcon = '';
+        if (index === 0) {
+          trophyIcon = '<i class="fas fa-crown crown-icon"></i>';
+        } else if (index === 1) {
+          trophyIcon = '<i class="fas fa-medal silver-medal"></i>';
+        } else if (index === 2) {
+          trophyIcon = '<i class="fas fa-medal bronze-medal"></i>';
+        }
+        
+        rankBlock.innerHTML = `
+          ${trophyIcon}
+          <div class="rank-number">${index + 1}</div>
+        `;
+      } else {
+        rankBlock.innerHTML = `<div class="rank-number">${index + 1}</div>`;
       }
-      rankBlock.innerHTML = `<div class="rank-number">${index + 1}</div>`;
 
       // Profil avatarı
       const playerAvatar = document.createElement('div');
@@ -165,16 +183,33 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // Avatar içeriği
-      const avatarContent = document.createElement('div');
-      avatarContent.className = 'avatar-content';
-      avatarContent.textContent = score.username.charAt(0).toUpperCase();
+      if (score.avatar_url) {
+        // Kullanıcının avatar'ı varsa onu göster
+        const avatarImg = document.createElement('img');
+        avatarImg.src = score.avatar_url;
+        avatarImg.className = 'avatar-image';
+        avatarImg.alt = score.username;
+        avatarImg.onerror = function() {
+          // Resim yüklenemezse harf göster
+          this.style.display = 'none';
+          const avatarContent = document.createElement('div');
+          avatarContent.className = 'avatar-content';
+          avatarContent.textContent = score.username.charAt(0).toUpperCase();
+          playerAvatar.appendChild(avatarContent);
+        };
+        playerAvatar.appendChild(avatarImg);
+      } else {
+        // Avatar yoksa baş harfi göster
+        const avatarContent = document.createElement('div');
+        avatarContent.className = 'avatar-content';
+        avatarContent.textContent = score.username.charAt(0).toUpperCase();
+        playerAvatar.appendChild(avatarContent);
+      }
 
       // Glow efekti
       const avatarGlow = document.createElement('div');
       avatarGlow.className = 'avatar-glow';
-
       playerAvatar.appendChild(avatarGlow);
-      playerAvatar.appendChild(avatarContent);
       rowContent.appendChild(playerAvatar);
 
 
@@ -182,11 +217,31 @@ document.addEventListener('DOMContentLoaded', function() {
       const playerInfo = document.createElement('div');
       playerInfo.className = 'player-info';
 
+      // Kullanıcı adı
       const playerName = document.createElement('div');
       playerName.className = 'player-name';
       playerName.textContent = score.username;
-
+      
+      // Kullanıcı seviyesi ve rank
+      const playerStats = document.createElement('div');
+      playerStats.className = 'player-stats';
+      
+      if (score.level) {
+        const levelBadge = document.createElement('span');
+        levelBadge.className = 'level-badge';
+        levelBadge.textContent = score.level;
+        playerStats.appendChild(levelBadge);
+      }
+      
+      if (score.total_games_played) {
+        const gamesBadge = document.createElement('span');
+        gamesBadge.className = 'games-badge';
+        gamesBadge.innerHTML = `<i class="fas fa-gamepad"></i> ${score.total_games_played}`;
+        playerStats.appendChild(gamesBadge);
+      }
+      
       playerInfo.appendChild(playerName);
+      playerInfo.appendChild(playerStats);
       rowContent.appendChild(playerInfo);
 
 
