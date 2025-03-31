@@ -1393,12 +1393,27 @@ def get_scores(game_type):
 
             for internal_game_type in game_types:
                 try:
-                    # Her oyun türü için en yüksek 10 skoru getir
+                    # Her oyun türü için kullanıcı başına en yüksek puanları bul
+                    max_scores_subquery = db.session.query(
+                        Score.user_id, 
+                        func.max(Score.score).label('max_score')
+                    ).filter_by(
+                        game_type=internal_game_type
+                    ).group_by(
+                        Score.user_id
+                    ).subquery()
+
+                    # Tam skor kayıtlarını ve kullanıcı bilgilerini getir
                     scores = db.session.query(Score, User).join(
+                        max_scores_subquery, 
+                        db.and_(
+                            Score.user_id == max_scores_subquery.c.user_id,
+                            Score.score == max_scores_subquery.c.max_score,
+                            Score.game_type == internal_game_type
+                        )
+                    ).join(
                         User, 
                         User.id == Score.user_id
-                    ).filter(
-                        Score.game_type == internal_game_type
                     ).order_by(
                         Score.score.desc()
                     ).limit(10).all()
@@ -1441,12 +1456,27 @@ def get_scores(game_type):
             if not internal_game_type:
                 return jsonify({'error': 'Invalid game type'}), 400
 
-            # En yüksek 10 skoru getir
+            # Önce her kullanıcı için maksimum skoru bulalım
+            max_scores_subquery = db.session.query(
+                Score.user_id, 
+                func.max(Score.score).label('max_score')
+            ).filter_by(
+                game_type=internal_game_type
+            ).group_by(
+                Score.user_id
+            ).subquery()
+
+            # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
             scores = db.session.query(Score, User).join(
+                max_scores_subquery, 
+                db.and_(
+                    Score.user_id == max_scores_subquery.c.user_id,
+                    Score.score == max_scores_subquery.c.max_score,
+                    Score.game_type == internal_game_type
+                )
+            ).join(
                 User, 
                 User.id == Score.user_id
-            ).filter(
-                Score.game_type == internal_game_type
             ).order_by(
                 Score.score.desc()
             ).limit(10).all()
