@@ -1,0 +1,699 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ get_current_user().username }} - Profil | OmGame{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-header-content">
+      <div class="profile-avatar-container">
+        {% if get_avatar_url() %}
+        <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ get_current_user().username }}" class="profile-avatar">
+        {% else %}
+        <div class="profile-avatar profile-avatar-placeholder">
+          <i class="fas fa-user fa-3x"></i>
+        </div>
+        {% endif %}
+        <a href="#" class="profile-avatar-edit" data-bs-toggle="modal" data-bs-target="#avatarModal">
+          <i class="fas fa-camera"></i>
+        </a>
+      </div>
+      
+      <div class="profile-user-info">
+        <h1 class="profile-username">{{ get_current_user().username }}</h1>
+        <div class="profile-email">
+          <i class="fas fa-envelope"></i>
+          <span>{{ get_current_user().email }}</span>
+        </div>
+        
+        <div class="profile-bio">
+          <span class="profile-bio-icon">Hakkımda</span>
+          {% if get_current_user().bio %}
+          {{ get_current_user().bio }}
+          {% else %}
+          <span class="profile-bio-empty">Henüz bir bio eklenmedi.</span>
+          {% endif %}
+        </div>
+        
+        <div class="profile-actions">
+          <a href="#" class="profile-action-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit"></i>
+            <span>Profili Düzenle</span>
+          </a>
+          <a href="#" class="profile-action-btn" data-bs-toggle="modal" data-bs-target="#passwordModal">
+            <i class="fas fa-key"></i>
+            <span>Şifre Değiştir</span>
+          </a>
+          <a href="#" class="profile-action-btn danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+            <i class="fas fa-trash-alt"></i>
+            <span>Hesabı Sil</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <div class="theme-toggle-container">
+    <label class="theme-toggle">
+      <input type="checkbox" id="themeToggle" {% if get_current_user().theme_preference == 'light' %}checked{% endif %}>
+      <span class="theme-slider"></span>
+    </label>
+  </div>
+
+  <!-- Profile Stats -->
+  <div class="profile-stats-container">
+    <div class="profile-stat-card">
+      <i class="fas fa-trophy profile-stat-icon"></i>
+      <div class="profile-stat-value">{{ get_current_user().highest_score }}</div>
+      <div class="profile-stat-label">En Yüksek Skor</div>
+    </div>
+    
+    <div class="profile-stat-card">
+      <i class="fas fa-gamepad profile-stat-icon"></i>
+      <div class="profile-stat-value">{{ get_current_user().total_games_played }}</div>
+      <div class="profile-stat-label">Toplam Oyun</div>
+    </div>
+    
+    <div class="profile-stat-card">
+      <i class="fas fa-star profile-stat-icon"></i>
+      <div class="profile-stat-value">{{ get_current_user().experience_points }}</div>
+      <div class="profile-stat-label">Deneyim Puanı</div>
+    </div>
+    
+    <div class="profile-stat-card">
+      <i class="fas fa-crown profile-stat-icon"></i>
+      <div class="profile-stat-value">{{ get_current_user().rank }}</div>
+      <div class="profile-stat-label">Rütbe</div>
+    </div>
+  </div>
+
+  <!-- Tabs System -->
+  <div class="profile-tabs">
+    <div class="tabs-container">
+      <div class="profile-tab active" data-tab="games">
+        <i class="fas fa-gamepad"></i>
+        <span>Oyun İstatistikleri</span>
+      </div>
+      <div class="profile-tab" data-tab="achievements">
+        <i class="fas fa-trophy"></i>
+        <span>Başarılar</span>
+      </div>
+      <div class="profile-tab" data-tab="history">
+        <i class="fas fa-history"></i>
+        <span>Oyun Geçmişi</span>
+      </div>
+      <div class="profile-tab" data-tab="settings">
+        <i class="fas fa-cog"></i>
+        <span>Ayarlar</span>
+      </div>
+      <div class="tab-indicator"></div>
+    </div>
+    
+    <!-- Game Stats Tab -->
+    <div class="tab-content active" id="games-tab">
+      <h2 class="section-title">
+        <i class="fas fa-chart-bar"></i>
+        <span>Oyun İstatistikleri</span>
+      </h2>
+      <div class="game-stat-cards">
+        {% set user_scores = get_user_scores() %}
+        
+        {% if 'wordPuzzle' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-spell-check"></i>
+            </div>
+            <div class="game-stat-title">Kelime Bulmaca</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['wordPuzzle'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['wordPuzzle_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if 'memoryMatch' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-clone"></i>
+            </div>
+            <div class="game-stat-title">Hafıza Kartları</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['memoryMatch'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['memoryMatch_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if 'labyrinth' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-route"></i>
+            </div>
+            <div class="game-stat-title">Labirent</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['labyrinth'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['labyrinth_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if 'puzzle' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <div class="game-stat-title">Yapboz</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['puzzle'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['puzzle_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if 'numberSequence' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-sort-numeric-up"></i>
+            </div>
+            <div class="game-stat-title">Sayı Dizisi</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['numberSequence'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['numberSequence_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if '3dLabyrinth' in user_scores %}
+        <div class="game-stat-card">
+          <div class="game-stat-header">
+            <div class="game-stat-icon">
+              <i class="fas fa-cube"></i>
+            </div>
+            <div class="game-stat-title">3D Labirent</div>
+          </div>
+          <div class="game-stat-body">
+            <div class="stat-item">
+              <div class="stat-name">En Yüksek Skor</div>
+              <div class="stat-value best-score">{{ user_scores['3dLabyrinth'] }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-name">Son Oynanma</div>
+              <div class="stat-value">{{ user_scores['3dLabyrinth_date']|default('--') }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Achievements Tab -->
+    <div class="tab-content" id="achievements-tab">
+      <h2 class="section-title">
+        <i class="fas fa-medal"></i>
+        <span>Başarılar</span>
+      </h2>
+      <div class="achievements-grid">
+        <div class="achievement-card">
+          <div class="achievement-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="achievement-name">Başlangıç</div>
+          <div class="achievement-desc">İlk oyununu tamamla</div>
+        </div>
+        
+        <div class="achievement-card achievement-locked">
+          <div class="achievement-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="achievement-name">Hafıza Uzmanı</div>
+          <div class="achievement-desc">Hafıza oyununda 1000 puan geç</div>
+        </div>
+        
+        <div class="achievement-card achievement-locked">
+          <div class="achievement-icon">
+            <i class="fas fa-puzzle-piece"></i>
+          </div>
+          <div class="achievement-name">Yapboz Ustası</div>
+          <div class="achievement-desc">10 yapboz tamamla</div>
+        </div>
+        
+        <div class="achievement-card achievement-locked">
+          <div class="achievement-icon">
+            <i class="fas fa-route"></i>
+          </div>
+          <div class="achievement-name">Labirent Kaşifi</div>
+          <div class="achievement-desc">5 farklı labirenti tamamla</div>
+        </div>
+        
+        <div class="achievement-card achievement-locked">
+          <div class="achievement-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="achievement-name">Yıldız Öğrenci</div>
+          <div class="achievement-desc">Tüm oyunlarda en az 500 puan kazan</div>
+        </div>
+        
+        <div class="achievement-card achievement-locked">
+          <div class="achievement-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="achievement-name">Şampiyon</div>
+          <div class="achievement-desc">Liderlik tablosunda ilk 10'a gir</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- History Tab -->
+    <div class="tab-content" id="history-tab">
+      <h2 class="section-title">
+        <i class="fas fa-history"></i>
+        <span>Oyun Geçmişi</span>
+      </h2>
+      <div class="table-responsive">
+        <table class="games-table">
+          <thead>
+            <tr>
+              <th>Oyun</th>
+              <th>Skor</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for score in get_current_user().scores[-10:]|reverse %}
+            <tr>
+              <td>
+                <div class="game-type">
+                  <div class="game-icon">
+                    {% if score.game_type == 'wordPuzzle' %}
+                    <i class="fas fa-spell-check"></i>
+                    {% elif score.game_type == 'memoryMatch' %}
+                    <i class="fas fa-clone"></i>
+                    {% elif score.game_type == 'labyrinth' %}
+                    <i class="fas fa-route"></i>
+                    {% elif score.game_type == 'puzzle' %}
+                    <i class="fas fa-puzzle-piece"></i>
+                    {% elif score.game_type == 'numberSequence' %}
+                    <i class="fas fa-sort-numeric-up"></i>
+                    {% elif score.game_type == '3dLabyrinth' %}
+                    <i class="fas fa-cube"></i>
+                    {% else %}
+                    <i class="fas fa-gamepad"></i>
+                    {% endif %}
+                  </div>
+                  {% if score.game_type == 'wordPuzzle' %}
+                  Kelime Bulmaca
+                  {% elif score.game_type == 'memoryMatch' %}
+                  Hafıza Kartları
+                  {% elif score.game_type == 'labyrinth' %}
+                  Labirent
+                  {% elif score.game_type == 'puzzle' %}
+                  Yapboz
+                  {% elif score.game_type == 'numberSequence' %}
+                  Sayı Dizisi
+                  {% elif score.game_type == '3dLabyrinth' %}
+                  3D Labirent
+                  {% else %}
+                  {{ score.game_type }}
+                  {% endif %}
+                </div>
+              </td>
+              <td class="score-cell">{{ score.score }}</td>
+              <td class="date-cell">{{ score.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings-tab">
+      <h2 class="section-title">
+        <i class="fas fa-cog"></i>
+        <span>Hesap Ayarları</span>
+      </h2>
+      
+      <div class="settings-form">
+        <div class="form-section">
+          <h3 class="form-section-title">Profil Bilgileri</h3>
+          <form action="{{ url_for('update_profile') }}" method="post">
+            <div class="form-group">
+              <label for="username" class="form-label">Kullanıcı Adı</label>
+              <input type="text" class="form-control" id="username" name="username" value="{{ get_current_user().username }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="email" class="form-label">E-posta</label>
+              <input type="email" class="form-control" id="email" name="email" value="{{ get_current_user().email }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="full_name" class="form-label">Tam İsim</label>
+              <input type="text" class="form-control" id="full_name" name="full_name" value="{{ get_current_user().full_name or '' }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="bio" class="form-label">Hakkımda</label>
+              <textarea class="form-control" id="bio" name="bio" rows="3">{{ get_current_user().bio or '' }}</textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Avatar Upload Modal -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Profil Fotoğrafını Değiştir</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('update_avatar') }}" method="post" enctype="multipart/form-data">
+          <div class="text-center mb-4">
+            <div class="avatar-preview mx-auto">
+              {% if get_avatar_url() %}
+              <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil Resmi" class="profile-upload-preview" id="avatarPreview">
+              {% else %}
+              <div class="profile-upload-preview d-flex align-items-center justify-content-center bg-secondary" id="avatarPreview">
+                <i class="fas fa-user fa-3x text-white"></i>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="avatar" class="form-label">Yeni Fotoğraf Seç</label>
+            <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*">
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Fotoğrafı Güncelle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Profili Düzenle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('update_profile') }}" method="post">
+          <div class="mb-3">
+            <label for="modal_username" class="form-label">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="modal_username" name="username" value="{{ get_current_user().username }}">
+          </div>
+          
+          <div class="mb-3">
+            <label for="modal_email" class="form-label">E-posta</label>
+            <input type="email" class="form-control" id="modal_email" name="email" value="{{ get_current_user().email }}">
+          </div>
+          
+          <div class="mb-3">
+            <label for="modal_full_name" class="form-label">Tam İsim</label>
+            <input type="text" class="form-control" id="modal_full_name" name="full_name" value="{{ get_current_user().full_name or '' }}">
+          </div>
+          
+          <div class="mb-3">
+            <label for="modal_bio" class="form-label">Hakkımda</label>
+            <textarea class="form-control" id="modal_bio" name="bio" rows="3">{{ get_current_user().bio or '' }}</textarea>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Şifre Değiştir</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('update_password') }}" method="post">
+          <div class="mb-3">
+            <label for="current_password" class="form-label">Mevcut Şifre</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="new_password" class="form-label">Yeni Şifre</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="confirm_password" class="form-label">Şifre (Tekrar)</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Hesabı Sil</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Uyarı:</strong> Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve tüm verileriniz silinecektir.
+        </div>
+        
+        <form action="{{ url_for('delete_account') }}" method="post">
+          <div class="mb-3">
+            <label for="delete_password" class="form-label">Silme işlemini onaylamak için şifrenizi girin</label>
+            <input type="password" class="form-control" id="delete_password" name="password" required>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger">Hesabımı Kalıcı Olarak Sil</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab system
+  const tabs = document.querySelectorAll('.profile-tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const tabIndicator = document.querySelector('.tab-indicator');
+  
+  function positionTabIndicator(activeTab) {
+    if (!tabIndicator || !activeTab) return;
+    const parentLeft = activeTab.parentElement.getBoundingClientRect().left;
+    const tabRect = activeTab.getBoundingClientRect();
+    const left = tabRect.left - parentLeft;
+    
+    tabIndicator.style.left = left + 'px';
+    tabIndicator.style.width = tabRect.width + 'px';
+  }
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and contents
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      // Add active class to clicked tab
+      tab.classList.add('active');
+      
+      // Show corresponding content
+      const tabId = tab.getAttribute('data-tab');
+      document.getElementById(tabId + '-tab').classList.add('active');
+      
+      // Move the indicator
+      positionTabIndicator(tab);
+    });
+  });
+  
+  // Initialize tab indicator position
+  positionTabIndicator(document.querySelector('.profile-tab.active'));
+  
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('change', function() {
+      const theme = this.checked ? 'light' : 'dark';
+      document.documentElement.className = theme;
+      
+      // Save theme preference via AJAX
+      fetch('/update_theme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ theme: theme })
+      });
+    });
+  }
+  
+  // Avatar preview
+  const avatarInput = document.getElementById('avatar');
+  const avatarPreview = document.getElementById('avatarPreview');
+  
+  if (avatarInput && avatarPreview) {
+    avatarInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if (avatarPreview.tagName === 'IMG') {
+            avatarPreview.src = e.target.result;
+          } else {
+            // If it's a div (placeholder), replace with an img
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.id = 'avatarPreview';
+            img.className = 'profile-upload-preview';
+            img.alt = 'Profil Resmi';
+            avatarPreview.parentNode.replaceChild(img, avatarPreview);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  
+  // Handle form submissions with AJAX for modals
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      // Skip the delete account form
+      if (form.action.includes('delete_account')) return;
+      
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const url = form.action;
+      const method = form.method;
+      
+      fetch(url, {
+        method: method,
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Close any open modals
+        const modalElement = form.closest('.modal');
+        if (modalElement) {
+          const modalInstance = bootstrap.Modal.getInstance(modalElement);
+          modalInstance.hide();
+        }
+        
+        // Show success message
+        if (data.success) {
+          Swal.fire({
+            title: 'Başarılı!',
+            text: data.message,
+            icon: 'success',
+            confirmButtonText: 'Tamam'
+          }).then(() => {
+            // Reload page if requested
+            if (data.reload) {
+              window.location.reload();
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'Hata!',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: 'Tamam'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Bir hata oluştu:', error);
+        Swal.fire({
+          title: 'Hata!',
+          text: 'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+          icon: 'error',
+          confirmButtonText: 'Tamam'
+        });
+      });
+    });
+  });
+});
+</script>
+{% endblock %}
