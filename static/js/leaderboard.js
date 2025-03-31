@@ -1,143 +1,182 @@
+
 document.addEventListener('DOMContentLoaded', function() {
-  loadAllScores();
-});
+  loadLeaderboard('all');
 
-// Tüm skorları yükleyen fonksiyon
-function loadAllScores() {
-  fetch('/api/leaderboard/all')
-    .then(response => response.json())
-    .then(data => {
-      console.log("Tüm yüklenen skorlar:", data);
-      processScores(data);
-    })
-    .catch(error => {
-      console.error('Skor yükleme hatası:', error);
-      document.querySelector('.loading').innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <p>Skorlar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
-      `;
-    });
-}
-
-// Tüm skorları işleyerek toplam skorları hesaplar
-function processScores(gameScores) {
-  // Tüm oyunların skorlarını toplamak için kullanıcı bazlı bir harita oluştur
-  const userTotals = new Map();
-
-  // Tüm oyun türlerini döngüyle kontrol et
-  Object.keys(gameScores).forEach(gameType => {
-    // Her oyun için skorları kontrol et
-    gameScores[gameType].forEach(score => {
-      const userId = score.user_id;
-      const username = score.username || 'Anonim';
-      const rank = score.rank || 'Başlangıç';
-      const scoreValue = parseInt(score.score);
-
-      // Kullanıcı haritada yoksa ekle
-      if (!userTotals.has(userId)) {
-        userTotals.set(userId, {
-          user_id: userId,
-          username: username,
-          rank: rank,
-          total_score: 0,
-          games_played: new Set(),
-          last_activity: new Date(0)
-        });
-      }
-
-      // Kullanıcının toplam puanını güncelle
-      const userInfo = userTotals.get(userId);
-      userInfo.total_score += scoreValue;
-      userInfo.games_played.add(gameType);
-
-      // Son aktivite zamanını güncelle
-      const scoreDate = new Date(score.timestamp);
-      if (scoreDate > userInfo.last_activity) {
-        userInfo.last_activity = scoreDate;
-      }
-    });
-  });
-
-  // Kullanıcı haritasını diziye çevir ve toplam puana göre sırala
-  const sortedUsers = Array.from(userTotals.values())
-    .sort((a, b) => b.total_score - a.total_score)
-    .map(user => ({
-      ...user,
-      games_played: user.games_played.size,
-      last_activity: user.last_activity
-    }));
-
-  // Skor tablosunu oluştur
-  renderLeaderboard(sortedUsers);
-}
-
-// Skor tablosunu ekrana çizen fonksiyon
-function renderLeaderboard(users) {
-  const container = document.getElementById('leaderboardContainer');
-
-  if (users.length === 0) {
+  // Sayfa yenilendiğinde veya veri yüklendiğinde göstermek için yükleme animasyonu
+  function showLoading() {
+    const container = document.getElementById('leaderboardContainer');
     container.innerHTML = `
-      <div class="no-scores">
-        <i class="fas fa-trophy-alt"></i>
-        <h3>Henüz skor kaydedilmemiş</h3>
-        <p>Oyunlar oynayarak skor tablosunda yerinizi alabilirsiniz.</p>
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Skorlar yükleniyor...</p>
       </div>
     `;
-    return;
   }
 
-  // Skor tablosu oluştur
-  container.innerHTML = `
-    <div class="leaderboard-card total-leaderboard">
-      <div class="card-header">
-        <h3>Genel Sıralama</h3>
-        <span class="header-divider"></span>
-      </div>
-      <div class="card-body">
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th class="rank-header">Sıra</th>
-              <th class="player-header">Oyuncu</th>
-              <th class="score-header">Toplam Puan</th>
-              <th class="games-header">Oynadığı Oyunlar</th>
-              <th class="date-header">Son Aktivite</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${users.map((user, index) => `
-              <tr class="player-row ${index < 3 ? 'top-' + (index + 1) : ''}">
-                <td class="rank-cell ${index < 3 ? 'rank-' + (index + 1) : ''}">
-                  <span class="rank-number">${index + 1}</span>
-                </td>
-                <td class="player-cell">
-                  <div class="player-avatar">
-                    ${user.username ? user.username.substring(0, 1).toUpperCase() : 'A'}
-                  </div>
-                  <div class="player-info">
-                    <div class="player-name">${user.username || 'Anonim'}</div>
-                    <div class="player-rank"><span>${user.rank || 'Başlangıç'}</span></div>
-                  </div>
-                </td>
-                <td class="score-cell">
-                  <span class="score-value">${user.total_score}</span>
-                </td>
-                <td class="games-played-cell">${user.games_played}</td>
-                <td class="date-cell">${formatDate(user.last_activity)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
+  // Skoru alma işlemini gerçekleştiren fonksiyon
+  function loadLeaderboard(gameType) {
+    showLoading();
+    
+    console.log('Skor yükleniyor:', gameType);
+    
+    fetch(`/api/leaderboard/${gameType}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Tüm yüklenen skorlar:', data);
+        displayLeaderboard(data, gameType);
+      })
+      .catch(error => {
+        console.log('Error loading scores:', error);
+        document.getElementById('leaderboardContainer').innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Skor tablosu yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
+          </div>
+        `;
+      });
+  }
 
-// Tarihi formatlayan yardımcı fonksiyon
-function formatDate(date) {
-  return new Date(date).toLocaleDateString('tr-TR', {
-    year: 'numeric',
-    month: 'short', 
-    day: 'numeric'
-  });
-}
+  // Tablo oluşturma fonksiyonu
+  function displayLeaderboard(data, gameType) {
+    const container = document.getElementById('leaderboardContainer');
+    container.innerHTML = '';
+
+    // Tüm oyunlar için toplam skoru hesapla
+    const allScores = [];
+    
+    if (gameType === 'all') {
+      // Her kullanıcı için tüm oyunlardan topladığı puanı hesapla
+      const userScores = {};
+      
+      // Tüm oyun türlerini döngüye al
+      Object.keys(data).forEach(gt => {
+        if (!Array.isArray(data[gt])) return;
+        
+        // Her oyun türündeki skorları döngüye al
+        data[gt].forEach(score => {
+          const userId = score.user_id;
+          const username = score.username;
+          const scoreValue = parseInt(score.score);
+          
+          // Kullanıcı henüz dizide yoksa ekle
+          if (!userScores[userId]) {
+            userScores[userId] = {
+              user_id: userId,
+              username: username,
+              total_score: 0,
+              games_played: 0
+            };
+          }
+          
+          // Kullanıcının toplam skorunu güncelle
+          userScores[userId].total_score += scoreValue;
+          userScores[userId].games_played += 1;
+        });
+      });
+      
+      // Objeyi diziye çevir ve puanlarına göre sırala
+      Object.values(userScores).forEach(user => {
+        allScores.push({
+          user_id: user.user_id,
+          username: user.username,
+          score: user.total_score,
+          games_played: user.games_played
+        });
+      });
+      
+      // Puanlara göre sırala (yüksekten düşüğe)
+      allScores.sort((a, b) => b.score - a.score);
+    } else {
+      // Belirli bir oyun türü için skorları al ve sırala
+      const scores = Array.isArray(data) ? data : [];
+      scores.sort((a, b) => b.score - a.score);
+      allScores.push(...scores);
+    }
+
+    if (allScores.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-trophy"></i>
+          <p>Henüz skor bulunmuyor. İlk skorunu kaydetmek için oyun oynamaya başla!</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Tablo oluştur
+    const leaderboardCard = document.createElement('div');
+    leaderboardCard.className = 'leaderboard-card';
+    leaderboardCard.style.display = 'block';
+
+    const tableTitle = document.createElement('h2');
+    tableTitle.className = 'leaderboard-title';
+    tableTitle.textContent = 'Genel Sıralama';
+    leaderboardCard.appendChild(tableTitle);
+
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'leaderboard-table-container';
+    
+    const table = document.createElement('table');
+    table.className = 'leaderboard-table';
+    
+    // Tablo başlığı
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = ['Sıra', 'Oyuncu', 'Puan'];
+    headers.forEach(header => {
+      const th = document.createElement('th');
+      th.textContent = header;
+      headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Tablo gövdesi
+    const tbody = document.createElement('tbody');
+    
+    allScores.forEach((score, index) => {
+      const row = document.createElement('tr');
+      row.className = 'player-row';
+      row.dataset.rank = index + 1;
+      
+      // Sıra hücresi
+      const rankCell = document.createElement('td');
+      rankCell.className = 'rank-cell';
+      if (index < 3) {
+        rankCell.classList.add(`rank-${index + 1}`);
+      }
+      rankCell.innerHTML = `<span>${index + 1}</span>`;
+      row.appendChild(rankCell);
+      
+      // Oyuncu hücresi
+      const playerCell = document.createElement('td');
+      playerCell.className = 'player-cell';
+      
+      const playerInfo = document.createElement('div');
+      playerInfo.className = 'player-info';
+      
+      const playerName = document.createElement('div');
+      playerName.className = 'player-name';
+      playerName.textContent = score.username;
+      
+      playerInfo.appendChild(playerName);
+      playerCell.appendChild(playerInfo);
+      row.appendChild(playerCell);
+      
+      // Puan hücresi
+      const scoreCell = document.createElement('td');
+      scoreCell.className = 'score-cell';
+      scoreCell.innerHTML = `<span>${score.score}</span>`;
+      row.appendChild(scoreCell);
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+    leaderboardCard.appendChild(tableContainer);
+    container.appendChild(leaderboardCard);
+  }
+});

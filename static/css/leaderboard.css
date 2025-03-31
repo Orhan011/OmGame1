@@ -1,9 +1,4 @@
-/* Leaderboard Page Styles */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
+/* Leaderboard Styles */
 .leaderboard-header {
   margin-bottom: 3rem;
   text-align: center;
@@ -31,421 +26,279 @@
   margin: 0 auto 2rem;
 }
 
-.leaderboard-container {
-  background: rgba(26, 26, 46, 0.7);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.leaderboard-card-container {
-  width: 100%;
-}
-
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  color: #8a8aa3;
-  font-size: 1.2rem;
-}
-
-.loading i {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #6a5ae0;
-}
-
-.no-scores {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  color: #8a8aa3;
-  text-align: center;
-}
-
-.no-scores i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #6a5ae0;
-}
-
-.no-scores h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #fff;
-}
-
+/* Leaderboard Card styles */
 .leaderboard-card {
   background: rgba(33, 33, 61, 0.4);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin-bottom: 2rem;
-  border: 1px solid rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 30px;
   transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.leaderboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(106, 90, 224, 0.3);
-}
-
-.card-header {
-  background: linear-gradient(135deg, rgba(106, 90, 224, 0.9), rgba(90, 103, 216, 0.8));
-  padding: 1.5rem;
-  position: relative;
-}
-
-.card-header h3 {
+.leaderboard-title {
+  padding: 20px;
   color: #fff;
   font-size: 1.5rem;
   font-weight: 700;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  background: rgba(35, 35, 65, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.header-divider {
-  display: block;
-  height: 3px;
-  width: 50px;
-  background: rgba(255, 255, 255, 0.5);
-  margin-top: 0.8rem;
-}
-
-.card-body {
-  padding: 0;
+.leaderboard-table-container {
+  padding: 0 20px 20px;
+  overflow-x: auto;
 }
 
 .leaderboard-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
 }
 
 .leaderboard-table th {
-  background: rgba(33, 33, 61, 0.6);
-  color: #fff;
-  font-weight: 600;
+  padding: 15px 20px;
   text-align: left;
-  padding: 1rem 1.5rem;
+  color: #a6a6c0;
+  font-weight: 600;
   font-size: 0.9rem;
-  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.leaderboard-table td {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+.leaderboard-table tr.player-row {
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.player-row {
-  transition: all 0.2s ease;
+.leaderboard-table tr.player-row td {
+  padding: 15px 20px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.player-row:hover {
+.leaderboard-table tr.player-row:hover td {
   background-color: rgba(106, 90, 224, 0.1);
-  transform: translateY(-2px);
 }
 
 .rank-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
   width: 60px;
-  font-weight: 800;
-  font-size: 1.4rem;
   position: relative;
 }
 
-.rank-cell .rank-number {
-  background: linear-gradient(135deg, #6a5ae0, #ff9c64);
+.rank-1, .rank-2, .rank-3 {
+  color: #fff;
+}
+
+.rank-1 span {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  position: relative;
-  z-index: 1;
+  font-weight: 800;
 }
 
-.rank-cell .rank-number:after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #6a5ae0, transparent);
-  z-index: -1;
-}
-
-.top-1 {
-  background: rgba(255, 215, 0, 0.05);
-}
-
-.top-2 {
-  background: rgba(192, 192, 192, 0.05);
-}
-
-.top-3 {
-  background: rgba(205, 127, 50, 0.05);
-}
-
-.rank-1 .rank-number {
-  background: linear-gradient(135deg, #ffd700, #ffb347);
+.rank-2 span {
+  background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
+  font-weight: 800;
 }
 
-.rank-2 .rank-number {
-  background: linear-gradient(135deg, #c0c0c0, #e0e0e0);
+.rank-3 span {
+  background: linear-gradient(135deg, #CD7F32, #B87333);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
-}
-
-.rank-3 .rank-number {
-  background: linear-gradient(135deg, #cd7f32, #e9967a);
-  -webkit-background-clip: text;
-  color: transparent;
+  font-weight: 800;
 }
 
 .player-cell {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 15px;
 }
 
 .player-avatar {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
   font-weight: 700;
+  color: #fff;
   font-size: 1.2rem;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-  overflow: hidden;
-  position: relative;
-}
-
-.player-avatar::after {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-  transform: rotate(45deg) translateX(-100%);
-  transition: transform 0.6s ease;
-}
-
-.player-row:hover .player-avatar::after {
-  transform: rotate(45deg) translateX(100%);
-}
-
-.top-1 .player-avatar {
-  background: linear-gradient(45deg, #ffd700, #ffb347);
-  border: 3px solid rgba(255, 215, 0, 0.3);
-  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
 }
 
 .player-info {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
 }
 
 .player-name {
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.2rem;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .player-rank {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.player-rank span {
-  padding: 0.2rem 0.6rem;
-  background: rgba(106, 90, 224, 0.2);
-  border-radius: 20px;
-  font-size: 0.75rem;
+  color: #8a8aa3;
+  font-size: 0.85rem;
 }
 
 .score-cell {
   font-weight: 700;
-  font-size: 1.3rem;
-  color: #6a5ae0;
-  position: relative;
-}
-
-.score-value {
-  display: inline-block;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.player-row:hover .score-value {
-  transform: scale(1.1);
-}
-
-.games-played-cell {
-  font-weight: 600;
-  color: #8a8aa3;
-  text-align: center;
+  font-size: 1.1rem;
+  text-align: right;
+  color: #fff;
 }
 
 .date-cell {
   color: #8a8aa3;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  text-align: right;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-  .leaderboard-container {
-    padding: 1.5rem;
-  }
-
-  .card-header {
-    padding: 1.2rem;
-  }
-
-  .leaderboard-table th,
-  .leaderboard-table td {
-    padding: 1rem;
-  }
-
-  .player-avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
-  }
-
-  .player-name {
-    font-size: 1.1rem;
-  }
+/* Empty state & Loading */
+.empty-state, .loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: rgba(33, 33, 61, 0.4);
+  border-radius: 16px;
+  min-height: 200px;
+  text-align: center;
 }
 
+.empty-state i, .loading i {
+  font-size: 3rem;
+  color: #6a5ae0;
+  margin-bottom: 20px;
+}
+
+.loading i {
+  animation: rotate 1.5s linear infinite;
+}
+
+.empty-state p, .loading p {
+  color: #8a8aa3;
+  font-size: 1.1rem;
+  max-width: 400px;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+tr[data-rank="1"] td, tr[data-rank="2"] td, tr[data-rank="3"] td {
+  animation: pulse 2s infinite;
+}
+
+/* Pulsing glow effect for top ranks */
+tr[data-rank="1"] {
+  animation-delay: 0s;
+}
+
+tr[data-rank="2"] {
+  animation-delay: 0.3s;
+}
+
+tr[data-rank="3"] {
+  animation-delay: 0.6s;
+}
+
+.refreshing i {
+  animation: rotate 1s linear infinite;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .leaderboard-container {
-    padding: 1rem;
-  }
-
-  .card-header h3 {
-    font-size: 1.3rem;
-  }
-
   .leaderboard-table th,
   .leaderboard-table td {
-    padding: 0.8rem;
+    padding: 12px 10px;
   }
 
-  .player-cell {
-    gap: 0.8rem;
-  }
-
-  .player-avatar {
+  .rank-cell {
     width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-
-  .player-name {
-    font-size: 1rem;
-  }
-
-  .player-rank {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-
-  .score-cell {
-    font-size: 1.1rem;
-  }
-
-  .date-cell,
-  .games-played-cell {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .leaderboard-header h1 {
-    font-size: 2rem;
-  }
-
-  .leaderboard-header p {
-    font-size: 1rem;
-  }
-
-  .leaderboard-container {
-    padding: 0.7rem;
-  }
-
-  .card-header {
-    padding: 1rem;
-  }
-
-  .leaderboard-table {
-    display: block;
-    overflow-x: auto;
-  }
-
-  .leaderboard-table th,
-  .leaderboard-table td {
-    padding: 0.7rem 0.5rem;
-    white-space: nowrap;
   }
 
   .player-avatar {
     width: 35px;
     height: 35px;
-    font-size: 0.9rem;
-  }
-
-  .rank-cell {
-    width: 40px;
-    font-size: 1.1rem;
-  }
-
-  .score-cell {
     font-size: 1rem;
   }
 
-  .games-played-cell,
-  .date-cell {
-    font-size: 0.8rem;
+  .leaderboard-title {
+    font-size: 1.3rem;
   }
 }
 
-/* Toplam skor tablosu için stiller */
-.total-leaderboard {
-  border: 2px solid rgba(106, 90, 224, 0.7);
-  box-shadow: 0 0 25px rgba(106, 90, 224, 0.3);
-}
+@media (max-width: 576px) {
+  .leaderboard-table {
+    display: block;
+  }
 
-.total-leaderboard .card-header {
-  background: linear-gradient(135deg, #6a5ae0, #8063f5);
-}
+  .leaderboard-table thead {
+    display: none;
+  }
 
-.total-leaderboard .card-header h3 {
-  font-size: 1.6rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
+  .leaderboard-table tbody,
+  .leaderboard-table tr,
+  .leaderboard-table td {
+    display: block;
+    width: 100%;
+  }
 
-/*These styles are removed because they are no longer relevant after removing the game-tabs and multiple leaderboard sections. */
-/*.game-tabs, .nav-container, .game-tab, .game-tab:hover, .game-tab.active, .game-tab.active::after, .game-tab i, .game-tab:hover i, .leaderboard-table-container, .leaderboard-table th, .leaderboard-table tr.player-row, .leaderboard-table tr.player-row td, .leaderboard-table tr.player-row:hover td, .leaderboard-table tr.player-row td:first-child, .leaderboard-table tr.player-row td:last-child, .rank-cell, .rank-1, .rank-2, .rank-3, .avatar-cell, .player-avatar, .player-info, .player-name, .player-rank, .score-cell, .date-cell, .empty-state, .empty-state i, .empty-state p, @keyframes fadeIn, @media (max-width: 992px), @media (max-width: 768px), @media (max-width: 576px), .refreshing i, tr[data-rank="1"] td, tr[data-rank="2"] td, tr[data-rank="3"] td, @keyframes pulse, @keyframes rotate*/
+  .leaderboard-table tr {
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+  }
+
+  .leaderboard-table td {
+    text-align: right;
+    padding: 10px;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .leaderboard-table td:last-child {
+    border-bottom: none;
+  }
+
+  .leaderboard-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: 700;
+    color: #6a5ae0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+
+  .player-cell {
+    justify-content: flex-end;
+  }
+}
