@@ -1268,46 +1268,43 @@ def save_score():
     original_level = user.experience_points // 1000 + 1
     xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
 
+    from sqlalchemy import func
+    
     is_high_score = False
 
-    # Önce mevcut skoru kontrol et
-    existing_score = Score.query.filter_by(
+    # Her oyun için yeni bir skor kaydı oluştur
+    new_score = Score(
+        user_id=user_id,
+        game_type=game_type,
+        score=data['score']
+    )
+
+    db.session.add(new_score)
+
+    # Kullanıcının bu oyun için en yüksek skorunu bul
+    highest_game_score = db.session.query(func.max(Score.score)).filter_by(
         user_id=user_id,
         game_type=game_type
-    ).first()
+    ).scalar() or 0
 
-    if existing_score:
-        # Eğer yeni skor daha yüksekse, mevcut skoru güncelle
-        if data['score'] > existing_score.score:
-            existing_score.score = data['score']
-            existing_score.timestamp = datetime.utcnow()  # Ayrıca zaman damgasını da güncelle
+    # Eğer yeni skor, bu oyun için en yüksek skorsa, bonus XP ekle
+    if data['score'] > highest_game_score:
+        xp_gain += 20
+        is_high_score = True
 
-            # Yeni rekor kırdığı için ekstra XP
-            xp_gain += 20
-            is_high_score = True
+    # Kullanıcının tüm zamanların en yüksek skorunu kontrol et ve güncelle
+    if data['score'] > user.highest_score:
+        user.highest_score = data['score']
 
-            # En yüksek skor güncelleme
-            if data['score'] > user.highest_score:
-                user.highest_score = data['score']
-        else:
-            # Yeni skor daha düşükse, XP kazancını azalt ama yine de ver
-            xp_gain = xp_gain // 2
-    else:
-        # İlk kez oynuyorsa yeni skor kaydı oluştur
-        new_score = Score(
-            user_id=user_id,
-            game_type=game_type,
-            score=data['score']
-        )
+    # İlk kez oynama kontrolü
+    game_play_count = Score.query.filter_by(
+        user_id=user_id,
+        game_type=game_type
+    ).count()
 
-        db.session.add(new_score)
-
-        # İlk defa oynamak için bonus XP
+    # İlk defa oynamak için bonus XP (yeni kayıt eklenmeden önce sayıldığı için 0 ise ilk kez)
+    if game_play_count == 0:
         xp_gain += 10
-
-        # En yüksek skor güncelleme
-        if data['score'] > user.highest_score:
-            user.highest_score = data['score']
 
     # XP ekle
     user.experience_points += xp_gain
