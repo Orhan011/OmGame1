@@ -173,6 +173,11 @@
     </div>
   </div>
 </div>
+
+<!-- Kullanıcı ID'sini meta etiketi olarak ekle (JavaScript tarafında kullanılacak) -->
+{% if current_user and current_user.is_authenticated %}
+<meta name="user-id" content="{{ current_user.id }}">
+{% endif %}
 {% endblock %}
 
 {% block styles %}
