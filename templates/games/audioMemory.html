@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center mb-4">Sesli Hafıza</h1>
-  
+
   <!-- Oyun İstatistikleri Bölümü -->
   <div class="game-stats-container">
     <div class="game-stat-item">
@@ -13,26 +13,26 @@
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-brain"></i>
       <div class="game-stat-value" id="level-display">1</div>
       <div class="game-stat-label">SEVİYE</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-music"></i>
       <div class="game-stat-value" id="sequence-length">3</div>
       <div class="game-stat-label">SES</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-check-circle"></i>
       <div class="game-stat-value" id="correct-display">0</div>
       <div class="game-stat-label">DOĞRU</div>
     </div>
   </div>
-  
+
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <!-- Intro Section -->
@@ -40,32 +40,49 @@
         <div class="row align-items-center">
           <div class="col-md-8">
             <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-volume-up me-2"></i>Nasıl Oynanır?</h4>
-              <p>Duyduğun ses sıralamasını doğru bir şekilde tekrarlamalısın. Hatırla ve sırayla aynı seslere tıkla. İlerledikçe ses dizisi uzayacak ve oyun zorlaşacak.</p>
+              <h4 class="instruction-title"><i class="fas fa-music me-2"></i>Nasıl Oynanır?</h4>
+              <p>Sesli Hafıza oyununda amacınız, bilgisayarın çaldığı ses dizisini aynı sırayla tekrar etmektir.</p>
+              <p>Her turda, ses dizisi biraz daha uzar ve zorlaşır. Ne kadar ilerlerseniz o kadar yüksek puan kazanırsınız.</p>
               <div class="memory-tips">
                 <div class="tip-badge">
                   <i class="fas fa-lightbulb"></i>
-                  <span>İpucu: Ses dizilerini ritim kalıpları olarak düşün ve hatırla</span>
+                  <span>İpucu: Sesleri zihinsel olarak tekrarlayarak hatırlamaya çalışın</span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="standard-start-btn">
+          <div class="col-md-4 text-center">
+            <button id="start-button" class="btn btn-lg btn-primary standard-start-btn">
               <i class="fas fa-play me-2"></i>Oyunu Başlat
             </button>
           </div>
         </div>
       </div>
-      
+
+      <!-- Game Section -->
+      <div class="glass-panel audio-memory-game d-none" id="game-section">
+        <div class="audio-memory-board">
+          <div class="sound-buttons-grid">
+            <button class="sound-btn" data-color="red">
+              <i class="fas fa-music"></i>
+            </button>
+            <button class="sound-btn" data-color="green">
+              <i class="fas fa-music"></i>
+            </button>
+            <button class="sound-btn" data-color="blue">
+              <i class="fas fa-music"></i>
+            </button>
+            <button class="sound-btn" data-color="yellow">
+              <i class="fas fa-music"></i>
+            </button>
+          </div>
+          <div class="audio-memory-status mt-4 text-center">
+            <p>Bilgisayarın dizisini dinleyin, sonra aynı sırayla tekrar edin.</p>
+          </div>
+        </div>
+      </div>
+
+
       <!-- Game Container -->
       <div id="game-container" class="audio-memory-container glass-effect" style="display: none;">
         <!-- Game Header -->
@@ -73,7 +90,7 @@
           <div class="phase-indicator" id="phase-indicator">
             <span id="phase-text">Sesleri Dinle</span>
           </div>
-          
+
           <div class="game-controls-top">
             <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
               <i class="fas fa-pause"></i>
@@ -83,17 +100,17 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Alert Container -->
         <div id="alert-container" class="audio-memory-alert"></div>
-        
+
         <!-- Audio Memory Play Section -->
         <div class="audio-memory-play-container">
           <div class="sequence-status">
             <div id="countdown-display" class="countdown-display">Dinliyorsun...</div>
             <div id="recall-message" class="recall-message" style="display: none;">Şimdi sırayı tekrarla!</div>
           </div>
-          
+
           <!-- Sound Buttons (The actual playing pads) -->
           <div id="audio-pads" class="audio-pads-grid">
             <div class="audio-pad" data-sound="1" style="--pad-color: #ff4d6b;">
@@ -110,7 +127,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Progress Bar -->
         <div class="game-progress">
           <div class="progress-label">İlerleme: <span id="progress-percent">0%</span></div>
@@ -119,7 +136,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Game Over Container -->
       <div id="game-over-container" class="game-results-container" style="display: none;">
         <div class="game-results-card">
@@ -129,7 +146,7 @@
             </span>
             <h2 class="mb-0" id="game-result-title">Oyun Tamamlandı!</h2>
           </div>
-          
+
           <div class="game-results-body">
             <div class="results-stats">
               <div class="result-stat">
@@ -139,7 +156,7 @@
                 </div>
                 <div class="result-stat-label">Toplam Puan</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-brain"></i>
                 <div class="result-stat-value">
@@ -147,7 +164,7 @@
                 </div>
                 <div class="result-stat-label">Ulaşılan Seviye</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-music"></i>
                 <div class="result-stat-value">
@@ -156,7 +173,7 @@
                 <div class="result-stat-label">En Uzun Dizi</div>
               </div>
             </div>
-            
+
             <div class="results-rating">
               <div class="rating-stars" id="rating-stars">
                 <i class="fas fa-star"></i>
@@ -167,7 +184,7 @@
               </div>
               <div class="rating-text" id="rating-text">İyi!</div>
             </div>
-            
+
             <div class="game-achievement" id="game-achievement" style="display: none;">
               <div class="achievement-icon">
                 <i class="fas fa-award"></i>
@@ -178,7 +195,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="game-results-footer">
             <button id="play-again" class="standard-replay-btn">
               <i class="fas fa-redo me-2"></i>Tekrar Oyna
@@ -187,7 +204,7 @@
               <i class="fas fa-trophy me-2"></i>Skor Tablosu
             </a>
           </div>
-          
+
           <div class="game-share-section">
             <p>Skorunuzu paylaşın:</p>
             <div class="share-buttons">
@@ -201,7 +218,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Pause Menu Overlay -->
       <div id="pause-overlay" class="pause-overlay" style="display: none;">
         <div class="pause-card">
@@ -223,10 +240,72 @@
     </div>
   </div>
 </div>
-{% endblock %}
+<style>
+  .audio-memory-board {
+    padding: 20px;
+  }
+
+  .sound-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .sound-btn {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border: none;
+    border-radius: 15px;
+    font-size: 24px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .sound-btn[data-color="red"] {
+    background-color: #ff5252;
+    color: white;
+  }
+
+  .sound-btn[data-color="green"] {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .sound-btn[data-color="blue"] {
+    background-color: #2196f3;
+    color: white;
+  }
+
+  .sound-btn[data-color="yellow"] {
+    background-color: #ffc107;
+    color: white;
+  }
+
+  .sound-btn.active {
+    transform: scale(0.95);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  }
+
+  .sound-btn.disabled {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 576px) {
+    .sound-buttons-grid {
+      gap: 10px;
+    }
+
+    .sound-btn {
+      font-size: 18px;
+    }
+  }
+</style>
 
 {% block scripts %}
-<!-- Tone.js Müzik Kütüphanesi -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
-<script src="{{ url_for('static', filename='js/games/audioMemory.js') }}"></script>
+<script src="{{ url_for('static', filename='js/audioMemory.js') }}"></script>
 {% endblock %}
