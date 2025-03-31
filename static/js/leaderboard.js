@@ -1,239 +1,224 @@
 
-// Tüm skorları saklamak için global değişken
-let allGameScores = {};
+// Sayfa yüklendiğinde çalışacak
+document.addEventListener('DOMContentLoaded', () => {
+  // Aktif oyun türünü takip etmek için
+  let activeGameType = 'word-puzzle';
 
-document.addEventListener('DOMContentLoaded', function() {
-  // İlk yüklemede tüm oyunların skorlarını al
+  // Tüm skorları depolamak için
+  let allGameScores = {};
+
+  // İlk yükleme
   loadAllScores();
-  
-  // Aktif oyun türünü URL'den al veya varsayılan olarak "word-puzzle" kullan
-  const urlParams = new URLSearchParams(window.location.search);
-  let activeGameType = urlParams.get('game') || 'word-puzzle';
 
-  // Tab switching
-  const tabs = document.querySelectorAll('.game-filter-btn');
-  tabs.forEach(tab => {
-    const gameType = tab.getAttribute('data-game');
-    
-    // URL'den gelen oyun türü varsa ilgili butonu aktif yap
-    if (gameType === activeGameType) {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      displayScoresForGameType(gameType);
-    }
-    
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      const gameType = tab.getAttribute('data-game');
-      // URL'yi güncelle (sayfa yenilenmeden)
-      window.history.replaceState({}, '', `?game=${gameType}`);
-      displayScoresForGameType(gameType);
+  // Sayfa ilk yüklendiğinde kelime bulmaca filtresini aktif yap
+  document.querySelector('[data-game="word-puzzle"]').classList.add('active');
+
+  // Oyun filtre butonlarına tıklama olayı ekle
+  document.querySelectorAll('.game-filter-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      // Aktif sınıfını tüm butonlardan kaldır
+      document.querySelectorAll('.game-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Tıklanan butona aktif sınıf ekle
+      this.classList.add('active');
+
+      // Aktif oyun türünü güncelle
+      activeGameType = this.getAttribute('data-game');
+
+      // Skorları görüntüle
+      displayScoresForGameType(activeGameType);
     });
   });
-  
-  // 30 saniyede bir skorları otomatik güncelle (10 saniye çok sık)
-  setInterval(loadAllScores, 30000);
-});
 
-// Tüm oyunların skorlarını tek bir API çağrısıyla yükle
-function loadAllScores() {
-  fetch('/api/get-scores/all')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Alınan verileri global değişkene kaydet
-      allGameScores = data;
-      console.log("Tüm yüklenen skorlar:", allGameScores);
-      
-      // Aktif sekmenin oyun türünü bul
-      const activeTab = document.querySelector('.game-filter-btn.active');
-      if (activeTab) {
-        const gameType = activeTab.getAttribute('data-game');
-        displayScoresForGameType(gameType);
-      }
-    })
-    .catch(error => {
-      console.error("Error loading scores:", error);
-    });
-}
+  // Yenile butonuna tıklama olayı ekle
+  document.querySelector('.refresh-btn').addEventListener('click', function() {
+    loadAllScores();
+  });
 
-// Belirli bir oyun türü için skorları görüntüler (yerel cache'den)
-function displayScoresForGameType(gameType) {
-  console.log("Skor yükleniyor:", gameType);
-  const container = document.getElementById('scores-container');
-  
-  // Oyun türünü dahili formata dönüştür
-  const gameTypeMap = {
-    'word-puzzle': 'wordPuzzle',
-    'memory-match': 'memoryMatch',
-    'labyrinth': 'labyrinth',
-    'puzzle': 'puzzle',
-    'number-sequence': 'numberSequence',
-    '3d-rotation': '3dRotation',
-    
-    // Hafıza Güçlendirme Oyunları
-    'memory-cards': 'memoryCards',
-    'number-chain': 'numberChain',
-    'audio-memory': 'audioMemory',
-    'n-back': 'nBack',
-    
-    // Sudoku ve diğer oyunlar
-    'sudoku': 'sudoku'
-  };
-  
-  const internalGameType = gameTypeMap[gameType];
-  
-  // Eğer oyun AudioMemory ise ve skor tablosu gizlendiyse kullanıcıya bilgi ver
-  if (internalGameType === 'audioMemory') {
-    container.innerHTML = `
-      <div class="no-scores warning-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <p>Sesli Hafıza Oyunu şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle geri dönecektir.</p>
-      </div>
-    `;
-    console.log("Sesli Hafıza Oyunu kaldırılmıştır.");
-    return;
-  }
-  
-  // API'den veri henüz yüklenmediyse yükleme ekranı göster
-  if (!allGameScores || Object.keys(allGameScores).length === 0) {
+  // Tüm oyun türleri için skorları yükler
+  function loadAllScores() {
+    // Yükleme animasyonunu göster
+    const container = document.getElementById('scores-container');
     container.innerHTML = `
       <div class="loading-scores">
         <div class="spinner"></div>
         <p>Skorlar yükleniyor...</p>
       </div>
     `;
-    return;
+
+    fetch('/api/get-scores/all')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Skorlar alınamadı');
+        }
+        return response.json();
+      })
+      .then(data => {
+        allGameScores = data;
+        console.log("Tüm yüklenen skorlar:", allGameScores);
+        
+        // Şu anki aktif oyun tipinin skorlarını göster
+        displayScoresForGameType(activeGameType);
+      })
+      .catch(error => {
+        console.log("Error loading scores:", error);
+        container.innerHTML = `
+          <div class="no-scores error">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Skor verisi yüklenirken bir hata oluştu. Lütfen tekrar deneyin.</p>
+          </div>
+        `;
+      });
   }
-  
-  // Cache'de skorlar varsa, onları göster
-  if (allGameScores && allGameScores[internalGameType]) {
-    const scores = allGameScores[internalGameType];
+
+  // Belirli bir oyun türü için skorları görüntüler (yerel cache'den)
+  function displayScoresForGameType(gameType) {
+    console.log("Skor yükleniyor:", gameType);
+    const container = document.getElementById('scores-container');
     
-    if (scores.length === 0) {
+    // Oyun türünü dahili formata dönüştür
+    const gameTypeMap = {
+      'word-puzzle': 'wordPuzzle',
+      'memory-match': 'memoryMatch',
+      'labyrinth': 'labyrinth',
+      'puzzle': 'puzzle',
+      'number-sequence': 'numberSequence',
+      
+      // Hafıza Güçlendirme Oyunları
+      'memory-cards': 'memoryCards',
+      'number-chain': 'numberChain',
+      'audio-memory': 'audioMemory',
+      'n-back': 'nBack',
+      
+      // Sudoku ve diğer oyunlar
+      'sudoku': 'sudoku'
+    };
+    
+    const internalGameType = gameTypeMap[gameType];
+    
+    // Eğer oyun AudioMemory ise ve skor tablosu gizlendiyse kullanıcıya bilgi ver
+    if (internalGameType === 'audioMemory') {
       container.innerHTML = `
-        <div class="no-scores">
-          <i class="fas fa-trophy empty-trophy"></i>
-          <p>Bu oyun için henüz skor kaydedilmemiş</p>
-          <p class="sub-text">İlk yüksek skoru sen kaydet!</p>
+        <div class="no-scores warning-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Sesli Hafıza Oyunu şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle geri dönecektir.</p>
+        </div>
+      `;
+      console.log("Sesli Hafıza Oyunu kaldırılmıştır.");
+      return;
+    }
+    
+    // API'den veri henüz yüklenmediyse yükleme ekranı göster
+    if (!allGameScores || Object.keys(allGameScores).length === 0) {
+      container.innerHTML = `
+        <div class="loading-scores">
+          <div class="spinner"></div>
+          <p>Skorlar yükleniyor...</p>
         </div>
       `;
       return;
     }
     
-    // Skor tablosunu oluştur
-    let html = '';
+    // Oyun türüne göre skorları al
+    const scores = allGameScores[internalGameType] || [];
     
-    scores.forEach((score, index) => {
-      // Kullanıcı avatarı için rastgele bir renk üret
-      const avatarColors = [
-        'linear-gradient(45deg, #FF6B6B, #FF8E8E)',
-        'linear-gradient(45deg, #6A5AE0, #9F8AFF)',
-        'linear-gradient(45deg, #48CFAD, #6BE5C3)',
-        'linear-gradient(45deg, #FFCE54, #FFD980)',
-        'linear-gradient(45deg, #5D9CEC, #8CB4F5)'
-      ];
-      const randomColor = avatarColors[index % avatarColors.length];
+    if (scores.length > 0) {
+      // Skorları görüntüle
+      let html = '';
       
-      // Kullanıcı adının ilk harfini al (avatar için)
-      const initial = (score.username || 'Anonim').charAt(0).toUpperCase();
-      
-      // Tarih ve saat formatla
-      const scoreDate = new Date(score.timestamp);
-      const formattedDate = new Intl.DateTimeFormat('tr-TR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).format(scoreDate);
-      
-      const formattedTime = new Intl.DateTimeFormat('tr-TR', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }).format(scoreDate);
-      
-      // Her bir skor için HTML oluştur
-      html += `
-        <div class="table-row ${index < 3 ? 'top-rank top-rank-' + (index + 1) : ''}" data-rank="${index + 1}">
-          <div class="rank-cell">
-            ${index < 3 ? 
-              `<div class="rank-trophy rank-${index + 1}">
-                 <i class="fas fa-trophy"></i>
-               </div>` : 
-              `<div class="rank-number">${index + 1}</div>`
-            }
-          </div>
-          
-          <div class="username-cell">
-            <div class="player-info">
-              <div class="avatar" style="background: ${randomColor}">
-                ${initial}
-              </div>
-              <div class="player-details">
+      scores.forEach((score, index) => {
+        const isTopRank = index < 3; // İlk 3 skor için özel sınıf
+        const rank = index + 1;
+        
+        html += `
+          <div class="table-row ${isTopRank ? 'top-rank' : ''}" style="opacity: 0;">
+            <div class="rank-cell">
+              <span class="rank-badge ${getRankClass(rank)}">${rank}</span>
+            </div>
+            <div class="username-cell">
+              <div class="user-info">
                 <span class="username">${score.username || 'Anonim'}</span>
-                ${score.rank ? `<span class="player-rank">${score.rank}</span>` : ''}
+                ${score.rank ? `<span class="user-rank">${score.rank}</span>` : ''}
               </div>
             </div>
-          </div>
-          
-          <div class="score-cell">
-            <div class="score-badge">
-              <span>${score.score}</span>
-              <div class="score-spark"></div>
+            <div class="score-cell">
+              <span class="score-badge">${score.score.toLocaleString()}</span>
+            </div>
+            <div class="date-cell">
+              <span class="date">${formatDate(score.timestamp)}</span>
             </div>
           </div>
-          
-          <div class="date-cell">
-            <div class="date-time">
-              <span class="date">${formattedDate}</span>
-              <span class="time">${formattedTime}</span>
-            </div>
-          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+      
+      // Animasyonları ekle - sayfa yüklendikten sonra
+      setTimeout(() => {
+        document.querySelectorAll('.table-row').forEach((row, index) => {
+          row.style.animation = `fadeInUp 0.3s ease forwards ${index * 0.05}s`;
+        });
+        
+        // En yüksek 3 skora parıltı efekti ekle
+        document.querySelectorAll('.top-rank').forEach(row => {
+          const scoreElement = row.querySelector('.score-badge');
+          if (scoreElement) {
+            scoreElement.classList.add('highlight-score');
+          }
+        });
+      }, 100);
+    } else {
+      // Oyun türü için skor bulunamadıysa
+      container.innerHTML = `
+        <div class="no-scores">
+          <i class="fas fa-trophy empty-trophy"></i>
+          <p>Bu oyun için henüz skor kaydedilmemiş. İlk olmak için hemen oyna!</p>
         </div>
       `;
-    });
-    
-    container.innerHTML = html;
-    
-    // Animasyonları ekle - sayfa yüklendikten sonra
-    setTimeout(() => {
-      document.querySelectorAll('.table-row').forEach((row, index) => {
-        row.style.animation = `fadeInUp 0.3s ease forwards ${index * 0.05}s`;
-      });
-      
-      // En yüksek 3 skora parıltı efekti ekle
-      document.querySelectorAll('.top-rank').forEach(row => {
-        const scoreElement = row.querySelector('.score-badge');
-        if (scoreElement) {
-          scoreElement.classList.add('highlight-score');
-        }
-      });
-    }, 100);
-  } else {
-    // Oyun türü için skor bulunamadıysa
-    container.innerHTML = `
-      <div class="no-scores">
-        <i class="fas fa-trophy empty-trophy"></i>
-        <p>Bu oyun için henüz skor kaydedilmemiş</p>
-        <p class="sub-text">İlk yüksek skoru sen kaydet!</p>
-      </div>
-    `;
+    }
   }
-}
-
-// Sayfa gizlendiğinde veya kapatıldığında otomatik güncellemeyi durdur
-document.addEventListener('visibilitychange', function() {
-  if (document.hidden) {
-    // Görünmeyen sayfada güncellemeleri durdur
-    clearInterval(window.scoreUpdateInterval);
-  } else {
-    // Sayfa görünür olduğunda güncellemeleri yeniden başlat
-    loadAllScores();
-    window.scoreUpdateInterval = setInterval(loadAllScores, 30000);
+  
+  // Sıralama için sınıf al
+  function getRankClass(rank) {
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank === 3) return 'bronze';
+    return '';
+  }
+  
+  // Tarih formatla
+  function formatDate(dateString) {
+    if (!dateString) return 'Bilinmeyen tarih';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Geçerli bir tarih mi kontrol et
+      if (isNaN(date.getTime())) {
+        return dateString; // Geçersizse orijinal string'i döndür
+      }
+      
+      // Bugün veya dün mü kontrol et
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return `Bugün ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return `Dün ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+      } else {
+        return date.toLocaleDateString('tr-TR', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        });
+      }
+    } catch (e) {
+      console.error('Tarih biçimlendirme hatası:', e);
+      return dateString;
+    }
   }
 });
