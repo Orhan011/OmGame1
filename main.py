@@ -1505,11 +1505,12 @@ def get_aggregated_scores():
             User.id.label('user_id'),
             User.username,
             User.rank,
+            User.avatar_url,
             func.sum(Score.score).label('total_score')
         ).join(
             Score, User.id == Score.user_id
         ).group_by(
-            User.id, User.username, User.rank
+            User.id, User.username, User.rank, User.avatar_url
         ).order_by(
             desc('total_score')
         ).all()
@@ -1520,6 +1521,7 @@ def get_aggregated_scores():
                 'user_id': row.user_id,
                 'username': row.username,
                 'rank': row.rank,
+                'avatar_url': row.avatar_url if row.avatar_url else '/static/images/avatars/avatar1.svg',
                 'total_score': row.total_score
             } for row in aggregated_scores
         ]
@@ -1621,7 +1623,7 @@ def get_leaderboard_data(game_type):
                 'level': calculate_level(score.score),  # Puana göre seviye hesapla
                 'experience_points': user.experience_points if user else 0,
                 'total_games_played': user.total_games_played if user else 0,
-                'avatar_url': f"/static/{user.avatar_url}" if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
+                'avatar_url': user.avatar_url if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
             })
 
         return score_list

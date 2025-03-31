@@ -63,6 +63,22 @@ function displayLeaderboard(scores) {
   scores.slice(0, 25).forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
     const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+    
+    // Sıralamaya göre kullanıcı adı renk sınıfı belirleme
+    let userNameColorClass = '';
+    if (index === 0) {
+      userNameColorClass = 'first-place'; // Altın renk
+    } else if (index === 1) {
+      userNameColorClass = 'second-place'; // Gümüş renk
+    } else if (index === 2) {
+      userNameColorClass = 'third-place'; // Bronz renk
+    } else if (index < 10) {
+      userNameColorClass = 'top-ten'; // Top 10
+    }
+    
+    // Avatar URL kontrolü ve taç eklemesi
+    const avatarUrl = player.avatar_url ? player.avatar_url : null;
+    const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
     html += `
       <div class="player-row ${rankClass}">
@@ -71,11 +87,17 @@ function displayLeaderboard(scores) {
         </div>
         <div class="player-cell">
           <div class="player-avatar">
-            <span class="avatar-content">${initial}</span>
+            ${crownHTML}
+            ${avatarUrl ? 
+              `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+               <span class="avatar-content" style="display:none">${initial}</span>` : 
+              `<span class="avatar-content">${initial}</span>`
+            }
           </div>
           <div class="player-info">
-            <div class="player-name">${player.username}</div>
-            <div class="player-rank"></div> </div>
+            <div class="player-name ${userNameColorClass}">${player.username}</div>
+            <div class="player-rank">${player.rank || ''}</div>
+          </div>
         </div>
         <div class="score-cell">
           <div class="score-container">
@@ -108,6 +130,7 @@ function calculateTotalScores(scoresData) {
               user_id: playerId,
               username: score.username,
               rank: score.rank,
+              avatar_url: score.avatar_url, // Avatar URL'i ekliyoruz
               total_score: 0
             };
           }
