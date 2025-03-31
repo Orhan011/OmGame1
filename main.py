@@ -677,6 +677,11 @@ def sudoku():
 def game_2048():
     return render_template('games/2048.html')
 
+@app.route('/games/wordle')
+def wordle():
+    """Wordle kelime tahmin oyunu"""
+    return render_template('games/wordle.html')
+
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():

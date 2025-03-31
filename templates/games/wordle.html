@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+
+{% block title %}Wordle - Kelime Tahmin Oyunu{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/wordle.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container wordle-container">
+  <div class="row">
+    <div class="col-md-12 text-center mb-3">
+      <h1 class="game-title">Wordle</h1>
+      <p class="game-subtitle">5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+      <!-- Oyun üst bilgisi -->
+      <div class="wordle-header mb-3">
+        <div id="message-display" class="message-display"></div>
+      </div>
+      
+      <!-- Oyun tahtası -->
+      <div class="wordle-board">
+        <div class="guess-grid" id="guess-grid">
+          <!-- JavaScript tarafından oluşturulacak oyun tahtası -->
+        </div>
+      </div>
+
+      <!-- Sanal klavye -->
+      <div class="keyboard" id="keyboard">
+        <div class="keyboard-row">
+          <button class="key" data-key="e">e</button>
+          <button class="key" data-key="r">r</button>
+          <button class="key" data-key="t">t</button>
+          <button class="key" data-key="y">y</button>
+          <button class="key" data-key="u">u</button>
+          <button class="key" data-key="ı">ı</button>
+          <button class="key" data-key="o">o</button>
+          <button class="key" data-key="p">p</button>
+          <button class="key" data-key="ğ">ğ</button>
+          <button class="key" data-key="ü">ü</button>
+        </div>
+        <div class="keyboard-row">
+          <button class="key" data-key="a">a</button>
+          <button class="key" data-key="s">s</button>
+          <button class="key" data-key="d">d</button>
+          <button class="key" data-key="f">f</button>
+          <button class="key" data-key="g">g</button>
+          <button class="key" data-key="h">h</button>
+          <button class="key" data-key="j">j</button>
+          <button class="key" data-key="k">k</button>
+          <button class="key" data-key="l">l</button>
+          <button class="key" data-key="ş">ş</button>
+          <button class="key" data-key="i">i</button>
+        </div>
+        <div class="keyboard-row">
+          <button class="key" data-key="Enter" class="wide-key">Enter</button>
+          <button class="key" data-key="z">z</button>
+          <button class="key" data-key="c">c</button>
+          <button class="key" data-key="v">v</button>
+          <button class="key" data-key="b">b</button>
+          <button class="key" data-key="n">n</button>
+          <button class="key" data-key="m">m</button>
+          <button class="key" data-key="ö">ö</button>
+          <button class="key" data-key="ç">ç</button>
+          <button class="key" data-key="Backspace" class="wide-key">⌫</button>
+        </div>
+      </div>
+      
+      <!-- Oyun kontrolleri -->
+      <div class="game-controls mt-3 text-center">
+        <button id="new-game-btn" class="btn btn-primary">Yeni Oyun</button>
+      </div>
+      
+      <!-- İstatistikler -->
+      <div class="stats-container mt-4">
+        <h4>İstatistikler</h4>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-number" id="games-played">0</div>
+            <div class="stat-label">Oyun</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="games-won">0</div>
+            <div class="stat-label">Kazanılan</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="win-percentage">0%</div>
+            <div class="stat-label">Kazanma Oranı</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="current-streak">0</div>
+            <div class="stat-label">Seri</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nasıl oynanır -->
+      <div class="card how-to-play mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Nasıl Oynanır?</h5>
+          <ul>
+            <li>5 harfli gizli kelimeyi 6 denemede tahmin etmeye çalışın.</li>
+            <li>Her tahmin 5 harfli geçerli bir kelime olmalıdır.</li>
+            <li>Her tahminden sonra, her harfin rengi değişerek ne kadar yakın olduğunuzu gösterir.</li>
+          </ul>
+          
+          <div class="examples">
+            <p><strong>Örnekler:</strong></p>
+            <div class="example">
+              <div class="letter correct">K</div>
+              <div class="letter">A</div>
+              <div class="letter">L</div>
+              <div class="letter">E</div>
+              <div class="letter">M</div>
+              <p>K harfi doğru yerde.</p>
+            </div>
+            
+            <div class="example">
+              <div class="letter">K</div>
+              <div class="letter present">A</div>
+              <div class="letter">L</div>
+              <div class="letter">E</div>
+              <div class="letter">M</div>
+              <p>A harfi kelimede var ama yanlış yerde.</p>
+            </div>
+            
+            <div class="example">
+              <div class="letter">K</div>
+              <div class="letter">A</div>
+              <div class="letter absent">L</div>
+              <div class="letter">E</div>
+              <div class="letter">M</div>
+              <p>L harfi kelimede yok.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Oyunlara dönüş bağlantısı -->
+      <div class="text-center mt-4 mb-5">
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Oyun sonu modalı -->
+  <div class="modal fade" id="game-end-modal" tabindex="-1" aria-labelledby="gameEndModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="gameEndModalLabel">Oyun Bitti</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="game-end-message">
+          <!-- Oyun sonu mesajı burada gösterilecek -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="button" class="btn btn-primary" id="new-game-modal-btn">Yeni Oyun</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/wordleWords.js') }}"></script>
+<script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
+{% endblock %}
