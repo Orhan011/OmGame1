@@ -311,13 +311,28 @@ function toggleShortcutPanel(event) {
   }
 }
 
-// Added to restore profile picture - ASSUMPTION:  Profile picture is in an img tag with id 'profilePicture'
+// Kısayol panelini aç/kapat
+function toggleShortcutPanel(event) {
+  event.stopPropagation();
+  const panel = document.getElementById('shortcutPanel');
+  if (!panel) return;
+
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = 'block';
+  }
+  
+  // Panel dışına tıklandığında paneli kapat
+  document.addEventListener('click', function closePanel(e) {
+    if (!panel.contains(e.target) && e.target !== event.target) {
+      panel.style.display = 'none';
+      document.removeEventListener('click', closePanel);
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const profilePicture = document.getElementById('profilePicture');
-    if (profilePicture) {
-        // Assumes the profile picture was removed.  This section would need to be adjusted
-        // based on how the profile picture was originally integrated into the page.
-        // This is a placeholder, you need to adjust the placement according to your HTML structure.
-        document.getElementById('profile-picture-container').appendChild(profilePicture);
+  // Diğer sayfa yükleme işlemleriiner').appendChild(profilePicture);
     }
 });
