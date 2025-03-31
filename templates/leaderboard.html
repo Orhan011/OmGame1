@@ -5,7 +5,7 @@
 <div class="leaderboard-container">
   <div class="leaderboard-header">
     <h1>Skor Tablosu</h1>
-    <p>Beyin geliştirme oyunlarımızda en yüksek skorlar burada gösteriliyor. Oyuncuların performansını karşılaştırın ve kendi yerinizi görün.</p>
+    <p>Beyin geliştirme oyunlarımızda en yüksek skorları takip edin. Performansınızı diğer oyuncularla karşılaştırın ve zirveye ulaşın.</p>
   </div>
 
   <!-- Oyun Kategorileri -->
@@ -116,11 +116,11 @@
 
     <!-- Tüm Oyunlar Filtresi -->
     <div class="game-filter" data-filter-category="all">
-      <!-- Bu tüm filtrelerin birleşimi olacak, ancak JavaScript tarafında yönetilecek -->
+      <!-- JavaScript tarafında otomatik doldurulacak -->
     </div>
   </div>
 
-  <!-- Skor Tablosu Kartı -->
+  <!-- Lider Podyumu ve Grafik -->
   <div class="leaderboard-card">
     <div class="card-header">
       <h3>Skor Sıralaması</h3>
@@ -134,6 +134,39 @@
         <button class="refresh-btn">
           <i class="fas fa-sync-alt"></i>
         </button>
+      </div>
+    </div>
+
+    <!-- Liderler Podyumu ve Performans Grafiği -->
+    <div class="leaderboard-highlights">
+      <div class="leaders-podium">
+        <div class="podium-item podium-second">
+          <div class="podium-avatar">2</div>
+          <div class="podium-block">
+            <span class="podium-score">0</span>
+          </div>
+          <div class="podium-name">-</div>
+        </div>
+        <div class="podium-item podium-first">
+          <div class="podium-avatar">1</div>
+          <div class="podium-block">
+            <span class="podium-score">0</span>
+          </div>
+          <div class="podium-name">-</div>
+        </div>
+        <div class="podium-item podium-third">
+          <div class="podium-avatar">3</div>
+          <div class="podium-block">
+            <span class="podium-score">0</span>
+          </div>
+          <div class="podium-name">-</div>
+        </div>
+      </div>
+      <div class="stats-graph">
+        <div class="graph-title">Kategori Performansı</div>
+        <div class="graph-container" id="performance-graph">
+          <!-- JavaScript ile doldurulacak grafik çubukları -->
+        </div>
       </div>
     </div>
     
@@ -174,7 +207,7 @@
   </div>
 </div>
 
-<!-- Kullanıcı ID'sini meta etiketi olarak ekle (JavaScript tarafında kullanılacak) -->
+<!-- Kullanıcı ID'sini meta etiketi olarak ekle -->
 {% if current_user and current_user.is_authenticated %}
 <meta name="user-id" content="{{ current_user.id }}">
 {% endif %}
