@@ -1,24 +1,30 @@
 /**
- * Wordle CSS Stilleri
+ * Wordle CSS Stilleri - Modern Tasarım
  */
 
 :root {
-  /* Ana renkler */
-  --wordle-correct: #6aaa64;      /* Doğru harf + doğru konum */
-  --wordle-present: #c9b458;      /* Doğru harf + yanlış konum */
-  --wordle-absent: #787c7e;       /* Harf kelimede yok */
-  --wordle-keyboard: #d3d6da;     /* Klavye tuşları */
-  --wordle-text: #1a1a1b;         /* Metin rengi */
-  --wordle-background: #ffffff;   /* Arka plan */
-  --wordle-border: #d3d6da;       /* Kenarlıklar */
+  /* Ana renkler - Daha canlı ve modern tonlar */
+  --wordle-correct: #4ade80;      /* Doğru harf + doğru konum - Daha canlı yeşil */
+  --wordle-present: #facc15;      /* Doğru harf + yanlış konum - Daha parlak sarı */
+  --wordle-absent: #64748b;       /* Harf kelimede yok - Daha yumuşak ton */
+  --wordle-keyboard: #e2e8f0;     /* Klavye tuşları - Daha hafif gri */
+  --wordle-text: #0f172a;         /* Metin rengi - Daha koyu */
+  --wordle-background: #f8fafc;   /* Arka plan - Çok hafif gri tonu */
+  --wordle-border: #cbd5e1;       /* Kenarlıklar - Daha yumuşak */
   
   /* Metin renkleri */
   --wordle-text-light: #ffffff;   /* Açık renkli metin */
-  --wordle-text-dark: #1a1a1b;    /* Koyu renkli metin */
+  --wordle-text-dark: #0f172a;    /* Koyu renkli metin */
   
   /* Durumlar */
-  --wordle-error: #ff5549;        /* Hata mesajları */
-  --wordle-success: #6aaa64;      /* Başarı mesajları */
+  --wordle-error: #ef4444;        /* Hata mesajları - Daha parlak kırmızı */
+  --wordle-success: #22c55e;      /* Başarı mesajları - Daha parlak yeşil */
+  
+  /* Animasyon süreleri */
+  --flip-duration: 0.5s;
+  --dance-duration: 0.5s;
+  --shake-duration: 0.3s;
+  --pop-duration: 0.1s;
 }
 
 .wordle-container {
