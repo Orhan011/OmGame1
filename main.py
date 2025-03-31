@@ -668,9 +668,11 @@ def n_back():
     return render_template('games/nBack.html')
 
 # Yeni Mantık ve IQ Geliştirme Oyunları
+# Sudoku oyunu kaldırıldı
 @app.route('/games/sudoku')
 def sudoku():
-    return render_template('games/sudoku.html')
+    flash('Sudoku oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
