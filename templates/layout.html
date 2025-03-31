@@ -82,80 +82,8 @@ function loadArticleContent() {
 <!-- Dinamik Arkaplan Efekti -->
 <!-- Arka plandaki şekiller kaldırıldı -->
 
-<!-- Profil Paneli -->
+<!-- Profil Paneli (üstteki kaldırıldı) -->
 {% if session.get('user_id') %}
-<div id="topLeftAvatar" class="top-left-avatar" onclick="toggleProfilePanel(event)">
-  {% if get_avatar_url() %}
-    <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-image">
-  {% else %}
-    <div class="avatar-placeholder">{{ session.get('username')[0]|upper }}</div>
-  {% endif %}
-</div>
-
-<div id="profilePanel" class="profile-panel">
-  <div class="profile-panel-header">
-    <div class="profile-panel-avatar">
-      {% if get_avatar_url() %}
-        <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-image">
-      {% else %}
-        <div class="avatar-placeholder avatar-lg">{{ session.get('username')[0]|upper }}</div>
-      {% endif %}
-    </div>
-    <div class="profile-panel-info">
-      <h4>{{ session.get('username') }}</h4>
-      <div class="profile-exp-info">
-        <div class="exp-bar">
-          {% set user = get_current_user() %}
-          {% if user %}
-            {% set user_level_num = calculate_level(user.experience_points)|int %}
-            {% set next_level = user_level_num + 1 %}
-            {% set xp_for_user_level = xp_for_level(user_level_num) %}
-            {% set xp_for_next_level = xp_for_level(next_level) %}
-            {% if xp_for_next_level > xp_for_user_level and (xp_for_next_level - xp_for_user_level) > 0 %}
-              {% set progress_percent = ((user.experience_points - xp_for_user_level) / (xp_for_next_level - xp_for_user_level) * 100)|round %}
-              {% if progress_percent < 0 %}
-                {% set progress_percent = 0 %}
-              {% elif progress_percent > 100 %}
-                {% set progress_percent = 100 %}
-              {% endif %}
-            {% else %}
-              {% set progress_percent = 100 %}
-            {% endif %}
-            <div class="exp-bar-progress" style="width: {{ progress_percent }}%;"></div>
-          {% else %}
-            <div class="exp-bar-progress" style="width: 0%;"></div>
-          {% endif %}
-        </div>
-        <div class="exp-text">
-          {% if user %}
-            Seviye {{ user_level_num }} • {{ user.experience_points|int }} XP
-          {% else %}
-            Seviye 0 • 0 XP
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="profile-panel-body">
-    <a href="{{ url_for('profile_v2') }}" class="profile-panel-item">
-      <i class="fas fa-user"></i>
-      Profilim
-    </a>
-    <a href="{{ url_for('leaderboard') }}" class="profile-panel-item">
-      <i class="fas fa-trophy"></i>
-      Skor Tablosu
-    </a>
-    <a href="{{ url_for('all_games') }}" class="profile-panel-item">
-      <i class="fas fa-gamepad"></i>
-      Oyunlarım
-    </a>
-    <div class="profile-panel-divider"></div>
-    <a href="{{ url_for('logout') }}" class="profile-panel-item">
-      <i class="fas fa-sign-out-alt"></i>
-      Çıkış Yap
-    </a>
-  </div>
-</div>
 {% endif %}
 
 <nav class="navbar navbar-expand-lg navbar-dark">
