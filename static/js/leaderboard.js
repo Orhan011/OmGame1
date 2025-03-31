@@ -62,22 +62,27 @@ function displayLeaderboard(scores) {
   // Her bir skoru tabloya ekle
   scores.forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
-    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';t(0).toUpperCase() : '?';
 
     html += `
       <div class="player-row ${rankClass}">
         <div class="rank-cell">
-          <span class="rank-number">${index + 1}</span>
+          <div class="rank-block ${index < 3 ? `rank-${index + 1}` : ''}">${index + 1}</div>
         </div>
         <div class="player-cell">
-          <div class="player-avatar">${initial}</div>
+          <div class="player-avatar">
+            <span class="avatar-content">${initial}</span>
+          </div>
           <div class="player-info">
             <div class="player-name">${player.username}</div>
             <div class="player-rank"><span>${player.rank || 'Başlangıç'}</span></div>
           </div>
         </div>
         <div class="score-cell">
-          <div class="score-value">${player.total_score}</div>
+          <div class="score-container">
+            <span class="score-value">${player.total_score || 0}</span>
+            <span class="score-label">puan</span>
+          </div>
         </div>
       </div>
     `;
@@ -88,5 +93,5 @@ function displayLeaderboard(scores) {
     </div>
   `;
 
-  leaderboardContainer.innerHTML = html;
+  leaderboardContainer.innerHTML = html;ontainer.innerHTML = html;
 }
