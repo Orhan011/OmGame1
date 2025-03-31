@@ -21,8 +21,8 @@
         </a>
         
         <!-- Level Badge -->
-        <div class="level-badge" title="Seviye {{ calculate_level(get_current_user().experience_points) }}">
-          <span>{{ calculate_level(get_current_user().experience_points) }}</span>
+        <div class="level-badge" title="Seviye {{ current_level }}">
+          <span>{{ current_level }}</span>
         </div>
       </div>
       
@@ -41,13 +41,11 @@
         <!-- Level Progress Bar - Yeni eklenen kısım -->
         <div class="level-progress-container">
           <div class="level-progress-info">
-            <span class="level-text">Seviye {{ calculate_level(get_current_user().experience_points) }}</span>
+            <span class="level-text">Seviye {{ current_level }}</span>
             <span class="xp-text">{{ get_current_user().experience_points }} XP</span>
           </div>
           
-          {% set xp_for_current_level = xp_for_level(calculate_level(get_current_user().experience_points)) %}
-          {% set xp_for_next_level = xp_for_level(calculate_level(get_current_user().experience_points) + 1) %}
-          {% set xp_progress = ((get_current_user().experience_points - xp_for_current_level) / (xp_for_next_level - xp_for_current_level)) * 100 %}
+          {% set xp_progress = ((get_current_user().experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100 if (xp_for_next - xp_for_current) > 0 else 0 %}
           
           <div class="level-progress-bar-container">
             <div class="level-progress-bar" style="width: {{ xp_progress|int }}%"></div>
@@ -55,8 +53,8 @@
           </div>
           
           <div class="level-progress-info">
-            <span class="current-level">{{ calculate_level(get_current_user().experience_points) }}</span>
-            <span class="next-level">{{ calculate_level(get_current_user().experience_points) + 1 }}</span>
+            <span class="current-level">{{ current_level }}</span>
+            <span class="next-level">{{ current_level + 1 }}</span>
           </div>
         </div>
         
