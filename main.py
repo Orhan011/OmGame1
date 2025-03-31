@@ -828,7 +828,7 @@ def logout():
     return redirect(url_for('login'))
 
 # Profile management routes
-@app.route('/profile/update', methods=['POST'])
+@app.route('/update_profile', methods=['POST'])
 def update_profile():
     if not session.get('user_id'):
         return redirect(url_for('login'))
@@ -875,7 +875,7 @@ def update_profile():
 
     return redirect(url_for('profile'))
 
-@app.route('/profile/password', methods=['POST'])
+@app.route('/update_password', methods=['POST'])
 def update_password():
     if not session.get('user_id'):
         return redirect(url_for('login'))
@@ -960,7 +960,7 @@ def update_notifications():
 
     return redirect(url_for('profile'))
 
-@app.route('/profile/deactivate', methods=['POST'])
+@app.route('/deactivate_account', methods=['POST'])
 def deactivate_account():
     if not session.get('user_id'):
         return redirect(url_for('login'))
@@ -981,7 +981,7 @@ def deactivate_account():
         flash('Hesap devre dışı bırakılırken bir hata oluştu.', 'danger')
         return redirect(url_for('profile'))
 
-@app.route('/profile/delete', methods=['POST'])
+@app.route('/delete_account', methods=['POST'])
 def delete_account():
     if not session.get('user_id'):
         return redirect(url_for('login'))
@@ -1005,7 +1005,7 @@ def delete_account():
 
     return redirect(url_for('login'))
 
-@app.route('/profile/avatar/update', methods=['POST'])
+@app.route('/update_avatar', methods=['POST'])
 def update_avatar():
     if not session.get('user_id'):
         return redirect(url_for('login'))
