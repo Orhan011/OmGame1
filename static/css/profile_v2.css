@@ -7,29 +7,38 @@
   --accent-color-secondary: #ff4f8b;
   --accent-color-tertiary: #22c2bb;
   --cyberpunk-yellow: #f7f700;
+  --primary-text: white; /* Added for better readability */
+  --secondary-text: rgba(255, 255, 255, 0.7); /* Added for better readability */
+  --accent-color: #7e50e0; /* Added for consistency */
 }
 
-/* Profile Header */
+/* Ana Container */
+.profile-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 20px;
+}
+
+/* Profil Header */
 .profile-header {
+  background: linear-gradient(135deg, rgba(32, 32, 64, 0.95), rgba(16, 16, 32, 0.95));
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   position: relative;
-  background: linear-gradient(135deg, rgba(106, 90, 224, 0.15), rgba(204, 68, 189, 0.1));
-  border-radius: var(--profile-card-radius);
-  padding: var(--profile-section-padding);
-  margin-bottom: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .profile-header::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at top right, rgba(106, 90, 224, 0.2), transparent 60%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/static/images/hexagon-pattern.png') repeat;
+  opacity: 0.1;
   z-index: 0;
 }
 
@@ -37,9 +46,316 @@
   position: relative;
   z-index: 1;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 30px;
+  align-items: flex-start;
 }
+
+/* Avatar Bölümü */
+.profile-avatar-container {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.3);
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, #2a2a4a, #1a1a2a);
+  color: var(--secondary-text);
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 35px;
+  height: 35px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.profile-avatar-container:hover .profile-avatar-edit {
+  opacity: 1;
+}
+
+/* Seviye Rozeti */
+.level-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  border: 3px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.level-badge:hover {
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* XP Bar */
+.level-progress-container {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.level-progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--secondary-text);
+}
+
+.level-progress-bar-container {
+  height: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.level-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 10px;
+  transition: width 1s ease;
+}
+
+.level-progress-spark {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  filter: blur(1px);
+}
+
+/* İstatistik Kartları */
+.profile-stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.profile-stat-card {
+  background: linear-gradient(135deg, rgba(32, 32, 64, 0.9), rgba(16, 16, 32, 0.9));
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.profile-stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.profile-stat-icon {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+}
+
+.profile-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 10px 0;
+}
+
+.profile-stat-label {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+/* Ayarlar Bölümü */
+.settings-form {
+  margin-top: 30px;
+  background: rgba(32, 32, 64, 0.9);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.form-section-title {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  color: var(--secondary-text);
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+/* Level Up Animasyonu */
+.level-up-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.level-up-content {
+  background: linear-gradient(135deg, #2a2a4a, #1a1a2a);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  animation: scaleIn 0.5s ease;
+}
+
+.level-up-icon {
+  font-size: 3rem;
+  color: #FFD700;
+  margin-bottom: 20px;
+  animation: bounce 1s infinite;
+}
+
+.level-up-text {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.level-up-level {
+  font-size: 3rem;
+  color: #FFD700;
+  margin-bottom: 20px;
+}
+
+.level-up-rewards {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.reward {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--secondary-text);
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+  .profile-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-avatar-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .profile-stats-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Profile Header */
+.profile-header-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 20px;
+}
+
 
 @media (min-width: 768px) {
   .profile-header-content {
@@ -138,7 +454,6 @@
 
 .level-badge:hover {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
 .level-badge::before {
@@ -149,9 +464,9 @@
   right: -2px;
   bottom: -2px;
   background: conic-gradient(
-    var(--accent-color), 
-    var(--accent-color-secondary), 
-    var(--accent-color-tertiary), 
+    var(--accent-color),
+    var(--accent-color-secondary),
+    var(--accent-color-tertiary),
     var(--accent-color)
   );
   border-radius: 50%;
