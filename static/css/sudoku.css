@@ -1,0 +1,562 @@
+
+/* Sudoku Oyunu Stilleri */
+
+/* Genel Konteyner Stilleri */
+.sudoku-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: rgba(30, 30, 60, 0.3);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Intro Bölümü */
+.sudoku-intro {
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.game-options-container {
+  background-color: rgba(30, 30, 60, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.difficulty-selector {
+  margin-bottom: 1.5rem;
+}
+
+.selector-label {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.level-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.level-btn {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.level-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.level-btn.active {
+  border-color: var(--accent-color);
+  background-color: rgba(106, 90, 224, 0.2);
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.4);
+}
+
+/* Oyun Başlatma Butonu */
+.standard-start-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #6a5ae0, #9373ff);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.standard-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
+}
+
+.standard-start-btn:active {
+  transform: translateY(1px);
+}
+
+/* Oyun Tahtası Stilleri */
+.sudoku-board-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+@media (min-width: 992px) {
+  .sudoku-board-section {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  background-color: rgba(20, 20, 40, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.sudoku-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background-color: rgba(50, 50, 90, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  color: #fff;
+}
+
+.sudoku-cell.empty {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sudoku-cell.given {
+  background-color: rgba(80, 80, 120, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sudoku-cell.filled {
+  color: #6a5ae0;
+  font-weight: 700;
+}
+
+.sudoku-cell.hint {
+  color: #00bcd4;
+  animation: highlight 2s ease-in-out;
+}
+
+.sudoku-cell.error {
+  color: #ff5252;
+  animation: shake 0.5s ease-in-out;
+}
+
+.sudoku-cell.selected {
+  background-color: rgba(106, 90, 224, 0.3);
+  box-shadow: inset 0 0 15px rgba(106, 90, 224, 0.5);
+}
+
+/* Hücre Sınırları */
+.sudoku-cell.border-top {
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.sudoku-cell.border-bottom {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.sudoku-cell.border-left {
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.sudoku-cell.border-right {
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Not Sistemi */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  font-size: 0.6rem;
+}
+
+.note-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+/* Sayı Seçim Paneli */
+.number-selection-panel {
+  background-color: rgba(30, 30, 60, 0.4);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+  .number-selection-panel {
+    width: 25%;
+    margin: 0;
+  }
+}
+
+.numbers-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 8px;
+  margin-bottom: 10px;
+}
+
+.number-btn {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: rgba(60, 60, 90, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 0;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.number-btn:hover {
+  background-color: rgba(106, 90, 224, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: 1rem;
+  color: #fff;
+  background-color: rgba(60, 60, 90, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn.active {
+  background-color: rgba(106, 90, 224, 0.4);
+  border-color: var(--accent-color);
+}
+
+.action-btn:hover {
+  background-color: rgba(106, 90, 224, 0.3);
+}
+
+/* Oyun Kontrol Butonları */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sudoku-indicator {
+  background-color: rgba(60, 60, 90, 0.5);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.game-controls-top {
+  display: flex;
+  gap: 10px;
+}
+
+.game-control-btn {
+  width: 36px;
+  height: 36px;
+  background-color: rgba(60, 60, 90, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.game-control-btn:hover {
+  background-color: rgba(106, 90, 224, 0.3);
+}
+
+.game-control-btn.active {
+  color: var(--accent-color);
+}
+
+.game-controls-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.game-btn {
+  background-color: rgba(60, 60, 90, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 15px;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.game-btn:hover {
+  background-color: rgba(106, 90, 224, 0.3);
+}
+
+/* Uyarı Mesajı */
+.sudoku-alert {
+  display: none;
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  z-index: 10;
+  animation: slideDown 0.3s forwards;
+  max-width: 100%;
+  text-align: center;
+}
+
+.sudoku-alert.success {
+  background-color: rgba(76, 175, 80, 0.9);
+}
+
+.sudoku-alert.error {
+  background-color: rgba(244, 67, 54, 0.9);
+}
+
+.sudoku-alert.info {
+  background-color: rgba(33, 150, 243, 0.9);
+}
+
+/* Oyun Sonucu Ekranı */
+.sudoku-results-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: rgba(30, 30, 60, 0.3);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.results-header {
+  margin-bottom: 2rem;
+}
+
+.results-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent-color);
+}
+
+.results-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.results-rating {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rating-stars {
+  margin-bottom: 0.5rem;
+  color: #ffc107;
+  font-size: 1.5rem;
+}
+
+.rating-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sudoku-achievement {
+  background-color: rgba(60, 60, 90, 0.5);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.achievement-icon {
+  font-size: 2rem;
+  color: #ffc107;
+}
+
+.achievement-text {
+  text-align: left;
+}
+
+.achievement-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.2rem;
+}
+
+.achievement-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sudoku-results-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Duraklatma Menüsü */
+.pause-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 15, 30, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.pause-menu-content {
+  background-color: rgba(30, 30, 60, 0.8);
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pause-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--accent-color);
+}
+
+.pause-description {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.pause-menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pause-menu-buttons .btn {
+  padding: 12px 20px;
+  font-size: 1rem;
+}
+
+@media (min-width: 576px) {
+  .pause-menu-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Bulanıklaştırma Efekti */
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+/* Animasyonlar */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+@keyframes highlight {
+  0% { box-shadow: 0 0 15px rgba(0, 188, 212, 0.8); }
+  100% { box-shadow: 0 0 0 rgba(0, 188, 212, 0); }
+}
+
+@keyframes slideDown {
+  0% { top: -60px; opacity: 0; }
+  100% { top: -50px; opacity: 1; }
+}

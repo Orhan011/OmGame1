@@ -1,19 +1,32 @@
-{% extends 'layout.html' %}
 
-{% block title %}Sesli Hafıza - Bu oyun kaldırılmıştır{% endblock %}
+{% extends "layout.html" %}
+
+{% block title %}Sesli Hafıza Oyunu{% endblock %}
 
 {% block content %}
-<div class="container mt-5 mb-5">
+<div class="container">
+  <h1 class="game-title text-center mb-4">Sesli Hafıza Oyunu</h1>
+  
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <div class="memory-game-container text-center">
-        <h2 class="section-title mb-4">Bu oyun kaldırılmıştır</h2>
-        <p>Sesli Hafıza Oyunu artık mevcut değildir.</p>
-        <a href="{{ url_for('index') }}" class="btn btn-primary mt-4">
-          <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
-        </a>
+      <div class="glass-panel game-panel mb-4">
+        <div class="game-info-container text-center">
+          <h2>Bu oyun kaldırılmıştır</h2>
+          <p>Sesli Hafıza Oyunu geliştiricilerimiz tarafından kaldırılmıştır.</p>
+          <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
+            <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("Sesli Hafıza Oyunu kaldırılmıştır.");
+  });
+</script>
 {% endblock %}

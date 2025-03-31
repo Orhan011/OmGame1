@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center mb-4">Sudoku</h1>
-  
+
   <!-- Oyun İstatistikleri Bölümü -->
   <div class="game-stats-container">
     <div class="game-stat-item">
@@ -13,60 +13,63 @@
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-clock"></i>
       <div class="game-stat-value" id="time-display">00:00</div>
       <div class="game-stat-label">SÜRE</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-tasks"></i>
       <div class="game-stat-value" id="progress-display">0%</div>
       <div class="game-stat-label">İLERLEME</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-times-circle"></i>
       <div class="game-stat-value" id="error-display">0</div>
       <div class="game-stat-label">HATA</div>
     </div>
   </div>
-  
+
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <!-- Intro Section -->
       <div class="glass-panel sudoku-intro mb-4" id="intro-section">
         <div class="row align-items-center">
-          <div class="col-md-8">
-            <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-th me-2"></i>Nasıl Oynanır?</h4>
-              <p>Sudoku, mantık ve düşünme yeteneğinizi geliştiren klasik bir bulmaca oyunudur. 9x9'luk bir ızgarada her satır, sütun ve 3x3'lük bloklarda 1'den 9'a kadar olan rakamları yerleştirmelisiniz.</p>
-              <p>Her rakam, her satır, her sütun ve her 3x3'lük kutuya yalnızca bir kez yerleştirilebilir.</p>
-              <div class="memory-tips">
-                <div class="tip-badge">
-                  <i class="fas fa-lightbulb"></i>
-                  <span>İpucu: Rakamları yerleştirirken önce kolay tamamlanabilecek satır, sütun veya kutuları doldurun.</span>
+          <div class="col-md-7">
+            <h2 class="section-title mb-3">Sudoku</h2>
+            <p class="game-description">
+              Sudoku, klasik bir sayı yerleştirme bulmacasıdır. Amaç, her satır, her sütun ve her 3x3 kutuda 1'den 9'a kadar tüm rakamların yalnızca bir kez bulunmasını sağlamaktır. Mantık ve stratejinizi kullanarak boş kareleri doldurun!
+            </p>
+            <h3 class="section-subtitle mt-4 mb-3">Nasıl Oynanır?</h3>
+            <ul class="game-instructions">
+              <li>Her satır, sütun ve 3x3 kutuda 1-9 arası rakamlar sadece bir kez kullanılmalıdır.</li>
+              <li>Verilen ipuçlarını kullanarak boş kareleri doldurun.</li>
+              <li>Bir kareye rakam yerleştirmek için önce kareyi seçin, sonra sayı tuşlarını kullanın.</li>
+              <li>Not almak için bir kareye sağ tıklayın veya Shift tuşuna basılı tutarak tıklayın.</li>
+              <li>Zamana karşı oynayın ve en yüksek puanı almaya çalışın!</li>
+            </ul>
+          </div>
+          <div class="col-md-5 mt-4 mt-md-0">
+            <div class="game-options-container">
+              <div class="difficulty-selector mb-4">
+                <div class="selector-label">Zorluk</div>
+                <div class="level-buttons">
+                  <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
+                  <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
+                  <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
                 </div>
               </div>
+              <button id="start-game" class="standard-start-btn">
+                <i class="fas fa-play me-2"></i>Oyunu Başlat
+              </button>
             </div>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="standard-start-btn">
-              <i class="fas fa-play me-2"></i>Oyunu Başlat
-            </button>
           </div>
         </div>
       </div>
-      
+
       <!-- Game Container -->
       <div id="game-container" class="sudoku-container glass-effect" style="display: none;">
         <!-- Game Header -->
@@ -74,7 +77,7 @@
           <div class="sudoku-indicator" id="sudoku-indicator">
             <span id="difficulty-display">KOLAY</span>
           </div>
-          
+
           <div class="game-controls-top">
             <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
               <i class="fas fa-pause"></i>
@@ -84,147 +87,115 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Alert Container -->
         <div id="alert-container" class="sudoku-alert"></div>
-        
+
         <!-- Sudoku Board Section -->
-        <div class="sudoku-board-container">
+        <div class="sudoku-board-section">
           <div id="sudoku-board" class="sudoku-board"></div>
-          
-          <div class="sudoku-controls">
-            <div class="number-pad">
-              <div class="number-buttons">
-                <button class="number-btn" data-number="1">1</button>
-                <button class="number-btn" data-number="2">2</button>
-                <button class="number-btn" data-number="3">3</button>
-                <button class="number-btn" data-number="4">4</button>
-                <button class="number-btn" data-number="5">5</button>
-                <button class="number-btn" data-number="6">6</button>
-                <button class="number-btn" data-number="7">7</button>
-                <button class="number-btn" data-number="8">8</button>
-                <button class="number-btn" data-number="9">9</button>
-                <button class="number-btn erase-btn" data-number="0">
-                  <i class="fas fa-eraser"></i>
-                </button>
-              </div>
+
+          <!-- Number Selection Panel -->
+          <div class="number-selection-panel" id="number-selection-panel">
+            <div class="numbers-row">
+              <div class="number-btn" data-number="1">1</div>
+              <div class="number-btn" data-number="2">2</div>
+              <div class="number-btn" data-number="3">3</div>
+              <div class="number-btn" data-number="4">4</div>
+              <div class="number-btn" data-number="5">5</div>
+              <div class="number-btn" data-number="6">6</div>
+              <div class="number-btn" data-number="7">7</div>
+              <div class="number-btn" data-number="8">8</div>
+              <div class="number-btn" data-number="9">9</div>
             </div>
-            
             <div class="action-buttons">
-              <button id="hint-btn" class="action-btn hint-btn" title="İpucu Al">
-                <i class="fas fa-lightbulb"></i> İpucu
-              </button>
-              <button id="check-btn" class="action-btn check-btn" title="Kontrol Et">
-                <i class="fas fa-check"></i> Kontrol
-              </button>
-              <button id="clear-btn" class="action-btn clear-btn" title="Temizle">
-                <i class="fas fa-trash"></i> Temizle
-              </button>
+              <div class="action-btn" id="note-toggle" title="Not Modu">
+                <i class="fas fa-pencil-alt"></i>
+              </div>
+              <div class="action-btn" id="eraser-btn" title="Sil">
+                <i class="fas fa-eraser"></i>
+              </div>
+              <div class="action-btn" id="hint-btn" title="İpucu">
+                <i class="fas fa-lightbulb"></i>
+              </div>
             </div>
           </div>
         </div>
-        
-        <!-- Progress Bar for overall game -->
-        <div class="game-progress">
-          <div class="progress-label">Genel İlerleme: <span id="progress-percent">0%</span></div>
-          <div class="progress">
-            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-          </div>
+
+        <!-- Game Controls Bottom -->
+        <div class="game-controls-bottom">
+          <button id="restart-game-btn" class="game-btn">
+            <i class="fas fa-redo me-2"></i>Yeniden Başlat
+          </button>
+          <button id="check-solution-btn" class="game-btn">
+            <i class="fas fa-check me-2"></i>Kontrol Et
+          </button>
         </div>
       </div>
-      
+
       <!-- Game Over Container -->
-      <div id="game-over-container" class="game-results-container" style="display: none;">
-        <div class="game-results-card">
-          <div class="game-results-header">
-            <span class="result-badge">
-              <i class="fas fa-flag-checkered"></i>
-            </span>
-            <h2 class="mb-0" id="game-result-title">Sudoku Tamamlandı!</h2>
+      <div id="game-over-container" class="sudoku-results-container" style="display: none;">
+        <div class="results-header">
+          <h2 class="results-title">Tebrikler!</h2>
+          <p class="results-message">Sudoku bulmacasını başarıyla tamamladınız.</p>
+        </div>
+
+        <div class="results-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="final-score">0</div>
+            <div class="stat-label">PUAN</div>
           </div>
-          
-          <div class="game-results-body">
-            <div class="results-stats">
-              <div class="result-stat">
-                <i class="fas fa-trophy"></i>
-                <div class="result-stat-value">
-                  <span id="final-score">0</span>
-                </div>
-                <div class="result-stat-label">Toplam Puan</div>
-              </div>
-              
-              <div class="result-stat">
-                <i class="fas fa-clock"></i>
-                <div class="result-stat-value">
-                  <span id="final-time">00:00</span>
-                </div>
-                <div class="result-stat-label">Süre</div>
-              </div>
-              
-              <div class="result-stat">
-                <i class="fas fa-bullseye"></i>
-                <div class="result-stat-value">
-                  <span id="final-difficulty">Kolay</span>
-                </div>
-                <div class="result-stat-label">Zorluk</div>
-              </div>
-            </div>
-            
-            <div class="results-rating">
-              <div class="rating-stars" id="rating-stars">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-              </div>
-              <div class="rating-text" id="rating-text">İyi!</div>
-            </div>
-            
-            <div class="game-achievement" id="game-achievement" style="display: none;">
-              <div class="achievement-icon">
-                <i class="fas fa-award"></i>
-              </div>
-              <div class="achievement-text">
-                <div class="achievement-title">Başarım Kazanıldı!</div>
-                <div class="achievement-name" id="achievement-name">Sudoku Ustası</div>
-              </div>
-            </div>
+          <div class="stat-item">
+            <div class="stat-value" id="final-time">00:00</div>
+            <div class="stat-label">SÜRE</div>
           </div>
-          
-          <div class="game-results-footer">
-            <button id="play-again" class="standard-replay-btn">
-              <i class="fas fa-redo me-2"></i>Tekrar Oyna
-            </button>
-            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-trophy me-2"></i>Skor Tablosu
-            </a>
-          </div>
-          
-          <div class="game-share-section">
-            <p>Skorunuzu paylaşın:</p>
-            <div class="share-buttons">
-              <button class="share-btn" title="Kopyala" id="copy-score">
-                <i class="fas fa-copy"></i>
-              </button>
-              <button class="share-btn" title="Paylaş" id="share-score">
-                <i class="fas fa-share-alt"></i>
-              </button>
-            </div>
+          <div class="stat-item">
+            <div class="stat-value" id="final-errors">0</div>
+            <div class="stat-label">HATA</div>
           </div>
         </div>
+
+        <div class="results-rating">
+          <div class="rating-stars" id="rating-stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="rating-text" id="rating-text">İyi!</div>
+        </div>
+
+        <div class="sudoku-achievement" id="sudoku-achievement" style="display: none;">
+          <div class="achievement-icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <div class="achievement-text">
+            <div class="achievement-title">Başarım Kazanıldı!</div>
+            <div class="achievement-name" id="achievement-name">Sudoku Ustası</div>
+          </div>
+        </div>
+
+        <div class="sudoku-results-footer">
+          <button id="play-again-btn" class="btn btn-primary btn-lg">
+            <i class="fas fa-redo me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-trophy me-2"></i>Skor Tablosu
+          </a>
+        </div>
       </div>
-      
-      <!-- Pause Menu Overlay -->
-      <div id="pause-overlay" class="pause-overlay" style="display: none;">
-        <div class="pause-card">
-          <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
-          <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
+
+      <!-- Pause Menu -->
+      <div id="pause-menu" class="pause-menu-overlay" style="display: none;">
+        <div class="pause-menu-content">
+          <h2 class="pause-title">Oyun Duraklatıldı</h2>
+          <p class="pause-description">Oyuna devam etmek için aşağıdaki düğmeye tıklayın.</p>
           <div class="pause-menu-buttons">
-            <button id="resume-game" class="btn btn-primary">
+            <button id="resume-game-btn" class="btn btn-primary">
               <i class="fas fa-play me-2"></i>Devam Et
             </button>
-            <button id="restart-game" class="btn btn-outline-primary">
+            <button id="restart-game-button" class="btn btn-outline-primary">
               <i class="fas fa-redo me-2"></i>Yeniden Başlat
             </button>
             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
