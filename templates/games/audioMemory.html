@@ -14,17 +14,15 @@
   <div class="row justify-content-center mb-3">
     <div class="col-md-6 text-center">
       <div class="game-stats">
-        <div class="stat-item">
-          <span class="stat-label">Seviye:</span>
-          <span id="level" class="stat-value">1</span>
+        <div class="game-stat">
+          <i class="fas fa-star"></i>
+          <div class="stat-label">SKOR</div>
+          <div class="stat-value" id="score">0</div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Skor:</span>
-          <span id="score" class="stat-value">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">En Yüksek Skor:</span>
-          <span id="highScore" class="stat-value">0</span>
+        <div class="game-stat">
+          <i class="fas fa-level-up-alt"></i>
+          <div class="stat-label">SEVİYE</div>
+          <div class="stat-value" id="level">1</div>
         </div>
       </div>
     </div>
@@ -33,8 +31,8 @@
   <div class="row justify-content-center">
     <div class="col-lg-6 col-md-8">
       <div id="game-container" class="simon-game-container">
-        <div id="status-display" class="status-display">Başlamak için "Başlat" butonuna tıklayın</div>
-        
+        <div id="status-display" class="status-display glass-panel mt-4">Başlamak için "Başlat" butonuna tıklayın</div>
+
         <!-- Zorluk Seviyesi Seçenekleri -->
         <div class="difficulty-selector">
           <label>Zorluk: </label>
@@ -44,7 +42,7 @@
             <button type="button" class="btn difficulty-btn" data-difficulty="hard">Zor</button>
           </div>
         </div>
-        
+
         <!-- Oyun butonları - Kolay mod (4 buton) -->
         <div id="easy-buttons" class="simon-buttons easy-mode">
           <button id="btn0" class="simon-btn red" data-sound="0"></button>
@@ -52,7 +50,7 @@
           <button id="btn2" class="simon-btn blue" data-sound="2"></button>
           <button id="btn3" class="simon-btn yellow" data-sound="3"></button>
         </div>
-        
+
         <!-- Oyun butonları - Orta mod (6 buton) -->
         <div id="medium-buttons" class="simon-buttons medium-mode" style="display: none;">
           <button id="btn0-medium" class="simon-btn red" data-sound="0"></button>
@@ -62,7 +60,7 @@
           <button id="btn4-medium" class="simon-btn purple" data-sound="4"></button>
           <button id="btn5-medium" class="simon-btn orange" data-sound="5"></button>
         </div>
-        
+
         <!-- Oyun butonları - Zor mod (8 buton) -->
         <div id="hard-buttons" class="simon-buttons hard-mode" style="display: none;">
           <button id="btn0-hard" class="simon-btn red" data-sound="0"></button>
@@ -74,10 +72,10 @@
           <button id="btn6-hard" class="simon-btn pink" data-sound="6"></button>
           <button id="btn7-hard" class="simon-btn teal" data-sound="7"></button>
         </div>
-        
+
         <div class="game-controls">
-          <button id="start-button" class="game-control-btn start">Başlat</button>
-          <button id="reset-button" class="game-control-btn reset" disabled>Sıfırla</button>
+          <button id="start-button" class="game-control-btn start"><i class="fas fa-play me-2"></i>Başlat</button>
+          <button id="reset-button" class="game-control-btn reset" disabled><i class="fas fa-redo me-2"></i>Sıfırla</button>
         </div>
       </div>
     </div>
@@ -99,7 +97,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="row mt-4 mb-5">
     <div class="col text-center">
       <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">

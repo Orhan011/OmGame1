@@ -107,118 +107,154 @@
   color: white;
 }
 
-/* Simon Butonları */
-.simon-buttons {
-  display: grid;
-  gap: 10px;
-  margin: 20px auto;
+/* Simon Butonları - Replaced with new structure */
+.simon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.easy-mode {
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.medium-mode {
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.hard-mode {
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-}
-
-.simon-btn {
-  width: 100%;
-  padding-bottom: 100%; /* Square aspect ratio */
+.simon-board {
   position: relative;
-  border-radius: 10px;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background-color: rgba(22, 22, 36, 0.8);
+  margin: 0 auto 30px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(106, 90, 224, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
+  transition: all 0.3s ease;
+}
+
+.simon-board:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(106, 90, 224, 0.4);
+}
+
+.simon-button {
+  position: absolute;
+  width: 165px;
+  height: 165px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  opacity: 0.7;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.simon-btn:hover {
   opacity: 0.9;
-  transform: translateY(-2px);
+  transition: all 0.3s ease;
+  transform: scale(0.95);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.05);
 }
 
-.simon-btn.active {
+.simon-button:hover {
   opacity: 1;
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-  transform: scale(1.05);
+  transform: scale(1);
 }
 
-/* Buton Renkleri */
-.simon-btn.red { background-color: #e74c3c; }
-.simon-btn.green { background-color: #2ecc71; }
-.simon-btn.blue { background-color: #3498db; }
-.simon-btn.yellow { background-color: #f1c40f; }
-.simon-btn.purple { background-color: #9b59b6; }
-.simon-btn.orange { background-color: #e67e22; }
-.simon-btn.pink { background-color: #fd79a8; }
-.simon-btn.teal { background-color: #00cec9; }
+.simon-button.active {
+  opacity: 1;
+  filter: brightness(1.6);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.4);
+  z-index: 10;
+}
 
-/* Aktif durumdaki butonlar için parlama efekti */
-.simon-btn.red.active { box-shadow: 0 0 30px rgba(231, 76, 60, 0.8); }
-.simon-btn.green.active { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); }
-.simon-btn.blue.active { box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
-.simon-btn.yellow.active { box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); }
-.simon-btn.purple.active { box-shadow: 0 0 30px rgba(155, 89, 182, 0.8); }
-.simon-btn.orange.active { box-shadow: 0 0 30px rgba(230, 126, 34, 0.8); }
-.simon-btn.pink.active { box-shadow: 0 0 30px rgba(253, 121, 168, 0.8); }
-.simon-btn.teal.active { box-shadow: 0 0 30px rgba(0, 206, 201, 0.8); }
+.green {
+  top: 5px;
+  left: 5px;
+  border-radius: 100% 0 0 0;
+  background: linear-gradient(135deg, #00E676, #00C853);
+}
 
-/* Oyun Kontrol Butonları */
+.red {
+  top: 5px;
+  right: 5px;
+  border-radius: 0 100% 0 0;
+  background: linear-gradient(135deg, #FF5252, #FF1744);
+}
+
+.yellow {
+  bottom: 5px;
+  left: 5px;
+  border-radius: 0 0 0 100%;
+  background: linear-gradient(135deg, #FFEA00, #FFD600);
+}
+
+.blue {
+  bottom: 5px;
+  right: 5px;
+  border-radius: 0 0 100% 0;
+  background: linear-gradient(135deg, #448AFF, #2979FF);
+}
+
+/* Oyun Kontrol Butonları - Updated styling */
 .game-controls {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  width: 100%;
+  gap: 20px;
+  margin-top: 25px;
 }
 
 .game-control-btn {
-  padding: 10px 30px;
-  margin: 0 10px;
-  border-radius: 30px;
-  font-weight: bold;
+  padding: 12px 25px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
   transition: all 0.3s ease;
   border: none;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.9rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-.game-control-btn.start {
-  background: linear-gradient(135deg, #43cea2, #185a9d);
+.game-control-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    transparent,
+    transparent,
+    transparent, 
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  transform: rotate(30deg);
+  animation: shimmer 8s infinite linear;
+  z-index: -1;
+}
+
+.start {
+  background: linear-gradient(135deg, #6a5ae0, #5246c0);
   color: white;
 }
 
-.game-control-btn.reset {
-  background: linear-gradient(135deg, #a8c0ff, #3f2b96);
-  color: white;
-  opacity: 0.7;
+.start:hover {
+  background: linear-gradient(135deg, #7a6aff, #6255e0);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
 }
 
-.game-control-btn:disabled {
-  opacity: 0.5;
+.reset {
+  background: linear-gradient(135deg, #adb5bd, #868e96);
+  color: white;
+}
+
+.reset:hover:not(:disabled) {
+  background: linear-gradient(135deg, #bbc3cb, #9ca5ad);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(134, 142, 150, 0.4);
+}
+
+.reset:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.game-control-btn:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
-}
-
-.game-control-btn:active:not(:disabled) {
-  transform: translateY(-1px);
-}
 
 /* Oyun Talimatları */
 .game-instructions {
@@ -248,20 +284,20 @@
   .simon-game-container {
     padding: 15px;
   }
-  
+
   .simon-buttons {
     max-width: 300px;
   }
-  
+
   .game-control-btn {
     padding: 8px 20px;
     font-size: 0.8rem;
   }
-  
+
   .stat-value {
     font-size: 1.2rem;
   }
-  
+
   .stat-item {
     margin: 0 8px;
   }
@@ -289,4 +325,14 @@
 .error-shake {
   animation: errorShake 0.4s ease;
   background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* Added animation for shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }
