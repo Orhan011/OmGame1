@@ -35,7 +35,23 @@
           </div>
         </div>
         
-        <!-- İstatistikler bölümü kaldırıldı -->
+        <!-- İstatistikler -->
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ user.total_games_played }}</span>
+            <span class="stat-label">Oyunlar</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ user.highest_score }}</span>
+            <span class="stat-label">En Yüksek Skor</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ game_scores|length }}</span>
+            <span class="stat-label">Başarılar</span>
+          </div>
+        </div>
         
         <!-- Kişisel Bilgiler -->
         <div class="personal-info-container">
@@ -79,7 +95,13 @@
         <!-- Sekme Başlıkları -->
         <div class="profile-tab-container">
           <div class="tab-navigation">
-            <button class="tab-button active" data-tab="security">
+            <button class="tab-button active" data-tab="achievements">
+              <i class="fas fa-trophy"></i> Başarılar
+            </button>
+            <button class="tab-button" data-tab="statistics">
+              <i class="fas fa-chart-line"></i> İstatistikler
+            </button>
+            <button class="tab-button" data-tab="security">
               <i class="fas fa-shield-alt"></i> Güvenlik
             </button>
             <button class="tab-button" data-tab="settings">
@@ -90,10 +112,122 @@
           
           <!-- Sekme İçerikleri -->
           <div class="tab-content-container">
-            <!-- Başarılar ve İstatistikler sekmeleri kaldırıldı -->
+            <!-- Başarılar Sekmesi -->
+            <div class="tab-content active" id="achievements-tab">
+              <h3 class="tab-title">Oyun Başarıları</h3>
+              
+              <div class="game-stats-grid">
+                {% for game_type, scores in game_scores.items() %}
+                  {% set max_score = scores|map(attribute='score')|max %}
+                  <div class="game-stat-card">
+                    <div class="game-stat-header">
+                      <div class="game-icon">
+                        {% if game_type == 'wordPuzzle' %}
+                          <i class="fas fa-spell-check"></i>
+                        {% elif game_type == 'memoryMatch' %}
+                          <i class="fas fa-clone"></i>
+                        {% elif game_type == 'labyrinth' %}
+                          <i class="fas fa-route"></i>
+                        {% elif game_type == 'numberSequence' %}
+                          <i class="fas fa-sort-numeric-up"></i>
+                        {% else %}
+                          <i class="fas fa-gamepad"></i>
+                        {% endif %}
+                      </div>
+                      <div class="game-name">
+                        {% if game_type == 'wordPuzzle' %}
+                          Kelime Bulmaca
+                        {% elif game_type == 'memoryMatch' %}
+                          Hafıza Kartları
+                        {% elif game_type == 'labyrinth' %}
+                          Labirent
+                        {% elif game_type == 'numberSequence' %}
+                          Sayı Dizisi
+                        {% else %}
+                          {{ game_type }}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="game-stat-body">
+                      <div class="game-stat-row">
+                        <div class="game-stat-item">
+                          <span class="game-stat-value">{{ max_score }}</span>
+                          <span class="game-stat-label">En Yüksek</span>
+                        </div>
+                        <div class="game-stat-item">
+                          <span class="game-stat-value">{{ scores|length }}</span>
+                          <span class="game-stat-label">Oynama</span>
+                        </div>
+                        <div class="game-stat-item">
+                          <span class="game-stat-value">{{ (scores|map(attribute='score')|sum / scores|length)|int if scores|length > 0 else 0 }}</span>
+                          <span class="game-stat-label">Ortalama</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="game-stat-footer">
+                      <span class="last-played">
+                        <i class="far fa-clock"></i> Son oynanma: {{ scores[0].timestamp.strftime('%d.%m.%Y') }}
+                      </span>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="no-achievements">
+                    <i class="fas fa-trophy-alt empty-icon"></i>
+                    <p>Henüz hiç oyun oynamadınız. Başarılar kazanmak için hemen bir oyun oynayın!</p>
+                    <a href="{{ url_for('all_games') }}" class="btn btn-primary mt-3">
+                      <i class="fas fa-gamepad me-2"></i>Oyunları Keşfet
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <!-- İstatistikler Sekmesi -->
+            <div class="tab-content" id="statistics-tab">
+              <h3 class="tab-title">Oyun İstatistikleri</h3>
+              
+              <div class="stats-overview">
+                <div class="stat-card total-games">
+                  <div class="stat-icon">
+                    <i class="fas fa-gamepad"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ user.total_games_played }}</span>
+                    <span class="stat-label">Toplam Oyun</span>
+                  </div>
+                </div>
+                
+                <div class="stat-card total-xp">
+                  <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ user.experience_points|int }}</span>
+                    <span class="stat-label">Toplam XP</span>
+                  </div>
+                </div>
+                
+                <div class="stat-card high-score">
+                  <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                  </div>
+                  <div class="stat-info">
+                    <span class="stat-value">{{ user.highest_score }}</span>
+                    <span class="stat-label">En Yüksek Skor</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="stats-detailed mt-4">
+                <!-- Burada daha ayrıntılı istatistikler veya grafikler gösterilebilir -->
+                <div class="placeholder-message">
+                  <p><i class="fas fa-chart-line me-2"></i> Daha ayrıntılı istatistikler yakında eklenecek!</p>
+                </div>
+              </div>
+            </div>
             
             <!-- Güvenlik Sekmesi -->
-            <div class="tab-content active" id="security-tab">
+            <div class="tab-content" id="security-tab">
               <h3 class="tab-title">Hesap Güvenliği</h3>
               
               <div class="security-settings">
