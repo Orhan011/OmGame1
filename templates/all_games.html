@@ -8,153 +8,99 @@
       <p class="text-center">Beyin egzersizi ve zihinsel gelişim için tasarlanmış tüm oyunlarımız</p>
     </div>
   </div>
-  
-  <div class="all-games-grid">
+
+  <div class="game-grid">
     <!-- Kelime Bulmaca -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-font"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-font"></i></div>
+      <div class="game-info">
         <h3>Kelime Bulmaca</h3>
+        <p>Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin.</p>
       </div>
-      <div class="game-content">
-        <p>Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin. Bu oyun, sözcük dağarcığınızı geliştirmenize yardımcı olurken aynı zamanda beyninizi aktif tutar.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Dil Becerileri</span>
-          <span><i class="fas fa-chart-line"></i> Kelime Dağarcığı</span>
-        </div>
-      </div>
-      <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Hafıza Kartları -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-clone"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-clone"></i></div>
+      <div class="game-info">
         <h3>Hafıza Kartları</h3>
+        <p>Kapalı kartların yerlerini belleğinizde tutun ve eşleştirin.</p>
       </div>
-      <div class="game-content">
-        <p>Kapalı kartların yerlerini belleğinizde tutun ve eşleştirmeye çalışın. Bu klasik oyun, görsel bellek ve konsantrasyon becerinizi geliştirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Görsel Bellek</span>
-          <span><i class="fas fa-chart-line"></i> Konsantrasyon</span>
-        </div>
-      </div>
-      <a href="{{ url_for('memory_match') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('memory_match') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Labirent -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-route"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-route"></i></div>
+      <div class="game-info">
         <h3>Labirent</h3>
+        <p>Karmaşık labirentlerde yolunuzu bulun.</p>
       </div>
-      <div class="game-content">
-        <p>Karmaşık labirentlerde yolunuzu bulun. Bu oyun, mekânsal düşünme becerinizi ve problem çözme yeteneğinizi geliştirmek için mükemmeldir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Mekânsal Zeka</span>
-          <span><i class="fas fa-chart-line"></i> Problem Çözme</span>
-        </div>
-      </div>
-      <a href="{{ url_for('labyrinth') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Yapboz -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+      <div class="game-info">
         <h3>Yapboz</h3>
+        <p>Parçaları doğru yerleştirerek resimleri tamamlayın.</p>
       </div>
-      <div class="game-content">
-        <p>Parçaları doğru yerleştirerek resimleri tamamlayın. Bu oyun görsel-mekânsal zekanızı ve organizasyon yeteneğinizi geliştirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Görsel-Mekânsal Zeka</span>
-          <span><i class="fas fa-chart-line"></i> El-Göz Koordinasyonu</span>
-        </div>
-      </div>
-      <a href="{{ url_for('puzzle') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Sayı Dizisi -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+      <div class="game-info">
         <h3>Sayı Dizisi</h3>
+        <p>Sayı dizilerindeki mantıksal örüntüleri keşfedin.</p>
       </div>
-      <div class="game-content">
-        <p>Sayı dizilerindeki mantıksal örüntüleri keşfedin. Bu oyun, analitik düşünme ve matematiksel akıl yürütme becerilerinizi geliştirmenizi sağlar.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Mantıksal Düşünme</span>
-          <span><i class="fas fa-chart-line"></i> Matematiksel Zeka</span>
-        </div>
-      </div>
-      <a href="{{ url_for('number_sequence') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Sayı Zinciri -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-link"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-link"></i></div>
+      <div class="game-info">
         <h3>Sayı Zinciri</h3>
+        <p>Ekranda beliren sayıları doğru sırayla hatırlayın.</p>
       </div>
-      <div class="game-content">
-        <p>Ekranda beliren sayıları doğru sırayla hatırlayıp tekrarlayın. Bu oyun çalışma belleğinizi ve sıralı hatırlama becerilerinizi geliştirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Çalışma Belleği</span>
-          <span><i class="fas fa-chart-line"></i> Sıralı Hatırlama</span>
-        </div>
-      </div>
-      <a href="{{ url_for('number_chain') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Sesli Hafıza -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+      <div class="game-info">
         <h3>Sesli Hafıza</h3>
+        <p>Duyduğunuz ses dizisini tekrar etmeye çalışın.</p>
       </div>
-      <div class="game-content">
-        <p>Duyduğunuz ses dizisini tekrar etmeye çalışın. Bu oyun işitsel belleğinizi ve dikkat becerilerinizi geliştirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> İşitsel Bellek</span>
-          <span><i class="fas fa-chart-line"></i> Dikkat</span>
-        </div>
-      </div>
-      <a href="{{ url_for('audio_memory') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- N-Back Test -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-brain"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-brain"></i></div>
+      <div class="game-info">
         <h3>N-Back Test</h3>
+        <p>Belirli bir zaman önce gösterilen uyaranı hatırlayın.</p>
       </div>
-      <div class="game-content">
-        <p>Belirli bir zaman önce gösterilen uyaranı hatırlayıp eşleştirin. Bilimsel olarak kanıtlanmış bu oyun, çalışma belleğinizi ve odaklanma yeteneğinizi güçlendirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> Çalışma Belleği</span>
-          <span><i class="fas fa-chart-line"></i> Odaklanma</span>
-        </div>
-      </div>
-      <a href="{{ url_for('n_back') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
     </div>
-    
+
     <!-- 3D Labirent -->
-    <div class="game-card large">
-      <div class="game-header">
-        <div class="game-icon"><i class="fas fa-cube"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-cube"></i></div>
+      <div class="game-info">
         <h3>3D Labirent</h3>
+        <p>First-person perspektifiyle 3D labirentte gezinin.</p>
       </div>
-      <div class="game-content">
-        <p>First-person perspektifiyle 3D labirentte gezinin. Bu oyun mekânsal düşünme ve navigasyon yeteneğinizi geliştirir.</p>
-        <div class="game-features">
-          <span><i class="fas fa-brain"></i> 3D Mekânsal Zeka</span>
-          <span><i class="fas fa-chart-line"></i> Yön Bulma</span>
-        </div>
-      </div>
-      <a href="{{ url_for('three_d_labyrinth') }}" class="btn btn-primary game-play-btn">Oyna</a>
+      <a href="{{ url_for('three_d_labyrinth') }}" class="game-btn">Oyna</a>
     </div>
   </div>
-  
+
   <div class="row mt-5 mb-5">
     <div class="col-12 text-center">
       <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg">
@@ -167,92 +113,48 @@
 
 {% block extra_css %}
 <style>
-  .all-games-grid {
+  .game-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 2rem;
   }
-  
-  .game-card.large {
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border-radius: 15px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .game-card.large:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  }
-  
-  .game-header {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: var(--primary-color);
-    color: white;
-  }
-  
-  .game-header .game-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-    font-size: 1.2rem;
-  }
-  
-  .game-header h3 {
-    margin: 0;
-    font-size: 1.4rem;
-  }
-  
-  .game-content {
-    padding: 20px;
-    flex-grow: 1;
-  }
-  
-  .game-features {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-  }
-  
-  .game-features span {
-    background: var(--accent-color-light);
-    color: var(--text-color);
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  .game-features span i {
-    margin-right: 5px;
-  }
-  
-  .game-play-btn {
-    margin: 0 20px 20px;
-    padding: 10px;
-    font-weight: 500;
-    border-radius: 30px;
-    transition: all 0.3s ease;
-  }
-  
+
   @media (max-width: 768px) {
-    .all-games-grid {
+    .game-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .game-grid {
       grid-template-columns: 1fr;
     }
+  }
+  .game-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+  }
+  .game-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .game-info h3 {
+    margin-top: 0;
+  }
+  .game-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
   }
 </style>
 {% endblock %}
