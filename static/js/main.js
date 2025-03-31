@@ -261,6 +261,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const navbarCollapse = document.querySelector('.navbar-collapse');
     const userDropdownContainer = document.querySelector('.navbar-nav.ms-auto.d-flex');
     
+    // Null kontrolü ekleyelim
+    if (!userDropdownContainer) return;
+    
     if (window.innerWidth < 992) { // Bootstrap'ın lg breakpoint değeri
       userDropdownContainer.classList.add('mobile-visible');
     } else {
@@ -269,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   
   // İlk yüklemede ayarla
-  adjustUserDropdown();
+  setTimeout(adjustUserDropdown, 100); // DOMContentLoaded olayından sonra bir gecikme ekleyelim
   
   // Ekran boyutu değiştiğinde ayarla
   window.addEventListener('resize', adjustUserDropdown);

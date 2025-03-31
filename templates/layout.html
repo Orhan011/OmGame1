@@ -40,6 +40,25 @@ document.addEventListener("DOMContentLoaded", function() {
       panel.style.maxHeight = '100vh';
     });
   }
+  
+  // Bootstrap dropdown'ları initialize et
+  const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+  if (dropdownElements.length > 0) {
+    dropdownElements.forEach(element => {
+      new bootstrap.Dropdown(element);
+    });
+  }
+  
+  // Profil dropdown'u için özel event listener ekle
+  const userDropdown = document.getElementById('userDropdown');
+  if (userDropdown) {
+    userDropdown.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropdown = bootstrap.Dropdown.getInstance(userDropdown) || new bootstrap.Dropdown(userDropdown);
+      dropdown.toggle();
+    });
+  }
 });
 
 // Makale ve ipucu içeriklerini dinamik olarak yükleme işlevi
@@ -117,7 +136,7 @@ function loadArticleContent() {
           {% endif %}
         </a>
         <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('profile_v2') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
         </ul>
