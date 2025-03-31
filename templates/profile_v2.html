@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="profile-container">
-  <!-- Profile Card -->
+  <!-- Profil Kartı -->
   <div class="profile-card">
     <div class="avatar-section">
-      {% if get_avatar_url() %}
-      <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ get_current_user().username }}" class="profile-avatar">
+      {% if get_current_user().avatar_url %}
+      <img src="{{ url_for('static', filename=get_current_user().avatar_url) }}" alt="{{ get_current_user().username }}" class="profile-avatar">
       {% else %}
       <div class="profile-avatar-placeholder">
         {{ get_current_user().username[0]|upper }}
@@ -21,11 +21,13 @@
 
     <div class="profile-info">
       <h2 class="username">{{ get_current_user().username }}</h2>
-      <span class="user-status {{ get_current_user().account_status }}">
-        {{ get_current_user().account_status|capitalize }}
-      </span>
+      <p class="birth-year">{{ get_current_user().age }}</p>
+      <button class="edit-profile-btn">Profil Düzenle</button>
     </div>
+  </div>
 
+  <!-- Oyuncu Seviyesi ve XP Kartı -->
+  <div class="profile-card">
     <div class="level-info">
       <div class="level-badge">
         <span class="level-number">{{ current_level }}</span>
@@ -43,15 +45,16 @@
     </div>
   </div>
 
-  <!-- Settings Tabs -->
-  <div class="settings-container">
+  <!-- Ayarlar Kartları -->
+  <div class="profile-card settings-card">
+    <!-- Tab Butonları -->
     <div class="settings-tabs">
       <button class="tab-btn active" data-tab="profile">Profil</button>
       <button class="tab-btn" data-tab="security">Güvenlik</button>
       <button class="tab-btn" data-tab="notifications">Bildirimler</button>
     </div>
 
-    <!-- Profile Tab -->
+    <!-- Profil Tab İçeriği -->
     <div class="tab-content active" id="profile-tab">
       <form class="settings-form" action="{{ url_for('update_profile') }}" method="post">
         <div class="form-group">
@@ -70,7 +73,7 @@
       </form>
     </div>
 
-    <!-- Security Tab -->
+    <!-- Güvenlik Tab İçeriği -->
     <div class="tab-content" id="security-tab">
       <form class="settings-form" action="{{ url_for('change_password') }}" method="post">
         <div class="form-group">
@@ -99,7 +102,7 @@
       </div>
     </div>
 
-    <!-- Notifications Tab -->
+    <!-- Bildirimler Tab İçeriği -->
     <div class="tab-content" id="notifications-tab">
       <form class="settings-form" action="{{ url_for('update_notification_settings') }}" method="post">
         <div class="notification-option">
@@ -124,7 +127,7 @@
   </div>
 </div>
 
-<!-- Level Up Modal -->
+<!-- Seviye Atlama Modalı -->
 <div class="level-up-modal" id="levelUpModal">
   <div class="level-up-content">
     <div class="level-up-icon">🎮</div>
@@ -141,7 +144,7 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Tab switching
+  // Tab değiştirme
   const tabs = document.querySelectorAll('.tab-btn');
   const contents = document.querySelectorAll('.tab-content');
 
@@ -155,28 +158,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Calculate XP progress for the progress bar
+  // Profil düzenleme butonunu aktifleştir
+  const editProfileBtn = document.querySelector('.edit-profile-btn');
+  if (editProfileBtn) {
+    editProfileBtn.addEventListener('click', function() {
+      document.querySelector('.tab-btn[data-tab="profile"]').click();
+    });
+  }
+
+  // XP ilerleme çubuğu için hesaplama
   const currentXP = {{ get_current_user().experience_points }};
   const xpForCurrent = {{ xp_for_current }};
   const xpForNext = {{ xp_for_next }};
-  
-  // Calculate percentage progress to next level
+
+  // Sonraki seviyeye ilerlemek için yüzdelik hesaplama
   const xpProgress = Math.min(100, Math.floor(((currentXP - xpForCurrent) / (xpForNext - xpForCurrent)) * 100));
-  
-  // Update XP progress bar
+
+  // XP ilerleme çubuğunu güncelleme
   const xpProgressBar = document.querySelector('.xp-progress');
   if (xpProgressBar) {
     xpProgressBar.style.width = xpProgress + '%';
   }
 
-  // Level up animation
+  // Seviye atlama animasyonu
   function showLevelUp(level) {
     const modal = document.getElementById('levelUpModal');
     document.getElementById('newLevel').textContent = level;
     modal.classList.add('show');
     setTimeout(() => modal.classList.remove('show'), 3000);
   }
-
 
   // Password strength meter (merged and improved from original)
   const passwordInputs = document.querySelectorAll('input[type="password"]');
