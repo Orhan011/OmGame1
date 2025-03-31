@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
 
 <!-- Sayfa Özel CSS Dosyaları -->
 <!--  Profil CSS dosyası kaldırıldı -->
@@ -104,14 +106,14 @@ function loadArticleContent() {
     </ul>
 
     {% if session.get('user_id') %}
-    <!-- User menu dropdown - Sol üstte profil resmi -->
-    <ul class="navbar-nav ms-auto">
+    <!-- User menu dropdown - Sağ üstte profil resmi (her zaman görünür) -->
+    <ul class="navbar-nav ms-auto d-flex">
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a class="nav-link user-dropdown d-flex align-items-center" href="#" id="userDropdown">
           {% if get_avatar_url() %}
-          <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini me-2">
+          <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini">
           {% else %}
-          <div class="avatar-mini-placeholder me-2">{{ session.get('username')[0]|upper }}</div>
+          <div class="avatar-mini-placeholder">{{ session.get('username')[0]|upper }}</div>
           {% endif %}
         </a>
         <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">

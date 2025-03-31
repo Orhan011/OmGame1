@@ -402,12 +402,27 @@ animation:pulse-slow 3s infinite alternate;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  cursor: pointer;
 }
 
 .user-dropdown:hover {
   background-color: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobil görünümde kullanıcı dropdown menüsünün her zaman görünmesi için */
+@media (max-width: 991.98px) {
+  .navbar-nav.ms-auto.d-flex {
+    position: absolute;
+    right: 70px;
+    top: 12px;
+  }
+  
+  /* Hamburger menüde kullanıcı bilgilerini gizle */
+  .mobile-menu .user-dropdown {
+    display: none !important;
+  }
 }
 
 .avatar-mini {

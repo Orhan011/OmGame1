@@ -233,21 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Profil panelini açma/kapama fonksiyonu
-function toggleProfilePanel(event) {
-  event.stopPropagation();
-  const profilePanel = document.getElementById('profilePanel');
-  profilePanel.classList.toggle('active');
-
-  // Panel dışına tıklandığında paneli kapat
-  document.addEventListener('click', function closePanel(e) {
-    if (!profilePanel.contains(e.target) && e.target !== document.getElementById('topLeftAvatar')) {
-      profilePanel.classList.remove('active');
-      document.removeEventListener('click', closePanel);
-    }
-  });
-}
-
 // Profile Modal Lazy Loading
 document.addEventListener('DOMContentLoaded', function() {
   const profileButton = document.getElementById('profileButton');
@@ -270,7 +255,22 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // Navbar'da kullanıcı dropdown menüsünü açmak için tıklama işlevselliği
+  const userDropdown = document.querySelector('.user-dropdown');
+  if (userDropdown) {
+    userDropdown.addEventListener('click', function(e) {
+      // Bootstrap dropdown'ı manuel olarak toggle et
+      if (!e.target.closest('.dropdown-menu')) {
+        const dropdownMenu = this.nextElementSibling;
+        if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+          dropdownMenu.classList.toggle('show');
+        }
+      }
+    });
+  }
 });
+
 // Yeni profil paneli işlevselliği
 document.addEventListener('DOMContentLoaded', function() {
   // Tıklama dışında profil menüsünü kapatma işlevi için global event listener
