@@ -434,63 +434,6 @@ animation:pulse-slow 3s infinite alternate;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Profil dropdown menüsü stilleri */
-.user-dropdown {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 5px 10px;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.user-dropdown:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.user-dropdown .avatar-mini, 
-.user-dropdown .avatar-mini-placeholder {
-  transition: transform 0.3s ease;
-}
-
-.user-dropdown:hover .avatar-mini,
-.user-dropdown:hover .avatar-mini-placeholder {
-  transform: scale(1.1);
-}
-
-.dropdown-menu.glass-dropdown {
-  background: rgba(30, 30, 40, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  animation: dropdownFadeIn 0.3s ease forwards;
-  padding: 10px;
-}
-
-.dropdown-menu.glass-dropdown .dropdown-item {
-  color: rgba(255, 255, 255, 0.9);
-  padding: 8px 15px;
-  border-radius: 5px;
-  transition: all 0.2s ease;
-}
-
-.dropdown-menu.glass-dropdown .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(5px);
-}
-
-.dropdown-menu.glass-dropdown .dropdown-item i {
-  transition: transform 0.2s ease;
-}
-
-.dropdown-menu.glass-dropdown .dropdown-item:hover i {
-  transform: scale(1.2);
-}
-
-.dropdown-menu.glass-dropdown .dropdown-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 5px 0;
-}
-
 @keyframes dropdownFadeIn {
   from {
     opacity:0;
