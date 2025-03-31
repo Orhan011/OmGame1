@@ -11,6 +11,37 @@
   <div class="leaderboard-header">
     <h1>ZekaPark Skor Tablosu</h1>
     <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
+    
+    <!-- Oyun Kategorileri -->
+    <div class="game-categories">
+      <ul class="nav nav-pills justify-content-center mb-4">
+        <li class="nav-item">
+          <a class="nav-link active" href="#" data-game-type="all">
+            <i class="fas fa-trophy"></i> Genel Sıralama
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-game-type="wordPuzzle">
+            <i class="fas fa-puzzle-piece"></i> Kelime Bulmaca
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-game-type="memoryMatch">
+            <i class="fas fa-brain"></i> Hafıza Kartları
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-game-type="numberSequence">
+            <i class="fas fa-sort-numeric-up"></i> Sayı Dizisi
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-game-type="3dRotation">
+            <i class="fas fa-cube"></i> 3D Rotasyon
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <div class="leaderboard-container">
@@ -23,6 +54,29 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Kategori seçimini dinle
+  document.addEventListener('DOMContentLoaded', function() {
+    const categoryLinks = document.querySelectorAll('.game-categories .nav-link');
+    
+    categoryLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Aktif sınıfı kaldır
+        categoryLinks.forEach(l => l.classList.remove('active'));
+        
+        // Bu bağlantıyı aktifleştir
+        this.classList.add('active');
+        
+        // Skor tablosunu yükle
+        const gameType = this.getAttribute('data-game-type');
+        loadLeaderboard(gameType);
+      });
+    });
+  });
+</script>
 
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}
