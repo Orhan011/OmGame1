@@ -1452,49 +1452,56 @@ def get_scores(game_type):
                 'sudoku': 'sudoku'
             }
 
-            internal_game_type = game_type_map.get(game_type)
+            internal_game_type = game_type_map.get(game_type, game_type)
             if not internal_game_type:
-                return jsonify({'error': 'Invalid game type'}), 400
+                # Eğer eşleşme bulunamadıysa ve tire içeren bir oyun tipi varsa
+                # varsayılan olarak hatayı önlemek için boş bir liste döndür
+                return jsonify([])
 
-            # Önce her kullanıcı için maksimum skoru bulalım
-            max_scores_subquery = db.session.query(
-                Score.user_id, 
-                func.max(Score.score).label('max_score')
-            ).filter_by(
-                game_type=internal_game_type
-            ).group_by(
-                Score.user_id
-            ).subquery()
+            try:
+                # Önce her kullanıcı için maksimum skoru bulalım
+                max_scores_subquery = db.session.query(
+                    Score.user_id, 
+                    func.max(Score.score).label('max_score')
+                ).filter_by(
+                    game_type=internal_game_type
+                ).group_by(
+                    Score.user_id
+                ).subquery()
 
-            # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
-            scores = db.session.query(Score, User).join(
-                max_scores_subquery, 
-                db.and_(
-                    Score.user_id == max_scores_subquery.c.user_id,
-                    Score.score == max_scores_subquery.c.max_score,
-                    Score.game_type == internal_game_type
-                )
-            ).join(
-                User, 
-                User.id == Score.user_id
-            ).order_by(
-                Score.score.desc()
-            ).limit(10).all()
+                # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
+                scores = db.session.query(Score, User).join(
+                    max_scores_subquery, 
+                    db.and_(
+                        Score.user_id == max_scores_subquery.c.user_id,
+                        Score.score == max_scores_subquery.c.max_score,
+                        Score.game_type == internal_game_type
+                    )
+                ).join(
+                    User, 
+                    User.id == Score.user_id
+                ).order_by(
+                    Score.score.desc()
+                ).limit(10).all()
 
-            # Skor listesini hazırla
-            score_list = []
-            for score, user in scores:
-                score_list.append({
-                    'username': user.username if user else 'Anonim',
-                    'score': score.score,
-                    'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                    'rank': user.rank if user else 'Başlangıç'
-                })
+                # Skor listesini hazırla
+                score_list = []
+                for score, user in scores:
+                    score_list.append({
+                        'username': user.username if user else 'Anonim',
+                        'score': score.score,
+                        'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                        'rank': user.rank if user else 'Başlangıç'
+                    })
 
-            return jsonify(score_list)
+                return jsonify(score_list)
+            except Exception as e:
+                logger.error(f"Error querying scores for {internal_game_type}: {e}")
+                return jsonify([])
     except Exception as e:
         logger.error(f"Error in get_scores API: {e}")
-        return jsonify({'error': str(e)}), 500
+        # Hata durumunda boş liste döndür - bu hatanın görüntüye yansımasını engeller
+        return jsonify([])
 
 @app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
 def get_scores_alt(game_type):
