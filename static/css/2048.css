@@ -10,7 +10,7 @@
   --text-color: #776e65;
   --text-color-light: #f9f6f2;
 
-  /* Kare renkleri */
+  /* Kare renkleri - Daha parlak ve dinamik */
   --tile-color-2: #eee4da;
   --tile-color-4: #ede0c8;
   --tile-color-8: #f2b179;
@@ -24,14 +24,14 @@
   --tile-color-2048: #edc22e;
   --tile-color-super: #3c3a32;
 
-  /* Gölge ve animasyon */
+  /* Gölge ve animasyon - Geliştirilmiş efektler */
   --shadow-color: rgba(0, 0, 0, 0.2);
-  --glow-color: rgba(243, 215, 116, 0.5);
+  --glow-color: rgba(243, 215, 116, 0.6);
 
-  /* Boyut değişkenleri */
+  /* Boyut değişkenleri - 4x4 için optimize edilmiş */
   --grid-spacing: 15px;
-  --grid-border-radius: 6px;
-  --tile-border-radius: 3px;
+  --grid-border-radius: 8px;
+  --tile-border-radius: 5px;
 }
 
 body {
@@ -173,6 +173,7 @@ h1.game-title {
 .grid-cell {
   background: var(--empty-cell-color);
   border-radius: var(--tile-border-radius);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .tile-container {
@@ -188,66 +189,84 @@ h1.game-title {
   height: calc(25% - var(--grid-spacing) + (var(--grid-spacing) / 4));
   border-radius: var(--tile-border-radius);
   font-weight: bold;
-  font-size: 55px;
+  font-size: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: transform 0.15s ease, opacity 0.15s ease;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.tile.tile-2 { background: var(--tile-color-2); }
-.tile.tile-4 { background: var(--tile-color-4); }
+.tile.tile-2 { 
+  background: linear-gradient(to bottom, #eee4da, #e6ddd0); 
+  color: #776e65;
+  border: 2px solid rgba(0,0,0,0.05);
+}
+.tile.tile-4 { 
+  background: linear-gradient(to bottom, #ede0c8, #e4d3b9); 
+  color: #776e65;
+  border: 2px solid rgba(0,0,0,0.05);
+}
 .tile.tile-8 { 
-  background: var(--tile-color-8); 
+  background: linear-gradient(to bottom, #f2b179, #ec9c65); 
   color: var(--text-color-light);
+  border: 2px solid rgba(0,0,0,0.05);
 }
 .tile.tile-16 { 
-  background: var(--tile-color-16); 
+  background: linear-gradient(to bottom, #f59563, #e58250); 
   color: var(--text-color-light);
+  border: 2px solid rgba(0,0,0,0.05);
 }
 .tile.tile-32 { 
-  background: var(--tile-color-32); 
+  background: linear-gradient(to bottom, #f67c5f, #e3664d); 
   color: var(--text-color-light);
+  border: 2px solid rgba(0,0,0,0.05);
 }
 .tile.tile-64 { 
-  background: var(--tile-color-64); 
+  background: linear-gradient(to bottom, #f65e3b, #e44d28); 
   color: var(--text-color-light);
+  border: 2px solid rgba(0,0,0,0.05);
 }
 .tile.tile-128 { 
-  background: var(--tile-color-128); 
+  background: linear-gradient(to bottom, #edcf72, #e9c95c); 
   color: var(--text-color-light);
-  font-size: 45px;
+  font-size: 42px;
   box-shadow: 0 0 20px 0 var(--glow-color), 0 0 5px 0 var(--glow-color);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .tile.tile-256 { 
-  background: var(--tile-color-256); 
+  background: linear-gradient(to bottom, #edcc61, #e7c34e); 
   color: var(--text-color-light);
-  font-size: 45px;
+  font-size: 42px;
   box-shadow: 0 0 20px 0 var(--glow-color), 0 0 5px 0 var(--glow-color);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .tile.tile-512 { 
-  background: var(--tile-color-512); 
+  background: linear-gradient(to bottom, #edc850, #e7c03d); 
   color: var(--text-color-light);
-  font-size: 45px;
+  font-size: 42px;
   box-shadow: 0 0 20px 0 var(--glow-color), 0 0 5px 0 var(--glow-color);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .tile.tile-1024 { 
-  background: var(--tile-color-1024); 
+  background: linear-gradient(to bottom, #edc53f, #e7bb2a); 
   color: var(--text-color-light);
-  font-size: 35px;
+  font-size: 32px;
   box-shadow: 0 0 20px 0 var(--glow-color), 0 0 5px 0 var(--glow-color);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .tile.tile-2048 { 
-  background: var(--tile-color-2048); 
+  background: linear-gradient(to bottom, #edc22e, #edb814); 
   color: var(--text-color-light);
-  font-size: 35px;
+  font-size: 32px;
   box-shadow: 0 0 30px 5px var(--glow-color), 0 0 15px 2px var(--glow-color);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 .tile.tile-super { 
-  background: var(--tile-color-super); 
+  background: linear-gradient(to bottom, #3c3a32, #29282a); 
   color: var(--text-color-light);
   font-size: 30px;
+  border: 2px solid rgba(255,255,255,0.1);
 }
 
 .tile.tile-new {
