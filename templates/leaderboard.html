@@ -1,73 +1,80 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
 <div class="leaderboard-container">
   <div class="leaderboard-header">
     <h1>Skor Tablosu</h1>
-    <p>Tüm beyin geliştirme oyunlarında skorlarınızın diğer oyunculara göre nasıl olduğunu kontrol edin.</p>
+    <p>Beyin geliştirme oyunlarımızda en yüksek skorlar burada gösteriliyor. Oyuncuların performansını karşılaştırın ve kendi yerinizi görün.</p>
   </div>
 
   <div class="game-filter">
     <button class="game-filter-btn active" data-game="word-puzzle">
       <i class="fas fa-font"></i>
-      Kelime Bulmaca
+      <span>Kelime Bulmaca</span>
     </button>
     <button class="game-filter-btn" data-game="memory-match">
       <i class="fas fa-brain"></i>
-      Hafıza Kartları
+      <span>Hafıza Kartları</span>
     </button>
     <button class="game-filter-btn" data-game="labyrinth">
       <i class="fas fa-route"></i>
-      Labirent
+      <span>Labirent</span>
     </button>
     <button class="game-filter-btn" data-game="puzzle">
       <i class="fas fa-puzzle-piece"></i>
-      Yapboz
+      <span>Yapboz</span>
     </button>
-    <!-- Görsel Dikkat oyunu kaldırıldı
-    <button class="game-filter-btn" data-game="visual-attention">
-      <i class="fas fa-eye"></i>
-      Görsel Dikkat
-    </button>
-    -->
     <button class="game-filter-btn" data-game="number-sequence">
       <i class="fas fa-sort-numeric-up"></i>
-      Sayı Dizisi
-    </button>
-    <button class="game-filter-btn" data-game="3d-rotation">
-      <i class="fas fa-cube"></i>
-      3D Rotasyon
+      <span>Sayı Dizisi</span>
     </button>
     
-    <!-- Yeni Hafıza Güçlendirme Oyunları -->
-    <!-- Kim Nerede? oyunu kaldırıldı -->
+    <!-- Hafıza Güçlendirme Oyunları -->
     <button class="game-filter-btn" data-game="memory-cards">
       <i class="fas fa-clone"></i>
-      Kart Eşleştirme
+      <span>Kart Eşleştirme</span>
     </button>
     <button class="game-filter-btn" data-game="number-chain">
       <i class="fas fa-link"></i>
-      Sayı Zinciri
+      <span>Sayı Zinciri</span>
     </button>
     <button class="game-filter-btn" data-game="audio-memory">
       <i class="fas fa-music"></i>
-      Sesli Hafıza
+      <span>Sesli Hafıza</span>
     </button>
     <button class="game-filter-btn" data-game="n-back">
       <i class="fas fa-braille"></i>
-      N-Back Testi
+      <span>N-Back Testi</span>
+    </button>
+    <button class="game-filter-btn" data-game="sudoku">
+      <i class="fas fa-th"></i>
+      <span>Sudoku</span>
     </button>
   </div>
 
-  <div class="leaderboard-table">
-    <div class="table-header">
-      <div class="rank-cell">Sıra</div>
-      <div class="username-cell">Oyuncu</div>
-      <div class="score-cell">Skor</div>
-      <div class="date-cell">Tarih</div>
+  <div class="leaderboard-card">
+    <div class="card-header">
+      <h3>Skor Sıralaması</h3>
+      <button class="refresh-btn" onclick="loadAllScores()">
+        <i class="fas fa-sync-alt"></i>
+      </button>
     </div>
-    <div class="table-body" id="scores-container">
-      <!-- Scores will be loaded here -->
+    
+    <div class="leaderboard-table">
+      <div class="table-header">
+        <div class="rank-cell">Sıra</div>
+        <div class="username-cell">Oyuncu</div>
+        <div class="score-cell">Skor</div>
+        <div class="date-cell">Tarih</div>
+      </div>
+      <div class="table-body" id="scores-container">
+        <!-- Skorlar buraya yüklenecek -->
+        <div class="loading-scores">
+          <div class="spinner"></div>
+          <p>Skorlar yükleniyor...</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

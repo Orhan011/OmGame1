@@ -16,6 +16,7 @@
 <!-- IQ Geliştirme oyunları kaldırıldı -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">  <!-- Added leaderboard stylesheet -->
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
       menu.classList.add('mobile-menu');
     });
   }
-  
+
   // Offcanvas panelleri için kaydırma özelliğini etkinleştir
   const offcanvasPanels = document.querySelectorAll('.offcanvas');
   if (offcanvasPanels) {
@@ -71,7 +72,7 @@ function loadArticleContent() {
       <span></span>
     </div>
   </button>
-  
+
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">
@@ -97,11 +98,11 @@ function loadArticleContent() {
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
     </ul>
-    
+
     {% if session.get('user_id') %}
     <!-- Profil kısmı buradan kaldırıldı -->
     {% endif %}
-  
+
   <ul class="navbar-nav ms-auto">
       {% if not session.get('user_id') %}
         <li class="nav-item"><a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt nav-icon"></i>Giriş Yap</a></li>
@@ -113,7 +114,20 @@ function loadArticleContent() {
 </nav>
 
 <main class="container py-4">
-{% block content %}{% endblock %}
+{% block content %}
+  <div id="leaderboard">  <!-- Leaderboard container -->
+    </div>
+    <script>
+      //  Fetch leaderboard data here (replace with actual API call)
+      fetch('/api/leaderboard')
+        .then(response => response.json())
+        .then(data => {
+          // Render leaderboard data in the #leaderboard div
+          // Implement the design specified in the prompt here
+          console.log(data); // Log the fetched data for debugging.
+        });
+    </script>
+{% endblock %}
 </main>
 
 <footer class="footer">
