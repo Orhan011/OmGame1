@@ -603,7 +603,7 @@ def profile():
         puzzle_score = Score.query.filter_by(user_id=current_user.id, game_type='puzzle').order_by(Score.score.desc()).first()
         
         # Yeni oyunlar için skorları bul
-        where_is_it_score = Score.query.filter_by(user_id=current_user.id, game_type='whereIsIt').order_by(Score.score.desc()).first()
+        # where_is_it_score kaldırıldı
         memory_cards_score = Score.query.filter_by(user_id=current_user.id, game_type='memoryCards').order_by(Score.score.desc()).first()
         number_chain_score = Score.query.filter_by(user_id=current_user.id, game_type='numberChain').order_by(Score.score.desc()).first()
         audio_memory_score = Score.query.filter_by(user_id=current_user.id, game_type='audioMemory').order_by(Score.score.desc()).first()
@@ -614,7 +614,7 @@ def profile():
             'memoryMatch': memory_match_score.score if memory_match_score else 0,
             'labyrinth': labyrinth_score.score if labyrinth_score else 0,
             'puzzle': puzzle_score.score if puzzle_score else 0,
-            'whereIsIt': where_is_it_score.score if where_is_it_score else 0,
+            # 'whereIsIt' kaldırıldı
             'memoryCards': memory_cards_score.score if memory_cards_score else 0,
             'numberChain': number_chain_score.score if number_chain_score else 0,
             'audioMemory': audio_memory_score.score if audio_memory_score else 0,
@@ -665,9 +665,7 @@ def number_sequence():
     return render_template('games/numberSequence.html')
 
 # Yeni Hafıza Güçlendirme Oyunları
-@app.route('/games/where-is-it')
-def where_is_it():
-    return render_template('games/whereIsIt.html')
+# Route for "Kim Nerede?" game has been removed
 
 @app.route('/games/memory-cards')
 def memory_cards():
@@ -697,7 +695,7 @@ def leaderboard():
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     
     # Yeni oyunlar için skor tablolarını ekleyelim
-    where_is_it_scores = Score.query.filter_by(game_type='whereIsIt').order_by(Score.score.desc()).limit(10).all()
+    # where_is_it_scores kaldırıldı
     memory_cards_scores = Score.query.filter_by(game_type='memoryCards').order_by(Score.score.desc()).limit(10).all()
     number_chain_scores = Score.query.filter_by(game_type='numberChain').order_by(Score.score.desc()).limit(10).all()
     audio_memory_scores = Score.query.filter_by(game_type='audioMemory').order_by(Score.score.desc()).limit(10).all()
@@ -711,7 +709,7 @@ def leaderboard():
                           # Görsel Dikkat oyunu kaldırıldı
                           # visual_attention_scores=visual_attention_scores,
                           number_sequence_scores=number_sequence_scores,
-                          where_is_it_scores=where_is_it_scores,
+                          # where_is_it_scores kaldırıldı
                           memory_cards_scores=memory_cards_scores,
                           number_chain_scores=number_chain_scores,
                           audio_memory_scores=audio_memory_scores,
