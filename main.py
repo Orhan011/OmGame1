@@ -1427,7 +1427,7 @@ def get_scores(game_type):
                 'word-puzzle': 'wordPuzzle',
                 'memory-match': 'memoryMatch',
                 'labyrinth': 'labyrinth',
-                'puzzle': 'puzzle',
+                'puzzle': 'puzzle', 
                 'visual-attention': 'visualAttention',
                 'number-sequence': 'numberSequence',
                 'memory-cards': 'memoryCards',
@@ -1437,19 +1437,24 @@ def get_scores(game_type):
                 'sudoku': 'sudoku'
             }
 
-            internal_game_type = game_type_map.get(game_type)
-            if not internal_game_type:
-                return jsonify({'error': 'Invalid game type'}), 400
+            internal_game_type = game_type_map.get(game_type, game_type)
+            
+            # Eğer hiçbir eşleşme yoksa test amaçlı doğrudan game_type'ı kullan
+            logger.debug(f"Loading scores for game type: {game_type} (internal: {internal_game_type})")
 
             # En yüksek 10 skoru getir
-            scores = db.session.query(Score, User).join(
+            scores_query = db.session.query(Score, User).join(
                 User, 
                 User.id == Score.user_id
             ).filter(
                 Score.game_type == internal_game_type
             ).order_by(
                 Score.score.desc()
-            ).limit(10).all()
+            ).limit(10)
+            
+            scores = scores_query.all()
+            
+            logger.debug(f"Found {len(scores)} scores for {internal_game_type}")
 
             # Skor listesini hazırla
             score_list = []
