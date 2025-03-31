@@ -11,7 +11,7 @@
 <div class="container py-5">
   <div class="leaderboard-header">
     <h1>ZekaPark Skor Tablosu</h1>
-    <p>En yüksek skorları elde eden oyuncular burada yer alır. Oyunları oynayarak ve skorunuzu geliştirerek siz de liderler arasında yerinizi alabilirsiniz!</p>
+    <p>En yüksek skorları elde eden oyuncular burada yer alır. Oyunları oynayarak ve yeteneklerinizi geliştirerek siz de lider sıralamada yerinizi alabilirsiniz!</p>
   </div>
 
   <div class="game-tabs">
@@ -47,13 +47,22 @@
       <button class="game-tab" data-game="nBack">
         <i class="fas fa-brain"></i> N-Back
       </button>
+      <button class="game-tab" data-game="sudoku">
+        <i class="fas fa-table"></i> Sudoku
+      </button>
+      <button class="game-tab" data-game="2048">
+        <i class="fas fa-cube"></i> 2048
+      </button>
+      <button class="game-tab" data-game="chess">
+        <i class="fas fa-chess"></i> Satranç
+      </button>
     </div>
 
     <!-- Oyunlar İçin Skor Tablolarının Konteyneri -->
     <div id="leaderboardsContainer">
       <!-- Bu bölüm JavaScript ile doldurulacak -->
       <div class="loading">
-        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <i class="fas fa-spinner fa-spin"></i>
         <p>Skorlar yükleniyor...</p>
       </div>
     </div>

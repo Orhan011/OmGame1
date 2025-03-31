@@ -482,8 +482,7 @@ def initialize_database():
                     <li><strong>Beyin Dinlenme Molaları:</strong> Pomodoro tekniği gibi yöntemlerle düzenli kısa molalar verin.</li>
                     <li><strong>Çoklu Görev Yapmaktan Kaçının:</strong> Bir seferde bir işe odaklanın, sürekli görev değiştirmek zihinsel yorgunluğu artırır.</li>
                     <li><strong>Uyku Hijyeni:</strong> Kaliteli ve yeterli uyku, bilişsel fonksiyonların yenilenmesi için şarttır.</li>
-                    <li><strong>Mindfulness:</strong> 5-10 dakikalık meditasyon, zihinsel netliği önemli ölçüde artırabilir.</li>
-                    <li><strong>Beslenme Düzeni: Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
+                    <li><strong>Mindfulness:</strong> 5-10 dakikalık meditasyon, zihinsel netliği önemli ölçüde artırabilir.</li<li><strong>Beslenme Düzeni:</strong> Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
                 </ul>
                 <p>ZekaPark oyunlarını oynamak için kendinizi en iyi hissettiğiniz zamanları seçin. Düzenli bilişsel egzersizler, beyin sisine karşı genel direncin artmasına yardımcı olabilir.</p>
                 """,
@@ -1495,6 +1494,79 @@ def get_scores(game_type):
 @app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
 def get_scores_alt(game_type):
     return get_scores(game_type)
+
+@app.route('/api/leaderboard/<game_type>')
+def get_leaderboard(game_type):
+    game_types = [
+        'puzzle', 'word-puzzle', 'number-sequence', 'labyrinth', 
+        'memory-match', 'memory-cards', 'number-chain', 'audio-memory', 'n-back',
+        'sudoku', '2048', 'chess', 'logic-puzzles', 'tangram', 'rubik-cube', '3d-rotation'
+    ]
+
+    if game_type not in game_types and game_type != 'all':
+        return jsonify([])
+
+    from sqlalchemy import func
+    try:
+        if game_type == 'all':
+            # Tüm oyun türleri için lider tablosu verilerini getir
+            all_leaderboards = {}
+            for gt in game_types:
+                leaderboard_data = get_leaderboard_data(gt)
+                all_leaderboards[gt] = leaderboard_data
+            return jsonify(all_leaderboards)
+        else:
+            # Belirli bir oyun türü için lider tablosu verilerini getir
+            return jsonify(get_leaderboard_data(game_type))
+    except Exception as e:
+        logger.error(f"Error in get_leaderboard API: {e}")
+        return jsonify([])
+
+def get_leaderboard_data(game_type):
+    from sqlalchemy import func
+    try:
+        # Her oyun türü için en yüksek puanları bul
+        max_scores_subquery = db.session.query(
+            Score.user_id, 
+            func.max(Score.score).label('max_score')
+        ).filter_by(
+            game_type=game_type
+        ).group_by(
+            Score.user_id
+        ).subquery()
+
+        # Tam skor kayıtlarını ve kullanıcı bilgilerini getir
+        scores = db.session.query(Score, User).join(
+            max_scores_subquery, 
+            db.and_(
+                Score.user_id == max_scores_subquery.c.user_id,
+                Score.score == max_scores_subquery.c.max_score,
+                Score.game_type == game_type
+            )
+        ).join(
+            User, 
+            User.id == Score.user_id
+        ).order_by(
+            Score.score.desc()
+        ).limit(10).all()
+
+        # Skor listesini oluştur
+        score_list = []
+        for score, user in scores:
+            score_list.append({
+                'user_id': score.user_id,
+                'username': user.username if user else 'Anonim',
+                'score': score.score,
+                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'game_type': game_type,
+                'rank': user.rank if user else 'Başlangıç',
+                'avatar_url': user.avatar_url if user and user.avatar_url else 'images/default-avatar.png'
+            })
+
+        return score_list
+    except Exception as e:
+        logger.error(f"Error querying leaderboard for {game_type}: {e}")
+        return []
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
