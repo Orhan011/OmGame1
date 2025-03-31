@@ -725,8 +725,30 @@ def logout():
     return redirect(url_for('login'))
 
 # Profile management routes
-# Account management related routes have been removed as part of the profile functionality removal
-# Basic functionality for account operations will be implemented in a different way if needed
+@app.route('/profile')
+def profile():
+    # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Kullanıcı bilgilerini veritabanından al
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Kullanıcının oyun skorlarını al
+    scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
+    
+    # Oyun türlerine göre skorları grupla
+    game_scores = {}
+    for score in scores:
+        if score.game_type not in game_scores:
+            game_scores[score.game_type] = []
+        game_scores[score.game_type].append(score)
+    
+    # Profil sayfasını render et
+    return render_template('profile_new.html', user=user, game_scores=game_scores)
 
 # Password reset routes
 @app.route('/forgot-password', methods=['GET', 'POST'])
