@@ -1,0 +1,20 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500">
+  <!-- İl sınırları -->
+  <path id="istanbul" d="M235,143 l10,5 l-5,15 l-15,-5 z" />
+  <path id="ankara" d="M380,220 l25,20 l-15,30 l-30,-15 z" />
+  <path id="izmir" d="M150,275 l20,15 l-10,25 l-25,-10 z" />
+  <path id="antalya" d="M300,350 l40,10 l-5,30 l-45,-10 z" />
+  <path id="bursa" d="M280,180 l30,10 l-10,25 l-35,-10 z" />
+  <path id="adana" d="M450,330 l35,10 l-10,25 l-40,-15 z" />
+  <path id="konya" d="M350,290 l45,15 l-15,40 l-50,-20 z" />
+  <path id="trabzon" d="M600,180 l30,5 l-5,20 l-35,-5 z" />
+  <path id="diyarbakir" d="M650,280 l40,10 l-10,30 l-45,-15 z" />
+  <path id="gaziantep" d="M550,350 l35,10 l-5,25 l-40,-15 z" />
+  <path id="samsun" d="M500,170 l30,10 l-10,20 l-35,-10 z" />
+  <path id="kayseri" d="M450,270 l35,15 l-10,30 l-45,-20 z" />
+  <path id="van" d="M750,270 l40,15 l-10,35 l-50,-20 z" />
+  <path id="erzurum" d="M650,220 l45,10 l-15,35 l-50,-15 z" />
+  <path id="edirne" d="M180,120 l25,10 l-10,20 l-30,-15 z" />
+  <path id="hatay" d="M500,390 l30,15 l-5,25 l-35,-15 z" />
+</svg>

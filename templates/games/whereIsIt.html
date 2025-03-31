@@ -344,3 +344,456 @@
 
 <script src="/static/js/games/whereIsIt.js"></script>
 {% endblock %}
+{% extends "layout.html" %}
+
+{% block title %}Kim Nerede?{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
+<style>
+  .where-is-it-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .game-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .game-title {
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #6a5ae0, #a762f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 10px;
+  }
+  
+  .map-container {
+    width: 100%;
+    height: 500px;
+    margin: 0 auto;
+    background-color: rgba(30, 30, 50, 0.7);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .map-container svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .map-container svg path {
+    fill: rgba(106, 90, 224, 0.5);
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1;
+    transition: all 0.3s ease;
+  }
+  
+  .map-container svg path:hover {
+    fill: rgba(106, 90, 224, 0.7);
+  }
+  
+  .map-container svg path.correct {
+    fill: rgba(39, 174, 96, 0.7) !important;
+  }
+  
+  .map-container svg path.wrong {
+    fill: rgba(231, 76, 60, 0.7) !important;
+  }
+  
+  .control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    background-color: rgba(40, 40, 60, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .info-display {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(60, 60, 80, 0.5);
+    padding: 8px 15px;
+    border-radius: 8px;
+    min-width: 80px;
+  }
+  
+  .info-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+  }
+  
+  .info-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .question-display {
+    background-color: rgba(106, 90, 224, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    border-left: 4px solid #6a5ae0;
+  }
+  
+  .question-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+  }
+  
+  .hint-container {
+    text-align: center;
+    margin: 15px 0;
+  }
+  
+  .hint-button {
+    background: linear-gradient(135deg, #6a5ae0, #8177d5);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+  }
+  
+  .hint-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5);
+  }
+  
+  .hint-text {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  .start-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 35, 0.95));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+  }
+  
+  .start-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    background-color: rgba(45, 45, 65, 0.7);
+    border-radius: 12px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .start-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #6a5ae0, #a762f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .start-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+  }
+  
+  .start-button {
+    background: linear-gradient(135deg, #6a5ae0, #8177d5);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.4);
+  }
+  
+  .start-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(106, 90, 224, 0.6);
+  }
+  
+  .level-select {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .level-button {
+    padding: 8px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .level-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .result-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 20, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    backdrop-filter: blur(5px);
+  }
+  
+  .result-content {
+    text-align: center;
+    background-color: rgba(45, 45, 65, 0.8);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .result-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #6a5ae0, #a762f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .final-score-container {
+    background-color: rgba(106, 90, 224, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+  
+  .final-score-label {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+  }
+  
+  .final-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .result-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  
+  .restart-button {
+    background: linear-gradient(135deg, #6a5ae0, #8177d5);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+  }
+  
+  .restart-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5);
+  }
+  
+  .home-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .home-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .how-to-play {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+  }
+  
+  .how-to-play h3 {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .how-to-play ul {
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .how-to-play li {
+    margin-bottom: 8px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="where-is-it-container">
+  <a href="{{ url_for('index') }}" class="back-button">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  
+  <div class="game-header">
+    <h1 class="game-title">Kim Nerede?</h1>
+  </div>
+  
+  <div id="gameContainer" style="display: none;">
+    <div class="control-panel">
+      <div class="info-display">
+        <div class="info-item">
+          <span class="info-label">PUAN</span>
+          <span class="info-value" id="score">0</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">SÜRE</span>
+          <span class="info-value" id="timer">60</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">TUR</span>
+          <span class="info-value" id="round">1/5</span>
+        </div>
+      </div>
+      <div class="level-controls">
+        <span id="currentLevel">Seviye: Kolay</span>
+        <button id="prevLevel" class="level-button"><i class="fas fa-chevron-left"></i></button>
+        <button id="nextLevel" class="level-button"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+    
+    <div class="question-display">
+      <p class="question-text" id="question">Ankara nerede?</p>
+    </div>
+    
+    <div class="map-container" id="mapContainer">
+      <!-- SVG haritası buraya yüklenecek -->
+      <div class="loading">Harita yükleniyor...</div>
+    </div>
+    
+    <div class="hint-container">
+      <button id="hintButton" class="hint-button">İpucu (3)</button>
+      <div id="hintText" class="hint-text"></div>
+    </div>
+  </div>
+  
+  <div id="startScreen" class="start-screen">
+    <div class="start-content">
+      <h2 class="start-title">Kim Nerede?</h2>
+      <p class="start-subtitle">Türkiye haritası üzerinde şehirlerin yerlerini bularak hafızanızı test edin.</p>
+      
+      <div class="how-to-play">
+        <h3><i class="fas fa-info-circle"></i> Nasıl Oynanır?</h3>
+        <ul>
+          <li>Size sorulan şehri harita üzerinde bulun ve tıklayın.</li>
+          <li>Doğru şehri ne kadar hızlı bulursanız o kadar çok puan kazanırsınız.</li>
+          <li>Her turda bir ipucu hakkınız var, ancak ipucu kullanırsanız puan kaybedersiniz.</li>
+          <li>Yanlış tıklamanın zaman cezası vardır.</li>
+          <li>Toplam 5 tur sonunda oyununuz değerlendirilir.</li>
+        </ul>
+      </div>
+      
+      <div class="level-select">
+        <button id="level1" class="level-button">Kolay</button>
+        <button id="level2" class="level-button">Orta</button>
+        <button id="level3" class="level-button">Zor</button>
+      </div>
+      
+      <button id="startButton" class="start-button">
+        <i class="fas fa-play me-2"></i> Oyunu Başlat
+      </button>
+    </div>
+  </div>
+  
+  <div id="resultScreen" class="result-screen">
+    <div class="result-content">
+      <h2 class="result-title">Oyun Bitti!</h2>
+      <p>Türkiye coğrafyasını ne kadar iyi bildiğinizi test ettiniz.</p>
+      
+      <div class="final-score-container">
+        <div class="final-score-label">Toplam Puanınız</div>
+        <div class="final-score" id="finalScore">0</div>
+      </div>
+      
+      <div class="result-buttons">
+        <button id="restartButton" class="restart-button">
+          <i class="fas fa-redo me-2"></i> Tekrar Oyna
+        </button>
+        <a href="{{ url_for('index') }}" class="home-button">
+          <i class="fas fa-home me-2"></i> Ana Sayfa
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
+{% endblock %}
