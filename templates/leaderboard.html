@@ -15,51 +15,53 @@
   </div>
 
   <div class="game-tabs">
-    <div class="nav-container">
-      <!-- Oyun türü seçimi için butonlar - 3'lü grid yapısında -->
-      <button class="game-tab active" data-game="all">
-        <i class="fas fa-trophy"></i> Tüm Oyunlar
-      </button>
-      <button class="game-tab" data-game="wordPuzzle">
-        <i class="fas fa-font"></i> Kelime Bulmaca
-      </button>
-      <button class="game-tab" data-game="memoryMatch">
-        <i class="fas fa-th"></i> Hafıza Eşleştirme
-      </button>
-      <button class="game-tab" data-game="labyrinth">
-        <i class="fas fa-map-signs"></i> Labirent
-      </button>
-      <button class="game-tab" data-game="puzzle">
-        <i class="fas fa-puzzle-piece"></i> Puzzle
-      </button>
-      <button class="game-tab" data-game="numberSequence">
-        <i class="fas fa-sort-numeric-up"></i> Sayı Dizisi
-      </button>
-      <button class="game-tab" data-game="memoryCards">
-        <i class="fas fa-clone"></i> Hafıza Kartları
-      </button>
-      <button class="game-tab" data-game="numberChain">
-        <i class="fas fa-link"></i> Sayı Zinciri
-      </button>
-      <button class="game-tab" data-game="audioMemory">
-        <i class="fas fa-music"></i> Sesli Hafıza
-      </button>
-      <button class="game-tab" data-game="nBack">
-        <i class="fas fa-brain"></i> N-Back
-      </button>
-      <button class="game-tab" data-game="sudoku">
-        <i class="fas fa-table"></i> Sudoku
-      </button>
-      <button class="game-tab" data-game="2048">
-        <i class="fas fa-cube"></i> 2048
-      </button>
-      <button class="game-tab" data-game="chess">
-        <i class="fas fa-chess"></i> Satranç
-      </button>
+    <div class="game-filter-wrapper">
+      <h3 class="filter-title">Oyun Kategorileri</h3>
+      <div class="nav-container">
+        <button class="game-tab active" data-game="all">
+          <i class="fas fa-trophy"></i> Tüm Oyunlar
+        </button>
+        <button class="game-tab" data-game="wordPuzzle">
+          <i class="fas fa-font"></i> Kelime Bulmaca
+        </button>
+        <button class="game-tab" data-game="memoryMatch">
+          <i class="fas fa-th"></i> Hafıza Eşleştirme
+        </button>
+        <button class="game-tab" data-game="labyrinth">
+          <i class="fas fa-map-signs"></i> Labirent
+        </button>
+        <button class="game-tab" data-game="puzzle">
+          <i class="fas fa-puzzle-piece"></i> Puzzle
+        </button>
+        <button class="game-tab" data-game="numberSequence">
+          <i class="fas fa-sort-numeric-up"></i> Sayı Dizisi
+        </button>
+        <button class="game-tab" data-game="memoryCards">
+          <i class="fas fa-clone"></i> Hafıza Kartları
+        </button>
+        <button class="game-tab" data-game="numberChain">
+          <i class="fas fa-link"></i> Sayı Zinciri
+        </button>
+        <button class="game-tab" data-game="audioMemory">
+          <i class="fas fa-music"></i> Sesli Hafıza
+        </button>
+        <button class="game-tab" data-game="nBack">
+          <i class="fas fa-brain"></i> N-Back
+        </button>
+        <button class="game-tab" data-game="sudoku">
+          <i class="fas fa-table"></i> Sudoku
+        </button>
+        <button class="game-tab" data-game="2048">
+          <i class="fas fa-cube"></i> 2048
+        </button>
+        <button class="game-tab" data-game="chess">
+          <i class="fas fa-chess"></i> Satranç
+        </button>
+      </div>
     </div>
 
     <!-- Oyunlar İçin Skor Tablolarının Konteyneri -->
-    <div id="leaderboardsContainer">
+    <div id="leaderboardsContainer" class="leaderboard-cards-container">
       <!-- Bu bölüm JavaScript ile doldurulacak -->
       <div class="loading">
         <i class="fas fa-spinner fa-spin"></i>

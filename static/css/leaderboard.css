@@ -699,47 +699,65 @@
 
 /* Yükleme ve hata durumları */
 .loading, .no-scores, .error {
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: rgba(33, 33, 61, 0.5);
+  border-radius: 16px;
+  margin: 1rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-  background: rgba(26, 26, 48, 0.5);
-  border-radius: 16px;
-  margin-top: 1rem;
-}
-
-.loading i {
-  color: #6a5ae0;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  animation: spin 1.5s infinite linear;
-}
-
-.loading p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.2rem;
-  font-weight: 500;
+  gap: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .no-scores {
+  color: #a29dff;
+}
+
+.no-scores h3 {
+  font-size: 1.8rem;
+  margin: 0.5rem 0;
+  font-weight: 700;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.no-scores p {
   color: #8a8aa3;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
 }
 
 .no-scores i {
-  margin-bottom: 15px;
   color: #6a5ae0;
-  font-size: 2.5rem;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+.play-games-btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.4);
+}
+
+.play-games-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.6);
 }
 
 .error {
   color: #ff6b6b;
-}
-
-.error i {
-  margin-bottom: 15px;
-  font-size: 2.5rem;
 }
 
 @keyframes spin {
@@ -748,14 +766,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Top 3 oyuncu için özel efektler */
@@ -774,49 +786,100 @@ tr[data-rank="3"] td {
   border-left: 3px solid #cd7f32;
 }
 
-/* Mobil uyumluluk */
+/* Animasyonlar */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.refreshing i {
+  animation: rotate 1s linear infinite;
+}
+
+/* Responsive medya sorguları */
+@media (max-width: 992px) {
+  .nav-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .leaderboard-header h1 {
-    font-size: 2rem;
+  .nav-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .game-tab {
-    padding: 0.8rem 1rem;
-    font-size: 0.85rem;
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4) {
+    display: none;
   }
 
-  .leaderboard-table th, 
-  .leaderboard-table td {
-    padding: 1rem 0.8rem;
-    font-size: 0.9rem;
-  }
-
-  .user-avatar {
-    width: 35px;
-    height: 35px;
+  .player-name {
     font-size: 1rem;
   }
 
-  .username {
-    font-size: 1rem;
-    max-width: 120px;
-  }
-
-  .rank-cell {
-    width: 40px;
-    font-size: 1rem;
+  .player-rank {
+    font-size: 0.7rem;
+    padding: 2px 6px;
   }
 
   .score-cell {
     font-size: 1.1rem;
-    min-width: 80px;
   }
 
-  .date-cell {
-    display: none; /* Mobil görünümde tarih gizlenir */
+  .leaderboard-header h1 {
+    font-size: 2.3rem;
   }
-  
-  .game-tabs {
-    padding: 1.5rem;
+
+  .leaderboard-header p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .nav-container {
+    grid-template-columns: 1fr;
+  }
+
+  .game-tab {
+    justify-content: flex-start;
+    padding: 0.7rem 1rem;
+  }
+
+  .leaderboard-table-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 0.8rem 0.5rem;
+  }
+
+  .player-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .rank-cell {
+    width: 40px;
+  }
+
+  .leaderboard-header h1 {
+    font-size: 2rem;
+  }
+
+  .play-games-btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
   }
 }
