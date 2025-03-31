@@ -3,6 +3,90 @@
 {% block title %}Sudoku{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sudoku.css') }}">
+<style>
+  /* Ek stiller burada kalabilir */
+  .selector-label, .sudoku-title {
+    color: var(--accent-color, #6a5ae0);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <div class="sudoku-container">
+    <h1 class="sudoku-title">Sudoku</h1>
+    
+    <div class="sudoku-intro">
+      <p>
+        Sudoku, her satır, sütun ve 3x3'lük bölgede 1'den 9'a kadar olan rakamların bir kez kullanıldığı bir mantık bulmacasıdır. 
+        Beyninizi zorlamak ve mantık becerilerinizi geliştirmek için mükemmel bir egzersizdir.
+      </p>
+      
+      <div class="game-options-container">
+        <div class="difficulty-selector">
+          <div class="selector-label">Zorluk Seviyesi:</div>
+          <div class="level-buttons">
+            <button class="level-btn active" data-difficulty="kolay">Kolay</button>
+            <button class="level-btn" data-difficulty="orta">Orta</button>
+            <button class="level-btn" data-difficulty="zor">Zor</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="game-stats">
+      <div class="timer" id="timer"><i class="fas fa-stopwatch"></i>00:00</div>
+      <div class="game-status text-success" id="game-status">Oyun başladı! Bol şanslar!</div>
+    </div>
+    
+    <div class="sudoku-game-container">
+      <div class="sudoku-board-container">
+        <div class="sudoku-board" id="sudoku-board"></div>
+      </div>
+      
+      <div class="game-controls">
+        <div class="control-row">
+          <button id="new-game" class="control-btn primary">
+            <i class="fas fa-redo"></i> Yeni Oyun
+          </button>
+          <button id="hint" class="control-btn warning">
+            <i class="fas fa-lightbulb"></i> İpucu
+          </button>
+          <button id="check-solution" class="control-btn secondary">
+            <i class="fas fa-check"></i> Kontrol Et
+          </button>
+          <button id="solve" class="control-btn danger">
+            <i class="fas fa-magic"></i> Çöz
+          </button>
+        </div>
+        
+        <div class="sudoku-numpad">
+          <button class="numpad-btn" data-num="1">1</button>
+          <button class="numpad-btn" data-num="2">2</button>
+          <button class="numpad-btn" data-num="3">3</button>
+          <button class="numpad-btn" data-num="4">4</button>
+          <button class="numpad-btn" data-num="5">5</button>
+          <button class="numpad-btn" data-num="6">6</button>
+          <button class="numpad-btn" data-num="7">7</button>
+          <button class="numpad-btn" data-num="8">8</button>
+          <button class="numpad-btn" data-num="9">9</button>
+          <button id="notes-toggle" class="numpad-btn tool notes">
+            <i class="fas fa-pencil-alt"></i> Notlar (Kapalı)
+          </button>
+          <button id="erase" class="numpad-btn tool erase">
+            <i class="fas fa-eraser"></i> Sil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sudoku.js') }}"></script>
+{% endblock %}
 <style>
   /* Sudoku oyun stilleri */
   .sudoku-container {
