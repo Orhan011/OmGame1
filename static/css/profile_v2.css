@@ -12,6 +12,339 @@
   --accent-color: #7e50e0; /* Added for consistency */
 }
 
+/* Profile Container */
+.profile-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Profile Card */
+.profile-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar-section {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1rem;
+}
+
+.profile-avatar,
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: linear-gradient(45deg, #8b5cf6, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.avatar-upload-btn:hover {
+  transform: scale(1.1);
+}
+
+.profile-info {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.username {
+  font-size: 1.5rem;
+  margin: 0;
+  color: white;
+}
+
+.user-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  background: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
+}
+
+/* Level System */
+.level-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.level-badge {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #8b5cf6, #6366f1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.level-number {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.level-label {
+  font-size: 0.75rem;
+}
+
+.xp-bar-container {
+  flex: 1;
+}
+
+.xp-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.xp-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.xp-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.5rem;
+}
+
+/* Settings Container */
+.settings-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.settings-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  background: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab-btn.active {
+  background: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
+}
+
+.tab-content {
+  display: none;
+  padding: 2rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Forms */
+.settings-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: #6366f1;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover {
+  background: #4f46e5;
+}
+
+/* Notification Switches */
+.notification-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #6366f1;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Danger Zone */
+.danger-zone {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.danger-zone h3 {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.danger-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.danger-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* Level Up Modal */
+.level-up-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0, 0, 0, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.level-up-modal.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.level-up-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-card {
+    padding: 1rem;
+  }
+
+  .level-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .settings-tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    padding: 0.75rem;
+  }
+}
+
 /* Ana Container */
 .profile-container {
   max-width: 1200px;
@@ -50,59 +383,6 @@
   align-items: flex-start;
 }
 
-/* Avatar Bölümü */
-.profile-avatar-container {
-  width: 180px;
-  height: 180px;
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.3);
-  border: 3px solid var(--accent-color);
-  box-shadow: 0 0 20px rgba(106, 90, 224, 0.3);
-}
-
-.profile-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.profile-avatar:hover {
-  transform: scale(1.05);
-}
-
-.profile-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(45deg, #2a2a4a, #1a1a2a);
-  color: var(--secondary-text);
-}
-
-.profile-avatar-edit {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 35px;
-  height: 35px;
-  background: var(--accent-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0;
-}
-
-.profile-avatar-container:hover .profile-avatar-edit {
-  opacity: 1;
-}
 
 /* Seviye Rozeti */
 .level-badge {
@@ -350,10 +630,10 @@
 
 /* Profile Header */
 .profile-header-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    gap: 20px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 20px;
 }
 
 
@@ -727,7 +1007,7 @@
 .theme-slider {
   position: absolute;
   top: 0;
-  left: 0;
+  left:0;
   right: 0;
   bottom: 0;
   background-color: rgba(20, 20, 43, 0.8);
@@ -1705,7 +1985,7 @@ input:checked + .theme-slider {
 }
 
 .modal-footer {
-  border-top-color: rgba(255, 255, 255, 0.05);
+  border-top-color: rgba(255, 255,255, 0.05);
   padding: 15px 20px;
 }
 
