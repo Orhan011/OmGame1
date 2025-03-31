@@ -62,7 +62,7 @@ function displayLeaderboard(scores) {
   // Her bir skoru tabloya ekle
   scores.forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
-    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';t(0).toUpperCase() : '?';
+    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
 
     html += `
       <div class="player-row ${rankClass}">
@@ -93,5 +93,5 @@ function displayLeaderboard(scores) {
     </div>
   `;
 
-  leaderboardContainer.innerHTML = html;ontainer.innerHTML = html;
+  leaderboardContainer.innerHTML = html;
 }
