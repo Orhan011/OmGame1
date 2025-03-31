@@ -667,8 +667,10 @@ def number_chain():
 def n_back():
     return render_template('games/nBack.html')
 
-# Yeni IQ Geliştirme Oyunları
-# Removed routes for IQ development games
+# Yeni Mantık ve IQ Geliştirme Oyunları
+@app.route('/games/sudoku')
+def sudoku():
+    return render_template('games/sudoku.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')

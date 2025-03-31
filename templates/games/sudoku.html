@@ -1,0 +1,909 @@
+{% extends "layout.html" %}
+
+{% block title %}Sudoku{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Sudoku oyun stilleri */
+  .sudoku-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(30, 30, 50, 0.7);
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    gap: 1px;
+    background-color: #444;
+    padding: 2px;
+    border: 2px solid #666;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+
+  .sudoku-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%; /* Kare hücreler için */
+    background-color: #222;
+    position: relative;
+    color: #fff;
+    font-weight: bold;
+    font-size: calc(1rem + 0.5vw);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .sudoku-cell:hover {
+    background-color: #2a2a3a;
+  }
+
+  .sudoku-cell.fixed {
+    color: #7bed9f;
+    background-color: #1e1e28;
+  }
+
+  .sudoku-cell.selected {
+    background-color: #2f4e96;
+  }
+
+  .sudoku-cell.error {
+    color: #ff6b6b;
+  }
+
+  /* 3x3 bölgelerini belirginleştiren kenar çizgileri */
+  .sudoku-cell:nth-child(3n) {
+    border-right: 2px solid #666;
+  }
+
+  .sudoku-cell:nth-child(9n) {
+    border-right: none;
+  }
+
+  .sudoku-row:nth-child(3n) .sudoku-cell {
+    border-bottom: 2px solid #666;
+  }
+
+  .sudoku-row:last-child .sudoku-cell {
+    border-bottom: none;
+  }
+
+  /* Kontroller */
+  .sudoku-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .difficulty-selector {
+    display: flex;
+    gap: 10px;
+  }
+
+  .difficulty-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #2c3e50, #4a69bd);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .difficulty-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .difficulty-btn.active {
+    background: linear-gradient(135deg, #4a69bd, #6a89cc);
+    box-shadow: 0 0 10px rgba(106, 137, 204, 0.5);
+  }
+
+  .game-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .action-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #414345, #232526);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .action-btn.new-game {
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+  }
+
+  .action-btn.hint {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #333;
+  }
+
+  .action-btn.solve {
+    background: linear-gradient(135deg, #ff6b6b, #ee0979);
+  }
+
+  /* Numpad */
+  .sudoku-numpad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .numpad-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #414345, #232526);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .numpad-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #606060, #303030);
+  }
+
+  .numpad-btn.erase {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+  }
+
+  .numpad-btn.notes {
+    grid-column: span 3;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+  }
+
+  /* Oyun bilgileri */
+  .game-info {
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .info-item {
+    text-align: center;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  .info-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  /* Notlar */
+  .sudoku-cell .notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 8px;
+    color: #aaa;
+  }
+
+  .notes span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Animasyonlar */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .pulse {
+    animation: pulse 0.5s;
+  }
+  
+  /* Mobil responsive düzenlemeler */
+  @media (max-width: 576px) {
+    .sudoku-controls {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .difficulty-selector, .game-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .sudoku-numpad {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .numpad-btn.erase {
+      grid-column: span 1;
+    }
+    
+    .numpad-btn.notes {
+      grid-column: span 2;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h1 class="display-4 game-title">Sudoku</h1>
+      <p class="lead">Mantık becerinizi geliştirin, her satır, sütun ve 3x3 bölgede 1-9 arasındaki sayıları yerleştirin.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="sudoku-container">
+        <!-- Zorluk seçim ve oyun kontrolları -->
+        <div class="sudoku-controls">
+          <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
+            <button class="difficulty-btn" data-difficulty="medium">Orta</button>
+            <button class="difficulty-btn" data-difficulty="hard">Zor</button>
+          </div>
+          <div class="game-actions">
+            <button class="action-btn new-game"><i class="fas fa-redo me-1"></i>Yeni Oyun</button>
+            <button class="action-btn hint"><i class="fas fa-lightbulb me-1"></i>İpucu</button>
+          </div>
+        </div>
+
+        <!-- Oyun bilgileri -->
+        <div class="game-info">
+          <div class="info-item">
+            <div class="info-label">Süre</div>
+            <div class="info-value timer">00:00</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Zorluk</div>
+            <div class="info-value difficulty">Kolay</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">İpuçları</div>
+            <div class="info-value hints">3</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Puan</div>
+            <div class="info-value score">0</div>
+          </div>
+        </div>
+
+        <!-- Sudoku tahtası -->
+        <div id="sudoku-board" class="sudoku-board">
+          <!-- JavaScript ile oluşturulacak -->
+        </div>
+
+        <!-- Numpad -->
+        <div class="sudoku-numpad">
+          <button class="numpad-btn" data-value="1">1</button>
+          <button class="numpad-btn" data-value="2">2</button>
+          <button class="numpad-btn" data-value="3">3</button>
+          <button class="numpad-btn" data-value="4">4</button>
+          <button class="numpad-btn" data-value="5">5</button>
+          <button class="numpad-btn" data-value="6">6</button>
+          <button class="numpad-btn" data-value="7">7</button>
+          <button class="numpad-btn" data-value="8">8</button>
+          <button class="numpad-btn" data-value="9">9</button>
+          <button class="numpad-btn notes"><i class="fas fa-pencil-alt me-1"></i>Not Modu</button>
+          <button class="numpad-btn erase"><i class="fas fa-eraser me-1"></i>Sil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Oyun Talimatları -->
+  <div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="card mb-4" style="background: rgba(30, 30, 50, 0.7); color: #fff; border: none;">
+        <div class="card-body">
+          <h4 class="card-title">Nasıl Oynanır?</h4>
+          <ul>
+            <li>Her satır, sütun ve 3x3 bölgede 1-9 arası rakamları sadece bir kez kullanın.</li>
+            <li>Koyu renkli sayılar başlangıçta verilen sayılardır ve değiştirilemez.</li>
+            <li>Bir hücreye tıklayıp, daha sonra numpad'den veya klavyeden bir sayı seçin.</li>
+            <li>Not almak için 'Not Modu' düğmesini kullanın.</li>
+            <li>Çıkmaza girdiğinizde ipucu kullanabilirsiniz, ancak sınırlı sayıdadır!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="text-center mb-5">
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/**
+ * Sudoku Oyunu
+ * Modern ve etkileşimli sudoku oyunu
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Oyun değişkenlerini tanımla
+  let gameBoard = [];            // Mevcut oyun tahtası
+  let solutionBoard = [];        // Çözüm tahtası
+  let isNotesMode = false;       // Not modu aktif mi?
+  let selectedCell = null;       // Seçilen hücre
+  let difficulty = 'easy';       // Zorluk seviyesi (easy, medium, hard)
+  let hintsLeft = 3;             // Kalan ipucu sayısı
+  let timer = 0;                 // Geçen süre (saniye)
+  let timerInterval;             // Zamanlayıcı
+  let score = 0;                 // Oyun puanı
+  
+  // DOM elemanlarını seç
+  const boardElement = document.getElementById('sudoku-board');
+  const timerElement = document.querySelector('.timer');
+  const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const difficultyDisplay = document.querySelector('.difficulty');
+  const hintsDisplay = document.querySelector('.hints');
+  const scoreDisplay = document.querySelector('.score');
+  const newGameBtn = document.querySelector('.new-game');
+  const hintBtn = document.querySelector('.hint');
+  const notesBtn = document.querySelector('.notes');
+  const eraseBtn = document.querySelector('.erase');
+  const numpadBtns = document.querySelectorAll('.numpad-btn[data-value]');
+  
+  // Oyunu başlat
+  initializeGame();
+  
+  // ===== Oyun Fonksiyonları =====
+  
+  // Oyunu başlatma
+  function initializeGame() {
+    // Zorluk seviyesine göre ipucu sayısını ayarla
+    updateHints();
+    
+    // Tahtayı oluştur
+    createBoard();
+    
+    // Yeni oyun oluştur
+    generateNewGame();
+    
+    // Zamanlayıcıyı başlat
+    startTimer();
+    
+    // Event listener'ları ekle
+    addEventListeners();
+  }
+  
+  // Yeni oyun
+  function generateNewGame() {
+    // Zamanlayıcıyı sıfırla
+    resetTimer();
+    
+    // Sudoku tahtası oluştur
+    generateSudoku();
+    
+    // Tahtayı görsel olarak güncelle
+    updateBoardDisplay();
+    
+    // Skoru sıfırla
+    score = 0;
+    updateScore();
+  }
+  
+  // Sudoku oluşturma (basitleştirilmiş)
+  function generateSudoku() {
+    // Çözümü oluştur (gerçek implementasyonda backtracking algoritması kullanılır)
+    solutionBoard = generateSolvedBoard();
+    
+    // Çözülmüş tahtadan ipuçlarını çıkar ve oyun tahtasını oluştur
+    gameBoard = removeCells(solutionBoard, getDifficultySettings());
+  }
+  
+  // Çözülmüş bir Sudoku tahtası oluştur (demo amaçlı basit bir tahta)
+  function generateSolvedBoard() {
+    // Not: Gerçek implementasyonda backtracking algoritması kullanılır.
+    // Bu sadece bir demo tahtasıdır.
+    return [
+      [5, 3, 4, 6, 7, 8, 9, 1, 2],
+      [6, 7, 2, 1, 9, 5, 3, 4, 8],
+      [1, 9, 8, 3, 4, 2, 5, 6, 7],
+      [8, 5, 9, 7, 6, 1, 4, 2, 3],
+      [4, 2, 6, 8, 5, 3, 7, 9, 1],
+      [7, 1, 3, 9, 2, 4, 8, 5, 6],
+      [9, 6, 1, 5, 3, 7, 2, 8, 4],
+      [2, 8, 7, 4, 1, 9, 6, 3, 5],
+      [3, 4, 5, 2, 8, 6, 1, 7, 9]
+    ];
+  }
+  
+  // Belirli sayıda hücreyi kaldır
+  function removeCells(board, count) {
+    // Derin kopya oluştur
+    const newBoard = JSON.parse(JSON.stringify(board));
+    const positions = [];
+    
+    // Tüm pozisyonları listeye ekle
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        positions.push({row: i, col: j});
+      }
+    }
+    
+    // Pozisyonları karıştır
+    shuffleArray(positions);
+    
+    // Belirtilen sayıda hücreyi temizle
+    for (let i = 0; i < count; i++) {
+      if (i < positions.length) {
+        const { row, col } = positions[i];
+        newBoard[row][col] = 0; // 0, boş hücreyi temsil eder
+      }
+    }
+    
+    return newBoard;
+  }
+  
+  // Zorluk seviyesine göre kaldırılacak hücre sayısını belirle
+  function getDifficultySettings() {
+    switch (difficulty) {
+      case 'easy':
+        return 40; // 40 hücre kaldırılır (41 ipucu)
+      case 'medium':
+        return 50; // 50 hücre kaldırılır (31 ipucu)
+      case 'hard':
+        return 60; // 60 hücre kaldırılır (21 ipucu)
+      default:
+        return 40;
+    }
+  }
+  
+  // Tahtayı görsel olarak güncelle
+  function updateBoardDisplay() {
+    // Board elementini temizle
+    boardElement.innerHTML = '';
+    
+    // Her hücre için
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        // Hücre elementini oluştur
+        const cell = document.createElement('div');
+        cell.classList.add('sudoku-cell');
+        cell.dataset.row = row;
+        cell.dataset.col = col;
+        
+        // Hücre değeri
+        const value = gameBoard[row][col];
+        if (value !== 0) {
+          cell.textContent = value;
+          cell.classList.add('fixed'); // Başlangıçta verilen sayıları vurgula
+        }
+        
+        // Hücreye tıklandığında
+        cell.addEventListener('click', () => selectCell(cell, row, col));
+        
+        // Tahtaya ekle
+        boardElement.appendChild(cell);
+      }
+    }
+  }
+  
+  // Hücre seçimi
+  function selectCell(cell, row, col) {
+    // Önceki seçimi temizle
+    if (selectedCell) {
+      selectedCell.classList.remove('selected');
+    }
+    
+    // Seçili olmayan hücreye tıklandıysa seç
+    if (selectedCell !== cell) {
+      cell.classList.add('selected');
+      selectedCell = cell;
+    } else {
+      selectedCell = null;
+    }
+  }
+  
+  // Hücreye değer gir
+  function enterValue(value) {
+    if (!selectedCell) return;
+    
+    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col);
+    
+    // Eğer başlangıçta verilen bir sayı ise değiştirilemez
+    if (selectedCell.classList.contains('fixed')) return;
+    
+    if (isNotesMode) {
+      // Not modu aktifse
+      toggleNote(selectedCell, value);
+    } else {
+      // Normal mod
+      // Notları temizle
+      if (selectedCell.querySelector('.notes')) {
+        selectedCell.querySelector('.notes').remove();
+      }
+      
+      // Değeri güncelle
+      selectedCell.textContent = value;
+      gameBoard[row][col] = parseInt(value);
+      
+      // Doğruluk kontrolü
+      if (solutionBoard[row][col] === gameBoard[row][col]) {
+        selectedCell.classList.remove('error');
+        // Puan ekle
+        addScore(10);
+      } else {
+        selectedCell.classList.add('error');
+        // Puan düşür
+        addScore(-5);
+      }
+      
+      // Oyun tamamlandı mı kontrol et
+      if (isBoardFilled() && isBoardCorrect()) {
+        gameCompleted();
+      }
+    }
+  }
+  
+  // Not ekle/çıkar
+  function toggleNote(cell, value) {
+    // Not div'i yoksa oluştur
+    let notesElement = cell.querySelector('.notes');
+    if (!notesElement) {
+      notesElement = document.createElement('div');
+      notesElement.classList.add('notes');
+      cell.textContent = '';
+      cell.appendChild(notesElement);
+      
+      // 9 not için boş alan oluştur
+      for (let i = 1; i <= 9; i++) {
+        const noteSpan = document.createElement('span');
+        noteSpan.dataset.note = i;
+        notesElement.appendChild(noteSpan);
+      }
+    }
+    
+    // Not elementini bul
+    const noteSpan = notesElement.querySelector(`[data-note="${value}"]`);
+    
+    // Not varsa sil, yoksa ekle
+    if (noteSpan.textContent === value) {
+      noteSpan.textContent = '';
+    } else {
+      noteSpan.textContent = value;
+    }
+  }
+  
+  // Seçili hücreyi temizle
+  function clearCell() {
+    if (!selectedCell || selectedCell.classList.contains('fixed')) return;
+    
+    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col);
+    
+    // Değeri ve notları temizle
+    selectedCell.textContent = '';
+    selectedCell.classList.remove('error');
+    gameBoard[row][col] = 0;
+    
+    // Not div'i oluştur (boş olarak)
+    const notesElement = document.createElement('div');
+    notesElement.classList.add('notes');
+    selectedCell.appendChild(notesElement);
+    
+    // 9 not için boş alan oluştur
+    for (let i = 1; i <= 9; i++) {
+      const noteSpan = document.createElement('span');
+      noteSpan.dataset.note = i;
+      notesElement.appendChild(noteSpan);
+    }
+  }
+  
+  // İpucu kullan
+  function useHint() {
+    if (!selectedCell || hintsLeft <= 0) return;
+    
+    // İpucu sayısını azalt
+    hintsLeft--;
+    updateHints();
+    
+    const row = parseInt(selectedCell.dataset.row);
+    const col = parseInt(selectedCell.dataset.col);
+    
+    // Eğer hücre doğru değerse ipucu kullanma
+    if (gameBoard[row][col] === solutionBoard[row][col]) return;
+    
+    // Doğru değeri göster
+    selectedCell.textContent = solutionBoard[row][col];
+    selectedCell.classList.add('fixed');
+    selectedCell.classList.remove('selected', 'error');
+    gameBoard[row][col] = solutionBoard[row][col];
+    selectedCell = null;
+    
+    // Puan düşür
+    addScore(-15);
+    
+    // Animasyon ekle
+    selectedCell.classList.add('pulse');
+    setTimeout(() => {
+      selectedCell.classList.remove('pulse');
+    }, 500);
+    
+    // Oyun tamamlandı mı kontrol et
+    if (isBoardFilled() && isBoardCorrect()) {
+      gameCompleted();
+    }
+  }
+  
+  // Zorluk seviyesini değiştir
+  function changeDifficulty(newDifficulty) {
+    difficulty = newDifficulty;
+    
+    // UI'da zorluk göstergesini güncelle
+    difficultyDisplay.textContent = getDifficultyName();
+    
+    // Aktif butonu değiştir
+    difficultyBtns.forEach(btn => {
+      if (btn.dataset.difficulty === difficulty) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    
+    // İpucu sayısını güncelle
+    updateHints();
+    
+    // Yeni oyun oluştur
+    generateNewGame();
+  }
+  
+  // Oyun tamamlandığında
+  function gameCompleted() {
+    // Zamanlayıcıyı durdur
+    clearInterval(timerInterval);
+    
+    // Tamamlama süresi bonusu
+    const timeBonus = Math.max(0, 1200 - timer); // 20 dk içinde bitirirse bonus
+    addScore(timeBonus);
+    
+    // Zorluk bonusu
+    const difficultyBonus = getDifficultyBonus();
+    addScore(difficultyBonus);
+    
+    // Tebrik mesajı
+    alert(`Tebrikler! Sudoku'yu ${formatTime(timer)} sürede tamamladınız!\n\nPuanınız: ${score}\nZaman Bonusu: ${timeBonus}\nZorluk Bonusu: ${difficultyBonus}\n\nToplam Puan: ${score}`);
+    
+    // Skoru kaydet
+    saveScore();
+    
+    // Yeni oyun oluştur
+    generateNewGame();
+  }
+  
+  // ===== Yardımcı Fonksiyonlar =====
+  
+  // Tahtayı oluştur
+  function createBoard() {
+    // 9x9 = 81 hücre oluştur
+    for (let i = 0; i < 81; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('sudoku-cell');
+      boardElement.appendChild(cell);
+    }
+  }
+  
+  // Event listener'ları ekle
+  function addEventListeners() {
+    // Yeni oyun butonu
+    newGameBtn.addEventListener('click', generateNewGame);
+    
+    // İpucu butonu
+    hintBtn.addEventListener('click', useHint);
+    
+    // Not modu butonu
+    notesBtn.addEventListener('click', () => {
+      isNotesMode = !isNotesMode;
+      notesBtn.classList.toggle('active', isNotesMode);
+    });
+    
+    // Silme butonu
+    eraseBtn.addEventListener('click', clearCell);
+    
+    // Numpad butonları
+    numpadBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        enterValue(btn.dataset.value);
+      });
+    });
+    
+    // Zorluk butonları
+    difficultyBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        changeDifficulty(btn.dataset.difficulty);
+      });
+    });
+    
+    // Klavye kontrolleri
+    document.addEventListener('keydown', e => {
+      // 1-9 tuşları ile değer gir
+      if (e.key >= '1' && e.key <= '9') {
+        enterValue(e.key);
+      }
+      // Delete veya Backspace ile temizle
+      else if (e.key === 'Delete' || e.key === 'Backspace') {
+        clearCell();
+      }
+      // Space ile not modunu değiştir
+      else if (e.key === ' ') {
+        isNotesMode = !isNotesMode;
+        notesBtn.classList.toggle('active', isNotesMode);
+        e.preventDefault(); // Sayfanın kaymasını engelle
+      }
+    });
+  }
+  
+  // Zamanlayıcıyı başlat
+  function startTimer() {
+    clearInterval(timerInterval); // Varsa önceki zamanlayıcıyı temizle
+    timerInterval = setInterval(() => {
+      timer++;
+      timerElement.textContent = formatTime(timer);
+    }, 1000);
+  }
+  
+  // Zamanlayıcıyı sıfırla
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timer = 0;
+    timerElement.textContent = formatTime(timer);
+    startTimer();
+  }
+  
+  // Zamanı formatla (ss:dd)
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  
+  // İpucu sayısını güncelle
+  function updateHints() {
+    // Zorluk seviyesine göre ipucu sayısı
+    switch (difficulty) {
+      case 'easy':
+        hintsLeft = 3;
+        break;
+      case 'medium':
+        hintsLeft = 5;
+        break;
+      case 'hard':
+        hintsLeft = 7;
+        break;
+      default:
+        hintsLeft = 3;
+    }
+    
+    hintsDisplay.textContent = hintsLeft;
+  }
+  
+  // Zorluk seviyesi adını döndür
+  function getDifficultyName() {
+    switch (difficulty) {
+      case 'easy': return 'Kolay';
+      case 'medium': return 'Orta';
+      case 'hard': return 'Zor';
+      default: return 'Kolay';
+    }
+  }
+  
+  // Zorluk bonusunu hesapla
+  function getDifficultyBonus() {
+    switch (difficulty) {
+      case 'easy': return 100;
+      case 'medium': return 250;
+      case 'hard': return 500;
+      default: return 100;
+    }
+  }
+  
+  // Puan ekle
+  function addScore(points) {
+    score += points;
+    if (score < 0) score = 0;
+    updateScore();
+  }
+  
+  // Skoru güncelle
+  function updateScore() {
+    scoreDisplay.textContent = score;
+  }
+  
+  // Skoru kaydet
+  function saveScore() {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'sudoku',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Skor kaydedildi:', data);
+    })
+    .catch(error => {
+      console.error('Skor kaydedilirken hata oluştu:', error);
+    });
+  }
+  
+  // Tahta tamamen dolu mu kontrol et
+  function isBoardFilled() {
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (gameBoard[row][col] === 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  // Tahta doğru mu kontrol et
+  function isBoardCorrect() {
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (gameBoard[row][col] !== solutionBoard[row][col]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  // Diziyi karıştır
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+});
+</script>
+{% endblock %}
