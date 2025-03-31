@@ -35,39 +35,20 @@
         <div class="row align-items-center">
           <div class="col-md-8">
             <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
-            <p>Bu oyunda, gösterilen kişilerin haritadaki konumunu bulmaya çalışacaksınız. Doğru konumu ne kadar hızlı bulursanız, o kadar çok puan kazanırsınız!</p>
-            <div class="rule-list mt-3">
-              <div class="rule-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Gösterilen karakteri haritada nerede olduğunu tahmin edin</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-clock"></i>
-                <span>Her tur için sınırlı süreniz var</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-bolt"></i>
-                <span>Hızlı ve doğru tahminler daha çok puan kazandırır</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Yanlış tıklamalar ceza puanı getirebilir</span>
-              </div>
-            </div>
+            <p>Bu oyunda, gösterilen şehirlerin Türkiye haritasındaki konumunu bulmaya çalışacaksınız. Doğru konumu ne kadar hızlı bulursanız, o kadar çok puan kazanırsınız!</p>
+            <ul class="instruction-list">
+              <li><i class="fas fa-map-marker-alt"></i> Harita üzerinde şehrin bulunduğu yere tıklayın</li>
+              <li><i class="fas fa-clock"></i> Süre dolmadan doğru konumu bulun</li>
+              <li><i class="fas fa-lightbulb"></i> İpucu kullanarak yardım alabilirsiniz</li>
+              <li><i class="fas fa-star"></i> İpucu kullanmadan doğru bulursanız bonus puan kazanırsınız</li>
+            </ul>
           </div>
-          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn active" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="standard-start-btn">
-              <i class="fas fa-play me-2"></i>Oyunu Başlat
-            </button>
+          <div class="col-md-4 text-center">
+            <img src="/static/images/whereIsIt/game-preview.png" alt="Oyun Önizleme" class="img-fluid rounded">
           </div>
+        </div>
+        <div class="text-center mt-4">
+          <button id="start-button" class="btn btn-lg btn-primary pulse-effect">Oyunu Başlat</button>
         </div>
       </div>
 
@@ -89,10 +70,10 @@
         </div>
 
         <div class="character-info-panel">
-          <img id="character-image" src="/static/images/whereIsIt/char1.png" alt="Karakter" class="character-avatar">
+          <img id="character-image" src="/static/images/whereIsIt/ankara.png" alt="Şehir" class="character-avatar">
           <div class="character-name-container">
-            <span>Kim Nerede:</span>
-            <h3 id="character-name">Mehmet</h3>
+            <span>Şu şehri bul:</span>
+            <h3 id="character-name">Ankara</h3>
           </div>
         </div>
 
@@ -100,247 +81,33 @@
           <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
         </div>
 
-        <div id="hint-display"></div>
+        <div id="hint-display" class="hint-display"></div>
 
         <div id="map-container" class="game-map">
           <!-- SVG Harita buraya yüklenecek -->
-          <div class="loading-map">
-            <div class="spinner-border text-light" role="status">
-              <span class="visually-hidden">Yükleniyor...</span>
-            </div>
-            <p class="mt-2">Harita yükleniyor...</p>
-          </div>
-        </div>
-
-        <!-- Sonuç Popup -->
-        <div id="result-popup" class="result-popup" style="display: none;">
-          <div class="result-content">
-            <h3 id="result-message" class="text-success">Harika! Doğru yeri buldunuz.</h3>
-            <p id="result-score">+100 puan kazandınız!</p>
-            <div class="result-buttons">
-              <button id="next-round-btn" class="btn btn-primary"><i class="fas fa-forward me-2"></i>Sonraki Tur</button>
-              <button id="game-over-btn" class="btn btn-success" style="display: none;"><i class="fas fa-check-circle me-2"></i>Oyunu Bitir</button>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Oyun Sonuç Ekranı -->
-      <div id="game-results" class="game-results glass-effect" style="display: none;">
-        <div class="result-card">
-          <h3>Tebrikler!</h3>
-          <div class="result-details">
-            <p>Toplam Puan: <strong id="final-score">0</strong></p>
-            <p>Doğru Tahminler: <strong id="correct-answers">0</strong></p>
-            <p>Tamamlanan Turlar: <strong id="completed-rounds">0</strong></p>
+      <!-- Oyun Sonu Ekranı -->
+      <div id="game-over-screen" class="game-over-container glass-effect" style="display: none;">
+        <h2>Oyun Bitti!</h2>
+        <div class="result-container">
+          <div class="result-score">
+            <span>Puanınız</span>
+            <h2 id="result-score">0</h2>
           </div>
-          <div class="rating">
-            <div id="rating-stars">
-              <!-- Yıldızlar buraya dinamik olarak eklenecek -->
-            </div>
-            <p id="rating-text">Harika!</p>
-          </div>
-          <div class="game-results-footer">
-            <button id="play-again" class="btn btn-primary btn-lg"><i class="fas fa-redo me-2"></i>Tekrar Oyna</button>
-            <a href="/" id="go-home" class="btn btn-outline-primary btn-lg"><i class="fas fa-home me-2"></i>Ana Sayfa</a>
-          </div>
+        </div>
+        <div class="result-message">
+          Tebrikler! Türkiye'nin şehirlerini ne kadar iyi tanıdığınızı gösterdiniz.
+        </div>
+        <div class="action-buttons">
+          <button id="play-again" class="btn btn-primary">Tekrar Oyna</button>
+          <a href="/" class="btn btn-outline-light">Ana Sayfaya Dön</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-.where-is-it-container {
-  padding: 20px;
-  position: relative;
-  min-height: 600px;
-}
-
-.character-info-panel {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 10px 15px;
-  border-radius: 10px;
-}
-
-.character-avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
-.character-name-container {
-  margin-left: 15px;
-}
-
-.character-name-container span {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  display: block;
-}
-
-.character-name-container h3 {
-  font-size: 1.6rem;
-  margin: 0;
-  font-weight: 600;
-  color: white;
-}
-
-.timer-progress {
-  height: 10px;
-  margin-bottom: 20px;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.game-map {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: crosshair;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-}
-
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.target-marker {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.target-marker.correct {
-  background-color: rgba(46, 204, 113, 0.7);
-  border: 2px solid #27ae60;
-}
-
-.target-marker.wrong {
-  background-color: rgba(231, 76, 60, 0.7);
-  border: 2px solid #c0392b;
-}
-
-.marker-pulse {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: inherit;
-  opacity: 0.7;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.5);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-}
-
-.result-popup {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  border-radius: 10px;
-}
-
-.result-content {
-  background: linear-gradient(135deg, rgba(40, 40, 80, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%);
-  padding: 30px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 80%;
-  max-width: 400px;
-}
-
-.result-content h3 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-}
-
-.result-content p {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.result-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.game-controls-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.game-control-btn {
-  background-color: transparent;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.game-control-btn.active i {
-  color: #28a745;
-}
-
-.loading-map {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.game-controls {
-  margin-left: auto; /* Push to the right */
-}
-
-#hint-display {
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  color: white;
-}
-</style>
 
 <script src="/static/js/games/whereIsIt.js"></script>
 {% endblock %}
