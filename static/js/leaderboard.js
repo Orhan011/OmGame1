@@ -60,14 +60,14 @@ function displayLeaderboard(scores) {
   `;
 
   // Her bir skoru tabloya ekle
-  scores.forEach((player, index) => {
+  scores.slice(0, 25).forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
     const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
 
     html += `
       <div class="player-row ${rankClass}">
         <div class="rank-cell">
-          <div class="rank-block ${index < 3 ? `rank-${index + 1}` : ''}">${index + 1}</div>
+          <div class="rank-number">${index + 1}</div>
         </div>
         <div class="player-cell">
           <div class="player-avatar">
@@ -80,7 +80,6 @@ function displayLeaderboard(scores) {
         <div class="score-cell">
           <div class="score-container">
             <span class="score-value">${player.total_score || 0}</span>
-            <span class="score-label">puan</span>
           </div>
         </div>
       </div>

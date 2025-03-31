@@ -123,7 +123,7 @@
 }
 
 .rank-cell {
-  width: 80px;
+  width: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -184,33 +184,21 @@
 }
 
 .top-1 .rank-number {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: gold; /* Changed to gold */
   position: relative;
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
 .top-2 .rank-number {
-  background: linear-gradient(135deg, #C0C0C0, #E0E0E0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: silver; /* Changed to silver */
 }
 
 .top-3 .rank-number {
-  background: linear-gradient(135deg, #CD7F32, #E6A972);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
 }
 
 .rank-cell .rank-number {
-  background: linear-gradient(135deg, #6a5ae0, #ff9c64);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #a6a6c0; /* default color */
   position: relative;
   z-index: 1;
 }
@@ -227,28 +215,26 @@
 }
 
 .player-avatar {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, rgba(106, 90, 224, 0.4), rgba(120, 104, 230, 0.4));
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
   margin-right: 15px;
   flex-shrink: 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .avatar-content {
-  opacity: 1;
-  transform: scale(1.1);
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
+
 
 .score-cell {
   display: flex;
@@ -257,37 +243,25 @@
 }
 
 .score-value {
-  background: linear-gradient(135deg, #6a5ae0, #ff9c64);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+ color: gold; /* Changed to gold */
   font-weight: 800;
   font-size: 1.3rem;
   position: relative;
 }
 
 .top-1 .score-value {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: gold; /* Changed to gold */
   font-size: 1.5rem;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .top-2 .score-value {
-  background: linear-gradient(135deg, #C0C0C0, #E0E0E0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: silver; /* Changed to silver */
   font-size: 1.4rem;
 }
 
 .top-3 .score-value {
-  background: linear-gradient(135deg, #CD7F32, #E6A972);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
   font-size: 1.3rem;
 }
 
@@ -376,42 +350,27 @@
 }
 
 /* Rank styling */
-.rank-block {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(106, 90, 224, 0.1);
-  color: #a6a6c0;
-  font-weight: 700;
-  font-size: 1.2rem;
+.rank-number {
+  display: inline-block;
+  text-align: center;
   margin-right: 15px;
-  flex-shrink: 0;
 }
 
-/* Premium medal ranks */
-.rank-block.rank-1 {
-  background: linear-gradient(135deg, #FFD700, #FFC800);
-  color: #fff;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.rank-1 {
+  color: gold !important;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
-.rank-block.rank-2 {
-  background: linear-gradient(135deg, #C0C0C0, #E6E6E6);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.rank-2 {
+  color: silver !important;
+  text-shadow: 0 0 8px rgba(192, 192, 192, 0.3);
 }
 
-.rank-block.rank-3 {
-  background: linear-gradient(135deg, #CD7F32, #E6A972);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.rank-3 {
+  color: darkgoldenrod !important;
+  text-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
 }
+
 
 .player-avatar {
   width: 50px;
@@ -455,9 +414,7 @@
 }
 
 .score-label {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 2px;
+  display: none; /* Remove score label */
 }
 .rank-number {
   font-size: 1.3rem;
@@ -519,29 +476,20 @@
 
 
 .player-row[data-rank="1"] .player-name {
-  background: linear-gradient(to right, #FFD700, #FFC800);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: gold; /* Changed to gold */
   font-weight: 700;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.5px;
 }
 
 .player-row[data-rank="2"] .player-name {
-  background: linear-gradient(to right, #C0C0C0, #E6E6E6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: silver; /* Changed to silver */
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .player-row[data-rank="3"] .player-name {
-  background: linear-gradient(to right, #CD7F32, #E29E54);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -592,7 +540,7 @@
 }
 
 .player-row[data-rank="1"] .score-value {
-  color: #FFD700;
+  color: gold; /* Changed to gold */
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 
@@ -608,7 +556,7 @@
 }
 
 .player-row[data-rank="2"] .score-value {
-  color: #C0C0C0;
+  color: silver; /* Changed to silver */
   text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
 }
 
@@ -624,7 +572,7 @@
 }
 
 .player-row[data-rank="3"] .score-value {
-  color: #CD7F32;
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
   text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
 }
 
