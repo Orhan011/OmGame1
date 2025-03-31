@@ -32,9 +32,9 @@ def send_verification_email(to_email, verification_code):
     from email.mime.multipart import MIMEMultipart
     import ssl
     
-    # Gmail hesap bilgileri
+    # Gmail hesap bilgileri (güvenlik için çevresel değişkenlerden alınmalı)
     sender_email = "omgameee@gmail.com"
-    sender_password = "htvh fmfz eeic kkls"
+    sender_password = os.environ.get("EMAIL_PASSWORD", "htvh fmfz eeic kkls")  # Daha güvenli bir yöntem kullanılmalı
     
     if not sender_password:
         logger.error("Gmail app password not found")
