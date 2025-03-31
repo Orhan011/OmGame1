@@ -96,6 +96,9 @@ function loadArticleContent() {
       </li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
+      <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('leaderboard') }}">Skor Tablosu</a>
+                </li>
     </ul>
 
     {% if session.get('user_id') %}

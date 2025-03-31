@@ -748,6 +748,11 @@ def n_back():
 def all_games():
     return render_template('all_games.html')
 
+# Skor Tablosu
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
+
 # Articles
 @app.route('/articles')
 def articles():
@@ -1466,7 +1471,8 @@ def get_scores(game_type):
                     'score': score.score,
                     'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
                     'game_type': internal_game_type,
-                    'rank': user.rank if user else 'Başlangıç'
+                    'rank': user.rank if user else 'Başlangıç',
+                    'avatar_url': user.avatar_url if user and user.avatar_url else 'images/default-avatar.png'
                 })
 
             return jsonify(score_list)

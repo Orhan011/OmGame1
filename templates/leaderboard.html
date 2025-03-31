@@ -1,1 +1,64 @@
-<!-- This file is intentionally left empty as we're removing the leaderboard page -->
+
+{% extends "layout.html" %}
+
+{% block title %}Skor Tablosu | ZekaPark{% endblock %}
+
+{% block head_extras %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="leaderboard-header">
+    <h1>ZekaPark Skor Tablosu</h1>
+    <p>En yüksek skorları elde eden oyuncular burada yer alır. Oyunları oynayarak ve skorunuzu geliştirerek siz de liderler arasında yerinizi alabilirsiniz!</p>
+  </div>
+
+  <div class="game-tabs">
+    <div class="nav-container">
+      <!-- Oyun türü seçimi için butonlar -->
+      <button class="game-tab active" data-game="all">
+        <i class="fas fa-trophy"></i> Tüm Oyunlar
+      </button>
+      <button class="game-tab" data-game="wordPuzzle">
+        <i class="fas fa-font"></i> Kelime Bulmaca
+      </button>
+      <button class="game-tab" data-game="memoryMatch">
+        <i class="fas fa-th"></i> Hafıza Eşleştirme
+      </button>
+      <button class="game-tab" data-game="labyrinth">
+        <i class="fas fa-map-signs"></i> Labirent
+      </button>
+      <button class="game-tab" data-game="puzzle">
+        <i class="fas fa-puzzle-piece"></i> Puzzle
+      </button>
+      <button class="game-tab" data-game="numberSequence">
+        <i class="fas fa-sort-numeric-up"></i> Sayı Dizisi
+      </button>
+      <button class="game-tab" data-game="memoryCards">
+        <i class="fas fa-clone"></i> Hafıza Kartları
+      </button>
+      <button class="game-tab" data-game="numberChain">
+        <i class="fas fa-link"></i> Sayı Zinciri
+      </button>
+      <button class="game-tab" data-game="audioMemory">
+        <i class="fas fa-music"></i> Sesli Hafıza
+      </button>
+      <button class="game-tab" data-game="nBack">
+        <i class="fas fa-brain"></i> N-Back
+      </button>
+    </div>
+
+    <!-- Oyunlar İçin Skor Tablolarının Konteyneri -->
+    <div id="leaderboardsContainer">
+      <!-- Bu bölüm JavaScript ile doldurulacak -->
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Skorlar yükleniyor...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+{% endblock %}

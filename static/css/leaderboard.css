@@ -1,1 +1,325 @@
-/* This file is intentionally left empty as we're removing the leaderboard page */
+
+/* Temel stillemeler */
+.leaderboard-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.leaderboard-header h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-header p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #8a8aa3;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+.game-tabs {
+  background: rgba(26, 26, 46, 0.7);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.nav-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.game-tab {
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(106, 90, 224, 0.1);
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-tab:hover, .game-tab.active {
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  transform: translateY(-2px);
+}
+
+.game-tab i {
+  font-size: 1.2rem;
+}
+
+/* Skor tablosu stillemesi */
+.leaderboard-card {
+  margin-bottom: 30px;
+  overflow: hidden;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  background: rgba(33, 33, 61, 0.4);
+}
+
+.card-header {
+  background: linear-gradient(45deg, rgba(106, 90, 224, 0.8), rgba(159, 138, 255, 0.8));
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.card-header h3 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(180deg);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  padding: 1.2rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leaderboard-table td {
+  padding: 1.2rem 1rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table tr:hover td {
+  background: rgba(106, 90, 224, 0.1);
+}
+
+.leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Rank hücreleri için renkler ve stiller */
+.rank-cell {
+  width: 70px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.rank-1, .rank-2, .rank-3 {
+  font-size: 1.5rem;
+}
+
+.rank-1 {
+  color: gold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.rank-2 {
+  color: silver;
+  text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+}
+
+.rank-3 {
+  color: #cd7f32; /* Bronze */
+  text-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
+}
+
+/* Kullanıcı hücresi */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6a5ae0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.user-rank {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Skor hücresi */
+.score-cell {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #6a5ae0;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Yükleme, hata ve boş durum stilleri */
+.loading, .no-scores, .error {
+  padding: 40px;
+  text-align: center;
+  background-color: rgba(33, 33, 61, 0.3);
+  border-radius: 12px;
+  margin: 15px 0;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  color: #6a5ae0;
+}
+
+.no-scores {
+  color: #8a8aa3;
+  font-style: italic;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Responsive tasarım için media query */
+@media (max-width: 768px) {
+  .leaderboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .game-tab {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .leaderboard-table th, 
+  .leaderboard-table td {
+    padding: 1rem 0.5rem;
+  }
+  
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .username {
+    font-size: 1rem;
+  }
+  
+  .rank-cell {
+    width: 50px;
+    font-size: 1rem;
+  }
+  
+  .score-cell {
+    font-size: 1.1rem;
+  }
+  
+  .date-cell {
+    display: none; /* Mobil görünümde tarih gizlenir */
+  }
+}
+
+/* Oyun kartı animasyonları */
+.leaderboard-card {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Top 3 oyuncu için premium vurgular */
+tr[data-rank="1"] .user-cell {
+  position: relative;
+}
+
+tr[data-rank="1"] .user-avatar {
+  border: 3px solid gold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+tr[data-rank="2"] .user-avatar {
+  border: 3px solid silver;
+  box-shadow: 0 0 10px rgba(192, 192, 192, 0.3);
+}
+
+tr[data-rank="3"] .user-avatar {
+  border: 3px solid #cd7f32;
+  box-shadow: 0 0 10px rgba(205, 127, 50, 0.3);
+}
+
+/* Lider için özel efekt */
+tr[data-rank="1"] .user-info::after {
+  content: "👑";
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  font-size: 1.5rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
