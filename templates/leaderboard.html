@@ -131,7 +131,7 @@
           </div>
           <span class="game-name">Kelime Bulmaca</span>
         </div>
-        <button class="refresh-btn" onclick="loadAllScores()">
+        <button class="refresh-btn">
           <i class="fas fa-sync-alt"></i>
         </button>
       </div>
@@ -173,6 +173,10 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
 {% endblock %}
 
 {% block scripts %}

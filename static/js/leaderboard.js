@@ -528,3 +528,303 @@ document.addEventListener('visibilitychange', function() {
     window.scoreUpdateInterval = setInterval(loadAllScores, 30000);
   }
 });
+// Global variables
+let allScores = {};
+let currentUserId = null;
+let activeGameType = 'word-puzzle';
+let activeCategory = 'all';
+
+// Initialize the page when loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setupEventListeners();
+  getCurrentUser();
+  loadAllScores();
+});
+
+// Set up event listeners for all interactive elements
+function setupEventListeners() {
+  // Category buttons
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const category = this.dataset.category;
+      setActiveCategory(category);
+    });
+  });
+
+  // Game filter buttons
+  document.querySelectorAll('.game-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const gameType = this.dataset.game;
+      setActiveGame(gameType);
+    });
+  });
+
+  // Refresh button
+  const refreshBtn = document.querySelector('.refresh-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      loadAllScores();
+    });
+  }
+}
+
+// Set active category and show appropriate game filters
+function setActiveCategory(category) {
+  // Update active state of category buttons
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    if (btn.dataset.category === category) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  activeCategory = category;
+  
+  // Show/hide appropriate game filters
+  document.querySelectorAll('.game-filter').forEach(filter => {
+    if (filter.dataset.filterCategory === category) {
+      filter.style.display = 'flex';
+    } else {
+      filter.style.display = 'none';
+    }
+  });
+  
+  // Select first game filter button in the category
+  const firstGameButton = document.querySelector(`.game-filter[data-filter-category="${category}"] .game-filter-btn`);
+  if (firstGameButton) {
+    setActiveGame(firstGameButton.dataset.game);
+  }
+}
+
+// Set active game and display scores
+function setActiveGame(gameType) {
+  // Update active state of game filter buttons
+  document.querySelectorAll('.game-filter-btn').forEach(btn => {
+    if (btn.dataset.game === gameType) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  activeGameType = gameType;
+  
+  // Update game icon and name in header
+  updateGameDisplay(gameType);
+  
+  // Display scores for selected game
+  displayScores(gameType);
+}
+
+// Update game icon and name in the header
+function updateGameDisplay(gameType) {
+  const gameIconContainer = document.querySelector('.game-icon-container');
+  const gameIcon = gameIconContainer.querySelector('.game-icon i');
+  const gameName = gameIconContainer.querySelector('.game-name');
+  
+  // Define game display information
+  const gameInfo = {
+    'word-puzzle': { icon: 'font', name: 'Kelime Bulmaca' },
+    'memory-match': { icon: 'brain', name: 'Hafıza Kartları' },
+    'labyrinth': { icon: 'route', name: 'Labirent' },
+    'puzzle': { icon: 'puzzle-piece', name: 'Yapboz' },
+    'number-sequence': { icon: 'sort-numeric-up', name: 'Sayı Dizisi' },
+    'memory-cards': { icon: 'clone', name: 'Kart Eşleştirme' },
+    'number-chain': { icon: 'link', name: 'Sayı Zinciri' },
+    'audio-memory': { icon: 'music', name: 'Sesli Hafıza' },
+    'n-back': { icon: 'braille', name: 'N-Back Testi' },
+    'sudoku': { icon: 'th', name: 'Sudoku' },
+    '2048': { icon: 'cubes', name: '2048' },
+    'chess': { icon: 'chess', name: 'Satranç' },
+    'logic-puzzles': { icon: 'project-diagram', name: 'Mantık Bulmacaları' },
+    'tangram': { icon: 'shapes', name: 'Tangram' },
+    '3d-rotation': { icon: 'cube', name: '3D Döndürme' },
+    'rubik-cube': { icon: 'dice', name: 'Rubik Küpü' }
+  };
+  
+  // Set icon and name based on selected game
+  const info = gameInfo[gameType] || { icon: 'gamepad', name: 'Oyun' };
+  gameIcon.className = `fas fa-${info.icon}`;
+  gameName.textContent = info.name;
+}
+
+// Get current user ID
+function getCurrentUser() {
+  fetch('/api/get-current-user')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.user_id) {
+        currentUserId = data.user_id;
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching current user:', error);
+    });
+}
+
+// Load all scores for all game types
+function loadAllScores() {
+  fetch('/api/get-scores/all')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Tüm yüklenen skorlar:', data);
+      allScores = data;
+      displayScores(activeGameType);
+      updateStatistics();
+    })
+    .catch(error => {
+      console.error('Error loading all scores:', error);
+      displayError();
+    });
+}
+
+// Display scores for a specific game type
+function displayScores(gameType) {
+  console.log('Skor yükleniyor:', gameType);
+  const scoresContainer = document.getElementById('scores-container');
+  const gameTypeKey = convertGameTypeToKey(gameType);
+  
+  // Get scores for the specific game type
+  const scores = allScores[gameTypeKey] || [];
+  
+  // Clear existing content
+  scoresContainer.innerHTML = '';
+  
+  if (scores.length === 0) {
+    scoresContainer.innerHTML = `
+      <div class="no-scores">
+        <i class="fas fa-trophy-alt"></i>
+        <p>Bu oyun için henüz skor kaydedilmemiş.</p>
+        <p>İlk sırada yer almak için hemen oynamaya başlayın!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Create score rows
+  scores.forEach((score, index) => {
+    const isCurrentUser = currentUserId && score.user_id === currentUserId;
+    const row = document.createElement('div');
+    row.className = `table-row ${index < 3 ? 'top-rank' : ''} ${isCurrentUser ? 'current-user-score' : ''}`;
+    
+    // Create rank cell with trophy for top 3
+    let rankHTML = '';
+    if (index === 0) {
+      rankHTML = '<div class="rank-trophy gold"><i class="fas fa-trophy"></i></div>';
+    } else if (index === 1) {
+      rankHTML = '<div class="rank-trophy silver"><i class="fas fa-trophy"></i></div>';
+    } else if (index === 2) {
+      rankHTML = '<div class="rank-trophy bronze"><i class="fas fa-trophy"></i></div>';
+    } else {
+      rankHTML = `<div class="rank-cell">${index + 1}</div>`;
+    }
+    
+    // Format date
+    const date = new Date(score.timestamp);
+    const formattedDate = date.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    
+    // Create row HTML
+    row.innerHTML = `
+      ${rankHTML}
+      <div class="username-cell">
+        <div class="user-info">
+          <div class="avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="username">${score.username || 'Anonim'}</div>
+        </div>
+      </div>
+      <div class="score-cell">${score.score}</div>
+      <div class="date-cell">${formattedDate}</div>
+    `;
+    
+    scoresContainer.appendChild(row);
+  });
+}
+
+// Convert game type from URL format to API key format
+function convertGameTypeToKey(gameType) {
+  const map = {
+    'word-puzzle': 'wordPuzzle',
+    'memory-match': 'memoryMatch',
+    'labyrinth': 'labyrinth',
+    'puzzle': 'puzzle',
+    'number-sequence': 'numberSequence',
+    'memory-cards': 'memoryCards',
+    'number-chain': 'numberChain',
+    'audio-memory': 'audioMemory',
+    'n-back': 'nBack',
+    'sudoku': 'sudoku',
+    '2048': '2048',
+    'chess': 'chess',
+    'logic-puzzles': 'logicPuzzles',
+    'tangram': 'tangram',
+    '3d-rotation': '3dRotation',
+    'rubik-cube': 'rubikCube'
+  };
+  return map[gameType] || gameType;
+}
+
+// Update statistics in the leaderboard card
+function updateStatistics() {
+  const totalGamesElement = document.getElementById('total-games');
+  const highestScoreElement = document.getElementById('highest-score');
+  const totalPlayersElement = document.getElementById('total-players');
+  const yourRankElement = document.getElementById('your-rank');
+  
+  // Calculate total games, unique players, and highest score
+  let totalGames = 0;
+  let uniquePlayers = new Set();
+  let highestScore = 0;
+  
+  Object.values(allScores).forEach(gameScores => {
+    totalGames += gameScores.length;
+    
+    gameScores.forEach(score => {
+      uniquePlayers.add(score.user_id);
+      if (score.score > highestScore) {
+        highestScore = score.score;
+      }
+    });
+  });
+  
+  // Find user's rank
+  let userRank = 'Sıralamada yok';
+  if (currentUserId) {
+    const gameTypeKey = convertGameTypeToKey(activeGameType);
+    const gameScores = allScores[gameTypeKey] || [];
+    
+    const userIndex = gameScores.findIndex(score => score.user_id === currentUserId);
+    if (userIndex !== -1) {
+      userRank = `${userIndex + 1}. sırada`;
+    }
+  }
+  
+  // Update stats display
+  totalGamesElement.textContent = totalGames;
+  highestScoreElement.textContent = highestScore;
+  totalPlayersElement.textContent = uniquePlayers.size;
+  yourRankElement.textContent = userRank;
+}
+
+// Display error message when loading scores fails
+function displayError() {
+  const scoresContainer = document.getElementById('scores-container');
+  scoresContainer.innerHTML = `
+    <div class="error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>Skorlar yüklenirken bir hata oluştu.</p>
+      <p>Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+    </div>
+  `;
+}
