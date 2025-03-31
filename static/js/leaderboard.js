@@ -96,7 +96,6 @@ function displayLeaderboard(scores) {
           </div>
           <div class="player-info">
             <div class="player-name ${userNameColorClass}">${player.username}</div>
-            <div class="player-rank">${player.rank || ''}</div>
           </div>
         </div>
         <div class="score-cell">
