@@ -1495,6 +1495,40 @@ def get_scores(game_type):
 def get_scores_alt(game_type):
     return get_scores(game_type)
 
+@app.route('/api/aggregated_scores')
+def get_aggregated_scores():
+    """Tüm oyunlardaki toplam skorları getiren API."""
+    from sqlalchemy import func, desc
+    try:
+        # Her kullanıcının tüm oyunlardaki toplam puanını hesapla
+        aggregated_scores = db.session.query(
+            User.id.label('user_id'),
+            User.username,
+            User.rank,
+            func.sum(Score.score).label('total_score')
+        ).join(
+            Score, User.id == Score.user_id
+        ).group_by(
+            User.id, User.username, User.rank
+        ).order_by(
+            desc('total_score')
+        ).all()
+        
+        # Sonuçları sözlük listesine dönüştür
+        result = [
+            {
+                'user_id': row.user_id,
+                'username': row.username,
+                'rank': row.rank,
+                'total_score': row.total_score
+            } for row in aggregated_scores
+        ]
+        
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in get_aggregated_scores API: {e}")
+        return jsonify([])
+
 @app.route('/api/leaderboard/<game_type>')
 def get_leaderboard(game_type):
     # Kabul edilen oyun türleri listesi - kategori ve id eşleştirmesi
