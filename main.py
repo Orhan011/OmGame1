@@ -691,6 +691,10 @@ def profile():
         return redirect(url_for('index'))
 
 # Game routes
+@app.route('/games/3d-labyrinth')
+def three_d_labyrinth():
+    return render_template('games/3dLabyrinth.html')
+    
 @app.route('/games/word-puzzle')
 def word_puzzle():
     return render_template('games/wordPuzzle.html')
@@ -772,6 +776,11 @@ def leaderboard():
                           number_chain_scores=number_chain_scores,
                           audio_memory_scores=audio_memory_scores,
                           n_back_scores=n_back_scores)
+
+# Tüm Oyunlar Sayfası
+@app.route('/all-games')
+def all_games():
+    return render_template('all_games.html')
 
 # Articles
 @app.route('/articles')
