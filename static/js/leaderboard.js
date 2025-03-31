@@ -158,7 +158,25 @@ document.addEventListener('DOMContentLoaded', function() {
       // Profil avatarı
       const playerAvatar = document.createElement('div');
       playerAvatar.className = 'player-avatar';
-      playerAvatar.textContent = score.username.charAt(0).toUpperCase();
+
+      // Top ranklara özel efektler
+      if (index < 3) {
+        playerAvatar.classList.add(`rank-${index + 1}-avatar`);
+      }
+
+      // Avatar içeriği
+      const avatarContent = document.createElement('div');
+      avatarContent.className = 'avatar-content';
+      avatarContent.textContent = score.username.charAt(0).toUpperCase();
+
+      // Glow efekti
+      const avatarGlow = document.createElement('div');
+      avatarGlow.className = 'avatar-glow';
+
+      playerAvatar.appendChild(avatarGlow);
+      playerAvatar.appendChild(avatarContent);
+      rowContent.appendChild(playerAvatar);
+
 
       // Kullanıcı bilgisi bloğu
       const playerInfo = document.createElement('div');
@@ -169,17 +187,20 @@ document.addEventListener('DOMContentLoaded', function() {
       playerName.textContent = score.username;
 
       playerInfo.appendChild(playerName);
+      rowContent.appendChild(playerInfo);
+
 
       // Puan bloğu
       const scoreBlock = document.createElement('div');
       scoreBlock.className = 'score-block';
-      scoreBlock.innerHTML = `<span>${score.score}</span>`;
-
-      // Hepsini sırayla ekle
-      rowContent.appendChild(rankBlock);
-      rowContent.appendChild(playerAvatar);
-      rowContent.appendChild(playerInfo);
+      scoreBlock.innerHTML = `
+        <div class="score-container">
+          <span class="score-value">${score.score}</span>
+          <div class="score-sparkles"></div>
+        </div>
+      `;
       rowContent.appendChild(scoreBlock);
+
 
       fullRow.appendChild(rowContent);
       row.appendChild(fullRow);
