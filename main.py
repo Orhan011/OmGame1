@@ -733,7 +733,7 @@ def number_chain():
 
 @app.route('/games/audio-memory')
 def audio_memory():
-    flash('Sesli Hafıza Oyunu kaldırılmıştır.', 'info')
+    flash('Sesli Hafıza Oyunu şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle geri dönecektir.', 'info')
     return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')
