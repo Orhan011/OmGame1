@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard('all');
 
@@ -16,9 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru alma işlemini gerçekleştiren fonksiyon
   function loadLeaderboard(gameType) {
     showLoading();
-    
+
     console.log('Skor yükleniyor:', gameType);
-    
+
     fetch(`/api/leaderboard/${gameType}`)
       .then(response => response.json())
       .then(data => {
@@ -43,21 +42,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Tüm oyunlar için toplam skoru hesapla
     const allScores = [];
-    
+
     if (gameType === 'all') {
       // Her kullanıcı için tüm oyunlardan topladığı puanı hesapla
       const userScores = {};
-      
+
       // Tüm oyun türlerini döngüye al
       Object.keys(data).forEach(gt => {
         if (!Array.isArray(data[gt])) return;
-        
+
         // Her oyun türündeki skorları döngüye al
         data[gt].forEach(score => {
           const userId = score.user_id;
           const username = score.username;
           const scoreValue = parseInt(score.score);
-          
+
           // Kullanıcı henüz dizide yoksa ekle
           if (!userScores[userId]) {
             userScores[userId] = {
@@ -67,13 +66,13 @@ document.addEventListener('DOMContentLoaded', function() {
               games_played: 0
             };
           }
-          
+
           // Kullanıcının toplam skorunu güncelle
           userScores[userId].total_score += scoreValue;
           userScores[userId].games_played += 1;
         });
       });
-      
+
       // Objeyi diziye çevir ve puanlarına göre sırala
       Object.values(userScores).forEach(user => {
         allScores.push({
@@ -83,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
           games_played: user.games_played
         });
       });
-      
+
       // Puanlara göre sırala (yüksekten düşüğe)
       allScores.sort((a, b) => b.score - a.score);
     } else {
@@ -115,39 +114,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tableContainer = document.createElement('div');
     tableContainer.className = 'leaderboard-table-container';
-    
+
     const table = document.createElement('table');
     table.className = 'leaderboard-table';
-    
+
     // Tablo başlığı - tek satır görünümü için başlık gerekmeyebilir
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    
+
     // Tek başlık kullanıyoruz
     const th = document.createElement('th');
     th.textContent = 'Skor Tablosu';
     th.colSpan = 3;
     headerRow.appendChild(th);
-    
+
     thead.appendChild(headerRow);
     table.appendChild(thead);
-    
+
     // Tablo gövdesi
     const tbody = document.createElement('tbody');
-    
+
     allScores.forEach((score, index) => {
       const row = document.createElement('tr');
       row.className = 'player-row';
       row.dataset.rank = index + 1;
-      
+
       // Tek satırda sıralama, profil resmi, kullanıcı adı ve puanı gösteren tek hücre
       const fullRow = document.createElement('td');
       fullRow.className = 'full-row-cell';
-      
+
       // İçerik konteyneri
       const rowContent = document.createElement('div');
       rowContent.className = 'row-content';
-      
+
       // Sıralama bloğu
       const rankBlock = document.createElement('div');
       rankBlock.className = 'rank-block';
@@ -155,39 +154,39 @@ document.addEventListener('DOMContentLoaded', function() {
         rankBlock.classList.add(`rank-${index + 1}`);
       }
       rankBlock.innerHTML = `<div class="rank-number">${index + 1}</div>`;
-      
+
       // Profil avatarı
       const playerAvatar = document.createElement('div');
       playerAvatar.className = 'player-avatar';
       playerAvatar.textContent = score.username.charAt(0).toUpperCase();
-      
+
       // Kullanıcı bilgisi bloğu
       const playerInfo = document.createElement('div');
       playerInfo.className = 'player-info';
-      
+
       const playerName = document.createElement('div');
       playerName.className = 'player-name';
       playerName.textContent = score.username;
-      
+
       playerInfo.appendChild(playerName);
-      
+
       // Puan bloğu
       const scoreBlock = document.createElement('div');
       scoreBlock.className = 'score-block';
       scoreBlock.innerHTML = `<span>${score.score}</span>`;
-      
+
       // Hepsini sırayla ekle
       rowContent.appendChild(rankBlock);
       rowContent.appendChild(playerAvatar);
       rowContent.appendChild(playerInfo);
       rowContent.appendChild(scoreBlock);
-      
+
       fullRow.appendChild(rowContent);
       row.appendChild(fullRow);
-      
+
       tbody.appendChild(row);
     });
-    
+
     table.appendChild(tbody);
     tableContainer.appendChild(table);
     leaderboardCard.appendChild(tableContainer);
