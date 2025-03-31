@@ -3,3 +3,8 @@
   <circle cx="50" cy="50" r="50" fill="#6a5ae0" />
   <text x="50" y="65" font-family="Arial, sans-serif" font-size="40" font-weight="bold" text-anchor="middle" fill="white">?</text>
 </svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#7b68ee"/>
+  <circle cx="100" cy="85" r="40" fill="#fff"/>
+  <path d="M100 135c-30 0-55 20-65 45 15 15 40 20 65 20s50-5 65-20c-10-25-35-45-65-45z" fill="#fff"/>
+</svg>
