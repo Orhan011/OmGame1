@@ -1,40 +1,37 @@
-/* Profile Page V2 - New Design - 2025 */
+/* Profile Page V2 - New Design */
 :root {
   --profile-section-padding: 25px;
   --profile-card-radius: 20px;
   --profile-glow-color: rgba(106, 90, 224, 0.3);
   --profile-hover-transition: all 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  --accent-color: #7e50e0;
   --accent-color-secondary: #ff4f8b;
   --accent-color-tertiary: #22c2bb;
-  --cyberpunk-yellow: #f7f700;
   --primary-text: white;
   --secondary-text: rgba(255, 255, 255, 0.7);
-  --accent-color: #7e50e0;
 }
 
-/* Profile Container */
 .profile-container {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
-/* Profile Card */
 .profile-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  background: rgba(32, 32, 64, 0.7);
+  border-radius: var(--profile-card-radius);
   padding: 2rem;
   margin-bottom: 2rem;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* Avatar Section */
 .avatar-section {
   position: relative;
   width: 120px;
   height: 120px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem;
 }
 
 .profile-avatar,
@@ -43,12 +40,13 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(45deg, #8b5cf6, #6366f1);
+  background: linear-gradient(45deg, var(--accent-color), var(--accent-color-secondary));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3rem;
   color: white;
+  border: 3px solid rgba(255, 255, 255, 0.1);
 }
 
 .avatar-upload-btn {
@@ -58,7 +56,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #6366f1;
+  background: var(--accent-color);
   border: none;
   color: white;
   cursor: pointer;
@@ -66,38 +64,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .avatar-upload-btn:hover {
   transform: scale(1.1);
 }
 
-/* Profile Info */
 .profile-info {
   text-align: center;
   margin-bottom: 2rem;
 }
 
 .username {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   color: var(--primary-text);
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .user-status {
   display: inline-block;
-  padding: 0.25rem 1rem;
+  padding: 0.35rem 1.25rem;
   border-radius: 20px;
   font-size: 0.875rem;
   background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-text);
 }
 
-/* Level Info */
+.user-status.active {
+  background: rgba(46, 213, 115, 0.2);
+  color: #2ed573;
+}
+
 .level-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .level-badge {
@@ -106,10 +110,11 @@
   padding: 1rem;
   text-align: center;
   min-width: 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .level-number {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: bold;
   color: white;
   display: block;
@@ -117,7 +122,9 @@
 
 .level-label {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .xp-bar-container {
@@ -129,7 +136,7 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .xp-progress {
@@ -144,19 +151,19 @@
   color: var(--secondary-text);
 }
 
-/* Settings Container */
 .settings-container {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(32, 32, 64, 0.7);
   border-radius: var(--profile-card-radius);
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Settings Tabs */
 .settings-tabs {
   display: flex;
   background: rgba(0, 0, 0, 0.2);
   padding: 1rem;
   gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab-btn {
@@ -165,12 +172,8 @@
   background: transparent;
   color: var(--secondary-text);
   cursor: pointer;
+  transition: var(--profile-hover-transition);
   border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.tab-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .tab-btn.active {
@@ -178,17 +181,15 @@
   color: white;
 }
 
-/* Tab Content */
 .tab-content {
   display: none;
-  padding: 2rem;
+  padding: var(--profile-section-padding);
 }
 
 .tab-content.active {
   display: block;
 }
 
-/* Form Styles */
 .settings-form {
   max-width: 600px;
   margin: 0 auto;
@@ -200,17 +201,24 @@
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
   color: var(--primary-text);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
   color: var(--primary-text);
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-color);
 }
 
 .save-btn {
@@ -220,14 +228,14 @@
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--profile-hover-transition);
 }
 
 .save-btn:hover {
-  background: var(--accent-color-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--profile-glow-color);
 }
 
-/* Danger Zone */
 .danger-zone {
   margin-top: 3rem;
   padding-top: 2rem;
@@ -235,32 +243,40 @@
 }
 
 .danger-zone h3 {
-  color: var(--danger);
+  color: #ff4757;
   margin-bottom: 1rem;
 }
 
 .danger-btn {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
-  border: 1px solid #ff3b30;
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.2);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--profile-hover-transition);
   margin-right: 1rem;
 }
 
 .danger-btn:hover {
-  background: #ff3b30;
-  color: white;
+  background: rgba(255, 71, 87, 0.2);
 }
 
-/* Switch Styles */
+.notification-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 24px;
 }
 
 .switch input {
@@ -278,14 +294,14 @@
   bottom: 0;
   background-color: rgba(255, 255, 255, 0.1);
   transition: .4s;
-  border-radius: 34px;
+  border-radius: 24px;
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 16px;
+  width: 16px;
   left: 4px;
   bottom: 4px;
   background-color: white;
@@ -301,287 +317,31 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-/* Notification Options */
-.notification-option {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-/* Level Up Modal */
-.level-up-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
-  background: rgba(0, 0, 0, 0.9);
-  padding: 2rem;
-  border-radius: 20px;
-  text-align: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 1000;
-}
-
-.level-up-modal.show {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  visibility: visible;
-}
-
-.level-up-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.level-up-content h2 {
-  color: var(--cyberpunk-yellow);
-  margin-bottom: 1rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .settings-tabs {
-    flex-direction: column;
-  }
-
-  .level-info {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .danger-zone {
-    text-align: center;
-  }
-
-  .danger-btn {
-    margin: 0.5rem;
-  }
-}
-
-/*Existing Styles from Original*/
-.user-status {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  background: rgba(99, 102, 241, 0.2);
-  color: #6366f1;
-}
-.level-badge {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #8b5cf6, #6366f1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-.level-number {
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-.level-label {
-  font-size: 0.75rem;
-}
-.xp-bar-container {
-  flex: 1;
-}
-.xp-bar {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.xp-progress {
-  height: 100%;
-  background: linear-gradient(90deg, #8b5cf6, #6366f1);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-.xp-text {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 0.5rem;
-}
-.settings-container {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  overflow: hidden;
-}
-.settings-tabs {
-  display: flex;
-  background: rgba(0, 0, 0, 0.2);
-}
-.tab-btn {
-  flex: 1;
-  padding: 1rem;
-  border: none;
-  background: none;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.tab-btn.active {
-  background: rgba(99, 102, 241, 0.2);
-  color: #6366f1;
-}
-.tab-content {
-  display: none;
-  padding: 2rem;
-}
-.tab-content.active {
-  display: block;
-}
-.settings-form {
-  max-width: 400px;
-  margin: 0 auto;
-}
-.form-group {
-  margin-bottom: 1.5rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
-}
-.save-btn {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: none;
-  background: #6366f1;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.save-btn:hover {
-  background: #4f46e5;
-}
-.notification-option {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-}
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: .4s;
-  border-radius: 24px;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
-input:checked + .slider {
-  background-color: #6366f1;
-}
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-.danger-zone {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-.danger-zone h3 {
-  color: #ef4444;
-  margin-bottom: 1rem;
-}
-.danger-btn {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #ef4444;
-  background: transparent;
-  color: #ef4444;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.danger-btn:hover {
-  background: #ef4444;
-  color: white;
-}
-.level-up-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
-  background: rgba(0, 0, 0, 0.95);
-  padding: 2rem;
-  border-radius: 20px;
-  text-align: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
-}
-.level-up-modal.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, -50%) scale(1);
-}
-.level-up-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
 @media (max-width: 768px) {
   .profile-card {
-    padding: 1rem;
+    padding: 1.5rem;
   }
+
+  .settings-tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem;
+  }
+
   .level-info {
     flex-direction: column;
     text-align: center;
   }
-  .settings-tabs {
-    flex-direction: column;
-  }
-  .tab-btn {
-    padding: 0.75rem;
+
+  .level-badge {
+    margin: 0 auto 1rem;
   }
 }
-.profile-container {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 20px;
-}
+
 .profile-header {
   background: linear-gradient(135deg, rgba(32, 32, 64, 0.95), rgba(16, 16, 32, 0.95));
   border-radius: 20px;
