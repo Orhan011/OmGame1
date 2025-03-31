@@ -1,115 +1,173 @@
-
 {% extends "layout.html" %}
 
 {% block title %}2048{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/2048.css') }}">
+<style>
+  body {
+    background: var(--page-background);
+    overflow-x: hidden;
+  }
+  
+  .game-wrapper {
+    background: #faf8ef;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .game-title-area {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .game-title {
+    color: #776e65;
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+  }
+  
+  .game-subtitle {
+    color: #8f7a66;
+    font-size: 18px;
+    margin-bottom: 0;
+  }
+  
+  .return-button {
+    background: #8f7a66;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    margin-top: 20px;
+  }
+  
+  .return-button:hover {
+    background: #7d6b5a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="row mb-4">
-    <div class="col text-center">
+  <div class="game-wrapper">
+    <div class="game-title-area">
       <h1 class="game-title">2048</h1>
-      <p class="lead">Sayıları kaydırarak aynı değerleri birleştirin ve 2048'e ulaşın!</p>
+      <p class="game-subtitle">Sayıları kaydırarak birleştir ve 2048'e ulaş!</p>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-lg-8 mx-auto">
-      <div class="game-header">
-        <div class="score-container">
-          <div class="score-label">Skor</div>
-          <div class="score-value" id="score">0</div>
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="game-container">
+          <div class="game-header">
+            <div class="score-container">
+              <div class="score-label">Skor</div>
+              <div class="score-value" id="score">0</div>
+            </div>
+            <div class="best-container">
+              <div class="score-label">En İyi</div>
+              <div class="score-value" id="best-score">0</div>
+            </div>
+            <div class="actions">
+              <button id="new-game-btn" class="action-btn"><i class="fas fa-redo me-1"></i>Yeni Oyun</button>
+            </div>
+          </div>
+
+          <div class="game-status" id="game-status">
+            <p>Ok tuşları veya kaydırma hareketleriyle oynayın</p>
+          </div>
+
+          <div class="grid-container">
+            <div class="grid-background">
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+              <div class="grid-cell"></div>
+            </div>
+            <div class="grid-tiles" id="grid-tiles">
+              <!-- Dinamik olarak oluşturulacak kutucuklar -->
+            </div>
+          </div>
+
+          <div class="game-message" id="game-message">
+            <div class="message-content">
+              <p></p>
+              <div class="message-buttons">
+                <button id="retry-button" class="message-button">Tekrar Dene</button>
+                <button id="keep-going-button" class="message-button">Devam Et</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="best-container">
-          <div class="score-label">En İyi</div>
-          <div class="score-value" id="best-score">0</div>
-        </div>
-        <div class="actions">
-          <button id="new-game-btn" class="action-btn new-game">Yeni Oyun</button>
+
+        <div class="keyboard-guide mt-4">
+          <div class="guide-title">Kontroller</div>
+          <div class="guide-keys">
+            <div class="key-row">
+              <div class="key"><i class="fas fa-arrow-up"></i></div>
+            </div>
+            <div class="key-row">
+              <div class="key"><i class="fas fa-arrow-left"></i></div>
+              <div class="key"><i class="fas fa-arrow-down"></i></div>
+              <div class="key"><i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="key-row">
+              <span>veya</span>
+            </div>
+            <div class="key-row">
+              <div class="key">W</div>
+            </div>
+            <div class="key-row">
+              <div class="key">A</div>
+              <div class="key">S</div>
+              <div class="key">D</div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="game-status" id="game-status">
-        <p>Tuş takımı ok tuşları veya W, A, S, D ile kontrol edin. Aynı sayıları birleştirerek 2048'e ulaşın!</p>
-      </div>
-
-      <div class="game-container">
-        <div class="grid-container">
-          <div class="grid-background">
-            <!-- Grid cells -->
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-          </div>
-          <div class="grid-tiles" id="grid-tiles">
-            <!-- Tiles will be added here by JS -->
-          </div>
+    <div class="row mt-4">
+      <div class="col-lg-8 mx-auto">
+        <div class="game-instructions">
+          <h4>Nasıl Oynanır?</h4>
+          <ul>
+            <li><strong>Amaç:</strong> Kareleri birleştirerek 2048 değerine ulaşmak.</li>
+            <li><strong>Kontrol:</strong> Ok tuşları, W/A/S/D tuşları veya dokunmatik ekranda kaydırma.</li>
+            <li><strong>Birleşme:</strong> Aynı değere sahip iki kare çarpıştığında birleşir ve değerleri ikiye katlanır.</li>
+            <li><strong>Strateji:</strong> Büyük sayılarınızı bir köşede tutmaya çalışın ve birleştirme zinciri oluşturun.</li>
+            <li><strong>Oyun Sonu:</strong> Daha fazla hamle kalmadığında oyun biter. 2048'e ulaştığınızda kazanırsınız!</li>
+          </ul>
         </div>
-        
-        <div class="game-message" id="game-message">
-          <p id="message-content"></p>
-          <div class="lower">
-            <button id="retry-button" class="message-button">Tekrar Dene</button>
-            <button id="keep-going-button" class="message-button">Devam Et</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="keyboard-guide">
-        <div class="guide-title">Kontroller</div>
-        <div class="guide-keys">
-          <div class="key-row">
-            <div class="key">↑</div>
-          </div>
-          <div class="key-row">
-            <div class="key">←</div>
-            <div class="key">↓</div>
-            <div class="key">→</div>
-          </div>
-          <div class="key-row">
-            <span>veya</span>
-          </div>
-          <div class="key-row">
-            <div class="key">W</div>
-          </div>
-          <div class="key-row">
-            <div class="key">A</div>
-            <div class="key">S</div>
-            <div class="key">D</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="game-instructions mt-4">
-        <h4>Nasıl Oynanır?</h4>
-        <ul>
-          <li>Ok tuşları veya W, A, S, D tuşlarını kullanarak kareleri kaydırın.</li>
-          <li>Aynı değere sahip iki kare birleştiğinde, tek bir kareye dönüşür ve değeri ikiye katlanır.</li>
-          <li>2048 değerine ulaşmaya çalışın!</li>
-          <li>Tahta tamamen dolduğunda ve daha fazla hamle kalmadığında oyun biter.</li>
-        </ul>
-      </div>
-
-      <div class="text-center mb-5 mt-4">
-        <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">
-          <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
-        </a>
+        <div class="text-center mb-3 mt-4">
+          <a href="{{ url_for('all_games') }}" class="return-button">
+            <i class="fas fa-arrow-left me-2"></i> Tüm Oyunlara Dön
+          </a>
+        </div>
       </div>
     </div>
   </div>
