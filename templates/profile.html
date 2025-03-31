@@ -135,7 +135,7 @@
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-user-edit"></i> Kişisel Bilgiler</h3>
 
-              <form class="profile-form" method="POST" action="{{ url_for('profile') }}/update">
+              <form class="profile-form" method="POST" action="{{ url_for('update_profile') }}">
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
@@ -187,7 +187,7 @@
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-key"></i> Şifre Değiştir</h3>
 
-              <form class="profile-form" method="POST" action="{{ url_for('profile') }}/password">
+              <form class="profile-form" method="POST" action="{{ url_for('update_password') }}">
                 <div class="form-floating mb-3">
                   <input type="password" class="form-control" id="currentPassword" name="current_password" placeholder="Mevcut Şifre" required>
                   <label for="currentPassword">Mevcut Şifre</label>
@@ -224,7 +224,7 @@
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-user-circle"></i> Profil Fotoğrafı</h3>
 
-              <form id="avatarForm" action="{{ url_for('profile') }}/avatar/update" method="POST" enctype="multipart/form-data" class="profile-form">
+              <form id="avatarForm" action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data" class="profile-form">
                 <div class="avatar-editor">
                   <div class="current-avatar">
                     {% if current_user.avatar_url %}
@@ -284,13 +284,13 @@
                 </div>
 
                 <div class="danger-actions">
-                  <form class="settings-form" method="POST" action="{{ url_for('profile') }}/deactivate">
+                  <form class="settings-form" method="POST" action="{{ url_for('deactivate_account') }}">
                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Hesabınızı devre dışı bırakmak istediğinizden emin misiniz? Giriş yaparak tekrar aktive edebilirsiniz.');">
                       <i class="fas fa-user-slash"></i> Hesabı Devre Dışı Bırak
                     </button>
                   </form>
 
-                  <form class="settings-form mt-3" method="POST" action="{{ url_for('profile') }}/delete">
+                  <form class="settings-form mt-3" method="POST" action="{{ url_for('delete_account') }}">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!');">
                       <i class="fas fa-trash-alt"></i> Hesabı Kalıcı Olarak Sil
                     </button>
