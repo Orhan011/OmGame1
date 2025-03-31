@@ -1,273 +1,264 @@
 
-document.addEventListener('DOMContentLoaded', function() {
-  // DOM elements
-  const introSection = document.getElementById('intro-section');
-  const gameSection = document.getElementById('game-section');
-  const gameOverSection = document.getElementById('game-over-section');
-  const startButton = document.getElementById('start-button');
-  const restartButton = document.getElementById('restart-button');
-  const scoreDisplay = document.getElementById('score-display');
-  const levelDisplay = document.getElementById('level-display');
-  const sequenceLengthDisplay = document.getElementById('sequence-length');
-  const correctDisplay = document.getElementById('correct-display');
-  const finalScoreDisplay = document.getElementById('final-score');
+// Sesli Hafıza Oyunu
+
+// Ses düğmeleri ve ses efektleri için değişkenler
+let buttons = [];
+let gameSequence = [];
+let playerSequence = [];
+let level = 1;
+let score = 0;
+let sequenceLength = 3;
+let isPlaying = false;
+let canPlay = false;
+let correctCount = 0;
+let synth;
+let gameOver = false;
+
+// Oyun başlatma fonksiyonu
+function startGame() {
+  // Müzik sentezleyicisini başlat
+  if (!synth) {
+    synth = new Tone.Synth().toDestination();
+    console.log("Audio is ready");
+  }
+
+  resetGame();
   
-  // Game variables
-  let score = 0;
-  let level = 1;
-  let sequenceLength = 3;
-  let correctCount = 0;
-  let currentSequence = [];
-  let playerSequence = [];
-  let isPlayingSequence = false;
-  let canPlayerInput = false;
+  // Intro bölümünü gizle ve oyun konteynerını göster
+  document.getElementById('intro-section').style.display = 'none';
+  document.getElementById('game-container').style.display = 'block';
+  document.getElementById('game-over-container').style.display = 'none';
   
-  // Colors and sounds
-  const buttons = document.querySelectorAll('.sound-btn');
-  const sounds = {
-    red: new Audio('/static/sounds/note1.mp3'),
-    green: new Audio('/static/sounds/note2.mp3'),
-    blue: new Audio('/static/sounds/note3.mp3'),
-    yellow: new Audio('/static/sounds/note4.mp3')
-  };
+  // Düğmeleri oluştur
+  createButtons();
   
-  // Initialize Tone.js for better audio performance
-  let audioReady = false;
+  // İlk diziyi başlat
+  setTimeout(() => {
+    playSequence();
+  }, 1000);
+}
+
+// Oyunu sıfırlama fonksiyonu
+function resetGame() {
+  gameSequence = [];
+  playerSequence = [];
+  level = 1;
+  score = 0;
+  sequenceLength = 3;
+  isPlaying = true;
+  canPlay = false;
+  correctCount = 0;
+  gameOver = false;
   
-  // Setup Tone.js if available
-  if (typeof Tone !== 'undefined') {
-    Tone.start().then(() => {
-      console.log('Audio is ready');
-      audioReady = true;
-    }).catch(e => {
-      console.error('Could not start audio:', e);
+  updateDisplay();
+}
+
+// Ekran göstergelerini güncelleme
+function updateDisplay() {
+  document.getElementById('score-display').textContent = score;
+  document.getElementById('level-display').textContent = level;
+  document.getElementById('sequence-length').textContent = sequenceLength;
+  document.getElementById('correct-display').textContent = correctCount;
+}
+
+// Düğmeleri oluşturma
+function createButtons() {
+  const buttonContainer = document.getElementById('audio-buttons');
+  buttonContainer.innerHTML = '';
+  buttons = [];
+  
+  // Ses notaları
+  const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4'];
+  
+  // Renk kodları
+  const colors = [
+    '#FF5252', '#FF9800', '#FFEB3B', 
+    '#66BB6A', '#42A5F5', '#7E57C2'
+  ];
+  
+  for (let i = 0; i < 6; i++) {
+    const btn = document.createElement('div');
+    btn.className = 'audio-button';
+    btn.dataset.index = i;
+    btn.dataset.note = notes[i];
+    btn.style.backgroundColor = colors[i];
+    
+    btn.addEventListener('click', () => {
+      if (canPlay && isPlaying) {
+        playSound(i, notes[i]);
+        checkSequence(i);
+      }
     });
+    
+    buttonContainer.appendChild(btn);
+    buttons.push(btn);
+  }
+}
+
+// Rastgele bir ses dizisi oluşturma
+function generateSequence() {
+  for (let i = 0; i < sequenceLength; i++) {
+    const randomIndex = Math.floor(Math.random() * 6);
+    gameSequence.push(randomIndex);
+  }
+}
+
+// Ses dizisini oynatma
+function playSequence() {
+  // Oyuncu girişini devre dışı bırak
+  canPlay = false;
+  
+  // Eğer dizi boşsa yeni bir dizi oluştur
+  if (gameSequence.length === 0) {
+    generateSequence();
   }
   
-  // Event listeners
+  // Diziyi oynat
+  let i = 0;
+  const interval = setInterval(() => {
+    const index = gameSequence[i];
+    const note = buttons[index].dataset.note;
+    
+    playSound(index, note);
+    
+    i++;
+    if (i >= gameSequence.length) {
+      clearInterval(interval);
+      
+      // Oyuncunun sırası
+      setTimeout(() => {
+        canPlay = true;
+        playerSequence = [];
+      }, 500);
+    }
+  }, 800);
+}
+
+// Ses çalma ve düğme animasyonu
+function playSound(index, note) {
+  // Visual feedback
+  const button = buttons[index];
+  button.classList.add('active');
+  
+  // Play sound
+  if (synth) {
+    synth.triggerAttackRelease(note, "8n");
+  }
+  
+  // Remove active class after animation
+  setTimeout(() => {
+    button.classList.remove('active');
+  }, 300);
+}
+
+// Oyuncunun girdilerini kontrol etme
+function checkSequence(index) {
+  // Oyuncunun seçimini kaydet
+  playerSequence.push(index);
+  
+  // Son giriş kontrolü
+  const currentIndex = playerSequence.length - 1;
+  
+  // Yanlış giriş
+  if (gameSequence[currentIndex] !== index) {
+    gameOver = true;
+    endGame();
+    return;
+  }
+  
+  // Dizi tamamlandı mı kontrol et
+  if (playerSequence.length === gameSequence.length) {
+    // Doğru sayısını artır
+    correctCount++;
+    
+    // Skoru güncelle: Seviye x Dizi uzunluğu x 10
+    score += level * sequenceLength * 10;
+    
+    // Displayi güncelle
+    updateDisplay();
+    
+    // Sonraki seviyeye geç
+    setTimeout(() => {
+      nextLevel();
+    }, 1000);
+  }
+}
+
+// Sonraki seviyeye geçme
+function nextLevel() {
+  level++;
+  
+  // Her 2 seviyede dizi uzunluğunu artır
+  if (level % 2 === 0) {
+    sequenceLength++;
+  }
+  
+  // Diziyi temizle ve yeni dizi oluştur
+  gameSequence = [];
+  playerSequence = [];
+  
+  // Ekranı güncelle
+  updateDisplay();
+  
+  // Yeni diziyi oynat
+  setTimeout(() => {
+    playSequence();
+  }, 1000);
+}
+
+// Oyun sonu
+function endGame() {
+  isPlaying = false;
+  canPlay = false;
+  
+  // Game over ekranını göster
+  document.getElementById('game-container').style.display = 'none';
+  document.getElementById('game-over-container').style.display = 'block';
+  
+  // Sonuç göster
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('final-level').textContent = level;
+  document.getElementById('final-correct').textContent = correctCount;
+  
+  // Skor kaydet (backend'e gönder)
+  if (score > 0) {
+    saveScore();
+  }
+}
+
+// Skoru kaydetme
+function saveScore() {
+  fetch('/save_score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      game: 'audio_memory',
+      score: score,
+      level: level
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Score saved:', data);
+  })
+  .catch(error => {
+    console.error('Error saving score:', error);
+  });
+}
+
+// Belge yüklendiğinde olay dinleyicilerini ekle
+document.addEventListener('DOMContentLoaded', function() {
+  // Başlat butonu
+  const startButton = document.getElementById('start-game');
   if (startButton) {
     startButton.addEventListener('click', startGame);
   }
   
+  // Yeniden başlat butonu
+  const restartButton = document.getElementById('restart-game');
   if (restartButton) {
-    restartButton.addEventListener('click', restartGame);
-  }
-  
-  // Setup button click events
-  buttons.forEach(button => {
-    button.addEventListener('click', handleButtonClick);
-  });
-  
-  // Functions
-  function startGame() {
-    introSection.classList.add('d-none');
-    if (gameSection) {
-      gameSection.classList.remove('d-none');
-    }
-    if (gameOverSection) {
-      gameOverSection.classList.add('d-none');
-    }
-    
-    resetGame();
-    nextLevel();
-  }
-  
-  function restartGame() {
-    gameOverSection.classList.add('d-none');
-    if (gameSection) {
-      gameSection.classList.remove('d-none');
-    }
-    
-    resetGame();
-    nextLevel();
-  }
-  
-  function resetGame() {
-    score = 0;
-    level = 1;
-    sequenceLength = 3;
-    correctCount = 0;
-    currentSequence = [];
-    
-    updateDisplay();
-  }
-  
-  function updateDisplay() {
-    scoreDisplay.textContent = score;
-    levelDisplay.textContent = level;
-    sequenceLengthDisplay.textContent = sequenceLength;
-    correctDisplay.textContent = correctCount;
-  }
-  
-  function nextLevel() {
-    playerSequence = [];
-    currentSequence = generateSequence(sequenceLength);
-    
-    setTimeout(() => {
-      playSequence();
-    }, 1000);
-  }
-  
-  function generateSequence(length) {
-    const colors = ['red', 'green', 'blue', 'yellow'];
-    const sequence = [];
-    
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * colors.length);
-      sequence.push(colors[randomIndex]);
-    }
-    
-    return sequence;
-  }
-  
-  function playSequence() {
-    isPlayingSequence = true;
-    canPlayerInput = false;
-    
-    buttons.forEach(button => {
-      button.classList.add('disabled');
-    });
-    
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < currentSequence.length) {
-        activateButton(currentSequence[i]);
-        i++;
-      } else {
-        clearInterval(interval);
-        isPlayingSequence = false;
-        canPlayerInput = true;
-        
-        buttons.forEach(button => {
-          button.classList.remove('disabled');
-        });
-      }
-    }, 800);
-  }
-  
-  function activateButton(color) {
-    const button = document.querySelector(`.sound-btn[data-color="${color}"]`);
-    
-    if (button) {
-      button.classList.add('active');
-      playSound(color);
-      
-      setTimeout(() => {
-        button.classList.remove('active');
-      }, 500);
-    }
-  }
-  
-  function playSound(color) {
-    if (sounds[color]) {
-      // Clone the audio to allow overlapping sounds
-      const sound = sounds[color].cloneNode();
-      sound.volume = 0.7;
-      sound.play().catch(e => console.error('Error playing sound:', e));
-    }
-  }
-  
-  function handleButtonClick(event) {
-    if (!canPlayerInput || isPlayingSequence) return;
-    
-    const color = event.currentTarget.getAttribute('data-color');
-    activateButton(color);
-    playerSequence.push(color);
-    
-    const currentIndex = playerSequence.length - 1;
-    
-    if (playerSequence[currentIndex] !== currentSequence[currentIndex]) {
-      gameOver();
-      return;
-    }
-    
-    if (playerSequence.length === currentSequence.length) {
-      canPlayerInput = false;
-      correctCount++;
-      score += level * 10;
-      
-      updateDisplay();
-      
-      setTimeout(() => {
-        if (correctCount >= 3) {
-          level++;
-          sequenceLength++;
-          correctCount = 0;
-        }
-        
-        updateDisplay();
-        nextLevel();
-      }, 1000);
-    }
-  }
-  
-  function gameOver() {
-    canPlayerInput = false;
-    finalScoreDisplay.textContent = score;
-    
-    // Save score to server if logged in
-    if (typeof saveScore === 'function') {
-      saveScore(score, 'audioMemory');
-    }
-    
-    if (gameSection) {
-      gameSection.classList.add('d-none');
-    }
-    
-    gameOverSection.classList.remove('d-none');
-  }
-  
-  // Common function to save score
-  function saveScore(score, gameType) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        score: score,
-        game_type: gameType
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        console.log('Score saved successfully!');
-        
-        // Handle XP and level up notifications
-        if (data.is_level_up) {
-          showNotification('Seviye Atladınız!', `Yeni seviyeniz: ${data.level}`, 'success');
-        }
-        
-        if (data.is_high_score) {
-          showNotification('Yeni Rekor!', 'Bu oyunda yeni bir rekor kırdınız!', 'success');
-        }
-      } else if (data.message === 'Login required') {
-        showNotification('Giriş Gerekli', 'Skorunuzu kaydetmek için giriş yapmalısınız.', 'warning');
-      } else {
-        console.log('Score could not be saved.');
-      }
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
-    });
-  }
-  
-  // Notification function
-  function showNotification(title, message, type = 'info') {
-    if (typeof Swal !== 'undefined') {
-      Swal.fire({
-        title: title,
-        text: message,
-        icon: type,
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-      });
-    } else {
-      alert(`${title}: ${message}`);
-    }
+    restartButton.addEventListener('click', startGame);
   }
 });
-
