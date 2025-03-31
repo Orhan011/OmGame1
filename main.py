@@ -860,21 +860,32 @@ def profile_v2():
         game_scores[score.game_type].append(score)
     
     # Kullanıcının seviyesini ve gereken XP miktarlarını hesapla
-    # calculate_level fonksiyonunu doğrudan çağırmak yerine rank hesaplamasını kendimiz yapalım
     # Seviye 1 için gereken minimum XP: 0
     user_xp = user.experience_points or 0
     if user_xp < 1000:
         current_level = 1
     else:
-        # Quadratic formülü çözerek seviyeyi hesaplama
-        # n^2 + n - (2*xp/1000) = 0 formülünden n'yi çözümle
-        import math
-        a = 1
-        b = 1
-        c = -2 * user_xp / 1000
-        
-        # Quadratic formülü kullanarak pozitif değeri bul: (-b + sqrt(b^2 - 4ac)) / 2a
-        current_level = int((-b + math.sqrt(b*b - 4*a*c)) / (2*a))
+        try:
+            # Quadratic formülü çözerek seviyeyi hesaplama
+            # n^2 + n - (2*xp/1000) = 0 formülünden n'yi çözümle
+            import math
+            a = 1
+            b = 1
+            c = -2 * user_xp / 1000
+            
+            # Quadratic formülü kullanarak pozitif değeri bul: (-b + sqrt(b^2 - 4ac)) / 2a
+            disc = b*b - 4*a*c
+            if disc >= 0:  # Discriminant pozitif olmalı
+                current_level = int((-b + math.sqrt(disc)) / (2*a))
+            else:
+                current_level = 1  # Hesaplama hatası durumunda varsayılan değer
+        except Exception as e:
+            # Herhangi bir hata durumunda varsayılan seviyeyi kullan
+            current_level = 1
+            print(f"Seviye hesaplama hatası: {e}")
+    
+    # Seviye en az 1 olmalıdır
+    current_level = max(1, current_level)
     
     xp_for_current = xp_for_level(current_level)
     xp_for_next = xp_for_level(current_level + 1)

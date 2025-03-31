@@ -111,8 +111,13 @@ function loadArticleContent() {
             {% set next_level = user_level_num + 1 %}
             {% set xp_for_user_level = xp_for_level(user_level_num) %}
             {% set xp_for_next_level = xp_for_level(next_level) %}
-            {% if xp_for_next_level > xp_for_user_level %}
+            {% if xp_for_next_level > xp_for_user_level and (xp_for_next_level - xp_for_user_level) > 0 %}
               {% set progress_percent = ((user.experience_points - xp_for_user_level) / (xp_for_next_level - xp_for_user_level) * 100)|round %}
+              {% if progress_percent < 0 %}
+                {% set progress_percent = 0 %}
+              {% elif progress_percent > 100 %}
+                {% set progress_percent = 100 %}
+              {% endif %}
             {% else %}
               {% set progress_percent = 100 %}
             {% endif %}
