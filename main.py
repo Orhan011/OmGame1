@@ -661,10 +661,7 @@ def memory_cards():
 def number_chain():
     return render_template('games/numberChain.html')
 
-@app.route('/games/audio-memory')
-def audio_memory():
-    # Yeni Sesli Hafıza Oyunu
-    return render_template('games/audioMemory.html')
+# Audio Memory oyunu kaldırıldı
 
 @app.route('/games/n-back')
 def n_back():
