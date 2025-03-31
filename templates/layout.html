@@ -65,37 +65,10 @@ function loadArticleContent() {
 
 <nav class="navbar navbar-expand-lg navbar-dark">
 <div class="container">
-  <div class="d-flex align-items-center">
-    {% if session.get('user_id') %}
-    <!-- User Profile Avatar (Sol üstte) -->
-    <div class="profile-avatar-wrapper me-3">
-      <a class="user-avatar-link" href="#" id="topLeftAvatar" onclick="toggleProfilePanel(event)">
-        {% if get_avatar_url() %}
-        <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini">
-        {% else %}
-        <div class="avatar-mini-placeholder">{{ session.get('username')[0]|upper }}</div>
-        {% endif %}
-      </a>
-      <!-- Profile Panel - Tıklandığında açılacak -->
-      <div id="profilePanel" class="profile-panel">
-        <div class="profile-panel-inner">
-          <a href="{{ url_for('profile') }}" class="profile-panel-item">
-            <i class="fas fa-user"></i> Profil
-          </a>
-          <a href="{{ url_for('logout') }}" class="profile-panel-item">
-            <i class="fas fa-sign-out-alt"></i> Çıkış Yap
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-    
-    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
-      <span class="brand-text">OmGame</span>
-    </a>
-  </div>
-  
+  <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
+    <span class="brand-text">OmGame</span>
+  </a>
   <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
     <div class="menu-icon">
       <span></span>
@@ -132,7 +105,25 @@ function loadArticleContent() {
                 </li>
     </ul>
 
-    <!-- Sağ üstteki profil resmi kaldırıldı (sol üste taşındı) -->
+    {% if session.get('user_id') %}
+    <!-- User menu dropdown - Sağ üstte profil resmi (her zaman görünür) -->
+    <ul class="navbar-nav ms-auto d-flex">
+      <li class="nav-item dropdown">
+        <a class="nav-link user-dropdown d-flex align-items-center" href="#" id="userDropdown">
+          {% if get_avatar_url() %}
+          <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini">
+          {% else %}
+          <div class="avatar-mini-placeholder">{{ session.get('username')[0]|upper }}</div>
+          {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
+        </ul>
+      </li>
+    </ul>
+    {% endif %}
 
   <ul class="navbar-nav ms-auto {% if session.get('user_id') %}d-none d-lg-flex{% endif %}">
       {% if not session.get('user_id') %}
