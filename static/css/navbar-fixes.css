@@ -5,13 +5,128 @@
   cursor: pointer !important;
 }
 
-/* Mobil görünümde kullanıcı dropdown menüsünün her zaman görünmesi için */
+/* Sol üstteki profil paneli stilleri */
+.profile-avatar-wrapper {
+  position: relative;
+}
+
+.user-avatar-link {
+  display: block;
+  line-height: 0;
+}
+
+.avatar-mini {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(106, 90, 224, 0.7);
+  object-fit: cover;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.avatar-mini:hover {
+  transform: scale(1.1);
+  border-color: rgb(106, 90, 224);
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.4);
+}
+
+.avatar-mini-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  color: white;
+  border: 2px solid rgba(106, 90, 224, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatar-mini-placeholder:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.4);
+}
+
+/* Profil Paneli */
+.profile-panel {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  min-width: 180px;
+  background: rgba(20, 20, 43, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1100;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(106, 90, 224, 0.1);
+  backdrop-filter: blur(10px);
+  transform: translateY(-10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.profile-panel.active {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.profile-panel-inner {
+  padding: 8px;
+}
+
+.profile-panel-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.profile-panel-item i {
+  margin-right: 12px;
+  color: #6a5ae0;
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.profile-panel-item:hover {
+  background: rgba(106, 90, 224, 0.15);
+  color: white;
+  transform: translateX(5px);
+}
+
+.profile-panel-item:hover i {
+  transform: scale(1.1);
+}
+
+.profile-panel-item + .profile-panel-item {
+  margin-top: 4px;
+}
+
+/* Mobil görünümde profil avatar ve paneli düzenlemeleri */
 @media (max-width: 991.98px) {
-  .navbar-nav.ms-auto.d-flex {
-    position: absolute;
-    right: 70px;
-    top: 12px;
-    z-index: 1050;
+  .profile-avatar-wrapper {
+    margin-right: 0;
+  }
+  
+  .profile-panel {
+    left: auto;
+    right: 0;
   }
   
   /* Hamburger menüde kullanıcı bilgilerini gizle */
