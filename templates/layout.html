@@ -9,8 +9,12 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
 {% if request.endpoint == 'profile' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endif %}
+{% if request.endpoint in ['sudoku', 'game_2048', 'chess', 'rubik_cube', 'logic_puzzles', 'tangram'] %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/audio-memory.css') }}">
 {% endif %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,6 +91,13 @@ function loadArticleContent() {
           <li><a class="dropdown-item" href="{{ url_for('labyrinth') }}"><i class="fas fa-route me-2"></i>Labirent</a></li>
           <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
           <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('sudoku') }}"><i class="fas fa-th me-2"></i>Sudoku</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('game_2048') }}"><i class="fas fa-cubes me-2"></i>2048</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('chess') }}"><i class="fas fa-chess me-2"></i>Satranç</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('rubik_cube') }}"><i class="fas fa-cube me-2"></i>Rubik Küp</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('logic_puzzles') }}"><i class="fas fa-lightbulb me-2"></i>Mantık Bulmacaları</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('tangram') }}"><i class="fas fa-shapes me-2"></i>Tangram</a></li>
+          <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
         </ul>
       </li>
@@ -154,6 +165,22 @@ function loadArticleContent() {
         <a href="{{ url_for('puzzle') }}" class="footer-game-button">
           <i class="fas fa-puzzle-piece"></i>
           <span>Yapboz</span>
+        </a>
+        <a href="{{ url_for('sudoku') }}" class="footer-game-button">
+          <i class="fas fa-th"></i>
+          <span>Sudoku</span>
+        </a>
+        <a href="{{ url_for('game_2048') }}" class="footer-game-button">
+          <i class="fas fa-cubes"></i>
+          <span>2048</span>
+        </a>
+        <a href="{{ url_for('chess') }}" class="footer-game-button">
+          <i class="fas fa-chess"></i>
+          <span>Satranç</span>
+        </a>
+        <a href="{{ url_for('logic_puzzles') }}" class="footer-game-button">
+          <i class="fas fa-lightbulb"></i>
+          <span>Mantık Bulmacaları</span>
         </a>
       </div>
     </div>
