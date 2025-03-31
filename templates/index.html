@@ -2,7 +2,30 @@
 
 {% block content %}
 {% if session.get('user_id') %}
-<!-- Profil kısayolu kaldırıldı -->
+<div class="profile-shortcut-container">
+  <div class="profile-shortcut-avatar-wrapper" onclick="toggleShortcutPanel(event)">
+    {% if get_avatar_url() %}
+      <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="profile-shortcut-avatar">
+    {% else %}
+      <div class="profile-shortcut-placeholder">{{ get_user_data().username[0]|upper }}</div>
+    {% endif %}
+  </div>
+  <div class="profile-shortcut-panel" id="shortcutPanel">
+    <div class="shortcut-panel-item">
+      <a href="{{ url_for('profile') }}">
+        <i class="fas fa-user-circle"></i>
+        <span>Profilim</span>
+      </a>
+    </div>
+    <div class="shortcut-panel-divider"></div>
+    <div class="shortcut-panel-item">
+      <a href="{{ url_for('logout') }}">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Çıkış Yap</span>
+      </a>
+    </div>
+  </div>
+</div>
 {% endif %}
 
 <section class="hero-section">
