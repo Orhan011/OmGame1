@@ -483,7 +483,7 @@ def initialize_database():
                     <li><strong>Çoklu Görev Yapmaktan Kaçının:</strong> Bir seferde bir işe odaklanın, sürekli görev değiştirmek zihinsel yorgunluğu artırır.</li>
                     <li><strong>Uyku Hijyeni:</strong> Kaliteli ve yeterli uyku, bilişsel fonksiyonların yenilenmesi için şarttır.</li>
                     <li><strong>Mindfulness:</strong> 5-10 dakikalık meditasyon, zihinsel netliği önemli ölçüde artırabilir.</li>
-                    <li><strong>Beslenme Düzeni:</strong> Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
+                    <li><strong>Beslenme Düzeni: Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
                 </ul>
                 <p>ZekaPark oyunlarını oynamak için kendinizi en iyi hissettiğiniz zamanları seçin. Düzenli bilişsel egzersizler, beyin sisine karşı genel direncin artmasına yardımcı olabilir.</p>
                 """,
@@ -694,7 +694,7 @@ def profile():
 @app.route('/games/3d-labyrinth')
 def three_d_labyrinth():
     return render_template('games/3dLabyrinth.html')
-    
+
 @app.route('/games/word-puzzle')
 def word_puzzle():
     return render_template('games/wordPuzzle.html')
@@ -742,40 +742,6 @@ def n_back():
 
 # Yeni IQ Geliştirme Oyunları
 # Removed routes for IQ development games
-
-# Leaderboard
-@app.route('/leaderboard')
-def leaderboard():
-    word_puzzle_scores = Score.query.filter_by(game_type='wordPuzzle').order_by(Score.score.desc()).limit(10).all()
-    memory_match_scores = Score.query.filter_by(game_type='memoryMatch').order_by(Score.score.desc()).limit(10).all()
-    labyrinth_scores = Score.query.filter_by(game_type='labyrinth').order_by(Score.score.desc()).limit(10).all()
-    puzzle_scores = Score.query.filter_by(game_type='puzzle').order_by(Score.score.desc()).limit(10).all()
-    # Görsel Dikkat oyunu kaldırıldı
-    # visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
-    number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
-
-    # Hafıza oyunları skor tabloları
-    # where_is_it_scores kaldırıldı
-    memory_cards_scores = Score.query.filter_by(game_type='memoryCards').order_by(Score.score.desc()).limit(10).all()
-    number_chain_scores = Score.query.filter_by(game_type='numberChain').order_by(Score.score.desc()).limit(10).all()
-    audio_memory_scores = Score.query.filter_by(game_type='audioMemory').order_by(Score.score.desc()).limit(10).all()
-    n_back_scores = Score.query.filter_by(game_type='nBack').order_by(Score.score.desc()).limit(10).all()
-
-    # IQ geliştirme oyunları kaldırıldı
-
-    return render_template('leaderboard.html', 
-                          word_puzzle_scores=word_puzzle_scores,
-                          memory_match_scores=memory_match_scores,
-                          labyrinth_scores=labyrinth_scores,
-                          puzzle_scores=puzzle_scores,
-                          # Görsel Dikkat oyunu kaldırıldı
-                          # visual_attention_scores=visual_attention_scores,
-                          number_sequence_scores=number_sequence_scores,
-                          # where_is_it_scores kaldırıldı
-                          memory_cards_scores=memory_cards_scores,
-                          number_chain_scores=number_chain_scores,
-                          audio_memory_scores=audio_memory_scores,
-                          n_back_scores=n_back_scores)
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')

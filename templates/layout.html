@@ -91,10 +91,9 @@ function loadArticleContent() {
           <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
           <!-- IQ geliştirme oyunları kaldırıldı -->
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Skor Tablosu</a></li>
+          </li>
         </ul>
       </li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
     </ul>
@@ -115,18 +114,7 @@ function loadArticleContent() {
 
 <main class="container py-4">
 {% block content %}
-  <div id="leaderboard">  <!-- Leaderboard container -->
-    </div>
-    <script>
-      //  Fetch leaderboard data here (replace with actual API call)
-      fetch('/api/leaderboard')
-        .then(response => response.json())
-        .then(data => {
-          // Render leaderboard data in the #leaderboard div
-          // Implement the design specified in the prompt here
-          console.log(data); // Log the fetched data for debugging.
-        });
-    </script>
+
 {% endblock %}
 </main>
 
@@ -148,7 +136,6 @@ function loadArticleContent() {
       <h5 class="footer-title">Hızlı Erişim</h5>
       <ul class="footer-links">
         <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right me-2"></i>Anasayfa</a></li>
-        <li><a href="{{ url_for('leaderboard') }}"><i class="fas fa-chevron-right me-2"></i>Skor Tablosu</a></li>
         <li><a href="{{ url_for('articles') }}"><i class="fas fa-chevron-right me-2"></i>Makaleler</a></li>
         <li><a href="{{ url_for('tips') }}"><i class="fas fa-chevron-right me-2"></i>İpuçları</a></li>
       </ul>
