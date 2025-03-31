@@ -5,6 +5,38 @@
   cursor: pointer !important;
 }
 
+/* Dropdown içindeki resmi ve başlıkları ayarla */
+.user-dropdown img.avatar-mini,
+.user-dropdown .avatar-mini-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.user-dropdown:hover img.avatar-mini,
+.user-dropdown:hover .avatar-mini-placeholder {
+  transform: scale(1.05);
+  border-color: #6A5AE0;
+}
+
+.dropdown-menu.show {
+  animation: fadeInDropdown 0.3s ease forwards;
+}
+
+@keyframes fadeInDropdown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Mobil görünümde kullanıcı dropdown menüsünün her zaman görünmesi için */
 @media (max-width: 991.98px) {
   .navbar-nav.ms-auto.d-flex {
@@ -17,5 +49,11 @@
   /* Hamburger menüde kullanıcı bilgilerini gizle */
   .navbar-collapse .user-dropdown {
     display: none !important;
+  }
+  
+  /* Mobil görünümde kullanıcı dropdown butonunu daha belirgin yap */
+  .navbar-nav.ms-auto.d-flex .user-dropdown {
+    background-color: rgba(106, 90, 224, 0.1);
+    padding: 8px;
   }
 }

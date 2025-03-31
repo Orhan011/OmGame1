@@ -109,7 +109,7 @@ function loadArticleContent() {
     <!-- User menu dropdown - Sağ üstte profil resmi (her zaman görünür) -->
     <ul class="navbar-nav ms-auto d-flex">
       <li class="nav-item dropdown">
-        <a class="nav-link user-dropdown d-flex align-items-center" href="#" id="userDropdown">
+        <a class="nav-link user-dropdown d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           {% if get_avatar_url() %}
           <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini">
           {% else %}

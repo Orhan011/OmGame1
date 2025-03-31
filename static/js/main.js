@@ -256,19 +256,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Navbar'da kullanıcı dropdown menüsünü açmak için tıklama işlevselliği
-  const userDropdown = document.querySelector('.user-dropdown');
-  if (userDropdown) {
-    userDropdown.addEventListener('click', function(e) {
-      // Bootstrap dropdown'ı manuel olarak toggle et
-      if (!e.target.closest('.dropdown-menu')) {
-        const dropdownMenu = this.nextElementSibling;
-        if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
-          dropdownMenu.classList.toggle('show');
-        }
-      }
-    });
-  }
+  // Navbar'da kullanıcı dropdown menüsünü mobil görünümde her zaman göster
+  const adjustUserDropdown = function() {
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    const userDropdownContainer = document.querySelector('.navbar-nav.ms-auto.d-flex');
+    
+    if (window.innerWidth < 992) { // Bootstrap'ın lg breakpoint değeri
+      userDropdownContainer.classList.add('mobile-visible');
+    } else {
+      userDropdownContainer.classList.remove('mobile-visible');
+    }
+  };
+  
+  // İlk yüklemede ayarla
+  adjustUserDropdown();
+  
+  // Ekran boyutu değiştiğinde ayarla
+  window.addEventListener('resize', adjustUserDropdown);
 });
 
 // Yeni profil paneli işlevselliği
@@ -308,31 +312,21 @@ function toggleShortcutPanel(event) {
     panel.style.display = 'none';
   } else {
     panel.style.display = 'block';
+    
+    // Panel dışına tıklandığında paneli kapat
+    document.addEventListener('click', function closePanel(e) {
+      if (!panel.contains(e.target) && e.target !== event.target) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', closePanel);
+      }
+    });
   }
 }
 
-// Kısayol panelini aç/kapat
-function toggleShortcutPanel(event) {
-  event.stopPropagation();
-  const panel = document.getElementById('shortcutPanel');
-  if (!panel) return;
-
-  if (panel.style.display === 'block') {
-    panel.style.display = 'none';
-  } else {
-    panel.style.display = 'block';
-  }
-  
-  // Panel dışına tıklandığında paneli kapat
-  document.addEventListener('click', function closePanel(e) {
-    if (!panel.contains(e.target) && e.target !== event.target) {
-      panel.style.display = 'none';
-      document.removeEventListener('click', closePanel);
-    }
-  });
-}
-
+// Added to restore profile picture
 document.addEventListener('DOMContentLoaded', function() {
-  // Diğer sayfa yükleme işlemleriiner').appendChild(profilePicture);
-    }
+  const profilePicture = document.getElementById('profilePicture');
+  if (profilePicture && document.getElementById('profile-picture-container')) {
+    document.getElementById('profile-picture-container').appendChild(profilePicture);
+  }
 });
