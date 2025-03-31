@@ -102,13 +102,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // İlerlemeyi güncelle
   const updateProgressDisplay = () => {
-    const progress = Math.floor((solvedCells / totalCellsToSolve) * 100);
+    const progress = Math.floor((solvedCells / totalCellsToSolve) * 100) || 0;
     progressDisplay.textContent = `${progress}%`;
-    progressPercent.textContent = `${progress}%`;
+    if (progressPercent) {
+      progressPercent.textContent = `${progress}%`;
+    }
     progressBar.style.width = `${progress}%`;
     
     // Oyunu tamamladık mı kontrol et
-    if (solvedCells === totalCellsToSolve) {
+    if (solvedCells === totalCellsToSolve && totalCellsToSolve > 0) {
       completeGame();
     }
   };
@@ -445,23 +447,34 @@ document.addEventListener('DOMContentLoaded', function() {
   function playSound(sound) {
     if (!soundEnabled) return;
     
-    const audio = new Audio();
-    switch (sound) {
-      case 'click':
-        audio.src = '/static/sounds/click.mp3';
-        break;
-      case 'correct':
-        audio.src = '/static/sounds/correct.mp3';
-        break;
-      case 'wrong':
-        audio.src = '/static/sounds/wrong.mp3';
-        break;
-      case 'complete':
-        audio.src = '/static/sounds/success.mp3';
-        break;
+    try {
+      const audio = new Audio();
+      switch (sound) {
+        case 'click':
+          audio.src = '/static/sounds/click.mp3';
+          break;
+        case 'correct':
+          audio.src = '/static/sounds/correct.mp3';
+          break;
+        case 'wrong':
+          audio.src = '/static/sounds/wrong.mp3';
+          break;
+        case 'complete':
+          audio.src = '/static/sounds/success.mp3';
+          break;
+      }
+      
+      // Ses çalma işlemini promise yapısına çevir
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          console.log('Ses çalma hatası:', e);
+        });
+      }
+    } catch (error) {
+      console.log('Ses çalma hatası:', error);
     }
-    
-    audio.play().catch(e => console.log('Ses çalma hatası:', e));
   }
   
   // Sudoku çözücü algoritması (backtracking)
@@ -617,20 +630,24 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Diğer butonlar için olay dinleyicileri
-  pauseButton.addEventListener('click', function() {
-    pauseOverlay.style.display = 'flex';
-    clearInterval(gameTimer);
-    playSound('click');
-  });
+  if (pauseButton) {
+    pauseButton.addEventListener('click', function() {
+      pauseOverlay.style.display = 'flex';
+      clearInterval(gameTimer);
+      playSound('click');
+    });
+  }
   
-  resumeButton.addEventListener('click', function() {
-    pauseOverlay.style.display = 'none';
-    gameTimer = setInterval(function() {
-      secondsElapsed++;
-      timeDisplay.textContent = formatTime(secondsElapsed);
-    }, 1000);
-    playSound('click');
-  });
+  if (resumeButton) {
+    resumeButton.addEventListener('click', function() {
+      pauseOverlay.style.display = 'none';
+      gameTimer = setInterval(function() {
+        secondsElapsed++;
+        timeDisplay.textContent = formatTime(secondsElapsed);
+      }, 1000);
+      playSound('click');
+    });
+  }
   
   playAgainButton.addEventListener('click', function() {
     gameOverContainer.style.display = 'none';

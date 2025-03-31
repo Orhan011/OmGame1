@@ -178,23 +178,34 @@ document.addEventListener('DOMContentLoaded', function() {
   function playSound(sound) {
     if (!soundEnabled) return;
     
-    const audio = new Audio();
-    switch (sound) {
-      case 'click':
-        audio.src = '/static/sounds/click.mp3';
-        break;
-      case 'merge':
-        audio.src = '/static/sounds/correct.mp3';
-        break;
-      case 'move':
-        audio.src = '/static/sounds/number.mp3';
-        break;
-      case 'complete':
-        audio.src = '/static/sounds/level-up.mp3';
-        break;
+    try {
+      const audio = new Audio();
+      switch (sound) {
+        case 'click':
+          audio.src = '/static/sounds/click.mp3';
+          break;
+        case 'merge':
+          audio.src = '/static/sounds/correct.mp3';
+          break;
+        case 'move':
+          audio.src = '/static/sounds/number.mp3';
+          break;
+        case 'complete':
+          audio.src = '/static/sounds/level-up.mp3';
+          break;
+      }
+      
+      // Ses çalma işlemini promise yapısına çevir
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          console.log('Ses çalma hatası:', e);
+        });
+      }
+    } catch (error) {
+      console.log('Ses çalma hatası:', error);
     }
-    
-    audio.play().catch(e => console.log('Ses çalma hatası:', e));
   }
   
   // Event Listeners
@@ -263,31 +274,35 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Diğer butonlar için olay dinleyicileri
-  pauseButton.addEventListener('click', function() {
-    pauseOverlay.style.display = 'flex';
-    clearInterval(gameTimer);
-    playSound('click');
-  });
+  if (pauseButton) {
+    pauseButton.addEventListener('click', function() {
+      pauseOverlay.style.display = 'flex';
+      clearInterval(gameTimer);
+      playSound('click');
+    });
+  }
   
-  resumeButton.addEventListener('click', function() {
-    pauseOverlay.style.display = 'none';
-    if (gameMode === 'TIME') {
-      gameTimer = setInterval(function() {
-        secondsElapsed--;
-        timeDisplay.textContent = formatTime(secondsElapsed);
-        
-        if (secondsElapsed <= 0) {
-          clearInterval(gameTimer);
-          endGame('Süre doldu!');
-        }
-      }, 1000);
-    } else {
-      gameTimer = setInterval(function() {
-        secondsElapsed++;
-      }, 1000);
-    }
-    playSound('click');
-  });
+  if (resumeButton) {
+    resumeButton.addEventListener('click', function() {
+      pauseOverlay.style.display = 'none';
+      if (gameMode === 'TIME') {
+        gameTimer = setInterval(function() {
+          secondsElapsed--;
+          timeDisplay.textContent = formatTime(secondsElapsed);
+          
+          if (secondsElapsed <= 0) {
+            clearInterval(gameTimer);
+            endGame('Süre doldu!');
+          }
+        }, 1000);
+      } else {
+        gameTimer = setInterval(function() {
+          secondsElapsed++;
+        }, 1000);
+      }
+      playSound('click');
+    });
+  }
   
   playAgainButton.addEventListener('click', function() {
     gameOverContainer.style.display = 'none';
