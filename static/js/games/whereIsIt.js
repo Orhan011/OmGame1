@@ -1,516 +1,879 @@
-// Kim Nerede? (Türkiye İlleri) oyunu için JavaScript
+/*
+ * Kim Nerede? Oyunu
+ * Türkiye haritası üzerinde belirtilen şehirleri bulma oyunu
+ */
 
-document.addEventListener("DOMContentLoaded", function() {
-  // Oyun değişkenleri
-  let score = 0;
-  let level = 1;
-  let timeLeft = 30; // Başlangıç süresi (saniye)
-  let correctAnswers = 0;
-  let totalCorrectAnswers = 0;
-  let timer;
-  let currentProvince = "";
-  let provinces = [];
-  let svgDocument = null;
-  let isGameActive = false;
-  let hintCount = 3;
-  let usedProvinces = [];
-
-  // Ses efektleri
-  const correctSound = new Audio('/static/sounds/correct.mp3');
-  const wrongSound = new Audio('/static/sounds/wrong.mp3');
-  const levelCompleteSound = new Audio('/static/sounds/level-complete.mp3');
-  const gameOverSound = new Audio('/static/sounds/game-over.mp3');
-
-  // Ses çalma fonksiyonu (hataları yakala)
-  function playSound(sound) {
-    try {
-      if (sound && sound.play) {
-        sound.currentTime = 0;
-        sound.play().catch(err => {
-          console.log("Sound play error:", err);
-        });
-      }
-    } catch (err) {
-      console.log("Sound play error:", err);
-    }
-  }
-
-  // DOM öğeleri
-  const startGameBtn = document.getElementById('start-game-btn');
-  const introSection = document.getElementById('intro-section');
-  const gameArea = document.getElementById('game-area');
-  const scoreDisplay = document.getElementById('score-display');
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elementleri
+  const startScreen = document.getElementById('start-screen');
+  const gameContainer = document.getElementById('game-container');
+  const mapContainer = document.getElementById('map-container');
+  const characterImage = document.getElementById('character-image');
   const timerDisplay = document.getElementById('timer-display');
-  const levelDisplay = document.getElementById('level-display');
-  const correctDisplay = document.getElementById('correct-display');
-  const currentProvinceDisplay = document.getElementById('current-province');
-  const turkeyMap = document.getElementById('turkey-map');
-  const levelCompleteModal = document.getElementById('level-complete-modal');
-  const gameOverModal = document.getElementById('game-over-modal');
-  const nextLevelBtn = document.getElementById('next-level-btn');
-  const playAgainBtn = document.getElementById('play-again-btn');
-  const backToMenuBtn = document.getElementById('back-to-menu-btn');
-  const hintBtn = document.getElementById('hint-btn');
-  const hintCountDisplay = document.getElementById('hint-count');
-  const provinceTooltip = document.getElementById('province-tooltip');
-  const tooltipText = document.getElementById('tooltip-text');
-
-  // Seviye tamamlama modal içeriği
-  const levelCorrectCount = document.getElementById('level-correct-count');
-  const levelPointsDisplay = document.getElementById('level-points');
-  const timeBonusDisplay = document.getElementById('time-bonus');
-  const totalScoreDisplay = document.getElementById('total-score');
-
-  // Oyun sonu modal içeriği
-  const finalLevelDisplay = document.getElementById('final-level');
-  const finalCorrectDisplay = document.getElementById('final-correct');
+  const scoreDisplay = document.getElementById('score-display');
+  const roundDisplay = document.getElementById('round-display');
+  const gameOverScreen = document.getElementById('game-over-screen');
+  const resultMessage = document.getElementById('result-message');
   const finalScoreDisplay = document.getElementById('final-score');
+  const startButton = document.getElementById('start-game');
+  const restartButton = document.getElementById('restart-game');
+  const hintButton = document.getElementById('hint-button');
+  const hintDisplay = document.getElementById('hint-display');
+  const loadingMessage = document.getElementById('loading-message');
 
-  // SVG yükleme
-  if (turkeyMap) {
-    turkeyMap.addEventListener('load', function() {
-      svgDocument = turkeyMap.contentDocument;
-      setupProvinces();
-    });
-  }
+  // Oyun durumu
+  const gameState = {
+    score: 0,
+    round: 0,
+    maxRounds: 10,
+    timer: 20,
+    interval: null,
+    isAnswerPhase: false,
+    correctRegion: null,
+    hintUsed: false,
+    hintCount: 3,
 
-  // Başlangıç butonuna tıklama
-  if (startGameBtn) {
-    startGameBtn.addEventListener('click', startGame);
-  }
+    // Karakter listesi (şehirler)
+    characters: [
+      { name: 'İstanbul', regionId: 'istanbul', image: '/static/images/characters/istanbul.jpg', hint: 'Boğazın iki yakasını birleştiren şehir' },
+      { name: 'Ankara', regionId: 'ankara', image: '/static/images/characters/ankara.jpg', hint: 'Başkent ve İç Anadolu\'nun merkezinde' },
+      { name: 'İzmir', regionId: 'izmir', image: '/static/images/characters/izmir.jpg', hint: 'Ege denizinin incisi' },
+      { name: 'Antalya', regionId: 'antalya', image: '/static/images/characters/antalya.jpg', hint: 'Turizm cenneti, Akdeniz\'in en güzel kıyılarından biri' },
+      { name: 'Konya', regionId: 'konya', image: '/static/images/characters/konya.jpg', hint: 'Mevlana\'nın şehri, İç Anadolu\'nun geniş düzlükleri' },
+      { name: 'Bursa', regionId: 'bursa', image: '/static/images/characters/bursa.jpg', hint: 'Uludağ\'ın eteğinde, Osmanlı\'nın ilk başkenti' },
+      { name: 'Adana', regionId: 'adana', image: '/static/images/characters/adana.jpg', hint: 'Kebabıyla ünlü, Akdeniz\'in doğusunda' },
+      { name: 'Trabzon', regionId: 'trabzon', image: '/static/images/characters/trabzon.jpg', hint: 'Karadeniz\'in incisi, yemyeşil yamaçları ile ünlü' },
+      { name: 'Gaziantep', regionId: 'gaziantep', image: '/static/images/characters/gaziantep.jpg', hint: 'Mutfağıyla ünlü, Güneydoğu\'nun kültür merkezi' },
+      { name: 'Samsun', regionId: 'samsun', image: '/static/images/characters/samsun.jpg', hint: 'Atatürk\'ün Kurtuluş Savaşı\'nı başlattığı şehir' }
+    ]
+  };
 
-  // Sonraki seviye butonuna tıklama
-  if (nextLevelBtn) {
-    nextLevelBtn.addEventListener('click', function() {
-      if (levelCompleteModal) {
-        levelCompleteModal.style.display = 'none';
-      }
-      startNextLevel();
-    });
-  }
-
-  // Tekrar oyna butonuna tıklama
-  if (playAgainBtn) {
-    playAgainBtn.addEventListener('click', function() {
-      if (gameOverModal) {
-        gameOverModal.style.display = 'none';
-      }
-      resetGame();
-      startGame();
-    });
-  }
-
-  // Ana menüye dön butonuna tıklama
-  if (backToMenuBtn) {
-    backToMenuBtn.addEventListener('click', function() {
-      if (gameOverModal) {
-        gameOverModal.style.display = 'none';
-      }
-      resetGame();
-      if (gameArea && introSection) {
-        gameArea.style.display = 'none';
-        introSection.style.display = 'block';
-      }
-    });
-  }
-
-  // İpucu butonuna tıklama
-  if (hintBtn) {
-    hintBtn.addEventListener('click', giveHint);
-  }
-
-  // İlleri ayarla
-  function setupProvinces() {
-    if (!svgDocument) return;
-
-    // Tüm il elemanlarını seç
-    const provinceElements = svgDocument.querySelectorAll('.province');
-
-    provinces = Array.from(provinceElements).map(el => {
-      const name = el.getAttribute('data-name');
-      return {
-        element: el,
-        name: name
-      };
-    });
-
-    // Her il için event listener ekle
-    provinces.forEach(province => {
-      // Hover efektleri
-      province.element.addEventListener('mouseover', function(e) {
-        if (!isGameActive) return;
-
-        this.style.fill = '#e0e0e0';
-        showTooltip(province.name, e);
-      });
-
-      province.element.addEventListener('mouseout', function() {
-        if (!isGameActive) return;
-
-        this.style.fill = '';
-        hideTooltip();
-      });
-
-      province.element.addEventListener('mousemove', function(e) {
-        if (!isGameActive) return;
-
-        updateTooltipPosition(e);
-      });
-
-      // Tıklama olayı
-      province.element.addEventListener('click', function() {
-        if (!isGameActive) return;
-
-        checkAnswer(province.name);
-      });
-    });
-  }
-
-  // Oyunu başlat
-  function startGame() {
-    isGameActive = true;
-    if (introSection && gameArea) {
-      introSection.style.display = 'none';
-      gameArea.style.display = 'block';
-    }
-
-    // Değerleri sıfırla
-    score = 0;
-    level = 1;
-    correctAnswers = 0;
-    totalCorrectAnswers = 0;
-    usedProvinces = [];
-    timeLeft = 30 + (level - 1) * 5; // Her seviye için +5 saniye
-    hintCount = 3;
-
-    // Ekranı güncelle
-    updateDisplay();
-
-    // İlk soruyu seç
-    selectRandomProvince();
-
-    // Zamanlayıcıyı başlat
-    startTimer();
-  }
-
-  // Zamanlayıcıyı başlat
-  function startTimer() {
-    clearInterval(timer);
-    timer = setInterval(function() {
-      timeLeft--;
-      updateTimerDisplay();
-
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        endLevel();
-      }
-    }, 1000);
-  }
-
-  // Zamanlayıcıyı güncelle
-  function updateTimerDisplay() {
-    if (!timerDisplay) return;
-
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-    // Son 10 saniye kırmızı yanıp sönsün
-    if (timeLeft <= 10) {
-      timerDisplay.classList.add('time-warning');
-    } else {
-      timerDisplay.classList.remove('time-warning');
+  // Ses fonksiyonları
+  function playSound(soundName) {
+    try {
+      const sound = new Audio(`/static/sounds/${soundName}.mp3`);
+      sound.volume = 0.5;
+      sound.play();
+    } catch (error) {
+      console.log("Sound play error:", error);
     }
   }
 
-  // Rastgele il seç
-  function selectRandomProvince() {
-    if (!provinces.length) return;
+  // Oyunu başlat butonu
+  if (startButton) {
+    startButton.addEventListener('click', function() {
+      if (startScreen) startScreen.style.display = 'none';
+      if (gameContainer) gameContainer.style.display = 'block';
 
-    let availableProvinces = provinces.filter(p => !usedProvinces.includes(p.name));
+      // SVG haritasını yükle
+      loadMap();
 
-    // Eğer tüm iller kullanıldıysa, listeyi sıfırla
-    if (availableProvinces.length === 0) {
-      usedProvinces = [];
-      availableProvinces = provinces;
-    }
+      // İlk turu başlat
+      startNewRound();
 
-    // Rastgele bir il seç
-    const randomIndex = Math.floor(Math.random() * availableProvinces.length);
-    currentProvince = availableProvinces[randomIndex].name;
-
-    // Kullanılan iller listesine ekle
-    usedProvinces.push(currentProvince);
-
-    // Ekranı güncelle
-    if (currentProvinceDisplay) {
-      currentProvinceDisplay.textContent = currentProvince;
-    }
+      // Ses çal
+      playSound('click');
+    });
   }
 
-  // Cevabı kontrol et
-  function checkAnswer(selectedProvince) {
-    if (selectedProvince === currentProvince) {
-      // Doğru cevap
-      playSound(correctSound);
+  // İpucu butonu işlevselliği
+  if (hintButton) {
+    hintButton.addEventListener('click', function() {
+      showHint();
+    });
+  }
 
-      // İl elemanını geçici olarak yeşile boyayalım
-      const provinceElement = provinces.find(p => p.name === selectedProvince).element;
-      const originalFill = provinceElement.style.fill;
-      provinceElement.style.fill = '#4CAF50';
+  // İpucu gösterme fonksiyonu
+  function showHint() {
+    if (gameState.hintCount <= 0) {
+      alert('İpucu hakkınız kalmadı!');
+      return;
+    }
 
-      // Puanı artır
-      const pointsEarned = 100 * level;
-      score += pointsEarned;
+    // İpucu sayısını azalt
+    gameState.hintCount--;
+    gameState.hintUsed = true;
 
-      // Doğru sayısını artır
-      correctAnswers++;
-      totalCorrectAnswers++;
+    // İpucu butonu metnini güncelle
+    if (hintButton) {
+      hintButton.textContent = `İpucu (${gameState.hintCount})`;
+    }
 
-      // Puan animasyonu göster
-      showPointsAnimation(pointsEarned);
+    // Mevcut karakterin ipucunu göster
+    const currentCharacter = gameState.characters[gameState.round - 1];
 
-      // Ekranı güncelle
-      updateDisplay();
+    if (hintDisplay) {
+      hintDisplay.textContent = currentCharacter.hint;
+      hintDisplay.style.display = 'block';
 
-      // 1 saniye sonra rengi normale döndürüp yeni soruya geç
-      setTimeout(function() {
-        provinceElement.style.fill = originalFill;
+      // İpucunu 5 saniye sonra gizle
+      setTimeout(() => {
+        hintDisplay.style.display = 'none';
+      }, 5000);
+    }
 
-        // Seviye tamamlandı mı kontrol et
-        if (correctAnswers >= 5) { // Her seviyede 5 doğru cevap gerekiyor
-          endLevel();
-        } else {
-          selectRandomProvince();
+    // İpucu ses efekti
+    playSound('hint');
+  }
+
+  // Yeni tur başlat
+  function startNewRound() {
+    gameState.round++;
+    gameState.isAnswerPhase = true;
+    gameState.hintUsed = false;
+
+    // Tur göstergesini güncelle
+    if (roundDisplay) {
+      roundDisplay.textContent = gameState.round + '/' + gameState.maxRounds;
+    }
+
+    // Karakteri seç
+    const characterIndex = gameState.round - 1;
+    if (characterIndex >= gameState.characters.length) {
+      endGame();
+      return;
+    }
+
+    const currentCharacter = gameState.characters[characterIndex];
+    gameState.correctRegion = currentCharacter.regionId;
+
+    // Karakter görselini göster
+    if (characterImage) {
+      characterImage.innerHTML = `
+        <img src="${currentCharacter.image}" alt="${currentCharacter.name}" onerror="this.src='/static/images/placeholder.jpg'">
+        <div class="character-name">${currentCharacter.name}</div>
+      `;
+    }
+
+    // Süreyi başlat
+    gameState.timer = 20;
+    if (timerDisplay) timerDisplay.textContent = gameState.timer;
+
+    if (gameState.interval) {
+      clearInterval(gameState.interval);
+    }
+
+    gameState.interval = setInterval(updateTimer, 1000);
+  }
+
+  // Haritayı yükle
+  function loadMap() {
+    if (!mapContainer) return;
+
+    // Yükleniyor mesajını göster
+    if (loadingMessage) loadingMessage.style.display = 'flex';
+
+    // Harita SVG'sini fetch ile çekelim
+    fetch('/static/images/turkey-map.svg')
+      .then(response => response.text())
+      .then(svgData => {
+        // SVG'yi container'a ekleyelim
+        mapContainer.innerHTML = svgData;
+
+        // SVG yüklendikten sonra
+        setTimeout(() => {
+          // Yükleniyor mesajını gizle
+          if (loadingMessage) loadingMessage.style.display = 'none';
+
+          // Harita bölgelerine tıklama olayı ekleyelim
+          const regions = document.querySelectorAll('#map-container svg path');
+          regions.forEach(region => {
+            region.addEventListener('click', handleRegionClick);
+            region.addEventListener('mouseover', handleRegionHover);
+            region.addEventListener('mouseout', handleRegionOut);
+
+            // Görsel iyileştirme - bölgelere sınır ve stil ekle
+            region.setAttribute('stroke', '#fff');
+            region.setAttribute('stroke-width', '0.5');
+            region.setAttribute('fill-opacity', '0.8');
+          });
+        }, 500);
+      })
+      .catch(error => {
+        console.error('Harita yüklenirken hata:', error);
+        if (loadingMessage) {
+          loadingMessage.innerHTML = 'Harita yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.';
         }
-      }, 800);
-    } else {
-      // Yanlış cevap
-      playSound(wrongSound);
+      });
+  }
 
-      // İl elemanını geçici olarak kırmızıya boyayalım
-      const provinceElement = provinces.find(p => p.name === selectedProvince).element;
-      const originalFill = provinceElement.style.fill;
-      provinceElement.style.fill = '#F44336';
+  // Bölge üzerine gelince
+  function handleRegionHover(event) {
+    if (!gameState.isAnswerPhase) return;
 
-      // Yanlış cevap için puan düşürme
-      score = Math.max(0, score - 25);
-      updateDisplay();
+    const region = event.target;
+    region.style.cursor = 'pointer';
+    region.style.filter = 'brightness(1.2)';
 
-      // 1 saniye sonra rengi normale döndür
-      setTimeout(function() {
-        provinceElement.style.fill = originalFill;
-      }, 500);
+    // Bölge adını göster
+    const regionId = region.getAttribute('id');
+    const regionName = getRegionName(regionId);
+
+    // Tooltip oluştur
+    let tooltip = document.getElementById('map-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = 'map-tooltip';
+      tooltip.style.position = 'absolute';
+      tooltip.style.padding = '5px 10px';
+      tooltip.style.backgroundColor = 'rgba(0,0,0,0.7)';
+      tooltip.style.color = '#fff';
+      tooltip.style.borderRadius = '5px';
+      tooltip.style.fontSize = '14px';
+      tooltip.style.pointerEvents = 'none';
+      tooltip.style.zIndex = '1000';
+      document.body.appendChild(tooltip);
+    }
+
+    tooltip.textContent = regionName;
+
+    // Tooltip pozisyonu
+    const mapRect = mapContainer.getBoundingClientRect();
+    const x = event.clientX;
+    const y = event.clientY;
+
+    tooltip.style.left = `${x + 10}px`;
+    tooltip.style.top = `${y + 10}px`;
+    tooltip.style.display = 'block';
+  }
+
+  // Bölgeden çıkınca
+  function handleRegionOut(event) {
+    const region = event.target;
+    region.style.filter = '';
+
+    // Tooltip'i gizle
+    const tooltip = document.getElementById('map-tooltip');
+    if (tooltip) {
+      tooltip.style.display = 'none';
     }
   }
 
-  // Ekranı güncelle
-  function updateDisplay() {
-    if (scoreDisplay) scoreDisplay.textContent = score;
-    if (levelDisplay) levelDisplay.textContent = level;
-    if (correctDisplay) correctDisplay.textContent = totalCorrectAnswers;
-    if (hintCountDisplay) hintCountDisplay.textContent = hintCount;
+  // Bölge adını bul
+  function getRegionName(regionId) {
+    const regionNames = {
+      'istanbul': 'İstanbul',
+      'ankara': 'Ankara',
+      'izmir': 'İzmir',
+      'antalya': 'Antalya',
+      'konya': 'Konya',
+      'adana': 'Adana',
+      'trabzon': 'Trabzon',
+      'bursa': 'Bursa',
+      'gaziantep': 'Gaziantep',
+      'samsun': 'Samsun',
+      // Diğer bölgeler...
+    };
 
-    // İpucu butonu aktif/pasif durumunu güncelle
-    if (hintBtn) {
-      if (hintCount <= 0) {
-        hintBtn.classList.add('disabled');
+    return regionNames[regionId] || regionId;
+  }
+
+  // Bölgeye tıklama olayı
+  function handleRegionClick(event) {
+    if (!gameState.isAnswerPhase) return;
+
+    const region = event.target;
+    const regionId = region.id || region.getAttribute('id');
+
+    // Animasyon için seçilen bölgeyi işaretle
+    const allRegions = document.querySelectorAll('#map-container svg path');
+    allRegions.forEach(r => {
+      r.style.filter = '';
+      r.style.fillOpacity = '0.8';
+    });
+
+    region.style.filter = 'brightness(1.3)';
+    region.style.fillOpacity = '1';
+
+    // Cevap kontrolü
+    checkAnswer(regionId);
+  }
+
+  // Cevap kontrolü
+  function checkAnswer(selectedRegionId) {
+    // Zamanlayıcıyı durdur
+    clearInterval(gameState.interval);
+    gameState.isAnswerPhase = false;
+
+    const isCorrect = selectedRegionId === gameState.correctRegion;
+    let pointsEarned = 0;
+
+    // Doğru cevap animasyonu ve puanlama
+    if (isCorrect) {
+      // Doğru bölgeyi yeşil yap
+      highlightRegion(selectedRegionId, '#4CAF50');
+
+      // Puanlama: Kalan süre + temel puan (ipucu kullanılmadıysa bonus)
+      pointsEarned = (gameState.timer * 5) + 100;
+      if (!gameState.hintUsed) pointsEarned += 50;
+
+      gameState.score += pointsEarned;
+      if (scoreDisplay) scoreDisplay.textContent = gameState.score;
+
+      // Ses efekti
+      playSound('correct');
+
+      // Doğru cevap mesajı
+      showMessage(`Doğru! +${pointsEarned} puan kazandınız.`, 'success');
+    } else {
+      // Yanlış bölgeyi kırmızı, doğru bölgeyi yeşil yap
+      highlightRegion(selectedRegionId, '#FF5252');
+      highlightRegion(gameState.correctRegion, '#4CAF50');
+
+      // Ses efekti
+      playSound('wrong');
+
+      // Yanlış cevap mesajı
+      showMessage('Yanlış cevap! Doğru cevap yeşil renkte gösterildi.', 'error');
+    }
+
+    // Sonraki tura geç veya oyunu bitir
+    setTimeout(() => {
+      if (gameState.round < gameState.maxRounds) {
+        startNewRound();
       } else {
-        hintBtn.classList.remove('disabled');
+        endGame();
       }
-    }
-  }
-
-  // Seviyeyi bitir
-  function endLevel() {
-    clearInterval(timer);
-    isGameActive = false;
-
-    // Zaman bonusu (kalan her saniye için +10 puan)
-    const timeBonus = timeLeft * 10;
-    score += timeBonus;
-
-    // Seviye tamamlandı modalını göster
-    if (levelCorrectCount) levelCorrectCount.textContent = correctAnswers;
-    if (levelPointsDisplay) levelPointsDisplay.textContent = score - timeBonus;
-    if (timeBonusDisplay) timeBonusDisplay.textContent = timeBonus;
-    if (totalScoreDisplay) totalScoreDisplay.textContent = score;
-
-    if (correctAnswers >= 5) {
-      // Seviye tamamlandı
-      playSound(levelCompleteSound);
-      if (levelCompleteModal) levelCompleteModal.style.display = 'flex';
-    } else {
-      // Oyun bitti
-      playSound(gameOverSound);
-      if (finalLevelDisplay) finalLevelDisplay.textContent = level;
-      if (finalCorrectDisplay) finalCorrectDisplay.textContent = totalCorrectAnswers;
-      if (finalScoreDisplay) finalScoreDisplay.textContent = score;
-      if (gameOverModal) gameOverModal.style.display = 'flex';
-
-      // Skoru kaydet
-      saveScore();
-    }
-  }
-
-  // Sonraki seviyeye geç
-  function startNextLevel() {
-    level++;
-    correctAnswers = 0;
-    timeLeft = 30 + (level - 1) * 5; // Her seviye için +5 saniye
-
-    // İlave ipucu
-    if (level % 2 === 0) {
-      hintCount += 1;
-    }
-
-    updateDisplay();
-    updateTimerDisplay();
-
-    // Yeni soruyu seç
-    selectRandomProvince();
-
-    // Zamanlayıcıyı başlat
-    isGameActive = true;
-    startTimer();
-  }
-
-  // Oyunu sıfırla
-  function resetGame() {
-    clearInterval(timer);
-    score = 0;
-    level = 1;
-    correctAnswers = 0;
-    totalCorrectAnswers = 0;
-    timeLeft = 30;
-    hintCount = 3;
-    usedProvinces = [];
-
-    updateDisplay();
-    updateTimerDisplay();
-  }
-
-  // İpucu ver
-  function giveHint() {
-    if (hintCount <= 0 || !isGameActive) return;
-
-    hintCount--;
-    updateDisplay();
-
-    // Doğru ili vurgula
-    const provinceElement = provinces.find(p => p.name === currentProvince).element;
-    if (!provinceElement) return;
-
-    const originalFill = provinceElement.style.fill;
-    provinceElement.style.fill = '#FFD700'; // Altın rengi
-
-    // 2 saniye sonra vurguyu kaldır
-    setTimeout(function() {
-      provinceElement.style.fill = originalFill;
     }, 2000);
   }
 
-  // Tooltip göster
-  function showTooltip(text, event) {
-    if (!provinceTooltip || !tooltipText) return;
+  // Bölgeyi vurgula
+  function highlightRegion(regionId, color) {
+    const region = document.getElementById(regionId);
+    if (region) {
+      region.style.fill = color;
+      region.style.fillOpacity = '0.9';
 
-    tooltipText.textContent = text;
-    provinceTooltip.style.display = 'block';
-    updateTooltipPosition(event);
-  }
+      // Vurgulama animasyonu
+      const pulseEffect = document.createElement('div');
+      pulseEffect.className = 'pulse-effect';
+      pulseEffect.style.position = 'absolute';
 
-  // Tooltip'i gizle
-  function hideTooltip() {
-    if (provinceTooltip) {
-      provinceTooltip.style.display = 'none';
+      const bbox = region.getBBox();
+      const svgElement = region.ownerSVGElement;
+
+      if (svgElement) {
+        const pt = svgElement.createSVGPoint();
+        pt.x = bbox.x + bbox.width / 2;
+        pt.y = bbox.y + bbox.height / 2;
+
+        const screenPt = pt.matrixTransform(svgElement.getScreenCTM());
+
+        pulseEffect.style.left = `${screenPt.x - 15}px`;
+        pulseEffect.style.top = `${screenPt.y - 15}px`;
+        pulseEffect.style.backgroundColor = color;
+
+        document.body.appendChild(pulseEffect);
+
+        setTimeout(() => {
+          pulseEffect.remove();
+        }, 1500);
+      }
     }
   }
 
-  // Tooltip pozisyonunu güncelle
-  function updateTooltipPosition(event) {
-    if (!provinceTooltip || !turkeyMap) return;
+  // Süre güncelleme
+  function updateTimer() {
+    if (gameState.timer > 0) {
+      gameState.timer--;
+      if (timerDisplay) timerDisplay.textContent = gameState.timer;
 
-    const mapRect = turkeyMap.getBoundingClientRect();
-    const x = event.clientX - mapRect.left;
-    const y = event.clientY - mapRect.top;
+      // Son 5 saniye için kırmızı renk
+      if (gameState.timer <= 5) {
+        if (timerDisplay) timerDisplay.style.color = '#FF5252';
 
-    provinceTooltip.style.left = (x + 10) + 'px';
-    provinceTooltip.style.top = (y + 10) + 'px';
+        // Tik sesi
+        if (gameState.timer > 0) {
+          playSound('tick');
+        }
+      }
+    } else {
+      // Süre doldu
+      clearInterval(gameState.interval);
+      gameState.isAnswerPhase = false;
+
+      // Doğru cevabı göster
+      highlightRegion(gameState.correctRegion, '#4CAF50');
+
+      // Ses efekti
+      playSound('timeout');
+
+      // Süre doldu mesajı
+      showMessage('Süre doldu! Doğru cevap yeşil renkte gösterildi.', 'warning');
+
+      // Sonraki tura geç veya oyunu bitir
+      setTimeout(() => {
+        if (gameState.round < gameState.maxRounds) {
+          startNewRound();
+        } else {
+          endGame();
+        }
+      }, 2000);
+    }
   }
 
-  // Puan animasyonu göster
-  function showPointsAnimation(points) {
-    const mapContainer = document.querySelector('.map-container');
-    if (!mapContainer) return;
+  // Oyun sonu
+  function endGame() {
+    clearInterval(gameState.interval);
 
-    const pointsElement = document.createElement('div');
-    pointsElement.className = 'points-animation';
-    pointsElement.textContent = '+' + points;
+    if (gameContainer) gameContainer.style.display = 'none';
+    if (gameOverScreen) {
+      gameOverScreen.style.display = 'flex';
 
-    // Map container içine ekle
-    mapContainer.appendChild(pointsElement);
+      // Final skoru ve mesajı
+      if (finalScoreDisplay) finalScoreDisplay.textContent = gameState.score;
 
-    // Animasyon bittikten sonra elementi kaldır
+      let message = '';
+      if (gameState.score >= 800) {
+        message = 'Tebrikler! Türkiye\'yi çok iyi tanıyorsunuz.';
+      } else if (gameState.score >= 500) {
+        message = 'Güzel bir performans! Türkiye\'yi iyi tanıyorsunuz.';
+      } else {
+        message = 'Türkiye\'yi daha iyi tanımak için tekrar oynayabilirsiniz.';
+      }
+
+      if (resultMessage) resultMessage.textContent = message;
+    }
+
+    // Skor kaydetme işlemi burada yapılabilir
+
+    // Bitiş sesi
+    playSound('gameOver');
+  }
+
+  // Yeniden başlat butonu
+  if (restartButton) {
+    restartButton.addEventListener('click', function() {
+      // Oyun durumunu sıfırla
+      gameState.score = 0;
+      gameState.round = 0;
+      gameState.hintCount = 3;
+
+      // UI sıfırla
+      if (scoreDisplay) scoreDisplay.textContent = '0';
+      if (timerDisplay) {
+        timerDisplay.textContent = '20';
+        timerDisplay.style.color = '';
+      }
+      if (hintButton) {
+        hintButton.textContent = `İpucu (${gameState.hintCount})`;
+      }
+
+      // Ekranları güncelle
+      if (gameOverScreen) gameOverScreen.style.display = 'none';
+      if (gameContainer) gameContainer.style.display = 'block';
+
+      // Haritayı yeniden yükle
+      loadMap();
+
+      // İlk turu başlat
+      startNewRound();
+
+      // Ses çal
+      playSound('click');
+    });
+  }
+
+  // Mesaj göster
+  function showMessage(text, type = 'info') {
+    const messageContainer = document.getElementById('message-container');
+    if (!messageContainer) return;
+
+    const message = document.createElement('div');
+    message.className = `game-message ${type}`;
+    message.textContent = text;
+
+    messageContainer.appendChild(message);
+
+    // Animasyon ile göster
     setTimeout(() => {
-      mapContainer.removeChild(pointsElement);
-    }, 1500);
+      message.style.opacity = '1';
+      message.style.transform = 'translateY(0)';
+    }, 10);
+
+    // Mesajı kaldır
+    setTimeout(() => {
+      message.style.opacity = '0';
+      message.style.transform = 'translateY(-20px)';
+
+      setTimeout(() => {
+        messageContainer.removeChild(message);
+      }, 500);
+    }, 3000);
+  }
+});
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM elementleri
+  const gameContainer = document.getElementById('gameContainer');
+  const startScreen = document.getElementById('startScreen');
+  const startButton = document.getElementById('startButton');
+  const mapContainer = document.getElementById('mapContainer');
+  const scoreDisplay = document.getElementById('score');
+  const timerDisplay = document.getElementById('timer');
+  const roundDisplay = document.getElementById('round');
+  const questionDisplay = document.getElementById('question');
+  const hintDisplay = document.getElementById('hintText');
+  const hintButton = document.getElementById('hintButton');
+  const resultScreen = document.getElementById('resultScreen');
+  const finalScoreDisplay = document.getElementById('finalScore');
+  const restartButton = document.getElementById('restartButton');
+  const nextLevelBtn = document.getElementById('nextLevel');
+  const prevLevelBtn = document.getElementById('prevLevel');
+
+  // Oyun durumu
+  let gameState = {
+    score: 0,
+    time: 60,
+    round: 0,
+    totalRounds: 5,
+    level: 1,
+    hintCount: 3,
+    hintUsed: false,
+    timer: null,
+    characters: []
+  };
+
+  // Level seçimi
+  const levels = {
+    1: { 
+      name: 'Kolay', 
+      characters: [
+        { id: 'ankara', name: 'Ankara', hint: 'Türkiye\'nin başkenti' },
+        { id: 'istanbul', name: 'İstanbul', hint: 'Boğazın iki yakasını birleştiren şehir' },
+        { id: 'izmir', name: 'İzmir', hint: 'Ege\'nin incisi olarak bilinen şehir' },
+        { id: 'antalya', name: 'Antalya', hint: 'Turizm cenneti olarak bilinen şehir' },
+        { id: 'bursa', name: 'Bursa', hint: 'Osmanlı\'nın ilk başkenti' }
+      ]
+    },
+    2: { 
+      name: 'Orta', 
+      characters: [
+        { id: 'trabzon', name: 'Trabzon', hint: 'Karadeniz\'in önemli liman şehri' },
+        { id: 'konya', name: 'Konya', hint: 'Mevlana\'nın şehri' },
+        { id: 'kayseri', name: 'Kayseri', hint: 'İç Anadolu\'da sanayisi gelişmiş şehir' },
+        { id: 'diyarbakir', name: 'Diyarbakır', hint: 'Surları ile ünlü Güneydoğu şehri' },
+        { id: 'gaziantep', name: 'Gaziantep', hint: 'Baklavasıyla ünlü şehir' }
+      ]
+    },
+    3: { 
+      name: 'Zor', 
+      characters: [
+        { id: 'edirne', name: 'Edirne', hint: 'Osmanlı\'nın ikinci başkenti' },
+        { id: 'erzurum', name: 'Erzurum', hint: 'Doğu Anadolu\'da kışın çok soğuk olan şehir' },
+        { id: 'samsun', name: 'Samsun', hint: 'Atatürk\'ün Milli Mücadeleyi başlattığı şehir' },
+        { id: 'van', name: 'Van', hint: 'Göl kenarında bulunan doğu şehri' },
+        { id: 'hatay', name: 'Hatay', hint: 'Güneyde, Suriye sınırında bulunan şehir' }
+      ]
+    }
+  };
+
+  // Ses fonksiyonları
+  function playSound(soundName) {
+    try {
+      const sound = new Audio(`/static/sounds/${soundName}.mp3`);
+      sound.volume = 0.5;
+      sound.play();
+    } catch (error) {
+      console.log("Sound play error:", error);
+    }
   }
 
-  // Skor kaydetme
-  function saveScore() {
-    if (score <= 0) return;
+  // Level değiştirme fonksiyonları
+  if (nextLevelBtn) {
+    nextLevelBtn.addEventListener('click', function() {
+      if (gameState.level < 3) {
+        gameState.level++;
+        updateLevelDisplay();
+        resetGame();
+        playSound('click');
+      }
+    });
+  }
 
-    fetch('/api/save-score', {
+  if (prevLevelBtn) {
+    prevLevelBtn.addEventListener('click', function() {
+      if (gameState.level > 1) {
+        gameState.level--;
+        updateLevelDisplay();
+        resetGame();
+        playSound('click');
+      }
+    });
+  }
+
+  function updateLevelDisplay() {
+    const levelDisplay = document.getElementById('currentLevel');
+    if (levelDisplay) {
+      levelDisplay.textContent = `Seviye: ${levels[gameState.level].name}`;
+    }
+  }
+
+  // Oyunu başlat butonu
+  if (startButton) {
+    startButton.addEventListener('click', function() {
+      if (startScreen) startScreen.style.display = 'none';
+      if (gameContainer) gameContainer.style.display = 'block';
+
+      // SVG haritasını yükle
+      loadMap();
+
+      // İlk turu başlat
+      startNewRound();
+
+      // Ses çal
+      playSound('click');
+    });
+  }
+
+  // İpucu butonu işlevselliği
+  if (hintButton) {
+    hintButton.addEventListener('click', function() {
+      showHint();
+      playSound('click');
+    });
+  }
+
+  // İpucu gösterme fonksiyonu
+  function showHint() {
+    if (gameState.hintCount <= 0) {
+      alert('İpucu hakkınız kalmadı!');
+      return;
+    }
+
+    // İpucu sayısını azalt
+    gameState.hintCount--;
+    gameState.hintUsed = true;
+
+    // İpucu butonu metnini güncelle
+    if (hintButton) {
+      hintButton.textContent = `İpucu (${gameState.hintCount})`;
+    }
+
+    // Mevcut karakterin ipucunu göster
+    const currentCharacter = gameState.characters[gameState.round - 1];
+
+    if (hintDisplay) {
+      hintDisplay.textContent = currentCharacter.hint;
+      hintDisplay.style.display = 'block';
+
+      // İpucunu 5 saniye sonra gizle
+      setTimeout(() => {
+        hintDisplay.style.display = 'none';
+      }, 5000);
+    }
+  }
+
+  // SVG harita yükleme
+  function loadMap() {
+    fetch('/static/images/turkey_map.svg')
+      .then(response => response.text())
+      .then(svgData => {
+        mapContainer.innerHTML = svgData;
+        
+        // SVG yüklendikten sonra şehirlere tıklama olayları ekle
+        setupCityClicks();
+      })
+      .catch(error => {
+        console.error('Harita yüklenirken hata oluştu:', error);
+        mapContainer.innerHTML = '<p class="error-message">Harita yüklenemedi. Lütfen sayfayı yenileyiniz.</p>';
+      });
+  }
+
+  // Şehirlere tıklama olayları ekleme
+  function setupCityClicks() {
+    const cityElements = document.querySelectorAll('#mapContainer path');
+    
+    cityElements.forEach(city => {
+      city.addEventListener('click', function() {
+        const cityId = this.id;
+        checkAnswer(cityId);
+      });
+      
+      // Hover etkisi
+      city.addEventListener('mouseenter', function() {
+        this.style.opacity = '0.7';
+        this.style.cursor = 'pointer';
+      });
+      
+      city.addEventListener('mouseleave', function() {
+        this.style.opacity = '1';
+      });
+    });
+  }
+
+  // Yeni tur başlatma
+  function startNewRound() {
+    if (gameState.round >= gameState.totalRounds) {
+      endGame();
+      return;
+    }
+
+    gameState.round++;
+    gameState.hintUsed = false;
+    gameState.time = 60;
+    
+    // Mevcut level için karakterleri ayarla
+    gameState.characters = levels[gameState.level].characters;
+    
+    // Ekranı güncelle
+    updateDisplay();
+    
+    // Zamanlayıcıyı başlat
+    if (gameState.timer) clearInterval(gameState.timer);
+    gameState.timer = setInterval(updateTimer, 1000);
+
+    // İpucu metnini temizle
+    if (hintDisplay) hintDisplay.style.display = 'none';
+  }
+
+  // Ekran güncelleme
+  function updateDisplay() {
+    if (scoreDisplay) scoreDisplay.textContent = gameState.score;
+    if (timerDisplay) timerDisplay.textContent = gameState.time;
+    if (roundDisplay) roundDisplay.textContent = `${gameState.round}/${gameState.totalRounds}`;
+    
+    const currentCharacter = gameState.characters[gameState.round - 1];
+    if (questionDisplay && currentCharacter) {
+      questionDisplay.textContent = `"${currentCharacter.name}" nerede?`;
+    }
+    
+    // İpucu sayısını güncelle
+    if (hintButton) {
+      hintButton.textContent = `İpucu (${gameState.hintCount})`;
+    }
+  }
+
+  // Zamanlayıcı güncellemesi
+  function updateTimer() {
+    gameState.time--;
+    
+    if (timerDisplay) timerDisplay.textContent = gameState.time;
+    
+    if (gameState.time <= 0) {
+      clearInterval(gameState.timer);
+      playSound('wrong');
+      
+      if (gameState.round < gameState.totalRounds) {
+        startNewRound();
+      } else {
+        endGame();
+      }
+    }
+  }
+
+  // Cevap kontrolü
+  function checkAnswer(selectedCityId) {
+    const currentCharacter = gameState.characters[gameState.round - 1];
+    
+    if (selectedCityId === currentCharacter.id) {
+      // Doğru cevap
+      const timeBonus = Math.floor(gameState.time / 3);
+      const basePoints = 100;
+      const hintPenalty = gameState.hintUsed ? 30 : 0;
+      
+      const roundScore = basePoints + timeBonus - hintPenalty;
+      gameState.score += roundScore;
+      
+      playSound('correct');
+      
+      // Şehri vurgula
+      highlightCity(selectedCityId, 'correct');
+      
+      // Zamanlayıcıyı durdur
+      clearInterval(gameState.timer);
+      
+      // Sonraki tura geç
+      setTimeout(() => {
+        if (gameState.round < gameState.totalRounds) {
+          startNewRound();
+        } else {
+          endGame();
+        }
+      }, 1500);
+    } else {
+      // Yanlış cevap
+      playSound('wrong');
+      highlightCity(selectedCityId, 'wrong');
+      
+      // Yanlış cevaplar için zaman cezası
+      gameState.time -= 5;
+      if (gameState.time < 0) gameState.time = 0;
+      updateDisplay();
+    }
+  }
+
+  // Şehri vurgulama
+  function highlightCity(cityId, result) {
+    const city = document.getElementById(cityId);
+    if (city) {
+      city.classList.add(result);
+      
+      setTimeout(() => {
+        city.classList.remove(result);
+      }, 1000);
+    }
+  }
+
+  // Oyun sonu
+  function endGame() {
+    clearInterval(gameState.timer);
+    
+    if (gameContainer) gameContainer.style.display = 'none';
+    if (resultScreen) {
+      resultScreen.style.display = 'flex';
+      if (finalScoreDisplay) finalScoreDisplay.textContent = gameState.score;
+    }
+    
+    // Kaydetme isteği
+    saveScore('whereIsIt', gameState.score);
+  }
+
+  // Skoru kaydetme
+  function saveScore(gameType, score) {
+    fetch('/save_score', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        game_type: 'whereIsIt',
+        game_type: gameType,
         score: score
       })
     })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
-        console.log('Skor başarıyla kaydedildi:', data);
-
-        // XP kazanımı mesajı
-        if (data.xp_gained) {
-          showXpNotification(data.xp_gained, data.is_level_up);
-        }
-      } else {
-        console.log('Skor kaydedilemedi:', data.message);
-      }
+      console.log('Score saved successfully:', data);
     })
-    .catch(err => {
-      console.log('Skor kaydedilirken hata:', err);
+    .catch(error => {
+      console.log('Skor kaydedilirken hata:', error);
     });
   }
 
-  // XP kazanımı bildirimini göster
-  function showXpNotification(xp, isLevelUp) {
-    const notification = document.createElement('div');
-    notification.className = 'xp-notification';
-
-    if (isLevelUp) {
-      notification.textContent = `+${xp} XP Kazandınız! Seviye Atladınız!`;
-      notification.classList.add('level-up');
-    } else {
-      notification.textContent = `+${xp} XP Kazandınız!`;
-    }
-
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 100);
-
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 500);
-    }, 3000);
+  // Oyunu sıfırla
+  function resetGame() {
+    gameState.score = 0;
+    gameState.round = 0;
+    gameState.time = 60;
+    gameState.hintCount = 3;
+    gameState.hintUsed = false;
+    
+    clearInterval(gameState.timer);
+    
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'flex';
+    if (gameContainer) gameContainer.style.display = 'none';
+    
+    updateLevelDisplay();
   }
+
+  // Oyunu yeniden başlatma butonu
+  if (restartButton) {
+    restartButton.addEventListener('click', function() {
+      resetGame();
+      playSound('click');
+    });
+  }
+
+  // İlk yükleme
+  updateLevelDisplay();
 });
