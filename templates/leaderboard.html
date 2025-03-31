@@ -2,82 +2,1086 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="leaderboard-container">
-  <div class="leaderboard-header">
-    <h1>Skor Tablosu</h1>
-    <p>Beyin geliştirme oyunlarımızda en yüksek skorlar burada gösteriliyor. Oyuncuların performansını karşılaştırın ve kendi yerinizi görün.</p>
+<div class="premium-leaderboard-container">
+  <div class="leaderboard-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Skor Tablosu</h1>
+      <p class="hero-subtitle">Rekabet et, zirveye yüksel</p>
+    </div>
+    <div class="hero-decoration">
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+    </div>
   </div>
 
-  <div class="game-filter">
-    <button class="game-filter-btn active" data-game="word-puzzle">
-      <i class="fas fa-font"></i>
-      <span>Kelime Bulmaca</span>
-    </button>
-    <button class="game-filter-btn" data-game="memory-match">
-      <i class="fas fa-brain"></i>
-      <span>Hafıza Kartları</span>
-    </button>
-    <button class="game-filter-btn" data-game="labyrinth">
-      <i class="fas fa-route"></i>
-      <span>Labirent</span>
-    </button>
-    <button class="game-filter-btn" data-game="puzzle">
-      <i class="fas fa-puzzle-piece"></i>
-      <span>Yapboz</span>
-    </button>
-    <button class="game-filter-btn" data-game="number-sequence">
-      <i class="fas fa-sort-numeric-up"></i>
-      <span>Sayı Dizisi</span>
-    </button>
-    
-    <!-- Hafıza Güçlendirme Oyunları -->
-    <button class="game-filter-btn" data-game="memory-cards">
-      <i class="fas fa-clone"></i>
-      <span>Kart Eşleştirme</span>
-    </button>
-    <button class="game-filter-btn" data-game="number-chain">
-      <i class="fas fa-link"></i>
-      <span>Sayı Zinciri</span>
-    </button>
-    <button class="game-filter-btn" data-game="audio-memory">
-      <i class="fas fa-music"></i>
-      <span>Sesli Hafıza</span>
-    </button>
-    <button class="game-filter-btn" data-game="n-back">
-      <i class="fas fa-braille"></i>
-      <span>N-Back Testi</span>
-    </button>
-    <button class="game-filter-btn" data-game="sudoku">
-      <i class="fas fa-th"></i>
-      <span>Sudoku</span>
-    </button>
-  </div>
-
-  <div class="leaderboard-card">
-    <div class="card-header">
-      <h3>Skor Sıralaması</h3>
-      <button class="refresh-btn" onclick="loadAllScores()">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+  <div class="leaderboard-content-wrapper">
+    <div class="leaderboard-sidebar">
+      <div class="game-categories">
+        <h3 class="sidebar-title"><i class="fas fa-gamepad"></i> Kategoriler</h3>
+        <div class="game-filter">
+          <button class="game-filter-btn active" data-game="word-puzzle">
+            <i class="fas fa-font"></i>
+            <span>Kelime Bulmaca</span>
+          </button>
+          <button class="game-filter-btn" data-game="memory-match">
+            <i class="fas fa-brain"></i>
+            <span>Hafıza Kartları</span>
+          </button>
+          <button class="game-filter-btn" data-game="labyrinth">
+            <i class="fas fa-route"></i>
+            <span>Labirent</span>
+          </button>
+          <button class="game-filter-btn" data-game="puzzle">
+            <i class="fas fa-puzzle-piece"></i>
+            <span>Yapboz</span>
+          </button>
+          <button class="game-filter-btn" data-game="number-sequence">
+            <i class="fas fa-sort-numeric-up"></i>
+            <span>Sayı Dizisi</span>
+          </button>
+          
+          <!-- Hafıza Güçlendirme Oyunları -->
+          <button class="game-filter-btn" data-game="memory-cards">
+            <i class="fas fa-clone"></i>
+            <span>Kart Eşleştirme</span>
+          </button>
+          <button class="game-filter-btn" data-game="number-chain">
+            <i class="fas fa-link"></i>
+            <span>Sayı Zinciri</span>
+          </button>
+          <button class="game-filter-btn" data-game="audio-memory">
+            <i class="fas fa-music"></i>
+            <span>Sesli Hafıza</span>
+          </button>
+          <button class="game-filter-btn" data-game="n-back">
+            <i class="fas fa-braille"></i>
+            <span>N-Back Testi</span>
+          </button>
+          <button class="game-filter-btn" data-game="sudoku">
+            <i class="fas fa-th"></i>
+            <span>Sudoku</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="sidebar-stats">
+        <h3 class="sidebar-title"><i class="fas fa-chart-line"></i> İstatistikler</h3>
+        <div class="stats-container">
+          <div class="stat-item">
+            <div class="stat-label">Toplam Oyuncu</div>
+            <div class="stat-value" id="total-players">--</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Toplam Oyun</div>
+            <div class="stat-value" id="total-games">--</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">En Yüksek Skor</div>
+            <div class="stat-value" id="highest-score">--</div>
+          </div>
+        </div>
+      </div>
     </div>
     
-    <div class="leaderboard-table">
-      <div class="table-header">
-        <div class="rank-cell">Sıra</div>
-        <div class="username-cell">Oyuncu</div>
-        <div class="score-cell">Skor</div>
-        <div class="date-cell">Tarih</div>
+    <div class="leaderboard-main">
+      <div class="leaderboard-card">
+        <div class="card-header">
+          <div class="header-left">
+            <h3 id="active-game-title">Skor Sıralaması</h3>
+            <span class="active-game-subtitle" id="active-game-subtitle">En iyi oyuncular</span>
+          </div>
+          <div class="header-right">
+            <div class="time-filter">
+              <button class="time-filter-btn active" data-time="all">Tüm Zamanlar</button>
+              <button class="time-filter-btn" data-time="monthly">Bu Ay</button>
+              <button class="time-filter-btn" data-time="weekly">Bu Hafta</button>
+            </div>
+            <button class="refresh-btn" onclick="loadAllScores()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="leaderboard-table">
+          <div class="table-header">
+            <div class="rank-cell">Sıra</div>
+            <div class="player-cell">Oyuncu</div>
+            <div class="score-cell">Skor</div>
+            <div class="trend-cell">Trend</div>
+            <div class="performance-cell">Performans</div>
+            <div class="date-cell">Tarih</div>
+          </div>
+          <div class="table-body" id="scores-container">
+            <!-- Skorlar buraya yüklenecek -->
+            <div class="loading-scores">
+              <div class="spinner"></div>
+              <p>Skorlar yükleniyor...</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <div class="pagination">
+            <button class="pagination-btn" id="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+            <span class="page-info">Sayfa <span id="current-page">1</span> / <span id="total-pages">1</span></span>
+            <button class="pagination-btn" id="next-page" disabled><i class="fas fa-chevron-right"></i></button>
+          </div>
+          
+          <div class="last-updated">
+            <i class="fas fa-clock"></i> <span id="update-time">Şimdi güncellendi</span>
+          </div>
+        </div>
       </div>
-      <div class="table-body" id="scores-container">
-        <!-- Skorlar buraya yüklenecek -->
-        <div class="loading-scores">
-          <div class="spinner"></div>
-          <p>Skorlar yükleniyor...</p>
+      
+      <!-- Spotlight Panel -->
+      <div class="spotlight-panel">
+        <div class="spotlight-header">
+          <h3><i class="fas fa-crown"></i> Lider Oyuncu</h3>
+        </div>
+        <div class="spotlight-content" id="leader-spotlight">
+          <!-- Lider bilgisi buraya gelecek -->
+          <div class="loading-spotlight">
+            <div class="spinner small-spinner"></div>
+            <p>Yükleniyor...</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Oyuncu profil tooltip template -->
+<div class="player-tooltip" id="player-tooltip" style="display: none;">
+  <div class="tooltip-header">
+    <div class="tooltip-avatar">
+      <img src="" alt="Avatar" id="tooltip-avatar">
+    </div>
+    <div class="tooltip-player-info">
+      <div class="tooltip-username" id="tooltip-username"></div>
+      <div class="tooltip-rank" id="tooltip-rank"></div>
+    </div>
+  </div>
+  <div class="tooltip-stats">
+    <div class="tooltip-stat">
+      <div class="tooltip-stat-label">Toplam Skor</div>
+      <div class="tooltip-stat-value" id="tooltip-total-score"></div>
+    </div>
+    <div class="tooltip-stat">
+      <div class="tooltip-stat-label">Toplam Oyun</div>
+      <div class="tooltip-stat-value" id="tooltip-games-played"></div>
+    </div>
+    <div class="tooltip-stat">
+      <div class="tooltip-stat-label">Favori Oyun</div>
+      <div class="tooltip-stat-value" id="tooltip-favorite-game"></div>
+    </div>
+  </div>
+  <div class="tooltip-game-chart" id="tooltip-game-chart">
+    <!-- Mini grafik buraya gelecek -->
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --leaderboard-primary: #6200ea;
+    --leaderboard-primary-dark: #3700b3;
+    --leaderboard-secondary: #03dac6;
+    --leaderboard-background: #121212;
+    --leaderboard-surface: #1e1e1e;
+    --leaderboard-surface-light: #2c2c2c;
+    --leaderboard-text-primary: #ffffff;
+    --leaderboard-text-secondary: rgba(255, 255, 255, 0.7);
+    --leaderboard-gold: #ffd700;
+    --leaderboard-silver: #c0c0c0;
+    --leaderboard-bronze: #cd7f32;
+    --leaderboard-green: #00e676;
+    --leaderboard-red: #ff1744;
+    
+    --animation-duration: 0.3s;
+  }
+  
+  /* Ana konteyner */
+  .premium-leaderboard-container {
+    background-color: var(--leaderboard-background);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 1200px;
+    margin: 20px auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Hero bölümü */
+  .leaderboard-hero {
+    background: linear-gradient(135deg, var(--leaderboard-primary-dark), var(--leaderboard-primary));
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+    height: 150px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+    color: white;
+    margin: 0;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-top: 5px;
+  }
+  
+  .hero-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+  
+  .particle-1 {
+    width: 100px;
+    height: 100px;
+    background: var(--leaderboard-secondary);
+    top: -20px;
+    right: 10%;
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  .particle-2 {
+    width: 150px;
+    height: 150px;
+    background: var(--leaderboard-secondary);
+    bottom: -40px;
+    right: 20%;
+    animation: float 12s ease-in-out infinite;
+  }
+  
+  .particle-3 {
+    width: 80px;
+    height: 80px;
+    background: var(--leaderboard-secondary);
+    top: 20%;
+    left: 10%;
+    animation: float 10s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(10px, 10px) rotate(5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+  
+  /* Ana içerik bölümü */
+  .leaderboard-content-wrapper {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Sidebar */
+  .leaderboard-sidebar {
+    flex: 0 0 250px;
+    background-color: var(--leaderboard-surface);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .sidebar-title {
+    color: var(--leaderboard-text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .sidebar-title i {
+    color: var(--leaderboard-secondary);
+  }
+  
+  .game-categories {
+    margin-bottom: 30px;
+  }
+  
+  .game-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .game-filter-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--leaderboard-surface-light);
+    color: var(--leaderboard-text-secondary);
+    cursor: pointer;
+    transition: all var(--animation-duration) ease;
+    text-align: left;
+  }
+  
+  .game-filter-btn i {
+    margin-right: 10px;
+    font-size: 0.9rem;
+    width: 20px;
+    text-align: center;
+  }
+  
+  .game-filter-btn:hover {
+    background-color: rgba(98, 0, 234, 0.15);
+    color: var(--leaderboard-text-primary);
+  }
+  
+  .game-filter-btn.active {
+    background-color: var(--leaderboard-primary);
+    color: white;
+  }
+  
+  .sidebar-stats {
+    background-color: var(--leaderboard-surface-light);
+    border-radius: 8px;
+    padding: 15px;
+  }
+  
+  .stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-label {
+    color: var(--leaderboard-text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .stat-value {
+    color: var(--leaderboard-text-primary);
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  /* Ana panel */
+  .leaderboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Skor tablosu kartı */
+  .leaderboard-card {
+    background-color: var(--leaderboard-surface);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--leaderboard-surface-light);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .header-left {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header-left h3 {
+    margin: 0;
+    color: var(--leaderboard-text-primary);
+    font-size: 1.2rem;
+  }
+  
+  .active-game-subtitle {
+    color: var(--leaderboard-text-secondary);
+    font-size: 0.85rem;
+    margin-top: 3px;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .time-filter {
+    display: flex;
+    background-color: var(--leaderboard-surface);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .time-filter-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    color: var(--leaderboard-text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all var(--animation-duration) ease;
+  }
+  
+  .time-filter-btn:hover {
+    color: var(--leaderboard-text-primary);
+  }
+  
+  .time-filter-btn.active {
+    background-color: var(--leaderboard-primary);
+    color: white;
+  }
+  
+  .refresh-btn {
+    background-color: var(--leaderboard-surface);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--leaderboard-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--animation-duration) ease;
+  }
+  
+  .refresh-btn:hover {
+    background-color: var(--leaderboard-secondary);
+    color: black;
+    transform: rotate(180deg);
+  }
+  
+  /* Tablo stili */
+  .leaderboard-table {
+    width: 100%;
+    color: var(--leaderboard-text-primary);
+  }
+  
+  .table-header {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 80px 1.5fr 1fr;
+    padding: 12px 20px;
+    background-color: var(--leaderboard-surface-light);
+    font-weight: bold;
+    color: var(--leaderboard-text-secondary);
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .table-body {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .table-row {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 80px 1.5fr 1fr;
+    padding: 15px 20px;
+    align-items: center;
+    transition: all var(--animation-duration) ease;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .table-row:hover {
+    background-color: rgba(98, 0, 234, 0.1);
+  }
+  
+  .table-row.top-rank {
+    background-color: rgba(98, 0, 234, 0.05);
+  }
+  
+  .table-row.top-rank:hover {
+    background-color: rgba(98, 0, 234, 0.15);
+  }
+  
+  .table-row.top-rank:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+  }
+  
+  .table-row.top-rank:nth-child(1):before {
+    background-color: var(--leaderboard-gold);
+  }
+  
+  .table-row.top-rank:nth-child(2):before {
+    background-color: var(--leaderboard-silver);
+  }
+  
+  .table-row.top-rank:nth-child(3):before {
+    background-color: var(--leaderboard-bronze);
+  }
+  
+  /* Hücre stilleri */
+  .rank-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
+  .rank-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    background-color: var(--leaderboard-surface-light);
+  }
+  
+  .rank-badge.gold {
+    background-color: var(--leaderboard-gold);
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  
+  .rank-badge.silver {
+    background-color: var(--leaderboard-silver);
+    color: #000;
+  }
+  
+  .rank-badge.bronze {
+    background-color: var(--leaderboard-bronze);
+    color: #000;
+  }
+  
+  .player-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  
+  .player-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--leaderboard-surface-light);
+    overflow: hidden;
+    border: 2px solid var(--leaderboard-surface-light);
+  }
+  
+  .player-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .player-name {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--leaderboard-text-primary);
+  }
+  
+  .player-rank {
+    font-size: 0.75rem;
+    color: var(--leaderboard-text-secondary);
+  }
+  
+  .score-cell {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .score-badge {
+    position: relative;
+    background: linear-gradient(135deg, var(--leaderboard-primary-dark), var(--leaderboard-primary));
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  
+  .highlight-score {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(98, 0, 234, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(98, 0, 234, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(98, 0, 234, 0); }
+  }
+  
+  .trend-cell {
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+  
+  .trend-up {
+    color: var(--leaderboard-green);
+  }
+  
+  .trend-down {
+    color: var(--leaderboard-red);
+  }
+  
+  .performance-cell {
+    display: flex;
+    align-items: center;
+  }
+  
+  .performance-bar {
+    flex: 1;
+    height: 6px;
+    background-color: var(--leaderboard-surface-light);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .performance-value {
+    height: 100%;
+    background: linear-gradient(to right, var(--leaderboard-primary), var(--leaderboard-secondary));
+    border-radius: 3px;
+  }
+  
+  .date-cell {
+    font-size: 0.85rem;
+    color: var(--leaderboard-text-secondary);
+  }
+  
+  /* Kart altı */
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: var(--leaderboard-surface-light);
+    color: var(--leaderboard-text-secondary);
+    font-size: 0.85rem;
+  }
+  
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .pagination-btn {
+    background: none;
+    border: none;
+    color: var(--leaderboard-text-secondary);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--animation-duration) ease;
+  }
+  
+  .pagination-btn:not([disabled]):hover {
+    background-color: var(--leaderboard-primary);
+    color: white;
+  }
+  
+  .pagination-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .page-info {
+    margin: 0 10px;
+  }
+  
+  .last-updated {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Lider Paneli */
+  .spotlight-panel {
+    background-color: var(--leaderboard-surface);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .spotlight-header {
+    padding: 15px 20px;
+    background-color: var(--leaderboard-surface-light);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .spotlight-header h3 {
+    margin: 0;
+    color: var(--leaderboard-text-primary);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .spotlight-header i {
+    color: var(--leaderboard-gold);
+  }
+  
+  .spotlight-content {
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .leader-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .leader-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--leaderboard-gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    overflow: hidden;
+  }
+  
+  .leader-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .leader-info {
+    flex: 1;
+  }
+  
+  .leader-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--leaderboard-text-primary);
+    margin-bottom: 5px;
+  }
+  
+  .leader-rank {
+    font-size: 0.9rem;
+    color: var(--leaderboard-text-secondary);
+    margin-bottom: 10px;
+  }
+  
+  .leader-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .leader-stat {
+    background-color: var(--leaderboard-surface-light);
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  
+  .leader-stat-label {
+    font-size: 0.75rem;
+    color: var(--leaderboard-text-secondary);
+  }
+  
+  .leader-stat-value {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--leaderboard-text-primary);
+  }
+  
+  .leader-actions {
+    display: flex;
+  }
+  
+  .leader-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .leader-score-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--leaderboard-text-primary);
+    background: linear-gradient(135deg, var(--leaderboard-primary), var(--leaderboard-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .leader-score-label {
+    font-size: 0.9rem;
+    color: var(--leaderboard-text-secondary);
+  }
+  
+  /* Yükleme animasyonu */
+  .loading-scores, .loading-spotlight {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: var(--leaderboard-text-secondary);
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--leaderboard-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+  
+  .small-spinner {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+    margin-bottom: 8px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .no-scores {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: var(--leaderboard-text-secondary);
+    text-align: center;
+  }
+  
+  .empty-trophy {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+  
+  .warning-message i {
+    color: #ffc107;
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  
+  .error i {
+    color: #f44336;
+  }
+  
+  /* Tooltip stilleri */
+  .player-tooltip {
+    position: absolute;
+    min-width: 300px;
+    background-color: var(--leaderboard-surface);
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all var(--animation-duration) ease;
+    color: var(--leaderboard-text-primary);
+    overflow: hidden;
+  }
+  
+  .tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--leaderboard-primary-dark), var(--leaderboard-primary));
+  }
+  
+  .tooltip-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid white;
+    overflow: hidden;
+  }
+  
+  .tooltip-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .tooltip-player-info {
+    flex: 1;
+  }
+  
+  .tooltip-username {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  
+  .tooltip-rank {
+    font-size: 0.8rem;
+    opacity: 0.9;
+  }
+  
+  .tooltip-stats {
+    display: flex;
+    padding: 15px;
+    background-color: var(--leaderboard-surface-light);
+  }
+  
+  .tooltip-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .tooltip-stat-label {
+    font-size: 0.75rem;
+    color: var(--leaderboard-text-secondary);
+    margin-bottom: 3px;
+  }
+  
+  .tooltip-stat-value {
+    font-size: 0.95rem;
+    font-weight: bold;
+  }
+  
+  .tooltip-game-chart {
+    height: 100px;
+    padding: 10px;
+  }
+  
+  /* Animasyonlar */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes highlight {
+    0% { background-color: rgba(98, 0, 234, 0.3); }
+    100% { background-color: transparent; }
+  }
+  
+  /* Duyarlı tasarım */
+  @media (max-width: 992px) {
+    .leaderboard-content-wrapper {
+      flex-direction: column;
+    }
+    
+    .leaderboard-sidebar {
+      flex: none;
+      width: 100%;
+    }
+    
+    .game-filter {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .table-header, .table-row {
+      grid-template-columns: 60px 2fr 1fr 0.5fr 1fr 0.5fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .header-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .table-header, .table-row {
+      grid-template-columns: 60px 2fr 1fr 0.5fr 0fr 0.5fr;
+    }
+    
+    .performance-cell {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .table-header, .table-row {
+      grid-template-columns: 50px 2fr 1fr 0fr 0fr 0.5fr;
+    }
+    
+    .trend-cell, .performance-cell {
+      display: none;
+    }
+    
+    .time-filter-btn {
+      padding: 6px 8px;
+      font-size: 0.7rem;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block scripts %}
