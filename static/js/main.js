@@ -233,32 +233,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-// Profil panelini açma/kapama fonksiyonu
-function toggleProfilePanel(event) {
-  event.stopPropagation();
-  const profilePanel = document.getElementById('profilePanel');
-  profilePanel.classList.toggle('active');
-  
-  // Panel dışına tıklandığında paneli kapat
-  document.addEventListener('click', function closePanel(e) {
-    if (!profilePanel.contains(e.target) && e.target !== document.getElementById('topLeftAvatar')) {
-      profilePanel.classList.remove('active');
-      document.removeEventListener('click', closePanel);
-    }
-  });
-}
+// Bu bölüm kaldırıldın// Profil fonksiyonları kaldırıldı
 
-// Profile Modal Lazy Loading
+// Diğer sayfa işlevleri
 document.addEventListener('DOMContentLoaded', function() {
-  const profileButton = document.getElementById('profileButton');
-  const profileModal = document.getElementById('profileModal');
-  const profileModalContent = document.getElementById('profileModalContent');
-  const profileContentTemplate = document.getElementById('profileContentTemplate');
-  let isContentLoaded = false;
-
-  if (profileButton && profileModal) {
-    profileButton.addEventListener('click', function() {
-      const modal = new bootstrap.Modal(profileModal);
+    // Sayfa yüklendiğinde çalıştırılacak kodlar
       modal.show();
 
       if (!isContentLoaded) {
