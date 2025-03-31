@@ -127,6 +127,55 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+/* Altın, gümüş ve bronz renkler için stil tanımları */
+.gold-text {
+  color: #FFD700 !important;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.silver-text {
+  color: #C0C0C0 !important;
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+}
+
+.bronze-text {
+  color: #CD7F32 !important;
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+}
+
+/* Taç ikonu için stil */
+.crown {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #FFD700;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7));
+}
+
+.player-avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Oyuncu satırı stil geliştirmeleri */
+.player-row.top-1 .player-avatar {
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+.player-row.top-2 .player-avatar {
+  border: 2px solid #C0C0C0;
+  box-shadow: 0 0 10px rgba(192, 192, 192, 0.7);
+}
+
+.player-row.top-3 .player-avatar {
+  border: 2px solid #CD7F32;
+  box-shadow: 0 0 10px rgba(205, 127, 50, 0.7);
+}
+
 }
 
 .player-cell {
