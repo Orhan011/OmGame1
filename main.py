@@ -132,12 +132,61 @@ def utility_processor():
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
         return session.get('avatar_url', 'images/default-avatar.png')
+        
+    def get_user_scores():
+        """Kullanıcının tüm oyun skorlarını döndürür"""
+        if 'user_id' in session:
+            user_id = session.get('user_id')
+            scores = {}
+            
+            # Temel oyunlar
+            word_puzzle_score = Score.query.filter_by(user_id=user_id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
+            memory_match_score = Score.query.filter_by(user_id=user_id, game_type='memoryMatch').order_by(Score.score.desc()).first()
+            labyrinth_score = Score.query.filter_by(user_id=user_id, game_type='labyrinth').order_by(Score.score.desc()).first()
+            puzzle_score = Score.query.filter_by(user_id=user_id, game_type='puzzle').order_by(Score.score.desc()).first()
+            number_sequence_score = Score.query.filter_by(user_id=user_id, game_type='numberSequence').order_by(Score.score.desc()).first()
+            
+            # Hafıza oyunları
+            memory_cards_score = Score.query.filter_by(user_id=user_id, game_type='memoryCards').order_by(Score.score.desc()).first()
+            number_chain_score = Score.query.filter_by(user_id=user_id, game_type='numberChain').order_by(Score.score.desc()).first()
+            audio_memory_score = Score.query.filter_by(user_id=user_id, game_type='audioMemory').order_by(Score.score.desc()).first()
+            n_back_score = Score.query.filter_by(user_id=user_id, game_type='nBack').order_by(Score.score.desc()).first()
+            
+            # Yeni IQ geliştirme oyunları
+            sudoku_score = Score.query.filter_by(user_id=user_id, game_type='sudoku').order_by(Score.score.desc()).first()
+            game_2048_score = Score.query.filter_by(user_id=user_id, game_type='2048').order_by(Score.score.desc()).first()
+            chess_score = Score.query.filter_by(user_id=user_id, game_type='chess').order_by(Score.score.desc()).first()
+            rubik_cube_score = Score.query.filter_by(user_id=user_id, game_type='rubikCube').order_by(Score.score.desc()).first()
+            logic_puzzles_score = Score.query.filter_by(user_id=user_id, game_type='logicPuzzles').order_by(Score.score.desc()).first()
+            tangram_score = Score.query.filter_by(user_id=user_id, game_type='tangram').order_by(Score.score.desc()).first()
+            
+            scores = {
+                'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
+                'memoryMatch': memory_match_score.score if memory_match_score else 0,
+                'labyrinth': labyrinth_score.score if labyrinth_score else 0,
+                'puzzle': puzzle_score.score if puzzle_score else 0,
+                'numberSequence': number_sequence_score.score if number_sequence_score else 0,
+                'memoryCards': memory_cards_score.score if memory_cards_score else 0,
+                'numberChain': number_chain_score.score if number_chain_score else 0,
+                'audioMemory': audio_memory_score.score if audio_memory_score else 0,
+                'nBack': n_back_score.score if n_back_score else 0,
+                'sudoku': sudoku_score.score if sudoku_score else 0,
+                '2048': game_2048_score.score if game_2048_score else 0,
+                'chess': chess_score.score if chess_score else 0,
+                'rubikCube': rubik_cube_score.score if rubik_cube_score else 0,
+                'logicPuzzles': logic_puzzles_score.score if logic_puzzles_score else 0,
+                'tangram': tangram_score.score if tangram_score else 0,
+            }
+            
+            return scores
+        return {}
     
     # Tüm yardımcı fonksiyonları şablonlarda kullanılabilir hale getir
     return dict(
         get_current_user=get_current_user,
         get_user_data=get_user_data,
-        get_avatar_url=get_avatar_url
+        get_avatar_url=get_avatar_url,
+        get_user_scores=get_user_scores
     )
 
 # Database initialization function
@@ -609,6 +658,14 @@ def profile():
         audio_memory_score = Score.query.filter_by(user_id=current_user.id, game_type='audioMemory').order_by(Score.score.desc()).first()
         n_back_score = Score.query.filter_by(user_id=current_user.id, game_type='nBack').order_by(Score.score.desc()).first()
         
+        # Yeni IQ geliştirme oyunları skorlarını da ekleyelim
+        sudoku_score = Score.query.filter_by(user_id=current_user.id, game_type='sudoku').order_by(Score.score.desc()).first()
+        game_2048_score = Score.query.filter_by(user_id=current_user.id, game_type='2048').order_by(Score.score.desc()).first()
+        chess_score = Score.query.filter_by(user_id=current_user.id, game_type='chess').order_by(Score.score.desc()).first()
+        rubik_cube_score = Score.query.filter_by(user_id=current_user.id, game_type='rubikCube').order_by(Score.score.desc()).first()
+        logic_puzzles_score = Score.query.filter_by(user_id=current_user.id, game_type='logicPuzzles').order_by(Score.score.desc()).first()
+        tangram_score = Score.query.filter_by(user_id=current_user.id, game_type='tangram').order_by(Score.score.desc()).first()
+        
         user_scores = {
             'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
             'memoryMatch': memory_match_score.score if memory_match_score else 0,
@@ -618,7 +675,14 @@ def profile():
             'memoryCards': memory_cards_score.score if memory_cards_score else 0,
             'numberChain': number_chain_score.score if number_chain_score else 0,
             'audioMemory': audio_memory_score.score if audio_memory_score else 0,
-            'nBack': n_back_score.score if n_back_score else 0
+            'nBack': n_back_score.score if n_back_score else 0,
+            # Yeni oyun skorları
+            'sudoku': sudoku_score.score if sudoku_score else 0,
+            '2048': game_2048_score.score if game_2048_score else 0,
+            'chess': chess_score.score if chess_score else 0,
+            'rubikCube': rubik_cube_score.score if rubik_cube_score else 0,
+            'logicPuzzles': logic_puzzles_score.score if logic_puzzles_score else 0,
+            'tangram': tangram_score.score if tangram_score else 0
         }
         
         # Kullanıcı bilgilerini güncel tut
@@ -684,6 +748,31 @@ def audio_memory():
 def n_back():
     return render_template('games/nBack.html')
 
+# Yeni IQ Geliştirme Oyunları
+@app.route('/games/sudoku')
+def sudoku():
+    return render_template('games/sudoku.html')
+
+@app.route('/games/2048')
+def game_2048():
+    return render_template('games/2048.html')
+
+@app.route('/games/chess')
+def chess():
+    return render_template('games/chess.html')
+
+@app.route('/games/rubik-cube')
+def rubik_cube():
+    return render_template('games/rubikCube.html')
+
+@app.route('/games/logic-puzzles')
+def logic_puzzles():
+    return render_template('games/logicPuzzles.html')
+
+@app.route('/games/tangram')
+def tangram():
+    return render_template('games/tangram.html')
+
 # Leaderboard
 @app.route('/leaderboard')
 def leaderboard():
@@ -695,12 +784,20 @@ def leaderboard():
     # visual_attention_scores = Score.query.filter_by(game_type='visualAttention').order_by(Score.score.desc()).limit(10).all()
     number_sequence_scores = Score.query.filter_by(game_type='numberSequence').order_by(Score.score.desc()).limit(10).all()
     
-    # Yeni oyunlar için skor tablolarını ekleyelim
+    # Hafıza oyunları skor tabloları
     # where_is_it_scores kaldırıldı
     memory_cards_scores = Score.query.filter_by(game_type='memoryCards').order_by(Score.score.desc()).limit(10).all()
     number_chain_scores = Score.query.filter_by(game_type='numberChain').order_by(Score.score.desc()).limit(10).all()
     audio_memory_scores = Score.query.filter_by(game_type='audioMemory').order_by(Score.score.desc()).limit(10).all()
     n_back_scores = Score.query.filter_by(game_type='nBack').order_by(Score.score.desc()).limit(10).all()
+    
+    # Yeni IQ geliştirme oyunları skor tabloları
+    sudoku_scores = Score.query.filter_by(game_type='sudoku').order_by(Score.score.desc()).limit(10).all()
+    game_2048_scores = Score.query.filter_by(game_type='2048').order_by(Score.score.desc()).limit(10).all()
+    chess_scores = Score.query.filter_by(game_type='chess').order_by(Score.score.desc()).limit(10).all()
+    rubik_cube_scores = Score.query.filter_by(game_type='rubikCube').order_by(Score.score.desc()).limit(10).all()
+    logic_puzzles_scores = Score.query.filter_by(game_type='logicPuzzles').order_by(Score.score.desc()).limit(10).all()
+    tangram_scores = Score.query.filter_by(game_type='tangram').order_by(Score.score.desc()).limit(10).all()
     
     return render_template('leaderboard.html', 
                           word_puzzle_scores=word_puzzle_scores,
@@ -714,7 +811,14 @@ def leaderboard():
                           memory_cards_scores=memory_cards_scores,
                           number_chain_scores=number_chain_scores,
                           audio_memory_scores=audio_memory_scores,
-                          n_back_scores=n_back_scores)
+                          n_back_scores=n_back_scores,
+                          # Yeni oyun skorları
+                          sudoku_scores=sudoku_scores,
+                          game_2048_scores=game_2048_scores,
+                          chess_scores=chess_scores,
+                          rubik_cube_scores=rubik_cube_scores,
+                          logic_puzzles_scores=logic_puzzles_scores,
+                          tangram_scores=tangram_scores)
 
 # Articles
 @app.route('/articles')

@@ -1,0 +1,261 @@
+{% extends "layout.html" %}
+
+{% block title %}Satranç{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="game-title text-center mb-4">Satranç</h1>
+  
+  <!-- Oyun İstatistikleri Bölümü -->
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-chess-pawn"></i>
+      <div class="game-stat-value" id="captured-display">0</div>
+      <div class="game-stat-label">ALINAN TAŞLAR</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-exchange-alt"></i>
+      <div class="game-stat-value" id="moves-display">0</div>
+      <div class="game-stat-label">HAMLE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-clock"></i>
+      <div class="game-stat-value" id="time-display">00:00</div>
+      <div class="game-stat-label">SÜRE</div>
+    </div>
+  </div>
+  
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Intro Section -->
+      <div class="glass-panel chess-intro mb-4" id="intro-section">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <div class="game-instructions mb-md-0">
+              <h4 class="instruction-title"><i class="fas fa-chess me-2"></i>Nasıl Oynanır?</h4>
+              <p>Satranç, stratejik düşünme ve planlama becerilerinizi geliştiren klasik bir zeka oyunudur.</p>
+              <p>Beyaz taşlarla oynayacaksınız ve yapay zeka siyah taşlarla oynayacak. Rakibinizin kralını mat etmeye çalışın.</p>
+              <div class="memory-tips">
+                <div class="tip-badge">
+                  <i class="fas fa-lightbulb"></i>
+                  <span>İpucu: Tahtanın kontrolünü ele geçirmek için merkezde güçlü bir konum oluşturun.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+            <div class="memory-levels-selector">
+              <div class="level-label">Zorluk</div>
+              <div class="level-buttons">
+                <button id="level-easy" class="level-btn active" data-level="EASY">Kolay</button>
+                <button id="level-medium" class="level-btn" data-level="MEDIUM">Orta</button>
+                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
+              </div>
+            </div>
+            <button id="start-game" class="standard-start-btn">
+              <i class="fas fa-play me-2"></i>Oyunu Başlat
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Game Container -->
+      <div id="game-container" class="chess-container glass-effect" style="display: none;">
+        <!-- Game Header -->
+        <div class="game-header">
+          <div class="chess-indicator" id="chess-indicator">
+            <span id="status-display">BEYAZ OYNAR</span>
+          </div>
+          
+          <div class="game-controls-top">
+            <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
+              <i class="fas fa-pause"></i>
+            </button>
+            <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Alert Container -->
+        <div id="alert-container" class="chess-alert"></div>
+        
+        <!-- Chess Board Container -->
+        <div class="chess-board-container">
+          <div class="captured-pieces black-captured" id="black-captured-pieces">
+            <!-- Siyah tarafından alınan taşlar buraya gelecek -->
+          </div>
+          
+          <div id="chess-board" class="chess-board"></div>
+          
+          <div class="captured-pieces white-captured" id="white-captured-pieces">
+            <!-- Beyaz tarafından alınan taşlar buraya gelecek -->
+          </div>
+          
+          <div class="chess-controls">
+            <button id="undo-move" class="chess-btn" title="Hamleyi Geri Al">
+              <i class="fas fa-undo"></i> Geri Al
+            </button>
+            <button id="hint" class="chess-btn" title="İpucu Al">
+              <i class="fas fa-lightbulb"></i> İpucu
+            </button>
+            <button id="resign" class="chess-btn" title="Teslim Ol">
+              <i class="fas fa-flag"></i> Teslim Ol
+            </button>
+            <button id="new-game" class="chess-btn" title="Yeni Oyun">
+              <i class="fas fa-sync"></i> Yeni Oyun
+            </button>
+          </div>
+        </div>
+        
+        <!-- Move History -->
+        <div class="move-history-container">
+          <h5 class="history-title">Hamle Geçmişi</h5>
+          <div id="move-history" class="move-history">
+            <!-- Hamle geçmişi buraya eklenecek -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Promotion Modal -->
+      <div id="promotion-modal" class="promotion-modal" style="display: none;">
+        <div class="promotion-modal-content">
+          <h4>Terfi Seçimi</h4>
+          <p>Piyon terfisi için bir taş seçin:</p>
+          <div class="promotion-pieces">
+            <div class="promotion-piece" data-piece="queen">
+              <img src="" alt="Vezir" class="piece-image">
+            </div>
+            <div class="promotion-piece" data-piece="rook">
+              <img src="" alt="Kale" class="piece-image">
+            </div>
+            <div class="promotion-piece" data-piece="bishop">
+              <img src="" alt="Fil" class="piece-image">
+            </div>
+            <div class="promotion-piece" data-piece="knight">
+              <img src="" alt="At" class="piece-image">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Game Over Container -->
+      <div id="game-over-container" class="game-results-container" style="display: none;">
+        <div class="game-results-card">
+          <div class="game-results-header">
+            <span class="result-badge">
+              <i class="fas fa-flag-checkered"></i>
+            </span>
+            <h2 class="mb-0" id="game-result-title">Oyun Bitti!</h2>
+          </div>
+          
+          <div class="game-results-body">
+            <div class="results-stats">
+              <div class="result-stat">
+                <i class="fas fa-trophy"></i>
+                <div class="result-stat-value">
+                  <span id="final-score">0</span>
+                </div>
+                <div class="result-stat-label">Toplam Puan</div>
+              </div>
+              
+              <div class="result-stat">
+                <i class="fas fa-chess-pawn"></i>
+                <div class="result-stat-value">
+                  <span id="final-captured">0</span>
+                </div>
+                <div class="result-stat-label">Alınan Taşlar</div>
+              </div>
+              
+              <div class="result-stat">
+                <i class="fas fa-exchange-alt"></i>
+                <div class="result-stat-value">
+                  <span id="final-moves">0</span>
+                </div>
+                <div class="result-stat-label">Toplam Hamle</div>
+              </div>
+            </div>
+            
+            <div class="chess-result" id="chess-result">
+              <div class="result-message" id="result-message"></div>
+            </div>
+            
+            <div class="results-rating">
+              <div class="rating-stars" id="rating-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <div class="rating-text" id="rating-text">İyi!</div>
+            </div>
+            
+            <div class="game-achievement" id="game-achievement" style="display: none;">
+              <div class="achievement-icon">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="achievement-text">
+                <div class="achievement-title">Başarım Kazanıldı!</div>
+                <div class="achievement-name" id="achievement-name">Satranç Ustası</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="game-results-footer">
+            <button id="play-again" class="standard-replay-btn">
+              <i class="fas fa-redo me-2"></i>Tekrar Oyna
+            </button>
+            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-trophy me-2"></i>Skor Tablosu
+            </a>
+          </div>
+          
+          <div class="game-share-section">
+            <p>Skorunuzu paylaşın:</p>
+            <div class="share-buttons">
+              <button class="share-btn" title="Kopyala" id="copy-score">
+                <i class="fas fa-copy"></i>
+              </button>
+              <button class="share-btn" title="Paylaş" id="share-score">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pause Menu Overlay -->
+      <div id="pause-overlay" class="pause-overlay" style="display: none;">
+        <div class="pause-card">
+          <h3><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h3>
+          <p>Devam etmek için aşağıdaki düğmeye tıklayın.</p>
+          <div class="pause-menu-buttons">
+            <button id="resume-game" class="btn btn-primary">
+              <i class="fas fa-play me-2"></i>Devam Et
+            </button>
+            <button id="restart-game" class="btn btn-outline-primary">
+              <i class="fas fa-redo me-2"></i>Yeniden Başlat
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+              <i class="fas fa-home me-2"></i>Ana Sayfa
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/chess.js') }}"></script>
+{% endblock %}
