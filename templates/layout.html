@@ -170,5 +170,9 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
-</body>
+<!-- Swipe Navigation -->
+    <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
+    <!-- Remove Back Buttons -->
+    <script src="{{ url_for('static', filename='js/removeBackButtons.js') }}"></script>
+  </body>
 </html>

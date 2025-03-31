@@ -9345,3 +9345,36 @@ main {
     font-size: 1.5rem;
   }
 }
+/* Standart Başlatma Butonu - Yuvarlak Köşeli */
+.standard-start-btn {
+  background: linear-gradient(135deg, #6a5ae0, #5246c0);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(106, 90, 224, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+  width: 200px;
+  cursor: pointer;
+}
+
+.standard-start-btn:hover {
+  background: linear-gradient(135deg, #7a6aff, #6255e0);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.5);
+  transform: translateY(-2px);
+}
+
+.standard-start-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 5px rgba(106, 90, 224, 0.2);
+}
+
+.standard-start-btn i {
+  font-size: 1.1rem;
+}

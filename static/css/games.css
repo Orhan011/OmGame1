@@ -125,12 +125,12 @@
   animation: pulse 1.5s infinite, gradientShift 3s ease infinite;
 }
 
-/* Standart Başla Butonu - Sabit ve Yuvarlak Köşeli*/
+/* Standart Başla Butonu - Yuvarlak Köşeli*/
 .standard-start-btn {
-  background-color: #6a5ae0;
+  background: linear-gradient(135deg, #6a5ae0, #5246c0);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   padding: 12px 30px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -146,8 +146,9 @@
 }
 
 .standard-start-btn:hover {
-  background-color: #7665e6;
-  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.4);
+  background: linear-gradient(135deg, #7a6aff, #6255e0);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.5);
+  transform: translateY(-2px);
 }
 
 .standard-start-btn:active {
