@@ -671,8 +671,11 @@ def n_back():
 # Sudoku oyunu kaldırıldı
 @app.route('/games/sudoku')
 def sudoku():
-    flash('Sudoku oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/sudoku.html')
+
+@app.route('/games/2048')
+def game_2048():
+    return render_template('games/2048.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')

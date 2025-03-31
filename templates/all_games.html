@@ -101,13 +101,23 @@
     </div>
 
     <!-- Sudoku -->
-    <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
-      <div class="game-icon" style="color: #6c757d;"><i class="fas fa-th"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-th"></i></div>
       <div class="game-info">
-        <h3>Sudoku <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
-        <p>Bu oyun şu an bakımda.</p>
+        <h3>Sudoku</h3>
+        <p>Mantık becerinizi geliştirin, her satır, sütun ve 3x3 kutuya 1-9 arası sayıları yerleştirin.</p>
       </div>
-      <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+    </div>
+    
+    <!-- 2048 -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-cubes"></i></div>
+      <div class="game-info">
+        <h3>2048</h3>
+        <p>Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!</p>
+      </div>
+      <a href="{{ url_for('game_2048') }}" class="game-btn">Oyna</a>
     </div>
   </div>
 
