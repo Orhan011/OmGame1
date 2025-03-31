@@ -21,7 +21,8 @@ function loadLeaderboard() {
     .then(response => response.json())
     .then(data => {
       console.log("Toplam skorlar:", data);
-      displayLeaderboard(data);
+      const scores = calculateTotalScores(data);
+      displayLeaderboard(scores);
     })
     .catch(error => {
       console.error('Skorlar yüklenirken hata oluştu:', error);
@@ -64,6 +65,16 @@ function displayLeaderboard(scores) {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
     const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
 
+    // Kullanıcı ismini sıralamaya göre renklendir
+    let nameColorClass = '';
+    if (index === 0) {
+      nameColorClass = 'name-gold';
+    } else if (index === 1) {
+      nameColorClass = 'name-silver';
+    } else if (index === 2) {
+      nameColorClass = 'name-bronze';
+    }
+
     html += `
       <div class="player-row ${rankClass}">
         <div class="rank-cell">
@@ -71,10 +82,11 @@ function displayLeaderboard(scores) {
         </div>
         <div class="player-cell">
           <div class="player-avatar">
-            <span class="avatar-content">${initial}</span>
+            ${index === 0 ? '<div class="crown-icon"><i class="fas fa-crown"></i></div>' : ''}
+            <div class="avatar-content">${initial}</div>
           </div>
           <div class="player-info">
-            <div class="player-name">${player.username}</div>
+            <div class="player-name ${nameColorClass}">${player.username}</div>
             <div class="player-rank"></div> </div>
         </div>
         <div class="score-cell">

@@ -218,21 +218,58 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 15px;
   flex-shrink: 0;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.crown-icon {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: gold;
+  font-size: 18px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
 }
 
 .avatar-content {
   color: white;
   font-weight: 700;
   font-size: 1.5rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+/* Sıralamaya göre avatar çerçeve renkleri */
+.top-1 .player-avatar {
+  border: 3px solid gold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.top-2 .player-avatar {
+  border: 3px solid silver;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+}
+
+.top-3 .player-avatar {
+  border: 3px solid #cd7f32; /* bronze */
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
 }
 
 
@@ -432,68 +469,36 @@
 }
 
 .player-name {
-  color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.player-stats {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+.player-name.name-gold {
+  color: gold;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+  font-size: 1.2rem;
 }
 
-.level-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  background: rgba(106, 90, 224, 0.2);
-  color: #9f8aff;
-  border-radius: 20px;
-  font-weight: 600;
-  white-space: nowrap;
+.player-name.name-silver {
+  color: silver;
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.7);
+  font-size: 1.15rem;
 }
 
-.games-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #8a8aa3;
-  border-radius: 20px;
-  font-weight: 500;
-  white-space: nowrap;
+.player-name.name-bronze {
+  color: #cd7f32; /* bronze */
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.7);
+  font-size: 1.1rem;
 }
 
-.games-badge i {
-  margin-right: 3px;
-  font-size: 0.65rem;
+.player-rank {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
 }
-
-
-.player-row[data-rank="1"] .player-name {
-  color: gold; /* Changed to gold */
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.5px;
-}
-
-.player-row[data-rank="2"] .player-name {
-  color: silver; /* Changed to silver */
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.player-row[data-rank="3"] .player-name {
-  color: darkgoldenrod; /* Changed to darkgoldenrod */
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
 
 .score-block {
   position: relative;
