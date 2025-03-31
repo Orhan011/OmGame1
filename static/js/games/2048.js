@@ -1,568 +1,494 @@
+/**
+ * 2048 Oyunu 
+ * Modern ve profesyonel tasarım
+ */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
-  const gridTiles = document.getElementById('grid-tiles');
+  // HTML elementleri
+  const gridContainer = document.getElementById('grid-container');
+  const tileContainer = document.getElementById('tile-container');
   const scoreDisplay = document.getElementById('score');
   const bestScoreDisplay = document.getElementById('best-score');
-  const newGameButton = document.getElementById('new-game-btn');
-  const gameMessage = document.getElementById('game-message');
-  const messageContent = document.getElementById('message-content');
+  const messageContainer = document.getElementById('game-message');
+  const messageContent = messageContainer.querySelector('p');
   const retryButton = document.getElementById('retry-button');
-  const keepGoingButton = document.getElementById('keep-going-button');
-  const gameStatus = document.getElementById('game-status');
+  const keepPlayingButton = document.getElementById('keep-playing-button');
+  const restartButton = document.getElementById('restart-button');
 
-  // Game State
-  const gameState = {
-    grid: Array(4).fill().map(() => Array(4).fill(0)),
-    score: 0,
-    bestScore: localStorage.getItem('2048-best-score') || 0,
-    won: false,
-    over: false,
-    tiles: []
+  // Game state
+  let grid = [];
+  let score = 0;
+  let bestScore = parseInt(localStorage.getItem('2048-best-score')) || 0;
+  let gameWon = false;
+  let gameOver = false;
+  let keepPlaying = false;
+
+  // Sabitleri tanımla
+  const GRID_SIZE = 4;
+  const TILE_MARGIN = 15;
+  const DIRECTIONS = {
+    UP: { x: 0, y: -1 },
+    RIGHT: { x: 1, y: 0 },
+    DOWN: { x: 0, y: 1 },
+    LEFT: { x: -1, y: 0 }
   };
 
-  // Tile positions
-  const positions = {
-    0: { x: 0, y: 0 },
-    1: { x: 0, y: 1 },
-    2: { x: 0, y: 2 },
-    3: { x: 0, y: 3 },
-    4: { x: 1, y: 0 },
-    5: { x: 1, y: 1 },
-    6: { x: 1, y: 2 },
-    7: { x: 1, y: 3 },
-    8: { x: 2, y: 0 },
-    9: { x: 2, y: 1 },
-    10: { x: 2, y: 2 },
-    11: { x: 2, y: 3 },
-    12: { x: 3, y: 0 },
-    13: { x: 3, y: 1 },
-    14: { x: 3, y: 2 },
-    15: { x: 3, y: 3 }
-  };
+  // En iyi skoru ayarla
+  bestScoreDisplay.textContent = bestScore;
 
-  // Oyun İşlevleri
+  // Oyunu başlat
+  initGame();
+
+  // Yön tuşları ve restart olaylarını ekle
+  window.addEventListener('keydown', handleKeyPress);
+  restartButton.addEventListener('click', restartGame);
+  retryButton.addEventListener('click', restartGame);
+  keepPlayingButton.addEventListener('click', continueGame);
+
+  // Dokunmatik cihazlar için kaydırma desteği ekle
+  setupTouchEvents();
+
+  // Oyunu başlatıp grid'i sıfırla
   function initGame() {
-    // Oyun durumunu sıfırla
-    resetGameState();
-    
-    // Tahta üzerine rastgele 2 kare yerleştir
+    setupGrid();
     addRandomTile();
     addRandomTile();
-    
-    // Tahtayı görsel olarak güncelle
-    updateGrid();
-    
-    // Skor göstergelerini güncelle
-    updateScore();
-    
-    // Event listener'ları ayarla
-    setupEventListeners();
+    updateGridDisplay();
   }
 
-  function resetGameState() {
-    gameState.grid = Array(4).fill().map(() => Array(4).fill(0));
-    gameState.score = 0;
-    gameState.bestScore = localStorage.getItem('2048-best-score') || 0;
-    gameState.won = false;
-    gameState.over = false;
-    gameState.tiles = [];
-    
-    // DOM elementlerini temizle
-    gridTiles.innerHTML = '';
-    
-    // Mesajı gizle
-    gameMessage.classList.remove('show');
-    
-    // Durum mesajını güncelle
-    gameStatus.textContent = 'Tuş takımı ok tuşları veya W, A, S, D ile kontrol edin. Aynı sayıları birleştirerek 2048\'e ulaşın!';
-  }
-
-  function updateScore() {
-    scoreDisplay.textContent = gameState.score;
-    bestScoreDisplay.textContent = gameState.bestScore;
-  }
-
-  function setupEventListeners() {
-    // Klavye olay dinleyicileri
-    document.addEventListener('keydown', handleKeyPress);
-    
-    // Dokunmatik destek
-    let touchStartX, touchStartY, touchEndX, touchEndY;
-    document.addEventListener('touchstart', function(e) {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }, {passive: true});
-    
-    document.addEventListener('touchend', function(e) {
-      touchEndX = e.changedTouches[0].clientX;
-      touchEndY = e.changedTouches[0].clientY;
-      
-      handleSwipe();
-    }, {passive: true});
-    
-    function handleSwipe() {
-      const dx = touchEndX - touchStartX;
-      const dy = touchEndY - touchStartY;
-      
-      // Yatay veya dikey hareket belirle
-      if (Math.abs(dx) > Math.abs(dy)) {
-        // Yatay hareket
-        if (dx > 20) {
-          // Sağa
-          move('right');
-        } else if (dx < -20) {
-          // Sola
-          move('left');
-        }
-      } else {
-        // Dikey hareket
-        if (dy > 20) {
-          // Aşağı
-          move('down');
-        } else if (dy < -20) {
-          // Yukarı
-          move('up');
-        }
+  // Grid yapısını oluştur
+  function setupGrid() {
+    grid = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      const row = [];
+      for (let x = 0; x < GRID_SIZE; x++) {
+        row.push(null);
       }
-    }
-    
-    // Buton olay dinleyicileri
-    newGameButton.addEventListener('click', initGame);
-    retryButton.addEventListener('click', initGame);
-    keepGoingButton.addEventListener('click', function() {
-      gameMessage.classList.remove('show');
-    });
-  }
-
-  function handleKeyPress(e) {
-    if (gameState.over) return;
-    
-    const key = e.key.toLowerCase();
-    
-    // Tuşa göre hareket yönünü belirle
-    switch (key) {
-      case 'arrowup':
-      case 'w':
-        e.preventDefault();
-        move('up');
-        break;
-      case 'arrowdown':
-      case 's':
-        e.preventDefault();
-        move('down');
-        break;
-      case 'arrowleft':
-      case 'a':
-        e.preventDefault();
-        move('left');
-        break;
-      case 'arrowright':
-      case 'd':
-        e.preventDefault();
-        move('right');
-        break;
+      grid.push(row);
     }
   }
 
-  function move(direction) {
-    if (gameState.over) return;
-    
-    // Hareket öncesi grid'in kopyasını al
-    const previousGrid = JSON.parse(JSON.stringify(gameState.grid));
-    
-    let moved = false;
-    
-    // Yön işleme
-    switch (direction) {
-      case 'up':
-        moved = moveUp();
-        break;
-      case 'down':
-        moved = moveDown();
-        break;
-      case 'left':
-        moved = moveLeft();
-        break;
-      case 'right':
-        moved = moveRight();
-        break;
+  // Grid'i göster
+  function updateGridDisplay() {
+    // Önce tüm mevcut kareleri temizle
+    while (tileContainer.firstChild) {
+      tileContainer.removeChild(tileContainer.firstChild);
     }
-    
-    // Eğer gerçek bir hareket yapıldıysa
-    if (moved) {
-      // Rastgele bir kare ekle
-      addRandomTile();
-      
-      // Görsel güncelleme
-      updateGrid();
-      
-      // Skor güncelleme
-      updateScore();
-      
-      // Oyunun bitip bitmediğini kontrol et
-      checkGameOver();
-    }
-  }
 
-  function moveLeft() {
-    let moved = false;
-    
-    for (let row = 0; row < 4; row++) {
-      // Mevcut satırı al
-      const currentRow = gameState.grid[row].filter(tile => tile !== 0);
-      const resultRow = [];
-      
-      // Birleştirmeleri işle
-      for (let i = 0; i < currentRow.length; i++) {
-        if (currentRow[i] === currentRow[i + 1]) {
-          const merged = currentRow[i] * 2;
-          resultRow.push(merged);
-          gameState.score += merged;
-          if (merged === 2048 && !gameState.won) {
-            gameState.won = true;
-            showWinMessage();
-          }
-          i++; // Birleştirilen kareyi atla
-          moved = true;
-        } else {
-          resultRow.push(currentRow[i]);
-        }
-      }
-      
-      // Sonuç satırını 0'larla doldur
-      while (resultRow.length < 4) {
-        resultRow.push(0);
-      }
-      
-      // Eğer satır değiştiyse
-      if (JSON.stringify(gameState.grid[row]) !== JSON.stringify(resultRow)) {
-        moved = true;
-      }
-      
-      // Grid'i güncelle
-      gameState.grid[row] = resultRow;
-    }
-    
-    return moved;
-  }
-
-  function moveRight() {
-    let moved = false;
-    
-    for (let row = 0; row < 4; row++) {
-      // Mevcut satırı al ve ters çevir
-      const currentRow = gameState.grid[row].filter(tile => tile !== 0).reverse();
-      const resultRow = [];
-      
-      // Birleştirmeleri işle
-      for (let i = 0; i < currentRow.length; i++) {
-        if (currentRow[i] === currentRow[i + 1]) {
-          const merged = currentRow[i] * 2;
-          resultRow.push(merged);
-          gameState.score += merged;
-          if (merged === 2048 && !gameState.won) {
-            gameState.won = true;
-            showWinMessage();
-          }
-          i++; // Birleştirilen kareyi atla
-          moved = true;
-        } else {
-          resultRow.push(currentRow[i]);
-        }
-      }
-      
-      // Sonuç satırını 0'larla doldur
-      while (resultRow.length < 4) {
-        resultRow.push(0);
-      }
-      
-      // Sonucu ters çevir ve grid'i güncelle
-      resultRow.reverse();
-      
-      // Eğer satır değiştiyse
-      if (JSON.stringify(gameState.grid[row]) !== JSON.stringify(resultRow)) {
-        moved = true;
-      }
-      
-      // Grid'i güncelle
-      gameState.grid[row] = resultRow;
-    }
-    
-    return moved;
-  }
-
-  function moveUp() {
-    let moved = false;
-    
-    for (let col = 0; col < 4; col++) {
-      // Mevcut sütunu al
-      const currentCol = [];
-      for (let row = 0; row < 4; row++) {
-        if (gameState.grid[row][col] !== 0) {
-          currentCol.push(gameState.grid[row][col]);
-        }
-      }
-      
-      const resultCol = [];
-      
-      // Birleştirmeleri işle
-      for (let i = 0; i < currentCol.length; i++) {
-        if (currentCol[i] === currentCol[i + 1]) {
-          const merged = currentCol[i] * 2;
-          resultCol.push(merged);
-          gameState.score += merged;
-          if (merged === 2048 && !gameState.won) {
-            gameState.won = true;
-            showWinMessage();
-          }
-          i++; // Birleştirilen kareyi atla
-          moved = true;
-        } else {
-          resultCol.push(currentCol[i]);
-        }
-      }
-      
-      // Sonuç sütununu 0'larla doldur
-      while (resultCol.length < 4) {
-        resultCol.push(0);
-      }
-      
-      // Önceki sütunun değerlerini sakla
-      const previousCol = [];
-      for (let row = 0; row < 4; row++) {
-        previousCol.push(gameState.grid[row][col]);
-      }
-      
-      // Eğer sütun değiştiyse
-      if (JSON.stringify(previousCol) !== JSON.stringify(resultCol)) {
-        moved = true;
-      }
-      
-      // Grid'i güncelle
-      for (let row = 0; row < 4; row++) {
-        gameState.grid[row][col] = resultCol[row];
-      }
-    }
-    
-    return moved;
-  }
-
-  function moveDown() {
-    let moved = false;
-    
-    for (let col = 0; col < 4; col++) {
-      // Mevcut sütunu al
-      const currentCol = [];
-      for (let row = 0; row < 4; row++) {
-        if (gameState.grid[row][col] !== 0) {
-          currentCol.push(gameState.grid[row][col]);
-        }
-      }
-      
-      currentCol.reverse();
-      const resultCol = [];
-      
-      // Birleştirmeleri işle
-      for (let i = 0; i < currentCol.length; i++) {
-        if (currentCol[i] === currentCol[i + 1]) {
-          const merged = currentCol[i] * 2;
-          resultCol.push(merged);
-          gameState.score += merged;
-          if (merged === 2048 && !gameState.won) {
-            gameState.won = true;
-            showWinMessage();
-          }
-          i++; // Birleştirilen kareyi atla
-          moved = true;
-        } else {
-          resultCol.push(currentCol[i]);
-        }
-      }
-      
-      // Sonuç sütununu 0'larla doldur
-      while (resultCol.length < 4) {
-        resultCol.push(0);
-      }
-      
-      // Sonucu ters çevir
-      resultCol.reverse();
-      
-      // Önceki sütunun değerlerini sakla
-      const previousCol = [];
-      for (let row = 0; row < 4; row++) {
-        previousCol.push(gameState.grid[row][col]);
-      }
-      
-      // Eğer sütun değiştiyse
-      if (JSON.stringify(previousCol) !== JSON.stringify(resultCol)) {
-        moved = true;
-      }
-      
-      // Grid'i güncelle
-      for (let row = 0; row < 4; row++) {
-        gameState.grid[row][col] = resultCol[3 - row];
-      }
-    }
-    
-    return moved;
-  }
-
-  function addRandomTile() {
-    // Boş hücreleri bul
-    const emptyCells = [];
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 4; col++) {
-        if (gameState.grid[row][col] === 0) {
-          emptyCells.push({ row, col });
-        }
-      }
-    }
-    
-    if (emptyCells.length === 0) return;
-    
-    // Rastgele bir boş hücre seç
-    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    
-    // %90 ihtimalle 2, %10 ihtimalle 4 değerini ata
-    const value = Math.random() < 0.9 ? 2 : 4;
-    
-    // Grid'i güncelle
-    gameState.grid[randomCell.row][randomCell.col] = value;
-  }
-
-  function updateGrid() {
-    // Mevcut kareleri temizle
-    gridTiles.innerHTML = '';
-    
-    // Her hücre için
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 4; col++) {
-        const value = gameState.grid[row][col];
-        
-        if (value !== 0) {
-          // Kare için HTML oluştur
+    // Her bir kareyi ekrana çiz
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const value = grid[y][x];
+        if (value) {
           const tile = document.createElement('div');
-          tile.classList.add('tile', `tile-${value}`);
-          tile.textContent = value;
-          
-          // Pozisyonu ayarla
-          const position = getPosition(row, col);
-          tile.style.top = `${position.top}px`;
-          tile.style.left = `${position.left}px`;
-          
-          // Yeni eklenen kareye animasyon ekle
-          if (isNewTile(row, col)) {
-            tile.classList.add('tile-new');
-          }
-          
-          // DOM'a ekle
-          gridTiles.appendChild(tile);
+          tile.className = `tile tile-${value.value} ${value.merged ? 'tile-merged' : value.isNew ? 'tile-new' : ''}`;
+          tile.textContent = value.value;
+
+          // Döşeme pozisyonunu hesapla
+          const cellSize = (100 - TILE_MARGIN * 2) / GRID_SIZE;
+          const position = {
+            x: x * (cellSize + TILE_MARGIN / GRID_SIZE) + TILE_MARGIN,
+            y: y * (cellSize + TILE_MARGIN / GRID_SIZE) + TILE_MARGIN
+          };
+
+          // Döşemeyi doğru konuma yerleştir
+          tile.style.left = position.x + '%';
+          tile.style.top = position.y + '%';
+
+          tileContainer.appendChild(tile);
         }
       }
     }
-    
-    // En yüksek skoru güncelle
-    if (gameState.score > gameState.bestScore) {
-      gameState.bestScore = gameState.score;
-      localStorage.setItem('2048-best-score', gameState.bestScore);
-    }
   }
 
-  function getPosition(row, col) {
-    const cellSize = 107.5; // Kare boyutu + kenar boşluğu
-    const gridPadding = 15; // Grid kenar dolgusu
-    
-    return {
-      top: gridPadding + row * cellSize,
-      left: gridPadding + col * cellSize
+  // Rastgele bir "2" veya "4" karesi ekle
+  function addRandomTile() {
+    const emptyCells = [];
+
+    // Boş hücreleri bul
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (!grid[y][x]) {
+          emptyCells.push({ x, y });
+        }
+      }
+    }
+
+    // Boş hücre yoksa geri dön
+    if (emptyCells.length === 0) return;
+
+    // Rastgele bir boş hücre seç
+    const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+    // Hücreye %90 ihtimalle "2", %10 ihtimalle "4" yerleştir
+    grid[cell.y][cell.x] = {
+      value: Math.random() < 0.9 ? 2 : 4,
+      isNew: true,
+      merged: false
     };
   }
 
-  function isNewTile(row, col) {
-    // Önceki durumda bu hücrede değer yoksa yeni eklenmiştir
-    return true; // Basitleştirme için her zaman true dönüyoruz
+  // Klavye olaylarını yönet
+  function handleKeyPress(event) {
+    if (gameOver && !keepPlaying) return;
+
+    // Hareket yönünü belirle
+    let direction;
+    switch(event.key) {
+      case 'ArrowUp':
+      case 'w':
+      case 'W':
+        direction = DIRECTIONS.UP;
+        break;
+      case 'ArrowRight':
+      case 'd':
+      case 'D':
+        direction = DIRECTIONS.RIGHT;
+        break;
+      case 'ArrowDown':
+      case 's':
+      case 'S':
+        direction = DIRECTIONS.DOWN;
+        break;
+      case 'ArrowLeft':
+      case 'a':
+      case 'A':
+        direction = DIRECTIONS.LEFT;
+        break;
+      default:
+        return; // Diğer tuşlar için hiçbir şey yapma
+    }
+
+    // Yönlü hareket et
+    event.preventDefault();
+    if (moveGrid(direction)) {
+      // Başarılı bir hareket sonrası yeni bir kare ekle
+      setTimeout(() => {
+        // Karoları yeni ve birleştirilmiş durumdan çıkar
+        for (let y = 0; y < GRID_SIZE; y++) {
+          for (let x = 0; x < GRID_SIZE; x++) {
+            if (grid[y][x]) {
+              grid[y][x].isNew = false;
+              grid[y][x].merged = false;
+            }
+          }
+        }
+
+        addRandomTile();
+        updateGridDisplay();
+
+        if (!canMove()) {
+          gameOver = true;
+          showGameOverMessage();
+        }
+      }, 150);
+    }
   }
 
-  function checkGameOver() {
-    // En yüksek skoru güncelle
-    if (gameState.score > gameState.bestScore) {
-      gameState.bestScore = gameState.score;
-      localStorage.setItem('2048-best-score', gameState.bestScore);
+  // Tahtayı belirli bir yönde hareket ettir
+  function moveGrid(direction) {
+    let moved = false;
+
+    // İlerleme yönünü ayarla
+    const traversals = getTraversalOrder(direction);
+
+    // Her hücreyi tarayarak hareket ettir
+    traversals.y.forEach(y => {
+      traversals.x.forEach(x => {
+        const cell = { x, y };
+        const tile = grid[y][x];
+
+        if (tile) {
+          const positions = findFarthestPosition(cell, direction);
+          const next = grid[positions.next.y][positions.next.x];
+
+          // Birleştirme mantığı
+          if (next && next.value === tile.value && !next.merged) {
+            // İki karo birleşecek
+            const mergedValue = tile.value * 2;
+            grid[positions.next.y][positions.next.x] = {
+              value: mergedValue,
+              merged: true,
+              isNew: false
+            };
+            grid[y][x] = null;
+
+            // Skoru güncelle
+            score += mergedValue;
+            updateScore();
+
+            // 2048'e ulaşıldı mı kontrol et
+            if (mergedValue === 2048 && !gameWon && !keepPlaying) {
+              gameWon = true;
+              showGameWonMessage();
+            }
+
+            moved = true;
+          } else {
+            // Sadece hareket, birleştirme yok
+            grid[positions.farthest.y][positions.farthest.x] = tile;
+            if (x !== positions.farthest.x || y !== positions.farthest.y) {
+              grid[y][x] = null;
+              moved = true;
+            }
+          }
+        }
+      });
+    });
+
+    if (moved) {
+      updateGridDisplay();
     }
-    
-    // Boş hücre varsa oyun devam eder
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 4; col++) {
-        if (gameState.grid[row][col] === 0) {
-          return;
+
+    return moved;
+  }
+
+  // Yön kontrolü için tarama sırasını belirle
+  function getTraversalOrder(direction) {
+    const traversals = {
+      x: [],
+      y: []
+    };
+
+    // X ve Y eksenleri için 0-3 arasında diziler oluştur
+    for (let i = 0; i < GRID_SIZE; i++) {
+      traversals.x.push(i);
+      traversals.y.push(i);
+    }
+
+    // Sağdan veya aşağıdan hareket ediyorsak dizileri ters çevir
+    if (direction.x === 1) traversals.x = traversals.x.reverse();
+    if (direction.y === 1) traversals.y = traversals.y.reverse();
+
+    return traversals;
+  }
+
+  // Verilen hücre için gidilebilecek en uzak pozisyonu bul
+  function findFarthestPosition(cell, direction) {
+    let previous;
+    let current = { x: cell.x, y: cell.y };
+
+    // Yönde ilerleyebildiğin kadar ilerle
+    do {
+      previous = { x: current.x, y: current.y };
+      current = {
+        x: previous.x + direction.x,
+        y: previous.y + direction.y
+      };
+    } while (isWithinBounds(current) && !grid[current.y][current.x]);
+
+    // En uzak noktayı ve sonrasındaki hücreyi döndür
+    return {
+      farthest: previous,
+      next: isWithinBounds(current) ? current : null
+    };
+  }
+
+  // Verilen pozisyonun grid sınırları içinde olup olmadığını kontrol et
+  function isWithinBounds(position) {
+    return position.x >= 0 && position.x < GRID_SIZE && 
+           position.y >= 0 && position.y < GRID_SIZE;
+  }
+
+  // Hala hareket edebilir miyiz?
+  function canMove() {
+    // Boş hücre var mı?
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (!grid[y][x]) return true;
+      }
+    }
+
+    // Birleştirilebilecek komşu hücreler var mı?
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const tile = grid[y][x];
+
+        // Her yöne komşuları kontrol et
+        for (const direction of Object.values(DIRECTIONS)) {
+          const neighbor = {
+            x: x + direction.x,
+            y: y + direction.y
+          };
+
+          // Komşu geçerli mi?
+          if (isWithinBounds(neighbor)) {
+            const neighborTile = grid[neighbor.y][neighbor.x];
+            // Komşu karo aynı değere sahip mi?
+            if (neighborTile && neighborTile.value === tile.value) {
+              return true;
+            }
+          }
         }
       }
     }
-    
-    // Komşu hücrelerde aynı değer var mı kontrol et
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 4; col++) {
-        const value = gameState.grid[row][col];
-        
-        // Sağdaki hücre
-        if (col < 3 && gameState.grid[row][col + 1] === value) {
-          return; // Birleştirilebilir komşu var, oyun devam ediyor
-        }
-        
-        // Aşağıdaki hücre
-        if (row < 3 && gameState.grid[row + 1][col] === value) {
-          return; // Birleştirilebilir komşu var, oyun devam ediyor
-        }
-      }
+
+    // Ne boş hücre ne de birleştirilebilir komşu var
+    return false;
+  }
+
+  // Skor göstergesini güncelle
+  function updateScore() {
+    scoreDisplay.textContent = score;
+
+    // En iyi skoru güncelle
+    if (score > bestScore) {
+      bestScore = score;
+      bestScoreDisplay.textContent = bestScore;
+      localStorage.setItem('2048-best-score', bestScore);
     }
-    
-    // Hiçbir hamle kalmadı, oyun bitti
-    gameState.over = true;
-    showGameOverMessage();
+
+    // Skor animasyonu ekle
+    const addition = document.createElement('div');
+    addition.className = 'score-addition';
+    addition.textContent = '+' + (score - parseInt(scoreDisplay.textContent) + score);
+    scoreDisplay.appendChild(addition);
+
+    // Animasyon bitiminde temizle
+    setTimeout(() => {
+      addition.remove();
+    }, 600);
   }
 
-  function showWinMessage() {
-    messageContent.textContent = 'Tebrikler! 2048\'e ulaştınız!';
-    gameMessage.classList.add('show');
-    keepGoingButton.style.display = 'inline-block';
-    
-    // Durum mesajını güncelle
-    gameStatus.textContent = '2048\'e ulaştınız! Devam ederek daha yüksek skorlar elde edebilirsiniz.';
+  // Oyunu yeniden başlat
+  function restartGame() {
+    // Tüm oyun değişkenlerini sıfırla
+    grid = [];
+    score = 0;
+    gameWon = false;
+    gameOver = false;
+    keepPlaying = false;
+
+    // UI'ı güncelle
+    scoreDisplay.textContent = '0';
+    messageContainer.style.display = 'none';
+
+    // Yeni oyun başlat
+    initGame();
   }
 
+  // "Oynamaya Devam Et" seçeneği
+  function continueGame() {
+    keepPlaying = true;
+    messageContainer.style.display = 'none';
+  }
+
+  // Oyun kazanıldı mesajını göster
+  function showGameWonMessage() {
+    messageContent.textContent = 'Tebrikler! 2048\'e ulaştın!';
+    messageContainer.className = 'game-message game-won';
+    keepPlayingButton.style.display = 'inline-block';
+    messageContainer.style.display = 'flex';
+  }
+
+  // Oyun bitti mesajını göster
   function showGameOverMessage() {
-    messageContent.textContent = 'Oyun Bitti! Daha fazla hamle kalmadı.';
-    gameMessage.classList.add('show');
-    keepGoingButton.style.display = 'none';
-    
-    // Durum mesajını güncelle
-    gameStatus.textContent = 'Oyun bitti! Toplam skorunuz: ' + gameState.score;
-    
-    // Skoru sunucuya gönder
+    messageContent.textContent = 'Oyun Bitti!';
+    messageContainer.className = 'game-message game-over';
+    keepPlayingButton.style.display = 'none';
+    messageContainer.style.display = 'flex';
+
+    // Sunucuya skoru kaydet
     saveScore();
   }
 
+  // Dokunmatik cihazlar için kaydırma desteği
+  function setupTouchEvents() {
+    let touchStartX, touchStartY;
+    let touchEndX, touchEndY;
+
+    document.addEventListener('touchstart', function(event) {
+      if (event.touches.length > 1) return; // Çoklu dokunuşları görmezden gel
+
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+      event.preventDefault();
+    }, false);
+
+    document.addEventListener('touchend', function(event) {
+      if (!touchStartX || !touchStartY) return;
+
+      touchEndX = event.changedTouches[0].clientX;
+      touchEndY = event.changedTouches[0].clientY;
+
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+
+      // Yatay ve dikey kaydırma mesafelerini karşılaştır
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Yatay kaydırma
+        if (dx > 0) {
+          // Sağa kaydırma
+          handleKeyPress({ key: 'ArrowRight', preventDefault: () => {} });
+        } else {
+          // Sola kaydırma
+          handleKeyPress({ key: 'ArrowLeft', preventDefault: () => {} });
+        }
+      } else {
+        // Dikey kaydırma
+        if (dy > 0) {
+          // Aşağı kaydırma
+          handleKeyPress({ key: 'ArrowDown', preventDefault: () => {} });
+        } else {
+          // Yukarı kaydırma
+          handleKeyPress({ key: 'ArrowUp', preventDefault: () => {} });
+        }
+      }
+
+      // Değerleri sıfırla
+      touchStartX = null;
+      touchStartY = null;
+      event.preventDefault();
+    }, false);
+  }
+
+  // Skoru sunucuya kaydeden fonksiyon
   function saveScore() {
-    fetch('/api/save-score', {
+    // API endpoint ve veriler
+    const url = '/api/save_score';
+    const data = {
+      game_id: '2048',
+      score: score,
+      difficulty: 'standard'
+    };
+
+    // Fetch API ile POST isteği
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        game_type: '2048',
-        score: gameState.score
-      })
+      body: JSON.stringify(data)
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Skor kaydedildi:', data);
+      console.log('Score saved:', data);
+
+      // Seviye atlama veya yüksek skor durumunda bildirim göster
+      if (data.is_level_up || data.is_high_score) {
+        const achievementMessage = document.createElement('div');
+        achievementMessage.className = 'achievement-message';
+        achievementMessage.innerHTML = `
+          <div class="achievement-content">
+            <i class="fas ${data.is_level_up ? 'fa-level-up-alt' : 'fa-trophy'}"></i>
+            <p>${data.is_level_up ? 'Seviye Atladın!' : 'Yeni Yüksek Skor!'}</p>
+            <span>${data.is_level_up ? `Yeni Seviye: ${data.level}` : `Skor: ${score}`}</span>
+          </div>
+        `;
+
+        document.body.appendChild(achievementMessage);
+
+        // 3 saniye sonra bildirim kaybolsun
+        setTimeout(() => {
+          achievementMessage.style.opacity = '0';
+          setTimeout(() => {
+            achievementMessage.remove();
+          }, 500);
+        }, 3000);
+      }
     })
     .catch(error => {
-      console.error('Skor kaydetme hatası:', error);
+      console.error('Error saving score:', error);
     });
   }
-
-  // Oyunu başlat
-  initGame();
 });
