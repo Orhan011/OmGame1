@@ -61,13 +61,17 @@
 
 .leaderboard-table th {
   padding: 15px 20px;
-  text-align: left;
+  text-align: center;
   color: #a6a6c0;
   font-weight: 600;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table thead {
+  display: none; /* Başlıkları gizle - tek satırda tüm bilgiler gösteriliyor */
 }
 
 .leaderboard-table tr.player-row {
@@ -83,6 +87,25 @@
 
 .leaderboard-table tr.player-row:hover td {
   background-color: rgba(106, 90, 224, 0.1);
+}
+
+/* Tek satır skor görünümü */
+.full-row-cell {
+  width: 100%;
+}
+
+.row-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.rank-block {
+  min-width: 40px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.3rem;
 }
 
 .rank-cell {
@@ -141,6 +164,7 @@
 .player-avatar {
   width: 50px;
   height: 50px;
+  min-width: 50px;
   border-radius: 50%;
   background: linear-gradient(45deg, #6a5ae0, #9f8aff);
   display: flex;
@@ -171,17 +195,17 @@
   transform: rotate(45deg) translateX(100%);
 }
 
-.rank-1 .player-avatar {
+.rank-1 .player-avatar, .row-content:has(.rank-1) .player-avatar {
   border: 3px solid gold;
   box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
 }
 
-.rank-2 .player-avatar {
+.rank-2 .player-avatar, .row-content:has(.rank-2) .player-avatar {
   border: 3px solid silver;
   box-shadow: 0 5px 15px rgba(192, 192, 192, 0.4);
 }
 
-.rank-3 .player-avatar {
+.rank-3 .player-avatar, .row-content:has(.rank-3) .player-avatar {
   border: 3px solid #CD7F32;
   box-shadow: 0 5px 15px rgba(205, 127, 50, 0.4);
 }
@@ -213,14 +237,15 @@
   font-size: 0.75rem;
 }
 
-.score-cell {
+.score-cell, .score-block {
   font-weight: 700;
   font-size: 1.2rem;
   text-align: right;
   color: #fff;
+  margin-left: auto;
 }
 
-.score-cell span {
+.score-cell span, .score-block span {
   display: inline-block;
   background: linear-gradient(135deg, #ff9c64, #6a5ae0);
   -webkit-background-clip: text;
@@ -233,7 +258,7 @@
   text-align: center;
 }
 
-.rank-1 .score-cell span {
+.rank-1 .score-cell span, .row-content:has(.rank-1) .score-block span {
   background: linear-gradient(135deg, #FFD700, #FFA500);
   -webkit-background-clip: text;
   background-clip: text;
@@ -241,7 +266,7 @@
   border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.rank-2 .score-cell span {
+.rank-2 .score-cell span, .row-content:has(.rank-2) .score-block span {
   background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
   -webkit-background-clip: text;
   background-clip: text;
@@ -249,7 +274,7 @@
   border: 1px solid rgba(192, 192, 192, 0.3);
 }
 
-.rank-3 .score-cell span {
+.rank-3 .score-cell span, .row-content:has(.rank-3) .score-block span {
   background: linear-gradient(135deg, #CD7F32, #B87333);
   -webkit-background-clip: text;
   background-clip: text;

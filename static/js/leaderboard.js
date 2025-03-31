@@ -119,16 +119,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const table = document.createElement('table');
     table.className = 'leaderboard-table';
     
-    // Tablo başlığı
+    // Tablo başlığı - tek satır görünümü için başlık gerekmeyebilir
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sıra', 'Oyuncu', 'Puan'];
-    headers.forEach(header => {
-      const th = document.createElement('th');
-      th.textContent = header;
-      headerRow.appendChild(th);
-    });
+    // Tek başlık kullanıyoruz
+    const th = document.createElement('th');
+    th.textContent = 'Skor Tablosu';
+    th.colSpan = 3;
+    headerRow.appendChild(th);
     
     thead.appendChild(headerRow);
     table.appendChild(thead);
@@ -141,25 +140,28 @@ document.addEventListener('DOMContentLoaded', function() {
       row.className = 'player-row';
       row.dataset.rank = index + 1;
       
-      // Sıra hücresi
-      const rankCell = document.createElement('td');
-      rankCell.className = 'rank-cell';
-      if (index < 3) {
-        rankCell.classList.add(`rank-${index + 1}`);
-      }
-      rankCell.innerHTML = `<div class="rank-number">${index + 1}</div>`;
-      row.appendChild(rankCell);
+      // Tek satırda sıralama, profil resmi, kullanıcı adı ve puanı gösteren tek hücre
+      const fullRow = document.createElement('td');
+      fullRow.className = 'full-row-cell';
       
-      // Oyuncu hücresi
-      const playerCell = document.createElement('td');
-      playerCell.className = 'player-cell';
+      // İçerik konteyneri
+      const rowContent = document.createElement('div');
+      rowContent.className = 'row-content';
+      
+      // Sıralama bloğu
+      const rankBlock = document.createElement('div');
+      rankBlock.className = 'rank-block';
+      if (index < 3) {
+        rankBlock.classList.add(`rank-${index + 1}`);
+      }
+      rankBlock.innerHTML = `<div class="rank-number">${index + 1}</div>`;
       
       // Profil avatarı
       const playerAvatar = document.createElement('div');
       playerAvatar.className = 'player-avatar';
       playerAvatar.textContent = score.username.charAt(0).toUpperCase();
-      playerCell.appendChild(playerAvatar);
       
+      // Kullanıcı bilgisi bloğu
       const playerInfo = document.createElement('div');
       playerInfo.className = 'player-info';
       
@@ -167,20 +169,21 @@ document.addEventListener('DOMContentLoaded', function() {
       playerName.className = 'player-name';
       playerName.textContent = score.username;
       
-      const playerRank = document.createElement('div');
-      playerRank.className = 'player-rank';
-      playerRank.innerHTML = `<span>${score.rank || 'Yeni Oyuncu'}</span>`;
-      
       playerInfo.appendChild(playerName);
-      playerInfo.appendChild(playerRank);
-      playerCell.appendChild(playerInfo);
-      row.appendChild(playerCell);
       
-      // Puan hücresi
-      const scoreCell = document.createElement('td');
-      scoreCell.className = 'score-cell';
-      scoreCell.innerHTML = `<span>${score.score}</span>`;
-      row.appendChild(scoreCell);
+      // Puan bloğu
+      const scoreBlock = document.createElement('div');
+      scoreBlock.className = 'score-block';
+      scoreBlock.innerHTML = `<span>${score.score}</span>`;
+      
+      // Hepsini sırayla ekle
+      rowContent.appendChild(rankBlock);
+      rowContent.appendChild(playerAvatar);
+      rowContent.appendChild(playerInfo);
+      rowContent.appendChild(scoreBlock);
+      
+      fullRow.appendChild(rowContent);
+      row.appendChild(fullRow);
       
       tbody.appendChild(row);
     });
