@@ -21,7 +21,7 @@ function loadLeaderboard() {
     .then(response => response.json())
     .then(data => {
       console.log("Toplam skorlar:", data);
-      displayLeaderboard(calculateTotalScores(data)); // Calculate total scores before displaying
+      displayLeaderboard(data);
     })
     .catch(error => {
       console.error('Skorlar yüklenirken hata oluştu:', error);
@@ -63,7 +63,7 @@ function displayLeaderboard(scores) {
   scores.slice(0, 25).forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
     const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
-
+    
     // Sıralamaya göre kullanıcı adı renk sınıfı belirleme
     let userNameColorClass = '';
     if (index === 0) {
@@ -75,7 +75,7 @@ function displayLeaderboard(scores) {
     } else if (index < 10) {
       userNameColorClass = 'top-ten'; // Top 10
     }
-
+    
     // Avatar URL kontrolü ve taç eklemesi
     const avatarUrl = player.avatar_url ? player.avatar_url : null;
     const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
@@ -100,7 +100,10 @@ function displayLeaderboard(scores) {
           </div>
         </div>
         <div class="score-cell">
-          <div class="score-value">${player.total_score || 0}</div> </div>
+          <div class="score-container">
+            <span class="score-value">${player.total_score || 0}</span>
+          </div>
+        </div>
       </div>
     `;
   });
