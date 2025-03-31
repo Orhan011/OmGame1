@@ -101,7 +101,7 @@
 
     <!-- Notifications Tab -->
     <div class="tab-content" id="notifications-tab">
-      <form class="settings-form" action="{{ url_for('update_notifications') }}" method="post">
+      <form class="settings-form" action="{{ url_for('update_notification_settings') }}" method="post">
         <div class="notification-option">
           <label class="switch">
             <input type="checkbox" name="email_notifications" 
@@ -154,6 +154,20 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
     });
   });
+
+  // Calculate XP progress for the progress bar
+  const currentXP = {{ get_current_user().experience_points }};
+  const xpForCurrent = {{ xp_for_current }};
+  const xpForNext = {{ xp_for_next }};
+  
+  // Calculate percentage progress to next level
+  const xpProgress = Math.min(100, Math.floor(((currentXP - xpForCurrent) / (xpForNext - xpForCurrent)) * 100));
+  
+  // Update XP progress bar
+  const xpProgressBar = document.querySelector('.xp-progress');
+  if (xpProgressBar) {
+    xpProgressBar.style.width = xpProgress + '%';
+  }
 
   // Level up animation
   function showLevelUp(level) {
