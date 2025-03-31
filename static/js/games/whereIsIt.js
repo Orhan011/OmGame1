@@ -275,33 +275,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const region = event.target;
     const regionId = region.id || region.getAttribute('id');
 
-    // Animasyon için seçilen bölgeyi işaretle
-    const allRegions = document.querySelectorAll('#map-container svg path');
-    allRegions.forEach(r => {
-      r.style.filter = '';
-      r.style.fillOpacity = '0.8';
-    });
-
-    region.style.filter = 'brightness(1.3)';
-    region.style.fillOpacity = '1';
-
-    // Cevap kontrolü
-    checkAnswer(regionId);
-  }
-
-  // Cevap kontrolü
-  function checkAnswer(selectedRegionId) {
     // Zamanlayıcıyı durdur
     clearInterval(gameState.interval);
     gameState.isAnswerPhase = false;
 
-    const isCorrect = selectedRegionId === gameState.correctRegion;
+    const isCorrect = regionId === gameState.correctRegion;
     let pointsEarned = 0;
 
     // Doğru cevap animasyonu ve puanlama
     if (isCorrect) {
       // Doğru bölgeyi yeşil yap
-      highlightRegion(selectedRegionId, '#4CAF50');
+      highlightRegion(regionId, '#4CAF50', true);
 
       // Puanlama: Kalan süre + temel puan (ipucu kullanılmadıysa bonus)
       pointsEarned = (gameState.timer * 5) + 100;
@@ -317,8 +301,13 @@ document.addEventListener('DOMContentLoaded', function() {
       showMessage(`Doğru! +${pointsEarned} puan kazandınız.`, 'success');
     } else {
       // Yanlış bölgeyi kırmızı, doğru bölgeyi yeşil yap
-      highlightRegion(selectedRegionId, '#FF5252');
-      highlightRegion(gameState.correctRegion, '#4CAF50');
+      const marker = highlightRegion(regionId, '#FF5252', false);
+      highlightRegion(gameState.correctRegion, '#4CAF50', true);
+
+      // Yanlış cevap verildiğinde 1 saniye sonra kırmızı işaretleyiciyi kaldır
+      setTimeout(() => {
+        if (marker) marker.remove();
+      }, 1000);
 
       // Ses efekti
       playSound('wrong');
@@ -337,40 +326,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
   }
 
-  // Bölgeyi vurgula
-  function highlightRegion(regionId, color) {
+  // Bölgeyi vurgula (addMarkerToMap fonksiyonunun yerine geçiyor)
+  function highlightRegion(regionId, color, isCorrect) {
     const region = document.getElementById(regionId);
     if (region) {
       region.style.fill = color;
       region.style.fillOpacity = '0.9';
 
-      // Vurgulama animasyonu
-      const pulseEffect = document.createElement('div');
-      pulseEffect.className = 'pulse-effect';
-      pulseEffect.style.position = 'absolute';
-
+      // Vurgulama animasyonu ve işaretleyici
+      const marker = document.createElement('div');
+      marker.className = `target-marker ${isCorrect ? 'correct' : 'wrong'}`;
       const bbox = region.getBBox();
       const svgElement = region.ownerSVGElement;
+      let x = 0, y = 0;
+
 
       if (svgElement) {
         const pt = svgElement.createSVGPoint();
         pt.x = bbox.x + bbox.width / 2;
         pt.y = bbox.y + bbox.height / 2;
-
         const screenPt = pt.matrixTransform(svgElement.getScreenCTM());
-
-        pulseEffect.style.left = `${screenPt.x - 15}px`;
-        pulseEffect.style.top = `${screenPt.y - 15}px`;
-        pulseEffect.style.backgroundColor = color;
-
-        document.body.appendChild(pulseEffect);
-
-        setTimeout(() => {
-          pulseEffect.remove();
-        }, 1500);
+        x = screenPt.x;
+        y = screenPt.y;
       }
+
+      marker.style.left = `${x -15}px`;
+      marker.style.top = `${y - 15}px`;
+
+
+      const pulse = document.createElement('div');
+      pulse.className = 'marker-pulse';
+      marker.appendChild(pulse);
+
+      const icon = document.createElement('i');
+      icon.className = isCorrect ? 'fas fa-check' : 'fas fa-times';
+      marker.appendChild(icon);
+
+      document.body.appendChild(marker);
+      return marker;
     }
+    return null;
   }
+
 
   // Süre güncelleme
   function updateTimer() {
@@ -393,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.isAnswerPhase = false;
 
       // Doğru cevabı göster
-      highlightRegion(gameState.correctRegion, '#4CAF50');
+      highlightRegion(gameState.correctRegion, '#4CAF50', true);
 
       // Ses efekti
       playSound('timeout');
