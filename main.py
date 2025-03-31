@@ -1377,6 +1377,15 @@ def save_score():
 
     return jsonify(response_data)
 
+@app.route('/api/get-current-user')
+def get_current_user_api():
+    """Mevcut kullanıcı kimliğini döndür (API)"""
+    user_id = session.get('user_id')
+    return jsonify({
+        'success': True if user_id else False,
+        'user_id': user_id
+    })
+
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
     from sqlalchemy import func
@@ -1422,6 +1431,7 @@ def get_scores(game_type):
                     score_list = []
                     for score, user in scores:
                         score_list.append({
+                            'user_id': score.user_id,
                             'username': user.username if user else 'Anonim',
                             'score': score.score,
                             'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
@@ -1485,9 +1495,11 @@ def get_scores(game_type):
             score_list = []
             for score, user in scores:
                 score_list.append({
+                    'user_id': score.user_id,
                     'username': user.username if user else 'Anonim',
                     'score': score.score,
                     'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                    'game_type': internal_game_type,
                     'rank': user.rank if user else 'Başlangıç'
                 })
 

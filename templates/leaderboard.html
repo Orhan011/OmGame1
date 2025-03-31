@@ -8,57 +8,152 @@
     <p>Beyin geliştirme oyunlarımızda en yüksek skorlar burada gösteriliyor. Oyuncuların performansını karşılaştırın ve kendi yerinizi görün.</p>
   </div>
 
-  <div class="game-filter">
-    <button class="game-filter-btn active" data-game="word-puzzle">
-      <i class="fas fa-font"></i>
-      <span>Kelime Bulmaca</span>
+  <!-- Oyun Kategorileri -->
+  <div class="game-categories">
+    <button class="category-btn active" data-category="all">
+      <i class="fas fa-trophy"></i>
+      <span>Tüm Oyunlar</span>
     </button>
-    <button class="game-filter-btn" data-game="memory-match">
+    <button class="category-btn" data-category="basic">
+      <i class="fas fa-graduation-cap"></i>
+      <span>Temel Oyunlar</span>
+    </button>
+    <button class="category-btn" data-category="memory">
       <i class="fas fa-brain"></i>
-      <span>Hafıza Kartları</span>
+      <span>Hafıza Oyunları</span>
     </button>
-    <button class="game-filter-btn" data-game="labyrinth">
-      <i class="fas fa-route"></i>
-      <span>Labirent</span>
-    </button>
-    <button class="game-filter-btn" data-game="puzzle">
+    <button class="category-btn" data-category="puzzle">
       <i class="fas fa-puzzle-piece"></i>
-      <span>Yapboz</span>
+      <span>Bulmaca Oyunları</span>
     </button>
-    <button class="game-filter-btn" data-game="number-sequence">
-      <i class="fas fa-sort-numeric-up"></i>
-      <span>Sayı Dizisi</span>
-    </button>
-    
-    <!-- Hafıza Güçlendirme Oyunları -->
-    <button class="game-filter-btn" data-game="memory-cards">
-      <i class="fas fa-clone"></i>
-      <span>Kart Eşleştirme</span>
-    </button>
-    <button class="game-filter-btn" data-game="number-chain">
-      <i class="fas fa-link"></i>
-      <span>Sayı Zinciri</span>
-    </button>
-    <button class="game-filter-btn" data-game="audio-memory">
-      <i class="fas fa-music"></i>
-      <span>Sesli Hafıza</span>
-    </button>
-    <button class="game-filter-btn" data-game="n-back">
-      <i class="fas fa-braille"></i>
-      <span>N-Back Testi</span>
-    </button>
-    <button class="game-filter-btn" data-game="sudoku">
-      <i class="fas fa-th"></i>
-      <span>Sudoku</span>
+    <button class="category-btn" data-category="iq">
+      <i class="fas fa-lightbulb"></i>
+      <span>IQ Geliştirme</span>
     </button>
   </div>
 
+  <!-- Oyun Filtreleri -->
+  <div class="game-filters-container">
+    <!-- Temel Oyunlar Filtreleri -->
+    <div class="game-filter" data-filter-category="basic">
+      <button class="game-filter-btn active" data-game="word-puzzle">
+        <i class="fas fa-font"></i>
+        <span>Kelime Bulmaca</span>
+      </button>
+      <button class="game-filter-btn" data-game="memory-match">
+        <i class="fas fa-brain"></i>
+        <span>Hafıza Kartları</span>
+      </button>
+      <button class="game-filter-btn" data-game="labyrinth">
+        <i class="fas fa-route"></i>
+        <span>Labirent</span>
+      </button>
+      <button class="game-filter-btn" data-game="puzzle">
+        <i class="fas fa-puzzle-piece"></i>
+        <span>Yapboz</span>
+      </button>
+      <button class="game-filter-btn" data-game="number-sequence">
+        <i class="fas fa-sort-numeric-up"></i>
+        <span>Sayı Dizisi</span>
+      </button>
+    </div>
+    
+    <!-- Hafıza Güçlendirme Oyunları Filtreleri -->
+    <div class="game-filter" data-filter-category="memory" style="display: none;">
+      <button class="game-filter-btn" data-game="memory-cards">
+        <i class="fas fa-clone"></i>
+        <span>Kart Eşleştirme</span>
+      </button>
+      <button class="game-filter-btn" data-game="number-chain">
+        <i class="fas fa-link"></i>
+        <span>Sayı Zinciri</span>
+      </button>
+      <button class="game-filter-btn" data-game="audio-memory">
+        <i class="fas fa-music"></i>
+        <span>Sesli Hafıza</span>
+      </button>
+      <button class="game-filter-btn" data-game="n-back">
+        <i class="fas fa-braille"></i>
+        <span>N-Back Testi</span>
+      </button>
+    </div>
+
+    <!-- IQ Geliştirme Oyunları Filtreleri -->
+    <div class="game-filter" data-filter-category="iq" style="display: none;">
+      <button class="game-filter-btn" data-game="sudoku">
+        <i class="fas fa-th"></i>
+        <span>Sudoku</span>
+      </button>
+      <button class="game-filter-btn" data-game="2048">
+        <i class="fas fa-cubes"></i>
+        <span>2048</span>
+      </button>
+      <button class="game-filter-btn" data-game="chess">
+        <i class="fas fa-chess"></i>
+        <span>Satranç</span>
+      </button>
+      <button class="game-filter-btn" data-game="logic-puzzles">
+        <i class="fas fa-project-diagram"></i>
+        <span>Mantık Bulmacaları</span>
+      </button>
+      <button class="game-filter-btn" data-game="tangram">
+        <i class="fas fa-shapes"></i>
+        <span>Tangram</span>
+      </button>
+    </div>
+
+    <!-- Bulmaca Oyunları Filtreleri -->
+    <div class="game-filter" data-filter-category="puzzle" style="display: none;">
+      <button class="game-filter-btn" data-game="3d-rotation">
+        <i class="fas fa-cube"></i>
+        <span>3D Döndürme</span>
+      </button>
+      <button class="game-filter-btn" data-game="rubik-cube">
+        <i class="fas fa-dice"></i>
+        <span>Rubik Küpü</span>
+      </button>
+    </div>
+
+    <!-- Tüm Oyunlar Filtresi -->
+    <div class="game-filter" data-filter-category="all">
+      <!-- Bu tüm filtrelerin birleşimi olacak, ancak JavaScript tarafında yönetilecek -->
+    </div>
+  </div>
+
+  <!-- Skor Tablosu Kartı -->
   <div class="leaderboard-card">
     <div class="card-header">
       <h3>Skor Sıralaması</h3>
-      <button class="refresh-btn" onclick="loadAllScores()">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+      <div class="card-header-actions">
+        <div class="game-icon-container">
+          <div class="game-icon">
+            <i class="fas fa-font"></i>
+          </div>
+          <span class="game-name">Kelime Bulmaca</span>
+        </div>
+        <button class="refresh-btn" onclick="loadAllScores()">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="leaderboard-stats">
+      <div class="stat-box">
+        <div class="stat-value" id="total-games">-</div>
+        <div class="stat-label">Toplam Oyun</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="highest-score">-</div>
+        <div class="stat-label">En Yüksek Skor</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="total-players">-</div>
+        <div class="stat-label">Oyuncu Sayısı</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="your-rank">-</div>
+        <div class="stat-label">Senin Sıran</div>
+      </div>
     </div>
     
     <div class="leaderboard-table">

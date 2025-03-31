@@ -1,41 +1,221 @@
-
 // Tüm skorları saklamak için global değişken
 let allGameScores = {};
+let leaderboardStats = {};
+let currentUserId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
   // İlk yüklemede tüm oyunların skorlarını al
   loadAllScores();
   
+  // Mevcut kullanıcı kimliğini al (oturumdan)
+  getCurrentUserId();
+  
   // Aktif oyun türünü URL'den al veya varsayılan olarak "word-puzzle" kullan
   const urlParams = new URLSearchParams(window.location.search);
   let activeGameType = urlParams.get('game') || 'word-puzzle';
-
-  // Tab switching
-  const tabs = document.querySelectorAll('.game-filter-btn');
-  tabs.forEach(tab => {
-    const gameType = tab.getAttribute('data-game');
-    
-    // URL'den gelen oyun türü varsa ilgili butonu aktif yap
-    if (gameType === activeGameType) {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      displayScoresForGameType(gameType);
-    }
-    
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      const gameType = tab.getAttribute('data-game');
-      // URL'yi güncelle (sayfa yenilenmeden)
-      window.history.replaceState({}, '', `?game=${gameType}`);
-      displayScoresForGameType(gameType);
-    });
-  });
+  let activeCategory = urlParams.get('category') || 'all';
   
-  // 30 saniyede bir skorları otomatik güncelle (10 saniye çok sık)
+  // Kategori sekmelerini ayarla
+  setupCategoryTabs(activeCategory);
+  
+  // Oyun filtrelerini ayarla
+  setupGameFilters(activeGameType, activeCategory);
+  
+  // 30 saniyede bir skorları otomatik güncelle
   setInterval(loadAllScores, 30000);
 });
+
+// Mevcut kullanıcı kimliğini al
+function getCurrentUserId() {
+  fetch('/api/get-current-user')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.user_id) {
+        currentUserId = data.user_id;
+      }
+    })
+    .catch(error => {
+      console.error("Error getting current user:", error);
+    });
+}
+
+// Kategori sekmelerini ayarla
+function setupCategoryTabs(activeCategory) {
+  const categoryBtns = document.querySelectorAll('.category-btn');
+  
+  // İlk yüklemede aktif kategoriyi ayarla
+  categoryBtns.forEach(btn => {
+    const category = btn.getAttribute('data-category');
+    if (category === activeCategory) {
+      activateCategory(btn);
+    }
+    
+    // Kategori tıklama işlevini ekle
+    btn.addEventListener('click', function() {
+      activateCategory(this);
+      
+      // URL'yi güncelle
+      const gameType = document.querySelector('.game-filter[data-filter-category="' + this.dataset.category + '"] .game-filter-btn.active')?.dataset.game || 'word-puzzle';
+      window.history.replaceState({}, '', `?category=${this.dataset.category}&game=${gameType}`);
+    });
+  });
+}
+
+// Kategoriyi etkinleştir
+function activateCategory(categoryBtn) {
+  // Tüm kategori butonlarını pasif yap
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Tüm oyun filtrelerini gizle
+  document.querySelectorAll('.game-filter').forEach(filter => {
+    filter.style.display = 'none';
+  });
+  
+  // Seçilen kategoriyi aktif yap
+  categoryBtn.classList.add('active');
+  
+  // İlgili filtre grubunu göster
+  const filterCategory = categoryBtn.getAttribute('data-category');
+  const filterGroup = document.querySelector(`.game-filter[data-filter-category="${filterCategory}"]`);
+  
+  if (filterGroup) {
+    filterGroup.style.display = 'flex';
+    
+    // Bu kategorideki aktif oyun butonunu bul
+    const activeGameBtn = filterGroup.querySelector('.game-filter-btn.active');
+    
+    if (activeGameBtn) {
+      // Zaten aktif bir oyun butonu varsa onun skorlarını göster
+      displayScoresForGameType(activeGameBtn.getAttribute('data-game'));
+    } else {
+      // Yoksa ilk oyun butonunu aktif yap
+      const firstGameBtn = filterGroup.querySelector('.game-filter-btn');
+      if (firstGameBtn) {
+        firstGameBtn.classList.add('active');
+        displayScoresForGameType(firstGameBtn.getAttribute('data-game'));
+      }
+    }
+    
+    // "Tüm Oyunlar" kategorisi için tüm oyun butonlarını kopyala
+    if (filterCategory === 'all') {
+      populateAllGamesFilter();
+    }
+  }
+}
+
+// "Tüm Oyunlar" kategorisi için tüm oyun butonlarını birleştir
+function populateAllGamesFilter() {
+  const allGamesFilter = document.querySelector('.game-filter[data-filter-category="all"]');
+  allGamesFilter.innerHTML = '';
+  
+  // Her kategoriden oyunları topla
+  const categories = ['basic', 'memory', 'puzzle', 'iq'];
+  
+  categories.forEach(category => {
+    const categoryFilter = document.querySelector(`.game-filter[data-filter-category="${category}"]`);
+    if (categoryFilter) {
+      // Kategori başlığı ekle
+      const categoryHeader = document.createElement('div');
+      categoryHeader.className = 'filter-category-header';
+      
+      let categoryTitle = '';
+      switch(category) {
+        case 'basic': categoryTitle = 'Temel Oyunlar'; break;
+        case 'memory': categoryTitle = 'Hafıza Oyunları'; break;
+        case 'puzzle': categoryTitle = 'Bulmaca Oyunları'; break;
+        case 'iq': categoryTitle = 'IQ Geliştirme'; break;
+      }
+      
+      categoryHeader.textContent = categoryTitle;
+      allGamesFilter.appendChild(categoryHeader);
+      
+      // Bu kategorideki oyun butonlarını klonla ve ekle
+      const gameButtons = categoryFilter.querySelectorAll('.game-filter-btn');
+      gameButtons.forEach(btn => {
+        const clonedBtn = btn.cloneNode(true);
+        // Aktif durumu temizle
+        clonedBtn.classList.remove('active');
+        
+        // Tıklama işlevi ekle
+        clonedBtn.addEventListener('click', function() {
+          activateGameButton(this);
+        });
+        
+        allGamesFilter.appendChild(clonedBtn);
+      });
+    }
+  });
+  
+  // İlk oyun butonunu varsayılan olarak etkinleştir
+  const firstGameBtn = allGamesFilter.querySelector('.game-filter-btn');
+  if (firstGameBtn) {
+    firstGameBtn.classList.add('active');
+  }
+}
+
+// Oyun filtrelerini ayarla
+function setupGameFilters(activeGameType, activeCategory) {
+  const allGameBtns = document.querySelectorAll('.game-filter-btn');
+  
+  allGameBtns.forEach(btn => {
+    const gameType = btn.getAttribute('data-game');
+    const parentFilter = btn.closest('.game-filter');
+    const category = parentFilter ? parentFilter.getAttribute('data-filter-category') : null;
+    
+    // URL'den gelen oyun türü ve kategori ile eşleşenler aktif olsun
+    if (gameType === activeGameType && (category === activeCategory || activeCategory === 'all')) {
+      activateGameButton(btn);
+    }
+    
+    // Tıklama işlevi ekle
+    btn.addEventListener('click', function() {
+      activateGameButton(this);
+    });
+  });
+}
+
+// Oyun butonunu etkinleştir
+function activateGameButton(gameBtn) {
+  // Aynı filtrede tüm butonları pasif yap
+  const parentFilter = gameBtn.closest('.game-filter');
+  if (parentFilter) {
+    parentFilter.querySelectorAll('.game-filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+  }
+  
+  // Seçilen butonu aktif yap
+  gameBtn.classList.add('active');
+  
+  // Oyun türünü al ve skorları göster
+  const gameType = gameBtn.getAttribute('data-game');
+  
+  // URL'yi güncelle
+  const activeCategory = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+  window.history.replaceState({}, '', `?category=${activeCategory}&game=${gameType}`);
+  
+  // Oyun adını ve simgesini güncelle
+  updateGameHeader(gameBtn);
+  
+  // Skorları görüntüle
+  displayScoresForGameType(gameType);
+}
+
+// Oyun başlığını ve simgesini güncelle
+function updateGameHeader(gameBtn) {
+  const gameIcon = document.querySelector('.game-icon i');
+  const gameName = document.querySelector('.game-name');
+  
+  if (gameIcon && gameName) {
+    const btnIcon = gameBtn.querySelector('i').className;
+    const btnName = gameBtn.querySelector('span').textContent;
+    
+    gameIcon.className = btnIcon;
+    gameName.textContent = btnName;
+  }
+}
 
 // Tüm oyunların skorlarını tek bir API çağrısıyla yükle
 function loadAllScores() {
@@ -51,6 +231,9 @@ function loadAllScores() {
       allGameScores = data;
       console.log("Tüm yüklenen skorlar:", allGameScores);
       
+      // Leaderboard istatistiklerini hesapla
+      calculateLeaderboardStats();
+      
       // Aktif sekmenin oyun türünü bul
       const activeTab = document.querySelector('.game-filter-btn.active');
       if (activeTab) {
@@ -61,6 +244,53 @@ function loadAllScores() {
     .catch(error => {
       console.error("Error loading scores:", error);
     });
+}
+
+// Leaderboard istatistiklerini hesapla
+function calculateLeaderboardStats() {
+  // İlk kez initiate ediyoruz
+  if (!leaderboardStats) {
+    leaderboardStats = {
+      totalGames: 0,
+      highestScores: {},
+      totalPlayers: new Set(),
+      playerRanks: {}
+    };
+  } else {
+    // Mevcut değerleri sıfırla
+    leaderboardStats.totalGames = 0;
+    leaderboardStats.highestScores = {};
+    leaderboardStats.totalPlayers.clear();
+    leaderboardStats.playerRanks = {};
+  }
+  
+  // Tüm oyun türleri için istatistikleri hesapla
+  for (const gameType in allGameScores) {
+    const scores = allGameScores[gameType];
+    if (!scores || !Array.isArray(scores)) continue;
+    
+    // Toplam oyun sayısını artır
+    leaderboardStats.totalGames += scores.length;
+    
+    // Bu oyun türündeki en yüksek skoru bul
+    if (scores.length > 0) {
+      leaderboardStats.highestScores[gameType] = scores[0].score;
+    } else {
+      leaderboardStats.highestScores[gameType] = 0;
+    }
+    
+    // Toplam benzersiz oyuncu sayısı
+    scores.forEach(score => {
+      if (score.user_id) {
+        leaderboardStats.totalPlayers.add(score.user_id);
+      }
+      
+      // Kullanıcının sıralamasını kaydet
+      if (currentUserId && score.user_id === currentUserId) {
+        leaderboardStats.playerRanks[gameType] = scores.indexOf(score) + 1;
+      }
+    });
+  }
 }
 
 // Belirli bir oyun türü için skorları görüntüler (yerel cache'den)
@@ -83,21 +313,29 @@ function displayScoresForGameType(gameType) {
     'audio-memory': 'audioMemory',
     'n-back': 'nBack',
     
-    // Sudoku ve diğer oyunlar
-    'sudoku': 'sudoku'
+    // IQ Geliştirme Oyunları
+    'sudoku': 'sudoku',
+    '2048': '2048',
+    'chess': 'chess',
+    'logic-puzzles': 'logicPuzzles',
+    'tangram': 'tangram',
+    'rubik-cube': 'rubikCube'
   };
   
   const internalGameType = gameTypeMap[gameType];
   
-  // Eğer oyun AudioMemory ise ve skor tablosu gizlendiyse kullanıcıya bilgi ver
-  if (internalGameType === 'audioMemory') {
+  // İstatistikleri güncelle
+  updateLeaderboardStats(internalGameType);
+  
+  // Geliştirme aşamasında olan oyunlar için uyarı göster
+  const developmentGames = ['audioMemory', 'rubikCube'];
+  if (developmentGames.includes(internalGameType)) {
     container.innerHTML = `
       <div class="no-scores warning-message">
         <i class="fas fa-exclamation-triangle"></i>
-        <p>Sesli Hafıza Oyunu şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle geri dönecektir.</p>
+        <p>Bu oyun şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle kullanıma sunulacaktır.</p>
       </div>
     `;
-    console.log("Sesli Hafıza Oyunu kaldırılmıştır.");
     return;
   }
   
@@ -131,7 +369,7 @@ function displayScoresForGameType(gameType) {
     let html = '';
     
     scores.forEach((score, index) => {
-      // Kullanıcı avatarı için rastgele bir renk üret
+      // Kullanıcı avatar renkleri
       const avatarColors = [
         'linear-gradient(45deg, #FF6B6B, #FF8E8E)',
         'linear-gradient(45deg, #6A5AE0, #9F8AFF)',
@@ -141,7 +379,7 @@ function displayScoresForGameType(gameType) {
       ];
       const randomColor = avatarColors[index % avatarColors.length];
       
-      // Kullanıcı adının ilk harfini al (avatar için)
+      // Avatar için kullanıcı adının ilk harfi
       const initial = (score.username || 'Anonim').charAt(0).toUpperCase();
       
       // Tarih ve saat formatla
@@ -157,9 +395,12 @@ function displayScoresForGameType(gameType) {
         minute: '2-digit'
       }).format(scoreDate);
       
+      // Mevcut kullanıcının skoru mu kontrol et
+      const isCurrentUser = currentUserId && score.user_id === currentUserId;
+      
       // Her bir skor için HTML oluştur
       html += `
-        <div class="table-row ${index < 3 ? 'top-rank top-rank-' + (index + 1) : ''}" data-rank="${index + 1}">
+        <div class="table-row ${index < 3 ? 'top-rank top-rank-' + (index + 1) : ''} ${isCurrentUser ? 'current-user-score' : ''}" data-rank="${index + 1}">
           <div class="rank-cell">
             ${index < 3 ? 
               `<div class="rank-trophy rank-${index + 1}">
@@ -213,6 +454,12 @@ function displayScoresForGameType(gameType) {
           scoreElement.classList.add('highlight-score');
         }
       });
+      
+      // Kullanıcının kendi skorunu vurgula
+      const currentUserScore = document.querySelector('.current-user-score');
+      if (currentUserScore) {
+        currentUserScore.classList.add('highlight-user');
+      }
     }, 100);
   } else {
     // Oyun türü için skor bulunamadıysa
@@ -223,6 +470,50 @@ function displayScoresForGameType(gameType) {
         <p class="sub-text">İlk yüksek skoru sen kaydet!</p>
       </div>
     `;
+  }
+}
+
+// Leaderboard istatistiklerini güncelle
+function updateLeaderboardStats(gameType) {
+  // leaderboardStats henüz tanımlanmadıysa işlemi atla
+  if (!leaderboardStats) {
+    // İlk başlangıçta leaderboardStats'i tanımla ve boş değerlerle doldur
+    calculateLeaderboardStats();
+  }
+  
+  // Toplam oyun sayısı
+  const totalGamesElement = document.getElementById('total-games');
+  if (totalGamesElement) {
+    totalGamesElement.textContent = leaderboardStats.totalGames || 0;
+  }
+  
+  // Bu oyun türü için en yüksek skor (eğer yoksa 0 göster)
+  const highestScoreElement = document.getElementById('highest-score');
+  if (highestScoreElement) {
+    // Güvenlik kontrolü: gameType undefined olabilir veya highestScores'da bu oyun olmayabilir
+    const highestScore = gameType && leaderboardStats.highestScores && 
+                        leaderboardStats.highestScores[gameType] !== undefined ? 
+                        leaderboardStats.highestScores[gameType] : 0;
+    highestScoreElement.textContent = highestScore;
+  }
+  
+  // Toplam oyuncu sayısı
+  const totalPlayersElement = document.getElementById('total-players');
+  if (totalPlayersElement) {
+    // Güvenlik kontrolü: totalPlayers henüz Set olarak tanımlanmamış olabilir
+    const playerCount = leaderboardStats.totalPlayers && leaderboardStats.totalPlayers.size ? 
+                       leaderboardStats.totalPlayers.size : 0;
+    totalPlayersElement.textContent = playerCount;
+  }
+  
+  // Kullanıcının sıralaması
+  const yourRankElement = document.getElementById('your-rank');
+  if (yourRankElement) {
+    // Güvenlik kontrolü: playerRanks tanımlanmamış veya gameType olmayabilir
+    const yourRank = gameType && leaderboardStats.playerRanks && 
+                    leaderboardStats.playerRanks[gameType] !== undefined ? 
+                    leaderboardStats.playerRanks[gameType] : '-';
+    yourRankElement.textContent = yourRank;
   }
 }
 
