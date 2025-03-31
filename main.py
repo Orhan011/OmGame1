@@ -18,6 +18,13 @@ from models import User, Score, Article
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# İzin verilen dosya uzantıları - avatar yüklemeleri için
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Dosya uzantısının izin verilen uzantılardan olup olmadığını kontrol eder."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 logging.basicConfig(level=logging.DEBUG)
 
 # Email verification
@@ -132,12 +139,36 @@ def utility_processor():
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
         return session.get('avatar_url', 'images/default-avatar.png')
+    
+    def get_user_scores():
+        """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
+        if 'user_id' not in session:
+            return {}
+        
+        user_id = session['user_id']
+        
+        # Kullanıcının tüm oyun skorlarını al
+        scores = Score.query.filter_by(user_id=user_id).all()
+        
+        # Her oyun türü için en yüksek skoru bul
+        score_dict = {}
+        for score in scores:
+            game_type = score.game_type
+            if game_type not in score_dict or score.score > score_dict[game_type]:
+                score_dict[game_type] = score.score
+                # Son oyun tarihini de ekle
+                score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
+        
+        return score_dict
 
     # Tüm yardımcı fonksiyonları şablonlarda kullanılabilir hale getir
     return dict(
         get_current_user=get_current_user,
         get_user_data=get_user_data,
-        get_avatar_url=get_avatar_url
+        get_avatar_url=get_avatar_url,
+        get_user_scores=get_user_scores,
+        calculate_level=calculate_level,
+        xp_for_level=xp_for_level
     )
 
 # Database initialization function
@@ -725,8 +756,54 @@ def logout():
     return redirect(url_for('login'))
 
 # Profile management routes
+def xp_for_level(level):
+    """Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar."""
+    # Basit bir XP hesaplama formülü: 1000 * level * (level + 1) / 2
+    return int(1000 * level * (level + 1) / 2)
+
+def calculate_level(xp):
+    """Toplam XP'ye göre kullanıcı seviyesini hesaplar."""
+    # Seviye 1 için gereken minimum XP: 0
+    if xp < 1000:
+        return 1
+    
+    # Quadratic formülü çözerek seviyeyi hesaplama
+    # n^2 + n - (2*xp/1000) = 0 formülünden n'yi çözümle
+    a = 1
+    b = 1
+    c = -2 * xp / 1000
+    
+    # Quadratic formülü kullanarak pozitif değeri bul: (-b + sqrt(b^2 - 4ac)) / 2a
+    import math
+    level = (-b + math.sqrt(b*b - 4*a*c)) / (2*a)
+    
+    # Tamsayıya yuvarla (aşağı)
+    return int(level)
+
+def get_user_scores():
+    """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
+    if 'user_id' not in session:
+        return {}
+    
+    user_id = session['user_id']
+    
+    # Kullanıcının tüm oyun skorlarını al
+    scores = Score.query.filter_by(user_id=user_id).all()
+    
+    # Her oyun türü için en yüksek skoru bul
+    score_dict = {}
+    for score in scores:
+        game_type = score.game_type
+        if game_type not in score_dict or score.score > score_dict[game_type]:
+            score_dict[game_type] = score.score
+            # Son oyun tarihini de ekle
+            score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
+    
+    return score_dict
+
 @app.route('/profile')
 def profile():
+    """Mevcut profil sayfası."""
     # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -749,6 +826,341 @@ def profile():
     
     # Profil sayfasını render et
     return render_template('profile_new.html', user=user, game_scores=game_scores)
+
+@app.route('/profile-v2')
+def profile_v2():
+    """Yeni tasarımlı profil sayfası."""
+    # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Kullanıcı bilgilerini veritabanından al
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Yeni profil sayfasını render et
+    return render_template('profile_v2.html')
+
+@app.route('/update-profile', methods=['POST'])
+def update_profile():
+    """Profil bilgilerini güncelleme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Form verilerini al
+    username = request.form.get('username')
+    email = request.form.get('email')
+    full_name = request.form.get('full_name')
+    bio = request.form.get('bio')
+    
+    # Kullanıcı adı kontrol - mevcut kullanıcı hariç
+    if username != user.username and User.query.filter_by(username=username).first():
+        flash('Bu kullanıcı adı zaten kullanılıyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # E-posta kontrol - mevcut kullanıcı hariç
+    if email != user.email and User.query.filter_by(email=email).first():
+        flash('Bu e-posta adresi zaten kullanılıyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Kullanıcı bilgilerini güncelle
+    user.username = username
+    user.email = email
+    user.full_name = full_name
+    user.bio = bio
+    
+    # Session'daki kullanıcı adını da güncelle
+    session['username'] = username
+    
+    try:
+        db.session.commit()
+        flash('Profil bilgileriniz başarıyla güncellendi.', 'success')
+    except:
+        db.session.rollback()
+        flash('Profil güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    
+    return redirect(url_for('profile_v2'))
+
+@app.route('/update-avatar', methods=['POST'])
+def update_avatar():
+    """Profil fotoğrafını güncelleme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Avatar yüklendi mi kontrol et
+    if 'avatar' not in request.files:
+        flash('Profil fotoğrafı yüklenirken bir hata oluştu.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    file = request.files['avatar']
+    
+    # Dosya seçilmedi ise
+    if file.filename == '':
+        flash('Lütfen bir dosya seçin.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Güvenli dosya ismi oluştur
+    if file and allowed_file(file.filename):
+        try:
+            filename = secure_filename(file.filename)
+            # Benzersiz isim üretmek için timestamp ekle
+            unique_filename = f"{user.id}_{int(time.time())}_{filename}"
+            filepath = os.path.join('static/uploads/avatars', unique_filename)
+            
+            # Dizin yoksa oluştur
+            os.makedirs('static/uploads/avatars', exist_ok=True)
+            
+            # Dosyayı kaydet
+            file.save(filepath)
+            
+            # Kullanıcının avatar_url'sini güncelle
+            user.avatar_url = f'uploads/avatars/{unique_filename}'
+            session['avatar_url'] = user.avatar_url
+            
+            db.session.commit()
+            flash('Profil fotoğrafınız başarıyla güncellendi.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Avatar upload error: {e}")
+            flash('Fotoğraf yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    else:
+        flash('İzin verilen dosya formatları: png, jpg, jpeg, gif', 'danger')
+    
+    return redirect(url_for('profile_v2'))
+
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    """Şifre değiştirme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Form verilerini al
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    # Mevcut şifreyi kontrol et
+    if not check_password_hash(user.password_hash, current_password):
+        flash('Mevcut şifreniz yanlış.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Yeni şifre doğrulama
+    if new_password != confirm_password:
+        flash('Yeni şifreler eşleşmiyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    if len(new_password) < 6:
+        flash('Yeni şifre en az 6 karakter olmalıdır.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Şifreyi güncelle
+    user.password_hash = generate_password_hash(new_password)
+    
+    try:
+        db.session.commit()
+        flash('Şifreniz başarıyla değiştirildi.', 'success')
+    except:
+        db.session.rollback()
+        flash('Şifre değiştirilirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    
+    return redirect(url_for('profile_v2'))
+
+@app.route('/update-security-settings', methods=['POST'])
+def update_security_settings():
+    """Güvenlik ayarlarını güncelleme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Form verilerini al
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    # Mevcut şifreyi kontrol et
+    if not check_password_hash(user.password_hash, current_password):
+        flash('Mevcut şifreniz yanlış.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Yeni şifre doğrulama
+    if new_password != confirm_password:
+        flash('Yeni şifreler eşleşmiyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    if len(new_password) < 6:
+        flash('Yeni şifre en az 6 karakter olmalıdır.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    # Şifreyi güncelle
+    user.password_hash = generate_password_hash(new_password)
+    
+    try:
+        db.session.commit()
+        flash('Güvenlik ayarlarınız başarıyla güncellendi.', 'success')
+    except:
+        db.session.rollback()
+        flash('Güvenlik ayarları güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    
+    return redirect(url_for('profile_v2'))
+
+@app.route('/update-notification-settings', methods=['POST'])
+def update_notification_settings():
+    """Bildirim ayarlarını güncelleme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Form verilerini al
+    email_notifications = 'email_notifications' in request.form
+    achievement_notifications = 'achievement_notifications' in request.form
+    leaderboard_notifications = 'leaderboard_notifications' in request.form
+    
+    # Kullanıcı modelinde bu alanlar yoksa eklemeli veya farklı bir yaklaşım kullanmalıyız
+    # Bu örnekte varsayalım ki User modelinde bu alanlar var:
+    try:
+        user.email_notifications = email_notifications
+        user.achievement_notifications = achievement_notifications
+        user.leaderboard_notifications = leaderboard_notifications
+        
+        db.session.commit()
+        flash('Bildirim ayarlarınız başarıyla güncellendi.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Notification settings update error: {e}")
+        flash('Bildirim ayarları güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    
+    return redirect(url_for('profile_v2'))
+
+@app.route('/update-theme', methods=['POST'])
+def update_theme():
+    """Tema tercihini güncelleme."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Giriş yapmamış kullanıcı'})
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı'})
+    
+    data = request.json
+    theme = data.get('theme', 'dark')
+    
+    try:
+        user.theme_preference = theme
+        db.session.commit()
+        return jsonify({'success': True, 'theme': theme})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Theme update error: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/delete-account', methods=['POST'])
+def delete_account():
+    """Hesabı silme."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Şifre ve onay kontrolü
+    password = request.form.get('password')
+    confirm_delete = request.form.get('confirm_delete') == 'on'
+    
+    if not check_password_hash(user.password_hash, password):
+        flash('Şifreniz yanlış.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    if not confirm_delete:
+        flash('Hesap silme işlemini onaylamanız gerekiyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    try:
+        # Kullanıcıya ait tüm skorları sil
+        Score.query.filter_by(user_id=user.id).delete()
+        
+        # Kullanıcıyı sil
+        db.session.delete(user)
+        db.session.commit()
+        
+        # Oturumu temizle
+        session.clear()
+        
+        flash('Hesabınız başarıyla silindi.', 'success')
+        return redirect(url_for('index'))
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Account deletion error: {e}")
+        flash('Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        return redirect(url_for('profile_v2'))
+
+@app.route('/suspend-account', methods=['POST'])
+def suspend_account():
+    """Hesabı dondurma."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect(url_for('login'))
+    
+    # Şifre ve onay kontrolü
+    password = request.form.get('password')
+    confirm_suspend = request.form.get('confirm_suspend') == 'on'
+    
+    if not check_password_hash(user.password_hash, password):
+        flash('Şifreniz yanlış.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    if not confirm_suspend:
+        flash('Hesap dondurma işlemini onaylamanız gerekiyor.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    try:
+        # Hesabı dondur - 30 gün sonrası için tarih hesapla
+        suspended_until = datetime.utcnow() + timedelta(days=30)
+        user.account_status = 'suspended'
+        user.suspended_until = suspended_until
+        
+        db.session.commit()
+        
+        # Oturumu temizle
+        session.clear()
+        
+        flash('Hesabınız 30 gün boyunca donduruldu. Bu süre sonunda tekrar giriş yapabilirsiniz.', 'info')
+        return redirect(url_for('index'))
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Account suspension error: {e}")
+        flash('Hesap dondurulurken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        return redirect(url_for('profile_v2'))
 
 # Password reset routes
 @app.route('/forgot-password', methods=['GET', 'POST'])

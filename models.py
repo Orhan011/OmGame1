@@ -25,6 +25,11 @@ class User(db.Model):
     account_status = db.Column(db.String(20), default='active')
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
+    suspended_until = db.Column(db.DateTime)
+    # Notification preferences
+    email_notifications = db.Column(db.Boolean, default=True)
+    achievement_notifications = db.Column(db.Boolean, default=True)
+    leaderboard_notifications = db.Column(db.Boolean, default=True)
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
