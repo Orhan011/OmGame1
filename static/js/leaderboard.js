@@ -147,12 +147,18 @@ document.addEventListener('DOMContentLoaded', function() {
       if (index < 3) {
         rankCell.classList.add(`rank-${index + 1}`);
       }
-      rankCell.innerHTML = `<span>${index + 1}</span>`;
+      rankCell.innerHTML = `<div class="rank-number">${index + 1}</div>`;
       row.appendChild(rankCell);
       
       // Oyuncu hücresi
       const playerCell = document.createElement('td');
       playerCell.className = 'player-cell';
+      
+      // Profil avatarı
+      const playerAvatar = document.createElement('div');
+      playerAvatar.className = 'player-avatar';
+      playerAvatar.textContent = score.username.charAt(0).toUpperCase();
+      playerCell.appendChild(playerAvatar);
       
       const playerInfo = document.createElement('div');
       playerInfo.className = 'player-info';
@@ -161,7 +167,12 @@ document.addEventListener('DOMContentLoaded', function() {
       playerName.className = 'player-name';
       playerName.textContent = score.username;
       
+      const playerRank = document.createElement('div');
+      playerRank.className = 'player-rank';
+      playerRank.innerHTML = `<span>${score.rank || 'Yeni Oyuncu'}</span>`;
+      
       playerInfo.appendChild(playerName);
+      playerInfo.appendChild(playerRank);
       playerCell.appendChild(playerInfo);
       row.appendChild(playerCell);
       

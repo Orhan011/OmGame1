@@ -86,37 +86,49 @@
 }
 
 .rank-cell {
-  font-weight: 700;
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 60px;
+  font-weight: 800;
+  font-size: 1.3rem;
   position: relative;
 }
 
-.rank-1, .rank-2, .rank-3 {
-  color: #fff;
+.rank-cell .rank-number {
+  background: linear-gradient(135deg, #6a5ae0, #ff9c64);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  z-index: 1;
 }
 
-.rank-1 span {
+.rank-1 .rank-number {
   background: linear-gradient(135deg, #FFD700, #FFA500);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  font-size: 1.5rem;
   font-weight: 800;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 }
 
-.rank-2 span {
+.rank-2 .rank-number {
   background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  font-size: 1.4rem;
   font-weight: 800;
 }
 
-.rank-3 span {
+.rank-3 .rank-number {
   background: linear-gradient(135deg, #CD7F32, #B87333);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  font-size: 1.4rem;
   font-weight: 800;
 }
 
@@ -127,38 +139,122 @@
 }
 
 .player-avatar {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
   color: #fff;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.3rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-avatar::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.player-row:hover .player-avatar::after {
+  transform: rotate(45deg) translateX(100%);
+}
+
+.rank-1 .player-avatar {
+  border: 3px solid gold;
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+.rank-2 .player-avatar {
+  border: 3px solid silver;
+  box-shadow: 0 5px 15px rgba(192, 192, 192, 0.4);
+}
+
+.rank-3 .player-avatar {
+  border: 3px solid #CD7F32;
+  box-shadow: 0 5px 15px rgba(205, 127, 50, 0.4);
 }
 
 .player-info {
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 .player-name {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .player-rank {
-  color: #8a8aa3;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.player-rank span {
+  padding: 3px 8px;
+  background: rgba(106, 90, 224, 0.2);
+  border-radius: 12px;
+  font-size: 0.75rem;
 }
 
 .score-cell {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   text-align: right;
   color: #fff;
+}
+
+.score-cell span {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff9c64, #6a5ae0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(106, 90, 224, 0.3);
+  min-width: 80px;
+  text-align: center;
+}
+
+.rank-1 .score-cell span {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.rank-2 .score-cell span {
+  background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.rank-3 .score-cell span {
+  background: linear-gradient(135deg, #CD7F32, #B87333);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border: 1px solid rgba(205, 127, 50, 0.3);
 }
 
 .date-cell {
