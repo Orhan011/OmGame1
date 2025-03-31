@@ -1497,13 +1497,32 @@ def get_scores_alt(game_type):
 
 @app.route('/api/leaderboard/<game_type>')
 def get_leaderboard(game_type):
-    game_types = [
-        'puzzle', 'word-puzzle', 'number-sequence', 'labyrinth', 
-        'memory-match', 'memory-cards', 'number-chain', 'audio-memory', 'n-back',
-        'sudoku', '2048', 'chess', 'logic-puzzles', 'tangram', 'rubik-cube', '3d-rotation'
-    ]
-
-    if game_type not in game_types and game_type != 'all':
+    # Kabul edilen oyun türleri listesi - kategori ve id eşleştirmesi
+    game_types = {
+        'all': 'all',  # Özel durum - tüm oyunlar
+        'wordPuzzle': 'wordpuzzle',
+        'memoryMatch': 'memorymatch',
+        'numberSequence': 'numbersequence',
+        'labyrinth': 'labyrinth',
+        'puzzle': 'puzzle',
+        'memoryCards': 'memorycards',
+        'numberChain': 'numberchain',
+        'audioMemory': 'audiomemory',
+        'nBack': 'nback',
+        'sudoku': 'sudoku',
+        '2048': '2048',
+        'chess': 'chess',
+        'logicPuzzles': 'logicpuzzles',
+        'tangram': 'tangram',
+        'rubikCube': 'rubikcube',
+        '3dRotation': '3drotation',
+        '3dLabyrinth': '3dlabyrinth'
+    }
+    
+    # Oyun türü kontrolü
+    normalized_game_type = game_types.get(game_type)
+    if not normalized_game_type and game_type != 'all':
+        logger.warning(f"Invalid game type requested: {game_type}")
         return jsonify([])
 
     from sqlalchemy import func
@@ -1511,13 +1530,14 @@ def get_leaderboard(game_type):
         if game_type == 'all':
             # Tüm oyun türleri için lider tablosu verilerini getir
             all_leaderboards = {}
-            for gt in game_types:
-                leaderboard_data = get_leaderboard_data(gt)
-                all_leaderboards[gt] = leaderboard_data
+            for game_id, internal_id in game_types.items():
+                if game_id != 'all':  # 'all' türünü atla
+                    leaderboard_data = get_leaderboard_data(internal_id)
+                    all_leaderboards[game_id] = leaderboard_data
             return jsonify(all_leaderboards)
         else:
             # Belirli bir oyun türü için lider tablosu verilerini getir
-            return jsonify(get_leaderboard_data(game_type))
+            return jsonify(get_leaderboard_data(normalized_game_type))
     except Exception as e:
         logger.error(f"Error in get_leaderboard API: {e}")
         return jsonify([])
@@ -1525,48 +1545,70 @@ def get_leaderboard(game_type):
 def get_leaderboard_data(game_type):
     from sqlalchemy import func
     try:
+        # Oyun türü adını düzgün formata dönüştür
+        internal_game_type = game_type.replace("-", "")
+        
         # Her oyun türü için en yüksek puanları bul
         max_scores_subquery = db.session.query(
             Score.user_id, 
             func.max(Score.score).label('max_score')
         ).filter_by(
-            game_type=game_type
+            game_type=internal_game_type
         ).group_by(
             Score.user_id
         ).subquery()
 
-        # Tam skor kayıtlarını ve kullanıcı bilgilerini getir
+        # Tam skor kayıtlarını ve kullanıcı bilgilerini getir (sıralamayı puanı yüksekten düşüğe doğru yap)
         scores = db.session.query(Score, User).join(
             max_scores_subquery, 
             db.and_(
                 Score.user_id == max_scores_subquery.c.user_id,
                 Score.score == max_scores_subquery.c.max_score,
-                Score.game_type == game_type
+                Score.game_type == internal_game_type
             )
         ).join(
             User, 
             User.id == Score.user_id
         ).order_by(
             Score.score.desc()
-        ).limit(10).all()
+        ).limit(25).all()  # Daha fazla skoruyla göster
 
-        # Skor listesini oluştur
+        # Skor listesini oluştur ve zengin kullanıcı bilgileriyle doldur
         score_list = []
         for score, user in scores:
             score_list.append({
                 'user_id': score.user_id,
                 'username': user.username if user else 'Anonim',
+                'full_name': user.full_name if user and user.full_name else None,
                 'score': score.score,
                 'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                'game_type': game_type,
+                'game_type': internal_game_type,
                 'rank': user.rank if user else 'Başlangıç',
-                'avatar_url': user.avatar_url if user and user.avatar_url else 'images/default-avatar.png'
+                'level': calculate_level(score.score),  # Puana göre seviye hesapla
+                'experience_points': user.experience_points if user else 0,
+                'total_games_played': user.total_games_played if user else 0,
+                'avatar_url': user.avatar_url if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
             })
 
         return score_list
     except Exception as e:
         logger.error(f"Error querying leaderboard for {game_type}: {e}")
         return []
+        
+# Puana göre seviye hesaplama fonksiyonu
+def calculate_level(score):
+    if score < 100:
+        return "Başlangıç"
+    elif score < 300:
+        return "Acemi"
+    elif score < 600:
+        return "Orta"
+    elif score < 1000:
+        return "İleri"
+    elif score < 2000:
+        return "Uzman"
+    else:
+        return "Üstadı"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

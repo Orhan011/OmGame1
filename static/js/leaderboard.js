@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         displayLeaderboard(data, gameType);
       })
       .catch(error => {
-        console.log('Error loading scores:', error);
+        console.log('Skor yükleme hatası:', error);
         document.getElementById('leaderboardContainer').innerHTML = `
           <div class="empty-state">
             <i class="fas fa-exclamation-circle"></i>
