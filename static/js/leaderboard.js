@@ -1,296 +1,324 @@
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Oyun türü sekmelerini yönet
-  const gameTabs = document.querySelectorAll('.game-tab');
-  let allScoresData = {};
-  let currentTab = 'all'; // Varsayılan sekme
-
-  // Tüm oyun türleri ve eşleşen API yolları
-  const gameTypes = {
-    'all': 'all',
-    'wordPuzzle': 'word-puzzle',
-    'memoryMatch': 'memory-match',
-    'labyrinth': 'labyrinth',
-    'puzzle': 'puzzle',
-    'numberSequence': 'number-sequence',
-    'memoryCards': 'memory-cards',
-    'numberChain': 'number-chain',
-    'audioMemory': 'audio-memory',
-    'nBack': 'n-back',
-    'sudoku': 'sudoku',
-    '2048': '2048',
-    'chess': 'chess',
-    'logicPuzzles': 'logic-puzzles',
-    'tangram': 'tangram',
-    'rubikCube': 'rubik-cube',
-    '3dRotation': '3d-rotation'
-  };
-
-  // Oyun türlerine karşılık gelen Türkçe isimler
-  const gameNames = {
-    'all': 'Tüm Oyunlar',
-    'wordPuzzle': 'Kelime Bulmaca',
-    'memoryMatch': 'Hafıza Eşleştirme',
-    'labyrinth': 'Labirent',
-    'puzzle': 'Puzzle',
-    'numberSequence': 'Sayı Dizisi',
-    'memoryCards': 'Hafıza Kartları',
-    'numberChain': 'Sayı Zinciri',
-    'audioMemory': 'Sesli Hafıza',
-    'nBack': 'N-Back',
-    'sudoku': 'Sudoku',
-    '2048': '2048',
-    'chess': 'Satranç',
-    'logicPuzzles': 'Mantık Bulmacaları',
-    'tangram': 'Tangram',
-    'rubikCube': 'Rubik Küp',
-    '3dRotation': '3D Döndürme'
-  };
-
-  // Sayfa yüklendiğinde tüm skorları al
-  fetchAllScores();
-
-  // Sekme tıklama olayını dinle
-  gameTabs.forEach(tab => {
+  // Game tabs interaction
+  const tabs = document.querySelectorAll('.game-tab');
+  const loadingIndicator = document.querySelector('.loading');
+  const container = document.querySelector('#leaderboardsContainer');
+  
+  // Initialize with the first tab (Tüm Oyunlar)
+  loadLeaderboard('all');
+  
+  // Add click event to each tab
+  tabs.forEach(tab => {
     tab.addEventListener('click', function() {
-      const gameType = this.getAttribute('data-game');
-
-      // Aktif sekmeyi güncelle
-      gameTabs.forEach(t => t.classList.remove('active'));
+      // Update active state
+      tabs.forEach(t => t.classList.remove('active'));
       this.classList.add('active');
-
-      // Seçilen oyun türüne göre skorları göster
-      displayScores(gameType);
-      currentTab = gameType;
+      
+      // Get the game type
+      const gameType = this.getAttribute('data-game');
+      
+      // Load the corresponding leaderboard
+      loadLeaderboard(gameType);
     });
   });
-
-  // Tüm oyun skorlarını getir
-  function fetchAllScores() {
-    // Yükleme göstergesi
-    const container = document.getElementById('leaderboardsContainer');
-    container.innerHTML = `
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Tüm skorlar yükleniyor...</p>
-      </div>
-    `;
-
-    // Her oyun türü için skor verilerini al
-    const promises = Object.keys(gameTypes).map(key => {
-      if (key === 'all') return Promise.resolve(); // 'all' için API çağrısı yapmıyoruz
-      return fetchScores(key);
-    });
-
-    // Tüm veri işlemleri tamamlandığında
-    Promise.all(promises)
-      .then(() => {
-        console.log("Tüm yüklenen skorlar:", allScoresData);
-        displayScores('all'); // Başlangıçta tüm skorları göster
+  
+  // Function to load leaderboard data
+  function loadLeaderboard(gameType) {
+    console.log('Skor yükleniyor:', gameType);
+    
+    // Show loading indicator
+    container.innerHTML = '';
+    loadingIndicator.style.display = 'flex';
+    
+    // API call to get scores
+    fetch(`/api/get-scores/${gameType}`)
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        if (gameType === 'all') {
+          // If "Tüm Oyunlar" tab, create multiple tables
+          console.log('Tüm yüklenen skorlar:', data);
+          
+          // Create a leaderboard for each game type
+          const gameTypes = {
+            'wordPuzzle': { name: 'Kelime Bulmaca', icon: 'fas fa-font' },
+            'memoryMatch': { name: 'Hafıza Eşleştirme', icon: 'fas fa-th' },
+            'labyrinth': { name: 'Labirent', icon: 'fas fa-map-signs' },
+            'puzzle': { name: 'Puzzle', icon: 'fas fa-puzzle-piece' },
+            'numberSequence': { name: 'Sayı Dizisi', icon: 'fas fa-sort-numeric-up' },
+            'memoryCards': { name: 'Hafıza Kartları', icon: 'fas fa-clone' },
+            'numberChain': { name: 'Sayı Zinciri', icon: 'fas fa-link' },
+            'audioMemory': { name: 'Sesli Hafıza', icon: 'fas fa-music' },
+            'nBack': { name: 'N-Back', icon: 'fas fa-brain' },
+            'sudoku': { name: 'Sudoku', icon: 'fas fa-table' },
+            '2048': { name: '2048', icon: 'fas fa-cube' },
+            'chess': { name: 'Satranç', icon: 'fas fa-chess' },
+            'visualAttention': { name: 'Görsel Dikkat', icon: 'fas fa-eye' }
+          };
+          
+          Object.keys(gameTypes).forEach(type => {
+            if (data[type] && data[type].length > 0) {
+              const card = createLeaderboardCard(gameTypes[type].name, gameTypes[type].icon, data[type]);
+              container.appendChild(card);
+            }
+          });
+          
+          // If no data was added, show a message
+          if (container.innerHTML === '') {
+            container.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <p>Henüz hiçbir skorunuz bulunmamaktadır. Oyunları oynayarak skor tablosunda yerinizi alın!</p>
+              </div>
+            `;
+          }
+        } else {
+          // Single game leaderboard
+          let gameName = '';
+          let gameIcon = '';
+          
+          // Set the appropriate game name based on the game type
+          switch(gameType) {
+            case 'wordPuzzle':
+            case 'word-puzzle': 
+              gameName = 'Kelime Bulmaca';
+              gameIcon = 'fas fa-font';
+              break;
+            case 'memoryMatch':
+            case 'memory-match': 
+              gameName = 'Hafıza Eşleştirme';
+              gameIcon = 'fas fa-th';
+              break;
+            case 'labyrinth': 
+              gameName = 'Labirent';
+              gameIcon = 'fas fa-map-signs';
+              break;
+            case 'puzzle': 
+              gameName = 'Puzzle';
+              gameIcon = 'fas fa-puzzle-piece';
+              break;
+            case 'visualAttention':
+            case 'visual-attention': 
+              gameName = 'Görsel Dikkat';
+              gameIcon = 'fas fa-eye';
+              break;
+            case 'numberSequence':
+            case 'number-sequence': 
+              gameName = 'Sayı Dizisi';
+              gameIcon = 'fas fa-sort-numeric-up';
+              break;
+            case 'memoryCards':
+            case 'memory-cards': 
+              gameName = 'Hafıza Kartları';
+              gameIcon = 'fas fa-clone';
+              break;
+            case 'numberChain':
+            case 'number-chain': 
+              gameName = 'Sayı Zinciri';
+              gameIcon = 'fas fa-link';
+              break;
+            case 'audioMemory':
+            case 'audio-memory': 
+              gameName = 'Sesli Hafıza';
+              gameIcon = 'fas fa-music';
+              break;
+            case 'nBack':
+            case 'n-back': 
+              gameName = 'N-Back';
+              gameIcon = 'fas fa-brain';
+              break;
+            case 'sudoku': 
+              gameName = 'Sudoku';
+              gameIcon = 'fas fa-table';
+              break;
+            case '2048': 
+              gameName = '2048';
+              gameIcon = 'fas fa-cube';
+              break;
+            case 'chess': 
+              gameName = 'Satranç';
+              gameIcon = 'fas fa-chess';
+              break;
+            case 'rubikCube':
+            case 'rubik-cube': 
+              gameName = 'Rubik Küpü';
+              gameIcon = 'fas fa-cube';
+              break;
+            case 'logicPuzzles':
+            case 'logic-puzzles': 
+              gameName = 'Mantık Bulmacaları';
+              gameIcon = 'fas fa-brain';
+              break;
+            case 'tangram': 
+              gameName = 'Tangram';
+              gameIcon = 'fas fa-shapes';
+              break;
+            case '3dRotation':
+            case '3d-rotation': 
+              gameName = '3D Rotasyon';
+              gameIcon = 'fas fa-cube';
+              break;
+            default: 
+              gameName = 'Skorlar';
+              gameIcon = 'fas fa-trophy';
+          }
+          
+          try {
+            // Create the leaderboard card
+            const card = createLeaderboardCard(gameName, gameIcon, data);
+            container.appendChild(card);
+          } catch (error) {
+            console.error('Error loading scores:', error);
+            container.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Skorlar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
+              </div>
+            `;
+          }
+        }
       })
       .catch(error => {
-        console.error("Skorlar yüklenirken hata oluştu:", error);
+        console.error('Error loading scores:', error);
+        loadingIndicator.style.display = 'none';
         container.innerHTML = `
-          <div class="error">
-            <i class="fas fa-exclamation-triangle"></i>
+          <div class="empty-state">
+            <i class="fas fa-exclamation-circle"></i>
             <p>Skorlar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
           </div>
         `;
       });
   }
-
-  // Belirli bir oyun türü için skorları getir
-  function fetchScores(gameType) {
-    console.log("Skor yükleniyor:", gameTypes[gameType]);
-
-    return fetch(`/api/leaderboard/${gameTypes[gameType]}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Verileri saklayın
-        allScoresData[gameType] = data;
-      })
-      .catch(error => {
-        console.error("Error loading scores:", error);
-        allScoresData[gameType] = [];
-      });
-  }
-
-  // Skorları tabloda göster
-  function displayScores(gameType) {
-    const container = document.getElementById('leaderboardsContainer');
-    container.innerHTML = ''; // Konteyneri temizle
-
-    // 'all' türü için tüm oyun skorlarından kartlar oluştur
-    if (gameType === 'all') {
-      const allGames = Object.keys(gameTypes).filter(key => key !== 'all');
-
-      // Her oyun türü için kart oluştur
-      allGames.forEach(game => {
-        const scores = allScoresData[game] || [];
-
-        // Oyun kartını oluştur
-        const card = document.createElement('div');
-        card.className = 'leaderboard-card active';
-        card.innerHTML = `
-          <div class="card-header">
-            <h3>${gameNames[game]}</h3>
-            <button class="refresh-btn" data-game="${game}">
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-          <div class="table-container">
-            ${createScoreTable(scores, 5)} <!-- Sadece ilk 5 skoru göster -->
-          </div>
-        `;
-        container.appendChild(card);
-
-        // Yenileme butonunu etkinleştir
-        const refreshBtn = card.querySelector('.refresh-btn');
-        refreshBtn.addEventListener('click', function() {
-          const gameType = this.getAttribute('data-game');
-          refreshScores(gameType, this);
-        });
-      });
-    } else {
-      // Belirli bir oyun türü için tam tablo göster
-      const scores = allScoresData[gameType] || [];
-
-      // Oyun kartını oluştur
-      const card = document.createElement('div');
-      card.className = 'leaderboard-card active';
-      card.innerHTML = `
-        <div class="card-header">
-          <h3>${gameNames[gameType]}</h3>
-          <button class="refresh-btn" data-game="${gameType}">
-            <i class="fas fa-sync-alt"></i>
-          </button>
-        </div>
-        <div class="table-container">
-          ${createScoreTable(scores)}
-        </div>
-      `;
-      container.appendChild(card);
-
-      // Yenileme butonunu etkinleştir
-      const refreshBtn = card.querySelector('.refresh-btn');
-      refreshBtn.addEventListener('click', function() {
-        const gameType = this.getAttribute('data-game');
-        refreshScores(gameType, this);
-      });
-    }
-  }
-
-  // Oyun skorlarını yenile
-  function refreshScores(gameType, button) {
-    // Yenileme animasyonu
-    button.classList.add('rotating');
-
-    // Skorları yeniden yükle
-    fetchScores(gameType)
-      .then(() => {
-        // Mevcut aktif sekmeyi güncelle
-        displayScores(currentTab);
-      })
-      .catch(error => {
-        console.error("Skorlar yenilenirken hata oluştu:", error);
-      })
-      .finally(() => {
-        // Animasyonu durdur
-        setTimeout(() => {
-          button.classList.remove('rotating');
-        }, 1000);
-      });
-  }
-
-  // Skor tablosu HTML'ini oluştur
-  function createScoreTable(scores, limit = null) {
-    // Limit varsa skorları sınırla
-    const displayScores = limit ? scores.slice(0, limit) : scores;
-
-    // Skorlar yoksa bilgi mesajı göster
-    if (!displayScores || displayScores.length === 0) {
-      return `
-        <div class="no-scores">
-          <i class="fas fa-trophy"></i>
-          <p>Henüz skor kaydedilmemiş. İlk skoru kaydedenlerden biri olun!</p>
-        </div>
-      `;
-    }
-
-    // Skor tablosunu oluştur
-    let tableHTML = `
-      <table class="leaderboard-table">
+  
+  // Function to create a leaderboard card
+  function createLeaderboardCard(title, icon, scores) {
+    const card = document.createElement('div');
+    card.className = 'leaderboard-card active';
+    
+    // Create header
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    header.innerHTML = `
+      <h3><i class="${icon}"></i> ${title}</h3>
+      <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+    `;
+    
+    // Create table container
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'leaderboard-table-container';
+    
+    if (scores && scores.length > 0) {
+      // Create table
+      const table = document.createElement('table');
+      table.className = 'leaderboard-table';
+      
+      // Table header
+      table.innerHTML = `
         <thead>
           <tr>
             <th>Sıra</th>
-            <th>Kullanıcı</th>
+            <th>Oyuncu</th>
             <th>Skor</th>
             <th>Tarih</th>
           </tr>
         </thead>
-        <tbody>
-    `;
-
-    // Her skor için satır oluştur
-    displayScores.forEach((score, index) => {
-      const rank = index + 1;
-      const rankClass = rank <= 3 ? `rank-${rank}` : '';
-
-      // İlk harfleri al (avatar için)
-      const initials = score.username
-        ? score.username.split(' ').map(n => n[0]).join('').toUpperCase()
-        : '?';
-
-      // Zaman biçimini formatla
-      const date = new Date(score.timestamp);
-      const formattedDate = formatDate(date);
-
-      tableHTML += `
-        <tr data-rank="${rank}">
-          <td class="rank-cell ${rankClass}">${rank}</td>
-          <td class="user-cell">
-            <div class="user-avatar">${initials}</div>
-            <div>
-              <span class="username">${score.username || 'İsimsiz'}</span>
-              <span class="rank-info">${score.rank || 'Başlangıç'}</span>
+        <tbody id="scoreTableBody">
+        </tbody>
+      `;
+      
+      // Add scores to table
+      const tbody = table.querySelector('#scoreTableBody');
+      scores.forEach((score, index) => {
+        const row = document.createElement('tr');
+        row.className = 'player-row';
+        
+        // Format date
+        const date = new Date(score.timestamp);
+        const formattedDate = date.toLocaleDateString('tr-TR', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+        
+        // Determine rank class
+        let rankClass = '';
+        if (index === 0) rankClass = 'rank-1';
+        else if (index === 1) rankClass = 'rank-2';
+        else if (index === 2) rankClass = 'rank-3';
+        
+        // Avatar URL
+        const avatarUrl = score.avatar_url ? `/static/${score.avatar_url}` : '/static/images/default-avatar.png';
+        
+        row.innerHTML = `
+          <td class="rank-cell ${rankClass}">${index + 1}</td>
+          <td>
+            <div class="player-info">
+              <img src="${avatarUrl}" alt="${score.username}" class="player-avatar">
+              <span class="player-name">${score.username}<span class="player-rank">${score.rank}</span></span>
             </div>
           </td>
-          <td class="score-cell">${score.score}</td>
+          <td class="score-cell">${score.score.toLocaleString()}</td>
           <td class="date-cell">${formattedDate}</td>
-        </tr>
-      `;
-    });
-
-    tableHTML += `
-        </tbody>
-      </table>
-    `;
-
-    return tableHTML;
-  }
-
-  // Tarihi formatla
-  function formatDate(date) {
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      return 'Bugün';
-    } else if (diffDays === 1) {
-      return 'Dün';
-    } else if (diffDays < 7) {
-      return `${diffDays} gün önce`;
-    } else {
-      return date.toLocaleDateString('tr-TR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
+        `;
+        
+        tbody.appendChild(row);
       });
+      
+      tableContainer.appendChild(table);
+    } else {
+      // No scores found
+      tableContainer.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-trophy"></i>
+          <p>Bu oyunda henüz skor kaydedilmemiş. İlk sırada yer almak için hemen oynamaya başlayın!</p>
+        </div>
+      `;
     }
+    
+    // Add refresh functionality
+    card.appendChild(header);
+    card.appendChild(tableContainer);
+    
+    const refreshBtn = card.querySelector('.refresh-btn');
+    refreshBtn.addEventListener('click', function() {
+      // Add rotation animation
+      this.classList.add('rotating');
+      
+      // Get the game type from the card title
+      let gameType = '';
+      switch(title) {
+        case 'Kelime Bulmaca': gameType = 'word-puzzle'; break;
+        case 'Hafıza Eşleştirme': gameType = 'memory-match'; break;
+        case 'Labirent': gameType = 'labyrinth'; break;
+        case 'Puzzle': gameType = 'puzzle'; break;
+        case 'Görsel Dikkat': gameType = 'visual-attention'; break;
+        case 'Sayı Dizisi': gameType = 'number-sequence'; break;
+        case 'Hafıza Kartları': gameType = 'memory-cards'; break;
+        case 'Sayı Zinciri': gameType = 'number-chain'; break;
+        case 'Sesli Hafıza': gameType = 'audio-memory'; break;
+        case 'N-Back': gameType = 'n-back'; break;
+        case 'Sudoku': gameType = 'sudoku'; break;
+        case '2048': gameType = '2048'; break;
+        case 'Satranç': gameType = 'chess'; break;
+        case 'Rubik Küpü': gameType = 'rubik-cube'; break;
+        case 'Mantık Bulmacaları': gameType = 'logic-puzzles'; break;
+        case 'Tangram': gameType = 'tangram'; break;
+        case '3D Rotasyon': gameType = '3d-rotation'; break;
+        default: gameType = 'all';
+      }
+      
+      // Reload the leaderboard
+      loadLeaderboard(gameType);
+      
+      // Remove rotation class after animation completes
+      setTimeout(() => {
+        this.classList.remove('rotating');
+      }, 1000);
+    });
+    
+    return card;
   }
 });
