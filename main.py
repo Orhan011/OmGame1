@@ -623,6 +623,11 @@ def login():
 
 @app.route('/profile')
 def profile():
+    """
+    Kullanıcı profil sayfasını görüntüler.
+    
+    Kullanıcının kişisel bilgilerini, en yüksek skorlarını ve oyun istatistiklerini gösterir.
+    """
     if not session.get('user_id'):
         return redirect(url_for('login'))
 
@@ -632,62 +637,104 @@ def profile():
         return redirect(url_for('login'))
 
     try:
-        # Kullanıcının en yüksek skorlarını bul
-        word_puzzle_score = Score.query.filter_by(user_id=current_user.id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
-        memory_match_score = Score.query.filter_by(user_id=current_user.id, game_type='memoryMatch').order_by(Score.score.desc()).first()
-        labyrinth_score = Score.query.filter_by(user_id=current_user.id, game_type='labyrinth').order_by(Score.score.desc()).first()
-        puzzle_score = Score.query.filter_by(user_id=current_user.id, game_type='puzzle').order_by(Score.score.desc()).first()
-
-        # Yeni oyunlar için skorları bul
-        # where_is_it_score kaldırıldı
-        memory_cards_score = Score.query.filter_by(user_id=current_user.id, game_type='memoryCards').order_by(Score.score.desc()).first()
-        number_chain_score = Score.query.filter_by(user_id=current_user.id, game_type='numberChain').order_by(Score.score.desc()).first()
-        audio_memory_score = Score.query.filter_by(user_id=current_user.id, game_type='audioMemory').order_by(Score.score.desc()).first()
-        n_back_score = Score.query.filter_by(user_id=current_user.id, game_type='nBack').order_by(Score.score.desc()).first()
-
-        # Yeni IQ geliştirme oyunları skorlarını da ekleyelim
-        sudoku_score = Score.query.filter_by(user_id=current_user.id, game_type='sudoku').order_by(Score.score.desc()).first()
-        game_2048_score = Score.query.filter_by(user_id=current_user.id, game_type='2048').order_by(Score.score.desc()).first()
-        chess_score = Score.query.filter_by(user_id=current_user.id, game_type='chess').order_by(Score.score.desc()).first()
-        rubik_cube_score = Score.query.filter_by(user_id=current_user.id, game_type='rubikCube').order_by(Score.score.desc()).first()
-        logic_puzzles_score = Score.query.filter_by(user_id=current_user.id, game_type='logicPuzzles').order_by(Score.score.desc()).first()
-        tangram_score = Score.query.filter_by(user_id=current_user.id, game_type='tangram').order_by(Score.score.desc()).first()
-
-        user_scores = {
-            'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
-            'memoryMatch': memory_match_score.score if memory_match_score else 0,
-            'labyrinth': labyrinth_score.score if labyrinth_score else 0,
-            'puzzle': puzzle_score.score if puzzle_score else 0,
-            # 'whereIsIt' kaldırıldı
-            'memoryCards': memory_cards_score.score if memory_cards_score else 0,
-            'numberChain': number_chain_score.score if number_chain_score else 0,
-            'audioMemory': audio_memory_score.score if audio_memory_score else 0,
-            'nBack': n_back_score.score if n_back_score else 0,
-            # Yeni oyun skorları
-            'sudoku': sudoku_score.score if sudoku_score else 0,
-            '2048': game_2048_score.score if game_2048_score else 0,
-            'chess': chess_score.score if chess_score else 0,
-            'rubikCube': rubik_cube_score.score if rubik_cube_score else 0,
-            'logicPuzzles': logic_puzzles_score.score if logic_puzzles_score else 0,
-            'tangram': tangram_score.score if tangram_score else 0
-        }
-
-        # Kullanıcı bilgilerini güncel tut
-        if not current_user.experience_points:
-            current_user.experience_points = 0
-        if not current_user.rank:
-            current_user.rank = 'Başlangıç'
-        if not current_user.total_games_played:
-            current_user.total_games_played = 0
+        # Tüm oyun skorlarını al
+        user_scores = get_user_all_scores(current_user.id)
+        
+        # Kullanıcı bilgilerini güncel tut ve sağlamlaştır
+        update_user_metadata(current_user)
+        
+        # En son aktif zamanı güncelle
+        current_user.last_active = datetime.utcnow()
         db.session.commit()
-
-        return render_template('profile.html', current_user=current_user, user=current_user, user_scores=user_scores)
+        
+        # Yeni profil sayfasını etkinleştirmek için:
+        return render_template('profile_new.html', current_user=current_user, user=current_user, user_scores=user_scores)
+        
+        # Eski profil sayfasına dönmek isterseniz:
+        # return render_template('profile.html', current_user=current_user, user=current_user, user_scores=user_scores)
 
     except Exception as e:
         logger.error(f"Error in profile page: {e}")
         db.session.rollback()
         flash('Profil bilgileri yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
         return redirect(url_for('index'))
+
+
+def get_user_all_scores(user_id):
+    """
+    Kullanıcının tüm oyunlardaki en yüksek skorlarını döndürür
+    
+    Args:
+        user_id: Kullanıcı ID'si
+        
+    Returns:
+        dict: Oyun tiplerine göre en yüksek skorların sözlüğü
+    """
+    # Temel oyunlar
+    word_puzzle_score = Score.query.filter_by(user_id=user_id, game_type='wordPuzzle').order_by(Score.score.desc()).first()
+    memory_match_score = Score.query.filter_by(user_id=user_id, game_type='memoryMatch').order_by(Score.score.desc()).first()
+    labyrinth_score = Score.query.filter_by(user_id=user_id, game_type='labyrinth').order_by(Score.score.desc()).first()
+    puzzle_score = Score.query.filter_by(user_id=user_id, game_type='puzzle').order_by(Score.score.desc()).first()
+
+    # Hafıza oyunları
+    memory_cards_score = Score.query.filter_by(user_id=user_id, game_type='memoryCards').order_by(Score.score.desc()).first()
+    number_chain_score = Score.query.filter_by(user_id=user_id, game_type='numberChain').order_by(Score.score.desc()).first()
+    audio_memory_score = Score.query.filter_by(user_id=user_id, game_type='audioMemory').order_by(Score.score.desc()).first()
+    n_back_score = Score.query.filter_by(user_id=user_id, game_type='nBack').order_by(Score.score.desc()).first()
+
+    # IQ geliştirme oyunları
+    sudoku_score = Score.query.filter_by(user_id=user_id, game_type='sudoku').order_by(Score.score.desc()).first()
+    game_2048_score = Score.query.filter_by(user_id=user_id, game_type='2048').order_by(Score.score.desc()).first()
+    chess_score = Score.query.filter_by(user_id=user_id, game_type='chess').order_by(Score.score.desc()).first()
+    rubik_cube_score = Score.query.filter_by(user_id=user_id, game_type='rubikCube').order_by(Score.score.desc()).first()
+    logic_puzzles_score = Score.query.filter_by(user_id=user_id, game_type='logicPuzzles').order_by(Score.score.desc()).first()
+    tangram_score = Score.query.filter_by(user_id=user_id, game_type='tangram').order_by(Score.score.desc()).first()
+
+    # Skorları sözlüğe aktar
+    user_scores = {
+        'wordPuzzle': word_puzzle_score.score if word_puzzle_score else 0,
+        'memoryMatch': memory_match_score.score if memory_match_score else 0,
+        'labyrinth': labyrinth_score.score if labyrinth_score else 0,
+        'puzzle': puzzle_score.score if puzzle_score else 0,
+        'memoryCards': memory_cards_score.score if memory_cards_score else 0,
+        'numberChain': number_chain_score.score if number_chain_score else 0,
+        'audioMemory': audio_memory_score.score if audio_memory_score else 0,
+        'nBack': n_back_score.score if n_back_score else 0,
+        'sudoku': sudoku_score.score if sudoku_score else 0,
+        '2048': game_2048_score.score if game_2048_score else 0,
+        'chess': chess_score.score if chess_score else 0,
+        'rubikCube': rubik_cube_score.score if rubik_cube_score else 0,
+        'logicPuzzles': logic_puzzles_score.score if logic_puzzles_score else 0,
+        'tangram': tangram_score.score if tangram_score else 0
+    }
+    
+    return user_scores
+
+
+def update_user_metadata(user):
+    """
+    Kullanıcı meta verilerini güncelleyerek geçerli değerlere sahip olmasını sağlar
+    
+    Args:
+        user: Kullanıcı nesnesi
+    """
+    # Temel değerleri sağlamlaştır
+    if not user.experience_points:
+        user.experience_points = 0
+    if not user.rank:
+        user.rank = 'Başlangıç'
+    if not user.total_games_played:
+        user.total_games_played = 0
+    
+    # En yüksek skoru hesapla
+    highest_score = db.session.query(db.func.max(Score.score)).filter_by(user_id=user.id).scalar()
+    if highest_score:
+        user.highest_score = highest_score
+    
+    # Toplam oynanmış oyun sayısını hesapla
+    total_games = db.session.query(db.func.count(Score.id)).filter_by(user_id=user.id).scalar()
+    if total_games:
+        user.total_games_played = total_games
 
 # Game routes
 @app.route('/games/3d-labyrinth')
@@ -913,24 +960,51 @@ def update_password():
 
     return redirect(url_for('profile'))
 
-@app.route('/profile/theme', methods=['POST'])
+@app.route('/update_theme', methods=['POST'])
 def update_theme():
+    """
+    Kullanıcının tema tercihini günceller
+    
+    Form veya JSON verisi olarak gelen 'theme' parametresini kullanır,
+    kullanıcının tema tercihini günceller ve sonucu JSON olarak veya
+    yönlendirme ile döndürür.
+    """
     if not session.get('user_id'):
+        if request.is_json:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    theme_preference = request.form.get('theme_preference')
+    
+    # JSON veya form verisi olarak gelen tema tercihini al
+    if request.is_json:
+        data = request.get_json()
+        theme_preference = data.get('theme')
+    else:
+        theme_preference = request.form.get('theme_preference')
 
-    # Update user's theme preference
+    # Tema tercihini kontrol et ve güncelle
     if theme_preference in ['dark', 'light', 'contrast']:
         user.theme_preference = theme_preference
+    else:
+        if request.is_json:
+            return jsonify({'success': False, 'error': 'Invalid theme'}), 400
+        flash('Geçersiz tema tercihi.', 'danger')
+        return redirect(url_for('profile'))
 
     try:
         db.session.commit()
+        if request.is_json:
+            return jsonify({'success': True, 'theme': theme_preference})
+        
         flash('Tema ayarlarınız başarıyla güncellendi.', 'success')
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error updating theme: {e}")
+        
+        if request.is_json:
+            return jsonify({'success': False, 'error': str(e)}), 500
+            
         flash('Tema ayarları güncellenirken bir hata oluştu.', 'danger')
 
     return redirect(url_for('profile'))
