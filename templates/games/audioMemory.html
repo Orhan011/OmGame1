@@ -1,174 +1,19 @@
-
 {% extends 'layout.html' %}
 
-{% block title %}Sesli Hafıza - ZekaPark{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/audio-memory.css') }}">
-{% endblock %}
+{% block title %}Sesli Hafıza - Bu oyun kaldırılmıştır{% endblock %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <!-- Introduction Screen -->
-      <div id="intro-screen" class="audio-memory-container">
-        <div class="row">
-          <div class="col-md-8">
-            <h2 class="section-title mb-4">Sesli Hafıza Oyunu</h2>
-            <div class="game-instructions mb-md-0">
-              <h4 class="instruction-title"><i class="fas fa-music me-2"></i>Nasıl Oynanır?</h4>
-              <p>İşitsel hafızanı ve müzikal kulağını test et! Oyun sana bir ses dizisi çalacak ve senin görevin bu diziyi aynı sırayla tekrarlamak.</p>
-              <p>Her seviye geçtiğinde dizi biraz daha uzayacak ve zorlaşacak.</p>
-              <div class="memory-tips mt-3">
-                <div class="tip-badge">
-                  <i class="fas fa-lightbulb"></i>
-                  <span>İpucu: Sesleri bir ritim veya melodi olarak düşünmek hatırlamanı kolaylaştırabilir.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn active" data-level="easy">Kolay</button>
-                <button id="level-medium" class="level-btn" data-level="medium">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="hard">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="btn btn-primary btn-lg pulse-animation mt-3">
-              <i class="fas fa-play me-2"></i>Oyunu Başlat
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Game Screen -->
-      <div id="game-screen" class="audio-memory-container" style="display: none;">
-        <div class="level-indicator">
-          <span>Seviye <span id="current-level">1</span></span>
-        </div>
-
-        <div class="status-display">
-          <div id="status-message" class="status-message">Dinle ve izle...</div>
-          <div id="status-submessage" class="status-submessage">Ses dizisini hafızana kaydet</div>
-        </div>
-
-        <div class="game-stats">
-          <div class="stat-item">
-            <div id="score-value" class="stat-value">0</div>
-            <div class="stat-label">Puan</div>
-          </div>
-          <div class="stat-item">
-            <div id="sequence-length" class="stat-value">3</div>
-            <div class="stat-label">Dizi Uzunluğu</div>
-          </div>
-        </div>
-
-        <div class="audio-pads">
-          <div class="audio-pad pad-blue" data-pad="0">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-music"></i>
-          </div>
-          <div class="audio-pad pad-red" data-pad="1">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-drum"></i>
-          </div>
-          <div class="audio-pad pad-green" data-pad="2">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-guitar"></i>
-          </div>
-          <div class="audio-pad pad-yellow" data-pad="3">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-bell"></i>
-          </div>
-          <div class="audio-pad pad-purple" data-pad="4">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-microphone"></i>
-          </div>
-          <div class="audio-pad pad-orange" data-pad="5">
-            <div class="audio-pad-overlay"></div>
-            <i class="fas fa-headphones"></i>
-          </div>
-        </div>
-
-        <div class="game-controls">
-          <button id="play-sequence" class="control-btn">
-            <i class="fas fa-play"></i> Diziyi Tekrar Çal
-          </button>
-          <button id="sound-toggle" class="control-btn">
-            <i class="fas fa-volume-up"></i> Ses
-          </button>
-        </div>
-      </div>
-
-      <!-- Game Over Screen -->
-      <div id="game-over-screen" class="audio-memory-container" style="display: none;">
-        <div class="results-container">
-          <div class="results-header">
-            <h2>Oyun Bitti!</h2>
-            <p>İşitsel hafıza performansın</p>
-          </div>
-
-          <div class="results-stats">
-            <div class="results-stat">
-              <div id="final-score" class="results-stat-value">0</div>
-              <div class="results-stat-label">Toplam Puan</div>
-            </div>
-            <div class="results-stat">
-              <div id="final-level" class="results-stat-value">0</div>
-              <div class="results-stat-label">Erişilen Seviye</div>
-            </div>
-            <div class="results-stat">
-              <div id="final-sequence" class="results-stat-value">0</div>
-              <div class="results-stat-label">En Uzun Dizi</div>
-            </div>
-          </div>
-
-          <div class="results-controls">
-            <button id="restart-button" class="control-btn">
-              <i class="fas fa-redo"></i> Tekrar Oyna
-            </button>
-            <button id="back-to-menu" class="control-btn">
-              <i class="fas fa-home"></i> Ana Menü
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Level Complete Screen -->
-      <div id="level-complete-screen" class="audio-memory-container" style="display: none;">
-        <div class="results-container">
-          <div class="results-header">
-            <h2>Seviye Tamamlandı!</h2>
-            <p>Harika iş çıkardın!</p>
-          </div>
-
-          <div class="results-stats">
-            <div class="results-stat">
-              <div id="level-complete-score" class="results-stat-value">0</div>
-              <div class="results-stat-label">Seviye Puanı</div>
-            </div>
-            <div class="results-stat">
-              <div id="level-complete-sequence" class="results-stat-value">0</div>
-              <div class="results-stat-label">Dizi Uzunluğu</div>
-            </div>
-          </div>
-
-          <div class="results-controls">
-            <button id="next-level-btn" class="control-btn">
-              <i class="fas fa-arrow-right"></i> Sonraki Seviye
-            </button>
-          </div>
-        </div>
+      <div class="memory-game-container text-center">
+        <h2 class="section-title mb-4">Bu oyun kaldırılmıştır</h2>
+        <p>Sesli Hafıza Oyunu artık mevcut değildir.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-4">
+          <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+        </a>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
-<script src="{{ url_for('static', filename='js/games/audioMemory.js') }}"></script>
 {% endblock %}
