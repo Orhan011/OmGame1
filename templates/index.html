@@ -3,27 +3,12 @@
 {% block content %}
 {% if session.get('user_id') %}
 <div class="profile-shortcut-container">
-  <div class="profile-shortcut-avatar-wrapper" onclick="toggleShortcutPanel(event)">
+  <div class="profile-shortcut-avatar-wrapper">
     {% if get_avatar_url() %}
       <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="Profil" class="profile-shortcut-avatar">
     {% else %}
       <div class="profile-shortcut-placeholder">{{ get_user_data().username[0]|upper }}</div>
     {% endif %}
-  </div>
-  <div class="profile-shortcut-panel" id="shortcutPanel">
-    <div class="shortcut-panel-item">
-      <a href="{{ url_for('profile') }}">
-        <i class="fas fa-user-circle"></i>
-        <span>Profilim</span>
-      </a>
-    </div>
-    <div class="shortcut-panel-divider"></div>
-    <div class="shortcut-panel-item">
-      <a href="{{ url_for('logout') }}">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Çıkış Yap</span>
-      </a>
-    </div>
   </div>
 </div>
 {% endif %}
@@ -106,9 +91,9 @@
     </div>
     <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
   </div>
-  
+
   <!-- Kim Nerede? oyunu kaldırıldı -->
-  
+
   <!-- Kart Eşleme oyunu kaldırıldı -->
   <!--
   <div class="game-card">
@@ -120,7 +105,7 @@
     <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
   </div>
   -->
-  
+
   <!-- Sayı Zinciri -->
   <div class="game-card">
     <div class="game-icon"><i class="fas fa-link"></i></div>
@@ -130,7 +115,7 @@
     </div>
     <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
   </div>
-  
+
   <!-- Sesli Hafıza -->
   <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
     <div class="game-icon" style="color: #6c757d;"><i class="fas fa-volume-up"></i></div>
@@ -140,7 +125,7 @@
     </div>
     <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Yakında</span>
   </div>
-  
+
   <!-- N-Back Test -->
   <div class="game-card">
     <div class="game-icon"><i class="fas fa-brain"></i></div>
@@ -150,7 +135,7 @@
     </div>
     <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
   </div>
-  
+
   <!-- IQ geliştirme oyunları kaldırıldı -->
 </div>
 </section>

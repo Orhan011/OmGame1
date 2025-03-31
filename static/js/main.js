@@ -7,12 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Setup button loading animations
   setupButtonLoadingStates();
-  
+
   // Kısayol panelini kapat - dışa tıklandığında
   document.addEventListener('click', function(e) {
     const shortcutPanel = document.getElementById('shortcutPanel');
     const profileShortcut = document.querySelector('.profile-shortcut-avatar-wrapper');
-    
+
     if (shortcutPanel && 
         shortcutPanel.style.display === 'block' && 
         !shortcutPanel.contains(e.target) && 
@@ -238,7 +238,7 @@ function toggleProfilePanel(event) {
   event.stopPropagation();
   const profilePanel = document.getElementById('profilePanel');
   profilePanel.classList.toggle('active');
-  
+
   // Panel dışına tıklandığında paneli kapat
   document.addEventListener('click', function closePanel(e) {
     if (!profilePanel.contains(e.target) && e.target !== document.getElementById('topLeftAvatar')) {
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(event) {
     const topLeftAvatar = document.getElementById('topLeftAvatar');
     const profilePanel = document.getElementById('profilePanel');
-    
+
     if (profilePanel && profilePanel.classList.contains('active') && 
         topLeftAvatar && !topLeftAvatar.contains(event.target) && 
         !profilePanel.contains(event.target)) {
@@ -290,10 +290,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleProfilePanel(event) {
   const panel = document.getElementById('profilePanel');
   if (!panel) return;
-  
+
   // Olay yayılımını durdur
   if (event) event.stopPropagation();
-  
+
   // Panel sınıfını değiştir (CSS geçişleri için)
   panel.classList.toggle('active');
 }
@@ -303,10 +303,21 @@ function toggleShortcutPanel(event) {
   event.stopPropagation();
   const panel = document.getElementById('shortcutPanel');
   if (!panel) return;
-  
+
   if (panel.style.display === 'block') {
     panel.style.display = 'none';
   } else {
     panel.style.display = 'block';
   }
 }
+
+// Added to restore profile picture - ASSUMPTION:  Profile picture is in an img tag with id 'profilePicture'
+document.addEventListener('DOMContentLoaded', function() {
+    const profilePicture = document.getElementById('profilePicture');
+    if (profilePicture) {
+        // Assumes the profile picture was removed.  This section would need to be adjusted
+        // based on how the profile picture was originally integrated into the page.
+        // This is a placeholder, you need to adjust the placement according to your HTML structure.
+        document.getElementById('profile-picture-container').appendChild(profilePicture);
+    }
+});
