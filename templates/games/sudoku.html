@@ -55,6 +55,7 @@
         <!-- Sudoku tahtası -->
         <div class="sudoku-board" id="sudoku-board"></div>
 
+        <!-- Numpad -->
         <div class="sudoku-numpad">
           <button class="numpad-btn" data-num="1">1</button>
           <button class="numpad-btn" data-num="2">2</button>
@@ -65,12 +66,8 @@
           <button class="numpad-btn" data-num="7">7</button>
           <button class="numpad-btn" data-num="8">8</button>
           <button class="numpad-btn" data-num="9">9</button>
-          <button id="notes-toggle" class="numpad-btn tool notes">
-            <i class="fas fa-pencil-alt"></i> Notlar (Kapalı)
-          </button>
-          <button id="erase" class="numpad-btn tool erase">
-            <i class="fas fa-eraser"></i> Sil
-          </button>
+          <button class="numpad-btn tool" id="notes-toggle"><i class="fas fa-pencil-alt me-1"></i>Not Modu</button>
+          <button class="numpad-btn tool" id="erase-btn"><i class="fas fa-eraser me-1"></i>Sil</button>
         </div>
       </div>
     </div>
