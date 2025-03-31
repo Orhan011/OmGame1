@@ -116,7 +116,7 @@ function loadArticleContent() {
           <span>{{ session.get('username') }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">
-          <!-- Profil bağlantısı kaldırıldı -->
+          <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
           <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy me-2"></i>Sıralama</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
