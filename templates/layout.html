@@ -111,7 +111,7 @@ function loadArticleContent() {
             {% set next_level = user_level_num + 1 %}
             {% set xp_for_user_level = xp_for_level(user_level_num) %}
             {% set xp_for_next_level = xp_for_level(next_level) %}
-            {% set progress_percent = ((user.experience_points - xp_for_user_level) / (xp_for_next_level - xp_for_user_level) * 100)|round %}
+            {% set progress_percent = ((user.experience_points - xp_for_user_level) / max(1, (xp_for_next_level - xp_for_user_level)) * 100)|round %}
             <div class="exp-bar-progress" style="width: {{ progress_percent }}%;"></div>
           {% else %}
             <div class="exp-bar-progress" style="width: 0%;"></div>
