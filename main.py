@@ -791,60 +791,50 @@ def xp_for_level(level):
 
 def get_user_scores():
     """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
-    try:
-        if 'user_id' not in session:
-            return {}
-        
-        user_id = session['user_id']
-        scores = Score.query.filter_by(user_id=user_id).all()
-        
-        score_dict = {}
-        for score in scores:
-            game_type = score.game_type
-            if game_type not in score_dict or score.score > score_dict[game_type]:
-                score_dict[game_type] = score.score
-                score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
-        
-        return score_dict
-    except Exception as e:
-        logger.error(f"Error getting user scores: {e}")
+    if 'user_id' not in session:
         return {}
+    
+    user_id = session['user_id']
+    
+    # Kullanıcının tüm oyun skorlarını al
+    scores = Score.query.filter_by(user_id=user_id).all()
+    
+    # Her oyun türü için en yüksek skoru bul
+    score_dict = {}
+    for score in scores:
+        game_type = score.game_type
+        if game_type not in score_dict or score.score > score_dict[game_type]:
+            score_dict[game_type] = score.score
+            # Son oyun tarihini de ekle
+            score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
+    
+    return score_dict
 
 @app.route('/profile')
 def profile():
     """Mevcut profil sayfası."""
+    # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
+    # Kullanıcı bilgilerini veritabanından al
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
     
-    try:
-        scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
-        game_scores = {}
-        for score in scores:
-            if score.game_type not in game_scores:
-                game_scores[score.game_type] = {
-                    'scores': [],
-                    'highest_score': score.score,
-                    'last_played': score.timestamp
-                }
-            game_scores[score.game_type]['scores'].append(score)
-            if score.score > game_scores[score.game_type]['highest_score']:
-                game_scores[score.game_type]['highest_score'] = score.score
-            
-        return render_template('profile_new.html', 
-                             user=user, 
-                             game_scores=game_scores,
-                             current_level=calculate_level(user.experience_points),
-                             xp_for_current=xp_for_level(calculate_level(user.experience_points)),
-                             xp_for_next=xp_for_level(calculate_level(user.experience_points) + 1))
-    except Exception as e:
-        logger.error(f"Profile page error: {e}")
-        flash('Profil yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-        return redirect(url_for('index'))
+    # Kullanıcının oyun skorlarını al
+    scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
+    
+    # Oyun türlerine göre skorları grupla
+    game_scores = {}
+    for score in scores:
+        if score.game_type not in game_scores:
+            game_scores[score.game_type] = []
+        game_scores[score.game_type].append(score)
+    
+    # Profil sayfasını render et
+    return render_template('profile_new.html', user=user, game_scores=game_scores)
 
 @app.route('/profile-v2')
 def profile_v2():
