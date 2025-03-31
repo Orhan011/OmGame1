@@ -1,47 +1,119 @@
-
 {% extends "layout.html" %}
 
 {% block title %}Sesli Hafıza Oyunu{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h1 class="game-title text-center mb-4">Sesli Hafıza Oyunu</h1>
-  
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="glass-panel game-panel mb-4">
-        <div class="game-info-container text-center">
-          <div class="alert alert-warning">
-            <i class="fas fa-tools me-2"></i>
-            <strong>Geliştirme Aşamasında</strong>
-          </div>
-          <h2>Bu oyun geçici olarak kaldırılmıştır</h2>
-          <p>Sesli Hafıza Oyunu şu anda yeniden tasarlanıyor ve geliştiriliyor. <br>Yakında yeni ve geliştirilmiş özellikleriyle geri dönecektir!</p>
-          <div class="mt-4">
-            <div class="progress mb-3" style="height: 20px;">
-              <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60% Tamamlandı</div>
-            </div>
-            <p class="text-muted">Tahmini tamamlanma süresi: 2 hafta</p>
-          </div>
-          <div class="mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
-              <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
-            </a>
-            <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">
-              <i class="fas fa-gamepad me-2"></i>Diğer Oyunları Keşfet
-            </a>
-          </div>
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h1 class="display-4 game-title">Sesli Hafıza Oyunu</h1>
+      <p class="lead">Duyduğunuz ses dizisini doğru sırada hatırlayın ve tekrar edin. Her seviyede dizi daha da uzar!</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-3">
+    <div class="col-md-6 text-center">
+      <div class="game-stats">
+        <div class="stat-item">
+          <span class="stat-label">Seviye:</span>
+          <span id="level" class="stat-value">1</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Skor:</span>
+          <span id="score" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">En Yüksek Skor:</span>
+          <span id="highScore" class="stat-value">0</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div id="game-container" class="simon-game-container">
+        <div id="status-display" class="status-display">Başlamak için "Başlat" butonuna tıklayın</div>
+        
+        <!-- Zorluk Seviyesi Seçenekleri -->
+        <div class="difficulty-selector">
+          <label>Zorluk: </label>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn difficulty-btn active" data-difficulty="easy">Kolay</button>
+            <button type="button" class="btn difficulty-btn" data-difficulty="medium">Orta</button>
+            <button type="button" class="btn difficulty-btn" data-difficulty="hard">Zor</button>
+          </div>
+        </div>
+        
+        <!-- Oyun butonları - Kolay mod (4 buton) -->
+        <div id="easy-buttons" class="simon-buttons easy-mode">
+          <button id="btn0" class="simon-btn red" data-sound="0"></button>
+          <button id="btn1" class="simon-btn green" data-sound="1"></button>
+          <button id="btn2" class="simon-btn blue" data-sound="2"></button>
+          <button id="btn3" class="simon-btn yellow" data-sound="3"></button>
+        </div>
+        
+        <!-- Oyun butonları - Orta mod (6 buton) -->
+        <div id="medium-buttons" class="simon-buttons medium-mode" style="display: none;">
+          <button id="btn0-medium" class="simon-btn red" data-sound="0"></button>
+          <button id="btn1-medium" class="simon-btn green" data-sound="1"></button>
+          <button id="btn2-medium" class="simon-btn blue" data-sound="2"></button>
+          <button id="btn3-medium" class="simon-btn yellow" data-sound="3"></button>
+          <button id="btn4-medium" class="simon-btn purple" data-sound="4"></button>
+          <button id="btn5-medium" class="simon-btn orange" data-sound="5"></button>
+        </div>
+        
+        <!-- Oyun butonları - Zor mod (8 buton) -->
+        <div id="hard-buttons" class="simon-buttons hard-mode" style="display: none;">
+          <button id="btn0-hard" class="simon-btn red" data-sound="0"></button>
+          <button id="btn1-hard" class="simon-btn green" data-sound="1"></button>
+          <button id="btn2-hard" class="simon-btn blue" data-sound="2"></button>
+          <button id="btn3-hard" class="simon-btn yellow" data-sound="3"></button>
+          <button id="btn4-hard" class="simon-btn purple" data-sound="4"></button>
+          <button id="btn5-hard" class="simon-btn orange" data-sound="5"></button>
+          <button id="btn6-hard" class="simon-btn pink" data-sound="6"></button>
+          <button id="btn7-hard" class="simon-btn teal" data-sound="7"></button>
+        </div>
+        
+        <div class="game-controls">
+          <button id="start-button" class="game-control-btn start">Başlat</button>
+          <button id="reset-button" class="game-control-btn reset" disabled>Sıfırla</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+      <div class="game-instructions card">
+        <div class="card-body">
+          <h5 class="card-title">Nasıl Oynanır?</h5>
+          <ol class="instruction-list">
+            <li>Oyun, renkli düğmelerin bir sırayla yanıp sönerek ses çıkarmasıyla başlar.</li>
+            <li>Sırayı dikkatle izleyin ve aynı düğmelere aynı sırayla basın.</li>
+            <li>Her başarılı turda, sıraya bir düğme daha eklenir.</li>
+            <li>Yanlış bir düğmeye basarsanız oyun sona erer.</li>
+            <li>Zorlu modlarda daha fazla buton ve daha hızlı tempo ile oynayın!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row mt-4 mb-5">
+    <div class="col text-center">
+      <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
+      </a>
     </div>
   </div>
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/audio-memory.css') }}">
+{% endblock %}
+
 {% block scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log("Sesli Hafıza Oyunu kaldırılmıştır.");
-  });
-</script>
+<script src="{{ url_for('static', filename='js/games/audioMemory.js') }}"></script>
 {% endblock %}

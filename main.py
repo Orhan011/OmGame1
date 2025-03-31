@@ -618,9 +618,10 @@ def login():
 # Profile routes have been removed from the application
 
 # Game routes
-@app.route('/games/3d-labyrinth')
-def three_d_labyrinth():
-    return render_template('games/3dLabyrinth.html')
+# 3D Labirent oyunu kaldırıldı
+# @app.route('/games/3d-labyrinth')
+# def three_d_labyrinth():
+#     return render_template('games/3dLabyrinth.html')
 
 @app.route('/games/word-puzzle')
 def word_puzzle():
@@ -630,9 +631,11 @@ def word_puzzle():
 def memory_match():
     return render_template('games/memoryMatch.html')
 
+# Labirent oyunu kaldırıldı
 @app.route('/games/labyrinth')
 def labyrinth():
-    return render_template('games/labyrinth.html')
+    flash('Labirent oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/puzzle')
 def puzzle():
@@ -660,7 +663,7 @@ def number_chain():
 
 @app.route('/games/audio-memory')
 def audio_memory():
-    flash('Sesli Hafıza Oyunu şu anda geliştirme aşamasındadır ve yakında yenilenmiş haliyle geri dönecektir.', 'info')
+    # Yeni Sesli Hafıza Oyunu
     return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')

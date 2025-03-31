@@ -1,15 +1,292 @@
+/**
+ * Sesli Hafıza Oyunu (Simon) - CSS Stilleri
+ */
 
-/* Bu oyun kaldırılmıştır */
-
-.game-panel {
-  padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+/* Ana Oyun Konteyneri */
+.simon-game-container {
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
-.game-info-container {
-  padding: 2rem;
+.simon-game-container:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b, #7bed9f, #70a1ff);
+  border-radius: 4px 4px 0 0;
+}
+
+/* Oyun İstatistikleri */
+.game-stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  background: rgba(20, 20, 40, 0.6);
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-item {
+  margin: 0 15px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #b8c7d9;
+  display: block;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f1f2f6;
+  display: block;
+}
+
+/* Durum Mesajı */
+.status-display {
+  text-align: center;
+  color: #f1f2f6;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Zorluk Seçici */
+.difficulty-selector {
+  margin-bottom: 20px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.difficulty-selector label {
+  color: #f1f2f6;
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.difficulty-btn {
+  background-color: rgba(60, 60, 80, 0.7);
+  color: #f1f2f6;
+  border: 1px solid #5a5a8a;
+  margin: 0 5px;
+  transition: all 0.2s ease;
+}
+
+.difficulty-btn:hover {
+  background-color: rgba(80, 80, 110, 0.9);
+  color: white;
+}
+
+.difficulty-btn.active {
+  background-color: #3498db;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+  border-color: #3498db;
+  color: white;
+}
+
+/* Simon Butonları */
+.simon-buttons {
+  display: grid;
+  gap: 10px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 400px;
+}
+
+.easy-mode {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.medium-mode {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.hard-mode {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.simon-btn {
+  width: 100%;
+  padding-bottom: 100%; /* Square aspect ratio */
+  position: relative;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  opacity: 0.7;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.simon-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.simon-btn.active {
+  opacity: 1;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+/* Buton Renkleri */
+.simon-btn.red { background-color: #e74c3c; }
+.simon-btn.green { background-color: #2ecc71; }
+.simon-btn.blue { background-color: #3498db; }
+.simon-btn.yellow { background-color: #f1c40f; }
+.simon-btn.purple { background-color: #9b59b6; }
+.simon-btn.orange { background-color: #e67e22; }
+.simon-btn.pink { background-color: #fd79a8; }
+.simon-btn.teal { background-color: #00cec9; }
+
+/* Aktif durumdaki butonlar için parlama efekti */
+.simon-btn.red.active { box-shadow: 0 0 30px rgba(231, 76, 60, 0.8); }
+.simon-btn.green.active { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); }
+.simon-btn.blue.active { box-shadow: 0 0 30px rgba(52, 152, 219, 0.8); }
+.simon-btn.yellow.active { box-shadow: 0 0 30px rgba(241, 196, 15, 0.8); }
+.simon-btn.purple.active { box-shadow: 0 0 30px rgba(155, 89, 182, 0.8); }
+.simon-btn.orange.active { box-shadow: 0 0 30px rgba(230, 126, 34, 0.8); }
+.simon-btn.pink.active { box-shadow: 0 0 30px rgba(253, 121, 168, 0.8); }
+.simon-btn.teal.active { box-shadow: 0 0 30px rgba(0, 206, 201, 0.8); }
+
+/* Oyun Kontrol Butonları */
+.game-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.game-control-btn {
+  padding: 10px 30px;
+  margin: 0 10px;
+  border-radius: 30px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+.game-control-btn.start {
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  color: white;
+}
+
+.game-control-btn.reset {
+  background: linear-gradient(135deg, #a8c0ff, #3f2b96);
+  color: white;
+  opacity: 0.7;
+}
+
+.game-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.game-control-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* Oyun Talimatları */
+.game-instructions {
+  background: rgba(30, 30, 50, 0.7);
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.game-instructions .card-title {
+  color: #f1f2f6;
+  font-weight: bold;
+  border-bottom: 2px solid rgba(200, 200, 200, 0.2);
+  padding-bottom: 10px;
+}
+
+.instruction-list {
+  color: #dcdde1;
+  padding-left: 20px;
+}
+
+.instruction-list li {
+  margin-bottom: 8px;
+}
+
+/* Mobil Düzenleme */
+@media (max-width: 768px) {
+  .simon-game-container {
+    padding: 15px;
+  }
+  
+  .simon-buttons {
+    max-width: 300px;
+  }
+  
+  .game-control-btn {
+    padding: 8px 20px;
+    font-size: 0.8rem;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .stat-item {
+    margin: 0 8px;
+  }
+}
+
+/* Animasyonlar */
+@keyframes levelUp {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.level-up {
+  animation: levelUp 0.5s ease;
+}
+
+@keyframes errorShake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(5px); }
+  50% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+.error-shake {
+  animation: errorShake 0.4s ease;
+  background-color: rgba(255, 0, 0, 0.1) !important;
 }
