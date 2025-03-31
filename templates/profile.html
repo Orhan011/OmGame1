@@ -19,7 +19,7 @@
           <div class="profile-cover-area">
             <div class="profile-cover-gradient"></div>
           </div>
-          
+
           <div class="profile-card-content">
             <!-- Profil Resmi -->
             <div class="profile-avatar-container">
@@ -30,28 +30,28 @@
                   {{ current_user.username[0]|upper }}
                 </div>
               {% endif %}
-              
+
               <div class="profile-status online" title="Çevrimiçi"></div>
             </div>
-            
+
             <!-- Kullanıcı Bilgileri -->
             <div class="profile-info">
               <h2 class="profile-name">{{ current_user.username }}</h2>
               <div class="profile-title">{{ current_user.rank }}</div>
-              
+
               <div class="profile-stats">
                 <div class="stat-item">
-                  <span class="stat-value">{{ current_user.total_games_played }}</span>
+                  <span class="stat-value">{{ current_user.total_games_played|default(0) }}</span>
                   <span class="stat-label">Oyun</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                  <span class="stat-value">{{ current_user.highest_score }}</span>
+                  <span class="stat-value">{{ current_user.highest_score|default(0) }}</span>
                   <span class="stat-label">En Yüksek Skor</span>
                 </div>
               </div>
             </div>
-            
+
             <!-- Seviye İlerleme Çubuğu -->
             <div class="level-progress-container">
               <div class="level-badge">{{ current_user.experience_points // 1000 + 1 }}</div>
@@ -60,7 +60,7 @@
               </div>
               <div class="level-text">{{ current_user.experience_points % 1000 }} / 1000 XP</div>
             </div>
-            
+
             <!-- Profil Rozet Alanı -->
             <div class="profile-badges-container">
               <h3 class="section-title"><i class="fas fa-award"></i> Rozetler</h3>
@@ -80,11 +80,11 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Hızlı İstatistikler -->
         <div class="quick-stats glass-effect">
           <h3 class="section-title"><i class="fas fa-chart-line"></i> İstatistikler</h3>
-          
+
           <div class="stats-bubbles">
             <div class="row g-2">
               <div class="col-6">
@@ -96,7 +96,7 @@
                   <div class="stat-label">OYUN</div>
                 </div>
               </div>
-              
+
               <div class="col-6">
                 <div class="stat-bubble">
                   <div class="stat-icon">
@@ -106,7 +106,7 @@
                   <div class="stat-label">EN YÜKSEK SKOR</div>
                 </div>
               </div>
-              
+
               <div class="col-6">
                 <div class="stat-bubble">
                   <div class="stat-icon">
@@ -116,7 +116,7 @@
                   <div class="stat-label">KELİME BULMACA</div>
                 </div>
               </div>
-              
+
               <div class="col-6">
                 <div class="stat-bubble">
                   <div class="stat-icon">
@@ -129,7 +129,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Bağlantılar -->
         <div class="profile-links glass-effect">
           <a href="{{ url_for('leaderboard') }}" class="profile-link">
@@ -144,7 +144,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Sağ İçerik Alanı - Ayarlar ve Düzenleme -->
     <div class="col-lg-9">
       <div class="profile-content">
@@ -155,33 +155,33 @@
               <span class="tab-icon"><i class="fas fa-user-edit"></i></span>
               <span class="tab-text">Kişisel Bilgiler</span>
             </button>
-            
+
             <button class="modern-tab" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
               <span class="tab-icon"><i class="fas fa-lock"></i></span>
               <span class="tab-text">Güvenlik</span>
             </button>
-            
+
             <button class="modern-tab" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar" type="button" role="tab" aria-controls="avatar" aria-selected="false">
               <span class="tab-icon"><i class="fas fa-user-circle"></i></span>
               <span class="tab-text">Profil Fotoğrafı</span>
             </button>
-            
+
             <button class="modern-tab" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab" aria-controls="account" aria-selected="false">
               <span class="tab-icon"><i class="fas fa-cog"></i></span>
               <span class="tab-text">Hesap</span>
             </button>
-            
+
             <div class="tab-indicator"></div>
           </div>
         </div>
-        
+
         <!-- Sekme İçerikleri -->
         <div class="tab-content" id="profileTabContent">
           <!-- Kişisel Bilgiler Sekmesi -->
           <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-user-edit"></i> Kişisel Bilgiler</h3>
-              
+
               <form class="profile-form" method="POST" action="{{ url_for('update_profile') }}">
                 <div class="row">
                   <div class="col-md-6">
@@ -190,7 +190,7 @@
                       <label for="fullName">Tam İsim</label>
                     </div>
                   </div>
-                  
+
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" placeholder="Email">
@@ -198,7 +198,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
@@ -206,7 +206,7 @@
                       <label for="age">Yaş</label>
                     </div>
                   </div>
-                  
+
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}" placeholder="Konum">
@@ -214,12 +214,12 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="form-floating mb-3">
                   <textarea class="form-control" id="bio" name="bio" style="height: 120px;" placeholder="Hakkında">{{ current_user.bio }}</textarea>
                   <label for="bio">Hakkında</label>
                 </div>
-                
+
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Değişiklikleri Kaydet
@@ -228,35 +228,35 @@
               </form>
             </div>
           </div>
-          
+
           <!-- Güvenlik Sekmesi -->
           <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-key"></i> Şifre Değiştir</h3>
-              
+
               <form class="profile-form" method="POST" action="{{ url_for('update_password') }}">
                 <div class="form-floating mb-3">
                   <input type="password" class="form-control" id="currentPassword" name="current_password" placeholder="Mevcut Şifre" required>
                   <label for="currentPassword">Mevcut Şifre</label>
                 </div>
-                
+
                 <div class="form-floating mb-3">
                   <input type="password" class="form-control" id="newPassword" name="new_password" placeholder="Yeni Şifre" required>
                   <label for="newPassword">Yeni Şifre</label>
                 </div>
-                
+
                 <div class="form-floating mb-3">
                   <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Yeni Şifre (Tekrar)" required>
                   <label for="confirmPassword">Yeni Şifre (Tekrar)</label>
                 </div>
-                
+
                 <div class="password-strength" id="passwordStrength">
                   <div class="strength-meter">
                     <div class="strength-meter-fill" data-strength="0"></div>
                   </div>
                   <div class="password-feedback" id="passwordFeedback">Şifre gücü: Zayıf</div>
                 </div>
-                
+
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary">
                     <i class="fas fa-lock"></i> Şifreyi Güncelle
@@ -265,12 +265,12 @@
               </form>
             </div>
           </div>
-          
+
           <!-- Profil Fotoğrafı Sekmesi -->
           <div class="tab-pane fade" id="avatar" role="tabpanel" aria-labelledby="avatar-tab">
             <div class="profile-form-container glass-effect">
               <h3 class="form-title"><i class="fas fa-user-circle"></i> Profil Fotoğrafı</h3>
-              
+
               <form id="avatarForm" action="{{ url_for('update_avatar') }}" method="POST" enctype="multipart/form-data" class="profile-form">
                 <div class="avatar-editor">
                   <div class="current-avatar">
@@ -282,7 +282,7 @@
                       </div>
                     {% endif %}
                   </div>
-                  
+
                   <div class="avatar-upload">
                     <label for="avatarInput" class="avatar-upload-label">
                       <i class="fas fa-upload"></i> Fotoğraf Yükle
@@ -290,10 +290,10 @@
                     <input type="file" id="avatarInput" name="avatar" accept="image/*" class="form-control" style="display: none;">
                   </div>
                 </div>
-                
+
                 <div class="avatar-gallery">
                   <h4 class="gallery-title">Hazır Avatarlar</h4>
-                  
+
                   <div class="avatar-options">
                     <div class="preset-avatar" data-avatar="avatar1.svg">
                       <img src="{{ url_for('static', filename='images/avatars/avatar1.svg') }}" alt="Avatar 1">
@@ -309,9 +309,9 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <input type="hidden" name="selected_avatar" id="selectedAvatar" value="">
-                
+
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Profil Fotoğrafını Kaydet
@@ -320,7 +320,7 @@
               </form>
             </div>
           </div>
-          
+
           <!-- Hesap Sekmesi -->
           <div class="tab-pane fade" id="account" role="tabpanel" aria-labelledby="account-tab">
             <div class="profile-form-container glass-effect">
@@ -329,14 +329,14 @@
                 <div class="warning-message">
                   <p><i class="fas fa-exclamation-circle"></i> Bu işlemler geri alınamaz ve hesabınıza kalıcı olarak zarar verebilir.</p>
                 </div>
-                
+
                 <div class="danger-actions">
                   <form class="settings-form" method="POST" action="{{ url_for('deactivate_account') }}">
                     <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Hesabınızı devre dışı bırakmak istediğinizden emin misiniz? Giriş yaparak tekrar aktive edebilirsiniz.');">
                       <i class="fas fa-user-slash"></i> Hesabı Devre Dışı Bırak
                     </button>
                   </form>
-                  
+
                   <form class="settings-form mt-3" method="POST" action="{{ url_for('delete_account') }}">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!');">
                       <i class="fas fa-trash-alt"></i> Hesabı Kalıcı Olarak Sil
@@ -347,11 +347,11 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Son Aktiviteler Kartı -->
         <div class="recent-activity glass-effect">
           <h3 class="section-title"><i class="fas fa-history"></i> Son Aktiviteler</h3>
-          
+
           <div class="activity-bubbles">
             <div class="row g-2">
               <div class="col-md-4">
@@ -364,7 +364,7 @@
                   <div class="activity-time">1 saat önce</div>
                 </div>
               </div>
-              
+
               <div class="col-md-4">
                 <div class="activity-bubble">
                   <div class="activity-icon">
@@ -375,7 +375,7 @@
                   <div class="activity-time">2 gün önce</div>
                 </div>
               </div>
-              
+
               <div class="col-md-4">
                 <div class="activity-bubble">
                   <div class="activity-icon">
@@ -402,7 +402,7 @@
     const avatarInput = document.getElementById('avatarInput');
     const avatarPreview = document.getElementById('avatarPreview');
     const selectedAvatarInput = document.getElementById('selectedAvatar');
-    
+
     // Dosya yükleme
     if (avatarInput) {
       avatarInput.addEventListener('change', function() {
@@ -421,13 +421,13 @@
               img.id = 'avatarPreview';
               avatarPreview.parentNode.replaceChild(img, avatarPreview);
             }
-            
+
             // Hazır avatar seçimini temizle
             selectedAvatarInput.value = '';
             document.querySelectorAll('.preset-avatar').forEach(el => {
               el.classList.remove('selected');
             });
-            
+
             // Anında animasyon efekti ekleme
             setTimeout(() => {
               document.querySelector('.updated')?.classList.remove('updated');
@@ -437,18 +437,18 @@
         }
       });
     }
-    
+
     // Hazır avatar seçimi
     const presetAvatars = document.querySelectorAll('.preset-avatar');
     presetAvatars.forEach(avatar => {
       avatar.addEventListener('click', function() {
         const avatarName = this.getAttribute('data-avatar');
         selectedAvatarInput.value = avatarName;
-        
+
         // Seçili sınıfını değiştir
         presetAvatars.forEach(a => a.classList.remove('selected'));
         this.classList.add('selected');
-        
+
         // Önizlemeyi güncelle
         const avatarSrc = this.querySelector('img').src;
         if (avatarPreview.tagName === 'IMG') {
@@ -461,35 +461,35 @@
           img.id = 'avatarPreview';
           avatarPreview.parentNode.replaceChild(img, avatarPreview);
         }
-        
+
         // Animasyon sınıfını kaldır
         setTimeout(() => {
           document.querySelector('.updated')?.classList.remove('updated');
         }, 1000);
-        
+
         // Dosya girdisini temizle
         if (avatarInput) avatarInput.value = '';
       });
     });
-    
+
     // Şifre gücü göstergesi
     const newPassword = document.getElementById('newPassword');
     const passwordStrength = document.getElementById('passwordStrength');
     const passwordFeedback = document.getElementById('passwordFeedback');
     const strengthMeter = document.querySelector('.strength-meter-fill');
-    
+
     if (newPassword && passwordStrength) {
       newPassword.addEventListener('input', function() {
         const val = this.value;
         let strength = 0;
         let feedback = 'Şifre gücü: ';
-        
+
         if (val.length >= 8) strength += 1;
         if (val.match(/[a-z]/)) strength += 1;
         if (val.match(/[A-Z]/)) strength += 1;
         if (val.match(/[0-9]/)) strength += 1;
         if (val.match(/[^a-zA-Z0-9]/)) strength += 1;
-        
+
         switch (strength) {
           case 0:
           case 1:
@@ -518,44 +518,44 @@
             strengthMeter.style.backgroundColor = '#27ae60';
             break;
         }
-        
+
         passwordFeedback.textContent = feedback;
         strengthMeter.setAttribute('data-strength', strength);
       });
     }
-    
+
     // Modern Tab İşlevselliği
     const modernTabs = document.querySelectorAll('.modern-tab');
     const tabIndicator = document.querySelector('.tab-indicator');
-    
+
     // Tab göstergesini konumlandır
     function positionTabIndicator(activeTab) {
       if (!tabIndicator || !activeTab) return;
-      
+
       const tabRect = activeTab.getBoundingClientRect();
       const tabContainerRect = activeTab.parentNode.getBoundingClientRect();
-      
+
       // Göstergeyi aktif tab'ın altında konumlandır
       tabIndicator.style.width = `${tabRect.width}px`;
       tabIndicator.style.left = `${tabRect.left - tabContainerRect.left}px`;
     }
-    
+
     // İlk yüklemede tab göstergesini konumlandır
     setTimeout(() => {
       const activeTab = document.querySelector('.modern-tab.active');
       positionTabIndicator(activeTab);
     }, 100);
-    
+
     // Tab değişimini yönet
     modernTabs.forEach(tab => {
       tab.addEventListener('click', function() {
         // Aktif tab'ı değiştir
         modernTabs.forEach(t => t.classList.remove('active'));
         this.classList.add('active');
-        
+
         // Tab göstergesini animasyonla hareket ettir
         positionTabIndicator(this);
-        
+
         // Tab içeriğini canlandır
         setTimeout(() => {
           const activePane = document.querySelector('.tab-pane.show.active');
