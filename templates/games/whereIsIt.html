@@ -1,799 +1,858 @@
+
 {% extends "layout.html" %}
 
-{% block title %}Kim Nerede Oyunu{% endblock %}
+{% block title %}Kim Nerede?{% endblock %}
 
 {% block content %}
 <div class="container position-relative">
   <a href="/" class="back-button"><i class="fas fa-chevron-left"></i></a>
-  <h1 class="game-title text-center">Kim Nerede?</h1>
-
-  <!-- Oyun İstatistikleri -->
+  <h1 class="game-title text-center mb-4">Kim Nerede?</h1>
+  
+  <!-- Oyun İstatistikleri Bölümü -->
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-
+    
     <div class="game-stat-item">
       <i class="fas fa-hourglass-half"></i>
-      <div class="game-stat-value" id="timer-display">20</div>
+      <div class="game-stat-value" id="timer-display">00:30</div>
       <div class="game-stat-label">SÜRE</div>
     </div>
-
+    
     <div class="game-stat-item">
-      <i class="fas fa-flag-checkered"></i>
-      <div class="game-stat-value" id="round-display">0/10</div>
-      <div class="game-stat-label">TUR</div>
+      <i class="fas fa-map-marker-alt"></i>
+      <div class="game-stat-value" id="level-display">1</div>
+      <div class="game-stat-label">SEVİYE</div>
+    </div>
+    
+    <div class="game-stat-item">
+      <i class="fas fa-check-circle"></i>
+      <div class="game-stat-value" id="correct-display">0</div>
+      <div class="game-stat-label">DOĞRU</div>
     </div>
   </div>
-
+  
   <div class="row justify-content-center">
     <div class="col-lg-10">
-      <!-- Başlangıç Ekranı -->
-      <div class="game-instructions" id="start-screen">
+      <!-- Intro Section -->
+      <div class="glass-panel where-is-it-intro mb-4" id="intro-section">
         <div class="row align-items-center">
-          <div class="col-md-8">
-            <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
-            <p>Bu oyunda, gösterilen kişilerin haritadaki konumunu bulmaya çalışacaksınız. Doğru konumu ne kadar hızlı bulursanız, o kadar çok puan kazanırsınız!</p>
-            <div class="rule-list mt-3">
-              <div class="rule-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Gösterilen karakteri haritada nerede olduğunu tahmin edin</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-clock"></i>
-                <span>Her tur için sınırlı süreniz var</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-bolt"></i>
-                <span>Hızlı ve doğru tahminler daha çok puan kazandırır</span>
-              </div>
-              <div class="rule-item">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Yanlış tıklamalar ceza puanı getirebilir</span>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
-            <div class="memory-levels-selector">
-              <div class="level-label">Zorluk</div>
-              <div class="level-buttons">
-                <button id="level-easy" class="level-btn" data-level="EASY">Kolay</button>
-                <button id="level-medium" class="level-btn active" data-level="MEDIUM">Orta</button>
-                <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
-              </div>
-            </div>
-            <button id="start-game" class="standard-start-btn">
+          <div class="col-md-6">
+            <h3 class="mb-3">Türkiye'nin İllerini Bul!</h3>
+            <p>Bu oyunda, verilen il adını Türkiye haritası üzerinde bulmanız gerekiyor. Her doğru tahmin için puan kazanırsınız, ancak dikkat edin - süreniz sınırlı!</p>
+            <ul class="game-instructions-list">
+              <li><i class="fas fa-check-circle"></i> İl ismini okuyun ve haritada bulun</li>
+              <li><i class="fas fa-clock"></i> Hızlı cevap verin, süre kısıtlı!</li>
+              <li><i class="fas fa-star"></i> Doğru cevaplar için ekstra puan kazanın</li>
+              <li><i class="fas fa-level-up-alt"></i> Zorlaştıkça daha fazla puan kazanın</li>
+            </ul>
+            <button id="start-game-btn" class="btn btn-lg btn-primary mt-3">
               <i class="fas fa-play me-2"></i>Oyunu Başlat
             </button>
           </div>
+          <div class="col-md-6 text-center">
+            <img src="/static/images/turkey_map_preview.png" alt="Türkiye Haritası" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+          </div>
         </div>
       </div>
-
-      <!-- Oyun Alanı -->
-      <div id="game-container" class="where-is-it-container glass-effect" style="display: none;">
-        <div class="game-controls-top">
-          <button id="pause-game" class="game-control-btn" title="Oyunu Duraklat">
-            <i class="fas fa-pause"></i>
-          </button>
-          <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
-            <i class="fas fa-volume-up"></i>
-          </button>
-          <a href="/" class="game-control-btn" title="Ana Sayfaya Dön">
-            <i class="fas fa-home"></i>
-          </a>
-          <div class="game-controls">
-            <button id="hint-button" class="btn btn-info btn-sm">İpucu (3)</button>
-          </div>
-        </div>
-
-        <div class="character-info-panel">
-          <img id="character-image" src="/static/images/whereIsIt/char1.png" alt="Karakter" class="character-avatar">
-          <div class="character-name-container">
-            <span>Kim Nerede:</span>
-            <h3 id="character-name">Mehmet</h3>
-          </div>
-        </div>
-
-        <div class="progress timer-progress">
-          <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
-        </div>
-
-        <div id="hint-display"></div>
-
-        <div id="map-container" class="game-map">
-          <!-- SVG Harita buraya yüklenecek -->
-          <div class="loading-map">
-            <div class="spinner-border text-light" role="status">
-              <span class="visually-hidden">Yükleniyor...</span>
+      
+      <!-- Game Area -->
+      <div class="glass-panel game-panel mb-4" id="game-area" style="display: none;">
+        <div class="row">
+          <div class="col-12 text-center mb-3">
+            <div class="current-province-container">
+              <h3 class="mb-0">Bul: <span id="current-province" class="fw-bold">İstanbul</span></h3>
             </div>
-            <p class="mt-2">Harita yükleniyor...</p>
           </div>
         </div>
-
-        <!-- Sonuç Popup -->
-        <div id="result-popup" class="result-popup" style="display: none;">
-          <div class="result-content">
-            <h3 id="result-message" class="text-success">Harika! Doğru yeri buldunuz.</h3>
-            <p id="result-score">+100 puan kazandınız!</p>
-            <div class="result-buttons">
-              <button id="next-round-btn" class="btn btn-primary"><i class="fas fa-forward me-2"></i>Sonraki Tur</button>
-              <button id="game-over-btn" class="btn btn-success" style="display: none;"><i class="fas fa-check-circle me-2"></i>Oyunu Bitir</button>
+        
+        <div class="row">
+          <div class="col-12 position-relative">
+            <div class="map-container">
+              <object id="turkey-map" data="/static/images/turkey_map.svg" type="image/svg+xml" class="img-fluid"></object>
+              
+              <!-- İpucu butonu -->
+              <button id="hint-btn" class="hint-button position-absolute top-0 end-0 m-2">
+                <i class="fas fa-lightbulb"></i> İpucu
+                <span id="hint-count" class="hint-count">3</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Oyun Sonuç Ekranı -->
-      <div id="game-results" class="game-results glass-effect" style="display: none;">
-        <div class="result-card">
-          <h3>Tebrikler!</h3>
-          <div class="result-details">
-            <p>Toplam Puan: <strong id="final-score">0</strong></p>
-            <p>Doğru Tahminler: <strong id="correct-answers">0</strong></p>
-            <p>Tamamlanan Turlar: <strong id="completed-rounds">0</strong></p>
-          </div>
-          <div class="rating">
-            <div id="rating-stars">
-              <!-- Yıldızlar buraya dinamik olarak eklenecek -->
+      
+      <!-- Level Complete Modal -->
+      <div class="modal-overlay" id="level-complete-modal" style="display: none;">
+        <div class="game-modal">
+          <div class="modal-content level-complete-content text-center">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
             </div>
-            <p id="rating-text">Harika!</p>
-          </div>
-          <div class="game-results-footer">
-            <button id="play-again" class="btn btn-primary btn-lg"><i class="fas fa-redo me-2"></i>Tekrar Oyna</button>
-            <a href="/" id="go-home" class="btn btn-outline-primary btn-lg"><i class="fas fa-home me-2"></i>Ana Sayfa</a>
+            <h2>Seviye Tamamlandı!</h2>
+            <div class="score-summary">
+              <div class="score-row">
+                <span>Doğru Sayısı:</span>
+                <span id="level-correct-count">0</span>
+              </div>
+              <div class="score-row">
+                <span>Toplam Puan:</span>
+                <span id="level-points">0</span>
+              </div>
+              <div class="score-row bonus">
+                <span>Zaman Bonusu:</span>
+                <span id="time-bonus">0</span>
+              </div>
+              <div class="score-row total">
+                <span>Toplam Skor:</span>
+                <span id="total-score">0</span>
+              </div>
+            </div>
+            <div class="buttons-container">
+              <button id="next-level-btn" class="btn btn-primary">
+                <i class="fas fa-arrow-right me-2"></i>Sonraki Seviye
+              </button>
+            </div>
           </div>
         </div>
       </div>
+      
+      <!-- Game Over Modal -->
+      <div class="modal-overlay" id="game-over-modal" style="display: none;">
+        <div class="game-modal">
+          <div class="modal-content game-over-content text-center">
+            <div class="game-over-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <h2>Oyun Bitti!</h2>
+            <p>Türkiye coğrafyasına hakimiyetinizi gösterdiniz!</p>
+            <div class="score-summary">
+              <div class="score-row">
+                <span>Tamamlanan Seviye:</span>
+                <span id="final-level">0</span>
+              </div>
+              <div class="score-row">
+                <span>Doğru Tahmin:</span>
+                <span id="final-correct">0</span>
+              </div>
+              <div class="score-row total">
+                <span>Toplam Puan:</span>
+                <span id="final-score">0</span>
+              </div>
+            </div>
+            <div class="buttons-container">
+              <button id="play-again-btn" class="btn btn-primary">
+                <i class="fas fa-redo me-2"></i>Tekrar Oyna
+              </button>
+              <button id="back-to-menu-btn" class="btn btn-secondary">
+                <i class="fas fa-home me-2"></i>Ana Menü
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>
 
+<!-- İl bilgileri tooltips için -->
+<div id="province-tooltip" class="province-tooltip" style="display: none;">
+  <span id="tooltip-text">İl Adı</span>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Oyun değişkenleri
+    let score = 0;
+    let level = 1;
+    let timeLeft = 30; // Başlangıç süresi (saniye)
+    let correctAnswers = 0;
+    let totalCorrectAnswers = 0;
+    let timer;
+    let currentProvince = "";
+    let provinces = [];
+    let svgDocument = null;
+    let isGameActive = false;
+    let hintCount = 3;
+    let usedProvinces = [];
+    
+    // Ses efektleri
+    const correctSound = new Audio('/static/sounds/correct.mp3');
+    const wrongSound = new Audio('/static/sounds/wrong.mp3');
+    const levelCompleteSound = new Audio('/static/sounds/level-complete.mp3');
+    const gameOverSound = new Audio('/static/sounds/game-over.mp3');
+    
+    // Ses çalma fonksiyonu (hataları yakala)
+    function playSound(sound) {
+      try {
+        sound.currentTime = 0;
+        sound.play().catch(err => {
+          console.log("Sound play error:", err);
+        });
+      } catch (err) {
+        console.log("Sound play error:", err);
+      }
+    }
+    
+    // DOM öğeleri
+    const startGameBtn = document.getElementById('start-game-btn');
+    const introSection = document.getElementById('intro-section');
+    const gameArea = document.getElementById('game-area');
+    const scoreDisplay = document.getElementById('score-display');
+    const timerDisplay = document.getElementById('timer-display');
+    const levelDisplay = document.getElementById('level-display');
+    const correctDisplay = document.getElementById('correct-display');
+    const currentProvinceDisplay = document.getElementById('current-province');
+    const turkeyMap = document.getElementById('turkey-map');
+    const levelCompleteModal = document.getElementById('level-complete-modal');
+    const gameOverModal = document.getElementById('game-over-modal');
+    const nextLevelBtn = document.getElementById('next-level-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
+    const hintBtn = document.getElementById('hint-btn');
+    const hintCountDisplay = document.getElementById('hint-count');
+    const provinceTooltip = document.getElementById('province-tooltip');
+    const tooltipText = document.getElementById('tooltip-text');
+    
+    // Seviye tamamlama modal içeriği
+    const levelCorrectCount = document.getElementById('level-correct-count');
+    const levelPointsDisplay = document.getElementById('level-points');
+    const timeBonusDisplay = document.getElementById('time-bonus');
+    const totalScoreDisplay = document.getElementById('total-score');
+    
+    // Oyun sonu modal içeriği
+    const finalLevelDisplay = document.getElementById('final-level');
+    const finalCorrectDisplay = document.getElementById('final-correct');
+    const finalScoreDisplay = document.getElementById('final-score');
+    
+    // SVG yükleme
+    turkeyMap.addEventListener('load', function() {
+      svgDocument = turkeyMap.contentDocument;
+      setupProvinces();
+    });
+    
+    // Başlangıç butonuna tıklama
+    startGameBtn.addEventListener('click', startGame);
+    
+    // Sonraki seviye butonuna tıklama
+    nextLevelBtn.addEventListener('click', function() {
+      levelCompleteModal.style.display = 'none';
+      startNextLevel();
+    });
+    
+    // Tekrar oyna butonuna tıklama
+    playAgainBtn.addEventListener('click', function() {
+      gameOverModal.style.display = 'none';
+      resetGame();
+      startGame();
+    });
+    
+    // Ana menüye dön butonuna tıklama
+    backToMenuBtn.addEventListener('click', function() {
+      gameOverModal.style.display = 'none';
+      resetGame();
+      gameArea.style.display = 'none';
+      introSection.style.display = 'block';
+    });
+    
+    // İpucu butonuna tıklama
+    hintBtn.addEventListener('click', giveHint);
+    
+    // İlleri ayarla
+    function setupProvinces() {
+      if (!svgDocument) return;
+      
+      // Tüm il elemanlarını seç
+      const provinceElements = svgDocument.querySelectorAll('.province');
+      
+      provinces = Array.from(provinceElements).map(el => {
+        const name = el.getAttribute('data-name');
+        return {
+          element: el,
+          name: name
+        };
+      });
+      
+      // Her il için event listener ekle
+      provinces.forEach(province => {
+        // Hover efektleri
+        province.element.addEventListener('mouseover', function(e) {
+          if (!isGameActive) return;
+          
+          this.style.fill = '#e0e0e0';
+          showTooltip(province.name, e);
+        });
+        
+        province.element.addEventListener('mouseout', function() {
+          if (!isGameActive) return;
+          
+          this.style.fill = '';
+          hideTooltip();
+        });
+        
+        province.element.addEventListener('mousemove', function(e) {
+          if (!isGameActive) return;
+          
+          updateTooltipPosition(e);
+        });
+        
+        // Tıklama olayı
+        province.element.addEventListener('click', function() {
+          if (!isGameActive) return;
+          
+          checkAnswer(province.name);
+        });
+      });
+    }
+    
+    // Oyunu başlat
+    function startGame() {
+      isGameActive = true;
+      introSection.style.display = 'none';
+      gameArea.style.display = 'block';
+      
+      // Değerleri sıfırla
+      score = 0;
+      level = 1;
+      correctAnswers = 0;
+      totalCorrectAnswers = 0;
+      usedProvinces = [];
+      timeLeft = 30 + (level - 1) * 5; // Her seviye için +5 saniye
+      hintCount = 3;
+      
+      // Ekranı güncelle
+      updateDisplay();
+      
+      // İlk soruyu seç
+      selectRandomProvince();
+      
+      // Zamanlayıcıyı başlat
+      startTimer();
+    }
+    
+    // Zamanlayıcıyı başlat
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(function() {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          endLevel();
+        }
+      }, 1000);
+    }
+    
+    // Zamanlayıcıyı güncelle
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Son 10 saniye kırmızı yanıp sönsün
+      if (timeLeft <= 10) {
+        timerDisplay.classList.add('time-warning');
+      } else {
+        timerDisplay.classList.remove('time-warning');
+      }
+    }
+    
+    // Rastgele il seç
+    function selectRandomProvince() {
+      let availableProvinces = provinces.filter(p => !usedProvinces.includes(p.name));
+      
+      // Eğer tüm iller kullanıldıysa, listeyi sıfırla
+      if (availableProvinces.length === 0) {
+        usedProvinces = [];
+        availableProvinces = provinces;
+      }
+      
+      // Rastgele bir il seç
+      const randomIndex = Math.floor(Math.random() * availableProvinces.length);
+      currentProvince = availableProvinces[randomIndex].name;
+      
+      // Kullanılan iller listesine ekle
+      usedProvinces.push(currentProvince);
+      
+      // Ekranı güncelle
+      currentProvinceDisplay.textContent = currentProvince;
+    }
+    
+    // Cevabı kontrol et
+    function checkAnswer(selectedProvince) {
+      if (selectedProvince === currentProvince) {
+        // Doğru cevap
+        playSound(correctSound);
+        
+        // İl elemanını geçici olarak yeşile boyayalım
+        const provinceElement = provinces.find(p => p.name === selectedProvince).element;
+        const originalFill = provinceElement.style.fill;
+        provinceElement.style.fill = '#4CAF50';
+        
+        // Puanı artır
+        const pointsEarned = 100 * level;
+        score += pointsEarned;
+        
+        // Doğru sayısını artır
+        correctAnswers++;
+        totalCorrectAnswers++;
+        
+        // Puan animasyonu göster
+        showPointsAnimation(pointsEarned);
+        
+        // Ekranı güncelle
+        updateDisplay();
+        
+        // 1 saniye sonra rengi normale döndürüp yeni soruya geç
+        setTimeout(function() {
+          provinceElement.style.fill = originalFill;
+          
+          // Seviye tamamlandı mı kontrol et
+          if (correctAnswers >= 5) { // Her seviyede 5 doğru cevap gerekiyor
+            endLevel();
+          } else {
+            selectRandomProvince();
+          }
+        }, 800);
+      } else {
+        // Yanlış cevap
+        playSound(wrongSound);
+        
+        // İl elemanını geçici olarak kırmızıya boyayalım
+        const provinceElement = provinces.find(p => p.name === selectedProvince).element;
+        const originalFill = provinceElement.style.fill;
+        provinceElement.style.fill = '#F44336';
+        
+        // Yanlış cevap için puan düşürme
+        score = Math.max(0, score - 25);
+        updateDisplay();
+        
+        // 1 saniye sonra rengi normale döndür
+        setTimeout(function() {
+          provinceElement.style.fill = originalFill;
+        }, 500);
+      }
+    }
+    
+    // Ekranı güncelle
+    function updateDisplay() {
+      scoreDisplay.textContent = score;
+      levelDisplay.textContent = level;
+      correctDisplay.textContent = totalCorrectAnswers;
+      hintCountDisplay.textContent = hintCount;
+      
+      // İpucu butonu aktif/pasif durumunu güncelle
+      if (hintCount <= 0) {
+        hintBtn.classList.add('disabled');
+      } else {
+        hintBtn.classList.remove('disabled');
+      }
+    }
+    
+    // Seviyeyi bitir
+    function endLevel() {
+      clearInterval(timer);
+      isGameActive = false;
+      
+      // Zaman bonusu (kalan her saniye için +10 puan)
+      const timeBonus = timeLeft * 10;
+      score += timeBonus;
+      
+      // Seviye tamamlandı modalını göster
+      levelCorrectCount.textContent = correctAnswers;
+      levelPointsDisplay.textContent = score - timeBonus;
+      timeBonusDisplay.textContent = timeBonus;
+      totalScoreDisplay.textContent = score;
+      
+      if (correctAnswers >= 5) {
+        // Seviye tamamlandı
+        playSound(levelCompleteSound);
+        levelCompleteModal.style.display = 'flex';
+      } else {
+        // Oyun bitti
+        playSound(gameOverSound);
+        finalLevelDisplay.textContent = level;
+        finalCorrectDisplay.textContent = totalCorrectAnswers;
+        finalScoreDisplay.textContent = score;
+        gameOverModal.style.display = 'flex';
+        
+        // Skoru kaydet
+        saveScore();
+      }
+    }
+    
+    // Sonraki seviyeye geç
+    function startNextLevel() {
+      level++;
+      correctAnswers = 0;
+      timeLeft = 30 + (level - 1) * 5; // Her seviye için +5 saniye
+      
+      // İlave ipucu
+      if (level % 2 === 0) {
+        hintCount += 1;
+      }
+      
+      updateDisplay();
+      updateTimerDisplay();
+      
+      // Yeni soruyu seç
+      selectRandomProvince();
+      
+      // Zamanlayıcıyı başlat
+      isGameActive = true;
+      startTimer();
+    }
+    
+    // Oyunu sıfırla
+    function resetGame() {
+      clearInterval(timer);
+      score = 0;
+      level = 1;
+      correctAnswers = 0;
+      totalCorrectAnswers = 0;
+      timeLeft = 30;
+      hintCount = 3;
+      usedProvinces = [];
+      
+      updateDisplay();
+      updateTimerDisplay();
+    }
+    
+    // İpucu ver
+    function giveHint() {
+      if (hintCount <= 0 || !isGameActive) return;
+      
+      hintCount--;
+      updateDisplay();
+      
+      // Doğru ili vurgula
+      const provinceElement = provinces.find(p => p.name === currentProvince).element;
+      const originalFill = provinceElement.style.fill;
+      provinceElement.style.fill = '#FFD700'; // Altın rengi
+      
+      // 2 saniye sonra vurguyu kaldır
+      setTimeout(function() {
+        provinceElement.style.fill = originalFill;
+      }, 2000);
+    }
+    
+    // Tooltip göster
+    function showTooltip(text, event) {
+      tooltipText.textContent = text;
+      provinceTooltip.style.display = 'block';
+      updateTooltipPosition(event);
+    }
+    
+    // Tooltip'i gizle
+    function hideTooltip() {
+      provinceTooltip.style.display = 'none';
+    }
+    
+    // Tooltip pozisyonunu güncelle
+    function updateTooltipPosition(event) {
+      const mapRect = turkeyMap.getBoundingClientRect();
+      const x = event.clientX - mapRect.left;
+      const y = event.clientY - mapRect.top;
+      
+      provinceTooltip.style.left = (x + 10) + 'px';
+      provinceTooltip.style.top = (y + 10) + 'px';
+    }
+    
+    // Puan animasyonu göster
+    function showPointsAnimation(points) {
+      const pointsElement = document.createElement('div');
+      pointsElement.className = 'points-animation';
+      pointsElement.textContent = '+' + points;
+      
+      // Map container içine ekle
+      const mapContainer = document.querySelector('.map-container');
+      mapContainer.appendChild(pointsElement);
+      
+      // Animasyon bittikten sonra elementi kaldır
+      setTimeout(() => {
+        mapContainer.removeChild(pointsElement);
+      }, 1500);
+    }
+    
+    // Skor kaydetme
+    function saveScore() {
+      if (score <= 0) return;
+      
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          game_type: 'whereIsIt',
+          score: score
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Skor başarıyla kaydedildi:', data);
+          
+          // XP kazanımı mesajı
+          if (data.xp_gained) {
+            showXpNotification(data.xp_gained, data.is_level_up);
+          }
+        } else {
+          console.log('Skor kaydedilemedi:', data.message);
+        }
+      })
+      .catch(err => {
+        console.log('Skor kaydedilirken hata:', err);
+      });
+    }
+    
+    // XP kazanımı bildirimini göster
+    function showXpNotification(xp, isLevelUp) {
+      const notification = document.createElement('div');
+      notification.className = 'xp-notification';
+      
+      if (isLevelUp) {
+        notification.textContent = `+${xp} XP Kazandınız! Seviye Atladınız!`;
+        notification.classList.add('level-up');
+      } else {
+        notification.textContent = `+${xp} XP Kazandınız!`;
+      }
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 500);
+      }, 3000);
+    }
+  });
+</script>
+
 <style>
-.where-is-it-container {
-  padding: 20px;
-  position: relative;
-  min-height: 600px;
-}
-
-.character-info-panel {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 10px 15px;
-  border-radius: 10px;
-}
-
-.character-avatar {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
-.character-name-container {
-  margin-left: 15px;
-}
-
-.character-name-container span {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  display: block;
-}
-
-.character-name-container h3 {
-  font-size: 1.6rem;
-  margin: 0;
-  font-weight: 600;
-  color: white;
-}
-
-.timer-progress {
-  height: 10px;
-  margin-bottom: 20px;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.game-map {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: crosshair;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-}
-
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.target-marker {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.target-marker.correct {
-  background-color: rgba(46, 204, 113, 0.7);
-  border: 2px solid #27ae60;
-}
-
-.target-marker.wrong {
-  background-color: rgba(231, 76, 60, 0.7);
-  border: 2px solid #c0392b;
-}
-
-.marker-pulse {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: inherit;
-  opacity: 0.7;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.5);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-}
-
-.result-popup {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  border-radius: 10px;
-}
-
-.result-content {
-  background: linear-gradient(135deg, rgba(40, 40, 80, 0.9) 0%, rgba(30, 30, 60, 0.9) 100%);
-  padding: 30px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 80%;
-  max-width: 400px;
-}
-
-.result-content h3 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-}
-
-.result-content p {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.result-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.game-controls-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.game-control-btn {
-  background-color: transparent;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.game-control-btn.active i {
-  color: #28a745;
-}
-
-.loading-map {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.game-controls {
-  margin-left: auto; /* Push to the right */
-}
-
-#hint-display {
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  color: white;
-}
-</style>
-
-<script src="/static/js/games/whereIsIt.js"></script>
-{% endblock %}
-{% extends "layout.html" %}
-
-{% block title %}Kim Nerede?{% endblock %}
-
-{% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
-<style>
-  .where-is-it-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
+  /* Harita Stil */
+  .map-container {
     position: relative;
-  }
-  
-  .game-header {
-    text-align: center;
+    width: 100%;
+    min-height: 400px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
   }
   
-  .game-title {
-    font-size: 2.2rem;
-    background: linear-gradient(135deg, #6a5ae0, #a762f7);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-bottom: 10px;
-  }
-  
-  .map-container {
+  /* SVG stil */
+  #turkey-map {
     width: 100%;
-    height: 500px;
-    margin: 0 auto;
-    background-color: rgba(30, 30, 50, 0.7);
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  }
-  
-  .map-container svg {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .map-container svg path {
-    fill: rgba(106, 90, 224, 0.5);
-    stroke: rgba(255, 255, 255, 0.3);
-    stroke-width: 1;
-    transition: all 0.3s ease;
-  }
-  
-  .map-container svg path:hover {
-    fill: rgba(106, 90, 224, 0.7);
-  }
-  
-  .map-container svg path.correct {
-    fill: rgba(39, 174, 96, 0.7) !important;
-  }
-  
-  .map-container svg path.wrong {
-    fill: rgba(231, 76, 60, 0.7) !important;
-  }
-  
-  .control-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 15px 0;
-    background-color: rgba(40, 40, 60, 0.7);
-    padding: 15px;
-    border-radius: 10px;
-    flex-wrap: wrap;
-  }
-  
-  .info-display {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .info-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: rgba(60, 60, 80, 0.5);
-    padding: 8px 15px;
+    height: auto;
+    max-height: 600px;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    min-width: 80px;
   }
   
-  .info-label {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
-  }
-  
-  .info-value {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #fff;
-  }
-  
-  .question-display {
-    background-color: rgba(106, 90, 224, 0.2);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    text-align: center;
-    border-left: 4px solid #6a5ae0;
-  }
-  
-  .question-text {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #fff;
-    margin: 0;
-  }
-  
-  .hint-container {
-    text-align: center;
-    margin: 15px 0;
-  }
-  
-  .hint-button {
-    background: linear-gradient(135deg, #6a5ae0, #8177d5);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-  }
-  
-  .hint-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5);
-  }
-  
-  .hint-text {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
+  /* Mevcut il stil */
+  .current-province-container {
+    background-color: rgba(66, 133, 244, 0.1);
+    border-left: 4px solid #4285f4;
     padding: 10px 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-    display: none;
-    animation: fadeIn 0.5s ease;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: inline-block;
   }
   
-  .start-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 35, 0.95));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(5px);
-    border-radius: 12px;
-  }
-  
-  .start-content {
-    text-align: center;
-    max-width: 600px;
-    padding: 40px;
-    background-color: rgba(45, 45, 65, 0.7);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .start-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #6a5ae0, #a762f7);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  
-  .start-subtitle {
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 25px;
-    font-size: 1.1rem;
-  }
-  
-  .start-button {
-    background: linear-gradient(135deg, #6a5ae0, #8177d5);
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.4);
-  }
-  
-  .start-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(106, 90, 224, 0.6);
-  }
-  
-  .level-select {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
-  }
-  
-  .level-button {
-    padding: 8px 20px;
-    border-radius: 50px;
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-  }
-  
-  .level-button:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-  }
-  
-  .result-screen {
+  /* Modal Overlay */
+  .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 10, 20, 0.9);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
-    backdrop-filter: blur(5px);
-  }
-  
-  .result-content {
-    text-align: center;
-    background-color: rgba(45, 45, 65, 0.8);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .result-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #6a5ae0, #a762f7);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  
-  .final-score-container {
-    background-color: rgba(106, 90, 224, 0.2);
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px 0;
-  }
-  
-  .final-score-label {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 10px;
-  }
-  
-  .final-score {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #fff;
-  }
-  
-  .result-buttons {
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
+    align-items: center;
   }
   
-  .restart-button {
-    background: linear-gradient(135deg, #6a5ae0, #8177d5);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+  /* Game Modal */
+  .game-modal {
+    background-color: #fff;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: modalFadeIn 0.3s ease;
   }
   
-  .restart-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5);
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
   
-  .home-button {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 12px 25px;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  /* Modal Content */
+  .modal-content {
+    padding: 30px;
   }
   
-  .home-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+  /* Success Icon */
+  .success-icon {
+    font-size: 60px;
+    color: #4CAF50;
+    margin-bottom: 20px;
   }
   
-  .how-to-play {
-    background-color: rgba(255, 255, 255, 0.05);
+  .game-over-icon {
+    font-size: 60px;
+    color: #FFC107;
+    margin-bottom: 20px;
+  }
+  
+  /* Score Summary */
+  .score-summary {
+    background-color: #f8f9fa;
+    border-radius: 8px;
     padding: 15px;
-    border-radius: 10px;
     margin: 20px 0;
     text-align: left;
   }
   
-  .how-to-play h3 {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
   }
   
-  .how-to-play ul {
-    padding-left: 20px;
-    color: rgba(255, 255, 255, 0.7);
+  .score-row.bonus {
+    border-top: 1px dashed #ddd;
+    padding-top: 12px;
+    margin-top: 4px;
+    color: #4CAF50;
   }
   
-  .how-to-play li {
-    margin-bottom: 8px;
+  .score-row.total {
+    border-top: 2px solid #ddd;
+    padding-top: 12px;
+    margin-top: 4px;
+    font-weight: bold;
+    font-size: 1.1em;
   }
   
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+  /* Buttons Container */
+  .buttons-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  /* Tooltip */
+  .province-tooltip {
+    position: absolute;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 100;
+  }
+  
+  /* İpucu Butonu */
+  .hint-button {
+    background-color: #FFC107;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .hint-button:hover {
+    background-color: #FFD54F;
+  }
+  
+  .hint-button.disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+    cursor: not-allowed;
+  }
+  
+  .hint-count {
+    background-color: rgba(0,0,0,0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    font-weight: bold;
+  }
+  
+  /* Timer Warning */
+  .time-warning {
+    color: #F44336;
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  /* Puan Animasyonu */
+  .points-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #4CAF50;
+    font-size: 36px;
+    font-weight: bold;
+    text-shadow: 0 0 5px white;
+    animation: pointsFadeOut 1.5s ease-out forwards;
+    z-index: 10;
+  }
+  
+  @keyframes pointsFadeOut {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    80% { opacity: 1; transform: translate(-50%, -30%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -100%) scale(0.8); }
+  }
+  
+  /* XP Bildirim */
+  .xp-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 1100;
+  }
+  
+  .xp-notification.level-up {
+    background-color: #2196F3;
+  }
+  
+  .xp-notification.show {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
-
-<div class="where-is-it-container">
-  <a href="{{ url_for('index') }}" class="back-button">
-    <i class="fas fa-arrow-left"></i>
-  </a>
-  
-  <div class="game-header">
-    <h1 class="game-title">Kim Nerede?</h1>
-  </div>
-  
-  <div id="gameContainer" style="display: none;">
-    <div class="control-panel">
-      <div class="info-display">
-        <div class="info-item">
-          <span class="info-label">PUAN</span>
-          <span class="info-value" id="score">0</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">SÜRE</span>
-          <span class="info-value" id="timer">60</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">TUR</span>
-          <span class="info-value" id="round">1/5</span>
-        </div>
-      </div>
-      <div class="level-controls">
-        <span id="currentLevel">Seviye: Kolay</span>
-        <button id="prevLevel" class="level-button"><i class="fas fa-chevron-left"></i></button>
-        <button id="nextLevel" class="level-button"><i class="fas fa-chevron-right"></i></button>
-      </div>
-    </div>
-    
-    <div class="question-display">
-      <p class="question-text" id="question">Ankara nerede?</p>
-    </div>
-    
-    <div class="map-container" id="mapContainer">
-      <!-- SVG haritası buraya yüklenecek -->
-      <div class="loading">Harita yükleniyor...</div>
-    </div>
-    
-    <div class="hint-container">
-      <button id="hintButton" class="hint-button">İpucu (3)</button>
-      <div id="hintText" class="hint-text"></div>
-    </div>
-  </div>
-  
-  <div id="startScreen" class="start-screen">
-    <div class="start-content">
-      <h2 class="start-title">Kim Nerede?</h2>
-      <p class="start-subtitle">Türkiye haritası üzerinde şehirlerin yerlerini bularak hafızanızı test edin.</p>
-      
-      <div class="how-to-play">
-        <h3><i class="fas fa-info-circle"></i> Nasıl Oynanır?</h3>
-        <ul>
-          <li>Size sorulan şehri harita üzerinde bulun ve tıklayın.</li>
-          <li>Doğru şehri ne kadar hızlı bulursanız o kadar çok puan kazanırsınız.</li>
-          <li>Her turda bir ipucu hakkınız var, ancak ipucu kullanırsanız puan kaybedersiniz.</li>
-          <li>Yanlış tıklamanın zaman cezası vardır.</li>
-          <li>Toplam 5 tur sonunda oyununuz değerlendirilir.</li>
-        </ul>
-      </div>
-      
-      <div class="level-select">
-        <button id="level1" class="level-button">Kolay</button>
-        <button id="level2" class="level-button">Orta</button>
-        <button id="level3" class="level-button">Zor</button>
-      </div>
-      
-      <button id="startButton" class="start-button">
-        <i class="fas fa-play me-2"></i> Oyunu Başlat
-      </button>
-    </div>
-  </div>
-  
-  <div id="resultScreen" class="result-screen">
-    <div class="result-content">
-      <h2 class="result-title">Oyun Bitti!</h2>
-      <p>Türkiye coğrafyasını ne kadar iyi bildiğinizi test ettiniz.</p>
-      
-      <div class="final-score-container">
-        <div class="final-score-label">Toplam Puanınız</div>
-        <div class="final-score" id="finalScore">0</div>
-      </div>
-      
-      <div class="result-buttons">
-        <button id="restartButton" class="restart-button">
-          <i class="fas fa-redo me-2"></i> Tekrar Oyna
-        </button>
-        <a href="{{ url_for('index') }}" class="home-button">
-          <i class="fas fa-home me-2"></i> Ana Sayfa
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='js/games/whereIsIt.js') }}"></script>
 {% endblock %}
