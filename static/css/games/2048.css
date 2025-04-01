@@ -550,8 +550,6 @@ h1 {
   transform: scale(1);
 }
 
-}
-
 
 /* Seviye bildirimi animasyonu - Removed */
 
@@ -580,7 +578,15 @@ body.dark-theme .score-box {
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* Removed Animations */
+/* Animasyonlar */
+
+/* BlockRotate animasyonu tanımı */
+@keyframes blockRotate {
+  0% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(2deg) translateY(-2px); }
+  75% { transform: rotate(-2deg) translateY(-1px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
 
 /* Seviye göstergesi renkli efekti */
 #level-value {
@@ -600,6 +606,29 @@ body.dark-theme .score-box {
 .combo-notification {
   animation: comboAnimation 1s ease-in-out;
   pointer-events: none;
+}
+
+/* Seviye bildirim animasyonu */
+.level-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.9), rgba(255, 98, 0, 0.9));
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 28px;
+  font-weight: bold;
+  z-index: 1000;
+  opacity: 0;
+  box-shadow: 0 10px 30px rgba(255, 149, 0, 0.5);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.level-notification.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* Düşme ve kayma animasyonları - geliştirilmiş */
