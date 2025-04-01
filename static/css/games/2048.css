@@ -72,13 +72,11 @@ h1 {
 }
 
 .scores {
-  display: flex;
-  gap: 12px;
+  display: none; /* Skor butonlarını gizle */
 }
 
 .level-box {
-  background: linear-gradient(135deg, rgba(254, 140, 0, 0.25), rgba(255, 183, 0, 0.15));
-  border: 1px solid rgba(254, 140, 0, 0.3);
+  display: none; /* Seviye bilgi kutusunu gizle */
 }
 
 .game-options {
@@ -406,57 +404,9 @@ h1 {
   display: none;
 }
 
-/* Power-ups section */
+/* Power-ups section - gizlendi */
 .power-ups {
-  margin-top: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.power-up-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.5px;
-}
-
-.power-up-grid {
-  display: flex;
-  justify-content: space-around;
-  gap: 10px;
-}
-
-.power-up {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 80px;
-}
-
-.power-up:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-3px);
-}
-
-.power-up-icon {
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.power-up-name {
-  font-size: 10px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.2;
+  display: none;
 }
 
 @keyframes fadeIn {

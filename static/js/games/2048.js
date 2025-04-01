@@ -42,10 +42,7 @@ class ModernMergePuzzle {
         // Get DOM elements
         this.columnsGridElement = document.querySelector('.columns-grid');
         this.blockSourceElement = document.querySelector('.block-source');
-        this.scoreElement = document.getElementById('score');
-        this.bestScoreElement = document.getElementById('best-score');
         this.finalScoreElement = document.querySelector('.final-score');
-        this.bestScoreElement.textContent = this.bestScore;
 
         // Clear existing grid
         this.columnsGridElement.innerHTML = '';
@@ -755,16 +752,10 @@ class ModernMergePuzzle {
 
     updateDisplay() {
         // Performans için sadece değişen alanları güncelle
-        // Update score
-        if (this.scoreElement) {
-            this.scoreElement.textContent = this.score;
-            if (this.score > this.bestScore) {
-                this.bestScore = this.score;
-                localStorage.setItem('bestScore', this.bestScore);
-                if (this.bestScoreElement) {
-                    this.bestScoreElement.textContent = this.bestScore;
-                }
-            }
+        // Update score - silinen elementlere erişim kaldırıldı
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            localStorage.setItem('bestScore', this.bestScore);
         }
 
         // Seviye kontrolü - her 1000 puan için seviye artışı
@@ -772,11 +763,7 @@ class ModernMergePuzzle {
         if (newLevel > this.level) {
             this.level = newLevel;
             localStorage.setItem('level', this.level);
-            const levelElement = document.getElementById('level-value');
-            if (levelElement) {
-                levelElement.textContent = this.level;
-            }
-
+            
             // Seviye atlama bildirimi göster
             this.showLevelUpNotification();
 
@@ -948,11 +935,6 @@ class ModernMergePuzzle {
             this.won = false;
         });
 
-        // Power-up events
-        document.getElementById('clear-column').addEventListener('click', () => this.usePowerUp('clear'));
-        document.getElementById('double-value').addEventListener('click', () => this.usePowerUp('double'));
-        document.getElementById('extra-move').addEventListener('click', () => this.usePowerUp('extra'));
-
         // Ses efekti kontrolü
         document.getElementById('toggle-sound').addEventListener('click', () => {
             this.soundEnabled = !this.soundEnabled;
@@ -1048,7 +1030,6 @@ class ModernMergePuzzle {
         this.score = 0;
         this.level = 1;
         localStorage.setItem('level', this.level);
-        document.getElementById('level-value').textContent = this.level;
 
         this.gameOver = false;
         this.won = false;
