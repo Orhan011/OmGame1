@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}Modern Hafıza Kartları{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games/memory_cards.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <div class="game-header">
+    <h1>Modern Hafıza Kartları</h1>
+    <div class="game-stats">
+      <div class="stat-item">
+        <i class="fas fa-brain"></i>
+        <span id="level">Seviye: 1</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-hourglass-half"></i>
+        <span id="timer">Süre: 0</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-trophy"></i>
+        <span id="score">Skor: 0</span>
+      </div>
+      <div class="stat-item">
+        <i class="fas fa-sync-alt"></i>
+        <span id="moves">Hamle: 0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-options">
+    <div class="difficulty-selector">
+      <label for="difficulty">Zorluk Seviyesi:</label>
+      <select id="difficulty">
+        <option value="easy">Kolay (4x4)</option>
+        <option value="medium" selected>Orta (6x6)</option>
+        <option value="hard">Zor (8x8)</option>
+        <option value="expert">Uzman (8x8 - Zaman Baskısı)</option>
+      </select>
+    </div>
+    <div class="theme-selector">
+      <label for="card-theme">Kart Teması:</label>
+      <select id="card-theme">
+        <option value="symbols">Semboller</option>
+        <option value="animals" selected>Hayvanlar</option>
+        <option value="food">Yiyecekler</option>
+        <option value="nature">Doğa</option>
+        <option value="tech">Teknoloji</option>
+      </select>
+    </div>
+    <button id="new-game-btn" class="primary-button">Yeni Oyun</button>
+  </div>
+
+  <div class="game-board-container">
+    <div id="game-board" class="memory-board medium-board"></div>
+  </div>
+
+  <div class="game-controls">
+    <button id="hint-btn" class="secondary-button" disabled>
+      <i class="fas fa-lightbulb"></i> İpucu
+      <span id="hints-left">(3)</span>
+    </button>
+    <button id="pause-btn" class="secondary-button" disabled>
+      <i class="fas fa-pause"></i> Duraklat
+    </button>
+    <button id="mute-btn" class="secondary-button">
+      <i class="fas fa-volume-up"></i> Ses
+    </button>
+  </div>
+
+  <div id="game-message" class="game-message">
+    <div class="message-content">
+      <h2 id="message-title">Hoş Geldiniz!</h2>
+      <p id="message-text">Modern Hafıza Kartları oyununa başlamak için "Yeni Oyun" butonuna tıklayın.</p>
+      <div id="message-stats" class="message-stats hidden">
+        <div class="message-stat">
+          <i class="fas fa-hourglass-end"></i>
+          <span id="final-time">Süre: 0 saniye</span>
+        </div>
+        <div class="message-stat">
+          <i class="fas fa-star"></i>
+          <span id="final-score">Skor: 0 puan</span>
+        </div>
+        <div class="message-stat">
+          <i class="fas fa-sync"></i>
+          <span id="final-moves">Hamle: 0</span>
+        </div>
+      </div>
+      <div class="message-buttons">
+        <button id="close-message-btn" class="primary-button">Tamam</button>
+        <button id="play-again-btn" class="secondary-button hidden">Tekrar Oyna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Oyun için gerekli ana JavaScript dosyası -->
+<script src="{{ url_for('static', filename='js/games/memory_cards.js') }}"></script>
+{% endblock %}
