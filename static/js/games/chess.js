@@ -497,6 +497,12 @@ function isKingInCheck(color) {
         if (isValidMove(r, c, kingRow, kingCol)) {
           return true;
         }
+      }
+    }
+  }
+  
+  return false;
+}
 
 // Yakalanan taşları güncelle
 function updateCapturedPieces() {
