@@ -2,44 +2,32 @@
 
 {% block extra_css %}
 <style>
-  /* Oyun bölümü düzeni */
-  .game-section-container {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 40px;
-  }
-  
-  @media (max-width: 991px) {
-    .game-section-container {
-      flex-direction: column;
-    }
-  }
-  
   /* Bakım duyurusu için stil */
   .maintenance-announcement {
     background: linear-gradient(135deg, #2c3e50, #1a1a2e);
     border-radius: 15px;
-    padding: 30px;
+    padding: 40px;
     text-align: center;
     color: #fff;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    flex: 1;
+    margin: 0 auto 40px auto;
+    max-width: 900px;
   }
   
   .maintenance-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
+    font-size: 5rem;
+    margin-bottom: 25px;
     color: #6a5ae0;
     text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
   }
   
   .maintenance-announcement h3 {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+    font-size: 2rem;
+    margin-bottom: 25px;
     position: relative;
     display: inline-block;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
   }
   
   .maintenance-announcement h3:after {
@@ -48,16 +36,16 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
+    width: 100px;
     height: 3px;
     background: #6a5ae0;
     border-radius: 3px;
   }
   
   .maintenance-announcement p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 15px;
-    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 18px;
+    font-size: 1.2rem;
     line-height: 1.6;
   }
   
@@ -65,138 +53,20 @@
     display: inline-block;
     background: linear-gradient(to right, #6a5ae0, #8170ff);
     color: white;
-    padding: 12px 25px;
+    padding: 14px 30px;
     border-radius: 30px;
     text-decoration: none;
     font-weight: 600;
-    margin-top: 15px;
+    margin-top: 20px;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+    font-size: 1.1rem;
   }
   
   .maintenance-info-btn:hover {
     background: linear-gradient(to right, #8170ff, #9a8eff);
     box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
     transform: translateY(-3px);
-    color: white;
-  }
-  
-  /* Mevcut oyunlar bölümü */
-  .available-games {
-    flex: 1;
-    background: linear-gradient(135deg, #2c3e50, #1a1a2e);
-    border-radius: 15px;
-    padding: 30px;
-    color: #fff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .available-games h3 {
-    color: #fff;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 10px;
-  }
-  
-  .available-games h3:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: #6a5ae0;
-    border-radius: 3px;
-  }
-  
-  /* Oyun kartı */
-  .game-card {
-    background: linear-gradient(135deg, #3a4d62, #2a2a3e);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-  }
-  
-  .game-card .game-icon {
-    font-size: 3.5rem;
-    text-align: center;
-    margin-bottom: 15px;
-    color: #6a5ae0;
-    transition: all 0.3s ease;
-    text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
-  }
-  
-  .game-card:hover .game-icon {
-    transform: scale(1.1);
-    color: #8170ff;
-  }
-  
-  .game-card .game-info {
-    flex: 1;
-  }
-  
-  .game-card .game-info h3 {
-    color: #fff;
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-    font-weight: 600;
-    position: relative;
-    padding-bottom: 8px;
-  }
-  
-  .game-card .game-info h3:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background: #6a5ae0;
-    border-radius: 3px;
-  }
-  
-  .game-card .game-info p {
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.5;
-    font-size: 0.95rem;
-  }
-  
-  .game-card .game-btn {
-    background: linear-gradient(to right, #6a5ae0, #8170ff);
-    color: white;
-    padding: 10px 24px;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 15px;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-  }
-  
-  .game-card .game-btn:hover {
-    background: linear-gradient(to right, #8170ff, #9a8eff);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-    transform: translateY(-2px);
     color: white;
   }
 </style>
@@ -237,7 +107,7 @@
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
   <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi uygulamasına hoş geldiniz.</p>
   <div class="d-flex justify-content-center flex-wrap">
-    <a href="{{ url_for('all_games') }}" class="btn btn-primary me-2 mb-2">Bilgi Al</a>
+    <a href="#platform-maintenance" class="btn btn-primary me-2 mb-2">Bakım Bilgisi</a>
     <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Detaylar</a>
   </div>
 </div>
@@ -245,33 +115,19 @@
 </div>
 </section>
 
-<section class="mt-4">
-<h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
-<div class="game-section-container">
-  <div class="maintenance-announcement">
-    <div class="maintenance-icon">
-      <i class="fas fa-tools"></i>
-    </div>
-    <h3>Çoğu Oyunumuz Şu Anda Bakımda</h3>
-    <p>Çoğu oyunumuz geçici olarak erişilemez durumdadır. Sistemimizde kapsamlı bir yenileme çalışması yapılmaktadır.</p>
-    <p>Daha güçlü, daha zengin içerikli ve kullanıcı dostu oyunlarla yakında yeniden hizmetinizde olacağız.</p>
-    <p>Gösterdiğiniz anlayış için teşekkür ederiz.</p>
-    <a href="{{ url_for('all_games') }}" class="maintenance-info-btn">
-      <i class="fas fa-info-circle me-2"></i>Detaylı Bilgi
-    </a>
+<section id="platform-maintenance" class="mt-4">
+<h2 class="text-center mb-3">Platform Bakımda</h2>
+<div class="maintenance-announcement">
+  <div class="maintenance-icon">
+    <i class="fas fa-tools"></i>
   </div>
-
-  <div class="available-games">
-    <h3 class="text-center mb-4">Erişilebilir Oyunlar</h3>
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-font"></i></div>
-      <div class="game-info">
-        <h3>Kelime Bulmaca</h3>
-        <p>Kelimeleri bul, sözcük hazineni genişlet. Dil becerilerini ve kelime dağarcığını geliştir.</p>
-      </div>
-      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
-    </div>
-  </div>
+  <h3>Sistemimiz Bakımda</h3>
+  <p>Tüm oyunlarımız geçici olarak erişilemez durumdadır. Platformumuzda kapsamlı bir yenileme çalışması yapılmaktadır.</p>
+  <p>Daha güçlü, daha zengin içerikli ve kullanıcı dostu bir platformla yakında yeniden hizmetinizde olacağız.</p>
+  <p>Gösterdiğiniz anlayış için teşekkür ederiz.</p>
+  <a href="{{ url_for('all_games') }}" class="maintenance-info-btn">
+    <i class="fas fa-info-circle me-2"></i>Detaylı Bilgi
+  </a>
 </div>
 </section>
 
