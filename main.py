@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from models import User, Score, Article, UserHomepagePreference
+from models import User, Score, Article
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -118,120 +118,6 @@ def get_user_avatar(user_id):
         # doğrudan bu yolu dön (url_for ile sarmalamadan)
         return user.avatar_url
     return 'images/default-avatar.png'  # Varsayılan avatar
-
-
-def get_all_available_games():
-    """
-    Sistemdeki tüm mevcut oyunları bir liste olarak döndürür.
-    Her oyun bir sözlük olarak temsil edilir ve şu bilgileri içerir:
-    - type: Oyun türü (slug formatında, örn. 'wordPuzzle')
-    - name: Oyun adı (görünen ad, örn. 'Kelime Bulmaca')
-    - description: Kısa açıklama
-    - icon: Font Awesome ikon sınıfı
-    - url: Oyun URL'si
-    - status: Oyunun durumu ('active', 'maintenance', vb.)
-    """
-    games = [
-        {
-            'type': 'wordPuzzle',
-            'name': 'Kelime Bulmaca',
-            'description': 'Kelimeleri bul, sözcük hazineni genişlet.',
-            'icon': 'fas fa-font',
-            'url': url_for('word_puzzle'),
-            'status': 'active'
-        },
-        {
-            'type': 'memoryMatch',
-            'name': 'Hafıza Kartları',
-            'description': 'Eşleşen kartları bul ve hafızanı test et.',
-            'icon': 'fas fa-clone',
-            'url': url_for('memory_match'),
-            'status': 'active'
-        },
-        {
-            'type': 'labyrinth',
-            'name': 'Labirent',
-            'description': 'Çıkış yolunu bul ve stratejik düşün.',
-            'icon': 'fas fa-route',
-            'url': url_for('labyrinth'),
-            'status': 'active'
-        },
-        {
-            'type': 'puzzle',
-            'name': 'Yapboz',
-            'description': 'Parçaları birleştir ve görsel zekânı geliştir.',
-            'icon': 'fas fa-puzzle-piece',
-            'url': url_for('puzzle'),
-            'status': 'active'
-        },
-        {
-            'type': 'numberSequence',
-            'name': 'Sayı Dizisi',
-            'description': 'Sayı örüntülerini keşfet ve analitik düşün.',
-            'icon': 'fas fa-sort-numeric-up',
-            'url': url_for('number_sequence'),
-            'status': 'active'
-        },
-        {
-            'type': 'numberChain',
-            'name': 'Sayı Zinciri',
-            'description': 'Gördüğün sayıları doğru sırayla hatırla.',
-            'icon': 'fas fa-link',
-            'url': url_for('number_chain'),
-            'status': 'active'
-        },
-        {
-            'type': 'audioMemory',
-            'name': 'Sesli Hafıza',
-            'description': 'Duyduğun ses sıralamasını doğru tekrarla.',
-            'icon': 'fas fa-volume-up',
-            'url': '#',
-            'status': 'maintenance'
-        },
-        {
-            'type': 'nBack',
-            'name': 'N-Back Test',
-            'description': 'Çalışma belleğini ve odaklanma gücünü test et.',
-            'icon': 'fas fa-brain',
-            'url': url_for('n_back'),
-            'status': 'active'
-        },
-        {
-            'type': 'chess',
-            'name': 'Satranç',
-            'description': 'Stratejik düşünme ve planlama becerilerinizi geliştirin.',
-            'icon': 'fas fa-chess',
-            'url': url_for('chess'),
-            'status': 'active'
-        },
-        {
-            'type': 'sudoku',
-            'name': 'Sudoku',
-            'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirin.',
-            'icon': 'fas fa-th',
-            'url': url_for('sudoku'),
-            'status': 'maintenance'
-        },
-        {
-            'type': 'game2048',
-            'name': '2048',
-            'description': 'Sayıları birleştirerek 2048 sayısına ulaşın.',
-            'icon': 'fas fa-calculator',
-            'url': url_for('game_2048'),
-            'status': 'active'
-        },
-        {
-            'type': 'wordle',
-            'name': 'Wordle',
-            'description': 'Beş harfli gizli kelimeyi tahmin edin.',
-            'icon': 'fas fa-spell-check',
-            'url': url_for('wordle'),
-            'status': 'active'
-        }
-    ]
-    
-    return games
-
 
 @app.context_processor
 def utility_processor():
@@ -691,29 +577,9 @@ def init_db_route():
 @app.route('/')
 def index():
     user = None
-    homepage_games = []
-    all_games = get_all_available_games()
-    
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-        # Kullanıcının anasayfa tercihleri
-        user_preferences = UserHomepagePreference.query.filter_by(user_id=user.id).order_by(UserHomepagePreference.display_order).all()
-        
-        if user_preferences:
-            # Kullanıcının belirlediği oyunları göster
-            for pref in user_preferences:
-                game_data = next((game for game in all_games if game['type'] == pref.game_type), None)
-                if game_data:
-                    homepage_games.append(game_data)
-        else:
-            # Varsayılan oyunları göster
-            homepage_games = all_games[:8]  # İlk 8 oyunu göster
-    else:
-        # Giriş yapmamış kullanıcılar için varsayılan oyunları göster
-        homepage_games = all_games[:8]
-        
-    return render_template('index.html', user=user, current_user=user, 
-                          homepage_games=homepage_games, all_games=all_games)
+    return render_template('index.html', user=user, current_user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -1934,129 +1800,6 @@ def get_leaderboard_data(game_type):
     except Exception as e:
         logger.error(f"Error querying leaderboard for {game_type}: {e}")
         return []
-
-
-# Kullanıcı anasayfa özelleştirme API'leri
-@app.route('/api/homepage/games', methods=['GET'])
-def get_homepage_games():
-    """Kullanıcının ana sayfada gösterilen oyunlarını getir"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Kullanıcı girişi yapılmamış', 'success': False}), 401
-    
-    user_id = session['user_id']
-    preferences = UserHomepagePreference.query.filter_by(user_id=user_id).order_by(UserHomepagePreference.display_order).all()
-    
-    games = []
-    for pref in preferences:
-        games.append({
-            'id': pref.id,
-            'game_type': pref.game_type,
-            'display_order': pref.display_order
-        })
-    
-    return jsonify({'games': games, 'success': True})
-
-
-@app.route('/api/homepage/games/add', methods=['POST'])
-def add_homepage_game():
-    """Kullanıcının ana sayfasına oyun ekle"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Kullanıcı girişi yapılmamış', 'success': False}), 401
-    
-    user_id = session['user_id']
-    game_type = request.json.get('game_type')
-    
-    if not game_type:
-        return jsonify({'error': 'Oyun türü belirtilmemiş', 'success': False}), 400
-    
-    # Bu oyun zaten eklenmiş mi kontrol et
-    existing_pref = UserHomepagePreference.query.filter_by(user_id=user_id, game_type=game_type).first()
-    if existing_pref:
-        return jsonify({'error': 'Bu oyun zaten ana sayfanızda bulunuyor', 'success': False}), 400
-    
-    # Mevcut en yüksek display_order'ı bul
-    max_order = db.session.query(db.func.max(UserHomepagePreference.display_order))\
-                 .filter_by(user_id=user_id).scalar() or 0
-    
-    # Yeni tercih oluştur
-    new_pref = UserHomepagePreference(
-        user_id=user_id,
-        game_type=game_type,
-        display_order=max_order + 1
-    )
-    
-    db.session.add(new_pref)
-    db.session.commit()
-    
-    return jsonify({
-        'success': True, 
-        'preference': {
-            'id': new_pref.id,
-            'game_type': new_pref.game_type,
-            'display_order': new_pref.display_order
-        }
-    })
-
-
-@app.route('/api/homepage/games/remove', methods=['POST'])
-def remove_homepage_game():
-    """Kullanıcının ana sayfasından oyun kaldır"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Kullanıcı girişi yapılmamış', 'success': False}), 401
-    
-    user_id = session['user_id']
-    game_type = request.json.get('game_type')
-    
-    if not game_type:
-        return jsonify({'error': 'Oyun türü belirtilmemiş', 'success': False}), 400
-    
-    # İlgili tercihi bul ve sil
-    pref = UserHomepagePreference.query.filter_by(user_id=user_id, game_type=game_type).first()
-    
-    if not pref:
-        return jsonify({'error': 'Bu oyun ana sayfanızda bulunamadı', 'success': False}), 404
-    
-    removed_order = pref.display_order
-    db.session.delete(pref)
-    
-    # Kalan tercihlerin sıralamalarını güncelle
-    remaining_prefs = UserHomepagePreference.query\
-                     .filter(UserHomepagePreference.user_id == user_id, 
-                             UserHomepagePreference.display_order > removed_order)\
-                     .all()
-    
-    for rp in remaining_prefs:
-        rp.display_order -= 1
-    
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Oyun ana sayfadan kaldırıldı'})
-
-
-@app.route('/api/homepage/games/reorder', methods=['POST'])
-def reorder_homepage_games():
-    """Kullanıcının ana sayfasındaki oyunların sırasını güncelle"""
-    if 'user_id' not in session:
-        return jsonify({'error': 'Kullanıcı girişi yapılmamış', 'success': False}), 401
-    
-    user_id = session['user_id']
-    new_order = request.json.get('games', [])
-    
-    if not new_order:
-        return jsonify({'error': 'Yeni sıralama bilgisi eksik', 'success': False}), 400
-    
-    # Her oyun için sıralamayı güncelle
-    for i, game_data in enumerate(new_order):
-        game_type = game_data.get('game_type')
-        pref = UserHomepagePreference.query.filter_by(user_id=user_id, game_type=game_type).first()
-        
-        if pref:
-            pref.display_order = i + 1
-    
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Oyun sıralaması güncellendi'})
-
         
 # Puana göre seviye hesaplama fonksiyonu
 def calculate_level(score):
