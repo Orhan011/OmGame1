@@ -1,9 +1,31 @@
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
 
-#game2048-container {
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: white;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: background 0.5s ease;
+}
+
+body.light-theme {
+    background: linear-gradient(135deg, #121212, #1e1e2a, #292938);
+}
+
+body.dark-theme {
+    background: linear-gradient(135deg, #000000, #0f0f17, #161624);
+}
+
+.container {
     max-width: 500px;
     width: 100%;
     background: rgba(31, 31, 42, 0.8);
@@ -29,7 +51,7 @@ header {
     flex-direction: column;
 }
 
-.title-area h1 {
+h1 {
     font-size: 36px;
     color: #fff;
     font-weight: 800;
@@ -268,6 +290,7 @@ header {
                 inset 0 2px 2px rgba(255, 255, 255, 0.3);
 }
 
+
 /* Block colors based on value */
 .block[data-value="2"] { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #ffffff; }
 .block[data-value="4"] { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #ffffff; }
@@ -280,6 +303,7 @@ header {
 .block[data-value="512"] { background: linear-gradient(135deg, #b721ff, #21d4fd); color: #ffffff; }
 .block[data-value="1024"] { background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b); color: #ffffff; font-size: 18px; }
 .block[data-value="2048"] { background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4); color: #ffffff; font-size: 18px; }
+
 
 /* Controls and Buttons */
 .controls {
@@ -440,44 +464,12 @@ header {
     to { opacity: 1; }
 }
 
-@keyframes blockPopIn {
-    0% { transform: scale(0.5); opacity: 0; }
-    70% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes blockMerge {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-}
-
-.block.dragging {
-    z-index: 9999;
-    opacity: 0.9;
-    transform: scale(1.1);
-    pointer-events: none;
-}
-
-.block.new {
-    animation: blockPopIn 0.3s ease-out forwards;
-}
-
-.block.merged {
-    animation: blockMerge 0.3s ease-out;
-    z-index: 20;
-}
-
 @media (max-width: 480px) {
     .container {
         padding: 20px;
     }
 
-    #game2048-container {
-        padding: 16px;
-    }
-
-    .title-area h1 {
+    h1 {
         font-size: 30px;
     }
 
@@ -506,23 +498,198 @@ header {
     .power-up-icon {
         font-size: 20px;
     }
+
+    .power-up-name {
+        font-size: 9px;
+    }
+
+/* Parçacık animasyonu ve diğer efektler */
+.particle {
+    pointer-events: none;
+    opacity: 0.8;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
 }
 
-/* Fix block dropping and sliding animations */
-@keyframes slideDown {
-    0% { transform: translateY(-50px); opacity: 0.3; }
+/* Üst üste binen taşların görünürlüğünü iyileştir */
+.column {
+    perspective: 800px;
+}
+
+/* Yer çekimi etkisi ve düşme animasyonu */
+@keyframes shakeOnLand {
+    0% { transform: translateY(0); }
+    30% { transform: translateY(2px); }
+    60% { transform: translateY(-1px); }
+    100% { transform: translateY(0); }
+}
+
+.falling-block:not(.dragging) {
+    animation: blockRotate 0.8s ease-in-out, shakeOnLand 0.4s ease-in-out 0.6s;
+}
+
+/* Zincirleme reaksiyon için özel gösterge */
+.combo-counter {
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFC700;
+    text-shadow: 0 0 10px rgba(255, 199, 0, 0.7);
+    z-index: 1000;
+    pointer-events: none;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 20px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease-out;
+}
+
+.combo-counter.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+}
+
+
+/* Seviye bildirimi animasyonu - Removed */
+
+
+/* Tema stilleri için ekstra ayarlar */
+body.dark-theme .container {
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .game-container {
+    background: rgba(10, 10, 15, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+body.dark-theme .column {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+body.dark-theme .column.highlight {
+    background: rgba(79, 172, 254, 0.08);
+}
+
+body.dark-theme .score-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Removed Animations */
+
+/* Seviye göstergesi renkli efekti */
+#level-value {
+    background: linear-gradient(45deg, #ff9500, #ff6200);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+/* Combo efekti animasyonu */
+@keyframes comboAnimation {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+.combo-notification {
+    animation: comboAnimation 1s ease-in-out;
+    pointer-events: none;
+}
+
+/* Düşme ve kayma animasyonları - geliştirilmiş */
+@keyframes blockBounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes blockSlide {
+    0% { transform: translateY(20px); opacity: 0.6; }
+    30% { transform: translateY(-5px); opacity: 0.9; }
+    60% { transform: translateY(3px); opacity: 1; }
     100% { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes slideUp {
-    0% { transform: translateY(50px); opacity: 0.3; }
-    100% { transform: translateY(0); opacity: 1; }
+@keyframes blockRotate {
+    0% { transform: rotate(0deg) translateY(0); }
+    25% { transform: rotate(2deg) translateY(-2px); }
+    75% { transform: rotate(-2deg) translateY(-1px); }
+    100% { transform: rotate(0deg) translateY(0); }
 }
 
-.block.sliding-down {
-    animation: slideDown 0.3s ease-out forwards;
+@keyframes blockAppear {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-.block.sliding-up {
-    animation: slideUp 0.3s ease-out forwards;
+.falling-block {
+    transition: top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform, top, left; /* Performans iyileştirmesi */
+    animation: blockSlide 0.8s ease-out, blockAppear 0.3s ease-out;
+    backface-visibility: hidden; /* Performans iyileştirmesi */
+    transform: translateZ(0); /* GPU hızlandırma */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.block {
+    transition: transform 0.3s ease, left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), top 0.6s cubic-bezier(0.05, 0.9, 0.1, 1);
+    backface-visibility: hidden; /* Performans iyileştirmesi */
+    transform: translateZ(0); /* GPU hızlandırma */
+}
+
+.block:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    animation: blockBounce 0.5s ease infinite;
+}
+
+/* Birleşme animasyonu ve efektleri */
+@keyframes mergeAnimation {
+    0% { transform: scale(1); filter: brightness(1); }
+    25% { transform: scale(1.2); filter: brightness(1.5); }
+    50% { transform: scale(1.1) rotate(2deg); filter: brightness(1.8); }
+    75% { transform: scale(1.15) rotate(-2deg); filter: brightness(1.5); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 215, 0, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+}
+
+.merged {
+    animation: mergeAnimation 0.5s ease-in-out, glowPulse 0.8s ease-in-out;
+    z-index: 10;
+    position: relative;
+}
+
+.merged::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    animation: glowPulse 0.8s ease-in-out;
+    z-index: -1;
+}
+
+/* Combo animasyonu */
+@keyframes comboGlow {
+    0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 50px rgba(255, 100, 100, 0.7); }
+    100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+}
+
+.combo-merged {
+    animation: mergeAnimation 0.6s ease-in-out, comboGlow 1s ease-in-out;
+    z-index: 20;
 }
