@@ -758,9 +758,9 @@ class ModernMergePuzzle {
     updateDisplay() {
         // Performans için sadece değişen alanları güncelle
         // Skor görüntüleme öğelerini güncelle
-        const currentScoreEl = document.getElementById('current-score');
+        const currentScoreEl = document.getElementById('score');
         const bestScoreEl = document.getElementById('best-score');
-        const currentLevelEl = document.getElementById('current-level');
+        const currentLevelEl = document.getElementById('level-value');
         
         // Elementlerin varlığını kontrol et
         if (currentScoreEl) currentScoreEl.textContent = this.score;
@@ -1163,6 +1163,9 @@ class ModernMergePuzzle {
 }
 
 // Oyunu başlat
-document.addEventListener('DOMContentLoaded', () => {
-    const game = new ModernMergePuzzle();
-});
+// Oyunu başlat
+(() => {
+    document.addEventListener('DOMContentLoaded', () => {
+        const game = new ModernMergePuzzle();
+    });
+})();
