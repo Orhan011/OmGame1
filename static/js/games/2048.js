@@ -763,7 +763,7 @@ class ModernMergePuzzle {
         if (newLevel > this.level) {
             this.level = newLevel;
             localStorage.setItem('level', this.level);
-            
+
             // Seviye atlama bildirimi göster
             this.showLevelUpNotification();
 
@@ -775,7 +775,7 @@ class ModernMergePuzzle {
                     console.error("Ses çalma hatası:", error);
                 }
             }
-            
+
             // Yeni seviyeye geçildiğinde skoru kaydet
             this.saveScore();
         }
@@ -957,10 +957,17 @@ class ModernMergePuzzle {
         });
 
         // Tema değiştirme
-        document.getElementById('toggle-theme').addEventListener('click', () => {
-            this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-            localStorage.setItem('themeMode', this.themeMode);
-            this.applyTheme();
+        document.getElementById('toggle-theme').addEventListener('click', function() {
+            const wrapper = document.querySelector('.game-2048-wrapper');
+            if (wrapper.classList.contains('dark-theme')) {
+                wrapper.classList.remove('dark-theme');
+                wrapper.classList.add('light-theme');
+                this.textContent = '☀️';
+            } else {
+                wrapper.classList.remove('light-theme');
+                wrapper.classList.add('dark-theme');
+                this.textContent = '🌙';
+            }
         });
     }
 
@@ -1050,7 +1057,7 @@ class ModernMergePuzzle {
         this.updateDisplay();
         this.generateNextBlock();
     }
-    
+
     // Skor kaydetme fonksiyonu
     saveScore() {
         // Skoru kontrol et - skor 0 veya undefined ise gönderme
@@ -1058,9 +1065,9 @@ class ModernMergePuzzle {
             console.log('Kaydedilecek skor yok');
             return;
         }
-        
+
         console.log(`Skor gönderiliyor: ${this.score}`);
-        
+
         // Backend'e skoru gönder
         fetch('/api/save-score', {
             method: 'POST',
@@ -1080,14 +1087,14 @@ class ModernMergePuzzle {
         })
         .then(data => {
             console.log('Skor başarıyla kaydedildi:', data);
-            
+
             if (data.success && data.achievement) {
                 // Başarı bildirimi göster
                 const notification = document.createElement('div');
                 notification.className = 'level-notification';
                 notification.textContent = `🏆 Başarı: ${data.achievement.title}`;
                 document.body.appendChild(notification);
-                
+
                 setTimeout(() => {
                     notification.classList.add('show');
                     setTimeout(() => {
@@ -1107,7 +1114,7 @@ class ModernMergePuzzle {
             errorNotification.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(200, 0, 0, 0.9))';
             errorNotification.textContent = `❌ Skor kaydedilemedi`;
             document.body.appendChild(errorNotification);
-            
+
             setTimeout(() => {
                 errorNotification.classList.add('show');
                 setTimeout(() => {
@@ -1126,7 +1133,7 @@ class ModernMergePuzzle {
             this.columns = lastState.columns;
             this.score = lastState.score;
             this.updateDisplay();
-            
+
             // İptal sesini çal
             if (this.soundEnabled && this.sounds.undo) {
                 try {
