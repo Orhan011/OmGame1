@@ -1,78 +1,219 @@
 /**
- * Wordle CSS Stilleri - Modern Tasarım
+ * Wordle CSS Stilleri - Premium Tasarım
+ * Modern, dinamik ve çekici bir kullanıcı deneyimi
  */
 
 :root {
-  /* Ana renkler - Daha canlı ve modern tonlar */
-  --wordle-correct: #4ade80;      /* Doğru harf + doğru konum - Daha canlı yeşil */
-  --wordle-present: #facc15;      /* Doğru harf + yanlış konum - Daha parlak sarı */
-  --wordle-absent: #64748b;       /* Harf kelimede yok - Daha yumuşak ton */
-  --wordle-keyboard: #e2e8f0;     /* Klavye tuşları - Daha hafif gri */
-  --wordle-text: #0f172a;         /* Metin rengi - Daha koyu */
-  --wordle-background: #f8fafc;   /* Arka plan - Çok hafif gri tonu */
-  --wordle-border: #cbd5e1;       /* Kenarlıklar - Daha yumuşak */
+  /* Ana renkler - Pro Tasarım */
+  --wordle-background: #111827;       /* Koyu arka plan */
+  --wordle-surface: #1f2937;          /* Kart ve kutu arka planı */
+  --wordle-border: #374151;           /* Sınırlar ve ayraçlar */
+  --wordle-text-primary: #f9fafb;     /* Ana metin */
+  --wordle-text-secondary: #9ca3af;   /* İkincil metin */
+  --wordle-text-muted: #6b7280;       /* Soluk metin */
   
-  /* Metin renkleri */
-  --wordle-text-light: #ffffff;   /* Açık renkli metin */
-  --wordle-text-dark: #0f172a;    /* Koyu renkli metin */
+  /* Durum renkleri */
+  --wordle-correct: #059669;          /* Doğru harf + doğru konum - Koyu yeşil */
+  --wordle-present: #d97706;          /* Doğru harf + yanlış konum - Turuncu/amber */
+  --wordle-absent: #4b5563;           /* Harf kelimede yok - Koyu gri */
   
-  /* Durumlar */
-  --wordle-error: #ef4444;        /* Hata mesajları - Daha parlak kırmızı */
-  --wordle-success: #22c55e;      /* Başarı mesajları - Daha parlak yeşil */
+  /* Vurgu renkleri */
+  --wordle-primary: #6d28d9;          /* Ana renk - Mor */
+  --wordle-primary-hover: #7c3aed;    /* Hover durumu */ 
+  --wordle-accent: #ec4899;           /* Vurgu rengi - Pembe */
+  --wordle-accent-hover: #f472b6;     /* Hover durumu */
+  
+  /* UI Renkleri */
+  --wordle-keyboard: #374151;         /* Klavye arka planı */
+  --wordle-key: #4b5563;              /* Tuş arka planı */
+  --wordle-key-text: #e5e7eb;         /* Tuş metni */
+  --wordle-success: #059669;          /* Başarı mesajları */
+  --wordle-error: #dc2626;            /* Hata mesajları */
+  --wordle-warning: #d97706;          /* Uyarı mesajları */
+  --wordle-info: #3b82f6;             /* Bilgi mesajları */
+  
+  /* Gölge efektleri */
+  --wordle-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --wordle-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --wordle-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --wordle-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --wordle-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  
+  /* Glowing efektleri */
+  --wordle-glow-purple: 0 0 15px rgba(109, 40, 217, 0.5);
+  --wordle-glow-pink: 0 0 15px rgba(236, 72, 153, 0.5);
+  --wordle-glow-green: 0 0 15px rgba(5, 150, 105, 0.5);
+  
+  /* Dekoratif renk ve gradyanlar */
+  --wordle-gradient-primary: linear-gradient(135deg, #6d28d9, #8b5cf6);
+  --wordle-gradient-accent: linear-gradient(135deg, #ec4899, #f472b6);
+  --wordle-gradient-success: linear-gradient(135deg, #059669, #10b981);
+  --wordle-gradient-warm: linear-gradient(135deg, #f59e0b, #dc2626);
+  
+  /* Boyutlar ve aralıklar */
+  --wordle-border-radius-sm: 0.375rem;
+  --wordle-border-radius: 0.5rem;
+  --wordle-border-radius-md: 0.75rem;
+  --wordle-border-radius-lg: 1rem;
+  --wordle-spacing-xs: 0.25rem;
+  --wordle-spacing-sm: 0.5rem;
+  --wordle-spacing: 1rem;
+  --wordle-spacing-md: 1.5rem;
+  --wordle-spacing-lg: 2rem;
+  --wordle-spacing-xl: 3rem;
   
   /* Animasyon süreleri */
-  --flip-duration: 0.5s;
+  --flip-duration: 0.65s;
   --dance-duration: 0.5s;
-  --shake-duration: 0.3s;
-  --pop-duration: 0.1s;
+  --shake-duration: 0.5s;
+  --pop-duration: 0.15s;
+  --reveal-duration: 0.3s;
+  --modal-duration: 0.25s;
+  
+  /* Zamanlama fonksiyonları */
+  --timing-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --timing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --timing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --timing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  
+  /* Yeni tema özellikleri - açık tema */
+  --wordle-light-background: #f3f4f6;
+  --wordle-light-surface: #ffffff;
+  --wordle-light-border: #e5e7eb;
+  --wordle-light-text-primary: #1f2937;
+  --wordle-light-text-secondary: #4b5563;
+  --wordle-light-keyboard: #e5e7eb;
+  --wordle-light-key: #d1d5db;
+  --wordle-light-key-text: #1f2937;
+}
+
+/* Genel ve Ana Kapsayıcı */
+body {
+  background-color: var(--wordle-background);
+  color: var(--wordle-text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .wordle-container {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: var(--wordle-spacing);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 100px);
 }
 
-/* Başlık stilleri */
-.wordle-container .game-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  letter-spacing: 2px;
-  color: var(--wordle-text);
+/* Header Bölümü ve Logo */
+.wordle-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--wordle-spacing) 0;
+  border-bottom: 1px solid var(--wordle-border);
+  margin-bottom: var(--wordle-spacing);
 }
 
-.wordle-container .game-subtitle {
-  font-size: 1rem;
-  text-align: center;
-  color: var(--wordle-text);
-  margin-bottom: 1.5rem;
+.wordle-logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wordle-logo {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  margin: 0;
+  background: var(--wordle-gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: var(--wordle-shadow-sm);
+}
+
+.wordle-logo-subtitle {
+  font-size: 0.8rem;
+  color: var(--wordle-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: -0.3rem;
+}
+
+.wordle-actions {
+  display: flex;
+  gap: var(--wordle-spacing-sm);
+}
+
+.wordle-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--wordle-text-secondary);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wordle-icon-btn:hover {
+  color: var(--wordle-text-primary);
+  background-color: var(--wordle-surface);
 }
 
 /* Mesaj Gösterimi */
 .message-display {
-  font-size: 1rem;
+  font-size: 0.9rem;
   text-align: center;
-  min-height: 2rem;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  min-height: 2.5rem;
+  margin: var(--wordle-spacing-sm) 0;
+  padding: var(--wordle-spacing-sm) var(--wordle-spacing);
+  border-radius: var(--wordle-border-radius);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transform: translateY(-10px);
+  transition: opacity 0.3s var(--timing-ease-out), transform 0.3s var(--timing-ease-out);
+  position: relative;
+  z-index: 10;
 }
 
 .message-display.show {
   opacity: 1;
+  transform: translateY(0);
 }
 
 .message-display.error {
   background-color: var(--wordle-error);
-  color: var(--wordle-text-light);
+  color: white;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
 }
 
 .message-display.success {
   background-color: var(--wordle-success);
-  color: var(--wordle-text-light);
+  color: white;
+  box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
+}
+
+.message-display.warning {
+  background-color: var(--wordle-warning);
+  color: white;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+}
+
+.message-display.info {
+  background-color: var(--wordle-info);
+  color: white;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Ana oyun alanı */
+.wordle-main-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--wordle-spacing-md);
 }
 
 /* Oyun tahtası stilleri */
@@ -80,105 +221,111 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--wordle-spacing-md);
 }
 
 .guess-grid {
   display: grid;
   grid-template-rows: repeat(6, 1fr);
-  grid-gap: 0.5rem;
+  grid-gap: var(--wordle-spacing-sm);
   width: 330px;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 .row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-gap: 0.5rem;
+  grid-gap: var(--wordle-spacing-xs);
 }
 
 .letter-box {
-  width: 100%;
   aspect-ratio: 1/1;
-  border: 2px solid var(--wordle-border);
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--wordle-text);
   user-select: none;
-  transition: all 0.2s ease;
+  border: 2px solid var(--wordle-border);
+  border-radius: var(--wordle-border-radius-sm);
+  color: var(--wordle-text-primary);
+  transition: all 0.1s ease;
+  background-color: var(--wordle-surface);
+  box-shadow: var(--wordle-shadow-sm);
 }
 
 /* Harf durumları */
 .letter-box.correct {
   background-color: var(--wordle-correct);
   border-color: var(--wordle-correct);
-  color: var(--wordle-text-light);
+  color: white;
+  box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
 }
 
 .letter-box.present {
   background-color: var(--wordle-present);
   border-color: var(--wordle-present);
-  color: var(--wordle-text-light);
+  color: white;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
 }
 
 .letter-box.absent {
   background-color: var(--wordle-absent);
   border-color: var(--wordle-absent);
-  color: var(--wordle-text-light);
+  color: var(--wordle-text-secondary);
 }
 
 .letter-box.empty {
   border: 2px solid var(--wordle-border);
-  background-color: transparent;
+  background-color: var(--wordle-surface);
+  box-shadow: none;
 }
 
 .letter-box.filled {
-  border: 2px solid #878a8c;
-  animation: pop 0.1s;
+  border-color: var(--wordle-text-secondary);
+  animation: pop var(--pop-duration) var(--timing-bounce);
 }
 
 .letter-box.shake {
-  animation: shake 0.5s;
+  animation: shake var(--shake-duration) var(--timing-ease-in);
 }
 
 .letter-box.dance {
-  animation: dance 0.5s;
+  animation: dance var(--dance-duration) var(--timing-bounce);
 }
 
 .letter-box.flip {
   transform: rotateX(90deg);
-  transition: transform 0.25s;
+  transition: transform calc(var(--flip-duration) / 2) var(--timing-ease-in);
 }
 
 /* Klavye stilleri */
 .keyboard {
   width: 100%;
   max-width: 500px;
-  margin: 0 auto;
+  margin: 0 auto var(--wordle-spacing-md) auto;
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--wordle-spacing-xs);
 }
 
 .key {
-  background-color: var(--wordle-keyboard);
+  background-color: var(--wordle-key);
   border: none;
-  border-radius: 4px;
-  color: var(--wordle-text);
+  border-radius: var(--wordle-border-radius-sm);
+  color: var(--wordle-key-text);
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   min-width: 2rem;
   height: 3.5rem;
-  padding: 0 0.5rem;
-  margin: 0 0.2rem;
+  padding: 0 var(--wordle-spacing-xs);
+  margin: 0 calc(var(--wordle-spacing-xs) / 2);
   cursor: pointer;
   text-transform: uppercase;
   flex: 1;
@@ -186,119 +333,468 @@
   justify-content: center;
   align-items: center;
   transition: all 0.2s ease;
+  box-shadow: var(--wordle-shadow-sm);
+  position: relative;
+  overflow: hidden;
 }
 
-.key:hover {
-  background-color: #bbbec1;
+.key::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.key:hover::after {
+  opacity: 1;
+}
+
+.key:active {
+  transform: scale(0.95);
 }
 
 .key.wide-key {
   flex: 1.5;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .key.correct {
   background-color: var(--wordle-correct);
-  color: var(--wordle-text-light);
+  color: white;
 }
 
 .key.present {
   background-color: var(--wordle-present);
-  color: var(--wordle-text-light);
+  color: white;
 }
 
 .key.absent {
   background-color: var(--wordle-absent);
-  color: var(--wordle-text-light);
-}
-
-/* İstatistik stilleri */
-.stats-container {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.stats-container h4 {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-.stat-box {
-  text-align: center;
-  padding: 0.5rem;
-}
-
-.stat-number {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--wordle-text);
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: #666;
+  color: var(--wordle-text-secondary);
 }
 
 /* Oyun Kontrolleri */
-.game-controls button {
-  min-width: 120px;
+.game-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--wordle-spacing);
+  margin: var(--wordle-spacing) 0;
 }
 
-/* Nasıl Oynanır Kısmı */
-.how-to-play {
-  margin-top: 2rem;
-}
-
-.examples {
-  margin-top: 1rem;
-}
-
-.example {
+.wordle-btn {
+  background-color: var(--wordle-surface);
+  color: var(--wordle-text-primary);
+  border: 1px solid var(--wordle-border);
+  border-radius: var(--wordle-border-radius);
+  padding: var(--wordle-spacing-sm) var(--wordle-spacing);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: var(--wordle-spacing-xs);
 }
 
-.example .letter {
+.wordle-btn:hover {
+  background-color: var(--wordle-key);
+}
+
+.wordle-btn:active {
+  transform: translateY(1px);
+}
+
+.wordle-btn-primary {
+  background: var(--wordle-gradient-primary);
+  color: white;
+  border: none;
+}
+
+.wordle-btn-primary:hover {
+  box-shadow: var(--wordle-glow-purple);
+}
+
+.wordle-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Geri dönüş bağlantısı */
+.return-link {
+  text-align: center;
+  margin: var(--wordle-spacing) 0;
+}
+
+.wordle-back-btn {
+  color: var(--wordle-text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wordle-spacing-xs);
+  transition: color 0.2s ease;
+}
+
+.wordle-back-btn:hover {
+  color: var(--wordle-text-primary);
+}
+
+/* Modal stilleri */
+.wordle-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--modal-duration) ease;
+}
+
+.wordle-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wordle-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 1001;
+  width: 90%;
+  max-width: 500px;
+  background-color: var(--wordle-surface);
+  border-radius: var(--wordle-border-radius-md);
+  box-shadow: var(--wordle-shadow-lg);
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--modal-duration) ease;
+  overflow: hidden;
+}
+
+.wordle-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.wordle-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--wordle-spacing);
+  border-bottom: 1px solid var(--wordle-border);
+}
+
+.wordle-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--wordle-text-primary);
+}
+
+.wordle-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--wordle-text-secondary);
+  cursor: pointer;
   width: 2rem;
   height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.wordle-modal-close:hover {
+  background-color: var(--wordle-key);
+  color: var(--wordle-text-primary);
+}
+
+.wordle-modal-body {
+  padding: var(--wordle-spacing);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Yardım modal içeriği */
+.help-text {
+  margin-bottom: var(--wordle-spacing);
+  line-height: 1.5;
+}
+
+.help-examples {
+  margin: var(--wordle-spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wordle-spacing);
+}
+
+.help-example {
+  background-color: var(--wordle-background);
+  border-radius: var(--wordle-border-radius);
+  padding: var(--wordle-spacing);
+}
+
+.example-row {
+  display: flex;
+  margin-bottom: var(--wordle-spacing-sm);
+}
+
+.letter-example {
+  width: 2.2rem;
+  height: 2.2rem;
   border: 2px solid var(--wordle-border);
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: var(--wordle-spacing-xs);
   text-transform: uppercase;
+  border-radius: var(--wordle-border-radius-sm);
+  background-color: var(--wordle-surface);
 }
 
-.example .letter.correct {
+.letter-example.correct {
   background-color: var(--wordle-correct);
   border-color: var(--wordle-correct);
-  color: var(--wordle-text-light);
+  color: white;
 }
 
-.example .letter.present {
+.letter-example.present {
   background-color: var(--wordle-present);
   border-color: var(--wordle-present);
-  color: var(--wordle-text-light);
+  color: white;
 }
 
-.example .letter.absent {
+.letter-example.absent {
   background-color: var(--wordle-absent);
   border-color: var(--wordle-absent);
-  color: var(--wordle-text-light);
+  color: var(--wordle-text-secondary);
 }
 
-.example p {
-  margin-left: 1rem;
-  margin-bottom: 0;
+.help-note {
+  padding: var(--wordle-spacing-sm);
+  background-color: var(--wordle-primary);
+  color: white;
+  border-radius: var(--wordle-border-radius);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: var(--wordle-spacing-xs);
+  margin-top: var(--wordle-spacing);
+}
+
+/* İstatistikler modal içeriği */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--wordle-spacing);
+  margin-bottom: var(--wordle-spacing-lg);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--wordle-spacing-sm);
+  background-color: var(--wordle-background);
+  border-radius: var(--wordle-border-radius);
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--wordle-text-primary);
+  margin-bottom: var(--wordle-spacing-xs);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--wordle-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.guess-distribution {
+  margin-top: var(--wordle-spacing);
+}
+
+.guess-distribution h4 {
+  font-size: 1rem;
+  margin-bottom: var(--wordle-spacing);
+  text-align: center;
+  color: var(--wordle-text-primary);
+}
+
+.guess-distribution-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wordle-spacing-xs);
+}
+
+.guess-row {
+  display: flex;
+  align-items: center;
+  gap: var(--wordle-spacing-sm);
+}
+
+.guess-label {
+  font-weight: bold;
+  width: 1rem;
+  text-align: center;
+}
+
+.guess-bar-container {
+  flex-grow: 1;
+  height: 1.2rem;
+  border-radius: var(--wordle-border-radius-sm);
+  overflow: hidden;
+  background-color: var(--wordle-background);
+}
+
+.guess-bar {
+  height: 100%;
+  background-color: var(--wordle-primary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--wordle-spacing-xs);
+  font-size: 0.8rem;
+  color: white;
+  transition: width 1s ease;
+}
+
+.guess-bar.current {
+  background-color: var(--wordle-accent);
+}
+
+/* Ayarlar modal içeriği */
+.settings-group {
+  margin-bottom: var(--wordle-spacing-lg);
+}
+
+.settings-group h4 {
+  font-size: 1rem;
+  margin-bottom: var(--wordle-spacing-sm);
+  color: var(--wordle-text-primary);
+}
+
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wordle-spacing-sm);
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  background-color: var(--wordle-background);
+  border-radius: var(--wordle-border-radius);
+  padding: var(--wordle-spacing-sm) var(--wordle-spacing);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.settings-option:hover {
+  background-color: var(--wordle-surface);
+}
+
+.settings-option input[type="radio"] {
+  margin-right: var(--wordle-spacing-sm);
+}
+
+.settings-label {
+  font-weight: 600;
+  margin-right: var(--wordle-spacing-sm);
+}
+
+.settings-info {
+  font-size: 0.8rem;
+  color: var(--wordle-text-secondary);
+  margin-left: auto;
+}
+
+/* Oyun sonu modal içeriği */
+#game-end-message {
+  text-align: center;
+  margin-bottom: var(--wordle-spacing);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-rows: repeat(6, auto);
+  gap: var(--wordle-spacing-xs);
+  margin: var(--wordle-spacing) 0;
+}
+
+.result-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--wordle-spacing-xs);
+}
+
+.result-cell {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--wordle-border-radius-sm);
+}
+
+.result-correct {
+  background-color: var(--wordle-correct);
+}
+
+.result-present {
+  background-color: var(--wordle-present);
+}
+
+.result-absent {
+  background-color: var(--wordle-absent);
+}
+
+.game-end-stats {
+  display: flex;
+  justify-content: center;
+  margin: var(--wordle-spacing) 0;
+}
+
+.end-stat {
+  text-align: center;
+  background-color: var(--wordle-background);
+  padding: var(--wordle-spacing);
+  border-radius: var(--wordle-border-radius);
+  min-width: 200px;
+}
+
+.end-stat-label {
+  font-size: 0.8rem;
+  color: var(--wordle-text-secondary);
+  margin-bottom: var(--wordle-spacing-xs);
+}
+
+.countdown {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--wordle-accent);
+}
+
+.game-end-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--wordle-spacing);
+  margin-top: var(--wordle-spacing);
 }
 
 /* Animasyonlar */
