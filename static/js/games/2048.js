@@ -1064,4 +1064,25 @@ class ModernMergePuzzle {
     }
 
     undoMove() {
-        if (this.move
+        if (this.moveHistory.length > 0) {
+            const lastState = this.moveHistory.pop();
+            this.columns = lastState.columns;
+            this.score = lastState.score;
+            this.updateDisplay();
+            
+            // İptal sesini çal
+            if (this.soundEnabled && this.sounds.undo) {
+                try {
+                    this.sounds.undo.play().catch(err => console.log("Ses çalma hatası:", err));
+                } catch (error) {
+                    console.error("Ses çalma hatası:", error);
+                }
+            }
+        }
+    }
+}
+
+// Oyunu başlat
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new ModernMergePuzzle();
+});
