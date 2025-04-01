@@ -502,6 +502,7 @@ h1 {
   .power-up-name {
       font-size: 9px;
   }
+}
 
 /* Parçacık animasyonu ve diğer efektler */
 .particle {
@@ -550,10 +551,58 @@ h1 {
   transform: scale(1);
 }
 
+
+/* Seviye bildirimi animasyonu */
+.level-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #FFC700;
+  color: #FFC700;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 0 20px rgba(255, 199, 0, 0.5);
+  pointer-events: none;
 }
 
+.level-notification.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
 
-/* Seviye bildirimi animasyonu - Removed */
+/* Mobile responsiveness improvements */
+@media (max-width: 380px) {
+  .container {
+    padding: 15px;
+  }
+  
+  h1 {
+    font-size: 26px;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+  }
+  
+  .scores {
+    gap: 8px;
+  }
+  
+  .score-box span:last-child {
+    font-size: 20px;
+  }
+  
+  .block {
+    font-size: 16px;
+  }
+}
 
 
 /* Tema stilleri için ekstra ayarlar */
