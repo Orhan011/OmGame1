@@ -1141,5 +1141,7 @@ class ModernMergePuzzle {
 
 // Oyunu başlat
 document.addEventListener('DOMContentLoaded', () => {
-    const game = new ModernMergePuzzle();
+    if (document.querySelector('.columns-grid') && document.querySelector('.block-source')) {
+        const game = new ModernMergePuzzle();
+    }
 });
