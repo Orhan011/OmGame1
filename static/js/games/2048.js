@@ -775,6 +775,9 @@ class ModernMergePuzzle {
                     console.error("Ses çalma hatası:", error);
                 }
             }
+            
+            // Yeni seviyeye geçildiğinde skoru kaydet
+            this.saveScore();
         }
 
         // Performans iyileştirmesi: Sadece önceki ve şimdiki durum arasında değişiklik olduğunda render
@@ -865,6 +868,8 @@ class ModernMergePuzzle {
         if (highest >= 2048 && !this.won) {
             this.won = true;
             document.getElementById('game-won').classList.remove('hidden');
+            // Oyun kazanıldığında skoru kaydet
+            this.saveScore();
             return;
         }
 
@@ -885,6 +890,8 @@ class ModernMergePuzzle {
             this.gameOver = true;
             this.finalScoreElement.textContent = this.score;
             document.getElementById('game-over').classList.remove('hidden');
+            // Oyun bittiğinde skoru kaydet
+            this.saveScore();
         }
     }
 
@@ -1042,6 +1049,42 @@ class ModernMergePuzzle {
         // Reset display
         this.updateDisplay();
         this.generateNextBlock();
+    }
+    
+    // Skor kaydetme fonksiyonu
+    saveScore() {
+        // Backend'e skoru gönder
+        fetch('/update_game_score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                game_id: '2048_game',
+                score: this.score
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.achievement) {
+                // Başarı bildirimi göster
+                const notification = document.createElement('div');
+                notification.className = 'level-notification';
+                notification.textContent = `🏆 Başarı: ${data.achievement.title}`;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('show');
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 500);
+                    }, 2000);
+                }, 100);
+            }
+        })
+        .catch(error => console.error('Skor gönderme hatası:', error));
     }
 
     undoMove() {
