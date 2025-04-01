@@ -45,7 +45,11 @@ class ModernMergePuzzle {
       this.scoreElement = document.getElementById('score');
       this.bestScoreElement = document.getElementById('best-score');
       this.finalScoreElement = document.querySelector('.final-score');
-      this.bestScoreElement.textContent = this.bestScore;
+      
+      // Eleman var mı kontrol et
+      if (this.bestScoreElement) {
+          this.bestScoreElement.textContent = this.bestScore;
+      }
 
       // Clear existing grid
       this.columnsGridElement.innerHTML = '';
@@ -755,7 +759,7 @@ class ModernMergePuzzle {
 
   updateDisplay() {
       // Performans için sadece değişen alanları güncelle
-      // Update score
+      // Update score - kaldırılan element için kontrol ekle
       if (this.scoreElement) {
           this.scoreElement.textContent = this.score;
           if (this.score > this.bestScore) {
@@ -772,13 +776,16 @@ class ModernMergePuzzle {
       if (newLevel > this.level) {
           this.level = newLevel;
           localStorage.setItem('level', this.level);
+          // Kaldırılan seviye elemanı için kontrol
           const levelElement = document.getElementById('level-value');
           if (levelElement) {
               levelElement.textContent = this.level;
           }
 
-          // Seviye atlama bildirimi göster
-          this.showLevelUpNotification();
+          // Seviye atlama bildirimi göster - kaldırılan öğeler olduğu için hata almamak için kontrol ekle
+          if (document.body) {
+              this.showLevelUpNotification();
+          }
 
           // Ses efekti çal
           if (this.soundEnabled && this.sounds.levelUp) {
@@ -940,24 +947,38 @@ class ModernMergePuzzle {
 
   setupEventListeners() {
       // Button events
-      document.getElementById('new-game').addEventListener('click', () => this.resetGame());
-      document.getElementById('undo').addEventListener('click', () => this.undoMove());
-      document.getElementById('retry').addEventListener('click', () => this.resetGame());
-      document.getElementById('continue').addEventListener('click', () => {
-          document.getElementById('game-won').classList.add('hidden');
+      const newGameBtn = document.getElementById('new-game');
+      if (newGameBtn) newGameBtn.addEventListener('click', () => this.resetGame());
+      
+      const undoBtn = document.getElementById('undo');
+      if (undoBtn) undoBtn.addEventListener('click', () => this.undoMove());
+      
+      const retryBtn = document.getElementById('retry');
+      if (retryBtn) retryBtn.addEventListener('click', () => this.resetGame());
+      
+      const continueBtn = document.getElementById('continue');
+      if (continueBtn) continueBtn.addEventListener('click', () => {
+          const gameWon = document.getElementById('game-won');
+          if (gameWon) gameWon.classList.add('hidden');
           this.won = false;
       });
 
-      // Power-up events
-      document.getElementById('clear-column').addEventListener('click', () => this.usePowerUp('clear'));
-      document.getElementById('double-value').addEventListener('click', () => this.usePowerUp('double'));
-      document.getElementById('extra-move').addEventListener('click', () => this.usePowerUp('extra'));
+      // Power-up events - silinen butonlar için kontrol ekle
+      const clearColumnBtn = document.getElementById('clear-column');
+      if (clearColumnBtn) clearColumnBtn.addEventListener('click', () => this.usePowerUp('clear'));
+      
+      const doubleValueBtn = document.getElementById('double-value');
+      if (doubleValueBtn) doubleValueBtn.addEventListener('click', () => this.usePowerUp('double'));
+      
+      const extraMoveBtn = document.getElementById('extra-move');
+      if (extraMoveBtn) extraMoveBtn.addEventListener('click', () => this.usePowerUp('extra'));
 
-      // Ses efekti kontrolü
-      document.getElementById('toggle-sound').addEventListener('click', () => {
+      // Ses efekti kontrolü - silinen buton için kontrol ekle
+      const toggleSoundBtn = document.getElementById('toggle-sound');
+      if (toggleSoundBtn) toggleSoundBtn.addEventListener('click', () => {
           this.soundEnabled = !this.soundEnabled;
           localStorage.setItem('soundEnabled', this.soundEnabled);
-          document.getElementById('toggle-sound').textContent = this.soundEnabled ? '🔊' : '🔇';
+          toggleSoundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
 
           // Ses durumu değiştiğinde sesleri yükle veya temizle
           if (this.soundEnabled) {
@@ -967,8 +988,9 @@ class ModernMergePuzzle {
           }
       });
 
-      // Tema değiştirme
-      document.getElementById('toggle-theme').addEventListener('click', () => {
+      // Tema değiştirme - silinen buton için kontrol ekle
+      const toggleThemeBtn = document.getElementById('toggle-theme');
+      if (toggleThemeBtn) toggleThemeBtn.addEventListener('click', () => {
           this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
           localStorage.setItem('themeMode', this.themeMode);
           this.applyTheme();
@@ -976,11 +998,16 @@ class ModernMergePuzzle {
   }
 
   applyTheme() {
-      document.body.classList.remove('light-theme', 'dark-theme');
-      document.body.classList.add(this.themeMode + '-theme');
+      if (document.body) {
+          document.body.classList.remove('light-theme', 'dark-theme');
+          document.body.classList.add(this.themeMode + '-theme');
+      }
 
-      // Tema ikonunu güncelle
-      document.getElementById('toggle-theme').textContent = this.themeMode === 'light' ? '🌙' : '☀️';
+      // Tema ikonunu güncelle - kaldırılmış olabileceği için kontrol ekle
+      const themeToggleBtn = document.getElementById('toggle-theme');
+      if (themeToggleBtn) {
+          themeToggleBtn.textContent = this.themeMode === 'light' ? '🌙' : '☀️';
+      }
   }
 
   usePowerUp(type) {
@@ -1048,15 +1075,27 @@ class ModernMergePuzzle {
       this.score = 0;
       this.level = 1;
       localStorage.setItem('level', this.level);
-      document.getElementById('level-value').textContent = this.level;
+      
+      // Kaldırılan level elemanı için kontrol
+      const levelElement = document.getElementById('level-value');
+      if (levelElement) {
+          levelElement.textContent = this.level;
+      }
 
       this.gameOver = false;
       this.won = false;
       this.moveHistory = [];
 
-      // Hide overlays
-      document.getElementById('game-over').classList.add('hidden');
-      document.getElementById('game-won').classList.add('hidden');
+      // Hide overlays - kaldırılmış olabileceği için kontrol ekle
+      const gameOverElement = document.getElementById('game-over');
+      if (gameOverElement) {
+          gameOverElement.classList.add('hidden');
+      }
+      
+      const gameWonElement = document.getElementById('game-won');
+      if (gameWonElement) {
+          gameWonElement.classList.add('hidden');
+      }
 
       // Reset display
       this.updateDisplay();
