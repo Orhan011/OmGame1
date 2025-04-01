@@ -155,7 +155,7 @@ h1 {
   display: flex;
   gap: 10px;
   width: 100%;
-  height: 400px;
+  height: 450px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   padding: 10px;
@@ -172,6 +172,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 80px;
 }
 
 .column.highlight {
@@ -219,6 +220,8 @@ h1 {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: #5090e0; /* Varsayılan renk */
+  min-width: 60px;
+  min-height: 60px;
 }
 
 /* Farklı değerler için farklı renkler */
@@ -582,8 +585,8 @@ body.dark-theme .score-box {
 
 @keyframes blockRotate {
   0% { transform: rotate(0deg) translateY(0); }
-  25% { transform: rotate(2deg) translateY(-2px); }
-  75% { transform: rotate(-2deg) translateY(-1px); }
+  25% { transform: rotate(3deg) translateY(-4px); }
+  75% { transform: rotate(-3deg) translateY(-2px); }
   100% { transform: rotate(0deg) translateY(0); }
 }
 
@@ -595,7 +598,7 @@ body.dark-theme .score-box {
 .falling-block {
   transition: top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   will-change: transform, top, left; /* Performans iyileştirmesi */
-  animation: blockSlide 0.8s ease-out, blockAppear 0.3s ease-out;
+  animation: blockSlide 0.8s ease-out, blockRotate 0.8s ease-in-out, blockAppear 0.3s ease-out;
   backface-visibility: hidden; /* Performans iyileştirmesi */
   transform: translateZ(0); /* GPU hızlandırma */
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
