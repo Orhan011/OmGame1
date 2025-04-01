@@ -72,11 +72,13 @@ h1 {
 }
 
 .scores {
-  display: none; /* Skor butonlarını gizle */
+  display: flex;
+  gap: 12px;
 }
 
 .level-box {
-  display: none; /* Seviye kutusunu gizle */
+  background: linear-gradient(135deg, rgba(254, 140, 0, 0.25), rgba(255, 183, 0, 0.15));
+  border: 1px solid rgba(254, 140, 0, 0.3);
 }
 
 .game-options {
