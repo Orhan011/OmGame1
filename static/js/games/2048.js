@@ -42,10 +42,8 @@ class ModernMergePuzzle {
       // Get DOM elements
       this.columnsGridElement = document.querySelector('.columns-grid');
       this.blockSourceElement = document.querySelector('.block-source');
-      this.scoreElement = document.getElementById('score');
-      this.bestScoreElement = document.getElementById('best-score');
       this.finalScoreElement = document.querySelector('.final-score');
-      this.bestScoreElement.textContent = this.bestScore;
+      // Score and best score elements removed as requested
 
       // Clear existing grid
       this.columnsGridElement.innerHTML = '';
@@ -754,40 +752,17 @@ class ModernMergePuzzle {
   }
 
   updateDisplay() {
-      // Performans için sadece değişen alanları güncelle
-      // Update score
-      if (this.scoreElement) {
-          this.scoreElement.textContent = this.score;
-          if (this.score > this.bestScore) {
-              this.bestScore = this.score;
-              localStorage.setItem('bestScore', this.bestScore);
-              if (this.bestScoreElement) {
-                  this.bestScoreElement.textContent = this.bestScore;
-              }
-          }
+      // Score and level tracking in background only
+      if (this.score > this.bestScore) {
+          this.bestScore = this.score;
+          localStorage.setItem('bestScore', this.bestScore);
       }
 
-      // Seviye kontrolü - her 1000 puan için seviye artışı
+      // Seviye kontrolü - her 1000 puan için seviye artışı (UI göstergesi olmadan)
       const newLevel = Math.floor(this.score / 1000) + 1;
       if (newLevel > this.level) {
           this.level = newLevel;
           localStorage.setItem('level', this.level);
-          const levelElement = document.getElementById('level-value');
-          if (levelElement) {
-              levelElement.textContent = this.level;
-          }
-
-          // Seviye atlama bildirimi göster
-          this.showLevelUpNotification();
-
-          // Ses efekti çal
-          if (this.soundEnabled && this.sounds.levelUp) {
-              try {
-                  this.sounds.levelUp.play().catch(err => console.log("Ses çalma hatası:", err));
-              } catch (error) {
-                  console.error("Ses çalma hatası:", error);
-              }
-          }
       }
 
       // Performans iyileştirmesi: Sadece önceki ve şimdiki durum arasında değişiklik olduğunda render
@@ -947,40 +922,15 @@ class ModernMergePuzzle {
           document.getElementById('game-won').classList.add('hidden');
           this.won = false;
       });
-
-      // Power-up events
-      document.getElementById('clear-column').addEventListener('click', () => this.usePowerUp('clear'));
-      document.getElementById('double-value').addEventListener('click', () => this.usePowerUp('double'));
-      document.getElementById('extra-move').addEventListener('click', () => this.usePowerUp('extra'));
-
-      // Ses efekti kontrolü
-      document.getElementById('toggle-sound').addEventListener('click', () => {
-          this.soundEnabled = !this.soundEnabled;
-          localStorage.setItem('soundEnabled', this.soundEnabled);
-          document.getElementById('toggle-sound').textContent = this.soundEnabled ? '🔊' : '🔇';
-
-          // Ses durumu değiştiğinde sesleri yükle veya temizle
-          if (this.soundEnabled) {
-              this.loadSounds();
-          } else {
-              this.sounds = {};
-          }
-      });
-
-      // Tema değiştirme
-      document.getElementById('toggle-theme').addEventListener('click', () => {
-          this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-          localStorage.setItem('themeMode', this.themeMode);
-          this.applyTheme();
-      });
+      
+      // Power-up events, sound and theme buttons removed as requested
   }
 
   applyTheme() {
       document.body.classList.remove('light-theme', 'dark-theme');
       document.body.classList.add(this.themeMode + '-theme');
-
-      // Tema ikonunu güncelle
-      document.getElementById('toggle-theme').textContent = this.themeMode === 'light' ? '🌙' : '☀️';
+      
+      // Theme icon update removed as requested
   }
 
   usePowerUp(type) {
@@ -1048,7 +998,7 @@ class ModernMergePuzzle {
       this.score = 0;
       this.level = 1;
       localStorage.setItem('level', this.level);
-      document.getElementById('level-value').textContent = this.level;
+      // Level display element removed as requested
 
       this.gameOver = false;
       this.won = false;
