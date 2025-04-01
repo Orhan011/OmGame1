@@ -16,7 +16,24 @@
                 <h1>X2 Blocks</h1>
                 <p class="subtitle">Modern Merge Puzzle</p>
             </div>
-            <!-- Skor, En İyi, Seviye ve butonlar kaldırıldı -->
+            <div class="scores">
+                <div class="score-box primary">
+                    <span>SKOR</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span>EN İYİ</span>
+                    <span id="best-score">0</span>
+                </div>
+                <div class="score-box level-box">
+                    <span>SEVİYE</span>
+                    <span id="level-value">1</span>
+                </div>
+            </div>
+            <div class="game-options">
+                <button id="toggle-sound" class="option-btn">🔊</button>
+                <button id="toggle-theme" class="option-btn">🌙</button>
+            </div>
         </header>
 
         <div class="game-container">
@@ -51,7 +68,23 @@
             <button id="undo" class="secondary-btn">Geri Al</button>
         </div>
 
-        <!-- Güçlendirmeler bölümü kaldırıldı -->
+        <div class="power-ups">
+            <div class="power-up-title">Güçlendirmeler</div>
+            <div class="power-up-grid">
+                <div class="power-up" id="clear-column">
+                    <div class="power-up-icon">🧹</div>
+                    <div class="power-up-name">Sütun Temizle</div>
+                </div>
+                <div class="power-up" id="double-value">
+                    <div class="power-up-icon">✖️2</div>
+                    <div class="power-up-name">Değeri İkile</div>
+                </div>
+                <div class="power-up" id="extra-move">
+                    <div class="power-up-icon">🔄</div>
+                    <div class="power-up-name">Ekstra Hamle</div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
 </body>
