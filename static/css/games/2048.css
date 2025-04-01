@@ -91,7 +91,7 @@ header {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-#current-score {
+#score {
   color: #4facfe;
 }
 
@@ -99,7 +99,7 @@ header {
   color: #ff9a9e;
 }
 
-#current-level {
+#level-value {
   background: linear-gradient(45deg, #ff9500, #ff6200);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
