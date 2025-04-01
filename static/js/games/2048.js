@@ -379,14 +379,11 @@ class ModernMergePuzzle {
             // Önce falling-block sınıfını ekle
             block.classList.add('falling-block');
 
-            // Animasyon süresini 0.8 saniye olarak ayarla (daha dinamik hissi için)
-            block.style.transition = 'top 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+            // Animasyon süresini 1 saniye olarak ayarla (istenildiği gibi)
+            block.style.transition = 'top 1s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
 
             // Hedef pozisyona git
             block.style.top = `${targetTopPosition}px`;
-            
-            // Hafif dönme animasyonu ekle
-            block.style.animation = 'blockRotate 0.8s ease-in-out';
 
             // Animasyon tamamlandığında temizlik işlemleri
             const transitionEndHandler = () => {
