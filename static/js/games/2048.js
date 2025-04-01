@@ -1,5 +1,4 @@
 class ModernMergePuzzle {
-    class ModernMergePuzzle {
         constructor() {
             this.columns = Array(5).fill().map(() => []);  // 5 columns
             this.score = 0;
