@@ -44,67 +44,6 @@ header {
   align-items: flex-start;
   margin-bottom: 25px;
   position: relative;
-  flex-wrap: wrap;
-}
-
-.game-stats {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  width: 100%;
-  justify-content: center;
-}
-
-.stat-box {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 8px 16px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 80px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
-}
-
-.stat-box:hover {
-  transform: translateY(-3px);
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-}
-
-.stat-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-  margin-bottom: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-#current-score {
-  color: #4facfe;
-}
-
-#best-score {
-  color: #ff9a9e;
-}
-
-#current-level {
-  background: linear-gradient(45deg, #ff9500, #ff6200);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: #ff9500;
 }
 
 .title-area {
@@ -585,49 +524,6 @@ h1 {
 .level-notification.show {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
-}
-
-/* Seviye atlama bildirimi */
-.level-up-notification {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 20px 30px;
-  border-radius: 15px;
-  z-index: 2000;
-  box-shadow: 0 0 40px rgba(255, 149, 0, 0.5);
-  backdrop-filter: blur(8px);
-  text-align: center;
-  max-width: 350px;
-  animation: fadeIn 0.4s ease;
-  border: 1px solid rgba(255, 149, 0, 0.3);
-}
-
-.level-up-notification h3 {
-  color: #ff9500;
-  font-size: 24px;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(45deg, #ff9500, #ff6200);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.level-up-notification p {
-  margin: 8px 0;
-  font-size: 16px;
-  opacity: 0.9;
-}
-
-.level-up-notification.hide {
-  opacity: 0;
-  transform: translate(-50%, -80%);
-  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 /* Seviye stilleri için ekstra ayarlar */
