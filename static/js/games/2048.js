@@ -23,8 +23,7 @@ class ModernMergePuzzle {
         this.loadSounds = () => {
             // Ses desteğini tamamen kapatıyoruz, çünkü hata oluşturuyor
             this.soundEnabled = false;
-            document.getElementById('toggle-sound').textContent = '🔇';
-
+            
             // Ses çalma işlevlerini boş fonksiyonlara dönüştür
             this.playSound = () => {};
         };
@@ -954,18 +953,24 @@ class ModernMergePuzzle {
         document.getElementById('extra-move').addEventListener('click', () => this.usePowerUp('extra'));
 
         // Ses efekti kontrolü
-        document.getElementById('toggle-sound').addEventListener('click', () => {
-            this.soundEnabled = !this.soundEnabled;
-            localStorage.setItem('soundEnabled', this.soundEnabled);
-            document.getElementById('toggle-sound').textContent = this.soundEnabled ? '🔊' : '🔇';
-
-            // Ses durumu değiştiğinde sesleri yükle veya temizle
-            if (this.soundEnabled) {
-                this.loadSounds();
-            } else {
-                this.sounds = {};
-            }
-        });
+        const toggleSoundButton = document.getElementById('toggle-sound');
+        if (toggleSoundButton) {
+            // İlk başlangıçta butonu ayarla
+            toggleSoundButton.textContent = this.soundEnabled ? '🔊' : '🔇';
+            
+            toggleSoundButton.addEventListener('click', () => {
+                this.soundEnabled = !this.soundEnabled;
+                localStorage.setItem('soundEnabled', this.soundEnabled);
+                toggleSoundButton.textContent = this.soundEnabled ? '🔊' : '🔇';
+    
+                // Ses durumu değiştiğinde sesleri yükle veya temizle
+                if (this.soundEnabled) {
+                    this.loadSounds();
+                } else {
+                    this.sounds = {};
+                }
+            });
+        }
 
         // Tema değiştirme
         document.getElementById('toggle-theme').addEventListener('click', () => {
@@ -980,7 +985,10 @@ class ModernMergePuzzle {
         document.body.classList.add(this.themeMode + '-theme');
 
         // Tema ikonunu güncelle
-        document.getElementById('toggle-theme').textContent = this.themeMode === 'light' ? '🌙' : '☀️';
+        const toggleThemeButton = document.getElementById('toggle-theme');
+        if (toggleThemeButton) {
+            toggleThemeButton.textContent = this.themeMode === 'light' ? '🌙' : '☀️';
+        }
     }
 
     usePowerUp(type) {
@@ -1048,15 +1056,27 @@ class ModernMergePuzzle {
         this.score = 0;
         this.level = 1;
         localStorage.setItem('level', this.level);
-        document.getElementById('level-value').textContent = this.level;
+        
+        const levelValueElement = document.getElementById('level-value');
+        if (levelValueElement) {
+            levelValueElement.textContent = this.level;
+        }
 
         this.gameOver = false;
         this.won = false;
         this.moveHistory = [];
 
         // Hide overlays
-        document.getElementById('game-over').classList.add('hidden');
-        document.getElementById('game-won').classList.add('hidden');
+        const gameOverElement = document.getElementById('game-over');
+        const gameWonElement = document.getElementById('game-won');
+        
+        if (gameOverElement) {
+            gameOverElement.classList.add('hidden');
+        }
+        
+        if (gameWonElement) {
+            gameWonElement.classList.add('hidden');
+        }
 
         // Reset display
         this.updateDisplay();
@@ -1075,7 +1095,11 @@ class ModernMergePuzzle {
 
             // Reset game state flags
             this.gameOver = false;
-            document.getElementById('game-over').classList.add('hidden');
+            
+            const gameOverElement = document.getElementById('game-over');
+            if (gameOverElement) {
+                gameOverElement.classList.add('hidden');
+            }
         }
     }
 }
