@@ -553,10 +553,30 @@ h1 {
 }
 
 
-/* Seviye bildirimi animasyonu - Removed */
+/* Seviye bildirimi için düzeltme */
+.level-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.9), rgba(255, 98, 0, 0.9));
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 5px 30px rgba(255, 149, 0, 0.5);
+  opacity: 0;
+  z-index: 1000;
+  transition: all 0.3s ease-out;
+}
 
+.level-notification.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
 
-/* Tema stilleri için ekstra ayarlar */
+/* Seviye stilleri için ekstra ayarlar */
 body.dark-theme .container {
   background: rgba(20, 20, 30, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.05);
