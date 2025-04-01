@@ -1,60 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X2 Blocks: Modern Merge Puzzle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/games/2048.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-area">
+                <h1>OmGame</h1>
+                <p class="subtitle"></p>
+            </div>
+            <div class="game-options">
+                <button id="toggle-sound" class="option-btn">🔊</button>
+                <button id="toggle-theme" class="option-btn">🌙</button>
+            </div>
+        </header>
 
-{% extends "layout.html" %}
+        <div class="game-container">
+            <div class="columns-grid">
+                <!-- Columns will be created dynamically -->
+            </div>
 
-{% block title %}X2 Blocks: Modern Merge Puzzle{% endblock %}
+            <div class="block-source">
+                <div class="next-label">SONRAKI BLOK</div>
+                <!-- Next block will appear here -->
+            </div>
 
-{% block content %}
-<div class="container">
-    <header>
-        <div class="title-area">
-            <h1>OmGame</h1>
-            <p class="subtitle"></p>
-        </div>
-        <div class="game-options">
-            <button id="toggle-sound" class="option-btn">🔊</button>
-            <button id="toggle-theme" class="option-btn">🌙</button>
-        </div>
-    </header>
+            <div id="game-over" class="overlay hidden">
+                <div class="overlay-content">
+                    <h2>Oyun Bitti!</h2>
+                    <p>Skorun: <span class="final-score">0</span></p>
+                    <button id="retry" class="primary-btn">Tekrar Dene</button>
+                    <a href="/leaderboard" class="secondary-btn">Skor Tablosu</a>
+                </div>
+            </div>
 
-    <div class="game-container">
-        <div class="columns-grid">
-            <!-- Columns will be created dynamically -->
-        </div>
-
-        <div class="block-source">
-            <div class="next-label">SONRAKI BLOK</div>
-            <!-- Next block will appear here -->
-        </div>
-
-        <div id="game-over" class="overlay hidden">
-            <div class="overlay-content">
-                <h2>Oyun Bitti!</h2>
-                <p>Skorun: <span class="final-score">0</span></p>
-                <button id="retry" class="primary-btn">Tekrar Dene</button>
-                <a href="/leaderboard" class="secondary-btn">Skor Tablosu</a>
+            <div id="game-won" class="overlay hidden">
+                <div class="overlay-content">
+                    <h2>Tebrikler!</h2>
+                    <p>2048'e ulaştın!</p>
+                    <button id="continue" class="primary-btn">Devam Et</button>
+                    <a href="/leaderboard" class="secondary-btn">Skor Tablosu</a>
+                </div>
             </div>
         </div>
 
-        <div id="game-won" class="overlay hidden">
-            <div class="overlay-content">
-                <h2>Tebrikler!</h2>
-                <p>2048'e ulaştın!</p>
-                <button id="continue" class="primary-btn">Devam Et</button>
-                <a href="/leaderboard" class="secondary-btn">Skor Tablosu</a>
-            </div>
+        <div class="controls">
+            <button id="new-game" class="primary-btn">Yeni Oyun</button>
+            <button id="undo" class="secondary-btn">Geri Al</button>
         </div>
+
+        <!-- Güçlendirmeler bölümü kaldırıldı -->
     </div>
-
-    <div class="controls">
-        <button id="new-game" class="primary-btn">Yeni Oyun</button>
-        <button id="undo" class="secondary-btn">Geri Al</button>
-    </div>
-
-    <!-- Güçlendirmeler bölümü kaldırıldı -->
-</div>
-{% endblock %}
-
-{% block scripts %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/games/2048.css') }}">
-<script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
-{% endblock %}
+    <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
+</body>
+</html>
