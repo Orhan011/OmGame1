@@ -51,7 +51,23 @@
             <button id="undo" class="secondary-btn">Geri Al</button>
         </div>
 
-        <!-- Güçlendirme butonları kaldırıldı -->
+        <div class="power-ups">
+            <div class="power-up-title">Güçlendirmeler</div>
+            <div class="power-up-grid">
+                <div class="power-up" id="clear-column">
+                    <div class="power-up-icon">🧹</div>
+                    <div class="power-up-name">Sütun Temizle</div>
+                </div>
+                <div class="power-up" id="double-value">
+                    <div class="power-up-icon">✖️2</div>
+                    <div class="power-up-name">Değeri İkile</div>
+                </div>
+                <div class="power-up" id="extra-move">
+                    <div class="power-up-icon">🔄</div>
+                    <div class="power-up-name">Ekstra Hamle</div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
 </body>
