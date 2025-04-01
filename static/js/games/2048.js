@@ -1163,8 +1163,6 @@ class ModernMergePuzzle {
 }
 
 // Oyunu başlat
-(() => {
-    document.addEventListener('DOMContentLoaded', () => {
-        const game = new ModernMergePuzzle();
-    });
-})();
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new ModernMergePuzzle();
+});
