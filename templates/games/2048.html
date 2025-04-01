@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/2048.css') }}">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -16,16 +16,34 @@
                 <h1>X2 Blocks</h1>
                 <p class="subtitle">Modern Merge Puzzle</p>
             </div>
+            <div class="scores">
+                <div class="score-box primary">
+                    <span>SKOR</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="score-box">
+                    <span>EN İYİ</span>
+                    <span id="best-score">0</span>
+                </div>
+                <div class="score-box level-box">
+                    <span>SEVİYE</span>
+                    <span id="level-value">1</span>
+                </div>
+            </div>
+            <div class="game-options">
+                <button id="toggle-sound" class="option-btn">🔊</button>
+                <button id="toggle-theme" class="option-btn">🌙</button>
+            </div>
         </header>
 
         <div class="game-container">
+            <div class="columns-grid">
+                <!-- Columns will be created dynamically -->
+            </div>
+
             <div class="block-source">
                 <div class="next-label">SONRAKI BLOK</div>
                 <!-- Next block will appear here -->
-            </div>
-            
-            <div class="columns-grid">
-                <!-- Columns will be created dynamically -->
             </div>
 
             <div id="game-over" class="overlay hidden">
@@ -49,7 +67,25 @@
             <button id="new-game" class="primary-btn">Yeni Oyun</button>
             <button id="undo" class="secondary-btn">Geri Al</button>
         </div>
+
+        <div class="power-ups">
+            <div class="power-up-title">Güçlendirmeler</div>
+            <div class="power-up-grid">
+                <div class="power-up" id="clear-column">
+                    <div class="power-up-icon">🧹</div>
+                    <div class="power-up-name">Sütun Temizle</div>
+                </div>
+                <div class="power-up" id="double-value">
+                    <div class="power-up-icon">✖️2</div>
+                    <div class="power-up-name">Değeri İkile</div>
+                </div>
+                <div class="power-up" id="extra-move">
+                    <div class="power-up-icon">🔄</div>
+                    <div class="power-up-name">Ekstra Hamle</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
+    <script src="script.js"></script>
 </body>
 </html>
