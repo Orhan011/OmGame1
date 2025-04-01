@@ -348,7 +348,8 @@
 }
 
 .chess-square.selected {
-  background-color: rgba(106, 90, 224, 0.4););
+  background-color: rgba(106, 90, 224, 0.4);
+  box-shadow: inset 0 0 0 3px rgba(106, 90, 224, 0.8);
 }
 
 .chess-square.highlight {
@@ -361,11 +362,95 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 30%;
-  height: 30%;
+  width: 35%;
+  height: 35%;
   background-color: rgba(106, 90, 224, 0.7);
   border-radius: 50%;
   z-index: 1;
+  animation: pulse 1.5s infinite;
+}
+
+.chess-square.last-move-from {
+  background-color: rgba(255, 233, 125, 0.4);
+}
+
+.chess-square.last-move-to {
+  background-color: rgba(255, 206, 68, 0.5);
+}
+
+.chess-square.check-highlight {
+  background-color: rgba(217, 83, 79, 0.3);
+  animation: pulse-warning 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes pulse-warning {
+  0% { background-color: rgba(217, 83, 79, 0.3); }
+  50% { background-color: rgba(217, 83, 79, 0.5); }
+  100% { background-color: rgba(217, 83, 79, 0.3); }
+}
+
+.chess-piece {
+  width: 85%;
+  height: 85%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 2;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.chess-piece:hover {
+  transform: scale(1.1);
+}
+
+.piece-animated {
+  animation: piece-move 0.3s ease-out;
+}
+
+@keyframes piece-move {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.chess-game-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.captured-pieces-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 80px;
+  min-height: 200px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 10px;
+  align-content: flex-start;
+}
+
+.captured-piece {
+  font-size: 1.5rem;
+  margin: 2px;
+  transition: all 0.2s ease;
+}
+
+.captured-piece:hover {
+  transform: scale(1.2);
 }
 
 .chess-controls {
@@ -397,6 +482,47 @@
   transform: translateY(-2px);
 }
 
+.chess-btn.danger {
+  background-color: rgba(217, 83, 79, 0.2);
+  color: #d9534f;
+}
+
+.chess-btn.danger:hover {
+  background-color: rgba(217, 83, 79, 0.3);
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.time-display {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 15px;
+}
+
+.player-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.white-time {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.black-time {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
 .chess-indicator {
   background-color: rgba(106, 90, 224, 0.2);
   color: #6a5ae0;
@@ -406,6 +532,29 @@
   text-align: center;
   margin-bottom: 15px;
   transition: all 0.3s ease;
+}
+
+.chess-indicator.check {
+  background-color: rgba(240, 173, 78, 0.2);
+  color: #f0ad4e;
+  animation: pulse-text 1.5s infinite;
+}
+
+.chess-indicator.winner {
+  background-color: rgba(92, 184, 92, 0.2);
+  color: #5cb85c;
+  font-weight: 700;
+}
+
+.chess-indicator.draw {
+  background-color: rgba(91, 192, 222, 0.2);
+  color: #5bc0de;
+}
+
+@keyframes pulse-text {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
 }
 
 .move-history-container {

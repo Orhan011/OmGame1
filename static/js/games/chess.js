@@ -7,13 +7,21 @@ let moveCount = 1;
 let moveHistory = [];
 let isBoardFlipped = false;
 let soundEnabled = true;
+let lastMove = null;
+let gameStartTime = null;
+let gameTimer = null;
+let whiteTimeSpent = 0;
+let blackTimeSpent = 0;
+let gameEndType = null; // 'checkmate', 'stalemate', 'resignation', 'time'
+let capturedPieces = { white: [], black: [] };
 
 // Ses efektleri
 const sounds = {
   move: new Audio('/static/sounds/click.mp3'),
   capture: new Audio('/static/sounds/correct.mp3'),
   check: new Audio('/static/sounds/number.mp3'),
-  illegal: new Audio('/static/sounds/wrong.mp3')
+  illegal: new Audio('/static/sounds/wrong.mp3'),
+  gameEnd: new Audio('/static/sounds/game-over.mp3')
 };
 
 // DOM referansları
@@ -126,8 +134,43 @@ function renderBoard() {
     const row = parseInt(square.dataset.row);
     const col = parseInt(square.dataset.col);
     
+    // Tüm vurgu sınıflarını temizle
+    square.classList.remove('last-move-from', 'last-move-to', 'check-highlight');
+    
     // Mevcut içeriği temizle
     square.innerHTML = '';
+    
+    // Son hamleyi vurgula
+    if (lastMove) {
+      if (row === lastMove.fromRow && col === lastMove.fromCol) {
+        square.classList.add('last-move-from');
+      }
+      if (row === lastMove.toRow && col === lastMove.toCol) {
+        square.classList.add('last-move-to');
+      }
+    }
+    
+    // Eğer şah mat veya şah durumu varsa, şahı vurgula
+    if (isKingInCheck(currentTurn)) {
+      // Şahın konumunu bul
+      let kingRow = -1;
+      let kingCol = -1;
+      
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (board[r][c].piece === `${currentTurn}-king`) {
+            kingRow = r;
+            kingCol = c;
+            break;
+          }
+        }
+        if (kingRow !== -1) break;
+      }
+      
+      if (row === kingRow && col === kingCol) {
+        square.classList.add('check-highlight');
+      }
+    }
     
     // Taşı render et
     const pieceType = board[row][col].piece;
@@ -136,6 +179,12 @@ function renderBoard() {
       pieceEl.className = 'chess-piece';
       pieceEl.textContent = PIECES[pieceType].symbol;
       pieceEl.style.color = PIECES[pieceType].color === 'white' ? '#FFF' : '#000';
+      
+      // Taş animasyonu
+      if (lastMove && row === lastMove.toRow && col === lastMove.toCol) {
+        pieceEl.classList.add('piece-animated');
+      }
+      
       square.appendChild(pieceEl);
     }
   });
@@ -147,7 +196,25 @@ function renderBoard() {
   currentTurnEl.textContent = currentTurn === 'white' ? 'Beyaz' : 'Siyah';
   
   // Oyun durumunu güncelle
-  gameStatus.textContent = `Hamle ${moveCount}: ${currentTurn === 'white' ? 'Beyaz' : 'Siyah'} oyuncunun sırası`;
+  if (gameEndType === 'checkmate') {
+    gameStatus.textContent = `Şah Mat! ${currentTurn === 'white' ? 'Siyah' : 'Beyaz'} oyuncu kazandı`;
+    gameStatus.className = 'chess-indicator winner';
+  } else if (gameEndType === 'stalemate') {
+    gameStatus.textContent = `Pat! Oyun berabere bitti`;
+    gameStatus.className = 'chess-indicator draw';
+  } else if (isKingInCheck(currentTurn)) {
+    gameStatus.textContent = `Şah! ${currentTurn === 'white' ? 'Beyaz' : 'Siyah'} oyuncu tehdit altında`;
+    gameStatus.className = 'chess-indicator check';
+  } else {
+    gameStatus.textContent = `Hamle ${moveCount}: ${currentTurn === 'white' ? 'Beyaz' : 'Siyah'} oyuncunun sırası`;
+    gameStatus.className = 'chess-indicator';
+  }
+  
+  // Zaman bilgisini güncelle
+  if (document.getElementById('white-time') && document.getElementById('black-time')) {
+    document.getElementById('white-time').textContent = formatTime(whiteTimeSpent);
+    document.getElementById('black-time').textContent = formatTime(blackTimeSpent);
+  }
 }
 
 // Kare tıklandığında
@@ -206,6 +273,16 @@ function handleSquareClick(event) {
       };
       
       // Taşı hareket ettir
+      // Eğer karşı taşı alıyorsa, yakalanan taşlar listesine ekle
+      if (isCapture) {
+        capturedPieces[currentTurn].push(board[row][col].piece);
+        updateCapturedPieces();
+      }
+      
+      // Hareket animasyonu için son hamleyi kaydet
+      lastMove = {fromRow: selectedPiece.row, fromCol: selectedPiece.col, toRow: row, toCol: col};
+      
+      // Taşı hareket ettir
       board[row][col].piece = board[selectedPiece.row][selectedPiece.col].piece;
       board[selectedPiece.row][selectedPiece.col].piece = null;
       
@@ -218,8 +295,20 @@ function handleSquareClick(event) {
       // Şahın tehdit altında olup olmadığını kontrol et
       const isCheck = isKingInCheck(currentTurn === 'white' ? 'black' : 'white');
       
+      // Şah mat kontrolü
+      const isCheckmate = isCheck && isCheckMate(currentTurn === 'white' ? 'black' : 'white');
+      
+      // Beraberlik (pat) kontrolü
+      const isStalemate = !isCheck && isInStalemate(currentTurn === 'white' ? 'black' : 'white');
+      
       // Ses çal
-      if (isCheck) {
+      if (isCheckmate) {
+        playSound('gameEnd');
+        gameEndType = 'checkmate';
+      } else if (isStalemate) {
+        playSound('gameEnd');
+        gameEndType = 'stalemate';
+      } else if (isCheck) {
         playSound('check');
       } else if (isCapture) {
         playSound('capture');
@@ -408,6 +497,156 @@ function isKingInCheck(color) {
         if (isValidMove(r, c, kingRow, kingCol)) {
           return true;
         }
+
+// Yakalanan taşları güncelle
+function updateCapturedPieces() {
+  const whiteCapturedEl = document.getElementById('white-captured');
+  const blackCapturedEl = document.getElementById('black-captured');
+  
+  if (!whiteCapturedEl || !blackCapturedEl) return;
+  
+  whiteCapturedEl.innerHTML = '';
+  blackCapturedEl.innerHTML = '';
+  
+  // Beyaz tarafından yakalanan taşlar
+  capturedPieces.white.forEach(piece => {
+    const pieceEl = document.createElement('span');
+    pieceEl.className = 'captured-piece';
+    pieceEl.textContent = PIECES[piece].symbol;
+    pieceEl.style.color = '#000';
+    whiteCapturedEl.appendChild(pieceEl);
+  });
+  
+  // Siyah tarafından yakalanan taşlar
+  capturedPieces.black.forEach(piece => {
+    const pieceEl = document.createElement('span');
+    pieceEl.className = 'captured-piece';
+    pieceEl.textContent = PIECES[piece].symbol;
+    pieceEl.style.color = '#FFF';
+    blackCapturedEl.appendChild(pieceEl);
+  });
+}
+
+// Şah mat durumunu kontrol et
+function isCheckMate(color) {
+  // Eğer şah tehdit altında değilse, şah mat değildir
+  if (!isKingInCheck(color)) return false;
+  
+  // Oyuncunun tüm taşlarını bul
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c].piece;
+      if (piece && PIECES[piece].color === color) {
+        // Bu taşın yapabileceği tüm hamleleri kontrol et
+        for (let toR = 0; toR < 8; toR++) {
+          for (let toC = 0; toC < 8; toC++) {
+            if (isValidMove(r, c, toR, toC)) {
+              // Hamleyi geçici olarak yap
+              const tempTarget = board[toR][toC].piece;
+              board[toR][toC].piece = board[r][c].piece;
+              board[r][c].piece = null;
+              
+              // Hamleden sonra şah tehdit altında mı kontrol et
+              const stillInCheck = isKingInCheck(color);
+              
+              // Hamleyi geri al
+              board[r][c].piece = board[toR][toC].piece;
+              board[toR][toC].piece = tempTarget;
+              
+              // Eğer bir hamle şahı tehditten kurtarıyorsa, şah mat değildir
+              if (!stillInCheck) return false;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Hiçbir hamle şahı tehditten kurtaramıyorsa, şah mattır
+  return true;
+}
+
+// Pat (Beraberlik) durumunu kontrol et
+function isInStalemate(color) {
+  // Eğer şah tehdit altındaysa, pat değildir
+  if (isKingInCheck(color)) return false;
+  
+  // Oyuncunun tüm taşlarını bul
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c].piece;
+      if (piece && PIECES[piece].color === color) {
+        // Bu taşın yapabileceği tüm hamleleri kontrol et
+        for (let toR = 0; toR < 8; toR++) {
+          for (let toC = 0; toC < 8; toC++) {
+            if (isValidMove(r, c, toR, toC)) {
+              // Hamleyi geçici olarak yap
+              const tempTarget = board[toR][toC].piece;
+              board[toR][toC].piece = board[r][c].piece;
+              board[r][c].piece = null;
+              
+              // Hamleden sonra şah tehdit altında mı kontrol et
+              const putsInCheck = isKingInCheck(color);
+              
+              // Hamleyi geri al
+              board[r][c].piece = board[toR][toC].piece;
+              board[toR][toC].piece = tempTarget;
+              
+              // Eğer legal bir hamle varsa, pat değildir
+              if (!putsInCheck) return false;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Hiçbir legal hamle yoksa, pattır
+  return true;
+}
+
+// Zamanı formatlama
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Oyun zamanlayıcısını başlat
+function startGameTimer() {
+  if (gameTimer) clearInterval(gameTimer);
+  
+  gameStartTime = Date.now();
+  
+  gameTimer = setInterval(() => {
+    const currentTime = Math.floor((Date.now() - gameStartTime) / 1000);
+    
+    // Sıraya göre zamanı güncelle
+    if (currentTurn === 'white') {
+      whiteTimeSpent = currentTime - blackTimeSpent;
+    } else {
+      blackTimeSpent = currentTime - whiteTimeSpent;
+    }
+    
+    // Zamanlayıcıyı güncelle
+    renderBoard();
+  }, 1000);
+}
+
+// Oyunu teslim et (resign)
+function resignGame() {
+  gameEndType = 'resignation';
+  playSound('gameEnd');
+  gameStatus.textContent = `${currentTurn === 'white' ? 'Beyaz' : 'Siyah'} oyuncu teslim oldu. ${currentTurn === 'white' ? 'Siyah' : 'Beyaz'} kazandı!`;
+  gameStatus.className = 'chess-indicator winner';
+  if (gameTimer) clearInterval(gameTimer);
+}
+
+// Teslim ol butonunu ayarla
+if (document.getElementById('resign-btn')) {
+  document.getElementById('resign-btn').addEventListener('click', resignGame);
+}
+
       }
     }
   }
@@ -510,19 +749,43 @@ function playSound(type) {
 
 // Oyunu sıfırla
 function resetGame() {
+  // Oyun durumunu sıfırla
   selectedPiece = null;
   currentTurn = 'white';
   moveCount = 1;
   moveHistory = [];
   moveHistoryEl.innerHTML = '';
+  lastMove = null;
+  gameEndType = null;
+  whiteTimeSpent = 0;
+  blackTimeSpent = 0;
+  capturedPieces = { white: [], black: [] };
   
+  // Zamanlayıcıyı temizle ve yeniden başlat
+  if (gameTimer) clearInterval(gameTimer);
+  
+  // Tahtayı kurulum haline getir
   setupPieces();
+  
+  // Yakalanan taşları güncelle
+  updateCapturedPieces();
+  
+  // Tahtayı güncelle
   renderBoard();
   
+  // Ses efekti
   playSound('move');
   
+  // Oyun durumunu güncelle
   gameStatus.textContent = 'Oyun başladı - Beyaz oyuncunun sırası';
+  gameStatus.className = 'chess-indicator';
+  
+  // Oyun zamanlayıcısını başlat
+  startGameTimer();
 }
 
 // Oyunu başlat
-window.addEventListener('DOMContentLoaded', initGame);
+window.addEventListener('DOMContentLoaded', () => {
+  initGame();
+  startGameTimer();
+});

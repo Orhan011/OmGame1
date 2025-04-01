@@ -21,11 +21,24 @@
           <span class="info-label">Sıra</span>
           <span class="info-value" id="current-turn">Beyaz</span>
         </div>
+        <div class="info-item time-display">
+          <div class="player-time white-time">
+            <i class="fas fa-user-circle"></i>
+            <span id="white-time">00:00</span>
+          </div>
+          <div class="player-time black-time">
+            <i class="fas fa-user-circle"></i>
+            <span id="black-time">00:00</span>
+          </div>
+        </div>
       </div>
 
-      <div>
+      <div class="game-controls">
         <button id="new-game-btn" class="btn-game">
           <i class="fas fa-redo"></i> Yeni Oyun
+        </button>
+        <button id="resign-btn" class="btn-game danger">
+          <i class="fas fa-flag"></i> Teslim Ol
         </button>
         <button id="sound-toggle" class="sound-toggle">
           <i class="fas fa-volume-up"></i>
@@ -35,9 +48,19 @@
 
     <div class="chess-indicator" id="game-status">Oyun başladı - Beyaz oyuncunun sırası</div>
 
-    <div class="chess-board-container">
-      <div class="chess-board" id="chess-board">
-        <!-- Satranç tahtası JavaScript ile oluşturulacak -->
+    <div class="chess-game-container">
+      <div class="captured-pieces-area" id="black-captured">
+        <!-- Beyaz tarafından yakalanan siyah taşlar burada görüntülenecek -->
+      </div>
+      
+      <div class="chess-board-container">
+        <div class="chess-board" id="chess-board">
+          <!-- Satranç tahtası JavaScript ile oluşturulacak -->
+        </div>
+      </div>
+      
+      <div class="captured-pieces-area" id="white-captured">
+        <!-- Siyah tarafından yakalanan beyaz taşlar burada görüntülenecek -->
       </div>
     </div>
 
