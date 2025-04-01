@@ -1,10 +1,15 @@
-
-{% extends 'layout.html' %}
-
-{% block title %}X2 Blocks: Modern Merge Puzzle{% endblock %}
-
-{% block content %}
-<div class="game-2048-wrapper">
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X2 Blocks: Modern Merge Puzzle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/games/2048.css') }}">
+</head>
+<body>
     <div class="container">
         <header>
             <div class="title-area">
@@ -50,10 +55,9 @@
             <button id="new-game" class="primary-btn">Yeni Oyun</button>
             <button id="undo" class="secondary-btn">Geri Al</button>
         </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
-{% endblock %}
+        <!-- Güçlendirmeler bölümü kaldırıldı -->
+    </div>
+    <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
+</body>
+</html>

@@ -17,11 +17,11 @@ body {
   transition: background 0.5s ease;
 }
 
-.game-2048-wrapper.light-theme {
+body.light-theme {
   background: linear-gradient(135deg, #121212, #1e1e2a, #292938);
 }
 
-.game-2048-wrapper.dark-theme {
+body.dark-theme {
   background: linear-gradient(135deg, #000000, #0f0f17, #161624);
 }
 
@@ -204,14 +204,13 @@ h1 {
 .next-label {
   position: absolute;
   top: -25px;
-  left: 0;
   font-size: 11px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.5px;
   text-transform: uppercase;
   width: 100%;
-  text-align: left;
+  text-align: center;
 }
 
 .block {
