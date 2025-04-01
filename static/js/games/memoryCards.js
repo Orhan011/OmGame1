@@ -71,27 +71,27 @@ document.addEventListener('DOMContentLoaded', function() {
   let matchedPairs = 0;        // Eşleştirilmiş çift sayısı
   let totalPairs = 0;          // Toplam çift sayısı
   
-  // Ses Efektleri
+  // Ses Efektleri - Ses dosyalarını kullanmak yerine basitleştirilmiş ses çalma sistemi
   const SOUNDS = {
     flip: {
-      url: 'flip.mp3',
-      buffer: null
+      frequency: 600,
+      duration: 0.1
     },
     match: {
-      url: 'match.mp3',
-      buffer: null
+      frequency: 800,
+      duration: 0.3
     },
     wrong: {
-      url: 'wrong.mp3',
-      buffer: null
+      frequency: 300,
+      duration: 0.2
     },
     win: {
-      url: 'win.mp3',
-      buffer: null
+      frequency: [500, 700, 900],
+      duration: 0.6
     },
     levelUp: {
-      url: 'level-up.mp3',
-      buffer: null
+      frequency: [400, 600, 800],
+      duration: 0.5
     }
   };
   
@@ -201,45 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Ses Efektlerini Önceden Yükle
+  // Ses Efektlerini Önceden Yükle - Web Audio API kullanılacak
   function preloadSounds() {
-    // Web Audio API desteğini kontrol et
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    
-    try {
-      const audioContext = new AudioContext();
-      
-      // Ses dosyalarını yükle
-      Object.keys(SOUNDS).forEach(soundName => {
-        const soundPath = `/static/sounds/${SOUNDS[soundName].url}`;
-        
-        fetch(soundPath)
-          .then(response => {
-            if (!response.ok) {
-              console.warn(`Ses dosyası yüklenemedi: ${soundPath}`);
-              return null;
-            }
-            return response.arrayBuffer();
-          })
-          .then(arrayBuffer => {
-            if (arrayBuffer) {
-              return audioContext.decodeAudioData(arrayBuffer);
-            }
-            return null;
-          })
-          .then(audioBuffer => {
-            if (audioBuffer) {
-              SOUNDS[soundName].buffer = audioBuffer;
-            }
-          })
-          .catch(error => {
-            console.warn(`Ses yükleme hatası (${soundName}):`, error);
-          });
-      });
-    } catch (error) {
-      console.warn('Ses sistemi başlatılamadı:', error);
-    }
+    // Ses dosyası kullanmadığımız için boş bırakıyoruz
+    // Sesler doğrudan Web Audio API ile üretilecek
   }
   
   // Oyunu Başlat
@@ -822,10 +787,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Ses Çal
+  // Ses Çal - Web Audio API kullanarak basit sesler üret
   function playSound(soundName) {
-    // Ses kapalıysa veya ses dosyası yoksa çıkış yap
-    if (!soundEnabled || !SOUNDS[soundName] || !SOUNDS[soundName].buffer) return;
+    if (!soundEnabled || !SOUNDS[soundName]) return;
     
     try {
       // Web Audio API desteğini kontrol et
@@ -833,12 +797,48 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!AudioContext) return;
       
       const audioContext = new AudioContext();
-      const source = audioContext.createBufferSource();
-      source.buffer = SOUNDS[soundName].buffer;
-      source.connect(audioContext.destination);
-      source.start(0);
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      // Ses türünü belirle
+      oscillator.type = 'sine';
+      
+      // Ses özelliklerini ayarla
+      const soundInfo = SOUNDS[soundName];
+      
+      if (Array.isArray(soundInfo.frequency)) {
+        // Çoklu ton (akor veya melodi) çal
+        const duration = soundInfo.duration / soundInfo.frequency.length;
+        
+        soundInfo.frequency.forEach((freq, index) => {
+          setTimeout(() => {
+            const tempOsc = audioContext.createOscillator();
+            const tempGain = audioContext.createGain();
+            
+            tempOsc.type = 'sine';
+            tempOsc.frequency.value = freq;
+            tempGain.gain.value = 0.2;
+            
+            tempOsc.connect(tempGain);
+            tempGain.connect(audioContext.destination);
+            
+            tempOsc.start();
+            tempOsc.stop(audioContext.currentTime + duration);
+          }, index * (duration * 1000));
+        });
+      } else {
+        // Tek ton çal
+        oscillator.frequency.value = soundInfo.frequency;
+        gainNode.gain.value = 0.2;
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + soundInfo.duration);
+      }
     } catch (error) {
-      console.warn(`Ses çalma hatası (${soundName}):`, error);
+      console.log("Ses çalma hatası:", error);
     }
   }
   
