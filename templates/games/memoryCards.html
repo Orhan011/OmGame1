@@ -1,10 +1,14 @@
 {% extends "layout.html" %}
 
-{% block title %}Kart Eşleme Oyunu{% endblock %}
+{% block title %}Hafıza Kartları Oyunu{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games/memory_cards.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h1 class="game-title text-center mb-4">Kart Eşleme</h1>
+  <h1 class="game-title text-center mb-4">Hafıza Kartları</h1>
   
   <!-- Oyun İstatistikleri Bölümü -->
   <div class="game-stats-container">
@@ -41,7 +45,7 @@
           <div class="col-md-8">
             <div class="game-instructions mb-md-0">
               <h4 class="instruction-title"><i class="fas fa-th me-2"></i>Nasıl Oynanır?</h4>
-              <p>İkonları eşleştir ve görsel hafızanı geliştir. Kartların konumlarını hatırlayarak birbirinin aynı olan sembolleri bulmaya çalış. Tüm çiftleri bulduğunda level tamamlanır!</p>
+              <p>İkonları eşleştir ve görsel hafızanı geliştir. Kartların konumlarını hatırlayarak birbirinin aynı olan sembolleri bulmaya çalış. Tüm çiftleri bulduğunda seviye tamamlanır!</p>
               <div class="memory-tips">
                 <div class="tip-badge">
                   <i class="fas fa-lightbulb"></i>
@@ -59,12 +63,20 @@
                 <button id="level-hard" class="level-btn" data-level="HARD">Zor</button>
               </div>
             </div>
+            <div class="theme-selector mt-3">
+              <div class="theme-label">Tema</div>
+              <div class="theme-buttons">
+                <button id="theme-emoji" class="theme-btn active" data-theme="0">Emoji</button>
+                <button id="theme-icon" class="theme-btn" data-theme="1">İkon</button>
+                <button id="theme-animal" class="theme-btn" data-theme="2">Hayvan</button>
+              </div>
+            </div>
             <button id="start-game" class="btn btn-primary standard-start-btn btn-lg pulse-animation mt-3">
               <i class="fas fa-play me-2"></i>Oyunu Başlat
             </button>
           </div>
         </div>
-      </div>>
+      </div>
       
       <!-- Game Container -->
       <div id="game-container" class="memory-cards-container glass-effect" style="display: none;">

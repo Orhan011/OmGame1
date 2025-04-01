@@ -1,0 +1,682 @@
+/* Hafıza Kartları Oyunu - CSS */
+:root {
+  --primary-color: #6a5ae0;
+  --primary-light: #8e7ee5;
+  --primary-dark: #4e3dc7;
+  --secondary-color: #ff7a50;
+  --success-color: #36b37e;
+  --danger-color: #ff5252;
+  --warning-color: #ffab00;
+  --info-color: #2196f3;
+  --text-color: #333;
+  --text-light: #757575;
+  --bg-color: #f8f9fa;
+  --card-color: #fff;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #ff9a76);
+  --transition-speed: 0.3s;
+  --card-flip-time: 0.6s;
+  
+  --memory-card-size-sm: 60px;
+  --memory-card-size-md: 80px;
+  --memory-card-size-lg: 100px;
+}
+
+/* Oyun İstatistikleri */
+.game-stats-container {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.game-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.game-stat-item i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.game-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.game-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 1px;
+}
+
+/* Giriş Bölümü */
+.memory-cards-intro {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-title {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.memory-tips {
+  margin-top: 1.5rem;
+}
+
+.tip-badge {
+  display: flex;
+  align-items: center;
+  background: rgba(106, 90, 224, 0.1);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.tip-badge i {
+  color: var(--warning-color);
+  font-size: 1.2rem;
+  margin-right: 0.8rem;
+}
+
+.tip-badge span {
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+/* Zorluk Seçici */
+.memory-levels-selector {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.level-label, .theme-label {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.level-buttons, .theme-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.level-btn, .theme-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.level-btn:hover, .theme-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.level-btn.active, .theme-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Tema Seçici */
+.theme-selector {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+/* Oyun Konteyneri */
+.memory-cards-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.level-indicator {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.game-controls-top {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.game-control-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.game-control-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.game-control-btn i {
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.game-control-btn.active {
+  background: var(--primary-light);
+}
+
+.game-control-btn.active i {
+  color: white;
+}
+
+/* Uyarı Konteyneri */
+.memory-cards-alert {
+  position: relative;
+  margin-bottom: 1rem;
+  min-height: 50px;
+}
+
+.alert-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.alert-message.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.alert-message.success {
+  background: var(--success-color);
+}
+
+.alert-message.error {
+  background: var(--danger-color);
+}
+
+.alert-message.info {
+  background: var(--info-color);
+}
+
+.alert-message.warning {
+  background: var(--warning-color);
+}
+
+/* Kart Alanı */
+.memory-cards-board-container {
+  position: relative;
+  width: 100%;
+  margin: 1rem 0;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+}
+
+.memory-cards-grid {
+  display: grid;
+  grid-gap: 12px;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Kart Tasarımı */
+.memory-card {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  cursor: pointer;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--card-flip-time) ease;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.memory-card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.memory-card.matched .card-inner {
+  box-shadow: 0 0 15px var(--success-color);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-front {
+  background: var(--gradient-primary);
+}
+
+.card-front::after {
+  content: "?";
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card-back {
+  background: white;
+  transform: rotateY(180deg);
+}
+
+.card-back span {
+  font-size: 2rem;
+}
+
+/* Puan Animasyonu */
+.points-animation {
+  position: absolute;
+  background: var(--success-color);
+  color: white;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  z-index: 5;
+  animation: pointsUp 1s forwards;
+  pointer-events: none;
+}
+
+@keyframes pointsUp {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(-50%, -150%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -200%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* İlerleme Çubuğu */
+.game-progress {
+  margin-top: 1.5rem;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.progress {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+/* Oyun Sonuç Ekranı */
+.game-results-container {
+  position: relative;
+}
+
+.game-results-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.game-results-header {
+  background: var(--gradient-primary);
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.result-badge {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.result-badge i {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+}
+
+.game-results-body {
+  padding: 2rem;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+}
+
+.result-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.result-stat i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.result-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.result-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.results-rating {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.rating-stars {
+  margin-bottom: 0.5rem;
+}
+
+.rating-stars i {
+  color: #ffc107;
+  font-size: 1.5rem;
+  margin: 0 0.2rem;
+}
+
+.rating-text {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.game-achievement {
+  display: flex;
+  align-items: center;
+  background: rgba(106, 90, 224, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1.5rem 0;
+}
+
+.achievement-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.achievement-icon i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.achievement-title {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.achievement-name {
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.game-results-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.game-share-section {
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 1.5rem;
+}
+
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.share-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.share-btn i {
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+/* Duraklama Menüsü */
+.pause-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.pause-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.pause-card h3 {
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.pause-menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+/* Duyarlı Tasarım İçin Medya Sorguları */
+@media (max-width: 768px) {
+  .game-stats-container {
+    flex-wrap: wrap;
+  }
+  
+  .game-stat-item {
+    flex: 1 0 40%;
+    margin: 0.5rem 0;
+  }
+  
+  .memory-cards-container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .level-buttons, .theme-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .memory-cards-grid {
+    grid-gap: 8px;
+  }
+  
+  .card-front::after, .card-back span {
+    font-size: 1.5rem;
+  }
+  
+  .results-stats {
+    flex-wrap: wrap;
+  }
+  
+  .result-stat {
+    flex: 1 0 30%;
+    margin: 0.5rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .game-stat-item {
+    flex: 1 0 40%;
+  }
+  
+  .game-stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .game-stat-item i {
+    font-size: 1.2rem;
+  }
+  
+  .memory-cards-container {
+    padding: 1rem;
+  }
+  
+  .card-front::after, .card-back span {
+    font-size: 1.2rem;
+  }
+  
+  .level-btn, .theme-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .level-indicator {
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Animasyonlar */
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(106, 90, 224, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0);
+  }
+}
