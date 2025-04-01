@@ -1,0 +1,65 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="game-container chess-container">
+    <div class="game-header">
+      <div class="game-title-section">
+        <h1 class="game-title">Satranç</h1>
+        <p class="game-description">Strateji ve planlama becerilerinizi geliştirin</p>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="info-display">
+        <div class="info-item">
+          <span class="info-label">Hamle</span>
+          <span class="info-value" id="move-counter">1</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Sıra</span>
+          <span class="info-value" id="current-turn">Beyaz</span>
+        </div>
+      </div>
+
+      <div>
+        <button id="new-game-btn" class="btn-game">
+          <i class="fas fa-redo"></i> Yeni Oyun
+        </button>
+        <button id="sound-toggle" class="sound-toggle">
+          <i class="fas fa-volume-up"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="chess-indicator" id="game-status">Oyun başladı - Beyaz oyuncunun sırası</div>
+
+    <div class="chess-board-container">
+      <div class="chess-board" id="chess-board">
+        <!-- Satranç tahtası JavaScript ile oluşturulacak -->
+      </div>
+    </div>
+
+    <div class="chess-controls">
+      <button class="chess-btn" id="undo-move">
+        <i class="fas fa-undo"></i> Hamleyi Geri Al
+      </button>
+      <button class="chess-btn" id="flip-board">
+        <i class="fas fa-exchange-alt"></i> Tahtayı Çevir
+      </button>
+    </div>
+
+    <div class="move-history-container">
+      <div class="history-title">Hamle Geçmişi</div>
+      <div class="move-history" id="move-history">
+        <!-- Hamle geçmişi JavaScript ile doldurulacak -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/games/chess.js') }}"></script>
+{% endblock %}

@@ -340,10 +340,15 @@
   background-position: center;
   background-repeat: no-repeat;
   z-index: 2;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
 }
 
 .chess-square.selected {
-  background-color: rgba(106, 90, 224, 0.4);
+  background-color: rgba(106, 90, 224, 0.4););
 }
 
 .chess-square.highlight {
@@ -424,6 +429,20 @@
   max-height: 100px;
   overflow-y: auto;
   padding: 5px;
+}
+
+.move-item {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.move-item.white {
+  color: #ffffff;
+}
+
+.move-item.black {
+  color: #aaaaaa;
+}x;
 }
 
 .move-item {

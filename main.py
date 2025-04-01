@@ -682,6 +682,11 @@ def wordle():
     """Wordle kelime tahmin oyunu"""
     return render_template('games/wordle.html')
 
+@app.route('/games/chess')
+def chess():
+    """Satranç oyunu"""
+    return render_template('games/chess.html')
+
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():
