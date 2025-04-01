@@ -1,31 +1,39 @@
 /**
- * 2048 Oyunu 
- * Modern ve profesyonel tasarım
+ * X2 Blocks: 2048 Number Puzzle
+ * Modern minimalist ve interaktif tasarım
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // HTML elementleri
+  // DOM Elementleri
   const gridContainer = document.getElementById('grid-container');
   const tileContainer = document.getElementById('tile-container');
   const scoreDisplay = document.getElementById('score');
   const bestScoreDisplay = document.getElementById('best-score');
+  const gameStatusDisplay = document.getElementById('game-status');
   const messageContainer = document.getElementById('game-message');
-  const messageContent = messageContainer.querySelector('p');
+  const messageText = document.getElementById('message-text');
   const retryButton = document.getElementById('retry-button');
   const keepPlayingButton = document.getElementById('keep-playing-button');
   const restartButton = document.getElementById('restart-button');
+  const undoButton = document.getElementById('undo-button');
 
-  // Game state
+  // Oyun Durumu
   let grid = [];
+  let previousGrids = []; // Geri alma için önceki durumları saklar
+  let previousScores = []; // Geri alma için önceki skorları saklar
   let score = 0;
-  let bestScore = parseInt(localStorage.getItem('2048-best-score')) || 0;
+  let bestScore = parseInt(localStorage.getItem('x2blocks-best-score')) || 0;
+  let moveCount = 0;
   let gameWon = false;
   let gameOver = false;
   let keepPlaying = false;
+  let gameStartTime = Date.now();
 
-  // Sabitleri tanımla
+  // Sabitler
   const GRID_SIZE = 4;
-  const TILE_MARGIN = 15;
+  const GRID_GAP = 12; // CSS'teki --x2-grid-gap değeriyle aynı olmalı
+  const ANIMATION_SPEED = 150; // milisaniye
+  const MAX_UNDO_STEPS = 5; // Geri alma için maksimum adım sayısı
   const DIRECTIONS = {
     UP: { x: 0, y: -1 },
     RIGHT: { x: 1, y: 0 },
@@ -33,30 +41,47 @@ document.addEventListener('DOMContentLoaded', function() {
     LEFT: { x: -1, y: 0 }
   };
 
-  // En iyi skoru ayarla
+  // En iyi skoru göster
   bestScoreDisplay.textContent = bestScore;
 
   // Oyunu başlat
   initGame();
+  updateStatusMessage();
 
-  // Yön tuşları ve restart olaylarını ekle
+  // Olay dinleyicileri
   window.addEventListener('keydown', handleKeyPress);
   restartButton.addEventListener('click', restartGame);
   retryButton.addEventListener('click', restartGame);
   keepPlayingButton.addEventListener('click', continueGame);
+  undoButton.addEventListener('click', undoMove);
 
-  // Dokunmatik cihazlar için kaydırma desteği ekle
+  // Dokunmatik cihazlar için kaydırma desteği
   setupTouchEvents();
 
-  // Oyunu başlatıp grid'i sıfırla
+  /**
+   * Oyunu başlatır ve başlangıç durumunu ayarlar
+   */
   function initGame() {
+    // Grid'i oluştur
     setupGrid();
+    
+    // Başlangıç karelerini ekle
     addRandomTile();
     addRandomTile();
+    
+    // UI'ı güncelle
     updateGridDisplay();
+    
+    // Oyun başlangıç zamanını kaydet
+    gameStartTime = Date.now();
+    
+    // Geri alma butonunu devre dışı bırak
+    undoButton.disabled = true;
   }
 
-  // Grid yapısını oluştur
+  /**
+   * Grid yapısını oluşturur
+   */
   function setupGrid() {
     grid = [];
     for (let y = 0; y < GRID_SIZE; y++) {
@@ -68,14 +93,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Grid'i göster
+  /**
+   * Grid'in görsel temsili güncellenir
+   */
   function updateGridDisplay() {
-    // Önce tüm mevcut kareleri temizle
+    // Önce tüm kareleri temizle
     while (tileContainer.firstChild) {
       tileContainer.removeChild(tileContainer.firstChild);
     }
 
-    // Her bir kareyi ekrana çiz
+    // Her kareyi ekrana çiz
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         const value = grid[y][x];
@@ -84,16 +111,18 @@ document.addEventListener('DOMContentLoaded', function() {
           tile.className = `tile tile-${value.value} ${value.merged ? 'tile-merged' : value.isNew ? 'tile-new' : ''}`;
           tile.textContent = value.value;
 
-          // Döşeme pozisyonunu hesapla
-          const cellSize = (100 - TILE_MARGIN * 2) / GRID_SIZE;
+          // Kare pozisyonunu hesapla
+          const cellSize = (100 - GRID_GAP * 5) / GRID_SIZE; // Yüzde olarak
           const position = {
-            x: x * (cellSize + TILE_MARGIN / GRID_SIZE) + TILE_MARGIN,
-            y: y * (cellSize + TILE_MARGIN / GRID_SIZE) + TILE_MARGIN
+            x: x * (cellSize + GRID_GAP) + GRID_GAP,
+            y: y * (cellSize + GRID_GAP) + GRID_GAP
           };
 
-          // Döşemeyi doğru konuma yerleştir
+          // Kareyi doğru konuma yerleştir
           tile.style.left = position.x + '%';
           tile.style.top = position.y + '%';
+          tile.style.width = cellSize + '%';
+          tile.style.height = cellSize + '%';
 
           tileContainer.appendChild(tile);
         }
@@ -101,7 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Rastgele bir "2" veya "4" karesi ekle
+  /**
+   * Rastgele bir "2" veya "4" karesi ekle
+   */
   function addRandomTile() {
     const emptyCells = [];
 
@@ -128,7 +159,24 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  // Klavye olaylarını yönet
+  /**
+   * Durum mesajını günceller
+   */
+  function updateStatusMessage() {
+    if (gameOver) {
+      gameStatusDisplay.innerHTML = 'Oyun bitti! Tekrar denemek için "Yeni Oyun" butonuna tıklayın.';
+    } else if (gameWon && !keepPlaying) {
+      gameStatusDisplay.innerHTML = 'Tebrikler! <strong>2048</strong>\'e ulaştınız! Devam edebilir veya yeni oyun başlatabilirsiniz.';
+    } else if (gameWon && keepPlaying) {
+      gameStatusDisplay.innerHTML = 'Daha yüksek skorlar için oynamaya devam edin! Şimdiden <strong>2048</strong>\'e ulaştınız!';
+    } else {
+      gameStatusDisplay.innerHTML = 'Aynı sayıları birleştirerek <strong>2048</strong> sayısına ulaşmaya çalışın!';
+    }
+  }
+
+  /**
+   * Klavye olaylarını yönetir
+   */
   function handleKeyPress(event) {
     if (gameOver && !keepPlaying) return;
 
@@ -156,15 +204,21 @@ document.addEventListener('DOMContentLoaded', function() {
         direction = DIRECTIONS.LEFT;
         break;
       default:
-        return; // Diğer tuşlar için hiçbir şey yapma
+        return; // Diğer tuşlarda hiçbir şey yapma
     }
+
+    // Mevcut durumu geri alma için kaydet
+    saveGameState();
 
     // Yönlü hareket et
     event.preventDefault();
     if (moveGrid(direction)) {
-      // Başarılı bir hareket sonrası yeni bir kare ekle
+      // Başarılı bir hareket sonrası
+      moveCount++;
+      
+      // Yeni kare eklemeden önce kısa bir animasyon süresi
       setTimeout(() => {
-        // Karoları yeni ve birleştirilmiş durumdan çıkar
+        // Karelerin durumunu sıfırla
         for (let y = 0; y < GRID_SIZE; y++) {
           for (let x = 0; x < GRID_SIZE; x++) {
             if (grid[y][x]) {
@@ -174,22 +228,87 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
 
+        // Yeni kare ekle ve görüntüyü güncelle
         addRandomTile();
         updateGridDisplay();
 
+        // Hareket kaldı mı kontrol et
         if (!canMove()) {
           gameOver = true;
           showGameOverMessage();
         }
-      }, 150);
+        
+        // Durumu güncelle
+        updateStatusMessage();
+        
+        // Geri alma butonunu etkinleştir
+        undoButton.disabled = previousGrids.length === 0;
+      }, ANIMATION_SPEED);
     }
   }
+  
+  /**
+   * Mevcut oyun durumunu geri alma için kaydeder
+   */
+  function saveGameState() {
+    // Grid'in derin kopyasını oluştur
+    const gridCopy = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      const row = [];
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (grid[y][x]) {
+          row.push({
+            value: grid[y][x].value,
+            isNew: false,
+            merged: false
+          });
+        } else {
+          row.push(null);
+        }
+      }
+      gridCopy.push(row);
+    }
+    
+    // Durumu kaydet
+    previousGrids.push(gridCopy);
+    previousScores.push(score);
+    
+    // Maksimum geri alma adımını aşmayalım
+    if (previousGrids.length > MAX_UNDO_STEPS) {
+      previousGrids.shift();
+      previousScores.shift();
+    }
+  }
+  
+  /**
+   * Son hareketi geri alır
+   */
+  function undoMove() {
+    if (previousGrids.length === 0) return;
+    
+    // Son kaydedilen durumu al
+    grid = previousGrids.pop();
+    score = previousScores.pop();
+    
+    // UI'ı güncelle
+    updateGridDisplay();
+    scoreDisplay.textContent = score;
+    
+    // Geri al butonu durumunu güncelle
+    undoButton.disabled = previousGrids.length === 0;
+    
+    // Oyun durumunu güncelle
+    gameOver = false;
+    updateStatusMessage();
+  }
 
-  // Tahtayı belirli bir yönde hareket ettir
+  /**
+   * Grid'i belirli bir yönde hareket ettirir
+   */
   function moveGrid(direction) {
     let moved = false;
 
-    // İlerleme yönünü ayarla
+    // Hareket sırasını belirle
     const traversals = getTraversalOrder(direction);
 
     // Her hücreyi tarayarak hareket ettir
@@ -200,11 +319,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (tile) {
           const positions = findFarthestPosition(cell, direction);
-          const next = grid[positions.next.y][positions.next.x];
+          const next = positions.next ? grid[positions.next.y][positions.next.x] : null;
 
           // Birleştirme mantığı
           if (next && next.value === tile.value && !next.merged) {
-            // İki karo birleşecek
+            // İki kare birleşecek
             const mergedValue = tile.value * 2;
             grid[positions.next.y][positions.next.x] = {
               value: mergedValue,
@@ -215,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Skoru güncelle
             score += mergedValue;
-            updateScore();
+            updateScore(mergedValue);
 
             // 2048'e ulaşıldı mı kontrol et
             if (mergedValue === 2048 && !gameWon && !keepPlaying) {
@@ -243,7 +362,9 @@ document.addEventListener('DOMContentLoaded', function() {
     return moved;
   }
 
-  // Yön kontrolü için tarama sırasını belirle
+  /**
+   * Yön kontrolü için tarama sırasını belirler
+   */
   function getTraversalOrder(direction) {
     const traversals = {
       x: [],
@@ -263,7 +384,9 @@ document.addEventListener('DOMContentLoaded', function() {
     return traversals;
   }
 
-  // Verilen hücre için gidilebilecek en uzak pozisyonu bul
+  /**
+   * Verilen hücre için gidilebilecek en uzak pozisyonu bulur
+   */
   function findFarthestPosition(cell, direction) {
     let previous;
     let current = { x: cell.x, y: cell.y };
@@ -284,13 +407,17 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  // Verilen pozisyonun grid sınırları içinde olup olmadığını kontrol et
+  /**
+   * Verilen pozisyonun grid sınırları içinde olup olmadığını kontrol eder
+   */
   function isWithinBounds(position) {
     return position.x >= 0 && position.x < GRID_SIZE && 
            position.y >= 0 && position.y < GRID_SIZE;
   }
 
-  // Hala hareket edebilir miyiz?
+  /**
+   * Hala hareket edilebilir mi kontrol eder
+   */
   function canMove() {
     // Boş hücre var mı?
     for (let y = 0; y < GRID_SIZE; y++) {
@@ -314,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Komşu geçerli mi?
           if (isWithinBounds(neighbor)) {
             const neighborTile = grid[neighbor.y][neighbor.x];
-            // Komşu karo aynı değere sahip mi?
+            // Komşu kare aynı değere sahip mi?
             if (neighborTile && neighborTile.value === tile.value) {
               return true;
             }
@@ -327,34 +454,48 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   }
 
-  // Skor göstergesini güncelle
-  function updateScore() {
+  /**
+   * Skor göstergesini günceller ve animasyon ekler
+   */
+  function updateScore(addition = 0) {
     scoreDisplay.textContent = score;
 
     // En iyi skoru güncelle
     if (score > bestScore) {
       bestScore = score;
       bestScoreDisplay.textContent = bestScore;
-      localStorage.setItem('2048-best-score', bestScore);
+      localStorage.setItem('x2blocks-best-score', bestScore);
     }
 
-    // Skor animasyonu ekle
-    const addition = document.createElement('div');
-    addition.className = 'score-addition';
-    addition.textContent = '+' + (score - parseInt(scoreDisplay.textContent) + score);
-    scoreDisplay.appendChild(addition);
+    // Skor ekleme animasyonu göster
+    if (addition > 0) {
+      const scoreAddition = document.createElement('div');
+      scoreAddition.className = 'score-addition';
+      scoreAddition.textContent = '+' + addition;
+      
+      // Rastgele hafif bir ofset ile göster
+      scoreAddition.style.top = (-20 - Math.random() * 10) + 'px';
+      scoreAddition.style.right = (Math.random() * 10) + 'px';
+      
+      scoreDisplay.appendChild(scoreAddition);
 
-    // Animasyon bitiminde temizle
-    setTimeout(() => {
-      addition.remove();
-    }, 600);
+      // Animasyon bitiminde temizle
+      setTimeout(() => {
+        scoreAddition.remove();
+      }, 600);
+    }
   }
 
-  // Oyunu yeniden başlat
+  /**
+   * Oyunu yeniden başlatır
+   */
   function restartGame() {
     // Tüm oyun değişkenlerini sıfırla
     grid = [];
+    previousGrids = [];
+    previousScores = [];
     score = 0;
+    moveCount = 0;
     gameWon = false;
     gameOver = false;
     keepPlaying = false;
@@ -362,50 +503,73 @@ document.addEventListener('DOMContentLoaded', function() {
     // UI'ı güncelle
     scoreDisplay.textContent = '0';
     messageContainer.style.display = 'none';
+    undoButton.disabled = true;
 
     // Yeni oyun başlat
     initGame();
+    updateStatusMessage();
   }
 
-  // "Oynamaya Devam Et" seçeneği
+  /**
+   * "Oynamaya Devam Et" seçeneği
+   */
   function continueGame() {
     keepPlaying = true;
     messageContainer.style.display = 'none';
+    updateStatusMessage();
   }
 
-  // Oyun kazanıldı mesajını göster
+  /**
+   * Oyun kazanıldı mesajını gösterir
+   */
   function showGameWonMessage() {
-    messageContent.textContent = 'Tebrikler! 2048\'e ulaştın!';
-    messageContainer.className = 'game-message game-won';
-    keepPlayingButton.style.display = 'inline-block';
+    messageText.textContent = 'Tebrikler! 2048\'e ulaştınız!';
+    messageContainer.classList.add('game-won');
+    keepPlayingButton.style.display = 'block';
     messageContainer.style.display = 'flex';
+    
+    // Durumu güncelle
+    updateStatusMessage();
+    
+    // Sunucuya skoru kaydet
+    saveScore('win');
   }
 
-  // Oyun bitti mesajını göster
+  /**
+   * Oyun bitti mesajını gösterir
+   */
   function showGameOverMessage() {
-    messageContent.textContent = 'Oyun Bitti!';
-    messageContainer.className = 'game-message game-over';
+    messageText.textContent = 'Oyun Bitti!';
+    messageContainer.classList.add('game-over');
     keepPlayingButton.style.display = 'none';
     messageContainer.style.display = 'flex';
-
+    
+    // Durumu güncelle
+    updateStatusMessage();
+    
     // Sunucuya skoru kaydet
-    saveScore();
+    saveScore('lose');
   }
 
-  // Dokunmatik cihazlar için kaydırma desteği
+  /**
+   * Dokunmatik cihazlar için kaydırma desteği ekler
+   */
   function setupTouchEvents() {
     let touchStartX, touchStartY;
     let touchEndX, touchEndY;
+    
+    // Dokunma olaylarını eklemek için grid içeren kapsayıcıyı seç
+    const gameContainer = document.querySelector('.x2blocks-game-container');
 
-    document.addEventListener('touchstart', function(event) {
+    gameContainer.addEventListener('touchstart', function(event) {
       if (event.touches.length > 1) return; // Çoklu dokunuşları görmezden gel
 
       touchStartX = event.touches[0].clientX;
       touchStartY = event.touches[0].clientY;
       event.preventDefault();
-    }, false);
+    }, { passive: false });
 
-    document.addEventListener('touchend', function(event) {
+    gameContainer.addEventListener('touchend', function(event) {
       if (!touchStartX || !touchStartY) return;
 
       touchEndX = event.changedTouches[0].clientX;
@@ -413,9 +577,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const dx = touchEndX - touchStartX;
       const dy = touchEndY - touchStartY;
+      
+      // Minimum kaydırma eşiği (çok küçük hareketleri görmezden gel)
+      const MIN_SWIPE = 10;
 
       // Yatay ve dikey kaydırma mesafelerini karşılaştır
-      if (Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > MIN_SWIPE) {
         // Yatay kaydırma
         if (dx > 0) {
           // Sağa kaydırma
@@ -424,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Sola kaydırma
           handleKeyPress({ key: 'ArrowLeft', preventDefault: () => {} });
         }
-      } else {
+      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > MIN_SWIPE) {
         // Dikey kaydırma
         if (dy > 0) {
           // Aşağı kaydırma
@@ -439,17 +606,27 @@ document.addEventListener('DOMContentLoaded', function() {
       touchStartX = null;
       touchStartY = null;
       event.preventDefault();
-    }, false);
+    }, { passive: false });
   }
 
-  // Skoru sunucuya kaydeden fonksiyon
-  function saveScore() {
+  /**
+   * Skoru sunucuya kaydeder
+   */
+  function saveScore(result = 'play') {
+    // Oynama süresini hesapla (saniye)
+    const playTime = Math.floor((Date.now() - gameStartTime) / 1000);
+    
     // API endpoint ve veriler
     const url = '/api/save_score';
     const data = {
-      game_id: '2048',
+      game_type: 'game_2048',
       score: score,
-      difficulty: 'standard'
+      game_data: {
+        moves: moveCount,
+        playTime: playTime,
+        result: result,
+        highestTile: getHighestTile()
+      }
     };
 
     // Fetch API ile POST isteği
@@ -463,32 +640,26 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
-
-      // Seviye atlama veya yüksek skor durumunda bildirim göster
-      if (data.is_level_up || data.is_high_score) {
-        const achievementMessage = document.createElement('div');
-        achievementMessage.className = 'achievement-message';
-        achievementMessage.innerHTML = `
-          <div class="achievement-content">
-            <i class="fas ${data.is_level_up ? 'fa-level-up-alt' : 'fa-trophy'}"></i>
-            <p>${data.is_level_up ? 'Seviye Atladın!' : 'Yeni Yüksek Skor!'}</p>
-            <span>${data.is_level_up ? `Yeni Seviye: ${data.level}` : `Skor: ${score}`}</span>
-          </div>
-        `;
-
-        document.body.appendChild(achievementMessage);
-
-        // 3 saniye sonra bildirim kaybolsun
-        setTimeout(() => {
-          achievementMessage.style.opacity = '0';
-          setTimeout(() => {
-            achievementMessage.remove();
-          }, 500);
-        }, 3000);
-      }
     })
     .catch(error => {
       console.error('Error saving score:', error);
     });
+  }
+  
+  /**
+   * Grid'deki en yüksek kare değerini bulur
+   */
+  function getHighestTile() {
+    let highest = 0;
+    
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (grid[y][x] && grid[y][x].value > highest) {
+          highest = grid[y][x].value;
+        }
+      }
+    }
+    
+    return highest;
   }
 });

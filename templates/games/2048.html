@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}2048{% endblock %}
+{% block title %}X2 Blocks: 2048 Number Puzzle{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/2048.css') }}">
@@ -8,69 +8,108 @@
 
 {% block content %}
 <div class="container">
-  <div class="game-container-wrapper">
-    <div class="heading">
-      <h1 class="game-title">2048</h1>
-      <div class="scores-container">
-        <div class="score-container" id="score">0</div>
-        <div class="best-container" id="best-score">0</div>
+  <div class="x2blocks-wrapper">
+    <!-- Game Header Section -->
+    <div class="x2blocks-header">
+      <div class="x2blocks-title">
+        <h1>X2 Blocks</h1>
+        <div class="x2blocks-subtitle">2048 Number Puzzle</div>
       </div>
-    </div>
-
-    <div class="above-game">
-      <p class="game-intro">
-        <b>2048 Oyunu:</b> Aynı sayıları birleştirerek <strong>2048</strong> karesine ulaş!
-      </p>
-      <a class="restart-button" id="restart-button">
-        <i class="fas fa-redo-alt"></i> Yeni Oyun
-      </a>
-    </div>
-
-    <div class="game-container">
-      <div class="grid-container" id="grid-container">
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-      </div>
-
-      <div class="tile-container" id="tile-container"></div>
-
-      <div class="game-message" id="game-message">
-        <p></p>
-        <div class="lower">
-          <a class="restart-button" id="retry-button">Tekrar Dene</a>
-          <a class="restart-button" id="keep-playing-button">Oynamaya Devam Et</a>
+      <div class="x2blocks-scores">
+        <div class="score-box">
+          <div class="score-label">SKOR</div>
+          <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-box best">
+          <div class="score-label">REKOR</div>
+          <div class="score-value" id="best-score">0</div>
         </div>
       </div>
     </div>
 
-    <div class="game-instructions mt-4">
-      <h4>Nasıl Oynanır?</h4>
+    <div class="game-status" id="game-status">
+      Aynı sayıları birleştirerek <strong>2048</strong> sayısına ulaşmaya çalışın!
+    </div>
+
+    <!-- Main Game Grid -->
+    <div class="x2blocks-game-container">
+      <div class="grid-background" id="grid-container">
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+        <div class="grid-cell"></div>
+      </div>
+
+      <div class="grid-tiles" id="tile-container"></div>
+
+      <!-- Game Message Overlay -->
+      <div class="game-message" id="game-message">
+        <div class="message-content">
+          <p id="message-text"></p>
+          <div class="message-buttons">
+            <button class="message-button" id="retry-button">
+              <i class="fas fa-redo-alt"></i> Tekrar Dene
+            </button>
+            <button class="message-button" id="keep-playing-button">
+              <i class="fas fa-play"></i> Devam Et
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Controls -->
+    <div class="x2blocks-controls">
+      <button class="x2blocks-btn" id="restart-button">
+        <i class="fas fa-sync-alt"></i> Yeni Oyun
+      </button>
+      <button class="x2blocks-btn" id="undo-button" disabled>
+        <i class="fas fa-undo"></i> Geri Al
+      </button>
+    </div>
+
+    <!-- Keyboard Controls Guide -->
+    <div class="keyboard-guide">
+      <div class="guide-title">Oyunu Klavye ile Oynayın</div>
+      <div class="guide-keys">
+        <div class="key-row">
+          <div class="key">↑</div>
+        </div>
+        <div class="key-row">
+          <div class="key">←</div>
+          <div class="key">↓</div>
+          <div class="key">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Instructions -->
+    <div class="x2blocks-instructions">
+      <h4><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h4>
       <ul>
         <li><strong>Amaç:</strong> Kareleri birleştirerek 2048 değerine ulaşmak.</li>
-        <li><strong>Kontrol:</strong> Ok tuşları veya W/A/S/D tuşları.</li>
-        <li><strong>Birleşme:</strong> Aynı değere sahip iki kare çarpıştığında birleşir ve değerleri ikiye katlanır.</li>
-        <li><strong>Strateji:</strong> Büyük sayılarınızı bir köşede tutmaya çalışın ve birleştirme zinciri oluşturun.</li>
-        <li><strong>Oyun Sonu:</strong> Daha fazla hamle kalmadığında oyun biter. 2048'e ulaştığınızda kazanırsınız!</li>
+        <li><strong>Kontrol:</strong> Ok tuşları ile blokları kaydırın veya dokunmatik ekranda parmağınızla kaydırın.</li>
+        <li><strong>Birleşme Kuralı:</strong> Aynı değere sahip iki blok çarpıştığında birleşir ve değerleri ikiye katlanır (2+2=4, 4+4=8...).</li>
+        <li><strong>Strateji İpucu:</strong> Büyük sayılarınızı bir köşede tutun ve birleştirme zinciri oluşturun.</li>
+        <li><strong>Oyun Sonu:</strong> Tahta dolduğunda ve hareket kalmadığında oyun biter, 2048'e ulaştığınızda kazanırsınız!</li>
       </ul>
     </div>
 
-    <div class="text-center mb-5 mt-4">
-      <a href="{{ url_for('all_games') }}" class="restart-button">
-        <i class="fas fa-arrow-left me-2"></i> Tüm Oyunlara Dön
+    <div class="x2blocks-footer">
+      <a href="{{ url_for('all_games') }}" class="x2blocks-back-btn">
+        <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
       </a>
     </div>
   </div>
