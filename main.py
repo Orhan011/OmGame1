@@ -623,69 +623,67 @@ def login():
 # def three_d_labyrinth():
 #     return render_template('games/3dLabyrinth.html')
 
+# Tüm oyunlar kaldırıldı
+
 @app.route('/games/word-puzzle')
 def word_puzzle():
-    return render_template('games/wordPuzzle.html')
+    flash('Kelime Bulmaca oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/memory-match')
 def memory_match():
-    return render_template('games/memoryMatch.html')
+    flash('Hafıza Eşleştirme oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/labyrinth')
 def labyrinth():
-    return render_template('games/labyrinth.html')
+    flash('Labirent oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/puzzle')
 def puzzle():
-    return render_template('games/puzzle.html')
-
-# Removed Visual Attention game as requested
-# @app.route('/games/visual-attention')
-# def visual_attention():
-#     return render_template('games/visualAttention.html')
+    flash('Puzzle oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/number-sequence')
 def number_sequence():
-    return render_template('games/numberSequence.html')
-
-# Yeni Hafıza Güçlendirme Oyunları
-# Route for "Kim Nerede?" game has been removed
+    flash('Sayı Dizisi oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/memory-cards')
 def memory_cards():
-    return render_template('games/memoryCards.html')
+    flash('Hafıza Kartları oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/number-chain')
 def number_chain():
-    return render_template('games/numberChain.html')
-
-@app.route('/games/audio-memory')
-def audio_memory():
-    return render_template('games/audioMemory.html')
+    flash('Sayı Zinciri oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/n-back')
 def n_back():
-    return render_template('games/nBack.html')
+    flash('N-Back oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
-# Yeni Mantık ve IQ Geliştirme Oyunları
-# Sudoku oyunu kaldırıldı
 @app.route('/games/sudoku')
 def sudoku():
-    return render_template('games/sudoku.html')
+    flash('Sudoku oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/2048')
 def game_2048():
-    return render_template('games/2048.html')
+    flash('2048 oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/wordle')
 def wordle():
-    """Wordle kelime tahmin oyunu"""
-    return render_template('games/wordle.html')
+    flash('Wordle oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 @app.route('/games/chess')
 def chess():
-    """Satranç oyunu"""
-    return render_template('games/chess.html')
+    flash('Satranç oyunu artık kullanılamıyor.', 'warning')
+    return redirect(url_for('all_games'))
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
