@@ -254,8 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kart boyutlarını ayarla
     adjustCardSize();
     
-    // Süreyi başlat
+    // Zamanlayıcıyı sıfırla ve başlat
     timer = 0;
+    updateTimerDisplay(); // Zamanlayıcıyı hemen güncelle
     startTimer();
     
     // Başlangıç mesajı göster
@@ -532,9 +533,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Süre Sayacını Başlat
   function startTimer() {
-    // Süreyi sıfırla
-    timer = 0;
-    
     // Önceki zamanlayıcıyı temizle
     clearInterval(timerInterval);
     
@@ -789,57 +787,63 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Ses Çal - Web Audio API kullanarak basit sesler üret
   function playSound(soundName) {
-    if (!soundEnabled || !SOUNDS[soundName]) return;
+    // Ses kapalıysa çıkış
+    if (!soundEnabled) return;
+    
+    // Belirtilen ses adı yoksa çıkış
+    if (!SOUNDS[soundName]) {
+      console.warn(`'${soundName}' adlı ses bulunamadı.`);
+      return;
+    }
     
     try {
       // Web Audio API desteğini kontrol et
       const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
+      if (!AudioContext) {
+        console.warn('Web Audio API bu tarayıcıda desteklenmiyor.');
+        return;
+      }
       
       const audioContext = new AudioContext();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      // Ses türünü belirle
-      oscillator.type = 'sine';
-      
-      // Ses özelliklerini ayarla
       const soundInfo = SOUNDS[soundName];
       
       if (Array.isArray(soundInfo.frequency)) {
-        // Çoklu ton (akor veya melodi) çal
-        const duration = soundInfo.duration / soundInfo.frequency.length;
-        
-        soundInfo.frequency.forEach((freq, index) => {
-          setTimeout(() => {
-            const tempOsc = audioContext.createOscillator();
-            const tempGain = audioContext.createGain();
-            
-            tempOsc.type = 'sine';
-            tempOsc.frequency.value = freq;
-            tempGain.gain.value = 0.2;
-            
-            tempOsc.connect(tempGain);
-            tempGain.connect(audioContext.destination);
-            
-            tempOsc.start();
-            tempOsc.stop(audioContext.currentTime + duration);
-          }, index * (duration * 1000));
-        });
+        // Çoklu ton çal (Melodi)
+        playMultiTone(audioContext, soundInfo.frequency, soundInfo.duration);
       } else {
         // Tek ton çal
-        oscillator.frequency.value = soundInfo.frequency;
-        gainNode.gain.value = 0.2;
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + soundInfo.duration);
+        playSingleTone(audioContext, soundInfo.frequency, soundInfo.duration);
       }
     } catch (error) {
-      console.log("Ses çalma hatası:", error);
+      console.warn(`Ses çalarken hata oluştu: ${error.message}`);
     }
+  }
+  
+  // Tek ton çal
+  function playSingleTone(audioContext, frequency, duration) {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.type = 'sine';
+    oscillator.frequency.value = frequency;
+    gainNode.gain.value = 0.2;
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+  }
+  
+  // Çoklu ton çal (melodi veya akor)
+  function playMultiTone(audioContext, frequencies, totalDuration) {
+    const duration = totalDuration / frequencies.length;
+    
+    frequencies.forEach((freq, index) => {
+      setTimeout(() => {
+        playSingleTone(audioContext, freq, duration);
+      }, index * (duration * 1000));
+    });
   }
   
   // Uyarı Mesajı Göster
