@@ -1,10 +1,12 @@
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-.game-2048-container {
-  min-height: 85vh;
-  width: 100%;
+body {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,16 +15,13 @@
   overflow-x: hidden;
   overflow-y: auto;
   transition: background 0.5s ease;
-  font-family: 'Poppins', sans-serif;
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
-.game-2048-container.light-theme {
+body.light-theme {
   background: linear-gradient(135deg, #121212, #1e1e2a, #292938);
 }
 
-.game-2048-container.dark-theme {
+body.dark-theme {
   background: linear-gradient(135deg, #000000, #0f0f17, #161624);
 }
 
