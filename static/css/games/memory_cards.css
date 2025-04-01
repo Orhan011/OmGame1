@@ -2,20 +2,20 @@
 
 :root {
   /* Ana Renkler */
-  --primary-color: #6a5ae0;
-  --primary-light: #8170ff;
-  --primary-dark: #5741d4;
-  --secondary-color: #2c3e50;
-  --secondary-light: #3a5068;
-  --secondary-dark: #1a2530;
+  --primary-color: #4e5bf2;
+  --primary-light: #6e79ff;
+  --primary-dark: #3748e3;
+  --secondary-color: #1e293b;
+  --secondary-light: #334155;
+  --secondary-dark: #0f172a;
   
   /* Nötr Renkler */
-  --background-dark: #1a1a2e;
-  --background-medium: #2d2d44;
-  --background-light: #3c3c57;
-  --text-light: #ffffff;
-  --text-medium: rgba(255, 255, 255, 0.85);
-  --text-dark: rgba(255, 255, 255, 0.65);
+  --background-dark: #0f172a;
+  --background-medium: #1e293b;
+  --background-light: #334155;
+  --text-light: #f8fafc;
+  --text-medium: rgba(248, 250, 252, 0.85);
+  --text-dark: rgba(248, 250, 252, 0.65);
   
   /* Durum Renkleri */
   --success-color: #10b981;
@@ -24,10 +24,10 @@
   --info-color: #3b82f6;
   
   /* Kart İlişkili Renkler */
-  --card-front: linear-gradient(135deg, #4b4be8, #3030a6);
-  --card-back: linear-gradient(135deg, #3a4d62, #2a2a3e);
-  --card-match: linear-gradient(135deg, #10b981, #059669);
-  --card-mismatch: linear-gradient(135deg, #ef4444, #b91c1c);
+  --card-front: linear-gradient(145deg, #4e5bf2, #3748e3);
+  --card-back: linear-gradient(145deg, #334155, #1e293b);
+  --card-match: linear-gradient(145deg, #10b981, #059669);
+  --card-mismatch: linear-gradient(145deg, #ef4444, #b91c1c);
   
   /* Geçişler */
   --transition-fast: 0.2s ease;
@@ -35,34 +35,35 @@
   --transition-slow: 0.5s ease;
   
   /* Gölgeler */
-  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.15);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.2);
-  --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.25);
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.2);
   
   /* İçerikler için Boyutlar */
   --container-max-width: 1200px;
-  --card-size-small: 70px;
-  --card-size-medium: 90px;
-  --card-size-large: 110px;
+  --card-size-small: 75px;
+  --card-size-medium: 95px;
+  --card-size-large: 115px;
   
   /* Köşe Yuvarlaklıkları */
-  --radius-small: 6px;
-  --radius-medium: 12px;
-  --radius-large: 18px;
+  --radius-small: 8px;
+  --radius-medium: 14px;
+  --radius-large: 20px;
   --radius-full: 9999px;
 }
 
 .game-container {
   max-width: var(--container-max-width);
   margin: 20px auto;
-  padding: 20px;
+  padding: 30px;
   background-color: var(--background-medium);
   border-radius: var(--radius-large);
   box-shadow: var(--shadow-large);
   color: var(--text-light);
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .game-container::before {
@@ -72,7 +73,18 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at top right, rgba(106, 90, 224, 0.2), transparent 500px);
+  background: radial-gradient(circle at top right, rgba(78, 91, 242, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.game-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent 60%);
   pointer-events: none;
 }
 
@@ -86,13 +98,28 @@
 }
 
 .game-header h1 {
-  font-size: 2.4rem;
-  font-weight: 700;
+  font-size: 2.6rem;
+  font-weight: 800;
   margin-bottom: 15px;
+  position: relative;
   background: linear-gradient(to right, var(--primary-light), #a191ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-align: center;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(106, 90, 224, 0.2);
+}
+
+.game-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+  border-radius: 4px;
 }
 
 .game-stats {
@@ -248,19 +275,29 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.6s;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   border-radius: var(--radius-small);
   box-shadow: var(--shadow-small);
+}
+
+.memory-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .memory-card.flipped {
   transform: rotateY(180deg);
 }
 
+.memory-card.flipped:hover {
+  transform: rotateY(180deg) translateY(-5px);
+}
+
 .memory-card.matched {
   transform: rotateY(180deg);
-  box-shadow: 0 0 15px var(--success-color);
+  box-shadow: 0 0 20px var(--success-color);
+  animation: matched-glow 1.5s infinite alternate;
 }
 
 .memory-card.disabled {
@@ -269,6 +306,15 @@
 
 .memory-card.mismatch {
   animation: shake 0.5s;
+}
+
+@keyframes matched-glow {
+  from {
+    box-shadow: 0 0 10px var(--success-color);
+  }
+  to {
+    box-shadow: 0 0 20px var(--success-color), 0 0 30px var(--success-color);
+  }
 }
 
 @keyframes shake {

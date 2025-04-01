@@ -72,24 +72,25 @@
   
   /* Öne çıkan oyun kartı */
   .featured-game-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 25px;
-    margin: 30px auto;
-    max-width: 550px;
+    background: linear-gradient(145deg, rgba(78, 91, 242, 0.15), rgba(16, 185, 129, 0.05));
+    border-radius: 16px;
+    padding: 30px;
+    margin: 35px auto;
+    max-width: 600px;
     display: flex;
     align-items: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(78, 91, 242, 0.2);
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   
   .featured-game-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(145deg, rgba(78, 91, 242, 0.2), rgba(16, 185, 129, 0.08));
+    border-color: rgba(78, 91, 242, 0.3);
   }
   
   .featured-game-card::before {
@@ -97,11 +98,11 @@
     position: absolute;
     top: -100%;
     left: -100%;
-    width: 100%;
-    height: 100%;
+    width: 150%;
+    height: 150%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
     transform: rotate(45deg);
-    transition: all 0.8s;
+    transition: all 1s ease;
   }
   
   .featured-game-card:hover::before {
@@ -109,17 +110,45 @@
     left: 100%;
   }
   
+  .featured-game-card::after {
+    content: 'YENİ';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(to right, #10b981, #059669);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
   .featured-game-icon {
-    background: linear-gradient(135deg, #6a5ae0, #4b4be8);
-    width: 80px;
-    height: 80px;
+    background: linear-gradient(145deg, #4e5bf2, #3748e3);
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 25px;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+    margin-right: 30px;
+    box-shadow: 0 8px 20px rgba(78, 91, 242, 0.3);
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .featured-game-icon::before {
+    content: '';
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    top: -20%;
+    left: -20%;
   }
   
   .featured-game-icon i {
