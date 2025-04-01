@@ -1,4 +1,3 @@
-
 {% extends "layout.html" %}
 
 {% block styles %}
@@ -8,85 +7,82 @@
 {% block content %}
 <div class="container">
   <div class="page-title-section">
-    <h1>X2 Blocks</h1>
-    <p>Modern Merge Puzzle - Aynı değerdeki blokları birleştirerek 2048'e ulaşın!</p>
+    <h1>2048</h1>
+    <p>Sayıları birleştirerek 2048 taşını oluşturmaya çalışın!</p>
   </div>
   
-  <div id="game2048-container" class="game-container">
-    <header>
-      <div class="title-area">
-        <h1>X2 Blocks</h1>
-        <p class="subtitle">Modern Merge Puzzle</p>
-      </div>
-      <div class="scores">
-        <div class="score-box primary">
-          <span>SKOR</span>
-          <span id="score">0</span>
-        </div>
+  <div id="game-2048" class="game-2048">
+    <div class="game-header">
+      <div class="score-container">
         <div class="score-box">
-          <span>EN İYİ</span>
-          <span id="best-score">0</span>
+          <div class="score-label">SKOR</div>
+          <div id="current-score" class="score-value">0</div>
         </div>
-        <div class="score-box level-box">
-          <span>SEVİYE</span>
-          <span id="level-value">1</span>
-        </div>
-      </div>
-      <div class="game-options">
-        <button id="toggle-sound" class="option-btn">🔊</button>
-        <button id="toggle-theme" class="option-btn">🌙</button>
-      </div>
-    </header>
-
-    <div class="game-container">
-      <div class="columns-grid">
-        <!-- Columns will be created dynamically -->
-      </div>
-      
-      <div class="block-source">
-        <div class="next-label">SONRAKI BLOK</div>
-        <!-- Next block will appear here -->
-      </div>
-      
-      <div id="game-over" class="overlay hidden">
-        <div class="overlay-content">
-          <h2>Oyun Bitti!</h2>
-          <p>Skorun: <span class="final-score">0</span></p>
-          <button id="retry" class="primary-btn">Tekrar Dene</button>
+        <div class="score-box best-box">
+          <div class="score-label">EN İYİ</div>
+          <div id="best-score" class="score-value">0</div>
         </div>
       </div>
       
-      <div id="game-won" class="overlay hidden">
-        <div class="overlay-content">
-          <h2>Tebrikler!</h2>
-          <p>2048'e ulaştın!</p>
-          <button id="continue" class="primary-btn">Devam Et</button>
-        </div>
+      <div class="action-buttons">
+        <button id="new-game-btn" class="action-btn">Yeni Oyun</button>
+        <button id="undo-btn" class="action-btn secondary-btn">Geri Al</button>
       </div>
-    </div>
-
-    <div class="controls">
-      <button id="new-game" class="primary-btn">Yeni Oyun</button>
-      <button id="undo" class="secondary-btn">Geri Al</button>
     </div>
     
-    <div class="power-ups">
-      <div class="power-up-title">Güçlendirmeler</div>
-      <div class="power-up-grid">
-        <div class="power-up" id="clear-column">
-          <div class="power-up-icon">🧹</div>
-          <div class="power-up-name">Sütun Temizle</div>
-        </div>
-        <div class="power-up" id="double-value">
-          <div class="power-up-icon">✖️2</div>
-          <div class="power-up-name">Değeri İkile</div>
-        </div>
-        <div class="power-up" id="extra-move">
-          <div class="power-up-icon">🔄</div>
-          <div class="power-up-name">Ekstra Hamle</div>
+    <div id="game-board-container" class="game-board-container">
+      <div id="tile-container" class="tile-container"></div>
+      <div id="grid-container" class="grid-container">
+        <!-- Grid cells will be added by JavaScript -->
+      </div>
+      
+      <div id="game-message" class="game-message hidden">
+        <p></p>
+        <div class="game-message-buttons">
+          <button id="keep-going-btn" class="action-btn">Devam Et</button>
+          <button id="try-again-btn" class="action-btn secondary-btn">Tekrar Dene</button>
         </div>
       </div>
     </div>
+    
+    <div class="game-controls">
+      <div class="mobile-controls">
+        <div class="control-row">
+          <button id="control-up" class="control-btn"><i class="fas fa-arrow-up"></i></button>
+        </div>
+        <div class="control-row">
+          <button id="control-left" class="control-btn"><i class="fas fa-arrow-left"></i></button>
+          <button id="control-down" class="control-btn"><i class="fas fa-arrow-down"></i></button>
+          <button id="control-right" class="control-btn"><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="game-info">
+    <h3>Nasıl Oynanır?</h3>
+    <p>2048, basit kuralları olan ancak zorlu bir strateji oyunudur:</p>
+    <ul>
+      <li>Sayıları yukarı, aşağı, sola veya sağa kaydırın.</li>
+      <li>Aynı değere sahip iki sayı birbirine dokunduğunda, birleşerek iki katı değerinde yeni bir sayı oluşturur.</li>
+      <li>Her kaydırma sonrasında yeni bir sayı (2 veya 4) tahtada rastgele bir konumda belirir.</li>
+      <li>Tahtadaki herhangi bir hücrede 2048 sayısını oluşturduğunuzda oyunu kazanırsınız.</li>
+      <li>Tahta dolduğunda ve geçerli hamle kalmadığında oyun sona erer.</li>
+    </ul>
+    
+    <h3>İpuçları:</h3>
+    <ul>
+      <li>Büyük sayıları tahtanın bir köşesinde tutmaya çalışın.</li>
+      <li>Küçük sayıları birleştirerek daha büyük sayılar oluşturun.</li>
+      <li>Tahtayı boş tutmak için düşünceli hamleler yapın.</li>
+      <li>Her zaman bir "çıkış stratejisi" planlayın.</li>
+    </ul>
+    
+    <h3>Kontroller:</h3>
+    <ul>
+      <li>Bilgisayar: Ok tuşları veya WASD tuşlarını kullanın.</li>
+      <li>Mobil: Ekrandaki ok tuşlarını kullanın veya ekranda kaydırma hareketi yapın.</li>
+    </ul>
   </div>
 </div>
 {% endblock %}

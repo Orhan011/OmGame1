@@ -1,0 +1,340 @@
+/* Sesli Hafıza Oyunu CSS */
+
+.game-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: rgba(30, 40, 70, 0.7);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.game-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.score-display {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.score-item {
+  flex: 1;
+  background: rgba(40, 60, 90, 0.5);
+  padding: 10px 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.score-item:hover {
+  transform: translateY(-3px);
+}
+
+.score-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.score-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.control-btn {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4);
+}
+
+.control-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(79, 172, 254, 0.5);
+}
+
+.control-btn:active {
+  transform: translateY(-1px);
+}
+
+.difficulty-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.difficulty-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.difficulty-options {
+  display: flex;
+  gap: 5px;
+}
+
+.difficulty-btn {
+  background: rgba(60, 80, 120, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.difficulty-btn:hover {
+  background: rgba(60, 80, 120, 0.5);
+}
+
+.difficulty-btn.active {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+}
+
+.status-message {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 25px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(40, 60, 90, 0.3);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 20px;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+}
+
+.game-btn {
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.game-btn:active, .game-btn.active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.game-btn.blue {
+  background: linear-gradient(135deg, #0066ff, #00ccff);
+}
+
+.game-btn.red {
+  background: linear-gradient(135deg, #ff3333, #ff6666);
+}
+
+.game-btn.green {
+  background: linear-gradient(135deg, #00cc66, #66ff99);
+}
+
+.game-btn.yellow {
+  background: linear-gradient(135deg, #ffcc00, #ffee00);
+}
+
+.game-btn.blue.active {
+  box-shadow: 0 0 20px 10px rgba(0, 102, 255, 0.4);
+}
+
+.game-btn.red.active {
+  box-shadow: 0 0 20px 10px rgba(255, 51, 51, 0.4);
+}
+
+.game-btn.green.active {
+  box-shadow: 0 0 20px 10px rgba(0, 204, 102, 0.4);
+}
+
+.game-btn.yellow.active {
+  box-shadow: 0 0 20px 10px rgba(255, 204, 0, 0.4);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 30, 60, 0.9);
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  backdrop-filter: blur(3px);
+  transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-content {
+  background: rgba(40, 60, 100, 0.7);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.overlay-content h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #4facfe; /* Fallback */
+}
+
+.result-details {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.result-item {
+  background: rgba(60, 80, 120, 0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.result-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 5px;
+}
+
+.result-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+#result-message {
+  font-size: 16px;
+  margin-bottom: 25px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Game info sections */
+.game-info {
+  margin-top: 40px;
+  background: rgba(30, 40, 70, 0.7);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.game-info h3 {
+  color: #4facfe;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.game-info p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.game-info ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.game-info li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .game-controls {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .game-buttons {
+    width: 260px;
+    height: 260px;
+    gap: 15px;
+  }
+  
+  .game-btn {
+    border-radius: 12px;
+  }
+  
+  .score-value {
+    font-size: 24px;
+  }
+  
+  .control-btn {
+    width: 100%;
+  }
+  
+  .difficulty-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .overlay-content {
+    padding: 20px;
+  }
+  
+  .result-item {
+    padding: 8px 15px;
+  }
+  
+  .result-value {
+    font-size: 20px;
+  }
+}

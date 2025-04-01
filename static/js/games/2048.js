@@ -1,757 +1,674 @@
+/**
+ * 2048 Game
+ * =========
+ * Modern implementation of the classic 2048 game.
+ */
 
-// Modern Merge Puzzle (X2 Blocks) - 2048 Game
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('X2 Blocks oyunu başlatılıyor...');
-  
-  // Eski yükleniyor mesajını temizle
-  const messageEl = document.getElementById('message');
-  if (messageEl) {
-    messageEl.remove();
+document.addEventListener('DOMContentLoaded', () => {
+  // Game class
+  class Game2048 {
+    constructor() {
+      // Game grid size (4x4)
+      this.size = 4;
+      
+      // DOM elements
+      this.gridContainer = document.getElementById('grid-container');
+      this.tileContainer = document.getElementById('tile-container');
+      this.scoreElement = document.getElementById('current-score');
+      this.bestScoreElement = document.getElementById('best-score');
+      this.messageContainer = document.getElementById('game-message');
+      
+      // Buttons
+      this.newGameButton = document.getElementById('new-game-btn');
+      this.undoButton = document.getElementById('undo-btn');
+      this.keepGoingButton = document.getElementById('keep-going-btn');
+      this.tryAgainButton = document.getElementById('try-again-btn');
+      
+      // Mobile control buttons
+      this.controlUp = document.getElementById('control-up');
+      this.controlDown = document.getElementById('control-down');
+      this.controlLeft = document.getElementById('control-left');
+      this.controlRight = document.getElementById('control-right');
+      
+      // Game state
+      this.grid = [];
+      this.score = 0;
+      this.bestScore = localStorage.getItem('2048_bestScore') ? parseInt(localStorage.getItem('2048_bestScore')) : 0;
+      this.won = false;
+      this.over = false;
+      this.gameHistory = [];
+      
+      // Set up the game
+      this.setup();
+    }
+    
+    // Set up game board and event listeners
+    setup() {
+      // Initialize grid
+      this.createGrid();
+      
+      // Set up event handlers
+      this.setupEventListeners();
+      
+      // Update the display with initial best score
+      this.updateBestScore();
+      
+      // Start a new game
+      this.newGame();
+    }
+    
+    // Create the grid cells
+    createGrid() {
+      // Clear grid container
+      this.gridContainer.innerHTML = '';
+      
+      // Create grid cells
+      for (let row = 0; row < this.size; row++) {
+        for (let col = 0; col < this.size; col++) {
+          const gridCell = document.createElement('div');
+          gridCell.className = 'grid-cell';
+          gridCell.id = `cell-${row}-${col}`;
+          this.gridContainer.appendChild(gridCell);
+        }
+      }
+    }
+    
+    // Set up event listeners
+    setupEventListeners() {
+      // Keyboard events
+      document.addEventListener('keydown', (event) => {
+        if (!this.over) {
+          switch(event.key) {
+            case 'ArrowUp':
+            case 'w':
+            case 'W':
+              event.preventDefault();
+              this.move('up');
+              break;
+            case 'ArrowDown':
+            case 's':
+            case 'S':
+              event.preventDefault();
+              this.move('down');
+              break;
+            case 'ArrowLeft':
+            case 'a':
+            case 'A':
+              event.preventDefault();
+              this.move('left');
+              break;
+            case 'ArrowRight':
+            case 'd':
+            case 'D':
+              event.preventDefault();
+              this.move('right');
+              break;
+          }
+        }
+      });
+      
+      // Button events
+      this.newGameButton.addEventListener('click', () => this.newGame());
+      this.undoButton.addEventListener('click', () => this.undo());
+      this.keepGoingButton.addEventListener('click', () => this.keepGoing());
+      this.tryAgainButton.addEventListener('click', () => this.newGame());
+      
+      // Mobile control buttons
+      this.controlUp.addEventListener('click', () => this.move('up'));
+      this.controlDown.addEventListener('click', () => this.move('down'));
+      this.controlLeft.addEventListener('click', () => this.move('left'));
+      this.controlRight.addEventListener('click', () => this.move('right'));
+      
+      // Touch events for swiping
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let touchEndY = 0;
+      
+      const gameContainer = document.getElementById('game-board-container');
+      
+      gameContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      });
+      
+      gameContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+        this.handleSwipe();
+      });
+      
+      // Handle swipe direction
+      this.handleSwipe = () => {
+        const xDiff = touchStartX - touchEndX;
+        const yDiff = touchStartY - touchEndY;
+        
+        // Determine the direction of the swipe
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+          // Horizontal swipe
+          if (xDiff > 10) {
+            this.move('left');
+          } else if (xDiff < -10) {
+            this.move('right');
+          }
+        } else {
+          // Vertical swipe
+          if (yDiff > 10) {
+            this.move('up');
+          } else if (yDiff < -10) {
+            this.move('down');
+          }
+        }
+      };
+    }
+    
+    // Start a new game
+    newGame() {
+      // Reset game state
+      this.grid = this.createEmptyGrid();
+      this.score = 0;
+      this.won = false;
+      this.over = false;
+      this.gameHistory = [];
+      
+      // Clear the board
+      this.tileContainer.innerHTML = '';
+      
+      // Hide any messages
+      this.messageContainer.classList.add('hidden');
+      this.messageContainer.classList.remove('game-won', 'game-over');
+      
+      // Add initial tiles
+      this.addRandomTile();
+      this.addRandomTile();
+      
+      // Update the UI
+      this.updateScore();
+      
+      // Save current state to history
+      this.saveHistory();
+    }
+    
+    // Create an empty grid
+    createEmptyGrid() {
+      const grid = [];
+      
+      for (let row = 0; row < this.size; row++) {
+        grid[row] = [];
+        for (let col = 0; col < this.size; col++) {
+          grid[row][col] = 0;
+        }
+      }
+      
+      return grid;
+    }
+    
+    // Add a random tile to the grid
+    addRandomTile() {
+      if (this.availableCells().length > 0) {
+        // Get a random empty cell
+        const cell = this.randomAvailableCell();
+        
+        // Set the value (90% chance for 2, 10% chance for 4)
+        const value = Math.random() < 0.9 ? 2 : 4;
+        
+        // Update grid
+        this.grid[cell.row][cell.col] = value;
+        
+        // Create and add the tile to the UI
+        this.addTile({ row: cell.row, col: cell.col, value: value });
+      }
+    }
+    
+    // Get all empty cells
+    availableCells() {
+      const cells = [];
+      
+      for (let row = 0; row < this.size; row++) {
+        for (let col = 0; col < this.size; col++) {
+          if (this.grid[row][col] === 0) {
+            cells.push({ row: row, col: col });
+          }
+        }
+      }
+      
+      return cells;
+    }
+    
+    // Get a random empty cell
+    randomAvailableCell() {
+      const cells = this.availableCells();
+      
+      if (cells.length > 0) {
+        return cells[Math.floor(Math.random() * cells.length)];
+      }
+      
+      return null;
+    }
+    
+    // Add a tile to the UI
+    addTile(tile) {
+      const tileElement = document.createElement('div');
+      
+      // Set class and position
+      tileElement.className = `tile tile-${tile.value} new`;
+      tileElement.textContent = tile.value;
+      tileElement.id = `tile-${tile.row}-${tile.col}`;
+      
+      // Position the tile
+      const position = this.calculateTilePosition(tile);
+      tileElement.style.top = `${position.top}px`;
+      tileElement.style.left = `${position.left}px`;
+      
+      // Add to DOM
+      this.tileContainer.appendChild(tileElement);
+    }
+    
+    // Calculate the position of a tile
+    calculateTilePosition(tile) {
+      const cellSize = 100 / this.size;
+      const gap = 10;
+      
+      // Calculate position in percentage
+      const left = tile.col * cellSize;
+      const top = tile.row * cellSize;
+      
+      // Convert to pixels based on container size
+      const containerWidth = this.tileContainer.offsetWidth;
+      const containerHeight = this.tileContainer.offsetHeight;
+      
+      return {
+        left: (left * containerWidth) / 100,
+        top: (top * containerHeight) / 100
+      };
+    }
+    
+    // Update the score display
+    updateScore() {
+      this.scoreElement.textContent = this.score;
+      
+      // Update best score if necessary
+      if (this.score > this.bestScore) {
+        this.bestScore = this.score;
+        localStorage.setItem('2048_bestScore', this.bestScore);
+        this.updateBestScore();
+      }
+    }
+    
+    // Update the best score display
+    updateBestScore() {
+      this.bestScoreElement.textContent = this.bestScore;
+    }
+    
+    // Move tiles in the specified direction
+    move(direction) {
+      // Don't do anything if the game is over
+      if (this.over) return;
+      
+      // Save current state for undo
+      this.saveHistory();
+      
+      let moved = false;
+      
+      // Process the grid based on direction
+      switch (direction) {
+        case 'up':
+          moved = this.moveUp();
+          break;
+        case 'down':
+          moved = this.moveDown();
+          break;
+        case 'left':
+          moved = this.moveLeft();
+          break;
+        case 'right':
+          moved = this.moveRight();
+          break;
+      }
+      
+      // Only add a new tile if a move was made
+      if (moved) {
+        this.updateScore();
+        
+        // Wait for animations to finish before adding a new tile
+        setTimeout(() => {
+          this.addRandomTile();
+          
+          // Check if the game is over
+          if (!this.movesAvailable()) {
+            this.over = true;
+            this.showMessage('game-over', 'Oyun Bitti!');
+            this.saveScoreToServer();
+          }
+        }, 150);
+      }
+    }
+    
+    // Move tiles up
+    moveUp() {
+      return this.moveTiles({
+        rowStart: 1,
+        rowEnd: this.size,
+        rowStep: 1,
+        colStart: 0,
+        colEnd: this.size,
+        colStep: 1,
+        direction: 'up'
+      });
+    }
+    
+    // Move tiles down
+    moveDown() {
+      return this.moveTiles({
+        rowStart: this.size - 2,
+        rowEnd: -1,
+        rowStep: -1,
+        colStart: 0,
+        colEnd: this.size,
+        colStep: 1,
+        direction: 'down'
+      });
+    }
+    
+    // Move tiles left
+    moveLeft() {
+      return this.moveTiles({
+        rowStart: 0,
+        rowEnd: this.size,
+        rowStep: 1,
+        colStart: 1,
+        colEnd: this.size,
+        colStep: 1,
+        direction: 'left'
+      });
+    }
+    
+    // Move tiles right
+    moveRight() {
+      return this.moveTiles({
+        rowStart: 0,
+        rowEnd: this.size,
+        rowStep: 1,
+        colStart: this.size - 2,
+        colEnd: -1,
+        colStep: -1,
+        direction: 'right'
+      });
+    }
+    
+    // Generic function to move tiles in any direction
+    moveTiles(params) {
+      let moved = false;
+      
+      // Clone the current grid to check for changes
+      const previousGrid = JSON.parse(JSON.stringify(this.grid));
+      
+      // Create a new grid to track merges
+      const mergedTiles = this.createEmptyGrid();
+      
+      // Process each tile
+      for (let col = params.colStart; col !== params.colEnd; col += params.colStep) {
+        for (let row = params.rowStart; row !== params.rowEnd; row += params.rowStep) {
+          // Skip empty cells
+          if (this.grid[row][col] === 0) continue;
+          
+          // Find the farthest position
+          const farthest = this.findFarthestPosition(row, col, params.direction);
+          const next = this.getNextTilePosition(farthest.row, farthest.col, params.direction);
+          
+          // Check if we can merge with the next tile
+          if (next && 
+              this.grid[next.row][next.col] === this.grid[row][col] && 
+              !mergedTiles[next.row][next.col]) {
+            // Merge the tiles
+            const mergedValue = this.grid[row][col] * 2;
+            this.grid[next.row][next.col] = mergedValue;
+            this.grid[row][col] = 0;
+            
+            // Mark as merged to prevent double merges
+            mergedTiles[next.row][next.col] = 1;
+            
+            // Update score
+            this.score += mergedValue;
+            
+            // Move the tile in the UI
+            this.moveTileInUI(row, col, next.row, next.col, true);
+            
+            // Check if we've won (reached 2048)
+            if (mergedValue === 2048 && !this.won) {
+              this.won = true;
+              this.showMessage('game-won', 'Tebrikler, Kazandınız!');
+              this.saveScoreToServer();
+            }
+            
+            moved = true;
+          } else if (farthest.row !== row || farthest.col !== col) {
+            // Move to the farthest position
+            this.grid[farthest.row][farthest.col] = this.grid[row][col];
+            this.grid[row][col] = 0;
+            
+            // Move the tile in the UI
+            this.moveTileInUI(row, col, farthest.row, farthest.col, false);
+            
+            moved = true;
+          }
+        }
+      }
+      
+      return moved;
+    }
+    
+    // Find the farthest position a tile can move in a given direction
+    findFarthestPosition(row, col, direction) {
+      let farthestRow = row;
+      let farthestCol = col;
+      let next;
+      
+      // Iterate until we hit an obstacle
+      do {
+        // Save current position
+        row = farthestRow;
+        col = farthestCol;
+        
+        // Get next position
+        next = this.getNextPosition(row, col, direction);
+        
+        // Update farthest position if valid and empty
+        if (next && this.grid[next.row][next.col] === 0) {
+          farthestRow = next.row;
+          farthestCol = next.col;
+        }
+      } while (next && this.grid[next.row][next.col] === 0);
+      
+      return { row: farthestRow, col: farthestCol };
+    }
+    
+    // Get the next position in a given direction
+    getNextPosition(row, col, direction) {
+      const positions = {
+        'up': { row: row - 1, col: col },
+        'down': { row: row + 1, col: col },
+        'left': { row: row, col: col - 1 },
+        'right': { row: row, col: col + 1 }
+      };
+      
+      const next = positions[direction];
+      
+      // Check if the next position is within bounds
+      if (next.row >= 0 && next.row < this.size && 
+          next.col >= 0 && next.col < this.size) {
+        return next;
+      }
+      
+      return null;
+    }
+    
+    // Get the position of the next tile in a given direction
+    getNextTilePosition(row, col, direction) {
+      let next = this.getNextPosition(row, col, direction);
+      
+      // Keep moving until we find a tile or reach the edge
+      while (next && this.grid[next.row][next.col] === 0) {
+        row = next.row;
+        col = next.col;
+        next = this.getNextPosition(row, col, direction);
+      }
+      
+      return next;
+    }
+    
+    // Move a tile in the UI
+    moveTileInUI(fromRow, fromCol, toRow, toCol, merged) {
+      const fromId = `tile-${fromRow}-${fromCol}`;
+      const tileElement = document.getElementById(fromId);
+      
+      if (!tileElement) return;
+      
+      // Update the tile's ID and position
+      tileElement.id = `tile-${toRow}-${toCol}`;
+      
+      // Calculate the new position
+      const position = this.calculateTilePosition({ row: toRow, col: toCol });
+      tileElement.style.top = `${position.top}px`;
+      tileElement.style.left = `${position.left}px`;
+      
+      // Handle merging
+      if (merged) {
+        tileElement.classList.add('merged');
+        
+        // Update the tile's value
+        const newValue = this.grid[toRow][toCol];
+        setTimeout(() => {
+          tileElement.className = `tile tile-${newValue}`;
+          tileElement.textContent = newValue;
+        }, 100);
+      }
+    }
+    
+    // Check if there are any valid moves left
+    movesAvailable() {
+      // Check if there are empty cells
+      if (this.availableCells().length > 0) {
+        return true;
+      }
+      
+      // Check if there are any possible merges
+      for (let row = 0; row < this.size; row++) {
+        for (let col = 0; col < this.size; col++) {
+          const value = this.grid[row][col];
+          
+          // Check adjacent cells
+          const directions = ['up', 'down', 'left', 'right'];
+          
+          for (const direction of directions) {
+            const next = this.getNextPosition(row, col, direction);
+            
+            if (next && this.grid[next.row][next.col] === value) {
+              return true;
+            }
+          }
+        }
+      }
+      
+      // No moves available
+      return false;
+    }
+    
+    // Save the current game state to history
+    saveHistory() {
+      this.gameHistory.push({
+        grid: JSON.parse(JSON.stringify(this.grid)),
+        score: this.score
+      });
+      
+      // Limit history size
+      if (this.gameHistory.length > 20) {
+        this.gameHistory.shift();
+      }
+    }
+    
+    // Undo the last move
+    undo() {
+      if (this.gameHistory.length > 1) {
+        // Remove the current state
+        this.gameHistory.pop();
+        
+        // Get the previous state
+        const previousState = this.gameHistory[this.gameHistory.length - 1];
+        
+        // Restore the grid and score
+        this.grid = JSON.parse(JSON.stringify(previousState.grid));
+        this.score = previousState.score;
+        
+        // Update the UI
+        this.updateScore();
+        this.renderGrid();
+        
+        // If the game was over or won, it's not anymore
+        if (this.over || this.won) {
+          this.over = false;
+          this.won = false;
+          this.messageContainer.classList.add('hidden');
+        }
+      }
+    }
+    
+    // Render the entire grid
+    renderGrid() {
+      // Clear the tile container
+      this.tileContainer.innerHTML = '';
+      
+      // Add tiles for all non-zero values
+      for (let row = 0; row < this.size; row++) {
+        for (let col = 0; col < this.size; col++) {
+          if (this.grid[row][col] !== 0) {
+            this.addTile({
+              row: row,
+              col: col,
+              value: this.grid[row][col]
+            });
+          }
+        }
+      }
+    }
+    
+    // Show a message (game over or won)
+    showMessage(type, message) {
+      // Set the message text
+      this.messageContainer.querySelector('p').textContent = message;
+      
+      // Show the message
+      this.messageContainer.classList.remove('hidden');
+      this.messageContainer.classList.add(type);
+    }
+    
+    // Continue playing after winning
+    keepGoing() {
+      this.messageContainer.classList.add('hidden');
+    }
+    
+    // Save the score to the server
+    saveScoreToServer() {
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          game_type: '2048',
+          score: this.score
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Score saved:', data);
+      })
+      .catch(error => {
+        console.error('Error saving score:', error);
+      });
+    }
   }
   
-  // Oyun sınıfını başlat
-  const game = new ModernMergePuzzle();
+  // Initialize the game
+  const game = new Game2048();
 });
-
-class ModernMergePuzzle {
-    constructor() {
-        this.columns = Array(5).fill().map(() => []);  // 5 columns
-        this.score = 0;
-        this.bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
-        this.level = parseInt(localStorage.getItem('level')) || 1;
-        this.moveHistory = [];
-        this.gameOver = false;
-        this.won = false;
-        this.draggingBlock = null;
-        this.dragStartPos = { x: 0, y: 0 };
-        this.blockSize = 60;
-        this.gap = 10;
-        this.maxBlocksPerColumn = 6;  // Maximum blocks visible in a column
-        this.nextBlockValue = null;
-        this.soundEnabled = localStorage.getItem('soundEnabled') === 'false' ? false : true;
-        this.themeMode = localStorage.getItem('themeMode') || 'light';
-
-        // Ses efektleri
-        this.sounds = {};
-
-        // Sesleri yükle
-        this.loadSounds = () => {
-            // Ses desteğini tamamen kapatıyoruz, çünkü hata oluşturuyor
-            this.soundEnabled = false;
-            document.getElementById('toggle-sound').textContent = '🔇';
-
-            // Ses çalma işlevlerini boş fonksiyonlara dönüştür
-            this.playSound = () => {};
-        };
-
-        // Sesleri yükle
-        this.loadSounds();
-
-        this.setupGame();
-        this.generateNextBlock();
-        this.setupEventListeners();
-        this.applyTheme();
-    }
-
-    setupGame() {
-        // Get DOM elements
-        this.columnsGridElement = document.querySelector('.columns-grid');
-        this.blockSourceElement = document.querySelector('.block-source');
-        this.scoreElement = document.getElementById('score');
-        this.bestScoreElement = document.getElementById('best-score');
-        this.finalScoreElement = document.querySelector('.final-score');
-        this.bestScoreElement.textContent = this.bestScore;
-
-        // Clear existing grid
-        this.columnsGridElement.innerHTML = '';
-
-        // Create columns
-        for (let i = 0; i < 5; i++) {
-            const column = document.createElement('div');
-            column.className = 'column';
-            column.dataset.index = i;
-            this.columnsGridElement.appendChild(column);
-        }
-    }
-
-    generateNextBlock() {
-        // Clear the source block container
-        this.blockSourceElement.innerHTML = '';
-
-        // Add the next-label back
-        const nextLabel = document.createElement('div');
-        nextLabel.className = 'next-label';
-        nextLabel.textContent = 'SONRAKI BLOK';
-        this.blockSourceElement.appendChild(nextLabel);
-
-        // Tablodaki en yüksek taş değerini bul
-        let highestValue = 0;
-        this.columns.forEach(column => {
-            column.forEach(value => {
-                highestValue = Math.max(highestValue, value);
-            });
-        });
-
-        // Yüksek değere göre minimum taş değeri belirle
-        let minBlockValue = 2;
-
-        if (highestValue >= 4096) {
-            minBlockValue = 32;
-        } else if (highestValue >= 2048) {
-            minBlockValue = 16;
-        } else if (highestValue >= 1024) {
-            minBlockValue = 8;
-        } else if (highestValue >= 512) {
-            minBlockValue = 4;
-        }
-
-        // Minimum taş değerine göre değer havuzu oluştur
-        let possibleValues = [];
-        let baseValue = minBlockValue;
-
-        // Değer havuzuna 4 farklı değer ekle (minimum ve 3 üst seviye)
-        for (let i = 0; i < 4; i++) {
-            possibleValues.push(baseValue * Math.pow(2, i));
-        }
-
-        // Olasılık dağılımını ayarla (düşük değerler daha sık gelsin)
-        const rand = Math.random();
-        let selectedIndex;
-
-        if (rand < 0.5) {
-            selectedIndex = 0; // %50 olasılıkla en küçük değer
-        } else if (rand < 0.8) {
-            selectedIndex = 1; // %30 olasılıkla ikinci değer
-        } else if (rand < 0.95) {
-            selectedIndex = 2; // %15 olasılıkla üçüncü değer
-        } else {
-            selectedIndex = 3; // %5 olasılıkla en büyük değer
-        }
-
-        // Seçilen değeri ata
-        this.nextBlockValue = possibleValues[selectedIndex];
-
-        // Create the block element
-        const block = document.createElement('div');
-        block.className = 'block';
-        block.dataset.value = this.nextBlockValue;
-        block.textContent = this.nextBlockValue;
-
-        // Style the block
-        block.style.width = `${this.blockSize}px`;
-        block.style.height = `${this.blockSize}px`;
-
-        // Add to DOM
-        this.blockSourceElement.appendChild(block);
-
-        // Setup dragging
-        this.setupBlockDrag(block);
-    }
-
-    setupBlockDrag(block) {
-        // Touch events for mobile
-        block.addEventListener('touchstart', (e) => {
-            if (this.gameOver || this.won) return;
-            e.preventDefault();
-
-            const touch = e.touches[0];
-            this.startDragging(block, touch.clientX, touch.clientY);
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!this.draggingBlock) return;
-            e.preventDefault();
-
-            const touch = e.touches[0];
-            this.updateDragging(touch.clientX, touch.clientY);
-        });
-
-        document.addEventListener('touchend', () => {
-            if (!this.draggingBlock) return;
-            this.endDragging();
-        });
-
-        // Mouse events for desktop
-        block.addEventListener('mousedown', (e) => {
-            if (this.gameOver || this.won) return;
-            e.preventDefault();
-
-            this.startDragging(block, e.clientX, e.clientY);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!this.draggingBlock) return;
-            this.updateDragging(e.clientX, e.clientY);
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (!this.draggingBlock) return;
-            this.endDragging();
-        });
-    }
-
-    startDragging(block, clientX, clientY) {
-        // Create a clone of the block for dragging
-        this.draggingBlock = block.cloneNode(true);
-        this.draggingBlock.classList.add('dragging');
-        document.body.appendChild(this.draggingBlock);
-
-        // Store starting position for calculating offset
-        const rect = block.getBoundingClientRect();
-        this.dragStartPos = {
-            x: clientX - rect.left,
-            y: clientY - rect.top
-        };
-
-        // Track current position
-        this.lastDragPos = {
-            x: clientX,
-            y: clientY
-        };
-
-        // Position the dragging block
-        this.draggingBlock.style.position = 'fixed';
-        this.draggingBlock.style.width = `${this.blockSize}px`;
-        this.draggingBlock.style.height = `${this.blockSize}px`;
-        this.draggingBlock.style.left = `${clientX - this.dragStartPos.x}px`;
-        this.draggingBlock.style.top = `${clientY - this.dragStartPos.y}px`;
-
-        // Highlight columns to show where block can be placed
-        document.querySelectorAll('.column').forEach(col => {
-            col.classList.add('highlight');
-        });
-    }
-
-    updateDragging(clientX, clientY) {
-        // Update position of dragging block
-        this.draggingBlock.style.left = `${clientX - this.dragStartPos.x}px`;
-        this.draggingBlock.style.top = `${clientY - this.dragStartPos.y}px`;
-
-        // Track current position
-        this.lastDragPos = { x: clientX, y: clientY };
-    }
-
-    endDragging() {
-        // Find which column the block was dropped on
-        const columnIndex = this.getColumnFromPosition(this.lastDragPos);
-
-        if (columnIndex !== -1) {
-            // Save current state for undo
-            this.saveGameState();
-
-            // Add block to column
-            this.placeBlockInColumn(columnIndex, this.nextBlockValue);
-        }
-
-        // Clean up
-        if (this.draggingBlock && this.draggingBlock.parentElement) {
-            this.draggingBlock.remove();
-        }
-        this.draggingBlock = null;
-
-        // Remove column highlights
-        document.querySelectorAll('.column').forEach(col => {
-            col.classList.remove('highlight');
-        });
-    }
-
-    getColumnFromPosition(pos) {
-        // Get the column where the block was dropped
-        const gridRect = this.columnsGridElement.getBoundingClientRect();
-
-        // Check if position is over the grid
-        if (pos.x < gridRect.left || pos.x > gridRect.right || 
-            pos.y < gridRect.top || pos.y > gridRect.bottom) {
-            return -1;
-        }
-
-        // Calculate column index based on x-position
-        const relativeX = pos.x - gridRect.left;
-        const columnWidth = gridRect.width / 5;
-        const columnIndex = Math.floor(relativeX / columnWidth);
-
-        return Math.max(0, Math.min(columnIndex, 4));
-    }
-
-    placeBlockInColumn(columnIndex, value) {
-        // If column is full, return
-        if (this.columns[columnIndex].length >= this.maxBlocksPerColumn) {
-            this.checkGameOver();
-            return;
-        }
-
-        // Add block to column data structure (at the end for visual placement at top)
-        this.columns[columnIndex].push(value);
-
-        // Blok pozisyonu (en üstte)
-        const blockPosition = this.columns[columnIndex].length - 1;
-
-        // Önce bloğu havada oluştur
-        const block = this.renderBlockWithAnimation(columnIndex, blockPosition, value);
-
-        // Check for merges
-        this.checkForMerges(columnIndex);
-
-        // Generate next block after rendering and merging
-        this.generateNextBlock();
-
-        // Check game state
-        this.checkGameState();
-    }
-
-    renderBlock(columnIndex, position, value) {
-        const column = document.querySelectorAll('.column')[columnIndex];
-        if (!column) return null; // Safety check
-
-        const block = document.createElement('div');
-
-        block.className = 'block';
-        block.dataset.value = value;
-        block.dataset.column = columnIndex;
-        block.dataset.position = position;
-        block.textContent = value;
-
-        // Calculate position
-        const columnRect = column.getBoundingClientRect();
-        const blockWidth = Math.max(30, Math.floor(columnRect.width - 10));
-        const blockHeight = blockWidth;
-
-        block.style.width = `${blockWidth}px`;
-        block.style.height = `${blockHeight}px`;
-
-        // Position within column (top-down) - hassas hesaplama
-        const topOffset = 5;  // Top padding
-        const gap = 10; // Bloklar arası boşluk
-        const topPosition = Math.floor((position * (blockHeight + gap)) + topOffset);
-
-        // Merkezi hizalama için sol pozisyonu hesaplama (tam sayı değerleri)
-        const leftOffset = Math.floor((columnRect.width - blockWidth) / 2);
-
-        // Doğrudan son pozisyona yerleştir (animasyon yok)
-        block.style.left = `${leftOffset}px`;
-        block.style.top = `${topPosition}px`;
-
-        column.appendChild(block);
-
-        return block;
-    }
-
-    renderBlockWithAnimation(columnIndex, position, value) {
-        const column = document.querySelectorAll('.column')[columnIndex];
-        if (!column) return null; // Safety check
-
-        const block = document.createElement('div');
-
-        // Animasyon sınıfını başlangıçta ekleme, daha sonra ekleyeceğiz
-        block.className = 'block';
-        block.dataset.value = value;
-        block.dataset.column = columnIndex;
-        block.dataset.position = position;
-        block.textContent = value;
-
-        // Calculate position
-        const columnRect = column.getBoundingClientRect();
-        const blockWidth = Math.max(30, Math.floor(columnRect.width - 10));
-        const blockHeight = blockWidth;
-
-        block.style.width = `${blockWidth}px`;
-        block.style.height = `${blockHeight}px`;
-
-        // Position within column (top-down)
-        const topOffset = 5;  // Top padding
-        const gap = 10; // Bloklar arası boşluk
-
-        // Bloğun hedef konumu
-        const targetTopPosition = Math.floor((position * (blockHeight + gap)) + topOffset);
-
-        // Başlangıç pozisyonu (sütunun ALTINDA) - Alttan yukarıya kayma animasyonu için
-        const columnHeight = column.clientHeight;
-        const startTopPosition = columnHeight;
-
-        // Merkezi hizalama için sol pozisyonu hesaplama
-        const leftOffset = Math.floor((columnRect.width - blockWidth) / 2);
-
-        // Başlangıç pozisyonuna yerleştir (sütunun altına)
-        block.style.left = `${leftOffset}px`;
-        block.style.top = `${startTopPosition}px`;
-
-        // Bloğu DOM'a ekle
-        column.appendChild(block);
-
-        // Alttan kayarak gelmesi için animasyon sınıfı ekle
-        block.classList.add('sliding-up');
-
-        // Biraz gecikme ile hedef pozisyona hareket et
-        setTimeout(() => {
-            block.style.top = `${targetTopPosition}px`;
-        }, 10);
-
-        return block;
-    }
-
-    checkForMerges(columnIndex) {
-        const column = this.columns[columnIndex];
-        const mergedIndices = [];
-        let mergeOccurred = false;
-
-        // Start from the bottom and check for consecutive blocks with same value
-        for (let i = column.length - 1; i > 0; i--) {
-            // Skip if the block was already merged in this pass
-            if (mergedIndices.includes(i)) continue;
-
-            const currentValue = column[i];
-            const aboveValue = column[i - 1];
-
-            // If blocks have the same value, merge them
-            if (currentValue === aboveValue) {
-                // Double the value of the current block
-                column[i] = currentValue * 2;
-                
-                // Remove the block above (it's merged)
-                column.splice(i - 1, 1);
-                
-                // Update score
-                this.addScore(column[i]);
-                
-                // Mark merge occurred
-                mergeOccurred = true;
-                
-                // Keep track of this index as merged
-                mergedIndices.push(i);
-                
-                // Check for 2048 block
-                if (column[i] === 2048) {
-                    this.showGameWon();
-                }
-            }
-        }
-
-        // If merges occurred, re-render the column
-        if (mergeOccurred) {
-            this.renderColumn(columnIndex, true);
-        }
-    }
-
-    renderColumn(columnIndex, withAnimation = false) {
-        const column = document.querySelectorAll('.column')[columnIndex];
-        if (!column) return; // Safety check
-
-        // Clear column
-        column.innerHTML = '';
-
-        // Render each block in the column
-        this.columns[columnIndex].forEach((value, position) => {
-            if (withAnimation) {
-                this.renderBlock(columnIndex, position, value).classList.add('merged');
-            } else {
-                this.renderBlock(columnIndex, position, value);
-            }
-        });
-    }
-
-    addScore(value) {
-        this.score += value;
-        this.scoreElement.textContent = this.score;
-        
-        // Update best score if needed
-        if (this.score > this.bestScore) {
-            this.bestScore = this.score;
-            this.bestScoreElement.textContent = this.bestScore;
-            localStorage.setItem('bestScore', this.bestScore);
-        }
-    }
-
-    checkGameState() {
-        // Check if game is over
-        this.checkGameOver();
-        
-        // Check level progression
-        this.checkLevelProgression();
-    }
-
-    checkGameOver() {
-        // If there are any columns not full, game is not over
-        for (let i = 0; i < this.columns.length; i++) {
-            if (this.columns[i].length < this.maxBlocksPerColumn) {
-                return false;
-            }
-        }
-        
-        // Game is over
-        this.gameOver = true;
-        this.showGameOver();
-        return true;
-    }
-
-    checkLevelProgression() {
-        // Calculate new level based on score
-        const newLevel = Math.floor(this.score / 1000) + 1;
-        
-        // Check if level increased
-        if (newLevel > this.level) {
-            this.level = newLevel;
-            document.getElementById('level-value').textContent = this.level;
-            localStorage.setItem('level', this.level);
-        }
-    }
-
-    showGameOver() {
-        const gameOverEl = document.getElementById('game-over');
-        const finalScoreEl = document.querySelector('.final-score');
-        
-        finalScoreEl.textContent = this.score;
-        gameOverEl.classList.remove('hidden');
-        
-        // Save the score to server
-        this.saveScoreToServer();
-    }
-
-    showGameWon() {
-        // Only show won message once
-        if (this.won) return;
-        
-        this.won = true;
-        const gameWonEl = document.getElementById('game-won');
-        gameWonEl.classList.remove('hidden');
-        
-        // Save the score to server
-        this.saveScoreToServer();
-    }
-
-    saveScoreToServer() {
-        // Check if API is available
-        if (!window.fetch) return;
-        
-        // Prepare data
-        const scoreData = {
-            game_type: '2048',
-            score: this.score
-        };
-        
-        // Send to server
-        fetch('/api/save-score', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(scoreData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Score saved:', data);
-        })
-        .catch(error => {
-            console.error('Error saving score:', error);
-        });
-    }
-
-    saveGameState() {
-        // Create a deep copy of the current game state
-        const gameState = {
-            columns: JSON.parse(JSON.stringify(this.columns)),
-            score: this.score,
-            nextBlockValue: this.nextBlockValue
-        };
-        
-        // Add to history
-        this.moveHistory.push(gameState);
-        
-        // Limit history to 20 moves to save memory
-        if (this.moveHistory.length > 20) {
-            this.moveHistory.shift();
-        }
-    }
-
-    undoMove() {
-        // Check if there are moves to undo
-        if (this.moveHistory.length === 0) return;
-        
-        // Get the last state
-        const lastState = this.moveHistory.pop();
-        
-        // Restore state
-        this.columns = lastState.columns;
-        this.score = lastState.score;
-        this.scoreElement.textContent = this.score;
-        
-        // Re-render all columns
-        for (let i = 0; i < this.columns.length; i++) {
-            this.renderColumn(i);
-        }
-        
-        // Game is not over if we can undo
-        this.gameOver = false;
-        document.getElementById('game-over').classList.add('hidden');
-        
-        // Game is not won if we undo beyond the winning move
-        let has2048 = false;
-        for (let i = 0; i < this.columns.length; i++) {
-            for (let j = 0; j < this.columns[i].length; j++) {
-                if (this.columns[i][j] === 2048) {
-                    has2048 = true;
-                    break;
-                }
-            }
-            if (has2048) break;
-        }
-        
-        if (!has2048) {
-            this.won = false;
-            document.getElementById('game-won').classList.add('hidden');
-        }
-    }
-
-    startNewGame() {
-        // Reset game state
-        this.columns = Array(5).fill().map(() => []);
-        this.score = 0;
-        this.scoreElement.textContent = 0;
-        this.moveHistory = [];
-        this.gameOver = false;
-        this.won = false;
-        
-        // Hide overlays
-        document.getElementById('game-over').classList.add('hidden');
-        document.getElementById('game-won').classList.add('hidden');
-        
-        // Clear columns
-        document.querySelectorAll('.column').forEach(col => {
-            col.innerHTML = '';
-        });
-        
-        // Generate next block
-        this.generateNextBlock();
-    }
-
-    continueGame() {
-        // Hide won overlay and continue playing
-        document.getElementById('game-won').classList.add('hidden');
-    }
-
-    applyTheme() {
-        if (this.themeMode === 'dark') {
-            document.body.classList.add('dark-theme');
-            document.body.classList.remove('light-theme');
-            document.getElementById('toggle-theme').textContent = '☀️';
-        } else {
-            document.body.classList.add('light-theme');
-            document.body.classList.remove('dark-theme');
-            document.getElementById('toggle-theme').textContent = '🌙';
-        }
-    }
-
-    toggleTheme() {
-        this.themeMode = this.themeMode === 'light' ? 'dark' : 'light';
-        localStorage.setItem('themeMode', this.themeMode);
-        this.applyTheme();
-    }
-
-    toggleSound() {
-        this.soundEnabled = !this.soundEnabled;
-        localStorage.setItem('soundEnabled', this.soundEnabled);
-        document.getElementById('toggle-sound').textContent = this.soundEnabled ? '🔊' : '🔇';
-    }
-
-    // Güçlendirme: Sütun Temizleme
-    clearColumn() {
-        // Hangi sütunları temizleyebileceğimizi kontrol et
-        const availableColumns = [];
-        for (let i = 0; i < this.columns.length; i++) {
-            if (this.columns[i].length > 0) {
-                availableColumns.push(i);
-            }
-        }
-        
-        if (availableColumns.length === 0) return;
-        
-        // Rastgele bir sütun seç
-        const randomIndex = Math.floor(Math.random() * availableColumns.length);
-        const columnIndex = availableColumns[randomIndex];
-        
-        // Mevcut durumu kaydet
-        this.saveGameState();
-        
-        // Sütunu temizle
-        this.columns[columnIndex] = [];
-        this.renderColumn(columnIndex);
-    }
-
-    // Güçlendirme: Değeri İkile
-    doubleValue() {
-        // En yüksek değerli taşı bul
-        let highestValue = 0;
-        let highestValueColumn = -1;
-        let highestValuePosition = -1;
-        
-        for (let i = 0; i < this.columns.length; i++) {
-            for (let j = 0; j < this.columns[i].length; j++) {
-                if (this.columns[i][j] > highestValue) {
-                    highestValue = this.columns[i][j];
-                    highestValueColumn = i;
-                    highestValuePosition = j;
-                }
-            }
-        }
-        
-        if (highestValueColumn === -1) return;
-        
-        // Mevcut durumu kaydet
-        this.saveGameState();
-        
-        // Değeri ikile
-        this.columns[highestValueColumn][highestValuePosition] *= 2;
-        
-        // Sütunu yeniden oluştur
-        this.renderColumn(highestValueColumn, true);
-        
-        // 2048 kontrolü
-        if (this.columns[highestValueColumn][highestValuePosition] === 2048) {
-            this.showGameWon();
-        }
-        
-        // Skoru güncelle
-        this.addScore(this.columns[highestValueColumn][highestValuePosition]);
-    }
-
-    // Güçlendirme: Ekstra Hamle
-    extraMove() {
-        // Rastgele bir değer seç
-        const values = [2, 4, 8, 16];
-        const randomIndex = Math.floor(Math.random() * values.length);
-        const value = values[randomIndex];
-        
-        // Rastgele bir sütun seç
-        const availableColumns = [];
-        for (let i = 0; i < this.columns.length; i++) {
-            if (this.columns[i].length < this.maxBlocksPerColumn) {
-                availableColumns.push(i);
-            }
-        }
-        
-        if (availableColumns.length === 0) return;
-        
-        const randomColumnIndex = Math.floor(Math.random() * availableColumns.length);
-        const columnIndex = availableColumns[randomColumnIndex];
-        
-        // Mevcut durumu kaydet
-        this.saveGameState();
-        
-        // Bloğu yerleştir
-        this.placeBlockInColumn(columnIndex, value);
-    }
-
-    setupEventListeners() {
-        // Button events
-        document.getElementById('new-game').addEventListener('click', () => this.startNewGame());
-        document.getElementById('undo').addEventListener('click', () => this.undoMove());
-        document.getElementById('retry').addEventListener('click', () => this.startNewGame());
-        document.getElementById('continue').addEventListener('click', () => this.continueGame());
-        document.getElementById('toggle-theme').addEventListener('click', () => this.toggleTheme());
-        document.getElementById('toggle-sound').addEventListener('click', () => this.toggleSound());
-        
-        // Power-up events
-        document.getElementById('clear-column').addEventListener('click', () => this.clearColumn());
-        document.getElementById('double-value').addEventListener('click', () => this.doubleValue());
-        document.getElementById('extra-move').addEventListener('click', () => this.extraMove());
-    }
-}

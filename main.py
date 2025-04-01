@@ -631,11 +631,9 @@ def word_puzzle():
 def memory_match():
     return render_template('games/memoryMatch.html')
 
-# Labirent oyunu kaldırıldı
 @app.route('/games/labyrinth')
 def labyrinth():
-    flash('Labirent oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/labyrinth.html')
 
 @app.route('/games/puzzle')
 def puzzle():
@@ -661,7 +659,9 @@ def memory_cards():
 def number_chain():
     return render_template('games/numberChain.html')
 
-# Audio Memory oyunu kaldırıldı
+@app.route('/games/audio-memory')
+def audio_memory():
+    return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')
 def n_back():

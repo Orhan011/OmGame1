@@ -1,621 +1,146 @@
 {% extends "layout.html" %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games/labyrinth.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="labyrinth-wrapper">
-  <div class="game-header glass-panel">
-    <h1 class="game-title">
-      <i class="fas fa-route"></i> Labirent
-    </h1>
-    <p class="game-subtitle">Girişten çıkışa giden yolu bul, stratejik düşünme ve uzamsal algı becerilerini test et</p>
+<div class="container">
+  <div class="page-title-section">
+    <h1>Labirent</h1>
+    <p>Zekâ ve strateji ile çıkış yolunu bulun!</p>
   </div>
   
-  <!-- Oyun Ayarları Paneli -->
-  <div id="labyrinthSettings" class="game-settings glass-panel">
-    <div class="settings-row">
-      <div class="settings-col">
-        <h3 class="settings-title">
-          <i class="fas fa-sliders-h"></i> Zorluk Seviyesi
-        </h3>
-        <div class="settings-options">
-          <button class="difficulty-option" data-difficulty="1">
-            <i class="fas fa-signal"></i> Kolay
-          </button>
-          <button class="difficulty-option" data-difficulty="2">
-            <i class="fas fa-signal"></i> Orta
-          </button>
-          <button class="difficulty-option" data-difficulty="3">
-            <i class="fas fa-signal"></i> Zor
-          </button>
+  <div class="game-container">
+    <div class="game-header">
+      <div class="game-stats">
+        <div class="stat-item">
+          <div class="stat-label">Seviye</div>
+          <div id="level" class="stat-value">1</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Zaman</div>
+          <div id="timer" class="stat-value">00:00</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Hamle</div>
+          <div id="moves" class="stat-value">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Puan</div>
+          <div id="score" class="stat-value">0</div>
         </div>
       </div>
-    </div>
-    
-    <div class="settings-row">
-      <button id="labyrinthSoundToggle" class="sound-toggle active">
-        <i class="fas fa-volume-up"></i>
-      </button>
       
-      <button id="labyrinthStartButton" class="standard-start-btn">
-        <i class="fas fa-play"></i> Oyunu Başlat
-      </button>
-    </div>
-    
-    <div id="labyrinthTutorial" class="tutorial-container">
-      <h3 class="tutorial-title">
-        <i class="fas fa-info-circle"></i> Nasıl Oynanır?
-      </h3>
-      <div class="tutorial-content">
-        <div class="tutorial-section">
-          <h4>Oyun Amacı</h4>
-          <p>Giriş noktasından (yeşil) çıkış noktasına (sarı) ulaşmak için labirentte yolunuzu bulun. Her seviyede labirent daha karmaşık hale gelir.</p>
-        </div>
-        
-        <div class="tutorial-section">
-          <h4>Kontroller</h4>
-          <div class="controls-grid">
-            <div class="control-item">
-              <div class="control-icon"><i class="fas fa-keyboard"></i></div>
-              <div class="control-text">Yön tuşları veya W,A,S,D tuşları</div>
-            </div>
-            <div class="control-item">
-              <div class="control-icon"><i class="fas fa-mobile-alt"></i></div>
-              <div class="control-text">Ekranda kaydırma hareketi</div>
-            </div>
-            <div class="control-item">
-              <div class="control-icon"><i class="fas fa-mouse-pointer"></i></div>
-              <div class="control-text">Gitmek istediğiniz komşu hücreye tıklama</div>
-            </div>
+      <div class="game-controls">
+        <button id="new-game-btn" class="control-btn">Yeni Oyun</button>
+        <div class="difficulty-selector">
+          <div class="difficulty-label">Zorluk:</div>
+          <div class="difficulty-options">
+            <button id="easy-btn" class="difficulty-btn active" data-size="8">Kolay</button>
+            <button id="medium-btn" class="difficulty-btn" data-size="12">Orta</button>
+            <button id="hard-btn" class="difficulty-btn" data-size="16">Zor</button>
           </div>
         </div>
-        
-        <div class="tutorial-section">
-          <h4>Puanlama</h4>
-          <p>Her seviye için taban puan ve kalan zamana bağlı bonus puan kazanırsınız. Ne kadar hızlı tamamlarsanız, o kadar çok puan alırsınız!</p>
+      </div>
+    </div>
+    
+    <div id="maze-container" class="maze-container">
+      <!-- Labirent burada oluşturulacak -->
+      <div class="loading-message">Labirent oluşturuluyor...</div>
+    </div>
+    
+    <div class="mobile-controls">
+      <div class="control-row">
+        <button id="up-btn" class="direction-btn"><i class="fas fa-chevron-up"></i></button>
+      </div>
+      <div class="control-row">
+        <button id="left-btn" class="direction-btn"><i class="fas fa-chevron-left"></i></button>
+        <button id="down-btn" class="direction-btn"><i class="fas fa-chevron-down"></i></button>
+        <button id="right-btn" class="direction-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+    
+    <div id="level-complete" class="overlay hidden">
+      <div class="overlay-content">
+        <h2>Seviye Tamamlandı!</h2>
+        <div class="level-stats">
+          <div class="level-stat-item">
+            <div class="level-stat-label">Zaman</div>
+            <div id="level-time" class="level-stat-value">00:00</div>
+          </div>
+          <div class="level-stat-item">
+            <div class="level-stat-label">Hamle</div>
+            <div id="level-moves" class="level-stat-value">0</div>
+          </div>
+          <div class="level-stat-item">
+            <div class="level-stat-label">Puan</div>
+            <div id="level-score" class="level-stat-value">0</div>
+          </div>
+        </div>
+        <div class="level-buttons">
+          <button id="next-level-btn" class="control-btn">Sonraki Seviye</button>
+          <button id="restart-level-btn" class="secondary-btn">Yeniden Başla</button>
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- Oyun Alanı -->
-  <div id="labyrinthGameplay" class="game-play glass-panel d-none">
-    <div class="game-stats">
-      <div class="stat-item">
-        <div class="stat-label">Seviye</div>
-        <div id="labyrinthLevel" class="stat-value">1</div>
-      </div>
-      
-      <div class="stat-item">
-        <div class="stat-label">Puan</div>
-        <div id="labyrinthScore" class="stat-value">0</div>
-      </div>
-      
-      <div class="stat-item">
-        <div class="stat-label">Süre</div>
-        <div id="labyrinthTimer" class="stat-value">60</div>
-      </div>
-    </div>
     
-    <div id="labyrinthMessages" class="messages-container"></div>
-    
-    <div class="canvas-container">
-      <canvas id="labyrinthCanvas"></canvas>
-    </div>
-    
-    <div class="game-controls-help">
-      <div class="control-help-item">
-        <i class="fas fa-keyboard"></i>
-        <span>Klavye</span>
-      </div>
-      <div class="control-help-item">
-        <i class="fas fa-hand-pointer"></i>
-        <span>Tıklama</span>
-      </div>
-      <div class="control-help-item">
-        <i class="fas fa-arrows-alt"></i>
-        <span>Kaydırma</span>
+    <div id="game-complete" class="overlay hidden">
+      <div class="overlay-content">
+        <h2>Tebrikler! Oyunu Tamamladınız!</h2>
+        <div class="game-stats-final">
+          <div class="game-stat-item">
+            <div class="game-stat-label">Toplam Seviye</div>
+            <div id="final-level" class="game-stat-value">0</div>
+          </div>
+          <div class="game-stat-item">
+            <div class="game-stat-label">Toplam Süre</div>
+            <div id="final-time" class="game-stat-value">00:00</div>
+          </div>
+          <div class="game-stat-item">
+            <div class="game-stat-label">Toplam Hamle</div>
+            <div id="final-moves" class="game-stat-value">0</div>
+          </div>
+          <div class="game-stat-item">
+            <div class="game-stat-label">Toplam Puan</div>
+            <div id="final-score" class="game-stat-value">0</div>
+          </div>
+        </div>
+        <button id="play-again-btn" class="control-btn">Tekrar Oyna</button>
       </div>
     </div>
   </div>
   
-  <!-- Oyun Sonu Modal -->
-  <div id="labyrinthGameOver" class="game-over-modal glass-panel d-none">
-    <h2 class="modal-title"><i class="fas fa-trophy"></i> Oyun Bitti!</h2>
-    <div class="modal-content">
-      <div class="final-score">
-        <div class="score-label">Toplam Puanınız</div>
-        <div id="labyrinthFinalScore" class="score-value">0</div>
-      </div>
-      
-      <div class="score-message">Tebrikler! Labirent oyununu tamamladınız.</div>
-      
-      <button id="labyrinthRestartButton" class="standard-replay-btn">
-        <i class="fas fa-redo"></i> Tekrar Oyna
-      </button>
-    </div>
+  <div class="game-info">
+    <h3>Nasıl Oynanır?</h3>
+    <p>Labirent oyununda, başlangıç noktasından çıkış noktasına ulaşmaya çalışırsınız:</p>
+    <ul>
+      <li>Mavi kare karakterinizdir.</li>
+      <li>Yeşil kare başlangıç noktasıdır.</li>
+      <li>Kırmızı kare çıkış noktasıdır.</li>
+      <li>Siyah kareler duvar olup, geçemezsiniz.</li>
+      <li>Ok tuşları veya ekrandaki yön düğmeleri ile hareket edebilirsiniz.</li>
+      <li>Hedef, çıkışa en kısa yoldan ve en hızlı şekilde ulaşmaktır.</li>
+    </ul>
+    
+    <h3>İpuçları:</h3>
+    <ul>
+      <li>Her hamlede duvarları ve açık yolları değerlendirin.</li>
+      <li>Bir labirentin genellikle birden fazla çözüm yolu vardır, en kısasını bulmaya çalışın.</li>
+      <li>Çıkmaz sokakları erken fark etmek size zaman kazandıracaktır.</li>
+      <li>Zihinsel bir harita oluşturmayı deneyin.</li>
+    </ul>
+    
+    <h3>Puanlama:</h3>
+    <ul>
+      <li>Hızlı tamamlama: Her seviyeyi ne kadar hızlı tamamlarsanız, o kadar çok puan kazanırsınız.</li>
+      <li>Verimli hareket: Daha az hamle yaparak labirenti tamamlarsanız bonus puan kazanırsınız.</li>
+      <li>Zorluk seviyesi: Daha zor labirentler daha yüksek puan değerine sahiptir.</li>
+    </ul>
   </div>
 </div>
+{% endblock %}
 
-<script src="/static/js/games/labyrinth.js"></script>
-
-<!-- CSS Stilleri -->
-<style>
-  .labyrinth-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .glass-panel {
-    background: rgba(20, 20, 40, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    padding: 25px;
-    margin-bottom: 30px;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .glass-panel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-color), rgba(255, 255, 255, 0.3), var(--accent-color));
-    opacity: 0.7;
-  }
-  
-  .game-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #fff;
-    text-align: center;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  
-  .game-title i {
-    margin-right: 10px;
-  }
-  
-  .game-subtitle {
-    text-align: center;
-    color: #a0a0c8;
-    font-size: 1.1rem;
-    margin-bottom: 0;
-  }
-  
-  /* Ayarlar Paneli */
-  .settings-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 25px;
-    justify-content: center;
-  }
-  
-  .settings-col {
-    flex: 1;
-    min-width: 250px;
-  }
-  
-  .settings-title {
-    font-size: 1.2rem;
-    color: #fff;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .settings-title i {
-    color: var(--accent-color);
-  }
-  
-  .settings-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .difficulty-option {
-    padding: 10px 15px;
-    background: rgba(30, 30, 60, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: #d0d0ea;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1;
-    min-width: 80px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  
-  .difficulty-option:hover, .difficulty-option.active {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: rgba(76, 175, 80, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    color: #fff;
-  }
-  
-  .difficulty-option i {
-    font-size: 0.9em;
-    color: #4CAF50;
-  }
-  
-  .sound-toggle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(30, 30, 60, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #d0d0ea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .sound-toggle.active {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: rgba(76, 175, 80, 0.4);
-    color: #fff;
-  }
-  
-  .start-button {
-    padding: 12px 30px;
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    border: none;
-    border-radius: 50px;
-    color: #fff;
-    font-weight: 600;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
-  }
-  
-  .start-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
-  }
-  
-  /* Tutorial */
-  .tutorial-container {
-    background: rgba(30, 30, 60, 0.3);
-    border-radius: 15px;
-    padding: 20px;
-    margin-top: 20px;
-  }
-  
-  .tutorial-title {
-    font-size: 1.2rem;
-    color: #fff;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .tutorial-title i {
-    color: #ffcc5c;
-  }
-  
-  .tutorial-content {
-    color: #a0a0c8;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-  
-  .tutorial-section {
-    margin-bottom: 20px;
-  }
-  
-  .tutorial-section h4 {
-    color: #e0e0ff;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-  }
-  
-  .controls-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-top: 10px;
-  }
-  
-  .control-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(40, 40, 70, 0.5);
-    border-radius: 10px;
-    padding: 10px;
-  }
-  
-  .control-icon {
-    width: 35px;
-    height: 35px;
-    background: rgba(76, 175, 80, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #8BC34A;
-    font-size: 0.9rem;
-  }
-  
-  .control-text {
-    font-size: 0.9rem;
-    color: #d0d0ea;
-  }
-  
-  /* Oyun Alanı */
-  .game-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: space-between;
-  }
-  
-  .stat-item {
-    background: rgba(30, 30, 60, 0.5);
-    border-radius: 10px;
-    padding: 10px 15px;
-    flex: 1;
-    min-width: 80px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .stat-label {
-    font-size: 0.8rem;
-    color: #a0a0c8;
-    margin-bottom: 5px;
-  }
-  
-  .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #fff;
-  }
-  
-  #labyrinthTimer.warning {
-    color: #f44336;
-    animation: pulse 1s infinite;
-  }
-  
-  .canvas-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-    overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-  }
-  
-  #labyrinthCanvas {
-    display: block;
-    background-color: #0a0a1a;
-  }
-  
-  .game-controls-help {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
-  }
-  
-  .control-help-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
-    background: rgba(30, 30, 60, 0.5);
-    border-radius: 30px;
-    font-size: 0.9rem;
-    color: #a0a0c8;
-  }
-  
-  .control-help-item i {
-    color: #8BC34A;
-  }
-  
-  /* Mesajlar */
-  .messages-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    pointer-events: none;
-  }
-  
-  .level-complete-message {
-    background: rgba(20, 20, 40, 0.95);
-    backdrop-filter: blur(10px);
-    border: 2px solid #4CAF50;
-    border-radius: 15px;
-    padding: 20px 30px;
-    color: #fff;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .level-complete-message.show {
-    opacity: 1;
-    transform: scale(1);
-  }
-  
-  .level-complete-message h3 {
-    color: #4CAF50;
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-  }
-  
-  .points-info {
-    margin: 15px 0;
-  }
-  
-  .point-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-    font-size: 1.1rem;
-  }
-  
-  .point-line.bonus {
-    color: #8BC34A;
-  }
-  
-  .point-line.total {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-top: 10px;
-    padding-top: 5px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .next-level-text {
-    font-size: 0.9rem;
-    color: #a0a0c8;
-    margin-top: 10px;
-  }
-  
-  /* Oyun Sonu Modal */
-  .game-over-modal {
-    max-width: 500px;
-    margin: 0 auto;
-    text-align: center;
-  }
-  
-  .modal-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-  }
-  
-  .modal-title i {
-    color: #ffc107;
-  }
-  
-  .final-score {
-    margin-bottom: 20px;
-  }
-  
-  .score-label {
-    font-size: 1.2rem;
-    color: #a0a0c8;
-    margin-bottom: 10px;
-  }
-  
-  .score-value {
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: #4CAF50;
-    text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
-    margin-bottom: 20px;
-  }
-  
-  .score-message {
-    font-size: 1.1rem;
-    color: #d0d0ea;
-    margin-bottom: 30px;
-  }
-  
-  .restart-button {
-    padding: 12px 30px;
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    border: none;
-    border-radius: 50px;
-    color: #fff;
-    font-weight: 600;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .restart-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
-  }
-  
-  /* Animasyonlar */
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .labyrinth-wrapper {
-      padding: 10px;
-    }
-    
-    .glass-panel {
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    
-    .game-title {
-      font-size: 2rem;
-    }
-    
-    .settings-row {
-      flex-direction: column;
-      gap: 15px;
-    }
-    
-    .settings-col {
-      min-width: 100%;
-    }
-    
-    .game-stats {
-      flex-wrap: wrap;
-    }
-    
-    .stat-item {
-      min-width: calc(33% - 10px);
-    }
-    
-    .game-controls-help {
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-  }
-</style>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/labyrinth.js') }}"></script>
 {% endblock %}
