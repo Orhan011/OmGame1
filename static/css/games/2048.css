@@ -502,6 +502,20 @@ h1 {
     .power-up-name {
         font-size: 9px;
     }
+    
+    .controls {
+        flex-wrap: wrap;
+    }
+    
+    .primary-btn, .secondary-btn {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+    
+    .power-up-grid {
+        flex-wrap: wrap;
+    }
+}
 
 /* Parçacık animasyonu ve diğer efektler */
 .particle {
@@ -548,8 +562,6 @@ h1 {
 .combo-counter.active {
     opacity: 1;
     transform: scale(1);
-}
-
 }
 
 
