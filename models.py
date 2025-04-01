@@ -88,3 +88,18 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
+
+
+class UserHomepagePreference(db.Model):
+    __tablename__ = 'user_homepage_preferences'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # Oyun türü (wordPuzzle, memoryMatch, vb.)
+    display_order = db.Column(db.Integer, default=0)  # Görüntüleme sırası
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # İlişkiler
+    user = db.relationship('User', backref=db.backref('homepage_preferences', lazy=True, cascade="all, delete-orphan"))
+    
+    def __repr__(self):
+        return f'<UserHomepagePreference {self.user_id}:{self.game_type}>'
