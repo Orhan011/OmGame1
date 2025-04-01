@@ -1053,19 +1053,34 @@ class ModernMergePuzzle {
     
     // Skor kaydetme fonksiyonu
     saveScore() {
+        // Skoru kontrol et - skor 0 veya undefined ise gönderme
+        if (!this.score) {
+            console.log('Kaydedilecek skor yok');
+            return;
+        }
+        
+        console.log(`Skor gönderiliyor: ${this.score}`);
+        
         // Backend'e skoru gönder
-        fetch('/update_game_score', {
+        fetch('/api/save-score', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                game_id: '2048_game',
+                game_type: '2048_game', // API endpoint'imiz game_type parametresi bekliyor
                 score: this.score
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP hata! Durum: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Skor başarıyla kaydedildi:', data);
+            
             if (data.success && data.achievement) {
                 // Başarı bildirimi göster
                 const notification = document.createElement('div');
@@ -1084,7 +1099,25 @@ class ModernMergePuzzle {
                 }, 100);
             }
         })
-        .catch(error => console.error('Skor gönderme hatası:', error));
+        .catch(error => {
+            console.error('Skor gönderme hatası:', error);
+            // Hata bilgisini daha detaylı göster
+            const errorNotification = document.createElement('div');
+            errorNotification.className = 'level-notification';
+            errorNotification.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(200, 0, 0, 0.9))';
+            errorNotification.textContent = `❌ Skor kaydedilemedi`;
+            document.body.appendChild(errorNotification);
+            
+            setTimeout(() => {
+                errorNotification.classList.add('show');
+                setTimeout(() => {
+                    errorNotification.classList.remove('show');
+                    setTimeout(() => {
+                        errorNotification.remove();
+                    }, 500);
+                }, 2000);
+            }, 100);
+        });
     }
 
     undoMove() {
