@@ -965,18 +965,11 @@ class ModernMergePuzzle {
     }
 
     applyTheme() {
-        const gameWrapper = document.querySelector('.game-wrapper');
-        if (gameWrapper) {
-            gameWrapper.style.background = this.themeMode === 'light' 
-                ? 'linear-gradient(135deg, #121212, #1e1e2a, #292938)'
-                : 'linear-gradient(135deg, #000000, #0f0f17, #161624)';
-        }
+        document.body.classList.remove('light-theme', 'dark-theme');
+        document.body.classList.add(this.themeMode + '-theme');
 
         // Tema ikonunu güncelle
-        const themeButton = document.getElementById('toggle-theme');
-        if (themeButton) {
-            themeButton.textContent = this.themeMode === 'light' ? '🌙' : '☀️';
-        }
+        document.getElementById('toggle-theme').textContent = this.themeMode === 'light' ? '🌙' : '☀️';
     }
 
     usePowerUp(type) {
