@@ -629,7 +629,7 @@ def word_puzzle():
 
 @app.route('/games/memory-match')
 def memory_match():
-    return render_template('games/memoryMatch.html')
+    return render_template('games/memory_match.html')
 
 # Labirent oyunu kaldırıldı
 @app.route('/games/labyrinth')
