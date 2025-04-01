@@ -1,11 +1,8 @@
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
 }
 
-body {
+.game-2048-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -17,11 +14,11 @@ body {
   transition: background 0.5s ease;
 }
 
-body.light-theme {
+.game-2048-container.light-theme {
   background: linear-gradient(135deg, #121212, #1e1e2a, #292938);
 }
 
-body.dark-theme {
+.game-2048-container.dark-theme {
   background: linear-gradient(135deg, #000000, #0f0f17, #161624);
 }
 
