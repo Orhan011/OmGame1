@@ -1140,6 +1140,13 @@ class ModernMergePuzzle {
 }
 
 // Oyunu başlat
+// Make sure the DOM is fully loaded before initializing the game
 document.addEventListener('DOMContentLoaded', () => {
-    const game = new ModernMergePuzzle();
+    // Check if required elements exist before initializing
+    if (document.querySelector('.columns-grid') && 
+        document.querySelector('.block-source')) {
+        const game = new ModernMergePuzzle();
+    } else {
+        console.error('Required game elements not found in the DOM');
+    }
 });
