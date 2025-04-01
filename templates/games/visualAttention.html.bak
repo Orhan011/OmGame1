@@ -1,0 +1,507 @@
+{% extends "layout.html" %}
+
+{% block title %}Görsel Dikkat | ZekaPark{% endblock %}
+
+{% block styles %}
+<style>
+  .game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(30, 30, 40, 0.7);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .game-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .game-title {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: #e6e6ff;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(100, 100, 255, 0.3);
+  }
+
+  .game-description {
+    color: #ccccdd;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+
+  .info-display {
+    display: flex;
+    gap: 15px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: rgba(60, 60, 80, 0.6);
+    border-radius: 8px;
+    min-width: 90px;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+    color: #aaaacc;
+    margin-bottom: 5px;
+  }
+
+  .info-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .btn-game {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+    color: white;
+  }
+
+  .btn-game:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(123, 104, 238, 0.4);
+  }
+
+  .btn-game:active {
+    transform: translateY(1px);
+  }
+
+  .sound-toggle {
+    background: none;
+    border: none;
+    color: #aaaacc;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .game-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    perspective: 1000px;
+  }
+
+  @media (min-width: 768px) {
+    .game-board {
+      grid-template-columns: repeat(8, 1fr);
+    }
+  }
+
+  .target-item {
+    aspect-ratio: 1;
+    background-color: rgba(60, 60, 100, 0.7);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #e6e6ff;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .target-item:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .target-item:active {
+    transform: scale(0.98);
+  }
+
+  .target-item.highlight {
+    background-color: rgba(100, 100, 180, 0.9);
+    animation: pulse 0.6s ease-in-out;
+  }
+
+  .target-item.correct {
+    background-color: rgba(100, 200, 100, 0.8);
+    animation: correctPulse 0.5s;
+  }
+
+  .target-item.incorrect {
+    background-color: rgba(220, 80, 80, 0.8);
+    animation: incorrectShake 0.5s;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes correctPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(100, 200, 100, 0); }
+    50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(100, 200, 100, 0.8); }
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(100, 200, 100, 0); }
+  }
+
+  @keyframes incorrectShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+
+  .message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 20, 40, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+  }
+
+  .message-box {
+    background: linear-gradient(135deg, #2a2a40 0%, #3a3a60 100%);
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+    animation: messageAppear 0.4s ease-out;
+  }
+
+  @keyframes messageAppear {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-title {
+    font-size: 1.8rem;
+    color: #e6e6ff;
+    margin-bottom: 15px;
+    font-weight: 700;
+  }
+
+  .message-content {
+    font-size: 1.1rem;
+    color: #ccccdd;
+    margin-bottom: 25px;
+    line-height: 1.5;
+  }
+
+  .score-highlight {
+    font-size: 2.5rem;
+    color: #7673fd;
+    display: block;
+    margin: 15px 0;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(100, 100, 255, 0.5);
+  }
+
+  .message-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .settings-panel {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+  }
+
+  .settings-title {
+    font-size: 1.2rem;
+    color: #e6e6ff;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .difficulty-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .difficulty-option {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+    background-color: rgba(60, 60, 80, 0.6);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #ccccdd;
+  }
+
+  .difficulty-option:hover {
+    background-color: rgba(70, 70, 100, 0.8);
+  }
+
+  .difficulty-option.active {
+    background-color: rgba(123, 104, 238, 0.4);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(123, 104, 238, 0.3);
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: rgba(60, 60, 80, 0.6);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #5b42f3, #7673fd);
+    width: 0%;
+    transition: width 0.3s linear;
+  }
+  
+  .loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #7673fd;
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .instructions-toggle {
+    color: #aaaacc;
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .instructions-content {
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ccccdd;
+  }
+  
+  .instructions-title {
+    font-size: 1.1rem;
+    color: #e6e6ff;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  
+  .instructions-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .instructions-list li {
+    margin-bottom: 5px;
+  }
+
+  .level-info {
+    background-color: rgba(60, 60, 100, 0.4);
+    border-radius: 8px;
+    padding: 8px 15px;
+    margin: 10px 0;
+    text-align: center;
+    color: #e6e6ff;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <div class="game-header">
+    <h1 class="game-title">Görsel Dikkat</h1>
+    <p class="game-description">Gösterilen desenleri akılda tutun ve eksik olanı bulun. Bu oyun görsel dikkatinizi ve odaklanma becerinizi geliştirir.</p>
+  </div>
+  
+  <div class="instructions-content" id="instructions">
+    <h3 class="instructions-title">Görsel Dikkat Egzersizi</h3>
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/visual-attention-icon.svg') }}" alt="Görsel Dikkat İkonu" style="width: 120px; height: 120px;" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MCIgZmlsbD0iIzVCNDJGMyIgZmlsbC1vcGFjaXR5PSIwLjIiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIzNSIgc3Ryb2tlPSIjNUI0MkYzIiBzdHJva2Utd2lkdGg9IjMiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIxNSIgZmlsbD0iIzVCNDJGMyIvPjxwYXRoIGQ9Ik02MCAyMFY1TTYwIDExNVYxMDAiIHN0cm9rZT0iIzVCNDJGMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTEwMCA2MEgxMTVNNSA2MEgyMCIgc3Ryb2tlPSIjNUI0MkYzIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNODUuODU4NSAzNC4xNDIyTDk3LjA3MTEgMjIuOTI5M001IG0xNy45MjkzIDc0LjE0MUwyMi45MjkzIDg1Ljg1ODQiIHN0cm9rZT0iIzVCNDJGMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTTg1Ljg1ODUgODUuODU3OEw5Ny4wNzExIDk3LjA3MDdNMjIuOTI5MyAzNC4xNDIyTDExLjcxNiAyMi45MjkzIiBzdHJva2U9IiM1QjQyRjMiIHN0cm9rZS13aWR0aD0iMyIvPjwvc3ZnPg=='">
+    </div>
+    
+    <div class="mb-4">
+      <div class="card mb-3 p-3" style="background-color: rgba(91, 66, 243, 0.1); border: 1px solid rgba(91, 66, 243, 0.2); border-radius: 10px;">
+        <p class="mb-0" style="color: #e6e6ff; font-weight: 500;">
+          Görsel dikkat beceriniz, çevrenizden gelen bilgileri hızlı ve doğru şekilde işleme yeteneğinizdir. Bu beceriyi geliştirmek, günlük yaşamda daha iyi konsantrasyon ve detayları fark etme yeteneği kazandırır.
+        </p>
+      </div>
+    </div>
+    
+    <h4 class="instructions-title" style="font-size: 1.1rem;">Nasıl Oynanır?</h4>
+    <div class="card p-3 mb-4" style="background-color: rgba(60, 60, 100, 0.4); border-radius: 10px;">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div style="text-align: center; margin-bottom: 15px;">
+            <div style="display: inline-flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; justify-content: center;">
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;">★</div>
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;">♦</div>
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;">●</div>
+            </div>
+            <div style="margin: 10px 0; text-align: center; color: #e6e6ff;">
+              <i class="fas fa-long-arrow-alt-down" style="font-size: 24px;"></i>
+            </div>
+            <div style="display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;">★</div>
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;"></div>
+              <div style="background: rgba(106, 90, 205, 0.3); width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white;">●</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <ol style="color: #ccccdd; padding-left: 20px; margin-bottom: 0;">
+            <li style="margin-bottom: 8px;">Ekranda bir desen kümesi gösterilir.</li>
+            <li style="margin-bottom: 8px;">Desenler gizlenir ve biri eksik olur.</li>
+            <li style="margin-bottom: 8px;">Karta tıklayarak eksik deseni bulun.</li>
+            <li style="margin-bottom: 8px;">Hızlı ve doğru yanıt vererek puan kazanın.</li>
+            <li style="margin-bottom: 0;">Her seviyede zorluk artar.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row text-center mt-4">
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-brain" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Dikkat</strong><br>Geliştir</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-eye" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Görsel Bellek</strong><br>Güçlendir</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-tachometer-alt" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Tepki Hızı</strong><br>Artır</p>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn-game" id="start-game">
+        <i class="fas fa-play-circle me-2"></i>
+        Oyunu Başlat
+      </button>
+    </div>
+  </div>
+  
+  <div class="settings-panel" id="settings-panel" style="display: none;">
+    <h3 class="settings-title">Zorluk Seviyesi</h3>
+    <div class="difficulty-options">
+      <div class="difficulty-option active" data-difficulty="easy">Kolay</div>
+      <div class="difficulty-option" data-difficulty="medium">Orta</div>
+      <div class="difficulty-option" data-difficulty="hard">Zor</div>
+    </div>
+  </div>
+  
+  <div class="control-panel" id="control-panel" style="display: none;">
+    <div class="info-display">
+      <div class="info-item">
+        <span class="info-label">Seviye</span>
+        <span class="info-value" id="level-display">1</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Puan</span>
+        <span class="info-value" id="score-display">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Süre</span>
+        <span class="info-value" id="time-display">0</span>
+      </div>
+    </div>
+    <div>
+      <button class="sound-toggle" id="sound-toggle">
+        <i class="fas fa-volume-up"></i>
+      </button>
+      <button class="btn-game" id="pause-button">
+        <i class="fas fa-pause"></i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="level-info" id="level-info" style="display: none;">
+    Seviye 1: Desenleri izleyin
+  </div>
+  
+  <div class="progress-bar-container" id="timer-bar-container" style="display: none;">
+    <div class="progress-bar" id="timer-bar"></div>
+  </div>
+  
+  <div class="game-board" id="game-board">
+    <!-- Game items will be generated here -->
+  </div>
+  
+  <div id="message-overlay" class="message-overlay" style="display: none;">
+    <div class="message-box">
+      <h2 class="message-title" id="message-title">Oyun Bitti!</h2>
+      <p class="message-content" id="message-content">
+        Muhteşem bir performans! İnanılmaz görsel dikkat becerinizi gösterdiniz.
+        <span class="score-highlight" id="final-score">0</span>
+        puan kazandınız!
+      </p>
+      <div class="message-buttons">
+        <button class="btn-game" id="restart-button">Tekrar Oyna</button>
+        <button class="btn-game" id="menu-button">Ana Menü</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/visualAttention.js') }}"></script>
+{% endblock %}

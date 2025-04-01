@@ -1,219 +1,5 @@
 {% extends "layout.html" %}
 
-{% block extra_css %}
-<style>
-  /* Bakım duyurusu için stil */
-  .maintenance-announcement {
-    background: linear-gradient(135deg, #2c3e50, #1a1a2e);
-    border-radius: 15px;
-    padding: 40px;
-    text-align: center;
-    color: #fff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 0 auto 40px auto;
-    max-width: 900px;
-  }
-  
-  .maintenance-icon {
-    font-size: 5rem;
-    margin-bottom: 25px;
-    color: #6a5ae0;
-    text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
-  }
-  
-  .maintenance-announcement h3 {
-    font-size: 2rem;
-    margin-bottom: 25px;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 12px;
-  }
-  
-  .maintenance-announcement h3:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 3px;
-    background: #6a5ae0;
-    border-radius: 3px;
-  }
-  
-  .maintenance-announcement p {
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 18px;
-    font-size: 1.2rem;
-    line-height: 1.6;
-  }
-  
-  .maintenance-info-btn {
-    display: inline-block;
-    background: linear-gradient(to right, #6a5ae0, #8170ff);
-    color: white;
-    padding: 14px 30px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    margin-top: 20px;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-    font-size: 1.1rem;
-  }
-  
-  .maintenance-info-btn:hover {
-    background: linear-gradient(to right, #8170ff, #9a8eff);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-    transform: translateY(-3px);
-    color: white;
-  }
-  
-  /* Öne çıkan oyun kartı */
-  .featured-game-card {
-    background: linear-gradient(145deg, rgba(78, 91, 242, 0.15), rgba(16, 185, 129, 0.05));
-    border-radius: 16px;
-    padding: 30px;
-    margin: 35px auto;
-    max-width: 600px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(78, 91, 242, 0.2);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .featured-game-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(145deg, rgba(78, 91, 242, 0.2), rgba(16, 185, 129, 0.08));
-    border-color: rgba(78, 91, 242, 0.3);
-  }
-  
-  .featured-game-card::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -100%;
-    width: 150%;
-    height: 150%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-    transform: rotate(45deg);
-    transition: all 1s ease;
-  }
-  
-  .featured-game-card:hover::before {
-    top: 100%;
-    left: 100%;
-  }
-  
-  .featured-game-card::after {
-    content: 'YENİ';
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: linear-gradient(to right, #10b981, #059669);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 5px 10px;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  .featured-game-icon {
-    background: linear-gradient(145deg, #4e5bf2, #3748e3);
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 30px;
-    box-shadow: 0 8px 20px rgba(78, 91, 242, 0.3);
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .featured-game-icon::before {
-    content: '';
-    position: absolute;
-    width: 140%;
-    height: 140%;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-    top: -20%;
-    left: -20%;
-  }
-  
-  .featured-game-icon i {
-    font-size: 2.5rem;
-    color: white;
-  }
-  
-  .featured-game-info {
-    flex: 1;
-    text-align: left;
-  }
-  
-  .featured-game-info h4 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: white;
-    font-weight: 600;
-  }
-  
-  .featured-game-info p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 15px;
-    font-size: 1rem;
-    line-height: 1.4;
-  }
-  
-  .featured-game-btn {
-    display: inline-block;
-    background: linear-gradient(to right, #10b981, #059669);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    font-size: 0.95rem;
-  }
-  
-  .featured-game-btn:hover {
-    background: linear-gradient(to right, #059669, #047857);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
-    color: white;
-  }
-  
-  @media (max-width: 576px) {
-    .featured-game-card {
-      flex-direction: column;
-      text-align: center;
-      padding: 20px 15px;
-    }
-    
-    .featured-game-icon {
-      margin-right: 0;
-      margin-bottom: 15px;
-    }
-    
-    .featured-game-info {
-      text-align: center;
-    }
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 {% if session.get('user_id') %}
 <div class="profile-shortcut-container">
@@ -247,9 +33,9 @@
 <div class="col-lg-12 text-center position-relative">
 <div class="card">
   <h1 class="hero-title"><span>Zekânı Geliştir</span><span>IQ'nu Yükselt</span></h1>
-  <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi uygulamasına hoş geldiniz.</p>
+  <p class="hero-subtitle">Bilişsel yeteneklerini geliştiren beyin egzersizi oyunlarımızla kendini zorla.</p>
   <div class="d-flex justify-content-center flex-wrap">
-    <a href="#platform-maintenance" class="btn btn-primary me-2 mb-2">Bakım Bilgisi</a>
+    <a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Hemen Başla</a>
     <a href="{{ url_for('articles') }}" class="btn btn-outline-primary mb-2">Detaylar</a>
   </div>
 </div>
@@ -257,32 +43,142 @@
 </div>
 </section>
 
-<section id="platform-maintenance" class="mt-4">
-<h2 class="text-center mb-3">Platform Bakımda</h2>
-<div class="maintenance-announcement">
-  <div class="maintenance-icon">
-    <i class="fas fa-tools"></i>
-  </div>
-  <h3>Platformumuz Yenileniyor</h3>
-  <p>Çoğu oyunumuz geçici olarak erişilemez durumdadır. Platformumuzda kapsamlı bir yenileme çalışması yapılmaktadır.</p>
-  <p>İlk olarak "Modern Hafıza Kartları" oyunumuz kullanıma açılmıştır. Diğer oyunlarımız da yakında gelecektir.</p>
-  <p>Daha güçlü, daha zengin içerikli ve kullanıcı dostu bir platformla adım adım yeniden hizmetinizde olacağız.</p>
-  <div class="featured-game-card">
-    <div class="featured-game-icon">
-      <i class="fas fa-clone"></i>
+<section class="mt-4">
+<h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
+<div class="game-grid">
+  <!-- Kelime Bulmaca -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-font"></i></div>
+    <div class="game-info">
+      <h3>Kelime Bulmaca</h3>
+      <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
     </div>
-    <div class="featured-game-info">
-      <h4>Modern Hafıza Kartları</h4>
-      <p>Yenilenmiş tasarımı ve gelişmiş özellikleriyle hafızanızı test edin ve güçlendirin.</p>
-      <a href="{{ url_for('memory_cards') }}" class="featured-game-btn">
-        <i class="fas fa-gamepad me-2"></i>Hemen Oyna
-      </a>
-    </div>
+    <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
   </div>
-  <a href="{{ url_for('all_games') }}" class="maintenance-info-btn">
-    <i class="fas fa-info-circle me-2"></i>Tüm Oyunları Gör
-  </a>
+
+  <!-- Hafıza Kartları -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-clone"></i></div>
+    <div class="game-info">
+      <h3>Hafıza Kartları</h3>
+      <p>Eşleşen kartları bul ve hafızanı test et.</p>
+    </div>
+    <a href="{{ url_for('memory_match') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Labirent -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-route"></i></div>
+    <div class="game-info">
+      <h3>Labirent</h3>
+      <p>Çıkış yolunu bul ve stratejik düşün.</p>
+    </div>
+    <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Yapboz -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+    <div class="game-info">
+      <h3>Yapboz</h3>
+      <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+    </div>
+    <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Görsel Dikkat oyunu kaldırıldı
+  <div class="game-card" style="display: none;">
+    <div class="game-icon"><i class="fas fa-eye"></i></div>
+    <div class="game-info">
+      <h3>Görsel Dikkat</h3>
+      <p>Örüntüleri bul ve dikkatini test et.</p>
+    </div>
+    <a href="#" class="game-btn">Oyna</a>
+  </div>
+  -->
+
+  <!-- Sayı Dizisi -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+    <div class="game-info">
+      <h3>Sayı Dizisi</h3>
+      <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+    </div>
+    <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Kim Nerede? oyunu kaldırıldı -->
+
+  <!-- Kart Eşleme oyunu kaldırıldı -->
+  <!--
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-th"></i></div>
+    <div class="game-info">
+      <h3>Kart Eşleme</h3>
+      <p>İkonları eşleştir ve görsel hafızanı geliştir.</p>
+    </div>
+    <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+  </div>
+  -->
+
+  <!-- Sayı Zinciri -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-link"></i></div>
+    <div class="game-info">
+      <h3>Sayı Zinciri</h3>
+      <p>Gördüğün sayıları doğru sırayla hatırla.</p>
+    </div>
+    <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Sesli Hafıza -->
+  <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
+    <div class="game-icon" style="color: #6c757d;"><i class="fas fa-volume-up"></i></div>
+    <div class="game-info">
+      <h3>Sesli Hafıza <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
+      <p>Duyduğun ses sıralamasını doğru tekrarla. (Şu anda geliştiriliyor)</p>
+    </div>
+    <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+  </div>
+
+  <!-- N-Back Test -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-brain"></i></div>
+    <div class="game-info">
+      <h3>N-Back Test</h3>
+      <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
+    </div>
+    <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Satranç -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-chess"></i></div>
+    <div class="game-info">
+      <h3>Satranç</h3>
+      <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+    </div>
+    <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+  </div>
+  
+  <!-- Sudoku - Onarımda -->
+  <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
+    <div class="game-icon" style="color: #6c757d;"><i class="fas fa-th"></i></div>
+    <div class="game-info">
+      <h3>Sudoku <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
+      <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
+    </div>
+    <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+  </div>
+
+  <!-- IQ geliştirme oyunları kaldırıldı -->
 </div>
+</section>
+
+<section class="text-center mt-4 mb-4">
+  <a href="{{ url_for('all_games') }}" class="btn btn-primary btn-lg">
+    <i class="fas fa-gamepad me-2"></i>Daha Çok Oyunlar
+  </a>
 </section>
 
 <section class="mt-4">
@@ -320,9 +216,9 @@
 <section class="mt-4 text-center">
 <div class="card">
 <div class="card-body py-4">
-<h2 class="card-title">Yenilikler İçin Hazır mısın?</h2>
-<p class="card-text mb-3">Bakım çalışmalarımız tamamlandığında yepyeni oyunlarımızla buluşacağız. Takipte kalın!</p>
-<a href="{{ url_for('all_games') }}" class="btn btn-primary me-2 mb-2">Bilgi Al</a>
+<h2 class="card-title">Beynini Zorlamaya Hazır mısın?</h2>
+<p class="card-text mb-3">Hemen beyin egzersizi oyunlarımızı oynamaya başla ve gelişimini takip et.</p>
+<a href="{{ url_for('word_puzzle') }}" class="btn btn-primary me-2 mb-2">Oyna</a>
 <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary mb-2">Skor Tablosu <i class="fas fa-trophy"></i></a>
 </div>
 </div>

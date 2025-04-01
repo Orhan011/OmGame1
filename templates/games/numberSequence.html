@@ -1,0 +1,767 @@
+{% extends "layout.html" %}
+
+{% block title %}Sayı Dizisi | ZekaPark{% endblock %}
+
+{% block styles %}
+<style>
+  .game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(30, 30, 40, 0.7);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .game-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .game-title {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: #e6e6ff;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(100, 100, 255, 0.3);
+  }
+
+  .game-description {
+    color: #ccccdd;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+
+  .info-display {
+    display: flex;
+    gap: 15px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 15px;
+    background-color: rgba(60, 60, 80, 0.6);
+    border-radius: 8px;
+    min-width: 90px;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+    color: #aaaacc;
+    margin-bottom: 5px;
+  }
+
+  .info-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .btn-game {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+    color: white;
+  }
+
+  .btn-game:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(123, 104, 238, 0.4);
+  }
+
+  .btn-game:active {
+    transform: translateY(1px);
+  }
+
+  .sound-toggle {
+    background: none;
+    border: none;
+    color: #aaaacc;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .game-board {
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .sequence-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+    min-height: 80px;
+  }
+
+  .sequence-number {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #3a3a60 0%, #4a4a80 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .sequence-number.highlight {
+    background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+    animation: highlight-pulse 0.6s ease-in-out;
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(123, 104, 238, 0.5);
+  }
+
+  @keyframes highlight-pulse {
+    0% { transform: scale(1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+    50% { transform: scale(1.15); box-shadow: 0 8px 20px rgba(123, 104, 238, 0.5); }
+    100% { transform: scale(1.05); box-shadow: 0 6px 15px rgba(123, 104, 238, 0.5); }
+  }
+
+  .question-mark {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .answer-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .answer-option {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #3a3a60 0%, #4a4a80 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .answer-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .answer-option:active {
+    transform: scale(0.95);
+  }
+
+  .answer-option.correct {
+    background: linear-gradient(135deg, #34c759 0%, #2ea043 100%);
+    animation: correct-answer 0.5s;
+  }
+
+  .answer-option.incorrect {
+    background: linear-gradient(135deg, #ff3b30 0%, #d70015 100%);
+    animation: incorrect-answer 0.5s;
+  }
+
+  @keyframes correct-answer {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes incorrect-answer {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+
+  .pattern-description {
+    background-color: rgba(60, 60, 100, 0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 15px 0;
+    text-align: center;
+    color: #e6e6ff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 20, 40, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+  }
+
+  .message-box {
+    background: linear-gradient(135deg, #2a2a40 0%, #3a3a60 100%);
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+    animation: messageAppear 0.4s ease-out;
+  }
+
+  @keyframes messageAppear {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .message-title {
+    font-size: 1.8rem;
+    color: #e6e6ff;
+    margin-bottom: 15px;
+    font-weight: 700;
+  }
+
+  .message-content {
+    font-size: 1.1rem;
+    color: #ccccdd;
+    margin-bottom: 25px;
+    line-height: 1.5;
+  }
+
+  .score-highlight {
+    font-size: 2.5rem;
+    color: #7673fd;
+    display: block;
+    margin: 15px 0;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(100, 100, 255, 0.5);
+  }
+
+  .message-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .settings-panel {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+  }
+
+  .settings-title {
+    font-size: 1.2rem;
+    color: #e6e6ff;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .difficulty-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .difficulty-option {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+    background-color: rgba(60, 60, 80, 0.6);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #ccccdd;
+  }
+
+  .difficulty-option:hover {
+    background-color: rgba(70, 70, 100, 0.8);
+  }
+
+  .difficulty-option.active {
+    background-color: rgba(123, 104, 238, 0.4);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(123, 104, 238, 0.3);
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: rgba(60, 60, 80, 0.6);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #5b42f3, #7673fd);
+    width: 0%;
+    transition: width 0.3s linear;
+  }
+  
+  .loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #7673fd;
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .instructions-toggle {
+    color: #aaaacc;
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .instructions-content {
+    background-color: rgba(40, 40, 60, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ccccdd;
+  }
+  
+  .instructions-title {
+    font-size: 1.1rem;
+    color: #e6e6ff;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  
+  .instructions-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .instructions-list li {
+    margin-bottom: 5px;
+  }
+
+  .level-info {
+    background-color: rgba(60, 60, 100, 0.4);
+    border-radius: 8px;
+    padding: 8px 15px;
+    margin: 10px 0;
+    text-align: center;
+    color: #e6e6ff;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .hint-button {
+    padding: 8px 15px;
+    background-color: rgba(60, 60, 100, 0.6);
+    border: none;
+    border-radius: 8px;
+    color: #ccccdd;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 10px auto;
+  }
+
+  .hint-button:hover {
+    background-color: rgba(70, 70, 100, 0.8);
+    color: #ffffff;
+  }
+
+  .hint-content {
+    background-color: rgba(60, 60, 100, 0.4);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 15px 0;
+    text-align: center;
+    color: #ccccdd;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <div class="game-header">
+    <h1 class="game-title">Sayı Dizisi</h1>
+    <p class="game-description">Sayı dizilerindeki örüntüleri analiz edin ve eksik sayıyı bulun. Bu oyun matematiksel akıl yürütme ve analitik düşünme becerinizi geliştirir.</p>
+  </div>
+  
+  <div class="instructions-content" id="instructions">
+    <h3 class="instructions-title">Sayı Dizisi Egzersizi</h3>
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/number-sequence-icon.svg') }}" alt="Sayı Dizisi İkonu" style="width: 120px; height: 120px;" 
+        onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiBmaWxsPSJub25lIj48cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcng9IjEwIiBmaWxsPSIjNUI0MkYzIiBmaWxsLW9wYWNpdHk9IjAuMiIvPjx0ZXh0IHg9IjQxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4xPC90ZXh0Pjx0ZXh0IHg9IjQxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4yPC90ZXh0Pjx0ZXh0IHg9IjQxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4zPC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4zPC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj41PC90ZXh0Pjx0ZXh0IHg9IjYxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj43PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj43PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4/PC90ZXh0Pjx0ZXh0IHg9IjgxIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIyMHB4IiBmaWxsPSIjNUI0MkYzIj4xNTwvdGV4dD48L3N2Zz4='">
+    </div>
+    
+    <div class="mb-4">
+      <div class="card mb-3 p-3" style="background-color: rgba(91, 66, 243, 0.1); border: 1px solid rgba(91, 66, 243, 0.2); border-radius: 10px;">
+        <p class="mb-0" style="color: #e6e6ff; font-weight: 500;">
+          Matematiksel örüntüleri tanıma ve analiz etme becerisi, beynimizin mantıksal düşünme ve problem çözme yeteneklerini güçlendirir. Bu egzersiz, örüntü tanıma ve matematiksel akıl yürütme becerilerinizi geliştirecek.
+        </p>
+      </div>
+    </div>
+    
+    <h4 class="instructions-title" style="font-size: 1.1rem;">Nasıl Oynanır?</h4>
+    <ul class="instructions-list">
+      <li>Bir sayı dizisi gösterilecek, dizi belirli bir örüntü veya kurala göre oluşturulmuştur.</li>
+      <li>Sizin göreviniz, dizideki eksik sayıyı bularak boşluğu doldurmaktır.</li>
+      <li>Her seviyede daha karmaşık örüntüler ve daha zorlu diziler yer alacaktır.</li>
+      <li>Doğru cevapları ne kadar hızlı bulursanız o kadar çok puan kazanırsınız.</li>
+      <li>İpucu butonu ile örüntü hakkında yardım alabilirsiniz, fakat bu puan kaybına neden olur.</li>
+    </ul>
+    
+    <div class="row text-center mt-4">
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-brain" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Analitik</strong><br>Düşünme</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-calculator" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Matematiksel</strong><br>Beceri</p>
+      </div>
+      <div class="col-4">
+        <div class="metric-circle" style="width: 60px; height: 60px; background-color: rgba(91, 66, 243, 0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; border: 2px solid #5B42F3;">
+          <i class="fas fa-lightbulb" style="font-size: 24px; color: #5B42F3;"></i>
+        </div>
+        <p class="mt-2" style="font-size: 0.9rem; color: #ccccdd;"><strong>Problem</strong><br>Çözme</p>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn-game" id="start-game">
+        <i class="fas fa-play-circle me-2"></i>
+        Oyunu Başlat
+      </button>
+    </div>
+  </div>
+  
+  <div class="settings-panel" id="settings-panel" style="display: none;">
+    <h3 class="settings-title">Zorluk Seviyesi</h3>
+    <div class="difficulty-options">
+      <div class="difficulty-option active" data-difficulty="easy">Kolay</div>
+      <div class="difficulty-option" data-difficulty="medium">Orta</div>
+      <div class="difficulty-option" data-difficulty="hard">Zor</div>
+    </div>
+  </div>
+  
+  <div class="control-panel" id="control-panel" style="display: none;">
+    <div class="info-display">
+      <div class="info-item">
+        <span class="info-label">Seviye</span>
+        <span class="info-value" id="level-display">1</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Puan</span>
+        <span class="info-value" id="score-display">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Süre</span>
+        <span class="info-value" id="time-display">0</span>
+      </div>
+    </div>
+    <div>
+      <button class="sound-toggle" id="sound-toggle">
+        <i class="fas fa-volume-up"></i>
+      </button>
+      <button class="btn-game" id="pause-button">
+        <i class="fas fa-pause"></i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="level-info" id="level-info" style="display: none;">
+    Seviye 1: Sayı dizisindeki eksik sayıyı bulun
+  </div>
+  
+  <div class="game-board" id="game-board" style="display: none;">
+    <div class="sequence-display horizontal-sequence" id="sequence-display">
+      <!-- Sequence numbers will be generated here -->
+    </div>
+    
+    <style>
+      .horizontal-sequence {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 15px 5px;
+        margin-bottom: 20px;
+      }
+      
+      @media (max-width: 768px) {
+        .horizontal-sequence {
+          gap: 8px;
+          padding: 10px 0;
+        }
+        .sequence-number {
+          width: 50px;
+          height: 50px;
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+    
+    <div class="pattern-description" id="pattern-description">
+      Sayı dizisindeki örüntüyü bulun ve eksik sayıyı tahmin edin
+    </div>
+    
+    <button class="hint-button" id="hint-button">
+      <i class="fas fa-lightbulb"></i> İpucu Al
+    </button>
+    
+    <div class="hint-content" id="hint-content" style="display: none;">
+      İpucu burada görünecek
+    </div>
+    
+    <div class="answer-options" id="answer-options">
+      <!-- Answer options will be generated here -->
+    </div>
+    
+    <style>
+      .answer-options {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 25px 0;
+      }
+      
+      .answer-option {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #3a3a60 0%, #4a4a80 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+      }
+      
+      .answer-option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        border-color: rgba(123, 104, 238, 0.3);
+      }
+      
+      .answer-option:active {
+        transform: scale(0.95);
+      }
+      
+      /* Rakam seçme stil iyileştirmeleri */
+      .number-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin: 25px 0;
+        flex-wrap: wrap;
+        padding: 15px;
+        background: rgba(30, 30, 40, 0.5);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      
+      .number-input {
+        width: 120px;
+        height: 60px;
+        background: rgba(60, 60, 100, 0.8);
+        border: 2px solid rgba(123, 104, 238, 0.5);
+        border-radius: 10px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: white;
+        padding: 5px 10px;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      
+      .number-btn {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #3a3a60 0%, #4a4a80 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .number-btn:hover {
+        background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      .number-btn:active {
+        transform: scale(0.95);
+      }
+      
+      .submit-answer {
+        width: auto;
+        padding: 12px 30px;
+        margin: 10px;
+        background: linear-gradient(135deg, #5b42f3 0%, #7673fd 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(91, 66, 243, 0.4);
+      }
+      
+      .submit-answer:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(91, 66, 243, 0.5);
+      }
+      
+      .submit-answer:active {
+        transform: translateY(1px);
+      }
+      
+      @media (max-width: 768px) {
+        .number-controls {
+          padding: 10px;
+          gap: 10px;
+        }
+        
+        .number-input {
+          width: 100px;
+          height: 50px;
+          font-size: 1.6rem;
+        }
+        
+        .number-btn {
+          width: 45px;
+          height: 45px;
+        }
+        
+        .submit-answer {
+          padding: 10px 25px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+
+    <div class="number-controls" id="number-controls" style="display: none;">
+      <button class="number-btn" id="decrease-btn"><i class="fas fa-minus"></i></button>
+      <input type="number" class="number-input" id="number-input" min="0" max="999" value="0">
+      <button class="number-btn" id="increase-btn"><i class="fas fa-plus"></i></button>
+      <button class="submit-answer" id="submit-answer">Cevapla</button>
+    </div>
+  </div>
+  
+  <div class="progress-bar-container" id="timer-bar-container" style="display: none;">
+    <div class="progress-bar" id="timer-bar"></div>
+  </div>
+  
+  <div id="message-overlay" class="message-overlay" style="display: none;">
+    <div class="message-box">
+      <h2 class="message-title" id="message-title">Oyun Bitti!</h2>
+      <p class="message-content" id="message-content">
+        Tebrikler! Etkileyici bir matematiksel akıl yürütme sergileyerek
+        <span class="score-highlight" id="final-score">0</span>
+        puan kazandınız!
+      </p>
+      <div class="message-buttons">
+        <button class="btn-game" id="restart-button">Tekrar Oyna</button>
+        <button class="btn-game" id="menu-button">Ana Menü</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/numberSequence.js') }}"></script>
+{% endblock %}

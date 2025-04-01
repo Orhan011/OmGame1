@@ -623,18 +623,15 @@ def login():
 # def three_d_labyrinth():
 #     return render_template('games/3dLabyrinth.html')
 
-# Tüm oyunlar kaldırıldı
-
 @app.route('/games/word-puzzle')
 def word_puzzle():
-    flash('Kelime Bulmaca oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/wordPuzzle.html')
 
 @app.route('/games/memory-match')
 def memory_match():
-    flash('Hafıza Eşleştirme oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/memoryMatch.html')
 
+# Labirent oyunu kaldırıldı
 @app.route('/games/labyrinth')
 def labyrinth():
     flash('Labirent oyunu artık kullanılamıyor.', 'warning')
@@ -642,47 +639,53 @@ def labyrinth():
 
 @app.route('/games/puzzle')
 def puzzle():
-    flash('Puzzle oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/puzzle.html')
+
+# Removed Visual Attention game as requested
+# @app.route('/games/visual-attention')
+# def visual_attention():
+#     return render_template('games/visualAttention.html')
 
 @app.route('/games/number-sequence')
 def number_sequence():
-    flash('Sayı Dizisi oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/numberSequence.html')
+
+# Yeni Hafıza Güçlendirme Oyunları
+# Route for "Kim Nerede?" game has been removed
 
 @app.route('/games/memory-cards')
 def memory_cards():
-    return render_template('games/memory_cards.html')
+    return render_template('games/memoryCards.html')
 
 @app.route('/games/number-chain')
 def number_chain():
-    flash('Sayı Zinciri oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/numberChain.html')
+
+# Audio Memory oyunu kaldırıldı
 
 @app.route('/games/n-back')
 def n_back():
-    flash('N-Back oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/nBack.html')
 
+# Yeni Mantık ve IQ Geliştirme Oyunları
+# Sudoku oyunu kaldırıldı
 @app.route('/games/sudoku')
 def sudoku():
-    flash('Sudoku oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/sudoku.html')
 
 @app.route('/games/2048')
 def game_2048():
-    flash('2048 oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/2048.html')
 
 @app.route('/games/wordle')
 def wordle():
-    flash('Wordle oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    """Wordle kelime tahmin oyunu"""
+    return render_template('games/wordle.html')
 
 @app.route('/games/chess')
 def chess():
-    flash('Satranç oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    """Satranç oyunu"""
+    return render_template('games/chess.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
@@ -1433,35 +1436,10 @@ def save_score():
     game_type = data.get('game_type', data.get('gameType', None))
     if not game_type:
         return jsonify({'success': False, 'message': 'Game type not provided'})
-    
-    # Metadata bilgisini al
-    metadata = data.get('metadata', {})
 
     # XP ve seviye hesaplamaları için değerler
     original_level = user.experience_points // 1000 + 1
-    
-    # Oyun türüne göre XP hesaplaması
-    if game_type == 'memory_cards':
-        # Hafıza Kartları için özel XP hesaplama
-        difficulty_multiplier = {
-            'easy': 1,
-            'medium': 1.5,
-            'hard': 2,
-            'expert': 3
-        }.get(metadata.get('difficulty', 'medium'), 1)
-        
-        level = metadata.get('level', 1)
-        time_bonus = max(0, 1000 - metadata.get('time', 0))
-        
-        xp_gain = int((data['score'] / 100) * difficulty_multiplier * (1 + (level * 0.1)))
-        # Zaman bonusu ekle (maksimum 500 XP)
-        xp_gain += min(500, int(time_bonus * 0.5 * difficulty_multiplier))
-    else:
-        # Diğer oyunlar için standart hesaplama
-        xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
-    
-    # Minimum XP garantisi
-    xp_gain = max(10, xp_gain)
+    xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
 
     from sqlalchemy import func
     

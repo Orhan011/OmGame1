@@ -1,0 +1,96 @@
+
+{% extends "layout.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games/2048.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-title-section">
+    <h1>X2 Blocks</h1>
+    <p>Modern Merge Puzzle - Aynı değerdeki blokları birleştirerek 2048'e ulaşın!</p>
+  </div>
+  
+  <div id="game2048-container" class="game-container">
+    <header>
+      <div class="title-area">
+        <h1>X2 Blocks</h1>
+        <p class="subtitle">Modern Merge Puzzle</p>
+      </div>
+      <div class="scores">
+        <div class="score-box primary">
+          <span>SKOR</span>
+          <span id="score">0</span>
+        </div>
+        <div class="score-box">
+          <span>EN İYİ</span>
+          <span id="best-score">0</span>
+        </div>
+        <div class="score-box level-box">
+          <span>SEVİYE</span>
+          <span id="level-value">1</span>
+        </div>
+      </div>
+      <div class="game-options">
+        <button id="toggle-sound" class="option-btn">🔊</button>
+        <button id="toggle-theme" class="option-btn">🌙</button>
+      </div>
+    </header>
+
+    <div class="game-container">
+      <div class="columns-grid">
+        <!-- Columns will be created dynamically -->
+      </div>
+      
+      <div class="block-source">
+        <div class="next-label">SONRAKI BLOK</div>
+        <!-- Next block will appear here -->
+      </div>
+      
+      <div id="game-over" class="overlay hidden">
+        <div class="overlay-content">
+          <h2>Oyun Bitti!</h2>
+          <p>Skorun: <span class="final-score">0</span></p>
+          <button id="retry" class="primary-btn">Tekrar Dene</button>
+        </div>
+      </div>
+      
+      <div id="game-won" class="overlay hidden">
+        <div class="overlay-content">
+          <h2>Tebrikler!</h2>
+          <p>2048'e ulaştın!</p>
+          <button id="continue" class="primary-btn">Devam Et</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="new-game" class="primary-btn">Yeni Oyun</button>
+      <button id="undo" class="secondary-btn">Geri Al</button>
+    </div>
+    
+    <div class="power-ups">
+      <div class="power-up-title">Güçlendirmeler</div>
+      <div class="power-up-grid">
+        <div class="power-up" id="clear-column">
+          <div class="power-up-icon">🧹</div>
+          <div class="power-up-name">Sütun Temizle</div>
+        </div>
+        <div class="power-up" id="double-value">
+          <div class="power-up-icon">✖️2</div>
+          <div class="power-up-name">Değeri İkile</div>
+        </div>
+        <div class="power-up" id="extra-move">
+          <div class="power-up-icon">🔄</div>
+          <div class="power-up-name">Ekstra Hamle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
+{% endblock %}
