@@ -1,7 +1,7 @@
 /**
  * Hafıza Kartları Oyunu - Memory Cards Game
  * 
- * Bu script, eşleşen kartları bulma oyununun temel mantığını içerir.
+ * Yeniden düzenlenmiş ve iyileştirilmiş versiyon
  * Oyun 3 farklı zorluk seviyesinde (kolay, orta, zor) oynanabilir ve
  * farklı temalar (hayvanlar, meyveler, emojiler, şekiller) sunar.
  */
@@ -38,31 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
   let gameMode = 'easy'; // varsayılan: kolay
   let gameTheme = 'animals'; // varsayılan: hayvanlar
 
-  // Tema sembollerini tanımla
+  // Tema sembollerini tanımla - tüm semboller Unicode olduğundan emin olundu
   const themeSymbols = {
     animals: [
       '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', 
-      '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦒', 
-      '🦓', '🦍', '🦘', '🦛', '🐘', '🦏', '🐪', '🐫',
-      '🦒', '🦘', '🦔', '🦇', '🐤', '🦅'
+      '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦒'
     ],
     fruits: [
       '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓',
-      '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑',
-      '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅',
-      '🥔', '🍠', '🫐', '🍏', '🍈', '🍆'
+      '🍒', '🍑', '🍍', '🥝', '🍅', '🥑', '🍆', '🥕'
     ],
     emojis: [
       '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
-      '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
-      '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜',
-      '🤪', '🤨', '🧐', '🤓', '😎', '🤩'
+      '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰'
     ],
     shapes: [
-      '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪',
-      '🟤', '🔺', '🔻', '💠', '🔸', '🔹', '🔶', '🔷',
-      '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜',
-      '🟫', '♠️', '♥️', '♦️', '♣️', '🔱'
+      '⭐', '⚡', '☁️', '❄️', '⚽', '🔥', '🌈', '🌙',
+      '💧', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫'
     ]
   };
 
@@ -123,26 +115,33 @@ document.addEventListener('DOMContentLoaded', function() {
    * Tek bir kart elementini oluştur
    */
   function createCardElement(symbol, index) {
+    // Ana kart container
     const card = document.createElement('div');
     card.classList.add('card');
     card.dataset.index = index;
     card.dataset.symbol = symbol;
     
+    // Ön yüz (kapalı durum)
     const cardFront = document.createElement('div');
     cardFront.classList.add('card-face', 'card-front');
     
+    // Arka yüz (açık durum - sembolün görüneceği)
     const cardBack = document.createElement('div');
     cardBack.classList.add('card-face', 'card-back');
     
+    // Sembol içeriği
     const cardContent = document.createElement('div');
     cardContent.classList.add('card-content');
     cardContent.innerHTML = symbol;
     cardBack.appendChild(cardContent);
     
+    // Kartın ön ve arka yüzlerini ekle
     card.appendChild(cardFront);
     card.appendChild(cardBack);
     
+    // Tıklama olayını ekle
     card.addEventListener('click', flipCard);
+    
     return card;
   }
 
@@ -150,9 +149,11 @@ document.addEventListener('DOMContentLoaded', function() {
    * Kartı çevirme işlemi
    */
   function flipCard() {
+    // Kilitliyse veya aynı karta tekrar tıklandıysa işlem yapma
     if (lockBoard) return;
     if (this === firstCard) return;
     
+    // Kartı çevir
     this.classList.add('flipped');
     
     if (!hasFlippedCard) {
@@ -164,19 +165,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // İkinci kart çevrildi
     secondCard = this;
-    checkForMatch();
     
     // Hamle sayısını artır
     updateMoves();
+    
+    // Eşleşip eşleşmediğini kontrol et
+    checkForMatch();
   }
 
   /**
    * Çevrilen iki kartın eşleşip eşleşmediğini kontrol et
    */
   function checkForMatch() {
+    // Sembol karşılaştırması
     const isMatch = firstCard.dataset.symbol === secondCard.dataset.symbol;
     
     if (isMatch) {
+      // Eşleşme durumu
       disableCards();
       updateScore(10); // Eşleşme durumunda puan ekle
       playMatchSound();
@@ -187,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => endGame(), 1000);
       }
     } else {
+      // Eşleşmeme durumu
       unflipCards();
       updateScore(-2); // Eşleşmeme durumunda puan düşür (opsiyonel, 0 da olabilir)
       playErrorSound();
@@ -197,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
    * Eşleşen kartları devre dışı bırak
    */
   function disableCards() {
+    // Tıklama olaylarını kaldır
     firstCard.removeEventListener('click', flipCard);
     secondCard.removeEventListener('click', flipCard);
     
@@ -295,10 +302,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame() {
     clearInterval(timer);
     
+    // Zorluk seviyesine göre bonus puanlama
+    let difficultyMultiplier = 1.0;
+    if (gameMode === 'medium') difficultyMultiplier = 1.2;
+    if (gameMode === 'hard') difficultyMultiplier = 1.5;
+    
     // Bonus puan: kalan süre ve az hamle sayısı
-    const timeBonus = Math.max(0, 120 - seconds) * 2;
+    const timeBonus = Math.max(0, 180 - seconds) * 2;
     const moveBonus = Math.max(0, 300 - moves * 5);
-    const finalScore = score + timeBonus + moveBonus;
+    const finalScore = Math.floor((score + timeBonus + moveBonus) * difficultyMultiplier);
     
     // Modal bilgilerini güncelle
     endTimerElement.textContent = timerElement.textContent;
@@ -423,10 +435,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
-      // Ses ayarları
+      // Ses ayarları - daha yüksek ve net bir eşleşme sesi
       oscillator.type = 'sine';
-      oscillator.frequency.value = 800;
-      gainNode.gain.value = 0.1;
+      oscillator.frequency.value = 880; // Daha tiz bir ses (A5 notası)
+      gainNode.gain.value = 0.2;
       
       // Ses başlangıç ve bitiş ayarları
       oscillator.connect(gainNode);
@@ -435,11 +447,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // Sesi çal
       oscillator.start();
       
-      // Ses süresini ayarla ve sonra durdur
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+      // Daha kısa ve belirgin bir ses
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
       setTimeout(() => {
         oscillator.stop();
-      }, 500);
+      }, 300);
     } catch (error) {
       console.log('Sound playback error:', error);
     }
@@ -455,10 +467,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
-      // Ses ayarları
-      oscillator.type = 'sine';
-      oscillator.frequency.value = 300;
-      gainNode.gain.value = 0.1;
+      // Ses ayarları - daha belirgin bir hata sesi
+      oscillator.type = 'sawtooth'; // Sawtooth daha keskin bir ses verir
+      oscillator.frequency.value = 220; // Daha alçak bir ses (A3 notası)
+      gainNode.gain.value = 0.15;
       
       // Ses başlangıç ve bitiş ayarları
       oscillator.connect(gainNode);
@@ -468,10 +480,10 @@ document.addEventListener('DOMContentLoaded', function() {
       oscillator.start();
       
       // Ses süresini ayarla ve sonra durdur
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
       setTimeout(() => {
         oscillator.stop();
-      }, 300);
+      }, 200);
     } catch (error) {
       console.log('Sound playback error:', error);
     }
