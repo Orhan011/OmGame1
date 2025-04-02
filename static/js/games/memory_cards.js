@@ -1,947 +1,762 @@
 /**
- * Hafıza Kartları Oyunu - v2.0
+ * Hafıza Kartları Oyunu (Memory Cards)
  * 
- * Görsel hafıza ve eşleştirme yeteneklerini geliştiren interaktif oyun.
- * Kullanıcılar, çift sayıda kartı çevirerek eşleşenleri bulmaya çalışır.
+ * Modern, etkileşimli ve görsel olarak çekici bir hafıza kartları oyunu.
+ * Farklı zorluk seviyeleri, temalar ve oyun modları sunar.
+ * Tam olarak duyarlı tasarım ve animasyonlu efektlerle güçlendirilmiştir.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-  // HTML Elementleri
-  const introSection = document.getElementById('intro-section');
-  const gameContainer = document.getElementById('game-container');
-  const gameOverContainer = document.getElementById('game-over-container');
-  const startGameBtn = document.getElementById('start-game');
-  const playAgainBtn = document.getElementById('play-again');
-  const pauseGameBtn = document.getElementById('pause-game');
-  const resumeGameBtn = document.getElementById('resume-game');
-  const restartGameBtn = document.getElementById('restart-game');
-  const soundToggleBtn = document.getElementById('sound-toggle');
-  const pauseOverlay = document.getElementById('pause-overlay');
-  const grid = document.getElementById('memory-cards-grid');
-  const difficultyButtons = document.querySelectorAll('.level-btn');
-  const themeButtons = document.querySelectorAll('.theme-btn');
-  const alertContainer = document.getElementById('alert-container');
+// Oyun konfigürasyonu
+const gameConfig = {
+  difficulty: 'easy', // 'easy', 'medium', 'hard'
+  theme: 'emoji',     // 'emoji', 'animals', 'icons'
+  mode: 'standard',   // 'standard', 'time', 'limited'
+  timeLimit: 60,      // Saniye (zamanlı mod için)
+  moveLimit: 25,      // Hamle limiti (sınırlı mod için)
+  cardCount: 16,      // Toplam kart sayısı (zorluk seviyesine göre değişir)
+  gridColumns: 4,     // Grid sütun sayısı
+  matchReward: 10,    // Eşleşme başına puan
+  mismatchPenalty: 1, // Hatalı eşleştirme cezası
+  timeBonus: 0.5,     // Kalan her saniye için bonus puan (zamanlı mod için)
+};
 
-  // Skor ve İstatistik Göstergeleri
-  const scoreDisplay = document.getElementById('score-display');
-  const timerDisplay = document.getElementById('timer-display');
-  const movesDisplay = document.getElementById('moves-display');
-  const streakDisplay = document.getElementById('streak-display');
-  const currentLevelDisplay = document.getElementById('current-level');
-  const progressBar = document.getElementById('progress-bar');
-  const progressPercent = document.getElementById('progress-percent');
-  
-  // Sonuç Göstergeleri
-  const finalScore = document.getElementById('final-score');
-  const finalMoves = document.getElementById('final-moves');
-  const finalTime = document.getElementById('final-time');
-  const ratingStars = document.getElementById('rating-stars');
-  const ratingText = document.getElementById('rating-text');
-  const gameAchievement = document.getElementById('game-achievement');
-  const achievementName = document.getElementById('achievement-name');
-  const gameResultTitle = document.getElementById('game-result-title');
-  
-  // Paylaşım Düğmeleri
-  const copyScoreBtn = document.getElementById('copy-score');
-  const shareScoreBtn = document.getElementById('share-score');
-  
-  // Oyun Durumu
-  let gameActive = false;      // Oyun aktif durumda mı?
-  let gamePaused = false;      // Oyun duraklatıldı mı?
-  let soundEnabled = true;     // Ses açık mı?
-  let difficulty = 'EASY';     // Zorluk seviyesi
-  let themeIndex = 0;          // Tema indeksi
-  let currentLevel = 1;        // Geçerli seviye
-  let score = 0;               // Toplam puan
-  let moves = 0;               // Hamle sayısı
-  let streak = 0;              // Seri doğru eşleştirme sayısı
-  let bestStreak = 0;          // En iyi seri
-  let timer = 0;               // Süre (saniye)
-  let timerInterval = null;    // Süre sayacı
-  let cards = [];              // Kart nesneleri
-  let flippedCards = [];       // Çevrilmiş kart referansları
-  let matchedPairs = 0;        // Eşleştirilmiş çift sayısı
-  let totalPairs = 0;          // Toplam çift sayısı
-  
-  // Zorluk Ayarları
-  const DIFFICULTIES = {
-    EASY: {
-      gridSize: { rows: 4, cols: 4 },
-      totalPairs: 8,
-      timeLimit: 120,
-      maxLevel: 3
-    },
-    MEDIUM: {
-      gridSize: { rows: 4, cols: 5 },
-      totalPairs: 10,
-      timeLimit: 180,
-      maxLevel: 4
-    },
-    HARD: {
-      gridSize: { rows: 5, cols: 6 },
-      totalPairs: 15,
-      timeLimit: 240,
-      maxLevel: 5
+// Oyun durumu
+const gameState = {
+  cards: [],
+  flippedCards: [],
+  matchedPairs: 0,
+  totalPairs: 0,
+  moves: 0,
+  score: 0,
+  timer: null,
+  timerValue: 0,
+  gameActive: false,
+  lockBoard: false,
+};
+
+// Tema içerikleri
+const themeContent = {
+  emoji: [
+    '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊', 
+    '😋', '😎', '😍', '😘', '🥰', '😗', '😙', '😚', '🙂', '🤗',
+    '🤩', '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥',
+    '😮', '🤐', '😯', '😪', '😫', '🥱', '😴', '😌', '😛', '😜', 
+  ],
+  animals: [
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', 
+    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦄',
+    '🦉', '🦇', '🐺', '🐗', '🐴', '🦓', '🦒', '🦌', '🦘', '🦥',
+    '🐙', '🦑', '🦞', '🦀', '🐚', '🦈', '🐬', '🐋', '🐊', '🦖',
+  ],
+  icons: [
+    'fas fa-heart', 'fas fa-star', 'fas fa-smile', 'fas fa-bolt', 'fas fa-bell',
+    'fas fa-moon', 'fas fa-sun', 'fas fa-home', 'fas fa-key', 'fas fa-trophy',
+    'fas fa-flag', 'fas fa-leaf', 'fas fa-apple-alt', 'fas fa-lemon', 'fas fa-car',
+    'fas fa-plane', 'fas fa-ship', 'fas fa-train', 'fas fa-bicycle', 'fas fa-motorcycle',
+    'fas fa-football-ball', 'fas fa-basketball-ball', 'fas fa-baseball-ball', 'fas fa-volleyball-ball', 'fas fa-table-tennis',
+    'fas fa-cloud', 'fas fa-snowflake', 'fas fa-fire', 'fas fa-meteor', 'fas fa-rainbow',
+    'fas fa-fish', 'fas fa-cat', 'fas fa-dog', 'fas fa-horse', 'fas fa-hippo',
+    'fas fa-dragon', 'fas fa-spider', 'fas fa-bug', 'fas fa-dove', 'fas fa-crow'
+  ]
+};
+
+// DOM elemanlarına referanslar
+const DOM = {
+  memoryGame: document.getElementById('memory-game'),
+  scoreDisplay: document.getElementById('score'),
+  movesOrTimeDisplay: document.getElementById('moves-or-time'),
+  movesOrTimeLabel: document.getElementById('moves-or-time-label'),
+  startGameBtn: document.getElementById('start-game'),
+  restartGameBtn: document.getElementById('restart-game'),
+  difficultyBtns: {
+    easy: document.getElementById('difficulty-easy'),
+    medium: document.getElementById('difficulty-medium'),
+    hard: document.getElementById('difficulty-hard')
+  },
+  themeBtns: {
+    emoji: document.getElementById('theme-emoji'),
+    animals: document.getElementById('theme-animals'),
+    icons: document.getElementById('theme-icons')
+  },
+  modeBtns: {
+    standard: document.getElementById('mode-standard'),
+    time: document.getElementById('mode-time'),
+    limited: document.getElementById('mode-limited')
+  },
+  gameStatusOverlay: document.getElementById('game-status-overlay'),
+  statusMessage: document.getElementById('status-message'),
+  statusDescription: document.getElementById('status-description'),
+  overlayButton: document.getElementById('overlay-button'),
+  successModal: document.getElementById('successModal'),
+  finalScore: document.getElementById('final-score'),
+  finalMoves: document.getElementById('final-moves'),
+  finalTime: document.getElementById('final-time'),
+  timeUpModal: document.getElementById('timeUpModal'),
+  timeoutScore: document.getElementById('timeout-score'),
+  matchedPairs: document.getElementById('matched-pairs'),
+  playAgainBtn: document.getElementById('play-again'),
+  timeUpPlayAgainBtn: document.getElementById('time-up-play-again')
+};
+
+// Ses efektleri için AudioContext ve gain node
+let audioContext;
+let gainNode;
+let loadSounds = false;
+
+// Ses efektlerini yükleme ve çalma
+const soundEffects = {
+  flip: {
+    play() {
+      if (!audioContext) return;
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(330, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(360, audioContext.currentTime + 0.15);
+      
+      oscillator.connect(gainNode);
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.15);
     }
-  };
-  
-  // Oyun Temaları - Her temada farklı sembol setleri
-  const THEMES = [
-    // Emoji Teması
-    ['😀', '😍', '🥳', '🤔', '😎', '🤩', '😴', '🙄', '🥶', '🥴', '🤯', '😱', '🤑', '🤠', '👻', '👽', '🤖', '👺', '🎃', '💩'],
-    // İkon Teması
-    ['♠', '♣', '♥', '♦', '★', '☂', '♫', '♪', '☀', '☁', '☾', '✿', '✈', '❤', '☎', '⌚', '⚓', '⚔', '⚽', '⛄'],
-    // Hayvan Teması
-    ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🦉', '🦆', '🐝']
-  ];
-  
-  // Olay Dinleyicileri
-  function initEventListeners() {
-    // Oyun başlatma
-    startGameBtn.addEventListener('click', startGame);
-    playAgainBtn.addEventListener('click', resetGame);
-    
-    // Duraklatma kontrolleri
-    pauseGameBtn.addEventListener('click', togglePause);
-    resumeGameBtn.addEventListener('click', togglePause);
-    restartGameBtn.addEventListener('click', restartGame);
-    
-    // Ses kontrolü
-    soundToggleBtn.addEventListener('click', toggleSound);
-    
-    // Paylaşım butonları
-    copyScoreBtn.addEventListener('click', copyScore);
-    shareScoreBtn.addEventListener('click', shareScore);
-    
-    // Zorluk seçimi
-    difficultyButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // Aktif zorluk düğmesini güncelle
-        difficultyButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
+  },
+  match: {
+    play() {
+      if (!audioContext) return;
+      const oscillator1 = audioContext.createOscillator();
+      const oscillator2 = audioContext.createOscillator();
+      
+      oscillator1.type = 'sine';
+      oscillator2.type = 'sine';
+      
+      oscillator1.frequency.setValueAtTime(440, audioContext.currentTime);
+      oscillator1.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + 0.1);
+      
+      oscillator2.frequency.setValueAtTime(440 * 1.25, audioContext.currentTime + 0.1);
+      oscillator2.frequency.exponentialRampToValueAtTime(660 * 1.25, audioContext.currentTime + 0.2);
+      
+      oscillator1.connect(gainNode);
+      oscillator2.connect(gainNode);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      
+      oscillator1.start();
+      oscillator1.stop(audioContext.currentTime + 0.1);
+      
+      oscillator2.start(audioContext.currentTime + 0.1);
+      oscillator2.stop(audioContext.currentTime + 0.2);
+    }
+  },
+  wrong: {
+    play() {
+      if (!audioContext) return;
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(110, audioContext.currentTime + 0.3);
+      
+      oscillator.connect(gainNode);
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+  },
+  success: {
+    play() {
+      if (!audioContext) return;
+      
+      const playNote = (freq, time, duration, gain) => {
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + time);
         
-        // Zorluğu ayarla
-        difficulty = this.dataset.level;
-      });
-    });
-    
-    // Tema seçimi
-    themeButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // Aktif tema düğmesini güncelle
-        themeButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
+        const noteGain = audioContext.createGain();
+        noteGain.gain.setValueAtTime(0, audioContext.currentTime + time);
+        noteGain.gain.linearRampToValueAtTime(gain, audioContext.currentTime + time + 0.05);
+        noteGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + time + duration);
         
-        // Temayı ayarla
-        themeIndex = parseInt(this.dataset.theme);
-      });
-    });
-    
-    // Pencere boyutu değiştiğinde kart boyutlarını ayarla
-    window.addEventListener('resize', function() {
-      if (gameActive) {
-        adjustCardSize();
-      }
-    });
+        oscillator.connect(noteGain);
+        noteGain.connect(gainNode);
+        
+        oscillator.start(audioContext.currentTime + time);
+        oscillator.stop(audioContext.currentTime + time + duration);
+      };
+      
+      // C chord
+      playNote(523.25, 0, 0.2, 0.3);  // C
+      playNote(659.25, 0, 0.2, 0.3);  // E
+      playNote(783.99, 0, 0.2, 0.3);  // G
+      
+      // G chord
+      playNote(392.00, 0.2, 0.2, 0.3); // G
+      playNote(493.88, 0.2, 0.2, 0.3); // B
+      playNote(587.33, 0.2, 0.2, 0.3); // D
+      
+      // Final C chord
+      playNote(523.25, 0.4, 0.4, 0.3); // C
+      playNote(659.25, 0.4, 0.4, 0.3); // E
+      playNote(783.99, 0.4, 0.4, 0.3); // G
+      playNote(1046.50, 0.4, 0.4, 0.2); // High C
+    }
+  },
+  timeUp: {
+    play() {
+      if (!audioContext) return;
+      
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = 'sawtooth';
+      
+      const gainNode2 = audioContext.createGain();
+      gainNode2.gain.setValueAtTime(0.2, audioContext.currentTime);
+      
+      oscillator.connect(gainNode2);
+      gainNode2.connect(gainNode);
+      
+      oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(110, audioContext.currentTime + 1);
+      gainNode2.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 1);
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 1);
+    }
+  }
+};
+
+// Sayfa yüklendiğinde çalışacak ana fonksiyon
+document.addEventListener('DOMContentLoaded', function() {
+  // Tüm eventListener'ları ayarla
+  setupEventListeners();
+  
+  // AudioContext'i hazırla
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.5;
+    gainNode.connect(audioContext.destination);
+    loadSounds = true;
+  } catch (e) {
+    console.error("Ses yüklenirken hata oluştu:", e);
+    loadSounds = false;
   }
   
-  // Oyunu başlat
-  function startGame() {
-    // Oyun durumunu sıfırla
-    gameActive = true;
-    flippedCards = [];
-    matchedPairs = 0;
-    currentLevel = 1;
-    score = 0;
-    moves = 0;
-    streak = 0;
-    bestStreak = 0;
-    timer = 0;
-    
-    // UI güncelle
-    hideIntro();
-    showGameContainer();
-    updateUI();
-    
-    // İlk seviyeyi başlat
-    startLevel();
-    
-    // Hata ayıklama için konsola bilgi
-    console.log(`Oyun başlatıldı. Zorluk: ${difficulty}, Tema: ${themeIndex}`);
+  // Başlangıç durumunu ayarla
+  resetGame();
+  
+  // Overlay'i göster
+  updateOverlayStatus('Hafıza Kartları', 'Kartları eşleştirerek belleğini güçlendir!', 'Başla');
+});
+
+// Event Listener'ları ayarlama
+function setupEventListeners() {
+  // Zorluk butonları
+  DOM.difficultyBtns.easy.addEventListener('click', () => selectDifficulty('easy'));
+  DOM.difficultyBtns.medium.addEventListener('click', () => selectDifficulty('medium'));
+  DOM.difficultyBtns.hard.addEventListener('click', () => selectDifficulty('hard'));
+  
+  // Tema butonları
+  DOM.themeBtns.emoji.addEventListener('click', () => selectTheme('emoji'));
+  DOM.themeBtns.animals.addEventListener('click', () => selectTheme('animals'));
+  DOM.themeBtns.icons.addEventListener('click', () => selectTheme('icons'));
+  
+  // Oyun modu butonları
+  DOM.modeBtns.standard.addEventListener('click', () => selectMode('standard'));
+  DOM.modeBtns.time.addEventListener('click', () => selectMode('time'));
+  DOM.modeBtns.limited.addEventListener('click', () => selectMode('limited'));
+  
+  // Oyun başlatma ve yeniden başlatma
+  DOM.startGameBtn.addEventListener('click', startGame);
+  DOM.restartGameBtn.addEventListener('click', restartGame);
+  DOM.overlayButton.addEventListener('click', startGame);
+  DOM.playAgainBtn.addEventListener('click', function() {
+    $(DOM.successModal).modal('hide');
+    restartGame();
+  });
+  DOM.timeUpPlayAgainBtn.addEventListener('click', function() {
+    $(DOM.timeUpModal).modal('hide');
+    restartGame();
+  });
+}
+
+// Zorluk seviyesi seçimi
+function selectDifficulty(difficulty) {
+  // Aktif sınıfını temizle
+  clearActiveClass(DOM.difficultyBtns);
+  
+  // Seçilen zorluk seviyesini aktifleştir
+  DOM.difficultyBtns[difficulty].classList.add('active');
+  
+  // Konfigürasyonu güncelle
+  gameConfig.difficulty = difficulty;
+  
+  // Kart sayısı ve grid sütunlarını ayarla
+  switch (difficulty) {
+    case 'easy':
+      gameConfig.cardCount = 16;
+      gameConfig.gridColumns = 4;
+      break;
+    case 'medium':
+      gameConfig.cardCount = 36;
+      gameConfig.gridColumns = 6;
+      break;
+    case 'hard':
+      gameConfig.cardCount = 64;
+      gameConfig.gridColumns = 8;
+      break;
+  }
+}
+
+// Tema seçimi
+function selectTheme(theme) {
+  // Aktif sınıfını temizle
+  clearActiveClass(DOM.themeBtns);
+  
+  // Seçilen temayı aktifleştir
+  DOM.themeBtns[theme].classList.add('active');
+  
+  // Konfigürasyonu güncelle
+  gameConfig.theme = theme;
+}
+
+// Oyun modu seçimi
+function selectMode(mode) {
+  // Aktif sınıfını temizle
+  clearActiveClass(DOM.modeBtns);
+  
+  // Seçilen modu aktifleştir
+  DOM.modeBtns[mode].classList.add('active');
+  
+  // Konfigürasyonu güncelle
+  gameConfig.mode = mode;
+  
+  // Mod etiketini güncelle
+  updateModeLabel(mode);
+}
+
+// Mod etiketini güncelleme
+function updateModeLabel(mode) {
+  if (mode === 'time') {
+    DOM.movesOrTimeLabel.textContent = 'Süre';
+  } else {
+    DOM.movesOrTimeLabel.textContent = 'Hamle';
+  }
+}
+
+// Aktif sınıfını temizleme
+function clearActiveClass(btnGroup) {
+  Object.values(btnGroup).forEach(btn => {
+    btn.classList.remove('active');
+  });
+}
+
+// Oyunu başlatma
+function startGame() {
+  // Ses desteğini kontrol et ve başlat
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume();
   }
   
-  // Seviyeyi başlat
-  function startLevel() {
-    // Önceki zamanlayıcıyı temizle
-    clearInterval(timerInterval);
-    
-    // Kart durumlarını sıfırla
-    flippedCards = [];
-    matchedPairs = 0;
-    
-    // UI güncelleme
-    currentLevelDisplay.textContent = currentLevel;
-    updateProgressBar();
-    
-    // Seviye parametrelerini al
-    const params = DIFFICULTIES[difficulty];
-    totalPairs = params.totalPairs;
-    
-    // Kartları oluştur
-    createCards();
-    
-    // Kart boyutlarını ayarla
-    adjustCardSize();
-    
-    // Zamanlayıcıyı sıfırla ve başlat
-    timer = 0;
-    updateTimerDisplay();
-    startTimer();
-    
-    // Başlangıç mesajı göster
-    showAlert(`Seviye ${currentLevel} Başladı!`, 'info');
-  }
+  // Overlay'i gizle
+  DOM.gameStatusOverlay.style.display = 'none';
+  
+  // Oyun durumunu sıfırla
+  resetGame();
+  
+  // Butonları güncelle
+  DOM.startGameBtn.style.display = 'none';
+  DOM.restartGameBtn.style.display = 'block';
   
   // Kartları oluştur
-  function createCards() {
-    // Kart grid'ini temizle
-    cards = [];
-    grid.innerHTML = '';
-    
-    // Zorluk ayarlarını al
-    const params = DIFFICULTIES[difficulty];
-    const { rows, cols } = params.gridSize;
-    
-    // Grid boyutunu ayarla
-    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-    
-    // Kart sayısı
-    const totalCards = rows * cols;
-    
-    // Çift sayıda kart olduğundan emin ol
-    const cardCount = totalCards - (totalCards % 2);
-    
-    // Çift sayısı (her iki kart bir çift)
-    const pairCount = cardCount / 2;
-    
-    // Seçilen temadan sembolleri al
-    const symbols = THEMES[themeIndex];
-    
-    // Kart sembolleri dizisini oluştur (her sembolden 2 adet)
-    const cardSymbols = [];
-    for (let i = 0; i < pairCount; i++) {
-      const symbol = symbols[i % symbols.length];
-      cardSymbols.push(symbol, symbol);
-    }
-    
-    // Sembolleri karıştır
-    const shuffledSymbols = shuffleArray(cardSymbols);
-    
-    // Kartları oluştur ve kart alanına ekle
-    for (let i = 0; i < cardCount; i++) {
-      // Kart elemanını oluştur
-      const card = document.createElement('div');
-      card.className = 'memory-card';
-      card.dataset.index = i;
-      
-      // Kart iç yapısı
-      const cardInner = document.createElement('div');
-      cardInner.className = 'card-inner';
-      
-      // Kart ön yüzü
-      const cardFront = document.createElement('div');
-      cardFront.className = 'card-front';
-      
-      // Kart arka yüzü
-      const cardBack = document.createElement('div');
-      cardBack.className = 'card-back';
-      cardBack.innerHTML = `<span>${shuffledSymbols[i]}</span>`;
-      
-      // Elemanları birleştir
-      cardInner.appendChild(cardFront);
-      cardInner.appendChild(cardBack);
-      card.appendChild(cardInner);
-      
-      // Kart tıklama olayı
-      card.addEventListener('click', function() {
-        flipCard(this);
-      });
-      
-      // Kart alanına ekle
-      grid.appendChild(card);
-      
-      // Kart verisini sakla
-      cards.push({
-        element: card,
-        symbol: shuffledSymbols[i],
-        isFlipped: false,
-        isMatched: false
-      });
-    }
+  createCards();
+  
+  // Oyunu aktifleştir
+  gameState.gameActive = true;
+  
+  // Mod özelliklerine göre başlat
+  if (gameConfig.mode === 'time') {
+    startTimer();
+  }
+}
+
+// Oyunu yeniden başlatma
+function restartGame() {
+  // Ses desteğini kontrol et ve başlat
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume();
   }
   
-  // Kart çevir
-  function flipCard(cardElement) {
-    // Oyun aktif değilse veya duraklatılmışsa çıkış yap
-    if (!gameActive || gamePaused) return;
-    
-    // Kart indeksini al
-    const index = parseInt(cardElement.dataset.index);
-    const card = cards[index];
-    
-    // Zaten çevrilmiş veya eşleşmiş kartları kontrol et
-    if (card.isFlipped || card.isMatched || flippedCards.length >= 2) return;
-    
-    // Kartı çevir
-    card.isFlipped = true;
-    cardElement.classList.add('flipped');
-    flippedCards.push(card);
-    
-    // Kart çevirme sesi çal
-    playSound('flip');
-    
-    // İki kart çevrildiyse kontrol et
-    if (flippedCards.length === 2) {
-      // Hamle sayısını artır
-      moves++;
-      updateMovesDisplay();
-      
-      // Kısa bir gecikme ile eşleşme kontrolü yap
-      setTimeout(checkForMatch, 600);
-    }
+  // Overlay'i gizle
+  DOM.gameStatusOverlay.style.display = 'none';
+  
+  // Oyun durumunu sıfırla
+  resetGame();
+  
+  // Butonları güncelle
+  DOM.startGameBtn.style.display = 'none';
+  DOM.restartGameBtn.style.display = 'block';
+  
+  // Kartları oluştur
+  createCards();
+  
+  // Oyunu aktifleştir
+  gameState.gameActive = true;
+  
+  // Mod özelliklerine göre başlat
+  if (gameConfig.mode === 'time') {
+    startTimer();
+  }
+}
+
+// Kartları oluşturma
+function createCards() {
+  // Oyun alanını temizle
+  DOM.memoryGame.innerHTML = '';
+  
+  // Grid sütunlarını ayarla
+  DOM.memoryGame.className = 'memory-game';
+  if (gameConfig.difficulty === 'medium') {
+    DOM.memoryGame.classList.add('medium');
+  } else if (gameConfig.difficulty === 'hard') {
+    DOM.memoryGame.classList.add('hard');
   }
   
-  // Eşleşme kontrolü
-  function checkForMatch() {
-    // İki çevrilmiş kartı al
-    const [card1, card2] = flippedCards;
+  // Çift semboller için kart sayısının yarısı kadar sembol seç
+  const totalPairs = gameConfig.cardCount / 2;
+  gameState.totalPairs = totalPairs;
+  const availableSymbols = themeContent[gameConfig.theme].slice(0, totalPairs);
+  
+  // Her sembolden 2 tane olacak şekilde kartları oluştur
+  let cardSet = [];
+  availableSymbols.forEach(symbol => {
+    // İki kart oluştur
+    for (let i = 0; i < 2; i++) {
+      cardSet.push({
+        id: symbol + i,
+        symbol: symbol,
+        matched: false
+      });
+    }
+  });
+  
+  // Kartları karıştır
+  cardSet = shuffleArray(cardSet);
+  gameState.cards = cardSet;
+  
+  // Kartları DOM'a ekle
+  cardSet.forEach((card, index) => {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'memory-card';
+    cardElement.dataset.id = card.id;
     
-    // Semboller eşleşiyor mu?
-    if (card1.symbol === card2.symbol) {
-      // Eşleşme Başarılı
-      card1.isMatched = true;
-      card2.isMatched = true;
-      
-      // Görsel geri bildirim için class ekle
-      card1.element.classList.add('matched');
-      card2.element.classList.add('matched');
-      
-      // Eşleşme sesi çal
-      playSound('match');
-      
-      // Puan hesaplama
-      streak++;
-      if (streak > bestStreak) {
-        bestStreak = streak;
-      }
-      
-      // Temel puan ve bonuslar
-      const basePoints = 50;
-      const streakBonus = streak > 1 ? streak * 10 : 0;
-      const timeBonus = Math.max(0, 100 - timer) * 0.2;
-      const pointsEarned = Math.round(basePoints + streakBonus + timeBonus);
-      
-      // Puanları ekle
-      score += pointsEarned;
-      matchedPairs++;
-      
-      // Puan animasyonu ve UI güncelleme
-      showPointsAnimation(card1.element, pointsEarned);
-      updateScoreDisplay();
-      updateStreakDisplay();
-      
-      // Tüm eşleşmeler tamamlandı mı?
-      if (matchedPairs === totalPairs) {
-        // Seviyeyi tamamla
-        setTimeout(() => {
-          completeLevel();
-        }, 1000);
-      }
+    // Kart ön yüzü
+    const cardFront = document.createElement('div');
+    cardFront.className = 'card-front';
+    
+    // Kart arka yüzü
+    const cardBack = document.createElement('div');
+    cardBack.className = 'card-back';
+    cardBack.innerHTML = '<i class="fas fa-brain"></i>';
+    
+    // İçerik konteyneri
+    const cardContent = document.createElement('div');
+    cardContent.className = 'card-content';
+    
+    // Temaya göre içerik ekle
+    if (gameConfig.theme === 'icons') {
+      cardContent.innerHTML = `<i class="${card.symbol} card-icon"></i>`;
     } else {
-      // Eşleşme Başarısız
-      card1.isFlipped = false;
-      card2.isFlipped = false;
-      
-      // Görsel geri bildirim olarak kartları geri çevir
-      card1.element.classList.remove('flipped');
-      card2.element.classList.remove('flipped');
-      
-      // Seriyi sıfırla
-      streak = 0;
-      
-      // Hata sesi çal
-      playSound('wrong');
-      
-      // UI güncelle
-      updateStreakDisplay();
+      cardContent.textContent = card.symbol;
     }
     
-    // Çevrilmiş kartları temizle
-    flippedCards = [];
+    // Ön yüze içeriği ekle
+    cardFront.appendChild(cardContent);
+    
+    // Kartı oluştur
+    cardElement.appendChild(cardFront);
+    cardElement.appendChild(cardBack);
+    
+    // Kart tıklama olayı
+    cardElement.addEventListener('click', () => flipCard(cardElement, index));
+    
+    // Oyun alanına ekle
+    DOM.memoryGame.appendChild(cardElement);
+  });
+}
+
+// Kart çevirme
+function flipCard(card, index) {
+  // Oyun aktif değilse veya board kilitliyse veya kart zaten eşleşmişse
+  if (!gameState.gameActive || gameState.lockBoard || gameState.cards[index].matched) return;
+  
+  // Aynı kartı tekrar çevirmeye çalışıyorsa
+  if (gameState.flippedCards.length === 1 && gameState.flippedCards[0].index === index) return;
+  
+  // Kartı çevir
+  card.classList.add('flip');
+  
+  // Ses efekti
+  soundEffects.flip.play();
+  
+  // Çevrilen kart bilgisini kaydet
+  gameState.flippedCards.push({ card, index });
+  
+  // İki kart çevrildiyse kontrol et
+  if (gameState.flippedCards.length === 2) {
+    // Hamle sayısını artır
+    gameState.moves++;
+    updateMovesDisplay();
+    
+    // Boardu kilitle
+    gameState.lockBoard = true;
+    
+    // Zamanlayıcıyı başlat ve eşleşme kontrolü yap
+    setTimeout(() => checkMatch(), 500);
+    
+    // Sınırlı modda hamle limitini kontrol et
+    if (gameConfig.mode === 'limited' && gameState.moves >= gameConfig.moveLimit) {
+      setTimeout(() => endGame('limit'), 1000);
+    }
+  }
+}
+
+// Eşleşme kontrolü
+function checkMatch() {
+  const [firstCard, secondCard] = gameState.flippedCards;
+  const isMatch = gameState.cards[firstCard.index].symbol === gameState.cards[secondCard.index].symbol;
+  
+  if (isMatch) {
+    // Eşleşme durumunda
+    handleMatch(firstCard, secondCard);
+  } else {
+    // Eşleşme yoksa
+    handleMismatch(firstCard, secondCard);
   }
   
-  // Puan animasyonu göster
-  function showPointsAnimation(cardElement, points) {
-    // Animasyon elementi oluştur
-    const pointsElement = document.createElement('div');
-    pointsElement.className = 'points-animation';
-    pointsElement.textContent = `+${points}`;
-    
-    // Pozisyon hesaplama
-    const rect = cardElement.getBoundingClientRect();
-    const containerRect = grid.getBoundingClientRect();
-    
-    // Pozisyonu ayarla (kart üzerinde)
-    pointsElement.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
-    pointsElement.style.top = `${rect.top - containerRect.top + rect.height / 2}px`;
-    
-    // Animasyon elementini ekle
-    grid.appendChild(pointsElement);
-    
-    // Animasyon tamamlandığında elementi kaldır
+  // Tahtayı resetle
+  resetBoard();
+}
+
+// Eşleşme durumunda yapılacaklar
+function handleMatch(firstCard, secondCard) {
+  // Kartları eşleşti olarak işaretle
+  gameState.cards[firstCard.index].matched = true;
+  gameState.cards[secondCard.index].matched = true;
+  
+  // Eşleşme sayısını artır
+  gameState.matchedPairs++;
+  
+  // Ses efekti
+  soundEffects.match.play();
+  
+  // Puanı artır
+  gameState.score += gameConfig.matchReward;
+  updateScoreDisplay();
+  
+  // Eşleşme animasyonu
+  firstCard.card.classList.add('matched');
+  secondCard.card.classList.add('matched');
+  firstCard.card.classList.add('success-animation');
+  secondCard.card.classList.add('success-animation');
+  
+  // Tüm kartlar eşleştiyse oyunu bitir
+  if (gameState.matchedPairs === gameState.totalPairs) {
     setTimeout(() => {
-      pointsElement.remove();
+      endGame('success');
     }, 1000);
   }
+}
+
+// Eşleşmeme durumunda yapılacaklar
+function handleMismatch(firstCard, secondCard) {
+  // Ses efekti
+  soundEffects.wrong.play();
   
-  // Seviyeyi tamamla
-  function completeLevel() {
-    // Zamanlayıcıyı durdur
-    clearInterval(timerInterval);
-    
-    // Bonus puanları hesapla
-    const levelBonus = currentLevel * 100;
-    const streakBonus = bestStreak * 20;
-    const movesBonus = Math.max(0, 500 - (moves * 10));
-    const timeBonus = Math.max(0, 300 - (timer * 2));
-    
-    // Toplam bonusu ekle
-    const totalBonus = levelBonus + streakBonus + movesBonus + timeBonus;
-    score += totalBonus;
-    
-    // Seviyeyi artır
-    currentLevel++;
-    
-    // Bonus mesajı göster
-    showAlert(`Seviye Tamamlandı! Bonus: +${totalBonus} Puan!`, 'success');
+  // Puanı azalt (eğer pozitifse)
+  if (gameState.score > 0) {
+    gameState.score = Math.max(0, gameState.score - gameConfig.mismatchPenalty);
     updateScoreDisplay();
+  }
+  
+  // Kartları geri çevir
+  setTimeout(() => {
+    firstCard.card.classList.remove('flip');
+    secondCard.card.classList.remove('flip');
+  }, 500);
+}
+
+// Tahtayı resetleme
+function resetBoard() {
+  // Çevrilen kartları temizle
+  gameState.flippedCards = [];
+  
+  // Tahtayı serbest bırak
+  gameState.lockBoard = false;
+}
+
+// Oyun durumunu sıfırlama
+function resetGame() {
+  // Oyun değişkenlerini sıfırla
+  gameState.cards = [];
+  gameState.flippedCards = [];
+  gameState.matchedPairs = 0;
+  gameState.totalPairs = 0;
+  gameState.moves = 0;
+  gameState.score = 0;
+  gameState.gameActive = false;
+  gameState.lockBoard = false;
+  
+  // Zamanlayıcıyı durdur
+  if (gameState.timer) {
+    clearInterval(gameState.timer);
+    gameState.timer = null;
+  }
+  
+  // Zamanlı mod için zamanı resetle
+  if (gameConfig.mode === 'time') {
+    gameState.timerValue = gameConfig.timeLimit;
+  } else {
+    gameState.timerValue = 0;
+  }
+  
+  // Ekranı güncelle
+  updateScoreDisplay();
+  updateMovesDisplay();
+}
+
+// Zamanlayıcıyı başlatma
+function startTimer() {
+  // Zamanı resetle
+  gameState.timerValue = gameConfig.timeLimit;
+  updateMovesDisplay();
+  
+  // Zamanlayıcıyı oluştur
+  gameState.timer = setInterval(() => {
+    gameState.timerValue--;
+    updateMovesDisplay();
     
-    // Seviye atlama sesi çal
-    playSound('levelUp');
-    
-    // Maksimum seviyeye ulaşıldı mı?
-    if (currentLevel > DIFFICULTIES[difficulty].maxLevel) {
-      // Oyunu bitir (Tüm seviyeler tamamlandı)
-      setTimeout(() => {
-        endGame(true);
-      }, 1500);
-    } else {
-      // Sonraki seviyeye geç
-      setTimeout(() => {
-        startLevel();
-      }, 1500);
+    // Zaman bittiyse oyunu sonlandır
+    if (gameState.timerValue <= 0) {
+      clearInterval(gameState.timer);
+      endGame('timeout');
     }
+  }, 1000);
+}
+
+// Oyunu sonlandırma
+function endGame(reason) {
+  // Oyunu pasif hale getir
+  gameState.gameActive = false;
+  
+  // Zamanlayıcıyı durdur
+  if (gameState.timer) {
+    clearInterval(gameState.timer);
+    gameState.timer = null;
   }
   
-  // Kart boyutlarını ayarla
-  function adjustCardSize() {
-    // Oyun aktif değilse çıkış yap
-    if (!gameActive) return;
+  // Sonuç modalını göster
+  if (reason === 'success') {
+    // Başarı ses efekti
+    soundEffects.success.play();
     
-    // Oyun parametrelerini al
-    const params = DIFFICULTIES[difficulty];
-    const { rows, cols } = params.gridSize;
-    
-    // Kart boyutlarını hesapla
-    const containerWidth = grid.parentElement.offsetWidth;
-    const containerHeight = Math.min(window.innerHeight * 0.6, 500);
-    
-    // Boşluk hesaba katılarak kart boyutlarını ayarla
-    const gapSize = 12; // CSS'deki grid-gap değeri
-    const cardWidth = Math.floor((containerWidth - (gapSize * (cols - 1))) / cols);
-    const cardHeight = Math.floor((containerHeight - (gapSize * (rows - 1))) / rows);
-    
-    // Kare kart için daha küçük olanı seç
-    const size = Math.min(cardWidth, cardHeight);
-    
-    // Grid içindeki tüm kartlara stili uygula
-    grid.style.width = `${cols * size + (cols - 1) * gapSize}px`;
-    grid.style.height = `${rows * size + (rows - 1) * gapSize}px`;
-  }
-  
-  // Zamanlayıcı başlat
-  function startTimer() {
-    // Önceki zamanlayıcıyı temizle
-    clearInterval(timerInterval);
-    
-    // Yeni zamanlayıcı başlat
-    timerInterval = setInterval(function() {
-      // Süreyi artır
-      timer++;
+    // Başarı modalı için verileri ayarla
+    DOM.finalScore.textContent = gameState.score;
+    DOM.finalMoves.textContent = gameState.moves;
+    DOM.finalTime.textContent = formatTime(gameConfig.mode === 'time' ? 
+      gameConfig.timeLimit - gameState.timerValue : gameState.timerValue);
       
-      // Süre göstergesini güncelle
-      updateTimerDisplay();
+    // Zamanlı modda kalan süre bonusu
+    if (gameConfig.mode === 'time' && gameState.timerValue > 0) {
+      const timeBonus = Math.round(gameState.timerValue * gameConfig.timeBonus);
+      gameState.score += timeBonus;
+      updateScoreDisplay();
       
-      // Süre limiti kontrolü
-      const timeLimit = DIFFICULTIES[difficulty].timeLimit;
-      if (timer >= timeLimit) {
-        // Süre doldu, oyunu bitir
-        clearInterval(timerInterval);
-        endGame(false);
-      }
-    }, 1000);
-  }
-  
-  // Oyunu bitir
-  function endGame(completed = false) {
-    // Oyunu durdur
-    gameActive = false;
-    clearInterval(timerInterval);
+      // Bonus bilgisi
+      DOM.finalScore.textContent = gameState.score;
+      DOM.finalTime.textContent = `${formatTime(gameConfig.timeLimit - gameState.timerValue)} (Bonus: +${timeBonus} puan)`;
+    }
     
-    // Sonuç ekranını hazırla
-    prepareResultScreen(completed);
+    // Başarı modalını göster
+    $(DOM.successModal).modal('show');
     
-    // UI güncelleme
-    hideGameContainer();
-    showGameOverScreen();
+    // Skoru kaydet
+    saveScore();
+  } else if (reason === 'timeout' || reason === 'limit') {
+    // Zaman dolduğunda
+    soundEffects.timeUp.play();
     
-    // Sonuç sesi çal
-    playSound('win');
+    // Zaman bitti modalı için verileri ayarla
+    DOM.timeoutScore.textContent = gameState.score;
+    DOM.matchedPairs.textContent = `${gameState.matchedPairs} / ${gameState.totalPairs}`;
+    
+    // Zaman bitti modalını göster
+    $(DOM.timeUpModal).modal('show');
     
     // Skoru kaydet
     saveScore();
   }
-  
-  // Sonuç ekranını hazırla
-  function prepareResultScreen(completed) {
-    // Sonuç verilerini göster
-    finalScore.textContent = score;
-    finalMoves.textContent = moves;
-    finalTime.textContent = formatTime(timer);
-    
-    // Sonuç başlığını ayarla
-    if (completed) {
-      gameResultTitle.textContent = 'Tebrikler! Tüm Seviyeleri Tamamladınız!';
-    } else {
-      gameResultTitle.textContent = 'Oyun Tamamlandı!';
-    }
-    
-    // Performans puanı hesapla
-    const timeScore = Math.max(0, 1 - (timer / (DIFFICULTIES[difficulty].timeLimit)));
-    const movesScore = Math.max(0, 1 - (moves / (totalPairs * 3)));
-    const streakScore = bestStreak / totalPairs;
-    
-    const performanceScore = (timeScore * 0.3) + (movesScore * 0.4) + (streakScore * 0.3);
-    
-    // Yıldız derecesini belirle
-    let stars = 0;
-    if (performanceScore >= 0.9) stars = 5;
-    else if (performanceScore >= 0.75) stars = 4;
-    else if (performanceScore >= 0.6) stars = 3;
-    else if (performanceScore >= 0.4) stars = 2;
-    else stars = 1;
-    
-    // Yıldızları göster
-    updateRatingStarsDisplay(stars);
-    
-    // Performans değerlendirme metni
-    const ratingTexts = ['Geliştirebilirsin', 'İyi', 'Harika', 'Mükemmel', 'Olağanüstü!'];
-    ratingText.textContent = ratingTexts[Math.min(stars - 1, 4)];
-    
-    // Başarımları kontrol et
-    checkAchievements();
+}
+
+// Overlay durumunu güncelleme
+function updateOverlayStatus(message, description, buttonText) {
+  DOM.statusMessage.textContent = message;
+  DOM.statusDescription.textContent = description;
+  DOM.overlayButton.textContent = buttonText;
+  DOM.gameStatusOverlay.style.display = 'flex';
+}
+
+// Skor ekranını güncelleme
+function updateScoreDisplay() {
+  DOM.scoreDisplay.textContent = gameState.score;
+}
+
+// Hamle/Zaman ekranını güncelleme
+function updateMovesDisplay() {
+  if (gameConfig.mode === 'time') {
+    DOM.movesOrTimeDisplay.textContent = formatTime(gameState.timerValue);
+  } else {
+    DOM.movesOrTimeDisplay.textContent = gameState.moves;
   }
-  
-  // Başarımları kontrol et
-  function checkAchievements() {
-    let achievement = null;
-    
-    // Başarım kuralları
-    if (score >= 5000) {
-      achievement = {
-        name: 'Hafıza Devi',
-        description: '5000 puan sınırını aştın!'
-      };
-    } else if (bestStreak >= 5) {
-      achievement = {
-        name: 'Akıcı Hafıza',
-        description: '5 kartı art arda eşleştirdin!'
-      };
-    } else if (currentLevel >= 5) {
-      achievement = {
-        name: 'Seviye Ustası',
-        description: '5. seviyeye ulaştın!'
-      };
-    }
-    
-    // Başarım kazanıldıysa göster
-    if (achievement) {
-      showAchievement(achievement);
-    } else {
-      gameAchievement.style.display = 'none';
-    }
+}
+
+// Zamanı formatlama
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+}
+
+// Array'i karıştırma (Fisher-Yates)
+function shuffleArray(array) {
+  const shuffled = array.slice();
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  
-  // Başarımı göster
-  function showAchievement(achievement) {
-    achievementName.textContent = achievement.name;
-    gameAchievement.style.display = 'flex';
-  }
-  
-  // Yıldız derecelendirmesini güncelle
-  function updateRatingStarsDisplay(starsCount) {
-    const stars = ratingStars.querySelectorAll('i');
-    
-    for (let i = 0; i < stars.length; i++) {
-      if (i < starsCount) {
-        stars[i].className = 'fas fa-star';
-      } else {
-        stars[i].className = 'far fa-star';
-      }
-    }
-  }
-  
-  // Skoru kaydet
-  function saveScore() {
-    // Skor 0'dan büyükse kaydet
-    if (score <= 0) return;
-    
-    // Oyun türü
-    const gameType = 'memoryCards';
-    
-    // Skoru backend'e gönder
-    console.log("Skor gönderiliyor:", score);
-    
-    fetch('/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: gameType,
-        score: score
-      })
+  return shuffled;
+}
+
+// Skoru kaydetme
+function saveScore() {
+  // API'ye skor gönder
+  fetch('/save-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      gameType: 'memoryCards',
+      score: gameState.score
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Skor başarıyla kaydedildi:', data);
-    })
-    .catch(error => {
-      console.error('Skor kaydetme hatası:', error);
-    });
-  }
-  
-  // Skoru kopyala
-  function copyScore() {
-    const scoreText = `Hafıza Kartları oyununda ${score} puan kazandım!`;
-    
-    navigator.clipboard.writeText(scoreText)
-      .then(() => {
-        showAlert('Skor panoya kopyalandı!', 'success');
-      })
-      .catch(() => {
-        showAlert('Skoru kopyalarken bir hata oluştu.', 'error');
-      });
-  }
-  
-  // Skoru paylaş
-  function shareScore() {
-    const scoreText = `Hafıza Kartları oyununda ${score} puan kazandım!`;
-    
-    // Web Share API desteğini kontrol et
-    if (navigator.share) {
-      navigator.share({
-        title: 'Hafıza Kartları Oyunu Skorumu Paylaş',
-        text: scoreText,
-        url: window.location.href
-      })
-      .then(() => {
-        showAlert('Skor başarıyla paylaşıldı!', 'success');
-      })
-      .catch(error => {
-        if (error.name !== 'AbortError') {
-          showAlert('Paylaşım sırasında bir hata oluştu.', 'error');
-        }
-      });
-    } else {
-      // Web Share API desteklenmiyorsa kopyala
-      copyScore();
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Skor kaydedilemedi');
     }
-  }
-  
-  // Oyunu sıfırla
-  function resetGame() {
-    // Oyun ekranını gizle
-    hideGameOverScreen();
-    
-    // Tekrar başlat
-    startGame();
-  }
-  
-  // Oyunu yeniden başlat
-  function restartGame() {
-    // Duraklatma menüsünü kapat
-    pauseOverlay.style.display = 'none';
-    gamePaused = false;
-    
-    // Oyunu sıfırla
-    resetGame();
-  }
-  
-  // Oyunu duraklat/devam ettir
-  function togglePause() {
-    if (!gameActive) return;
-    
-    gamePaused = !gamePaused;
-    
-    if (gamePaused) {
-      // Süre sayacını durdur
-      clearInterval(timerInterval);
-      
-      // Duraklama menüsünü göster
-      pauseOverlay.style.display = 'flex';
-    } else {
-      // Duraklama menüsünü gizle
-      pauseOverlay.style.display = 'none';
-      
-      // Süre sayacını tekrar başlat
-      startTimer();
-    }
-  }
-  
-  // Sesi aç/kapat
-  function toggleSound() {
-    soundEnabled = !soundEnabled;
-    
-    // Buton görünümünü güncelle
-    if (soundEnabled) {
-      soundToggleBtn.classList.add('active');
-      soundToggleBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    } else {
-      soundToggleBtn.classList.remove('active');
-      soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-    }
-  }
-  
-  // Ses çal
-  function playSound(soundName) {
-    // Ses kapalıysa çıkış
-    if (!soundEnabled) return;
-    
-    try {
-      // Web Audio API desteğini kontrol et
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      
-      const audioContext = new AudioContext();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      // Ses parametrelerini ayarla
-      switch(soundName) {
-        case 'flip':
-          oscillator.type = 'sine';
-          oscillator.frequency.value = 600;
-          gainNode.gain.value = 0.1;
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.start();
-          oscillator.stop(audioContext.currentTime + 0.1);
-          break;
-          
-        case 'match':
-          oscillator.type = 'sine';
-          oscillator.frequency.value = 800;
-          gainNode.gain.value = 0.2;
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.start();
-          oscillator.stop(audioContext.currentTime + 0.3);
-          break;
-          
-        case 'wrong':
-          oscillator.type = 'sine';
-          oscillator.frequency.value = 300;
-          gainNode.gain.value = 0.2;
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.start();
-          oscillator.stop(audioContext.currentTime + 0.2);
-          break;
-          
-        case 'win':
-          playSuccessSound(audioContext);
-          break;
-          
-        case 'levelUp':
-          playLevelUpSound(audioContext);
-          break;
-      }
-    } catch (error) {
-      // Ses hatası sessizce geç
-      console.log("Ses çalma hatası:", error.message);
-    }
-  }
-  
-  // Başarı sesi çal
-  function playSuccessSound(audioContext) {
-    const frequencies = [500, 700, 900];
-    const duration = 0.15;
-    
-    frequencies.forEach((freq, index) => {
-      setTimeout(() => {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.value = 0.2;
-        
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.start();
-        osc.stop(audioContext.currentTime + duration);
-      }, index * (duration * 1000));
-    });
-  }
-  
-  // Seviye atlama sesi çal
-  function playLevelUpSound(audioContext) {
-    const frequencies = [400, 600, 800];
-    const duration = 0.15;
-    
-    frequencies.forEach((freq, index) => {
-      setTimeout(() => {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.value = 0.2;
-        
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.start();
-        osc.stop(audioContext.currentTime + duration);
-      }, index * (duration * 1000));
-    });
-  }
-  
-  // Uyarı mesajı göster
-  function showAlert(message, type = 'info') {
-    // Mevcut uyarıyı temizle
-    alertContainer.innerHTML = '';
-    
-    // Yeni uyarı elementi oluştur
-    const alertElement = document.createElement('div');
-    alertElement.className = `alert-message ${type}`;
-    alertElement.textContent = message;
-    alertContainer.appendChild(alertElement);
-    
-    // Uyarıyı görünür yap
-    setTimeout(() => {
-      alertElement.classList.add('show');
-    }, 10);
-    
-    // Uyarıyı belli bir süre sonra kaldır
-    setTimeout(() => {
-      alertElement.classList.remove('show');
-      setTimeout(() => {
-        alertElement.remove();
-      }, 300);
-    }, 3000);
-  }
-  
-  // İlerleme çubuğunu güncelle
-  function updateProgressBar() {
-    if (!gameActive) return;
-    
-    // Maksimum seviyeyi al
-    const maxLevel = DIFFICULTIES[difficulty].maxLevel;
-    
-    // İlerleme yüzdesini hesapla
-    const progress = ((currentLevel - 1) / maxLevel) * 100;
-    
-    // İlerleme çubuğunu güncelle
-    progressBar.style.width = `${progress}%`;
-    progressPercent.textContent = `${Math.round(progress)}%`;
-  }
-  
-  // UI göstergelerini güncelle
-  function updateUI() {
-    updateScoreDisplay();
-    updateMovesDisplay();
-    updateTimerDisplay();
-    updateStreakDisplay();
-  }
-  
-  // Süre göstergesini güncelle
-  function updateTimerDisplay() {
-    timerDisplay.textContent = formatTime(timer);
-  }
-  
-  // Hamle göstergesini güncelle
-  function updateMovesDisplay() {
-    movesDisplay.textContent = moves;
-  }
-  
-  // Seri göstergesini güncelle
-  function updateStreakDisplay() {
-    streakDisplay.textContent = streak;
-  }
-  
-  // Skor göstergesini güncelle
-  function updateScoreDisplay() {
-    scoreDisplay.textContent = score;
-  }
-  
-  // Zamanı formatla
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
-  
-  // UI yardımcı fonksiyonları
-  function hideIntro() {
-    introSection.style.display = 'none';
-  }
-  
-  function showGameContainer() {
-    gameContainer.style.display = 'block';
-  }
-  
-  function hideGameContainer() {
-    gameContainer.style.display = 'none';
-  }
-  
-  function showGameOverScreen() {
-    gameOverContainer.style.display = 'block';
-  }
-  
-  function hideGameOverScreen() {
-    gameOverContainer.style.display = 'none';
-  }
-  
-  // Diziyi karıştır
-  function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  }
-  
-  // Başlangıç işlemleri
-  function initialize() {
-    // Olay dinleyicilerini ekle
-    initEventListeners();
-  }
-  
-  // Oyunu başlat
-  initialize();
-});
+    return response.json();
+  })
+  .then(data => {
+    console.log('Skor başarıyla kaydedildi:', data);
+  })
+  .catch(error => {
+    console.error('Skor kayıt hatası:', error);
+  });
+}
