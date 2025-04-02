@@ -1,7 +1,6 @@
+
 /**
- * Sesli Hafıza Oyunu (Audio Memory Game) - Professional CSS Styles
- * 
- * Sesli hafıza oyunu için gelişmiş modern arayüz tasarımı
+ * Sesli Hafıza Oyunu (Audio Memory Game) - Gelişmiş CSS Stilleri
  */
 
 :root {
@@ -353,6 +352,24 @@
   letter-spacing: 0.5px;
 }
 
+/* Form Switch Ayarları */
+.form-check-input {
+  height: 1.5em;
+  width: 3em;
+  cursor: pointer;
+}
+
+.form-check-input:checked {
+  background-color: var(--audio-primary);
+  border-color: var(--audio-primary);
+}
+
+.form-check-label {
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  padding-left: 5px;
+}
+
 /* Oyun Kontrolleri */
 .audio-memory-controls {
   display: flex;
@@ -553,6 +570,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.15);
   min-height: 120px;
   margin: 10px 0;
+  background: linear-gradient(145deg, #4a9bfa, #2055d0);
 }
 
 .audio-btn:hover {
@@ -582,20 +600,6 @@
   opacity: 1;
 }
 
-.audio-btn::after {
-  content: '';
-  position: absolute;
-  width: 80%;
-  height: 80%;
-  top: 10%;
-  left: 10%;
-  background-size: 60%;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.8;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-}
-
 .btn-icon {
   position: absolute;
   top: 50%;
@@ -604,42 +608,6 @@
   font-size: 2.5rem;
   color: white;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.audio-btn-1 {
-  background: linear-gradient(145deg, #fd6262, #e71d1d);
-  box-shadow: 0 10px 25px rgba(231, 29, 29, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.audio-btn-1::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z'/%3E%3C/svg%3E");
-}
-
-.audio-btn-2 {
-  background: linear-gradient(145deg, #2edb99, #05b67a);
-  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.audio-btn-2::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 16a6 6 0 0 0 6-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 0 0 6 6M6.646 4.646l.708.708c-.29.29-.58.58-.708.708-.29.29-.58.58-.708.708l-.708-.708c.29-.29.58-.58.708-.708.29-.29.58-.58.708-.708z'/%3E%3C/svg%3E");
-}
-
-.audio-btn-3 {
-  background: linear-gradient(145deg, #4a9bfa, #2055d0);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.audio-btn-3::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1z'/%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8'/%3E%3C/svg%3E");
-}
-
-.audio-btn-4 {
-  background: linear-gradient(145deg, #ffcb38, #ed8c00);
-  box-shadow: 0 10px 25px rgba(217, 119, 6, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.audio-btn-4::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8.25 1v1.5H7a.5.5 0 0 0-.5.5t.5.5H8v1.25H4.5a.5.5 0 0 0 0 1h3.5v1.25h-1A.5.5 0 0 0 6.5 8t.5.5h1v1.25H4.5a.5.5 0 0 0 0 1h3.5V12H7a.5.5 0 0 0-.5.5t.5.5h1.25v1.5h1.5v-1.5H11a.5.5 0 0 0 .5-.5t-.5-.5h-1.25v-1.25h3.5a.5.5 0 0 0 0-1h-3.5V8.5h1a.5.5 0 0 0 .5-.5t-.5-.5h-1V6.25h3.5a.5.5 0 0 0 0-1h-3.5V4H11a.5.5 0 0 0 .5-.5t-.5-.5H9.75V1z'/%3E%3C/svg%3E");
 }
 
 /* İlerleme Çubuğu */
@@ -741,67 +709,6 @@
 @keyframes button-pulse {
   0% { transform: scale(0.5); opacity: 0.8; }
   100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* Bonus puan animasyonu */
-.bonus-points {
-  position: absolute;
-  color: var(--audio-success);
-  font-weight: 700;
-  font-size: 1.5rem;
-  z-index: 10;
-  text-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
-  pointer-events: none;
-  animation: bonus-float 1.5s ease-out forwards;
-  opacity: 0;
-}
-
-@keyframes bonus-float {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-50px); opacity: 0; }
-}
-
-/* Oyun istatistikleri kutusu */
-.stats-box {
-  background: rgba(15, 23, 42, 0.8);
-  border-radius: 15px;
-  padding: 20px;
-  margin: 20px 0;
-  border: 1px solid var(--audio-border-light);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-}
-
-.stat-card {
-  background: rgba(20, 20, 40, 0.5);
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid rgba(106, 90, 224, 0.1);
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  border-color: rgba(106, 90, 224, 0.3);
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--audio-primary);
-  margin: 5px 0;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Uyarı Mesajları */
@@ -1125,6 +1032,64 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
+/* İstatistikler Kutusu */
+.stats-box {
+  background: rgba(15, 15, 30, 0.6);
+  border-radius: 18px;
+  padding: 25px;
+  margin-top: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: fade-in 0.8s ease 1.5s both;
+}
+
+.stats-box h4 {
+  color: white;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stats-box h4 i {
+  color: var(--audio-primary);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.stat-card {
+  background: rgba(20, 20, 40, 0.5);
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(106, 90, 224, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-color: rgba(106, 90, 224, 0.3);
+}
+
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--audio-primary);
+}
+
 /* Duraklat Overlay */
 .game-pause-overlay {
   position: fixed;
@@ -1293,5 +1258,11 @@
 
   .rating-text {
     font-size: 1.1rem;
+  }
+  
+  .standard-start-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px 20px;
   }
 }

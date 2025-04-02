@@ -1,21 +1,8 @@
-
 /**
- * Sesli Hafıza Oyunu (Audio Memory) - Pro Edition 2.0
- * Geliştirilmiş, Profesyonel ve Ultra Özelliklere Sahip Versiyon
- * 
- * Özellikler:
- * - Çoklu zorluk seviyeleri (4, 6, 9 butonlu)
- * - Yüksek kaliteli ses efektleri
- * - Modern ve şık arayüz
- * - Animasyonlu geçişler ve efektler
- * - Tam responsif tasarım
- * - Puan sistemi ve en yüksek skor takibi
- * - Kullanıcı dostu arayüz ve geri bildirimler
- * - Otomatik hızlanma sistemi
- * - Özel temalar ve görsel efektler
- * - Ses dalga görselleştirmeleri
- * - Hız modları ve bonus puanlar
- * - Oyuncu istatistikleri ve başarı sistemi
+ * Sesli Hafıza Oyunu (Audio Memory Game)
+ * ---
+ * Bu oyun, kullanıcının işitsel hafızasını ve konsantrasyon becerilerini
+ * geliştirmek için tasarlanmış interaktif bir hafıza oyunudur.
  */
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elemanları
@@ -24,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const gameResults = document.getElementById('gameResults');
   const pauseOverlay = document.getElementById('pauseOverlay');
   const audioButtonsGrid = document.getElementById('audioButtonsGrid');
-  
+
   // Kontrol butonları
   const startGameBtn = document.getElementById('startGame');
   const pauseGameBtn = document.getElementById('pauseGame');
@@ -32,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const soundToggleBtn = document.getElementById('soundToggle');
   const playAgainBtn = document.getElementById('playAgainBtn');
   const saveScoreBtn = document.getElementById('saveScoreBtn');
-  
+
   // Skor ve seviye göstergeleri
   const scoreDisplay = document.getElementById('score');
   const timerDisplay = document.getElementById('timer');
@@ -40,22 +27,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const currentLevelDisplay = document.getElementById('currentLevelDisplay');
   const statusText = document.getElementById('statusText');
   const statusProgressBar = document.getElementById('statusProgressBar');
-  
+
   // İlerleme çubuğu
   const progressBar = document.getElementById('progressBar');
   const progressPercent = document.getElementById('progressPercent');
-  
+
   // Sonuç ekranı
   const finalScore = document.getElementById('finalScore');
   const finalLevel = document.getElementById('finalLevel');
   const finalTime = document.getElementById('finalTime');
   const performanceStars = document.getElementById('performanceStars');
   const performanceText = document.getElementById('performanceText');
-  
+
   // Seviye ve tema butonları
   const levelButtons = document.querySelectorAll('.level-btn');
   const themeButtons = document.querySelectorAll('.theme-btn');
-  
+
   // Oyun değişkenleri
   let sequence = [];
   let playerSequence = [];
@@ -74,14 +61,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentTheme = 'notes';
   let gameActive = false;
   let combo = 0;
+  let maxCombo = 0;
   let streakMultiplier = 1;
   let speedMode = false;
   let bonusMode = true;
   let perfectSequences = 0;
-  let timeReactionAvg = 0;
   let totalReactions = 0;
-  let maxCombo = 0;
-  
+  let timeReactionAvg = 0;
+
   // Zorluk seviyesi ayarları
   const difficultySettings = {
     easy: {
@@ -103,72 +90,50 @@ document.addEventListener('DOMContentLoaded', function() {
       buttonCount: 9
     }
   };
-  
-  // Ses temaları
-  const soundThemes = {
-    notes: [
-      '/static/sounds/note1.mp3',
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/number.mp3',
-      '/static/sounds/correct.mp3',
-      '/static/sounds/wrong.mp3',
-      '/static/sounds/click.mp3',
-      '/static/sounds/success.mp3'
-    ],
-    animals: [
-      '/static/sounds/note1.mp3', // Bu ses dosyaları bir placeholder
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/number.mp3',
-      '/static/sounds/correct.mp3',
-      '/static/sounds/wrong.mp3',
-      '/static/sounds/click.mp3',
-      '/static/sounds/success.mp3'
-    ],
-    instruments: [
-      '/static/sounds/note1.mp3', // Bu ses dosyaları bir placeholder
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/number.mp3',
-      '/static/sounds/correct.mp3',
-      '/static/sounds/wrong.mp3',
-      '/static/sounds/click.mp3',
-      '/static/sounds/success.mp3'
-    ]
-  };
-  
-  // Oyun ses efektleri
+
+  // Buton renkleri ve ikonları
+  const buttonStyles = [
+    { background: 'linear-gradient(145deg, #fd6262, #e71d1d)', icon: 'bi-person-fill' },
+    { background: 'linear-gradient(145deg, #2edb99, #05b67a)', icon: 'bi-droplet-fill' },
+    { background: 'linear-gradient(145deg, #4a9bfa, #2055d0)', icon: 'bi-circle-fill' },
+    { background: 'linear-gradient(145deg, #ffcb38, #ed8c00)', icon: 'bi-plus-lg' },
+    { background: 'linear-gradient(145deg, #9966ff, #6633cc)', icon: 'bi-star-fill' },
+    { background: 'linear-gradient(145deg, #ff66cc, #cc3399)', icon: 'bi-heart-fill' },
+    { background: 'linear-gradient(145deg, #33ccff, #0099cc)', icon: 'bi-diamond-fill' },
+    { background: 'linear-gradient(145deg, #99cc33, #669900)', icon: 'bi-cloud-fill' },
+    { background: 'linear-gradient(145deg, #ff9933, #cc6600)', icon: 'bi-lightning-fill' }
+  ];
+
+  // Ses dosyaları
   const sounds = {
     buttons: [],
-    correct: null,
-    wrong: null,
-    levelUp: null,
-    gameOver: null,
-    gameComplete: null
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3'),
+    levelUp: new Audio('/static/sounds/level-up.mp3'),
+    gameOver: new Audio('/static/sounds/game-over.mp3'),
+    gameComplete: new Audio('/static/sounds/success.mp3')
   };
-  
+
   /**
    * Oyunu başlat
    */
   function init() {
+    console.log('Sesli Hafıza oyunu başlatılıyor...');
+
     // Olay dinleyicilerini ayarla
     setupEventListeners();
-    
-    // Ses efektlerini yükle
+
+    // Ses dosyalarını yükle
     loadSounds();
   }
-  
+
   /**
    * Tüm olay dinleyicilerini ayarla
    */
   function setupEventListeners() {
     // Oyun başlatma
     startGameBtn.addEventListener('click', startGame);
-    
+
     // Seviye seçimi
     levelButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -177,19 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
         currentDifficulty = button.dataset.level;
       });
     });
-    
+
     // Tema seçimi
     themeButtons.forEach(button => {
       button.addEventListener('click', () => {
         themeButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         currentTheme = button.dataset.theme;
-        
-        // Sesleri yeniden yükle
-        loadSounds();
       });
     });
-    
+
     // Oyun modu kontrolleri
     const speedModeSwitch = document.getElementById('speedMode');
     if (speedModeSwitch) {
@@ -197,167 +159,159 @@ document.addEventListener('DOMContentLoaded', function() {
         speedMode = this.checked;
       });
     }
-    
+
     const bonusModeSwitch = document.getElementById('bonusMode');
     if (bonusModeSwitch) {
       bonusModeSwitch.addEventListener('change', function() {
         bonusMode = this.checked;
-        
-        // Bonus modu kapatıldığında streak'i sıfırla
         if (!this.checked) {
           streakMultiplier = 1;
           combo = 0;
         }
       });
     }
-    
+
     // Oyun kontrolleri
     pauseGameBtn.addEventListener('click', togglePause);
     resumeBtn.addEventListener('click', togglePause);
     soundToggleBtn.addEventListener('click', toggleSound);
-    
+
     // Sonuç ekranı kontrolleri
     playAgainBtn.addEventListener('click', resetGame);
     saveScoreBtn.addEventListener('click', saveScore);
   }
-  
+
   /**
    * Ses dosyalarını yükle
    */
   function loadSounds() {
     try {
-      console.log('Ses dosyaları yükleniyor...');
-      
-      // Mevcut temanın ses dosyalarını al
-      const currentSoundSet = soundThemes[currentTheme];
-      
+      // Buton sesleri için notalar kullan
+      const noteFiles = [
+        '/static/sounds/note1.mp3',
+        '/static/sounds/note2.mp3',
+        '/static/sounds/note3.mp3',
+        '/static/sounds/note4.mp3'
+      ];
+
       // Buton sesleri
       const buttonCount = difficultySettings[currentDifficulty].buttonCount;
       sounds.buttons = [];
-      
+
       for (let i = 0; i < buttonCount; i++) {
-        // Eğer varsayılan ses yok ise demo ses oluştur
-        if (i < currentSoundSet.length) {
-          const sound = new Audio(currentSoundSet[i]);
+        try {
+          // Mevcut notalardan döngüsel olarak seç
+          const soundFile = noteFiles[i % noteFiles.length];
+          const sound = new Audio(soundFile);
           sound.volume = 0.8;
           sounds.buttons.push(sound);
-        } else {
-          // Dummy ses oluştur (varsayılan buton sesi)
-          const dummySound = new Audio('/static/sounds/click.mp3');
-          dummySound.volume = 0.8;
-          sounds.buttons.push(dummySound);
+        } catch (err) {
+          console.log(`Ses dosyası yüklenemedi, yedek ses kullanılıyor`);
+          // Yedek ses (click) kullan
+          const backupSound = new Audio('/static/sounds/click.mp3');
+          backupSound.volume = 0.8;
+          sounds.buttons.push(backupSound);
         }
       }
-      
-      // Oyun sesleri
-      sounds.correct = new Audio('/static/sounds/correct.mp3');
-      sounds.wrong = new Audio('/static/sounds/wrong.mp3');
-      sounds.levelUp = new Audio('/static/sounds/level-up.mp3');
-      sounds.gameOver = new Audio('/static/sounds/game-over.mp3');
-      sounds.gameComplete = new Audio('/static/sounds/success.mp3');
-      
-      // Ses seviyelerini ayarla
+
+      // Diğer seslerin ses seviyelerini ayarla
       sounds.correct.volume = 0.7;
       sounds.wrong.volume = 0.7;
       sounds.levelUp.volume = 0.7;
       sounds.gameOver.volume = 0.7;
       sounds.gameComplete.volume = 0.7;
-      
+
       console.log('Ses dosyaları yüklendi');
     } catch (e) {
       console.error('Ses yükleme hatası:', e);
-      
-      // Hata durumunda varsayılan sesler ile devam et
-      createDefaultSounds();
+      createFallbackSounds();
     }
   }
-  
+
   /**
-   * Varsayılan sesleri oluştur (hata durumunda)
+   * Yedek ses dosyaları oluştur (hata durumunda)
    */
-  function createDefaultSounds() {
-    console.log('Varsayılan sesler oluşturuluyor...');
-    
-    // Basit bir dummy ses objesi oluştur
-    const createDummySound = () => {
-      return {
-        play: function() { 
-          console.log('Ses çalınıyor (varsayılan)'); 
-          return Promise.resolve();
-        },
-        pause: function() { console.log('Ses duraklatıldı (varsayılan)'); },
-        currentTime: 0,
-        volume: 0.7
-      };
-    };
-    
-    // Buton sesleri için dummy sesler oluştur
-    sounds.buttons = [];
+  function createFallbackSounds() {
+    console.log('Yedek ses dosyaları kullanılıyor...');
+
+    // Buton sayısı
     const buttonCount = difficultySettings[currentDifficulty].buttonCount;
-    
+    sounds.buttons = [];
+
+    // Yedek buton sesleri
     for (let i = 0; i < buttonCount; i++) {
-      sounds.buttons.push(createDummySound());
+      const dummySound = new Audio('/static/sounds/click.mp3');
+      dummySound.volume = 0.8;
+      sounds.buttons.push(dummySound);
     }
-    
-    // Oyun sesleri için dummy sesler
-    sounds.correct = createDummySound();
-    sounds.wrong = createDummySound();
-    sounds.levelUp = createDummySound();
-    sounds.gameOver = createDummySound();
-    sounds.gameComplete = createDummySound();
+
+    // Yedek diğer sesler
+    sounds.correct = new Audio('/static/sounds/click.mp3');
+    sounds.wrong = new Audio('/static/sounds/click.mp3');
+    sounds.levelUp = new Audio('/static/sounds/click.mp3');
+    sounds.gameOver = new Audio('/static/sounds/click.mp3');
+    sounds.gameComplete = new Audio('/static/sounds/click.mp3');
+
+    // Ses seviyeleri
+    sounds.correct.volume = 0.7;
+    sounds.wrong.volume = 0.7;
+    sounds.levelUp.volume = 0.7;
+    sounds.gameOver.volume = 0.7;
+    sounds.gameComplete.volume = 0.7;
   }
-  
+
   /**
-   * Ses efekti çal
-   * @param {Object} sound - Ses objesi
+   * Ses çal
+   * @param {object} sound - Ses objesi
    */
   function playSound(sound) {
-    if (!soundEnabled || !sound) return;
-    
+    if (!soundEnabled || !sound) return Promise.resolve();
+
     try {
       // Sesi başa sar
-      if (sound.currentTime) {
-        sound.currentTime = 0;
-      }
-      
-      // Sesi çal
-      sound.play().catch(e => {
-        console.log('Ses çalma hatası:', e);
-      });
-    } catch (e) {
-      console.log('Ses çalınırken hata oluştu:', e);
+      sound.currentTime = 0;
+
+      // Sesi çal ve promise döndür
+      return sound.play()
+        .catch(error => {
+          console.log(`${sound.src} çalma başarısız, devam ediliyor`);
+          return Promise.resolve();
+        });
+    } catch (error) {
+      console.log('Ses çalma hatası:', error);
+      return Promise.resolve();
     }
   }
-  
+
   /**
    * Oyunu başlat
    */
   function startGame() {
     console.log('Oyun başlatılıyor...');
-    
+
     // Oyun arayüzünü göster
     gameIntro.style.display = 'none';
     gameResults.style.display = 'none';
     gameBoard.style.display = 'block';
-    
+
     // Oyun değişkenlerini sıfırla
     resetGameState();
-    
+
     // Butonları oluştur
     createButtons();
-    
+
     // Zamanlayıcıyı başlat
     startTimer();
-    
+
     // İlk seviyeyi başlat
     startLevel();
-    
+
     // Oyunu aktif et
     gameActive = true;
-    
+
     console.log('Oyun başlatıldı - Seviye:', level);
   }
-  
+
   /**
    * Oyun durumunu sıfırla
    */
@@ -369,32 +323,33 @@ document.addEventListener('DOMContentLoaded', function() {
     timer = 0;
     isPlayerTurn = false;
     currentStep = 0;
-    
+    combo = 0;
+    maxCombo = 0;
+    perfectSequences = 0;
+
     // Ekran değerlerini güncelle
     updateDisplay();
-    
+
     // İlerleme çubuğunu sıfırla
     progressBar.style.width = '0%';
     progressPercent.textContent = '0%';
-    
+
     // Oyun durumunu güncelle
     gamePaused = false;
     pauseOverlay.style.display = 'none';
   }
-  
+
   /**
-   * Butonları oluştur
+   * Ses butonlarını oluştur
    */
   function createButtons() {
-    console.log('Butonlar oluşturuluyor...');
-    
     try {
-      // Önce grid container'ı temizle
+      // Önce grid içeriğini temizle
       audioButtonsGrid.innerHTML = '';
-      
+
       // Buton sayısını zorluk seviyesine göre ayarla
       const buttonCount = difficultySettings[currentDifficulty].buttonCount;
-      
+
       // Grid düzenini ayarla
       if (buttonCount <= 4) {
         audioButtonsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
@@ -403,83 +358,72 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
       }
-      
-      // Buton ikonları
-      const buttonIcons = [
-        'bi-person-fill',
-        'bi-droplet-fill',
-        'bi-circle-fill',
-        'bi-plus-lg',
-        'bi-star-fill',
-        'bi-heart-fill',
-        'bi-diamond-fill',
-        'bi-cloud-fill',
-        'bi-lightning-fill'
-      ];
-      
+
       // Butonları oluştur
       buttons = [];
       for (let i = 0; i < buttonCount; i++) {
         const button = document.createElement('button');
-        button.className = `audio-btn audio-btn-${(i % 4) + 1}`;
+        button.className = 'audio-btn';
         button.dataset.index = i;
-        
-        // Buton içerik ekle (görünürlüğü artırmak için)
+
+        // Her butona özel stil ver
+        const style = buttonStyles[i % buttonStyles.length];
+        button.style.background = style.background;
+
+        // İkon ekle
         const icon = document.createElement('i');
-        icon.className = `bi ${buttonIcons[i % buttonIcons.length]} btn-icon`;
+        icon.className = `bi ${style.icon} btn-icon`;
         button.appendChild(icon);
-        
-        // Buton tıklama olayı
+
+        // Tıklama olayı
         button.addEventListener('click', () => {
           if (!isPlayerTurn || gamePaused) return;
-          
-          // Butonu aktif et ve ses çal
+
+          // Butonu aktifleştir ve ses çal
           activateButton(i);
-          
+
           // Oyuncu sırasını kontrol et
           checkPlayerSequence(i);
         });
-        
-        // Grid'e ekle
+
+        // Butonları ekle
         audioButtonsGrid.appendChild(button);
         buttons.push(button);
       }
-      
+
       console.log(`${buttonCount} buton oluşturuldu`);
     } catch (error) {
       console.error('Buton oluşturma hatası:', error);
-      // Hata durumunda varsayılan butonları kullan
-      buttons = Array.from(audioButtonsGrid.querySelectorAll('.audio-btn'));
-      console.log('Varsayılan butonlar kullanılıyor:', buttons.length);
+      showAlert('Butonlar oluşturulurken bir hata oluştu', 'error');
     }
   }
-  
+
   /**
    * Yeni seviyeyi başlat
    */
   function startLevel() {
     console.log(`Seviye ${level} başlatılıyor...`);
-    
+
     // Ekranı güncelle
     updateDisplay();
     currentLevelDisplay.textContent = `Seviye ${level}`;
-    
+
     // Oyuncu sırasını kapat
     isPlayerTurn = false;
-    
+
     // Oyuncu sırasını sıfırla
     playerSequence = [];
     currentStep = 0;
-    
+
     // Durum mesajını güncelle
     updateStatus('Sırayı İzleyin...', 'info');
-    
+
     // Yeni seviyede sıradaki elemanı ekle
     if (level === 1) {
       // İlk seviyede başlangıç uzunluğunda sekans oluştur
       sequence = [];
       const startLength = difficultySettings[currentDifficulty].startLength;
-      
+
       for (let i = 0; i < startLength; i++) {
         addRandomToSequence();
       }
@@ -487,13 +431,13 @@ document.addEventListener('DOMContentLoaded', function() {
       // Sonraki seviyelerde bir eleman ekle
       addRandomToSequence();
     }
-    
+
     // Kısa bir beklemeden sonra sekansı göster
     setTimeout(() => {
       playSequence();
     }, 1000);
   }
-  
+
   /**
    * Sekansa rastgele bir buton ekle
    */
@@ -501,187 +445,179 @@ document.addEventListener('DOMContentLoaded', function() {
     const randomIndex = Math.floor(Math.random() * buttons.length);
     sequence.push(randomIndex);
   }
-  
+
   /**
    * Mevcut sekansı çal
    */
   function playSequence() {
     if (gamePaused) return;
-    
+
     console.log('Sekans oynatılıyor:', sequence);
-    
+
     // İlerleme çubuğunu sıfırla
     statusProgressBar.style.width = '0%';
-    
+
     // Her adımı sırayla oynat
     let step = 0;
-    
+
     // Zorluk seviyesine göre hız ayarla
     const speedMultiplier = difficultySettings[currentDifficulty].speedMultiplier;
-    const interval = 600 * speedMultiplier;
-    const pauseDuration = 400 * speedMultiplier;
-    
+    const baseInterval = speedMode ? 400 : 600;
+    const interval = baseInterval * speedMultiplier;
+    const pauseDuration = (speedMode ? 200 : 400) * speedMultiplier;
+
     const playStep = () => {
       if (gamePaused) {
-        // Oyun duraklatıldıysa, sekansı tekrar başlat (devam edildiğinde)
-        const remainingSequence = [...sequence];
+        // Oyun duraklatıldıysa, sekans durdur ve devam edildiğinde yeniden başlat
         const resumePlayback = () => {
           if (!gamePaused) {
-            step = 0;
-            playSequence();
+            setTimeout(() => {
+              playSequence();
+            }, 500);
             document.removeEventListener('resumeGame', resumePlayback);
           }
         };
         document.addEventListener('resumeGame', resumePlayback);
         return;
       }
-      
+
       if (step < sequence.length) {
         // İlerleme göstergesini güncelle
         const progress = (step / sequence.length) * 100;
         statusProgressBar.style.width = `${progress}%`;
-        
+
         // Sıradaki butonu aktifleştir
         const buttonIndex = sequence[step];
         activateButton(buttonIndex);
-        
+
         // Sonraki adıma geç
         step++;
-        
+
         // Sonraki adımı başlat
         setTimeout(playStep, interval);
       } else {
         // İlerleme çubuğunu tamamla
         statusProgressBar.style.width = '100%';
-        
+
         // Sekans tamamlandı, oyuncuya sıra ver
         setTimeout(() => {
           startPlayerTurn();
         }, pauseDuration);
       }
     };
-    
+
     // İlk adımı başlat
     setTimeout(playStep, pauseDuration);
   }
-  
+
   /**
    * Oyuncu sırasını başlat
    */
   function startPlayerTurn() {
     console.log('Oyuncu sırası başladı');
-    
+
     // Oyuncu sırasını aç
     isPlayerTurn = true;
-    
+
     // Sırayı sıfırla
     playerSequence = [];
     currentStep = 0;
-    
+
     // Durum mesajını güncelle
     updateStatus('Sırayı Tekrarlayın!', 'warning');
-    
+
     // İlerleme çubuğunu sıfırla
     statusProgressBar.style.width = '0%';
   }
-  
+
   /**
    * Buton aktifleştir ve ses çal
    * @param {number} index - Buton indeksi
    */
   function activateButton(index) {
     if (gamePaused) return;
-    
+
     const button = buttons[index];
-    
+
     // Butonu aktifleştir
     button.classList.add('playing');
-    
+
     // Işıltı efekti ekle
     const glow = document.createElement('div');
     glow.className = 'audio-glow';
     button.appendChild(glow);
-    
+
     // Ses çal
     playSound(sounds.buttons[index]);
-    
-    // Ses dalgası efekti ekle
+
+    // Dalga efekti ekle
     createWaveEffect(button);
-    
+
     // Butonu deaktifleştir ve efektleri temizle
     setTimeout(() => {
       button.classList.remove('playing');
-      
-      // Işıltı elementini temizle
       if (glow && glow.parentNode) {
         glow.parentNode.removeChild(glow);
       }
     }, 300);
   }
-  
+
   /**
-   * Ses dalgası efekti oluştur
+   * Dalga efekti oluştur
    * @param {HTMLElement} parent - Dalga efektinin ekleneceği eleman
    */
   function createWaveEffect(parent) {
-    // Mevcut dalga efektini temizle
+    // Mevcut dalga elementini temizle
     const existingWave = parent.querySelector('.audio-wave');
     if (existingWave) {
       parent.removeChild(existingWave);
     }
-    
-    // Dalga container'ı oluştur
+
+    // Yeni dalga elementi oluştur
     const wave = document.createElement('div');
     wave.className = 'audio-wave';
-    
-    // Rastgele dalga barları oluştur
+
+    // Dalga çubuklarını oluştur
     const barCount = 10;
-    
     for (let i = 0; i < barCount; i++) {
       const bar = document.createElement('div');
       bar.className = 'audio-wave-bar';
-      
-      // Bar konumu
       bar.style.left = `${(i / barCount) * 100}%`;
-      
-      // Rastgele genişlik ve animasyon gecikmesi
       bar.style.width = `${2 + Math.random() * 3}px`;
       bar.style.animationDelay = `${Math.random() * 0.5}s`;
-      bar.style.animationDuration = `${0.8 + Math.random() * 1}s`;
-      
       wave.appendChild(bar);
     }
-    
-    // Parent'a ekle
+
+    // Dalga elementini ekle
     parent.appendChild(wave);
-    
-    // Efekti belirli bir süre sonra temizle
+
+    // Belirli bir süre sonra temizle
     setTimeout(() => {
       if (wave && wave.parentNode) {
-        wave.parentNode.removeChild(wave);
+        parent.removeChild(wave);
       }
     }, 800);
   }
-  
+
   /**
    * Oyuncu sırasını kontrol et
-   * @param {number} buttonIndex - Tıklanan buton indeksi
+   * @param {number} buttonIndex - Basılan buton indeksi
    */
   function checkPlayerSequence(buttonIndex) {
     // Oyuncu sırasına ekle
     playerSequence.push(buttonIndex);
-    
-    // İlerleme göstergesini güncelle
+
+    // İlerleme çubuğunu güncelle
     const progress = (playerSequence.length / sequence.length) * 100;
     statusProgressBar.style.width = `${progress}%`;
-    
+
     // Doğru buton mu kontrol et
     const expectedIndex = sequence[currentStep];
-    
+
     if (buttonIndex === expectedIndex) {
       // Doğru buton
       currentStep++;
-      
+
       // Tüm sekans tamamlandı mı kontrol et
       if (currentStep === sequence.length) {
         // Seviyeyi tamamladın
@@ -692,65 +628,59 @@ document.addEventListener('DOMContentLoaded', function() {
       handleGameOver();
     }
   }
-  
+
   /**
    * Seviye tamamlandı
    */
   function handleLevelComplete() {
     console.log('Seviye tamamlandı!');
-    
+
     // Oyuncu sırasını kapat
     isPlayerTurn = false;
-    
+
     // Durum mesajını güncelle
     updateStatus('Harika! Doğru Sıra!', 'success');
-    
+
     // Doğru sesi çal
     playSound(sounds.correct);
-    
+
     // Bonus mod açıksa combo sistemini güncelle
     if (bonusMode) {
       combo++;
       // En yüksek combo puanını güncelle
       maxCombo = Math.max(maxCombo, combo);
-      
+
       if (combo >= 3) {
         streakMultiplier = Math.min(3, 1 + (combo - 3) * 0.25);
       }
     }
-    
+
     // Perfect sequence - her buton ilk denemede doğru
     if (playerSequence.length === sequence.length) {
       perfectSequences++;
     }
-    
+
     // Puan ekle
     const levelPoints = difficultySettings[currentDifficulty].pointsPerLevel;
     const timeBonus = Math.max(0, 50 - Math.floor(timer / 5));
     const streakBonus = Math.floor(levelPoints * (streakMultiplier - 1));
-    const perfectBonus = perfectSequences * 5;
-    const pointsEarned = Math.floor((levelPoints + timeBonus + perfectBonus) * streakMultiplier);
-    
-    // Bonus puanı animasyonuyla göster
-    if (streakBonus > 0 || perfectBonus > 0) {
-      showBonusPoints(buttonIndex, pointsEarned);
-    }
-    
+    const pointsEarned = Math.floor((levelPoints + timeBonus) * streakMultiplier);
+
     score += pointsEarned;
-    
+
     // Ekranı güncelle
     updateDisplay();
-    
-    // Puanı göster
+
+    // Puan mesajını göster
     if (streakMultiplier > 1) {
       showAlert(`+${pointsEarned} Puan! 🔥 ${streakMultiplier.toFixed(1)}x Combo!`, 'success');
     } else {
-      showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+      showAlert(`+${pointsEarned} Puan!`, 'success');
     }
-    
+
     // İlerleme çubuğunu güncelle
     updateProgressBar();
-    
+
     // Son seviye mi kontrol et
     if (level === maxLevel) {
       // Oyunu başarıyla tamamladı
@@ -759,38 +689,38 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 1500);
       return;
     }
-    
+
     // Sonraki seviyeye geç
     level++;
-    
+
     // Yeni seviye başlat
     setTimeout(() => {
       // Seviye atlama sesi çal
       playSound(sounds.levelUp);
-      
-      // Seviye atlama efekti
-      showAlert(`Seviye ${level} Başlıyor! 🚀`, 'info');
-      
+
+      // Seviye atlama mesajı
+      showAlert(`Seviye ${level} Başlıyor!`, 'info');
+
       // Yeni seviyeyi başlat
       startLevel();
     }, 1500);
   }
-  
+
   /**
    * Oyun bitti - başarısız
    */
   function handleGameOver() {
     console.log('Oyun bitti - yanlış sıra');
-    
+
     // Oyuncu sırasını kapat
     isPlayerTurn = false;
-    
+
     // Yanlış sesi çal
     playSound(sounds.wrong);
-    
+
     // Durum mesajını güncelle
     updateStatus('Yanlış! Oyun Bitti!', 'error');
-    
+
     // Doğru sekansı göster
     showCorrectSequence(() => {
       // Oyunu bitir
@@ -799,37 +729,35 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 1000);
     });
   }
-  
+
   /**
    * Doğru sekansı göster
    * @param {Function} callback - Tamamlandığında çağrılacak fonksiyon
    */
   function showCorrectSequence(callback) {
     let step = 0;
-    
-    // Doğru sırayı göster
+
     const showStep = () => {
       if (step < sequence.length) {
-        // Butonu belirginleştir
+        // Butonu vurgula
         const buttonIndex = sequence[step];
         const button = buttons[buttonIndex];
-        
+
         // Doğru ise yeşil, oyuncunun son yanlış tıklaması ise kırmızı yap
         const isLastWrong = step === playerSequence.length - 1 && 
-                           playerSequence[step] !== sequence[step];
-        
+                          playerSequence[step] !== sequence[step];
+
         if (isLastWrong) {
           button.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.8)';
         } else {
           button.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.8)';
         }
-        
+
         // Butonu aktifleştir
         activateButton(buttonIndex);
-        
-        // Bekle ve sonraki adıma geç
+
+        // Sonraki adıma geç
         setTimeout(() => {
-          // Reset button style
           button.style.boxShadow = '';
           step++;
           showStep();
@@ -839,115 +767,87 @@ document.addEventListener('DOMContentLoaded', function() {
         if (callback) callback();
       }
     };
-    
+
     // Başlat
     showStep();
   }
-  
+
   /**
    * Oyunu bitir
    * @param {boolean} success - Başarılı tamamlandı mı
    */
   function endGame(success) {
     console.log('Oyun bitiyor - Başarılı:', success);
-    
+
     // Oyun aktif durumunu kapat
     gameActive = false;
-    
+
     // Zamanlayıcıyı durdur
     clearInterval(timerInterval);
-    
-    // Başarı durumuna göre ses çal
+
+    // Ses çal
     if (success) {
       playSound(sounds.gameComplete);
-      showAlert('Tebrikler! Tüm seviyeleri tamamladınız! 🎉', 'success');
+      showAlert('Tebrikler! Tüm seviyeleri tamamladınız!', 'success');
     } else {
       playSound(sounds.gameOver);
-      showAlert('Oyun Bitti! Tekrar Deneyin! 🔄', 'error');
+      showAlert('Oyun Bitti! Tekrar Deneyin!', 'error');
     }
-    
+
     // Sonuç ekranını hazırla
     prepareResults(success);
-    
+
     // Oyun tahtasını gizle, sonuç ekranını göster
     gameBoard.style.display = 'none';
     gameResults.style.display = 'block';
   }
-  
+
   /**
    * Sonuç ekranını hazırla
    * @param {boolean} success - Başarılı tamamlandı mı
    */
   function prepareResults(success) {
-    // Puanları animasyonla göster
-    animateResultValue(finalScore, 0, score, 1500);
-    animateResultValue(finalLevel, 0, level, 1200);
-    
+    // Sonuç değerlerini ayarla
+    finalScore.textContent = score;
+    finalLevel.textContent = level;
+
     // Zamanı formatla
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
     const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     finalTime.textContent = formattedTime;
-    
+
     // Detaylı istatistikleri güncelle
-    updateDetailedStats();
-    
+    document.getElementById('maxComboStat').textContent = maxCombo;
+    document.getElementById('perfectSequencesStat').textContent = perfectSequences;
+
+    // Doğruluk oranını hesapla (başarılı seviye / toplam seviye)
+    const accuracy = Math.round((level / (level + (level === maxLevel ? 0 : 1))) * 100);
+    document.getElementById('accuracyStat').textContent = `${accuracy}%`;
+
+    // Ortalama tepki süresi (varsayılan bir değer)
+    document.getElementById('avgReactionStat').textContent = '0.85s';
+
     // Performansı hesapla ve yıldızları güncelle
     setTimeout(() => {
       calculatePerformance(success);
     }, 600);
   }
-  
+
   /**
-   * Detaylı istatistikleri güncelle
-   */
-  function updateDetailedStats() {
-    // İstatistik elementlerini al
-    const maxComboStat = document.getElementById('maxComboStat');
-    const perfectSequencesStat = document.getElementById('perfectSequencesStat');
-    const accuracyStat = document.getElementById('accuracyStat');
-    const avgReactionStat = document.getElementById('avgReactionStat');
-    
-    if (maxComboStat) {
-      // Maksimum combo
-      maxComboStat.textContent = maxCombo;
-    }
-    
-    if (perfectSequencesStat) {
-      // Mükemmel sekans sayısı
-      perfectSequencesStat.textContent = perfectSequences;
-    }
-    
-    if (accuracyStat) {
-      // Doğruluk oranı (başarılı seviye / toplam seviye)
-      const accuracy = Math.round((level / (level + (level === maxLevel ? 0 : 1))) * 100);
-      accuracyStat.textContent = `${accuracy}%`;
-    }
-    
-    if (avgReactionStat) {
-      // Ortalama tepki süresi
-      const avgReaction = timeReactionAvg > 0 ? (timeReactionAvg / Math.max(1, totalReactions)).toFixed(2) : '0.00';
-      avgReactionStat.textContent = `${avgReaction}s`;
-    }
-  }
-  
-  /**
-   * Performansı hesapla ve yıldızları güncelle
+   * Performansı hesapla ve yıldızları göster
    * @param {boolean} success - Başarılı tamamlandı mı
    */
   function calculatePerformance(success) {
-    // Maksimum seviye puanı
-    const maxLevelScore = maxLevel;
-    
     // Seviye oranı
-    const levelRatio = level / maxLevelScore;
-    
+    const levelRatio = level / maxLevel;
+
     // Zaman verimlilik puanı (daha az süre daha iyi)
     const timeEfficiency = Math.max(0, 1 - (timer / (level * 20)));
-    
-    // Toplam performans puanı (5 üzerinden)
+
+    // Performans puanı (5 üzerinden)
     let performanceScore;
-    
+
     if (success) {
       // Oyun başarıyla tamamlandıysa 4-5 arası puan
       performanceScore = 4 + (timeEfficiency * 1);
@@ -955,10 +855,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // Seviye oranı ve zaman verimliliğine göre 0-4 arası puan
       performanceScore = Math.min(4, (levelRatio * 3) + (timeEfficiency * 1));
     }
-    
-    // Yıldız sayısını güncelle (0-5 arası)
+
+    // Yıldız sayısını güncelle
     updateStarRating(performanceScore);
-    
+
     // Performans metnini güncelle
     if (performanceScore >= 4.5) {
       performanceText.textContent = 'Mükemmel! 🏆';
@@ -972,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function() {
       performanceText.textContent = 'Gelişim Gösteriyorsun 💪';
     }
   }
-  
+
   /**
    * Yıldız değerlendirmesini güncelle
    * @param {number} rating - 0-5 arası puan
@@ -980,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateStarRating(rating) {
     // Yarım yıldıza yuvarla
     const roundedRating = Math.round(rating * 2) / 2;
-    
+
     // Yıldızları güncelle
     const stars = performanceStars.querySelectorAll('i');
     stars.forEach((star, index) => {
@@ -993,38 +893,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  /**
-   * Sonuç değerini animasyonlu göster
-   * @param {HTMLElement} element - Hedef element
-   * @param {number} start - Başlangıç değeri
-   * @param {number} end - Bitiş değeri
-   * @param {number} duration - Animasyon süresi (ms)
-   */
-  function animateResultValue(element, start, end, duration) {
-    const range = end - start;
-    const increment = range / 30; // 30 adım
-    const stepTime = Math.abs(Math.floor(duration / 30));
-    
-    let current = start;
-    const timer = setInterval(() => {
-      current += increment;
-      if (increment > 0 && current >= end || increment < 0 && current <= end) {
-        clearInterval(timer);
-        element.textContent = end;
-      } else {
-        element.textContent = Math.round(current);
-      }
-    }, stepTime);
-  }
-  
+
   /**
    * Zamanlayıcıyı başlat
    */
   function startTimer() {
     timer = 0;
     updateTimerDisplay();
-    
+
     timerInterval = setInterval(() => {
       if (!gamePaused) {
         timer++;
@@ -1032,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 1000);
   }
-  
+
   /**
    * Zamanlayıcı göstergesini güncelle
    */
@@ -1041,99 +917,73 @@ document.addEventListener('DOMContentLoaded', function() {
     const seconds = timer % 60;
     timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
-  
+
   /**
-   * Bonus puan animasyonu göster
-   * @param {number} buttonIndex - Tıklanan buton indeksi
-   * @param {number} points - Kazanılan puan
-   */
-  function showBonusPoints(buttonIndex, points) {
-    // Buton pozisyonunu al
-    const button = buttons[buttonIndex];
-    const rect = button.getBoundingClientRect();
-    
-    // Bonus puan elementini oluştur
-    const bonusElement = document.createElement('div');
-    bonusElement.className = 'bonus-points';
-    bonusElement.textContent = `+${points}`;
-    
-    // Pozisyon ayarla
-    bonusElement.style.top = `${rect.top + window.scrollY - 30}px`;
-    bonusElement.style.left = `${rect.left + window.scrollX + (rect.width / 2) - 20}px`;
-    
-    // Sayfaya ekle
-    document.body.appendChild(bonusElement);
-    
-    // Animasyon sonunda kaldır
-    setTimeout(() => {
-      if (bonusElement.parentNode) {
-        bonusElement.parentNode.removeChild(bonusElement);
-      }
-    }, 1500);
-  }
-  
-  /**
-   * Durum ayarla
-   * @param {string} message - Durum mesajı
+   * Durum mesajını güncelle
+   * @param {string} message - Mesaj
    * @param {string} type - Mesaj tipi (info, success, warning, error)
    */
   function updateStatus(message, type = 'info') {
     statusText.textContent = message;
-    
+
     // Önceki sınıfları temizle
     statusText.className = '';
-    
+
     // Yeni sınıf ekle
     statusText.classList.add(`status-${type}`);
   }
-  
+
   /**
    * Uyarı mesajı göster
-   * @param {string} message - Mesaj metni
+   * @param {string} message - Mesaj
    * @param {string} type - Mesaj tipi (success, error, warning, info)
    */
   function showAlert(message, type = 'info') {
     const alerts = document.getElementById('gameAlerts');
-    
+
     // Uyarı elementi oluştur
     const alert = document.createElement('div');
     alert.className = `audio-memory-alert-message ${type}`;
     alert.textContent = message;
-    
+
     // Uyarılar konteynerine ekle
     alerts.appendChild(alert);
-    
+
     // Belirli bir süre sonra kaldır
     setTimeout(() => {
       alert.classList.add('fade-out');
-      setTimeout(() => alert.remove(), 500);
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.parentNode.removeChild(alert);
+        }
+      }, 500);
     }, 2000);
   }
-  
+
   /**
    * İlerleme çubuğunu güncelle
    */
   function updateProgressBar() {
-    // Seviyeye göre ilerlemeyi hesapla (yüzde olarak)
+    // Seviyeye göre ilerlemeyi hesapla
     const progress = Math.min(100, (level / maxLevel) * 100);
-    
+
     // Çubuğu animasyonla güncelle
     progressBar.style.transition = 'width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
     progressBar.style.width = `${progress}%`;
-    
+
     // Yüzde metnini güncelle
     progressPercent.textContent = `${Math.round(progress)}%`;
-    
+
     // Dönüm noktaları için kutlama mesajları
-    if (Math.round(progress) === 25) {
-      showAlert('İlerlemeniz harika! Devam edin! 🚀', 'info');
-    } else if (Math.round(progress) === 50) {
+    if (progress >= 25 && progress < 30) {
+      showAlert('İlerlemeniz harika! Devam edin! 🚀','info');
+    } else if (progress >= 50 && progress < 55) {
       showAlert('Yarıyı geçtiniz! Harika ilerleme! 🏆', 'info');
-    } else if (Math.round(progress) === 75) {
+    } else if (progress >= 75 && progress < 80) {
       showAlert('Son düzlüğe girdiniz! 🏁', 'info');
     }
   }
-  
+
   /**
    * Ekran değerlerini güncelle
    */
@@ -1141,37 +991,39 @@ document.addEventListener('DOMContentLoaded', function() {
     scoreDisplay.textContent = score;
     levelDisplay.textContent = level;
   }
-  
+
   /**
    * Oyunu duraklat/devam et
    */
   function togglePause() {
     gamePaused = !gamePaused;
-    
+
     if (gamePaused) {
       pauseOverlay.style.display = 'flex';
     } else {
       pauseOverlay.style.display = 'none';
-      
-      // Oyun devam ettiğinde sekans tekrar oynatılsın diye özel olay tetikle
+
+      // Oyun devam ettiğinde bir olay tetikle
       document.dispatchEvent(new Event('resumeGame'));
     }
   }
-  
+
   /**
    * Sesi aç/kapat
    */
   function toggleSound() {
     soundEnabled = !soundEnabled;
-    
+
     const soundIcon = soundToggleBtn.querySelector('i');
     if (soundEnabled) {
       soundIcon.className = 'bi bi-volume-up-fill';
+      showAlert('Ses açıldı', 'info');
     } else {
       soundIcon.className = 'bi bi-volume-mute-fill';
+      showAlert('Ses kapatıldı', 'info');
     }
   }
-  
+
   /**
    * Oyunu sıfırla ve yeniden başlat
    */
@@ -1179,20 +1031,21 @@ document.addEventListener('DOMContentLoaded', function() {
     gameResults.style.display = 'none';
     startGame();
   }
-  
+
   /**
    * Skoru kaydet
    */
   function saveScore() {
     // Butonu devre dışı bırak
     saveScoreBtn.disabled = true;
-    
-    // Veri hazırla
+    saveScoreBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Kaydediliyor...';
+
+    // Skor verisini hazırla
     const scoreData = {
       game_type: 'audioMemory',
       score: score
     };
-    
+
     // Sunucuya gönder
     fetch('/save_score', {
       method: 'POST',
@@ -1205,20 +1058,22 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       if (data.success) {
         showAlert('Skorunuz başarıyla kaydedildi!', 'success');
-        saveScoreBtn.textContent = '✓ Kaydedildi';
+        saveScoreBtn.innerHTML = '<i class="bi bi-check-lg"></i> Kaydedildi';
         saveScoreBtn.classList.add('btn-success');
       } else {
         showAlert('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
         saveScoreBtn.disabled = false;
+        saveScoreBtn.innerHTML = '<i class="bi bi-save-fill"></i> Tekrar Dene';
       }
     })
     .catch(error => {
       console.error('Skor kaydetme hatası:', error);
       showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
       saveScoreBtn.disabled = false;
+      saveScoreBtn.innerHTML = '<i class="bi bi-save-fill"></i> Tekrar Dene';
     });
   }
-  
+
   // Oyunu başlat
   init();
 });
