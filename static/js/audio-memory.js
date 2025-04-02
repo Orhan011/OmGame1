@@ -89,37 +89,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
   
-  // Ses temaları
+  // Ses temaları - hem ana dizin hem alt dizin desteği
   const soundThemes = {
     electronic: [
-      '/static/sounds/note1.mp3',
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/note5.mp3',
-      '/static/sounds/note6.mp3',
-      '/static/sounds/note7.mp3',
-      '/static/sounds/note8.mp3'
+      '/static/sounds/audio-memory/note1.mp3',
+      '/static/sounds/audio-memory/note2.mp3',
+      '/static/sounds/audio-memory/note3.mp3',
+      '/static/sounds/audio-memory/note4.mp3',
+      '/static/sounds/audio-memory/note5.mp3',
+      '/static/sounds/audio-memory/note6.mp3',
+      '/static/sounds/audio-memory/note7.mp3',
+      '/static/sounds/audio-memory/note8.mp3'
     ],
     musical: [
-      '/static/sounds/note1.mp3',
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/note5.mp3',
-      '/static/sounds/note6.mp3',
-      '/static/sounds/note7.mp3',
-      '/static/sounds/note8.mp3'
+      '/static/sounds/audio-memory/note1.mp3',
+      '/static/sounds/audio-memory/note2.mp3',
+      '/static/sounds/audio-memory/note3.mp3',
+      '/static/sounds/audio-memory/note4.mp3',
+      '/static/sounds/audio-memory/note5.mp3',
+      '/static/sounds/audio-memory/note6.mp3',
+      '/static/sounds/audio-memory/note7.mp3',
+      '/static/sounds/audio-memory/note8.mp3'
     ],
     drums: [
-      '/static/sounds/note1.mp3',
-      '/static/sounds/note2.mp3',
-      '/static/sounds/note3.mp3',
-      '/static/sounds/note4.mp3',
-      '/static/sounds/note5.mp3',
-      '/static/sounds/note6.mp3',
-      '/static/sounds/note7.mp3',
-      '/static/sounds/note8.mp3'
+      '/static/sounds/audio-memory/note1.mp3',
+      '/static/sounds/audio-memory/note2.mp3',
+      '/static/sounds/audio-memory/note3.mp3',
+      '/static/sounds/audio-memory/note4.mp3',
+      '/static/sounds/audio-memory/note5.mp3',
+      '/static/sounds/audio-memory/note6.mp3',
+      '/static/sounds/audio-memory/note7.mp3',
+      '/static/sounds/audio-memory/note8.mp3'
     ]
   };
 
@@ -139,11 +139,26 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Ses dosyaları yükleniyor...');
       
       // UI sesleri
-      sounds.correct = new Audio('/static/sounds/correct.mp3');
-      sounds.wrong = new Audio('/static/sounds/wrong.mp3');
-      sounds.levelUp = new Audio('/static/sounds/level-up.mp3');
-      sounds.gameOver = new Audio('/static/sounds/game-over.mp3');
-      sounds.gameComplete = new Audio('/static/sounds/success.mp3');
+      // Ana dizinden yüklemeyi dene, başarısız olursa alt dizinden yüklemeyi dene
+      try {
+        sounds.correct = new Audio('/static/sounds/correct.mp3');
+        sounds.wrong = new Audio('/static/sounds/wrong.mp3');
+        sounds.levelUp = new Audio('/static/sounds/level-up.mp3');
+        sounds.gameOver = new Audio('/static/sounds/game-over.mp3');
+        sounds.gameComplete = new Audio('/static/sounds/success.mp3');
+      } catch (e) {
+        console.warn('Ana dizinden ses yükleme başarısız, alt dizinden deneniyor...');
+        try {
+          sounds.correct = new Audio('/static/sounds/audio-memory/correct.mp3');
+          sounds.wrong = new Audio('/static/sounds/audio-memory/wrong.mp3');
+          sounds.levelUp = new Audio('/static/sounds/audio-memory/level-up.mp3');
+          sounds.gameOver = new Audio('/static/sounds/audio-memory/game-over.mp3');
+          sounds.gameComplete = new Audio('/static/sounds/audio-memory/success.mp3');
+        } catch (innerE) {
+          console.error('Ses yükleme hatası, varsayılan sesler kullanılacak:', innerE);
+          createFallbackSounds();
+        }
+      }
       
       // Ses seviyelerini ayarla
       sounds.correct.volume = 0.7;
@@ -175,14 +190,54 @@ document.addEventListener('DOMContentLoaded', function() {
       // Her kutu için ses yükle
       for (let i = 0; i < tileCount; i++) {
         if (i < currentSoundSet.length) {
-          const sound = new Audio(currentSoundSet[i]);
-          sound.volume = 0.8;
-          sounds.tiles.push(sound);
+          try {
+            // Önce normal yoldan yüklemeyi dene
+            const sound = new Audio(currentSoundSet[i]);
+            sound.volume = 0.8;
+            sounds.tiles.push(sound);
+          } catch (noteError) {
+            console.warn(`Not ${i+1} ana dizinden yüklenemedi, alternatif konumları deneniyor...`);
+            try {
+              // Alt dizinden yüklemeyi dene
+              const altPath = currentSoundSet[i].replace('/static/sounds/', '/static/sounds/audio-memory/');
+              const sound = new Audio(altPath);
+              sound.volume = 0.8;
+              sounds.tiles.push(sound);
+            } catch (innerError) {
+              console.error(`Not ${i+1} yüklenemedi, varsayılan ses kullanılıyor`, innerError);
+              // Varsayılan ses
+              const dummySound = {
+                play: function() { console.log(`Kutucuk ${i+1} sesi çalınıyor (varsayılan)`); return Promise.resolve(); },
+                pause: function() { console.log('Ses durduruldu'); },
+                currentTime: 0,
+                volume: 0.8
+              };
+              sounds.tiles.push(dummySound);
+            }
+          }
         } else {
           // Ses temasında yeterli ses yoksa varsayılan ses kullan
-          const fallbackSound = new Audio('/static/sounds/note1.mp3');
-          fallbackSound.volume = 0.8;
-          sounds.tiles.push(fallbackSound);
+          try {
+            const fallbackSound = new Audio('/static/sounds/note1.mp3');
+            fallbackSound.volume = 0.8;
+            sounds.tiles.push(fallbackSound);
+          } catch (fbError) {
+            console.warn('Varsayılan ses 1 yüklenemedi, alternatif dizin deneniyor');
+            try {
+              const fallbackSound = new Audio('/static/sounds/audio-memory/note1.mp3');
+              fallbackSound.volume = 0.8;
+              sounds.tiles.push(fallbackSound);
+            } catch (innerFBError) {
+              console.error('Varsayılan ses de yüklenemedi, sessiz nesne kullanılıyor');
+              const dummySound = {
+                play: function() { console.log(`Kutucuk ${i+1} sesi çalınıyor (varsayılan)`); return Promise.resolve(); },
+                pause: function() { console.log('Ses durduruldu'); },
+                currentTime: 0,
+                volume: 0.8
+              };
+              sounds.tiles.push(dummySound);
+            }
+          }
         }
       }
     } catch (e) {
@@ -1119,20 +1174,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Ses çal
+  // Ses çal - güçlendirilmiş
   function playSound(sound) {
     if (!soundEnabled || !sound) return;
     
     try {
-      // Sesi başa sar
-      if (sound.currentTime) {
-        sound.currentTime = 0;
+      // Geçerli bir Audio nesnesi mi kontrol et
+      if (sound instanceof Audio) {
+        // Sesi başa sar
+        if (sound.currentTime !== undefined) {
+          sound.currentTime = 0;
+        }
+        
+        // Sesi çal
+        sound.play().catch(e => {
+          console.log('Ses çalma hatası:', e);
+          // Hata durumunda alternatif çalma yöntemi
+          if (sound.src) {
+            try {
+              // Yeni bir ses nesnesi oluştur ve çal
+              const tempSound = new Audio(sound.src);
+              tempSound.volume = sound.volume || 0.7;
+              tempSound.play().catch(innerE => {
+                console.log('Alternatif ses çalma hatası:', innerE);
+              });
+            } catch (altError) {
+              console.error('Alternatif ses çalma başarısız:', altError);
+            }
+          }
+        });
+      } else if (sound.play && typeof sound.play === 'function') {
+        // Custom ses nesnesi (kendi oluşturduğumuz)
+        sound.play();
+      } else {
+        console.warn('Geçersiz ses nesnesi, çalınamıyor:', sound);
       }
-      
-      // Sesi çal
-      sound.play().catch(e => {
-        console.log('Ses çalma hatası:', e);
-      });
     } catch (e) {
       console.error('Ses çalma hatası:', e);
     }
@@ -1148,6 +1224,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function saveScore() {
     // Butonu devre dışı bırak
     saveScoreBtn.disabled = true;
+    saveScoreBtn.textContent = 'Kaydediliyor...';
     
     // Veri hazırla
     const scoreData = {
@@ -1155,13 +1232,33 @@ document.addEventListener('DOMContentLoaded', function() {
       score: score
     };
     
-    // Sunucuya gönder
-    fetch('/save_score', {
+    console.log('Skor kaydediliyor:', scoreData);
+    
+    // API URL doğru mu kontrol et
+    let apiUrl = '/api/save-score';
+    
+    // İlk önce /api/save-score'u dene, başarısız olursa /save_score'u dene
+    fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(scoreData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.warn('İlk API endpoint başarısız, alternatif deneniyor');
+        // İlk endpoint başarısız olursa alternatif endpoint'i dene
+        apiUrl = '/save_score';
+        return fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(scoreData)
+        });
+      }
+      return response;
     })
     .then(response => response.json())
     .then(data => {
@@ -1170,13 +1267,15 @@ document.addEventListener('DOMContentLoaded', function() {
         saveScoreBtn.textContent = '✓ Kaydedildi';
         saveScoreBtn.classList.add('btn-success');
       } else {
-        showAlert('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+        showAlert('Skor kaydedilemedi: ' + (data.message || 'Bilinmeyen hata'), 'error');
+        saveScoreBtn.textContent = 'Tekrar Dene';
         saveScoreBtn.disabled = false;
       }
     })
     .catch(error => {
       console.error('Skor kaydetme hatası:', error);
       showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+      saveScoreBtn.textContent = 'Tekrar Dene';
       saveScoreBtn.disabled = false;
     });
   }
