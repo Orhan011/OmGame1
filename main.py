@@ -628,7 +628,8 @@ def word_puzzle():
 
 @app.route('/games/memory-match')
 def memory_match():
-    return render_template('games/memory_match.html')
+    # Eski Hafıza Kartları oyunu artık kullanılmıyor, yeni sürüme yönlendir
+    return redirect(url_for('memory_cards'))
 
 @app.route('/games/labyrinth')
 def labyrinth():
