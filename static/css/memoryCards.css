@@ -5,9 +5,9 @@
  */
 
 :root {
-  --memory-card-size: 90px;
-  --memory-card-font-size: 2.5rem;
-  --memory-animation-time: 0.5s;
+  --memory-card-size: 110px;
+  --memory-card-font-size: 3.5rem;
+  --memory-animation-time: 0.6s;
   
   /* Game colors */
   --memory-primary: #6a5ae0;
@@ -446,12 +446,12 @@
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 15px;
+  border-radius: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: var(--memory-card-font-size);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   overflow: hidden;
 }
@@ -460,36 +460,40 @@
   background: var(--memory-front-bg);
   transform: rotateY(180deg);
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  text-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
 }
 
 .memory-card__back {
-  background: var(--memory-card-back);
+  background: linear-gradient(145deg, #7a6aff, #483dc0);
   color: transparent;
-  border: 2px solid rgba(106, 90, 224, 0.3);
+  border: 3px solid rgba(106, 90, 224, 0.4);
   position: relative;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.35);
 }
 
 .memory-card__back::before {
-  content: '?';
+  content: '';
   position: absolute;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 2rem;
-  font-weight: 700;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 60%;
+  height: 60%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'%3E%3C/path%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
 }
 
 .memory-card__back::after {
   content: '';
   position: absolute;
-  width: 160%;
-  height: 160%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-  top: -30%;
-  left: -30%;
+  width: 180%;
+  height: 180%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05));
+  top: -40%;
+  left: -40%;
   transform: rotate(35deg);
-  transition: all 0.5s ease;
+  transition: all 0.6s ease;
 }
 
 .memory-card:hover .memory-card__back::after {

@@ -53,13 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let soundEnabled = true;
   let currentLevel = 'easy';
   let currentTheme = 'animals';
-  let gridSize = 4; // 4x4 default
+  let rows = 3; // Default rows
+  let cols = 4; // Default columns
   
   // Game configuration
   const levelConfig = {
-    easy: { gridSize: 4, timeBonus: 500, movePenalty: 2 },
-    medium: { gridSize: 6, timeBonus: 750, movePenalty: 1 },
-    hard: { gridSize: 8, timeBonus: 1000, movePenalty: 0.5 }
+    easy: { rows: 3, cols: 4, timeBonus: 500, movePenalty: 2 },
+    medium: { rows: 3, cols: 6, timeBonus: 750, movePenalty: 1 },
+    hard: { rows: 3, cols: 10, timeBonus: 1000, movePenalty: 0.5 }
   };
   
   // Theme configuration with emojis
@@ -128,7 +129,8 @@ document.addEventListener('DOMContentLoaded', function() {
         levelButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         currentLevel = button.dataset.level;
-        gridSize = levelConfig[currentLevel].gridSize;
+        rows = levelConfig[currentLevel].rows;
+        cols = levelConfig[currentLevel].cols;
       });
     });
     
@@ -186,11 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear previous cards
     memoryGrid.innerHTML = '';
     
-    // Set grid columns based on grid size
-    memoryGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    // Set grid columns based on columns count
+    memoryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     
     // Determine number of pairs needed
-    totalPairs = (gridSize * gridSize) / 2;
+    totalPairs = (rows * cols) / 2;
     
     // Get symbols for current theme
     const themeSymbols = themes[currentTheme];
