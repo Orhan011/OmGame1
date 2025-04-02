@@ -447,36 +447,6 @@ document.addEventListener('DOMContentLoaded', function() {
         waveContainer.appendChild(bar);
       }
 
-      // İkon veya sembol ekle (minimal stil)
-      const icon = document.createElement('i');
-      icon.className = 'bi bi-music-note';
-      icon.style.position = 'absolute';
-      icon.style.top = '50%';
-      icon.style.left = '50%';
-      icon.style.transform = 'translate(-50%, -50%)';
-      icon.style.fontSize = '2rem';
-      icon.style.color = 'rgba(255, 255, 255, 0.9)';
-      icon.style.zIndex = '1';
-      icon.style.opacity = '0.7';
-      icon.style.transition = 'all 0.3s ease';
-      icon.style.pointerEvents = 'none';
-      icon.style.textShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-
-      // Dalga çubukları oluştur (statik kutular için)
-      for (let j = 0; j < 5; j++) {
-        const bar = document.createElement('div');
-        bar.className = 'audio-wave-bar';
-        bar.style.left = `${(j / 4) * 80 + 10}%`;
-        bar.style.animationDelay = `${j * 0.1}s`;
-        bar.style.width = '4px';
-        bar.style.opacity = '0';
-        waveContainer.appendChild(bar);
-      }
-
-      // İçerikleri tile'a ekle
-      tile.appendChild(icon);
-      tile.appendChild(waveContainer);
-
       // Kutucuğa tıklama olayı
       tile.addEventListener('click', () => {
         if (!isPlayerTurn || gamePaused) return;
