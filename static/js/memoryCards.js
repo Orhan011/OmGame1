@@ -1,491 +1,694 @@
 /**
- * Hafıza Kartları Oyunu - Memory Cards Game
+ * Hafıza Kartları (Memory Card Game)
  * 
- * Yeniden düzenlenmiş ve iyileştirilmiş versiyon
- * Oyun 3 farklı zorluk seviyesinde (kolay, orta, zor) oynanabilir ve
- * farklı temalar (hayvanlar, meyveler, emojiler, şekiller) sunar.
+ * Profesyonel ve interaktif hafıza kartları oyunu
+ * Gelişmiş özellikler: Farklı temalar, zorluk seviyeleri, ipuçları ve puan sistemi
  */
-
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM elementleri
-  const memoryBoard = document.getElementById('memory-board');
-  const timerElement = document.getElementById('timer');
-  const movesElement = document.getElementById('moves');
-  const scoreElement = document.getElementById('score');
-  const easyModeBtn = document.getElementById('easy-mode');
-  const mediumModeBtn = document.getElementById('medium-mode');
-  const hardModeBtn = document.getElementById('hard-mode');
-  const themeSelect = document.getElementById('theme-select');
-  const restartBtn = document.getElementById('restart-game');
-  const gameEndModal = document.getElementById('game-end-modal');
-  const endTimerElement = document.getElementById('end-timer');
-  const endMovesElement = document.getElementById('end-moves');
-  const endScoreElement = document.getElementById('end-score');
-  const playAgainBtn = document.getElementById('play-again');
-  const saveScoreBtn = document.getElementById('save-score');
-
-  // Oyun değişkenleri
+  // DOM Elements
+  const gameIntro = document.getElementById('gameIntro');
+  const gameBoard = document.getElementById('gameBoard');
+  const gameResults = document.getElementById('gameResults');
+  const pauseOverlay = document.getElementById('pauseOverlay');
+  const memoryGrid = document.getElementById('memoryGrid');
+  const startGameBtn = document.getElementById('startGame');
+  const pauseGameBtn = document.getElementById('pauseGame');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const soundToggleBtn = document.getElementById('soundToggle');
+  const hintBtn = document.getElementById('hintBtn');
+  const playAgainBtn = document.getElementById('playAgainBtn');
+  const saveScoreBtn = document.getElementById('saveScoreBtn');
+  
+  // Game display elements
+  const scoreDisplay = document.getElementById('score');
+  const timerDisplay = document.getElementById('timer');
+  const movesDisplay = document.getElementById('moves');
+  const progressBar = document.getElementById('progressBar');
+  const progressPercent = document.getElementById('progressPercent');
+  const currentThemeDisplay = document.getElementById('currentTheme');
+  const hintCounter = document.querySelector('.hint-counter');
+  
+  // Result elements
+  const finalScore = document.getElementById('finalScore');
+  const finalTime = document.getElementById('finalTime');
+  const finalMoves = document.getElementById('finalMoves');
+  const performanceStars = document.getElementById('performanceStars');
+  const performanceText = document.getElementById('performanceText');
+  
+  // Level buttons
+  const levelButtons = document.querySelectorAll('.level-btn:not(.theme-btn)');
+  const themeButtons = document.querySelectorAll('.theme-btn');
+  
+  // Game state variables
   let cards = [];
-  let hasFlippedCard = false;
-  let lockBoard = false;
-  let firstCard, secondCard;
+  let flippedCards = [];
+  let matchedPairs = 0;
+  let totalPairs = 0;
   let moves = 0;
   let score = 0;
-  let matches = 0;
-  let totalPairs = 0;
-  let timer;
-  let seconds = 0;
-  let gameMode = 'easy'; // varsayılan: kolay
-  let gameTheme = 'animals'; // varsayılan: hayvanlar
-
-  // Tema sembollerini tanımla - tüm semboller Unicode olduğundan emin olundu
-  const themeSymbols = {
-    animals: [
-      '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', 
-      '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦒'
-    ],
-    fruits: [
-      '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓',
-      '🍒', '🍑', '🍍', '🥝', '🍅', '🥑', '🍆', '🥕'
-    ],
-    emojis: [
-      '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
-      '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰'
-    ],
-    shapes: [
-      '⭐', '⚡', '☁️', '❄️', '⚽', '🔥', '🌈', '🌙',
-      '💧', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫'
-    ]
+  let hintsLeft = 3;
+  let timer = 0;
+  let timerInterval;
+  let gamePaused = false;
+  let soundEnabled = true;
+  let currentLevel = 'easy';
+  let currentTheme = 'animals';
+  let rows = 3; // Default rows
+  let cols = 4; // Default columns
+  
+  // Game configuration
+  const levelConfig = {
+    easy: { rows: 3, cols: 4, timeBonus: 500, movePenalty: 2 },
+    medium: { rows: 3, cols: 6, timeBonus: 750, movePenalty: 1 },
+    hard: { rows: 3, cols: 10, timeBonus: 1000, movePenalty: 0.5 }
   };
-
-  // Seviyeye göre kart sayısını belirle
-  const gameModes = {
-    easy: { pairs: 6, layout: '3x4' },     // 12 kart, 6 çift
-    medium: { pairs: 9, layout: '3x6' },   // 18 kart, 9 çift
-    hard: { pairs: 15, layout: '3x10' }    // 30 kart, 15 çift
+  
+  // Theme configuration with emojis
+  const themes = {
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🦋', '🐝', '🐙', '🦑', '🦈', '🐊', '🦓', '🦒', '🦔', '🐘', '🦍', '🐆', '🦬', '🦥', '🐦', '🦅'],
+    fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥦', '🥬', '🧄', '🧅', '🍄', '🥜', '🌰', '🥐'],
+    emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨'],
+    shapes: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🔺', '🔻', '💠', '🔷', '🔶', '🔹', '🔸', '♠️', '♥️', '♦️', '♣️', '🎴', '🃏', '🀄', '🎭', '🎯', '🎲', '🎮', '🎰', '🧩', '🎪', '🎨', '🎺']
   };
-
-  // Varsayılan oyun modunu ayarla
-  initializeGame();
-
+  
+  // Audio effects
+  const sounds = {
+    flip: new Audio('/static/sounds/card-flip.mp3'),
+    match: new Audio('/static/sounds/match.mp3'),
+    noMatch: new Audio('/static/sounds/no-match.mp3'),
+    gameComplete: new Audio('/static/sounds/game-complete.mp3'),
+    hint: new Audio('/static/sounds/hint.mp3')
+  };
+  
   /**
-   * Oyunu başlat ve ayarla
+   * Initialize game sounds with placeholder paths, files will be created later
    */
-  function initializeGame() {
-    resetGame();
-    setupModeButtons();
-    setupThemeSelector();
-    setupRestartButton();
-    setupModalButtons();
-    createCards();
-    startTimer();
-  }
-
-  /**
-   * Seçilen tema ve zorluk seviyesine göre kartları oluştur
-   */
-  function createCards() {
-    memoryBoard.innerHTML = '';
-    memoryBoard.className = `memory-board ${gameMode}-mode`;
-    
-    // Zorluk seviyesine göre çift sayısını belirle
-    const pairCount = gameModes[gameMode].pairs;
-    totalPairs = pairCount;
-    
-    // Tema sembollerinden rastgele seç
-    const selectedSymbols = [...themeSymbols[gameTheme]];
-    const gameSymbols = selectedSymbols
-      .sort(() => 0.5 - Math.random())
-      .slice(0, pairCount);
-    
-    // Her sembolden 2 adet olmak üzere kart dizisini oluştur
-    cards = [...gameSymbols, ...gameSymbols];
-    
-    // Kartları karıştır
-    cards.sort(() => 0.5 - Math.random());
-    
-    // Kartları ekrana ekle
-    cards.forEach((symbol, index) => {
-      const card = createCardElement(symbol, index);
-      memoryBoard.appendChild(card);
+  function initSounds() {
+    // Set volume for all sounds
+    Object.values(sounds).forEach(sound => {
+      sound.volume = 0.5;
+      
+      // Create a placeholder for missing sounds
+      sound.onerror = function() {
+        this.src = 'data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAGA...';
+        console.log('Sound file not found, using placeholder');
+      };
     });
   }
-
+  
   /**
-   * Tek bir kart elementini oluştur
+   * Play a sound effect if sound is enabled
+   * @param {string} soundName - The name of the sound to play
    */
-  function createCardElement(symbol, index) {
-    // Ana kart container
+  function playSound(soundName) {
+    if (soundEnabled && sounds[soundName]) {
+      sounds[soundName].currentTime = 0;
+      sounds[soundName].play().catch(e => console.log('Sound play error:', e));
+    }
+  }
+  
+  /**
+   * Initialize the game
+   */
+  function init() {
+    initSounds();
+    setupEventListeners();
+    updateHintDisplay();
+  }
+  
+  /**
+   * Set up all event listeners
+   */
+  function setupEventListeners() {
+    // Start game button
+    startGameBtn.addEventListener('click', startGame);
+    
+    // Level selection
+    levelButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        levelButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentLevel = button.dataset.level;
+        rows = levelConfig[currentLevel].rows;
+        cols = levelConfig[currentLevel].cols;
+      });
+    });
+    
+    // Theme selection
+    themeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        themeButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentTheme = button.dataset.theme;
+        currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
+      });
+    });
+    
+    // Game controls
+    pauseGameBtn.addEventListener('click', togglePause);
+    resumeBtn.addEventListener('click', togglePause);
+    soundToggleBtn.addEventListener('click', toggleSound);
+    hintBtn.addEventListener('click', useHint);
+    
+    // Result actions
+    playAgainBtn.addEventListener('click', resetGame);
+    saveScoreBtn.addEventListener('click', saveScore);
+  }
+  
+  /**
+   * Start the game
+   */
+  function startGame() {
+    // Hide intro, show game board
+    gameIntro.style.display = 'none';
+    gameResults.style.display = 'none';
+    gameBoard.style.display = 'block';
+    
+    // Reset game state
+    resetGameState();
+    
+    // Generate cards
+    generateCards();
+    
+    // Start timer
+    startTimer();
+    
+    // Update theme display
+    currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
+    
+    // Show game board with animation
+    gameBoard.classList.add('animate__animated', 'animate__fadeIn');
+    setTimeout(() => gameBoard.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
+  }
+  
+  /**
+   * Generate memory cards based on current settings
+   */
+  function generateCards() {
+    // Clear previous cards
+    memoryGrid.innerHTML = '';
+    
+    // Set grid columns based on columns count
+    memoryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    
+    // Determine number of pairs needed
+    totalPairs = (rows * cols) / 2;
+    
+    // Get symbols for current theme
+    const themeSymbols = themes[currentTheme];
+    
+    // Create pairs array
+    const pairs = [];
+    for (let i = 0; i < totalPairs; i++) {
+      // Use modulo to cycle through available symbols if we need more than we have
+      const symbolIndex = i % themeSymbols.length;
+      pairs.push(themeSymbols[symbolIndex]);
+      pairs.push(themeSymbols[symbolIndex]);
+    }
+    
+    // Shuffle the pairs
+    const shuffledPairs = shuffleArray(pairs);
+    
+    // Create card elements
+    cards = [];
+    shuffledPairs.forEach((symbol, index) => {
+      const card = createCard(index, symbol);
+      memoryGrid.appendChild(card);
+      cards.push(card);
+    });
+  }
+  
+  /**
+   * Create a single card element
+   * @param {number} id - Card unique identifier
+   * @param {string} symbol - Card symbol/emoji
+   * @returns {HTMLElement} - The card DOM element
+   */
+  function createCard(id, symbol) {
     const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.index = index;
+    card.className = 'memory-card';
+    card.dataset.id = id;
     card.dataset.symbol = symbol;
     
-    // Ön yüz (kapalı durum)
-    const cardFront = document.createElement('div');
-    cardFront.classList.add('card-face', 'card-front');
+    const frontFace = document.createElement('div');
+    frontFace.className = 'memory-card__front';
+    frontFace.textContent = symbol;
     
-    // Arka yüz (açık durum - sembolün görüneceği)
-    const cardBack = document.createElement('div');
-    cardBack.classList.add('card-face', 'card-back');
+    const backFace = document.createElement('div');
+    backFace.className = 'memory-card__back';
     
-    // Sembol içeriği
-    const cardContent = document.createElement('div');
-    cardContent.classList.add('card-content');
-    cardContent.innerHTML = symbol;
-    cardBack.appendChild(cardContent);
+    card.appendChild(frontFace);
+    card.appendChild(backFace);
     
-    // Kartın ön ve arka yüzlerini ekle
-    card.appendChild(cardFront);
-    card.appendChild(cardBack);
-    
-    // Tıklama olayını ekle
+    // Add click event
     card.addEventListener('click', flipCard);
     
     return card;
   }
-
+  
   /**
-   * Kartı çevirme işlemi
+   * Handle card flip
+   * @param {Event} e - Click event
    */
-  function flipCard() {
-    // Kilitliyse veya aynı karta tekrar tıklandıysa işlem yapma
-    if (lockBoard) return;
-    if (this === firstCard) return;
+  function flipCard(e) {
+    // Ignore if game is paused
+    if (gamePaused) return;
     
-    // Kartı çevir
-    this.classList.add('flipped');
+    const card = e.currentTarget;
     
-    if (!hasFlippedCard) {
-      // İlk kart çevrildi
-      hasFlippedCard = true;
-      firstCard = this;
+    // Ignore if the card is already flipped or matched
+    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    
+    // Ignore if two cards are already flipped
+    if (flippedCards.length === 2) return;
+    
+    // Play flip sound
+    playSound('flip');
+    
+    // Flip the card
+    card.classList.add('flipped');
+    flippedCards.push(card);
+    
+    // Check for match if two cards are flipped
+    if (flippedCards.length === 2) {
+      moves++;
+      movesDisplay.textContent = moves;
+      checkForMatch();
+    }
+  }
+  
+  /**
+   * Check if the two flipped cards match
+   */
+  function checkForMatch() {
+    const [firstCard, secondCard] = flippedCards;
+    
+    // Get symbols from cards
+    const firstSymbol = firstCard.dataset.symbol;
+    const secondSymbol = secondCard.dataset.symbol;
+    
+    // Check if symbols match
+    if (firstSymbol === secondSymbol) {
+      handleMatch(firstCard, secondCard);
+    } else {
+      handleMismatch(firstCard, secondCard);
+    }
+  }
+  
+  /**
+   * Handle matching cards
+   * @param {HTMLElement} firstCard - First card element
+   * @param {HTMLElement} secondCard - Second card element
+   */
+  function handleMatch(firstCard, secondCard) {
+    // Mark cards as matched
+    firstCard.classList.add('matched', 'match-animation');
+    secondCard.classList.add('matched', 'match-animation');
+    
+    // Play match sound
+    playSound('match');
+    
+    // Calculate points (base + time bonus)
+    const basePoints = 10;
+    const timeBonus = Math.max(0, levelConfig[currentLevel].timeBonus - timer);
+    const pointsEarned = basePoints + Math.floor(timeBonus / 10);
+    
+    // Update score
+    score += pointsEarned;
+    scoreDisplay.textContent = score;
+    
+    // Show success message
+    showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+    
+    // Increase matched pairs
+    matchedPairs++;
+    
+    // Update progress
+    updateProgress();
+    
+    // Reset flipped cards
+    flippedCards = [];
+    
+    // Check if game is complete
+    if (matchedPairs === totalPairs) {
+      setTimeout(endGame, 1000);
+    }
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      firstCard.classList.remove('match-animation');
+      secondCard.classList.remove('match-animation');
+    }, 600);
+  }
+  
+  /**
+   * Handle mismatched cards
+   * @param {HTMLElement} firstCard - First card element
+   * @param {HTMLElement} secondCard - Second card element
+   */
+  function handleMismatch(firstCard, secondCard) {
+    // Add no-match animation class
+    firstCard.classList.add('no-match');
+    secondCard.classList.add('no-match');
+    
+    // Play no match sound
+    playSound('noMatch');
+    
+    // Apply move penalty
+    const movePenalty = levelConfig[currentLevel].movePenalty;
+    if (movePenalty > 0) {
+      score = Math.max(0, score - movePenalty);
+      scoreDisplay.textContent = score;
+    }
+    
+    // Flip cards back after a delay
+    setTimeout(() => {
+      firstCard.classList.remove('flipped', 'no-match');
+      secondCard.classList.remove('flipped', 'no-match');
+      flippedCards = [];
+    }, 1000);
+  }
+  
+  /**
+   * Show an alert message
+   * @param {string} message - Message to display
+   * @param {string} type - Alert type (success, error, warning, info)
+   */
+  function showAlert(message, type = 'info') {
+    const alerts = document.getElementById('gameAlerts');
+    
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = `memory-alert-message ${type}`;
+    alert.textContent = message;
+    
+    // Add to alerts container
+    alerts.appendChild(alert);
+    
+    // Remove after delay
+    setTimeout(() => {
+      alert.classList.add('fade-out');
+      setTimeout(() => alert.remove(), 500);
+    }, 2000);
+  }
+  
+  /**
+   * Update the progress bar
+   */
+  function updateProgress() {
+    const progress = (matchedPairs / totalPairs) * 100;
+    progressBar.style.width = `${progress}%`;
+    progressPercent.textContent = `${Math.round(progress)}%`;
+  }
+  
+  /**
+   * Start the game timer
+   */
+  function startTimer() {
+    timer = 0;
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+      if (!gamePaused) {
+        timer++;
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+  
+  /**
+   * Update the timer display
+   */
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  /**
+   * Toggle game pause state
+   */
+  function togglePause() {
+    gamePaused = !gamePaused;
+    
+    if (gamePaused) {
+      pauseOverlay.style.display = 'flex';
+    } else {
+      pauseOverlay.style.display = 'none';
+    }
+  }
+  
+  /**
+   * Toggle sound on/off
+   */
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    
+    const soundIcon = soundToggleBtn.querySelector('i');
+    if (soundEnabled) {
+      soundIcon.className = 'bi bi-volume-up-fill';
+    } else {
+      soundIcon.className = 'bi bi-volume-mute-fill';
+    }
+  }
+  
+  /**
+   * Use a hint to reveal a pair briefly
+   */
+  function useHint() {
+    if (hintsLeft <= 0 || gamePaused || matchedPairs === totalPairs) {
       return;
     }
     
-    // İkinci kart çevrildi
-    secondCard = this;
+    // Find an unmatched pair
+    const unmatchedCards = cards.filter(card => !card.classList.contains('matched'));
+    if (unmatchedCards.length === 0) return;
     
-    // Hamle sayısını artır
-    updateMoves();
-    
-    // Eşleşip eşleşmediğini kontrol et
-    checkForMatch();
-  }
-
-  /**
-   * Çevrilen iki kartın eşleşip eşleşmediğini kontrol et
-   */
-  function checkForMatch() {
-    // Sembol karşılaştırması
-    const isMatch = firstCard.dataset.symbol === secondCard.dataset.symbol;
-    
-    if (isMatch) {
-      // Eşleşme durumu
-      disableCards();
-      updateScore(10); // Eşleşme durumunda puan ekle
-      playMatchSound();
-      matches++;
-      
-      // Tüm eşleşmeler bulundu mu kontrol et
-      if (matches === totalPairs) {
-        setTimeout(() => endGame(), 1000);
+    // Group by symbols
+    const cardsBySymbol = {};
+    unmatchedCards.forEach(card => {
+      const symbol = card.dataset.symbol;
+      if (!cardsBySymbol[symbol]) {
+        cardsBySymbol[symbol] = [];
       }
+      cardsBySymbol[symbol].push(card);
+    });
+    
+    // Find a symbol with exactly 2 cards (a complete pair)
+    const availablePairs = Object.values(cardsBySymbol).filter(group => group.length === 2);
+    
+    if (availablePairs.length === 0) return;
+    
+    // Select a random pair
+    const selectedPair = availablePairs[Math.floor(Math.random() * availablePairs.length)];
+    
+    // Highlight the pair briefly
+    selectedPair.forEach(card => card.classList.add('hint'));
+    
+    // Play hint sound
+    playSound('hint');
+    
+    // Decrease available hints
+    hintsLeft--;
+    updateHintDisplay();
+    
+    // Remove highlight after a delay
+    setTimeout(() => {
+      selectedPair.forEach(card => card.classList.remove('hint'));
+    }, 1500);
+  }
+  
+  /**
+   * Update the hint counter display
+   */
+  function updateHintDisplay() {
+    hintCounter.textContent = hintsLeft;
+    if (hintsLeft <= 0) {
+      hintBtn.classList.add('disabled');
     } else {
-      // Eşleşmeme durumu
-      unflipCards();
-      updateScore(-2); // Eşleşmeme durumunda puan düşür (opsiyonel, 0 da olabilir)
-      playErrorSound();
+      hintBtn.classList.remove('disabled');
     }
   }
-
+  
   /**
-   * Eşleşen kartları devre dışı bırak
-   */
-  function disableCards() {
-    // Tıklama olaylarını kaldır
-    firstCard.removeEventListener('click', flipCard);
-    secondCard.removeEventListener('click', flipCard);
-    
-    // Eşleşen kartları işaretle
-    setTimeout(() => {
-      firstCard.classList.add('matched');
-      secondCard.classList.add('matched');
-      resetBoard();
-    }, 600);
-  }
-
-  /**
-   * Eşleşmeyen kartları geri çevir
-   */
-  function unflipCards() {
-    lockBoard = true;
-    
-    setTimeout(() => {
-      firstCard.classList.remove('flipped');
-      secondCard.classList.remove('flipped');
-      resetBoard();
-    }, 1000);
-  }
-
-  /**
-   * Oyun tahtasını bir sonraki hamle için hazırla
-   */
-  function resetBoard() {
-    [hasFlippedCard, lockBoard] = [false, false];
-    [firstCard, secondCard] = [null, null];
-  }
-
-  /**
-   * Oyunu tamamen sıfırla
-   */
-  function resetGame() {
-    resetBoard();
-    clearInterval(timer);
-    seconds = 0;
-    moves = 0;
-    score = 0;
-    matches = 0;
-    
-    updateTimer();
-    updateMoves();
-    updateScore(0);
-    
-    // Modal'ı kapat
-    gameEndModal.style.display = 'none';
-  }
-
-  /**
-   * Zamanlayıcıyı başlat
-   */
-  function startTimer() {
-    clearInterval(timer);
-    seconds = 0;
-    updateTimer();
-    
-    timer = setInterval(() => {
-      seconds++;
-      updateTimer();
-    }, 1000);
-  }
-
-  /**
-   * Zaman bilgisini ekranda güncelle
-   */
-  function updateTimer() {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
-
-  /**
-   * Hamle sayısını güncelle
-   */
-  function updateMoves() {
-    moves++;
-    movesElement.textContent = moves;
-  }
-
-  /**
-   * Puanı güncelle
-   */
-  function updateScore(points) {
-    score += points;
-    // Puan negatif olmasın
-    if (score < 0) score = 0;
-    scoreElement.textContent = score;
-  }
-
-  /**
-   * Oyun sonu işlemleri
+   * End the game and show results
    */
   function endGame() {
-    clearInterval(timer);
+    // Stop the timer
+    clearInterval(timerInterval);
     
-    // Zorluk seviyesine göre bonus puanlama
-    let difficultyMultiplier = 1.0;
-    if (gameMode === 'medium') difficultyMultiplier = 1.2;
-    if (gameMode === 'hard') difficultyMultiplier = 1.5;
+    // Play completion sound
+    playSound('gameComplete');
     
-    // Bonus puan: kalan süre ve az hamle sayısı
-    const timeBonus = Math.max(0, 180 - seconds) * 2;
-    const moveBonus = Math.max(0, 300 - moves * 5);
-    const finalScore = Math.floor((score + timeBonus + moveBonus) * difficultyMultiplier);
+    // Calculate final score
+    const timeBonus = Math.max(0, 1000 - timer);
+    const movePenalty = Math.max(0, moves - (totalPairs * 2));
+    const finalScoreValue = score + Math.floor(timeBonus / 10) - movePenalty;
     
-    // Modal bilgilerini güncelle
-    endTimerElement.textContent = timerElement.textContent;
-    endMovesElement.textContent = moves;
-    endScoreElement.textContent = finalScore;
+    // Update results display
+    finalScore.textContent = finalScoreValue;
+    finalTime.textContent = timerDisplay.textContent;
+    finalMoves.textContent = moves;
     
-    // Skoru güncelle
-    score = finalScore;
-    scoreElement.textContent = score;
+    // Calculate star rating
+    const perfectMoves = totalPairs * 2;
+    const moveEfficiency = perfectMoves / moves;
+    const timeEfficiency = 1 - (timer / (totalPairs * 10));
+    const overallRating = (moveEfficiency * 0.6 + timeEfficiency * 0.4) * 5;
     
-    // Modalı göster
-    gameEndModal.style.display = 'flex';
+    // Update star display
+    updateStarRating(overallRating);
+    
+    // Hide game board, show results
+    gameBoard.style.display = 'none';
+    gameResults.style.display = 'block';
+    
+    // Add animation to results
+    gameResults.classList.add('animate__animated', 'animate__fadeIn');
+    setTimeout(() => gameResults.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
   }
-
+  
   /**
-   * Zorluk seviyesi butonlarını ayarla
+   * Update the star rating display
+   * @param {number} rating - Rating from 0-5
    */
-  function setupModeButtons() {
-    easyModeBtn.addEventListener('click', () => changeGameMode('easy'));
-    mediumModeBtn.addEventListener('click', () => changeGameMode('medium'));
-    hardModeBtn.addEventListener('click', () => changeGameMode('hard'));
-  }
-
-  /**
-   * Oyun modunu değiştir
-   */
-  function changeGameMode(mode) {
-    // Aktif butonu değiştir
-    document.querySelector('.difficulty-btn.active').classList.remove('active');
-    document.getElementById(`${mode}-mode`).classList.add('active');
+  function updateStarRating(rating) {
+    // Round to nearest half star
+    const roundedRating = Math.round(rating * 2) / 2;
     
-    gameMode = mode;
-    resetGame();
-    createCards();
-    startTimer();
-  }
-
-  /**
-   * Tema seçiciyi ayarla
-   */
-  function setupThemeSelector() {
-    themeSelect.addEventListener('change', () => {
-      gameTheme = themeSelect.value;
-      resetGame();
-      createCards();
-      startTimer();
-    });
-  }
-
-  /**
-   * Yeniden başlat butonunu ayarla
-   */
-  function setupRestartButton() {
-    restartBtn.addEventListener('click', () => {
-      resetGame();
-      createCards();
-      startTimer();
-    });
-  }
-
-  /**
-   * Modal butonlarını ayarla
-   */
-  function setupModalButtons() {
-    playAgainBtn.addEventListener('click', () => {
-      resetGame();
-      createCards();
-      startTimer();
+    // Update stars
+    const stars = performanceStars.querySelectorAll('i');
+    stars.forEach((star, index) => {
+      if (index + 1 <= roundedRating) {
+        star.className = 'bi bi-star-fill';
+      } else if (index + 0.5 === roundedRating) {
+        star.className = 'bi bi-star-half';
+      } else {
+        star.className = 'bi bi-star';
+      }
     });
     
-    saveScoreBtn.addEventListener('click', saveGameScore);
+    // Update performance text
+    if (roundedRating >= 4.5) {
+      performanceText.textContent = 'Mükemmel! 🏆';
+    } else if (roundedRating >= 3.5) {
+      performanceText.textContent = 'Çok İyi! 🎉';
+    } else if (roundedRating >= 2.5) {
+      performanceText.textContent = 'İyi Performans! 👍';
+    } else if (roundedRating >= 1.5) {
+      performanceText.textContent = 'İyi Çalışma 👌';
+    } else {
+      performanceText.textContent = 'Gelişim Gösteriyorsun 💪';
+    }
   }
-
+  
   /**
-   * Oyun skorunu kaydet
+   * Reset the game state
    */
-  function saveGameScore() {
-    fetch('/api/save-score', {
+  function resetGameState() {
+    cards = [];
+    flippedCards = [];
+    matchedPairs = 0;
+    totalPairs = 0;
+    moves = 0;
+    score = 0;
+    hintsLeft = 3;
+    timer = 0;
+    
+    // Clear timer
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    
+    // Reset displays
+    scoreDisplay.textContent = '0';
+    movesDisplay.textContent = '0';
+    timerDisplay.textContent = '00:00';
+    progressBar.style.width = '0%';
+    progressPercent.textContent = '0%';
+    
+    // Reset game state
+    gamePaused = false;
+    pauseOverlay.style.display = 'none';
+    
+    // Update hint display
+    updateHintDisplay();
+  }
+  
+  /**
+   * Reset and restart the game
+   */
+  function resetGame() {
+    gameResults.style.display = 'none';
+    startGame();
+  }
+  
+  /**
+   * Save the player's score to the database
+   */
+  function saveScore() {
+    // Disable button to prevent multiple submissions
+    saveScoreBtn.disabled = true;
+    
+    // Get final score from display
+    const finalScoreValue = parseInt(finalScore.textContent);
+    
+    // Prepare data for submission
+    const scoreData = {
+      game_type: 'memoryCards',
+      score: finalScoreValue
+    };
+    
+    // Send score to server
+    fetch('/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
       },
-      body: JSON.stringify({
-        game_type: 'memoryCards',
-        score: score,
-        difficulty: gameMode
-      })
+      body: JSON.stringify(scoreData)
     })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // Başarılı bildirim göster
-        const xpMessage = data.xp_gained ? `\nKazanılan XP: ${data.xp_gained}` : '';
-        alert(`Skorunuz kaydedildi!${xpMessage}`);
-        
-        // Sayfayı yenile veya modalı kapat
-        resetGame();
-        createCards();
-        startTimer();
+        showAlert('Skorunuz başarıyla kaydedildi!', 'success');
+        saveScoreBtn.textContent = '✓ Kaydedildi';
+        saveScoreBtn.classList.add('btn-success');
       } else {
-        if (data.message === 'Login required') {
-          alert('Skor kaydetmek için giriş yapmalısınız!');
-        } else {
-          alert('Skor kaydedilemedi. Lütfen tekrar deneyin.');
-        }
+        showAlert('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+        saveScoreBtn.disabled = false;
       }
     })
     .catch(error => {
-      console.error('Skor kaydetme hatası:', error);
-      alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+      console.error('Error saving score:', error);
+      showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+      saveScoreBtn.disabled = false;
     });
   }
-
+  
   /**
-   * Eşleşme sesi çal
+   * Utility function to shuffle an array using Fisher-Yates algorithm
+   * @param {Array} array - Array to shuffle
+   * @returns {Array} - Shuffled array
    */
-  function playMatchSound() {
-    try {
-      // Web Audio API kullanarak ses oluştur
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      // Ses ayarları - daha yüksek ve net bir eşleşme sesi
-      oscillator.type = 'sine';
-      oscillator.frequency.value = 880; // Daha tiz bir ses (A5 notası)
-      gainNode.gain.value = 0.2;
-      
-      // Ses başlangıç ve bitiş ayarları
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Sesi çal
-      oscillator.start();
-      
-      // Daha kısa ve belirgin bir ses
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-      setTimeout(() => {
-        oscillator.stop();
-      }, 300);
-    } catch (error) {
-      console.log('Sound playback error:', error);
+  function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
+    return newArray;
   }
-
+  
   /**
-   * Hata sesi çal
+   * Utility function to capitalize first letter of a string
+   * @param {string} str - String to capitalize
+   * @returns {string} - Capitalized string
    */
-  function playErrorSound() {
-    try {
-      // Web Audio API kullanarak ses oluştur
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      // Ses ayarları - daha belirgin bir hata sesi
-      oscillator.type = 'sawtooth'; // Sawtooth daha keskin bir ses verir
-      oscillator.frequency.value = 220; // Daha alçak bir ses (A3 notası)
-      gainNode.gain.value = 0.15;
-      
-      // Ses başlangıç ve bitiş ayarları
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Sesi çal
-      oscillator.start();
-      
-      // Ses süresini ayarla ve sonra durdur
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
-      setTimeout(() => {
-        oscillator.stop();
-      }, 200);
-    } catch (error) {
-      console.log('Sound playback error:', error);
-    }
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
+  
+  // Initialize the game
+  init();
 });

@@ -113,7 +113,7 @@ function loadArticleContent() {
         </a>
         <ul class="dropdown-menu glass-dropdown">
           <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
-          <!-- Hafıza Kartları oyunu kaldırıldı -->
+          <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
           <li><a class="dropdown-item" href="{{ url_for('labyrinth') }}"><i class="fas fa-route me-2"></i>Labirent</a></li>
           <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
           <!-- IQ geliştirme oyunları kaldırıldı -->
@@ -193,7 +193,10 @@ function loadArticleContent() {
           <i class="fas fa-spell-check"></i>
           <span>Kelime Bulmaca</span>
         </a>
-        <!-- Hafıza Kartları oyunu kaldırıldı -->
+        <a href="{{ url_for('memory_match') }}" class="footer-game-button">
+          <i class="fas fa-clone"></i>
+          <span>Hafıza Kartları</span>
+        </a>
         <a href="{{ url_for('labyrinth') }}" class="footer-game-button">
           <i class="fas fa-route"></i>
           <span>Labirent</span>

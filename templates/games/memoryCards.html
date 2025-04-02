@@ -1,77 +1,171 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
-{% block title %}Hafıza Kartları - OmGame{% endblock %}
+{% block title %}Hafıza Kartları - ZekaPark{% endblock %}
+
+{% block styles %}
+<!-- Custom styles for memory cards game -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/memoryCards.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="memory-game-container">
-  <div class="memory-game-header">
-    <h1>Hafıza Kartları</h1>
-    <div class="game-controls">
-      <div class="difficulty-selector">
-        <button id="easy-mode" class="difficulty-btn active">Kolay</button>
-        <button id="medium-mode" class="difficulty-btn">Orta</button>
-        <button id="hard-mode" class="difficulty-btn">Zor</button>
-      </div>
-      <div class="theme-selector">
-        <select id="theme-select">
-          <option value="animals">Hayvanlar</option>
-          <option value="fruits">Meyveler</option>
-          <option value="emojis">Emojiler</option>
-          <option value="shapes">Şekiller</option>
-        </select>
+<div class="container py-3">
+  <div class="memory-game-container">
+    <div class="memory-header">
+      <h1 class="game-title">Hafıza Kartları</h1>
+      <div class="game-stats">
+        <div class="game-stat"><i class="bi bi-star-fill"></i><span class="stat-label">Puan</span><span class="stat-value" id="score">0</span></div>
+        <div class="game-stat"><i class="bi bi-stopwatch"></i><span class="stat-label">Süre</span><span class="stat-value" id="timer">00:00</span></div>
+        <div class="game-stat"><i class="bi bi-arrow-repeat"></i><span class="stat-label">Hamle</span><span class="stat-value" id="moves">0</span></div>
       </div>
     </div>
-    <div class="game-info">
-      <div class="game-stat">
-        <span class="stat-label">Süre:</span>
-        <span id="timer" class="stat-value">00:00</span>
+    
+    <!-- Game introduction section -->
+    <div class="memory-intro" id="gameIntro">
+      <div class="row">
+        <div class="col-lg-6">
+          <h2 class="instruction-title"><i class="bi bi-info-circle"></i> Oyun Hakkında</h2>
+          <p>Hafıza Kartları oyunu, bilişsel becerilerinizi ve görsel hafızanızı geliştirmek için harika bir yoldur.</p>
+          
+          <div class="instruction-steps">
+            <div class="instruction-step"><div class="step-number">1</div><div class="step-text">İki kart seçerek eşleşen çiftleri bulun</div></div>
+            <div class="instruction-step"><div class="step-number">2</div><div class="step-text">Eşleşen kartlar açık kalır, diğerleri kapanır</div></div>
+            <div class="instruction-step"><div class="step-number">3</div><div class="step-text">Tüm çiftleri minimum hamlede bulun</div></div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6">
+          <!-- Game settings -->
+          <div class="memory-levels-selector">
+            <h3 class="level-label">Zorluk Seviyesi</h3>
+            <div class="level-buttons">
+              <button class="level-btn active" data-level="easy">Kolay (3x4)</button>
+              <button class="level-btn" data-level="medium">Orta (3x6)</button>
+              <button class="level-btn" data-level="hard">Zor (3x10)</button>
+            </div>
+          </div>
+          
+          <div class="memory-theme-selector mt-3">
+            <h3 class="level-label">Tema Seçimi</h3>
+            <div class="level-buttons">
+              <button class="level-btn theme-btn active" data-theme="animals">Hayvanlar</button>
+              <button class="level-btn theme-btn" data-theme="fruits">Meyveler</button>
+              <button class="level-btn theme-btn" data-theme="emojis">Emojiler</button>
+              <button class="level-btn theme-btn" data-theme="shapes">Şekiller</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="game-stat">
-        <span class="stat-label">Hamle:</span>
-        <span id="moves" class="stat-value">0</span>
-      </div>
-      <div class="game-stat">
-        <span class="stat-label">Puan:</span>
-        <span id="score" class="stat-value">0</span>
+      
+      <div class="memory-controls">
+        <button class="btn btn-primary standard-start-btn" id="startGame">
+          <i class="bi bi-play-fill"></i> Oyunu Başlat
+        </button>
       </div>
     </div>
-    <button id="restart-game" class="action-btn restart-btn">
-      <i class="fas fa-redo"></i> Yeniden Başlat
-    </button>
-  </div>
-
-  <div class="memory-board-container">
-    <div id="memory-board" class="memory-board"></div>
-  </div>
-
-  <div id="game-end-modal" class="modal">
-    <div class="modal-content">
-      <h2>Tebrikler!</h2>
-      <div class="end-game-stats">
-        <div class="end-game-stat">
-          <span class="stat-label">Süre:</span>
-          <span id="end-timer" class="stat-value">00:00</span>
+    
+    <!-- Game board section -->
+    <div class="memory-board-container" id="gameBoard" style="display: none;">
+      <div class="memory-board-backdrop"></div>
+      
+      <!-- Game stats and controls -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="theme-indicator">
+          <i class="bi bi-palette-fill theme-icon"></i>
+          <span class="theme-name" id="currentTheme">Hayvanlar</span>
         </div>
-        <div class="end-game-stat">
-          <span class="stat-label">Hamle:</span>
-          <span id="end-moves" class="stat-value">0</span>
-        </div>
-        <div class="end-game-stat">
-          <span class="stat-label">Puan:</span>
-          <span id="end-score" class="stat-value">0</span>
+        
+        <div class="game-controls-top">
+          <button class="game-control-btn" id="hintBtn" title="İpucu (3)">
+            <i class="bi bi-lightbulb-fill"></i><span class="hint-counter">3</span>
+          </button>
+          <button class="game-control-btn" id="soundToggle" title="Sesi Aç/Kapat">
+            <i class="bi bi-volume-up-fill"></i>
+          </button>
+          <button class="game-control-btn" id="pauseGame" title="Oyunu Duraklat">
+            <i class="bi bi-pause-fill"></i>
+          </button>
         </div>
       </div>
-      <div class="modal-actions">
-        <button id="play-again" class="action-btn">Tekrar Oyna</button>
-        <button id="save-score" class="action-btn primary">Skoru Kaydet</button>
+      
+      <!-- Memory cards grid -->
+      <div class="memory-grid" id="memoryGrid"></div>
+      
+      <!-- Progress bar -->
+      <div class="memory-progress">
+        <div class="progress-label">
+          <span>İlerleme</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Game alerts -->
+    <div class="memory-alert" id="gameAlerts"></div>
+    
+    <!-- Game results section -->
+    <div class="memory-results-container" id="gameResults" style="display: none;">
+      <div class="memory-results-card">
+        <div class="memory-results-header">
+          <div class="result-badge"><i class="bi bi-trophy-fill"></i></div>
+          <h2>Oyun Tamamlandı!</h2>
+        </div>
+        
+        <div class="memory-results-body">
+          <div class="results-stats">
+            <div class="result-stat">
+              <div class="result-stat-value" id="finalScore">0</div>
+              <div class="result-stat-label">Puan</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-value" id="finalTime">00:00</div>
+              <div class="result-stat-label">Süre</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-value" id="finalMoves">0</div>
+              <div class="result-stat-label">Hamle</div>
+            </div>
+          </div>
+          
+          <div class="performance-rating mt-3">
+            <div class="rating-stars" id="performanceStars">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star"></i>
+              <i class="bi bi-star"></i>
+            </div>
+            <div class="rating-text" id="performanceText">İyi Performans!</div>
+          </div>
+        </div>
+        
+        <div class="memory-results-footer">
+          <button class="btn btn-outline-light" id="playAgainBtn">
+            <i class="bi bi-arrow-repeat"></i> Tekrar Oyna
+          </button>
+          <button class="btn btn-primary" id="saveScoreBtn">
+            <i class="bi bi-save-fill"></i> Skoru Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pause overlay -->
+    <div class="game-pause-overlay" id="pauseOverlay" style="display: none;">
+      <div class="pause-card">
+        <h3><i class="bi bi-pause-circle-fill"></i> Oyun Duraklatıldı</h3>
+        <p>Devam etmek için butona tıklayın.</p>
+        <button class="btn btn-primary" id="resumeBtn">
+          <i class="bi bi-play-fill"></i> Devam Et
+        </button>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/memoryCards.css') }}">
 {% endblock %}
 
 {% block scripts %}

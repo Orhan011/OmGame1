@@ -628,8 +628,8 @@ def word_puzzle():
 
 @app.route('/games/memory-match')
 def memory_match():
-    # Bu sayfa artık mevcut değil, ana sayfaya yönlendir
-    return redirect(url_for('index'))
+    # Eski Hafıza Kartları oyunu artık kullanılmıyor, yeni sürüme yönlendir
+    return redirect(url_for('memory_cards'))
 
 @app.route('/games/labyrinth')
 def labyrinth():
@@ -653,7 +653,6 @@ def number_sequence():
 
 @app.route('/games/memory-cards')
 def memory_cards():
-    """Hafıza Kartları eşleştirme oyunu"""
     return render_template('games/memoryCards.html')
 
 @app.route('/games/number-chain')
