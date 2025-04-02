@@ -1,1093 +1,575 @@
+/* Sesli Hafıza Oyunu CSS - Modern Tasarım */
 
-/**
- * Sesli Hafıza Oyunu (Audio Memory Game) - Gelişmiş CSS Stilleri
- */
-
-:root {
-  --audio-primary: #6366f1; /* Indigo */
-  --audio-secondary: #4f46e5; /* Deep indigo */
-  --audio-tertiary: #8b5cf6; /* Purple accent */
-  --audio-success: #10b981; /* Emerald green */
-  --audio-warning: #f59e0b; /* Amber */
-  --audio-danger: #ef4444; /* Modern red */
-
-  /* Arka planlar */
-  --audio-dark: rgba(15, 23, 42, 0.95);
-  --audio-dark-bg: rgba(15, 23, 42, 0.75);
-  --audio-darker-bg: rgba(10, 15, 30, 0.85);
-
-  /* Buton renkleri */
-  --audio-red: linear-gradient(145deg, #f87171, #dc2626);
-  --audio-green: linear-gradient(145deg, #34d399, #059669);
-  --audio-blue: linear-gradient(145deg, #60a5fa, #2563eb);
-  --audio-yellow: linear-gradient(145deg, #fcd34d, #d97706);
-
-  /* Metin ve vurgu renkleri */
-  --audio-light-text: rgba(255, 255, 255, 0.98);
-  --audio-muted-text: rgba(255, 255, 255, 0.75);
-  --audio-border-color: rgba(99, 102, 241, 0.28);
-  --audio-border-light: rgba(255, 255, 255, 0.15);
-
-  /* Animasyonlar */
-  --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Parıltı efektleri */
-  --audio-glow-primary: 0 0 25px rgba(99, 102, 241, 0.5);
-  --audio-glow-success: 0 0 25px rgba(16, 185, 129, 0.5);
-  --audio-glow-warning: 0 0 25px rgba(245, 158, 11, 0.5);
-  --audio-glow-danger: 0 0 25px rgba(239, 68, 68, 0.5);
-}
-
-/* Ana Container */
+/* Ana Konteyner */
 .audio-memory-container {
-  background: rgba(15, 23, 42, 0.92);
-  border-radius: 24px;
-  padding: 35px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.1);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid var(--audio-border-light);
-  animation: container-appear 0.8s var(--transition-bounce);
-  max-width: 1200px;
-  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  --primary-color: #00bcd4;
+  --secondary-color: #673ab7;
+  --success-color: #4caf50;
+  --error-color: #f44336;
+  --warning-color: #ff9800;
+  --info-color: #2196f3;
+  --dark-bg: #111827;
+  --card-bg: #1e293b;
+  --tile-color-1: #00BCD4;
+  --tile-color-2: #FF4081;
+  --tile-color-3: #FFEB3B;
+  --tile-color-4: #8BC34A;
+  --tile-color-5: #FF9800;
+  --tile-color-6: #673AB7;
+  --tile-color-7: #E91E63;
+  --tile-color-8: #4CAF50;
 }
 
-@keyframes container-appear {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.audio-memory-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--audio-primary), var(--audio-tertiary), var(--audio-primary));
-  background-size: 200% 100%;
-  animation: gradient-move 8s linear infinite;
-  z-index: 1;
-}
-
-@keyframes gradient-move {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
-}
-
-.audio-memory-container::after {
-  content: '';
-  position: absolute;
-  top: -150px;
-  right: -150px;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse-glow 12s infinite alternate ease-in-out;
-  opacity: 0.6;
-  z-index: -1;
-  filter: blur(20px);
-}
-
-@keyframes pulse-glow {
-  0% { transform: scale(1); opacity: 0.5; }
-  100% { transform: scale(1.2); opacity: 0.7; }
-}
-
-/* Başlık */
+/* Oyun Başlığı */
 .audio-memory-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 15px;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .game-title {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #fff;
-  margin: 0;
-  background: linear-gradient(90deg, #fff, #b8b5ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 3px 15px rgba(106, 90, 224, 0.4);
-  letter-spacing: 1px;
-  padding: 10px 0;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
 }
 
-.game-title:after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  width: 120px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--audio-primary), transparent);
-  border-radius: 3px;
-  z-index: -1;
-}
-
-/* İstatistikler Satırı */
 .game-stats-row {
   display: flex;
-  background: rgba(15, 23, 42, 0.65);
-  border-radius: 20px;
-  padding: 15px 25px;
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  box-shadow: 
-    0 15px 30px rgba(0, 0, 0, 0.2), 
-    0 0 0 1px rgba(99, 102, 241, 0.1);
-  margin-top: 15px;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 30px;
-  width: 100%;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  justify-content: center;
+  gap: 2rem;
+  background-color: var(--card-bg);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  display: inline-flex;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .game-stat-horizontal {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  position: relative;
-}
-
-.game-stat-horizontal:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 20%;
-  right: -15px;
-  height: 60%;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  gap: 0.5rem;
 }
 
 .game-stat-horizontal i {
-  font-size: 1.3rem;
-  color: var(--audio-primary);
-  filter: drop-shadow(0 2px 5px rgba(106, 90, 224, 0.5));
+  color: var(--primary-color);
 }
 
-.game-stat-horizontal .stat-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 0.5px;
+.stat-label {
   font-weight: 500;
+  color: #a0aec0;
 }
 
-.game-stat-horizontal .stat-value {
-  font-size: 1.4rem;
+.stat-value {
   font-weight: 700;
-  color: #fff;
-  margin-left: 5px;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: white;
 }
 
 /* Giriş Ekranı */
 .audio-memory-intro {
-  background: rgba(15, 15, 30, 0.7);
-  border-radius: 20px;
-  padding: 25px;
-  border: 1px solid rgba(106, 90, 224, 0.1);
-  margin-bottom: 20px;
-  animation: fade-in 0.8s ease;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
 }
 
 .instruction-title {
-  color: var(--audio-primary);
-  margin-bottom: 15px;
-  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: white;
   display: flex;
   align-items: center;
-  font-size: 1.3rem;
+  gap: 0.5rem;
 }
 
 .instruction-title i {
-  margin-right: 10px;
-  color: var(--audio-primary);
+  color: var(--primary-color);
 }
 
 .instruction-steps {
-  display: flex;
-  gap: 20px;
-  margin: 25px 0;
-  flex-wrap: wrap;
+  margin-top: 1.5rem;
 }
 
 .instruction-step {
-  flex: 1;
-  min-width: 180px;
-  background: rgba(20, 20, 40, 0.5);
-  padding: 12px;
-  border-radius: 15px;
   display: flex;
+  margin-bottom: 0.75rem;
   align-items: center;
-  gap: 10px;
-  border: 1px solid rgba(106, 90, 224, 0.15);
 }
 
 .step-number {
-  width: 30px;
-  height: 30px;
-  background: var(--audio-primary);
+  background-color: var(--primary-color);
+  color: white;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: white;
-  font-size: 0.9rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
 .step-text {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  line-height: 1.4;
+  color: #e2e8f0;
+  font-size: 0.95rem;
 }
 
 /* Ayarlar */
 .audio-memory-settings {
-  background: rgba(20, 20, 40, 0.5);
-  padding: 20px;
-  border-radius: 18px;
-  margin-bottom: 15px;
-  border: 1px solid rgba(106, 90, 224, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.audio-memory-settings:hover {
-  border-color: rgba(106, 90, 224, 0.3);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(106, 90, 224, 0.2);
-  transform: translateY(-3px);
-}
-
-.audio-memory-settings::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--audio-primary), var(--audio-tertiary));
-  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
 }
 
 .level-label {
-  font-weight: 700;
-  color: var(--audio-primary);
-  margin-bottom: 15px;
-  font-size: 1rem;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  position: relative;
-  display: inline-block;
-  text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
-}
-
-.level-label::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 50px;
-  height: 2px;
-  background: var(--audio-primary);
-  border-radius: 2px;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: white;
 }
 
 .level-buttons {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .level-btn, .theme-btn {
-  padding: 12px 22px;
-  background: rgba(20, 20, 43, 0.7);
-  border: 1px solid rgba(106, 90, 224, 0.2);
-  border-radius: 30px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
-  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: all 0.3s var(--transition-bounce);
-  flex: 1;
-  min-width: 100px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .level-btn:hover, .theme-btn:hover {
-  background: rgba(106, 90, 224, 0.2);
-  color: white;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .level-btn.active, .theme-btn.active {
-  background: var(--audio-primary);
-  color: white;
-  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.5);
 }
 
-/* Form Switch Ayarları */
 .form-check-input {
-  height: 1.5em;
-  width: 3em;
-  cursor: pointer;
+  width: 3rem;
+  height: 1.5rem;
 }
 
 .form-check-input:checked {
-  background-color: var(--audio-primary);
-  border-color: var(--audio-primary);
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .form-check-label {
-  color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  padding-left: 5px;
+  padding-left: 0.5rem;
+  font-size: 0.95rem;
 }
 
 /* Oyun Kontrolleri */
 .audio-memory-controls {
   display: flex;
-  gap: 15px;
-  margin: 30px 0 10px;
   justify-content: center;
+  margin-top: 2rem;
 }
 
-.standard-start-btn {
-  background: linear-gradient(135deg, var(--audio-primary), var(--audio-secondary));
-  border: none;
-  padding: 16px 36px;
-  border-radius: 50px;
-  box-shadow: 0 10px 25px rgba(106, 90, 224, 0.4);
-  transition: all 0.4s var(--transition-bounce);
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: white;
-  letter-spacing: 0.8px;
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-}
-
-.standard-start-btn:hover {
-  background: linear-gradient(135deg, #7a6aff, #6255e0);
-  box-shadow: 0 15px 30px rgba(106, 90, 224, 0.6), 0 0 20px rgba(106, 90, 224, 0.4);
-  transform: translateY(-5px) scale(1.05);
-  letter-spacing: 1.2px;
-}
-
-.standard-start-btn i {
-  margin-right: 12px;
+.play-btn {
   font-size: 1.25rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transition: transform 0.3s ease;
+  padding: 0.75rem 3rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+  transition: all 0.3s ease;
 }
 
-.standard-start-btn:hover i {
-  transform: scale(1.2) rotate(-5deg);
+.play-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 188, 212, 0.6);
+}
+
+.play-btn:active {
+  transform: translateY(1px);
 }
 
 /* Oyun Tahtası */
 .audio-memory-board {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   position: relative;
-  padding: 30px;
-  background: rgba(15, 23, 42, 0.85);
-  border-radius: 24px;
-  margin: 25px 0;
-  box-shadow: 
-    inset 0 0 30px rgba(0, 0, 0, 0.25), 
-    0 10px 30px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(99, 102, 241, 0.15);
-  border: 1px solid var(--audio-border-light);
   overflow: hidden;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
 }
 
-.audio-memory-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  overflow: hidden;
-  border-radius: 24px;
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.audio-memory-backdrop::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.05) 0%, rgba(15, 23, 42, 0.2) 70%);
-  animation: rotate-backdrop 60s linear infinite;
-  filter: blur(5px);
-}
-
-@keyframes rotate-backdrop {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Üst Kontroller */
 .current-level {
-  background: rgba(20, 20, 43, 0.7);
-  padding: 8px 15px;
-  border-radius: 20px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid rgba(106, 90, 224, 0.15);
+  gap: 0.5rem;
 }
 
 .current-level i {
-  font-size: 1.4rem;
-  color: var(--audio-primary);
+  color: var(--primary-color);
 }
 
 .game-controls-top {
   display: flex;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 .game-control-btn {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(15, 15, 30, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.2rem;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
+  transition: all 0.2s ease;
 }
 
 .game-control-btn:hover {
-  background: rgba(106, 90, 224, 0.2);
-  color: white;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.game-control-btn.active {
-  background: rgba(106, 90, 224, 0.3);
-  color: white;
-  border-color: rgba(106, 90, 224, 0.3);
+.game-control-btn i {
+  font-size: 1.25rem;
 }
 
 /* Durum Mesajı */
 .status-message {
-  background: rgba(15, 15, 30, 0.8);
-  padding: 20px;
-  border-radius: 18px;
-  margin: 20px 0;
-  border: 1px solid rgba(106, 90, 224, 0.15);
   text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
+  margin-bottom: 2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 0.75rem;
 }
 
 #statusText {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: white;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 0.75rem;
 }
 
 .status-progress {
   height: 6px;
-  background: rgba(15, 15, 30, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
-  margin-top: 10px;
 }
 
 .status-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--audio-primary), var(--audio-tertiary));
+  background-color: var(--primary-color);
   width: 0%;
-  transition: width 0.3s linear;
+  transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
-/* Ses Butonları Grid */
-.audio-buttons-grid {
+/* Kutucuklar Konteyneri */
+.tiles-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  margin: 30px auto;
-  max-width: 600px;
-  padding: 15px;
-  background: rgba(20, 20, 43, 0.4);
-  border-radius: 20px;
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* Ses Butonları */
-.audio-btn {
-  position: relative;
-  border-radius: 20px;
-  padding: 0;
+@media (min-width: 576px) {
+  .tiles-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Ses Kutuları */
+.audio-tile {
   aspect-ratio: 1/1;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
   cursor: pointer;
-  transition: all 0.3s var(--transition-bounce);
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.15);
-  min-height: 120px;
-  margin: 10px 0;
-  background: linear-gradient(145deg, #4a9bfa, #2055d0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.audio-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), inset 0 0 30px rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+.audio-tile-1 { background-color: var(--tile-color-1); }
+.audio-tile-2 { background-color: var(--tile-color-2); }
+.audio-tile-3 { background-color: var(--tile-color-3); }
+.audio-tile-4 { background-color: var(--tile-color-4); }
+.audio-tile-5 { background-color: var(--tile-color-5); }
+.audio-tile-6 { background-color: var(--tile-color-6); }
+.audio-tile-7 { background-color: var(--tile-color-7); }
+.audio-tile-8 { background-color: var(--tile-color-8); }
+
+.audio-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.audio-btn.playing {
+.audio-tile.active {
   transform: scale(0.95);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
-.audio-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.audio-btn:hover::before {
-  opacity: 1;
-}
-
-.btn-icon {
+/* Ses Dalgası Efekti */
+.audio-wave {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 2.5rem;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-/* İlerleme Çubuğu */
-.audio-memory-progress {
-  margin-top: 35px;
-  position: relative;
-  z-index: 1;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.progress {
-  height: 12px;
-  background-color: rgba(15, 15, 30, 0.5);
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
-
-.progress-bar {
+  width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, var(--audio-primary), var(--audio-secondary));
-  border-radius: 5px;
-  transition: width 0.4s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-}
-
-.progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0) 0%, 
-    rgba(255, 255, 255, 0.2) 50%, 
-    rgba(255, 255, 255, 0) 100%);
-  animation: progress-shine 1.5s infinite;
-}
-
-@keyframes progress-shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Ses dalgası görselleştirmesi */
-.audio-wave {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  overflow: hidden;
-  opacity: 0.7;
-  z-index: 0;
+  pointer-events: none;
 }
 
 .audio-wave-bar {
   position: absolute;
   bottom: 0;
-  width: 3px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 4px;
+  height: 20%;
+  border-radius: 2px 2px 0 0;
   transform-origin: bottom;
-  animation: wave-animation 1.5s infinite ease-in-out;
+  animation: wave-animation 1s infinite ease-in-out;
 }
 
 @keyframes wave-animation {
   0%, 100% { height: 20%; }
-  50% { height: 80%; }
+  50% { height: 60%; }
 }
 
-/* Buton ışıltı efekti */
-.audio-btn.playing .audio-glow {
+/* Işıltı Efekti */
+.audio-glow {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 20px;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8), transparent 70%);
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.6);
   opacity: 0;
-  animation: button-pulse 0.5s ease-out;
-  z-index: 2;
+  animation: glow-animation 0.5s ease-out;
 }
 
-@keyframes button-pulse {
-  0% { transform: scale(0.5); opacity: 0.8; }
-  100% { transform: scale(1.5); opacity: 0; }
+@keyframes glow-animation {
+  0% { opacity: 0.8; }
+  100% { opacity: 0; }
 }
 
-/* Uyarı Mesajları */
-.audio-memory-alert {
-  position: fixed;
-  top: 80px;
-  left: 0;
-  right: 0;
+/* İlerleme Çubuğu */
+.audio-memory-progress {
+  margin-top: 1rem;
+}
+
+.progress-label {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-  z-index: 1000;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #a0aec0;
+  font-size: 0.9rem;
 }
 
-.audio-memory-alert-message {
-  margin-bottom: 12px;
-  padding: 12px 24px;
-  border-radius: 50px;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  max-width: 320px;
-  text-align: center;
-  opacity: 0;
-  transform: translateY(-20px) scale(0.9);
-  animation: alert-appear 0.4s var(--transition-bounce) forwards;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  position: relative;
+.progress {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   overflow: hidden;
 }
 
-.audio-memory-alert-message::before {
-  content: '';
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Oyun Uyarıları */
+.audio-memory-alert {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alert-message {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slide-in 0.3s ease-out, fade-out 0.3s ease-in forwards 2s;
+}
+
+.alert-message.success { border-left: 4px solid var(--success-color); }
+.alert-message.error { border-left: 4px solid var(--error-color); }
+.alert-message.warning { border-left: 4px solid var(--warning-color); }
+.alert-message.info { border-left: 4px solid var(--info-color); }
+
+@keyframes slide-in {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Sonuç Ekranı */
+.audio-memory-results {
   position: absolute;
   top: 0;
   left: 0;
-  width: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.5);
-  animation: alert-progress 2s linear forwards;
-}
-
-.audio-memory-alert-message.success {
-  background: rgba(16, 185, 129, 0.9);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.audio-memory-alert-message.error {
-  background: rgba(239, 68, 68, 0.9);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-}
-
-.audio-memory-alert-message.warning {
-  background: rgba(245, 158, 11, 0.9);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-}
-
-.audio-memory-alert-message.info {
-  background: rgba(99, 102, 241, 0.9);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-}
-
-.audio-memory-alert-message.fade-out {
-  animation: alert-disappear 0.5s var(--transition-bounce) forwards;
-}
-
-@keyframes alert-appear {
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes alert-disappear {
-  to { opacity: 0; transform: translateY(-20px) scale(0.9); }
-}
-
-@keyframes alert-progress {
-  0% { width: 0; }
-  100% { width: 100%; }
-}
-
-/* Sonuçlar Ekranı */
-.audio-memory-results {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
 
 .results-card {
-  background: rgba(20, 20, 40, 0.85);
-  border-radius: 25px;
-  overflow: hidden;
-  width: 100%;
-  max-width: 650px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(106, 90, 224, 0.2);
-  border: 1px solid rgba(106, 90, 224, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  position: relative;
-  animation: results-card-appear 0.8s var(--transition-bounce);
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes results-card-appear {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .results-header {
-  background: rgba(15, 15, 30, 0.8);
-  padding: 30px 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
 .result-badge {
-  position: absolute;
-  left: 25px;
-  width: 60px;
-  height: 60px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--audio-primary), var(--audio-secondary));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 1.8rem;
-  box-shadow: 0 10px 25px rgba(106, 90, 224, 0.5);
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  z-index: 2;
-  animation: badge-bounce 1s var(--transition-bounce);
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 188, 212, 0.2);
 }
 
-@keyframes badge-bounce {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.1); }
-  70% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+.result-badge i {
+  font-size: 2rem;
+  color: white;
 }
 
 .results-header h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: white;
-  margin: 0;
-  font-weight: 700;
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-  background: linear-gradient(90deg, #fff, #b8b5ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  z-index: 2;
-}
-
-.results-body {
-  padding: 40px 30px;
-  position: relative;
-  z-index: 1;
 }
 
 .results-stats {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
-  flex-wrap: wrap;
-  gap: 25px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .result-stat {
-  flex: 1;
-  min-width: 140px;
-  background: rgba(15, 15, 30, 0.6);
-  padding: 25px 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: stat-appear 0.7s var(--transition-bounce) forwards;
-  animation-delay: calc(var(--i, 0) * 0.15s);
-}
-
-.result-stat:nth-child(1) { --i: 1; }
-.result-stat:nth-child(2) { --i: 2; }
-.result-stat:nth-child(3) { --i: 3; }
-
-@keyframes stat-appear {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.result-stat:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  border-color: rgba(106, 90, 224, 0.2);
-}
-
-.result-stat::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--audio-primary), transparent);
-  opacity: 0.7;
+  text-align: center;
 }
 
 .result-stat-value {
-  font-size: 2.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: white;
-  margin-bottom: 8px;
-  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-  position: relative;
-  display: inline-block;
-}
-
-.result-stat-value::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
-  background: var(--audio-primary);
-  border-radius: 2px;
-  opacity: 0.5;
 }
 
 .result-stat-label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  font-weight: 500;
-  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #a0aec0;
 }
 
+/* Performans Yıldızları */
 .performance-rating {
-  text-align: center;
-  margin-top: 35px;
-  background: rgba(15, 15, 30, 0.6);
-  padding: 25px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
-  animation: rating-appear 0.5s var(--transition-bounce) 0.9s both;
-}
-
-@keyframes rating-appear {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
+  margin-bottom: 1.5rem;
 }
 
 .rating-stars {
-  font-size: 2.2rem;
-  color: var(--audio-warning);
-  margin-bottom: 15px;
-  text-shadow: 0 2px 8px rgba(245, 158, 11, 0.6);
-  animation: stars-appear 1s ease-in-out 1s both;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
 }
 
-@keyframes stars-appear {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 1; transform: scale(1); }
+.rating-stars i {
+  color: #ffc107;
+  margin: 0 0.1rem;
 }
 
 .rating-text {
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 600;
   color: white;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  animation: text-appear 0.5s ease-in-out 1.5s both;
-}
-
-@keyframes text-appear {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
 }
 
 .results-footer {
-  margin-top: 15px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 15, 30, 0.7);
-  position: relative;
-  z-index: 1;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
 
-.results-footer .btn {
-  transition: all 0.3s var(--transition-bounce);
-  position: relative;
-  overflow: hidden;
-  padding: 12px 25px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  animation: button-appear 0.5s ease-in-out 1.7s both;
-}
-
-@keyframes button-appear {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.results-footer .btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* İstatistikler Kutusu */
-.stats-box {
-  background: rgba(15, 15, 30, 0.6);
-  border-radius: 18px;
-  padding: 25px;
-  margin-top: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  animation: fade-in 0.8s ease 1.5s both;
-}
-
-.stats-box h4 {
+.btn-outline-light {
   color: white;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.stats-box h4 i {
-  color: var(--audio-primary);
+.btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 15px;
+.btn-primary {
+  color: white;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 188, 212, 0.2);
+  transition: all 0.2s ease;
 }
 
-.stat-card {
-  background: rgba(20, 20, 40, 0.5);
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid rgba(106, 90, 224, 0.1);
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  border-color: rgba(106, 90, 224, 0.3);
-}
-
-.stat-card .stat-label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-card .stat-value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--audio-primary);
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 188, 212, 0.3);
 }
 
 /* Duraklat Overlay */
@@ -1095,174 +577,91 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(10, 10, 20, 0.85);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  animation: fade-in 0.3s ease;
 }
 
 .pause-card {
-  background: rgba(20, 20, 40, 0.9);
-  padding: 30px;
-  border-radius: 20px;
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 2rem;
   text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   max-width: 400px;
-  border: 1px solid rgba(106, 90, 224, 0.2);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  animation: scale-in 0.3s var(--transition-bounce);
-}
-
-@keyframes scale-in {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  width: 90%;
 }
 
 .pause-card h3 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 0.5rem;
 }
 
-.pause-card h3 i {
-  color: var(--audio-primary);
+.pause-card i {
+  color: var(--primary-color);
 }
 
 .pause-card p {
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 25px;
-  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: #a0aec0;
 }
 
-.pause-card .btn {
-  min-width: 180px;
-  font-size: 1.1rem;
-  padding: 12px 25px;
+/* Bonus Puan Animasyonu */
+.bonus-points {
+  position: absolute;
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  animation: float-up 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 100;
 }
 
-/* Responsive Tasarım */
-@media (max-width: 992px) {
-  .audio-buttons-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-50px); opacity: 0; }
 }
 
+/* Responsive Ayarlamalar */
 @media (max-width: 768px) {
-  .audio-memory-container {
-    padding: 25px;
-  }
-
-  .audio-memory-header {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .game-title {
-    font-size: 1.8rem;
-  }
-
-  .audio-memory-intro,
-  .audio-memory-board {
-    padding: 20px;
-  }
-
-  .instruction-steps {
-    flex-direction: column;
-  }
-
-  .audio-buttons-grid {
-    gap: 10px;
-  }
-
-  .results-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .result-badge {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
-    left: 15px;
-  }
-
-  .results-footer {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .results-footer .btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .audio-memory-container {
-    padding: 15px;
-    border-radius: 16px;
-  }
-
-  .game-title {
-    font-size: 1.5rem;
-  }
-
-  .game-stats-row {
-    padding: 10px 15px;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .game-stat-horizontal:not(:last-child)::after {
-    display: none;
-  }
-
-  .level-btn, .theme-btn {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-  }
-
-  .audio-buttons-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .pause-card {
-    width: 90%;
-    padding: 20px;
-  }
-
-  .pause-card h3 {
-    font-size: 1.4rem;
-  }
-
-  .result-stat-value {
-    font-size: 2rem;
-  }
-
-  .result-stat-label {
-    font-size: 0.8rem;
-  }
-
-  .rating-stars {
-    font-size: 1.8rem;
-  }
-
-  .rating-text {
-    font-size: 1.1rem;
+  .audio-memory-intro {
+    padding: 1.5rem;
   }
   
-  .standard-start-btn {
-    width: 100%;
-    font-size: 1rem;
-    padding: 12px 20px;
+  .tiles-container {
+    gap: 0.75rem;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .results-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .result-stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .game-stats-row {
+    gap: 1rem;
+    padding: 0.5rem 1rem;
   }
 }
