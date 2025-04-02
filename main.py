@@ -650,7 +650,11 @@ def number_sequence():
 
 # Yeni Hafıza Güçlendirme Oyunları
 # Route for "Kim Nerede?" game has been removed
-# Memory Cards game has been removed
+
+@app.route('/games/memory-cards')
+def memory_cards():
+    """Hafıza Kartları eşleştirme oyunu"""
+    return render_template('games/memoryCards.html')
 
 @app.route('/games/number-chain')
 def number_chain():

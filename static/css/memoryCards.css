@@ -1,0 +1,396 @@
+/* Hafıza Kartları Oyunu CSS */
+.memory-game-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.memory-game-header {
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+.memory-game-header h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 2.2rem;
+  position: relative;
+  font-weight: 700;
+}
+
+.memory-game-header h1:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  border-radius: 2px;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.difficulty-selector, .theme-selector {
+  margin: 10px 0;
+}
+
+.difficulty-btn {
+  background: #2c3e50;
+  color: #fff;
+  border: 2px solid #4a6583;
+  border-radius: 30px;
+  padding: 8px 20px;
+  margin-right: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.difficulty-btn:hover {
+  background: #3a5374;
+}
+
+.difficulty-btn.active {
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+}
+
+.theme-selector select {
+  background: #2c3e50;
+  color: #fff;
+  border: 2px solid #4a6583;
+  border-radius: 30px;
+  padding: 7px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.theme-selector select:hover {
+  background: #3a5374;
+}
+
+.game-info {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.game-stat {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin: 5px 15px;
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-weight: 600;
+  margin-right: 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.action-btn {
+  background: #3a5374;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+}
+
+.action-btn i {
+  margin-right: 8px;
+}
+
+.action-btn:hover {
+  background: #4a6583;
+  transform: translateY(-2px);
+}
+
+.action-btn.primary {
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+}
+
+.action-btn.primary:hover {
+  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
+}
+
+.restart-btn {
+  margin: 10px auto 0;
+}
+
+/* Oyun tahtası stilleri */
+.memory-board-container {
+  background: linear-gradient(135deg, #2a3b4d, #1a1a2e);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  margin-bottom: 30px;
+}
+
+.memory-board {
+  display: grid;
+  grid-gap: 12px;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+/* Kolay mod için grid düzeni (3x4) */
+.memory-board.easy-mode {
+  grid-template-columns: repeat(4, minmax(80px, 120px));
+  grid-template-rows: repeat(3, minmax(80px, 120px));
+}
+
+/* Orta mod için grid düzeni (3x6) */
+.memory-board.medium-mode {
+  grid-template-columns: repeat(6, minmax(70px, 100px));
+  grid-template-rows: repeat(3, minmax(70px, 100px));
+}
+
+/* Zor mod için grid düzeni (3x10) */
+.memory-board.hard-mode {
+  grid-template-columns: repeat(10, minmax(60px, 80px));
+  grid-template-rows: repeat(3, minmax(60px, 80px));
+}
+
+.card {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: scale(0.9);
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.card.flipped {
+  transform: rotateY(180deg) scale(0.9);
+}
+
+.card.matched {
+  transform: rotateY(180deg) scale(0.9);
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.8);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(106, 90, 224, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+  }
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+  transform: rotateY(0deg);
+  border: 2px solid #4a6583;
+}
+
+.card-front::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-image: url('/static/images/card-pattern.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.4;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #8170ff, #6a5ae0);
+  transform: rotateY(180deg);
+  border: 2px solid #6a5ae0;
+  font-size: 2rem;
+}
+
+.card-content {
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #fff;
+  animation: modalFadeIn 0.4s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.modal-content h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  border-radius: 2px;
+}
+
+.end-game-stats {
+  margin: 30px 0;
+}
+
+.end-game-stat {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 250px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+  gap: 15px;
+}
+
+/* Responsive tasarım */
+@media (max-width: 992px) {
+  .memory-board.hard-mode {
+    grid-template-columns: repeat(5, minmax(60px, 80px));
+    grid-template-rows: repeat(6, minmax(60px, 80px));
+  }
+}
+
+@media (max-width: 768px) {
+  .memory-board.medium-mode {
+    grid-template-columns: repeat(3, minmax(70px, 90px));
+    grid-template-rows: repeat(6, minmax(70px, 90px));
+  }
+  
+  .memory-board.hard-mode {
+    grid-template-columns: repeat(5, minmax(50px, 70px));
+    grid-template-rows: repeat(6, minmax(50px, 70px));
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .difficulty-selector, .theme-selector {
+    margin: 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .memory-board.easy-mode {
+    grid-template-columns: repeat(3, minmax(60px, 90px));
+    grid-template-rows: repeat(4, minmax(60px, 90px));
+  }
+  
+  .memory-board.medium-mode {
+    grid-template-columns: repeat(3, minmax(60px, 80px));
+    grid-template-rows: repeat(6, minmax(60px, 80px));
+  }
+  
+  .memory-board.hard-mode {
+    grid-template-columns: repeat(3, minmax(50px, 70px));
+    grid-template-rows: repeat(10, minmax(50px, 70px));
+  }
+  
+  .card-front::after {
+    width: 30px;
+    height: 30px;
+  }
+}

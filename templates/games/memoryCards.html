@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}Hafıza Kartları - OmGame{% endblock %}
+
+{% block content %}
+<div class="memory-game-container">
+  <div class="memory-game-header">
+    <h1>Hafıza Kartları</h1>
+    <div class="game-controls">
+      <div class="difficulty-selector">
+        <button id="easy-mode" class="difficulty-btn active">Kolay</button>
+        <button id="medium-mode" class="difficulty-btn">Orta</button>
+        <button id="hard-mode" class="difficulty-btn">Zor</button>
+      </div>
+      <div class="theme-selector">
+        <select id="theme-select">
+          <option value="animals">Hayvanlar</option>
+          <option value="fruits">Meyveler</option>
+          <option value="emojis">Emojiler</option>
+          <option value="shapes">Şekiller</option>
+        </select>
+      </div>
+    </div>
+    <div class="game-info">
+      <div class="game-stat">
+        <span class="stat-label">Süre:</span>
+        <span id="timer" class="stat-value">00:00</span>
+      </div>
+      <div class="game-stat">
+        <span class="stat-label">Hamle:</span>
+        <span id="moves" class="stat-value">0</span>
+      </div>
+      <div class="game-stat">
+        <span class="stat-label">Puan:</span>
+        <span id="score" class="stat-value">0</span>
+      </div>
+    </div>
+    <button id="restart-game" class="action-btn restart-btn">
+      <i class="fas fa-redo"></i> Yeniden Başlat
+    </button>
+  </div>
+
+  <div class="memory-board-container">
+    <div id="memory-board" class="memory-board"></div>
+  </div>
+
+  <div id="game-end-modal" class="modal">
+    <div class="modal-content">
+      <h2>Tebrikler!</h2>
+      <div class="end-game-stats">
+        <div class="end-game-stat">
+          <span class="stat-label">Süre:</span>
+          <span id="end-timer" class="stat-value">00:00</span>
+        </div>
+        <div class="end-game-stat">
+          <span class="stat-label">Hamle:</span>
+          <span id="end-moves" class="stat-value">0</span>
+        </div>
+        <div class="end-game-stat">
+          <span class="stat-label">Puan:</span>
+          <span id="end-score" class="stat-value">0</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="play-again" class="action-btn">Tekrar Oyna</button>
+        <button id="save-score" class="action-btn primary">Skoru Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/memoryCards.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/memoryCards.js') }}"></script>
+{% endblock %}
