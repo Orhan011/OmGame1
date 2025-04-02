@@ -1,12 +1,14 @@
 /* Memory Cards Game CSS */
 :root {
-  --card-size-small: 80px;
-  --card-size-medium: 70px;
-  --card-size-large: 60px;
+  --card-size-small: 90px;
+  --card-size-medium: 80px;
+  --card-size-large: 70px;
   --card-color: #2c3e50;
   --card-color-hover: #34495e;
-  --card-back: linear-gradient(135deg, #3498db, #9b59b6);
-  --card-front: #fff;
+  --card-back: linear-gradient(145deg, #6c5ce7, #a55eea);
+  --card-front: #ffffff;
+  --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --card-border: rgba(255, 255, 255, 0.3);
   --card-border: rgba(255, 255, 255, 0.2);
   --success-color: #2ecc71;
   --error-color: #e74c3c;
