@@ -76,7 +76,7 @@
 .memory-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 25px;
   flex-wrap: wrap;
   gap: 15px;
@@ -111,64 +111,72 @@
 
 .game-stats {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 10px;
   background: rgba(15, 15, 30, 0.5);
   border-radius: 18px;
   padding: 15px 20px;
   border: 1px solid rgba(106, 90, 224, 0.2);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  width: 220px;
 }
 
 .game-stat {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   position: relative;
-  min-width: 100px;
-  padding: 12px 20px;
-  position: relative;
+  width: 100%;
+  padding: 8px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.game-stat:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 20%;
-  right: -10px;
-  height: 60%;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.1);
+.game-stat:last-child {
+  border-bottom: none;
 }
 
 .game-stat i {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--memory-primary);
-  margin-bottom: 8px;
+  margin-right: 12px;
   filter: drop-shadow(0 2px 5px rgba(106, 90, 224, 0.5));
 }
 
+.stat-info {
+  display: flex;
+  align-items: center;
+}
+
+.stat-data {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .stat-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 6px;
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
+  line-height: 1;
 }
 
 .stat-value {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   position: relative;
+  margin-top: 2px;
 }
 
 .stat-value::after {
   content: '';
   position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: -3px;
+  left: 0;
   width: 0;
   height: 2px;
   background: var(--memory-primary);
@@ -176,7 +184,7 @@
 }
 
 .game-stat:hover .stat-value::after {
-  width: 70%;
+  width: 100%;
 }
 
 /* Memory Intro Section */
