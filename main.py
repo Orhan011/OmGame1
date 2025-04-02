@@ -659,9 +659,10 @@ def memory_cards():
 def number_chain():
     return render_template('games/numberChain.html')
 
-@app.route('/games/audio-memory')
-def audio_memory():
-    return render_template('games/audioMemory.html')
+# Audio Memory oyunu kaldırıldı
+# @app.route('/games/audio-memory')
+# def audio_memory():
+#     return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')
 def n_back():
@@ -1536,7 +1537,7 @@ def get_scores(game_type):
             # Tüm oyun türleri için en yüksek skorları getir
             game_types = [
                 'wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'visualAttention', 'numberSequence',
-                'memoryCards', 'numberChain', 'audioMemory', 'nBack', 'sudoku', '2048', 'chess', 
+                'memoryCards', 'numberChain', 'nBack', 'sudoku', '2048', 'chess', 
                 'logicPuzzles', 'tangram', 'rubikCube'
             ]
             all_scores = {}
@@ -1598,7 +1599,7 @@ def get_scores(game_type):
                 'number-sequence': 'numberSequence',
                 'memory-cards': 'memoryCards',
                 'number-chain': 'numberChain',
-                'audio-memory': 'audioMemory',
+                # 'audio-memory': 'audioMemory',  # Audio Memory oyunu kaldırıldı
                 'n-back': 'nBack',
                 'sudoku': 'sudoku',
                 '2048': '2048',
@@ -1713,7 +1714,7 @@ def get_leaderboard(game_type):
         'puzzle': 'puzzle',
         'memoryCards': 'memorycards',
         'numberChain': 'numberchain',
-        'audioMemory': 'audiomemory',
+        # 'audioMemory': 'audiomemory',  # Audio Memory oyunu kaldırıldı
         'nBack': 'nback',
         'sudoku': 'sudoku',
         '2048': '2048',
