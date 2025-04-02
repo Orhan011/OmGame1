@@ -1,4 +1,3 @@
-
 /**
  * Sesli Hafıza Oyunu (Audio Memory Game) - Professional CSS Styles
  * 
@@ -12,28 +11,28 @@
   --audio-success: #10b981; /* Emerald green */
   --audio-warning: #f59e0b; /* Amber */
   --audio-danger: #ef4444; /* Modern red */
-  
+
   /* Arka planlar */
   --audio-dark: rgba(15, 23, 42, 0.95);
   --audio-dark-bg: rgba(15, 23, 42, 0.75);
   --audio-darker-bg: rgba(10, 15, 30, 0.85);
-  
+
   /* Buton renkleri */
   --audio-red: linear-gradient(145deg, #f87171, #dc2626);
   --audio-green: linear-gradient(145deg, #34d399, #059669);
   --audio-blue: linear-gradient(145deg, #60a5fa, #2563eb);
   --audio-yellow: linear-gradient(145deg, #fcd34d, #d97706);
-  
+
   /* Metin ve vurgu renkleri */
   --audio-light-text: rgba(255, 255, 255, 0.98);
   --audio-muted-text: rgba(255, 255, 255, 0.75);
   --audio-border-color: rgba(99, 102, 241, 0.28);
   --audio-border-light: rgba(255, 255, 255, 0.15);
-  
+
   /* Animasyonlar */
   --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Parıltı efektleri */
   --audio-glow-primary: 0 0 25px rgba(99, 102, 241, 0.5);
   --audio-glow-success: 0 0 25px rgba(16, 185, 129, 0.5);
@@ -608,7 +607,8 @@
 }
 
 .audio-btn-1 {
-  background: linear-gradient(145deg, #f87171, #dc2626);
+  background: linear-gradient(145deg, #fd6262, #e71d1d);
+  box-shadow: 0 10px 25px rgba(231, 29, 29, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .audio-btn-1::after {
@@ -616,7 +616,8 @@
 }
 
 .audio-btn-2 {
-  background: linear-gradient(145deg, #34d399, #059669);
+  background: linear-gradient(145deg, #2edb99, #05b67a);
+  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .audio-btn-2::after {
@@ -624,7 +625,8 @@
 }
 
 .audio-btn-3 {
-  background: linear-gradient(145deg, #60a5fa, #2563eb);
+  background: linear-gradient(145deg, #4a9bfa, #2055d0);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .audio-btn-3::after {
@@ -632,7 +634,8 @@
 }
 
 .audio-btn-4 {
-  background: linear-gradient(145deg, #fcd34d, #d97706);
+  background: linear-gradient(145deg, #ffcb38, #ed8c00);
+  box-shadow: 0 10px 25px rgba(217, 119, 6, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .audio-btn-4::after {
@@ -1193,45 +1196,45 @@
   .audio-memory-container {
     padding: 25px;
   }
-  
+
   .audio-memory-header {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .game-title {
     font-size: 1.8rem;
   }
-  
+
   .audio-memory-intro,
   .audio-memory-board {
     padding: 20px;
   }
-  
+
   .instruction-steps {
     flex-direction: column;
   }
-  
+
   .audio-buttons-grid {
     gap: 10px;
   }
-  
+
   .results-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .result-badge {
     width: 50px;
     height: 50px;
     font-size: 1.5rem;
     left: 15px;
   }
-  
+
   .results-footer {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .results-footer .btn {
     width: 100%;
   }
@@ -1242,52 +1245,52 @@
     padding: 15px;
     border-radius: 16px;
   }
-  
+
   .game-title {
     font-size: 1.5rem;
   }
-  
+
   .game-stats-row {
     padding: 10px 15px;
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .game-stat-horizontal:not(:last-child)::after {
     display: none;
   }
-  
+
   .level-btn, .theme-btn {
     padding: 8px 16px;
     font-size: 0.85rem;
   }
-  
+
   .audio-buttons-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  
+
   .pause-card {
     width: 90%;
     padding: 20px;
   }
-  
+
   .pause-card h3 {
     font-size: 1.4rem;
   }
-  
+
   .result-stat-value {
     font-size: 2rem;
   }
-  
+
   .result-stat-label {
     font-size: 0.8rem;
   }
-  
+
   .rating-stars {
     font-size: 1.8rem;
   }
-  
+
   .rating-text {
     font-size: 1.1rem;
   }

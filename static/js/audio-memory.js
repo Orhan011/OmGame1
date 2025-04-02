@@ -404,6 +404,19 @@ document.addEventListener('DOMContentLoaded', function() {
         audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
       }
       
+      // Buton ikonları
+      const buttonIcons = [
+        'bi-person-fill',
+        'bi-droplet-fill',
+        'bi-circle-fill',
+        'bi-plus-lg',
+        'bi-star-fill',
+        'bi-heart-fill',
+        'bi-diamond-fill',
+        'bi-cloud-fill',
+        'bi-lightning-fill'
+      ];
+      
       // Butonları oluştur
       buttons = [];
       for (let i = 0; i < buttonCount; i++) {
@@ -412,9 +425,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.dataset.index = i;
         
         // Buton içerik ekle (görünürlüğü artırmak için)
-        const glow = document.createElement('div');
-        glow.className = 'btn-icon';
-        button.appendChild(glow);
+        const icon = document.createElement('i');
+        icon.className = `bi ${buttonIcons[i % buttonIcons.length]} btn-icon`;
+        button.appendChild(icon);
         
         // Buton tıklama olayı
         button.addEventListener('click', () => {
