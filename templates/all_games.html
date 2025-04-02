@@ -18,16 +18,6 @@
       <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
     </div>
 
-    <!-- Hafıza Kartları -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-clone"></i></div>
-      <div class="game-info">
-        <h3>Hafıza Kartları</h3>
-        <p>Kapalı kartların yerlerini belleğinizde tutun ve eşleştirin.</p>
-      </div>
-      <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
-    </div>
-
     <!-- Labirent -->
     <div class="game-card">
       <div class="game-icon"><i class="fas fa-route"></i></div>
@@ -107,7 +97,7 @@
       </div>
       <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
     </div>
-    
+
     <!-- 2048 -->
     <div class="game-card">
       <div class="game-icon"><i class="fas fa-cubes"></i></div>
@@ -117,7 +107,7 @@
       </div>
       <a href="{{ url_for('game_2048') }}" class="game-btn">Oyna</a>
     </div>
-    
+
     <!-- Wordle -->
     <div class="game-card">
       <div class="game-icon"><i class="fas fa-spell-check"></i></div>
@@ -170,7 +160,7 @@
       grid-template-columns: 1fr;
     }
   }
-  
+
   /* Oyun kartı tasarımı */
   .game-card {
     background: linear-gradient(135deg, #2c3e50, #1a1a2e);
@@ -184,12 +174,12 @@
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .game-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
   }
-  
+
   .game-card::before {
     content: '';
     position: absolute;
@@ -201,12 +191,12 @@
     transform: rotate(45deg);
     transition: all 0.5s ease;
   }
-  
+
   .game-card:hover::before {
     top: 150%;
     right: 150%;
   }
-  
+
   /* İkon stilleri */
   .game-icon {
     font-size: 3.5rem;
@@ -216,17 +206,17 @@
     transition: all 0.3s ease;
     text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
   }
-  
+
   .game-card:hover .game-icon {
     transform: scale(1.1);
     color: #8170ff;
   }
-  
+
   /* Oyun bilgileri */
   .game-info {
     flex: 1;
   }
-  
+
   .game-info h3 {
     margin-top: 0;
     color: #fff;
@@ -236,7 +226,7 @@
     position: relative;
     padding-bottom: 8px;
   }
-  
+
   .game-info h3::after {
     content: '';
     position: absolute;
@@ -247,13 +237,13 @@
     background: #6a5ae0;
     border-radius: 3px;
   }
-  
+
   .game-info p {
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.5;
     font-size: 0.95rem;
   }
-  
+
   /* Oyun butonu */
   .game-btn {
     background: linear-gradient(to right, #6a5ae0, #8170ff);
@@ -271,18 +261,18 @@
     text-align: center;
     box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
   }
-  
+
   .game-btn:hover {
     background: linear-gradient(to right, #8170ff, #9a8eff);
     box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
     transform: translateY(-2px);
   }
-  
+
   /* Onarımda olan oyunlar için stiller */
   .game-card[style*="opacity: 0.8"] {
     position: relative;
   }
-  
+
   .game-card[style*="opacity: 0.8"]::after {
     content: '';
     position: absolute;
@@ -294,18 +284,18 @@
     border-radius: 15px;
     z-index: 1;
   }
-  
+
   .game-card[style*="opacity: 0.8"] .game-icon,
   .game-card[style*="opacity: 0.8"] .game-info,
   .game-card[style*="opacity: 0.8"] .game-btn {
     position: relative;
     z-index: 2;
   }
-  
+
   .game-card[style*="opacity: 0.8"] .game-icon {
     color: #6c757d;
   }
-  
+
   /* Sayfa başlığı */
   .page-title-section {
     text-align: center;
@@ -313,7 +303,7 @@
     position: relative;
     padding-bottom: 2rem;
   }
-  
+
   .page-title-section h1 {
     font-size: 2.8rem;
     color: #2c3e50;
@@ -322,7 +312,7 @@
     position: relative;
     display: inline-block;
   }
-  
+
   .page-title-section h1::after {
     content: '';
     position: absolute;
@@ -334,14 +324,14 @@
     background: linear-gradient(to right, #6a5ae0, #8170ff);
     border-radius: 4px;
   }
-  
+
   .page-title-section p {
     color: #666;
     font-size: 1.2rem;
     max-width: 700px;
     margin: 0 auto;
   }
-  
+
   /* Ana sayfa butonu */
   .home-button {
     display: inline-block;
@@ -354,13 +344,13 @@
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
-  
+
   .home-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     background: linear-gradient(to right, #34495e, #2980b9);
   }
-  
+
   .home-button i {
     margin-right: 8px;
   }
