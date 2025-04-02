@@ -111,6 +111,205 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="200" cy="100" r="40" fill="#7209b7"/>
       <circle cx="100" cy="200" r="40" fill="#4cc9f0"/>
       <circle cx="200" cy="200" r="40" fill="#4d3ee3"/>
+    </svg>`,
+    
+    // Yeni Eklenen Görseller - Manzaralar ve Sanatsal Tasarımlar
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#2c3e50"/>
+      <!-- Güneş -->
+      <circle cx="200" cy="80" r="40" fill="#f39c12"/>
+      <!-- Arka dağlar -->
+      <path d="M0,200 L60,140 L100,170 L150,110 L200,160 L240,120 L300,180 L300,300 L0,300 Z" fill="#34495e"/>
+      <!-- Ön dağlar -->
+      <path d="M0,230 L50,180 L100,220 L150,170 L200,220 L250,150 L300,200 L300,300 L0,300 Z" fill="#2c3e50"/>
+      <!-- Nehir -->
+      <path d="M120,300 C150,250 180,230 170,180 C160,130 130,100 130,50 L150,50 C150,100 180,130 190,180 C200,230 170,250 180,300 Z" fill="#3498db"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#1e3c72"/>
+      <!-- Deniz -->
+      <rect x="0" y="150" width="300" height="150" fill="#4ca1af"/>
+      <!-- Ay -->
+      <circle cx="70" cy="70" r="30" fill="#ecf0f1"/>
+      <!-- Ay gölgesi -->
+      <circle cx="85" cy="65" r="25" fill="#1e3c72"/>
+      <!-- Gemi -->
+      <path d="M180,180 L220,180 L240,200 L160,200 Z" fill="#34495e"/>
+      <rect x="190" y="160" width="10" height="20" fill="#7f8c8d"/>
+      <rect x="200" y="150" width="2" height="30" fill="#7f8c8d"/>
+      <!-- Dalgalar -->
+      <path d="M20,210 Q35,200 50,210 Q65,220 80,210 Q95,200 110,210" stroke="#fff" fill="none" stroke-width="2"/>
+      <path d="M220,230 Q235,220 250,230 Q265,240 280,230" stroke="#fff" fill="none" stroke-width="2"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#005C97"/>
+      <!-- Gökyüzü gradyanı -->
+      <defs>
+        <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#1CB5E0;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#000046;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="300" height="300" fill="url(#skyGradient)"/>
+      <!-- Yıldızlar -->
+      <circle cx="30" cy="30" r="1" fill="white"/>
+      <circle cx="60" cy="50" r="1.5" fill="white"/>
+      <circle cx="120" cy="40" r="1" fill="white"/>
+      <circle cx="180" cy="20" r="2" fill="white"/>
+      <circle cx="220" cy="60" r="1" fill="white"/>
+      <circle cx="250" cy="30" r="1.5" fill="white"/>
+      <circle cx="280" cy="70" r="1" fill="white"/>
+      <!-- Dağlar -->
+      <polygon points="0,200 50,120 100,180 150,80 180,150 220,90 250,150 300,110 300,300 0,300" fill="#001529"/>
+      <!-- Orman -->
+      <path d="M0,300 L0,220 C20,210 40,225 60,215 C80,205 100,220 120,210 C140,200 160,220 180,210 C200,200 220,215 240,205 C260,195 280,210 300,200 L300,300 Z" fill="#003300"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#FEE140"/>
+      <!-- Arka plan gradient -->
+      <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#FA709A;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#FEE140;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="300" height="300" fill="url(#bgGradient)"/>
+      <!-- Geometrik şekiller -->
+      <circle cx="80" cy="80" r="30" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="110" cy="120" r="50" fill="rgba(255,255,255,0.3)"/>
+      <circle cx="220" cy="150" r="60" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="180" cy="240" r="40" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="40" cy="200" r="25" fill="rgba(255,255,255,0.6)"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#3A1C71"/>
+      <!-- Arkaplan gradient -->
+      <defs>
+        <linearGradient id="retroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#3A1C71;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#D76D77;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#FFAF7B;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="300" height="300" fill="url(#retroGradient)"/>
+      <!-- Retro Güneş -->
+      <circle cx="150" cy="150" r="80" fill="none" stroke="#fff" stroke-width="5"/>
+      <circle cx="150" cy="150" r="60" fill="none" stroke="#fff" stroke-width="5"/>
+      <circle cx="150" cy="150" r="40" fill="none" stroke="#fff" stroke-width="5"/>
+      <circle cx="150" cy="150" r="20" fill="#fff"/>
+      <!-- Retro çizgiler -->
+      <line x1="150" y1="0" x2="150" y2="70" stroke="#fff" stroke-width="5"/>
+      <line x1="150" y1="230" x2="150" y2="300" stroke="#fff" stroke-width="5"/>
+      <line x1="0" y1="150" x2="70" y2="150" stroke="#fff" stroke-width="5"/>
+      <line x1="230" y1="150" x2="300" y2="150" stroke="#fff" stroke-width="5"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#000000"/>
+      <!-- Gece gökyüzü -->
+      <rect x="0" y="0" width="300" height="200" fill="#0D0221"/>
+      <!-- Şehir silüeti -->
+      <path d="M0,200 L20,200 L20,180 L40,180 L40,160 L50,160 L50,180 L60,180 L60,150 L70,150 L70,170 L80,170 L80,140 L100,140 L100,160 L120,160 L120,130 L140,130 L140,150 L150,150 L150,120 L160,120 L160,140 L180,140 L180,110 L200,110 L200,150 L210,150 L210,100 L220,100 L220,130 L240,130 L240,150 L260,150 L260,140 L280,140 L280,160 L300,160 L300,200 Z" fill="#353535"/>
+      <!-- Pencere ışıkları -->
+      <rect x="30" y="170" width="5" height="5" fill="#FFD700"/>
+      <rect x="45" y="165" width="3" height="5" fill="#FFD700"/>
+      <rect x="65" y="160" width="4" height="4" fill="#FFD700"/>
+      <rect x="85" y="150" width="5" height="5" fill="#FFD700"/>
+      <rect x="105" y="150" width="3" height="5" fill="#FFD700"/>
+      <rect x="125" y="140" width="4" height="4" fill="#FFD700"/>
+      <rect x="155" y="130" width="3" height="5" fill="#FFD700"/>
+      <rect x="185" y="120" width="5" height="5" fill="#FFD700"/>
+      <rect x="215" y="110" width="3" height="5" fill="#FFD700"/>
+      <rect x="245" y="140" width="4" height="4" fill="#FFD700"/>
+      <rect x="265" y="145" width="5" height="5" fill="#FFD700"/>
+      <rect x="285" y="150" width="3" height="5" fill="#FFD700"/>
+      <!-- Zemin -->
+      <rect x="0" y="200" width="300" height="100" fill="#121212"/>
+      <!-- Ay -->
+      <circle cx="250" cy="50" r="20" fill="#fff"/>
+      <circle cx="240" cy="45" r="15" fill="#0D0221"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#111111"/>
+      <!-- Uzay arka planı -->
+      <!-- Yıldızlar -->
+      <circle cx="20" cy="40" r="1" fill="white"/>
+      <circle cx="50" cy="70" r="1.5" fill="white"/>
+      <circle cx="90" cy="30" r="1" fill="white"/>
+      <circle cx="140" cy="90" r="1.2" fill="white"/>
+      <circle cx="180" cy="40" r="0.8" fill="white"/>
+      <circle cx="220" cy="80" r="1.3" fill="white"/>
+      <circle cx="260" cy="20" r="1" fill="white"/>
+      <circle cx="280" cy="60" r="1.5" fill="white"/>
+      <circle cx="40" cy="120" r="1" fill="white"/>
+      <circle cx="80" cy="180" r="1.2" fill="white"/>
+      <circle cx="120" cy="220" r="0.8" fill="white"/>
+      <circle cx="200" cy="170" r="1.3" fill="white"/>
+      <circle cx="230" cy="250" r="1" fill="white"/>
+      <circle cx="270" cy="210" r="1.5" fill="white"/>
+      <!-- Gezegen -->
+      <circle cx="150" cy="150" r="70" fill="#2980b9"/>
+      <!-- Gezegen yüzeyi -->
+      <path d="M100,120 Q130,90 170,100 Q210,110 230,140 Q250,170 220,210 Q190,250 150,240 Q110,230 90,190 Q70,150 100,120 Z" fill="#3498db"/>
+      <!-- Kraterler -->
+      <circle cx="120" cy="130" r="10" fill="#1a5276"/>
+      <circle cx="190" cy="170" r="15" fill="#1a5276"/>
+      <circle cx="140" cy="200" r="8" fill="#1a5276"/>
+      <!-- Uydu -->
+      <circle cx="80" cy="80" r="15" fill="#7f8c8d"/>
+      <circle cx="85" cy="75" r="5" fill="#555555"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#f1c40f"/>
+      <!-- Sarı Arka plan -->
+      <!-- Emoji Yüz -->
+      <circle cx="150" cy="150" r="100" fill="#f39c12"/>
+      <!-- Gözler -->
+      <ellipse cx="120" cy="120" rx="15" ry="20" fill="white"/>
+      <ellipse cx="180" cy="120" rx="15" ry="20" fill="white"/>
+      <circle cx="120" cy="120" r="7" fill="#2c3e50"/>
+      <circle cx="180" cy="120" r="7" fill="#2c3e50"/>
+      <!-- Gülümseyen Ağız -->
+      <path d="M100,180 Q150,220 200,180" stroke="#2c3e50" stroke-width="8" fill="none"/>
+    </svg>`,
+    
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="300" height="300" fill="#2ecc71"/>
+      <!-- Yeşil Arka plan -->
+      
+      <!-- Ağaç gövdesi -->
+      <rect x="130" y="150" width="40" height="100" fill="#8B4513"/>
+      
+      <!-- Ağaç tacı -->
+      <circle cx="150" cy="120" r="70" fill="#27ae60"/>
+      <circle cx="110" cy="100" r="40" fill="#27ae60"/>
+      <circle cx="190" cy="100" r="40" fill="#27ae60"/>
+      <circle cx="150" cy="70" r="40" fill="#27ae60"/>
+      
+      <!-- Çiçekler -->
+      <circle cx="100" cy="80" r="10" fill="#e74c3c"/>
+      <circle cx="130" cy="50" r="8" fill="#f1c40f"/>
+      <circle cx="170" cy="55" r="9" fill="#e74c3c"/>
+      <circle cx="200" cy="85" r="7" fill="#f1c40f"/>
+      <circle cx="210" cy="120" r="10" fill="#e74c3c"/>
+      <circle cx="185" cy="150" r="8" fill="#f1c40f"/>
+      <circle cx="115" cy="150" r="9" fill="#e74c3c"/>
+      <circle cx="90" cy="120" r="7" fill="#f1c40f"/>
+      
+      <!-- Çimen -->
+      <rect x="0" y="250" width="300" height="50" fill="#27ae60"/>
+      <path d="M20,250 L30,230 L40,250" stroke="#27ae60" stroke-width="3" fill="none"/>
+      <path d="M60,250 L70,235 L80,250" stroke="#27ae60" stroke-width="3" fill="none"/>
+      <path d="M100,250 L110,230 L120,250" stroke="#27ae60" stroke-width="3" fill="none"/>
+      <path d="M180,250 L190,235 L200,250" stroke="#27ae60" stroke-width="3" fill="none"/>
+      <path d="M220,250 L230,230 L240,250" stroke="#27ae60" stroke-width="3" fill="none"/>
+      <path d="M260,250 L270,235 L280,250" stroke="#27ae60" stroke-width="3" fill="none"/>
     </svg>`
   ];
 
