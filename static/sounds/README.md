@@ -11,7 +11,9 @@ This directory contains the sound effects used in the ZekaPark games.
 - `level-up.mp3`: Level up sound
 - `number.mp3`: Number selected sound
 
+
 The sounds are in MP3 format, but JavaScript creates AudioContext for games that need more advanced audio capabilities.
+
 # Sesli Hafıza Oyunu Ses Dosyaları
 
 Bu klasör, Sesli Hafıza Oyunu için gerekli ses dosyalarını içerir. 
@@ -21,12 +23,26 @@ Bu klasör, Sesli Hafıza Oyunu için gerekli ses dosyalarını içerir.
 Oyun şu ses dosyalarını kullanır:
 
 - **Temel Sesler:**
-  - `note1.mp3`, `note2.mp3`, `note3.mp3`, `note4.mp3`: Temel müzikal notalar
+  - `note1.mp3`, `note2.mp3`, `note3.mp3`, `note4.mp3`: Temel müzikal notalar (These might be superseded by the more detailed list below)
   - `match.mp3`: Doğru eşleşme sesi
   - `no-match.mp3`: Yanlış eşleşme sesi
   - `hint.mp3`: İpucu kullanıldığında çalan ses
   - `game-complete.mp3`: Oyun başarıyla tamamlandığında çalan ses
   - `card-flip.mp3`: Kart çevirme/ses butonu basılma sesi
+
+
+## Sesli Hafıza: Melodi Ses Dosyaları
+
+Bu klasör, Sesli Hafıza oyunu için gerekli ses dosyalarını içerir:
+
+- `note1.mp3` - `note8.mp3`: Kutucuklar için ses notaları
+- `correct.mp3`: Doğru sıralama yapıldığında
+- `wrong.mp3`: Yanlış sıralama yapıldığında
+- `level-up.mp3`: Seviye yükseltildiğinde
+- `game-over.mp3`: Oyun bittiğinde
+- `success.mp3`: Oyun başarıyla tamamlandığında
+
+Kendi ses temalarınızı eklemek için bu klasöre uygun ses dosyalarını ekleyebilirsiniz.
 
 ## Ses Temaları
 
