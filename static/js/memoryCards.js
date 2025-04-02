@@ -20,9 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const saveScoreBtn = document.getElementById('saveScoreBtn');
   
   // Game display elements
-  const scoreDisplay = document.getElementById('score');
-  const timerDisplay = document.getElementById('timer');
-  const movesDisplay = document.getElementById('moves');
   const progressBar = document.getElementById('progressBar');
   const progressPercent = document.getElementById('progressPercent');
   const currentThemeDisplay = document.getElementById('currentTheme');
@@ -365,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check for match if two cards are flipped
     if (flippedCards.length === 2) {
       moves++;
-      movesDisplay.textContent = moves;
       checkForMatch();
     }
   }
@@ -408,7 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update score
     score += pointsEarned;
-    scoreDisplay.textContent = score;
     
     // Show success message
     showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
@@ -451,7 +446,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const movePenalty = levelConfig[currentLevel].movePenalty;
     if (movePenalty > 0) {
       score = Math.max(0, score - movePenalty);
-      scoreDisplay.textContent = score;
     }
     
     // Flip cards back after a delay
@@ -513,9 +507,10 @@ document.addEventListener('DOMContentLoaded', function() {
    * Update the timer display
    */
   function updateTimerDisplay() {
+    // No timer display to update - function kept for structure
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // timerDisplay reference removed since we don't display it anymore
   }
   
   /**
@@ -620,7 +615,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update results display
     finalScore.textContent = finalScoreValue;
-    finalTime.textContent = timerDisplay.textContent;
+    
+    // Format time for display since timerDisplay might not exist
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    finalTime.textContent = formattedTime;
     finalMoves.textContent = moves;
     
     // Calculate star rating
@@ -694,10 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
       timerInterval = null;
     }
     
-    // Reset displays
-    scoreDisplay.textContent = '0';
-    movesDisplay.textContent = '0';
-    timerDisplay.textContent = '00:00';
+    // Reset displays - only progress bar since stats display is removed
     progressBar.style.width = '0%';
     progressPercent.textContent = '0%';
     
