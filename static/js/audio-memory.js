@@ -388,45 +388,57 @@ document.addEventListener('DOMContentLoaded', function() {
   function createButtons() {
     console.log('Butonlar oluşturuluyor...');
     
-    // Önce grid container'ı temizle
-    audioButtonsGrid.innerHTML = '';
-    
-    // Buton sayısını zorluk seviyesine göre ayarla
-    const buttonCount = difficultySettings[currentDifficulty].buttonCount;
-    
-    // Grid düzenini ayarla
-    if (buttonCount <= 4) {
-      audioButtonsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-    } else if (buttonCount <= 6) {
-      audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    } else {
-      audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    }
-    
-    // Butonları oluştur
-    buttons = [];
-    for (let i = 0; i < buttonCount; i++) {
-      const button = document.createElement('button');
-      button.className = `audio-btn audio-btn-${(i % 4) + 1}`;
-      button.dataset.index = i;
+    try {
+      // Önce grid container'ı temizle
+      audioButtonsGrid.innerHTML = '';
       
-      // Buton tıklama olayı
-      button.addEventListener('click', () => {
-        if (!isPlayerTurn || gamePaused) return;
-        
-        // Butonu aktif et ve ses çal
-        activateButton(i);
-        
-        // Oyuncu sırasını kontrol et
-        checkPlayerSequence(i);
-      });
+      // Buton sayısını zorluk seviyesine göre ayarla
+      const buttonCount = difficultySettings[currentDifficulty].buttonCount;
       
-      // Grid'e ekle
-      audioButtonsGrid.appendChild(button);
-      buttons.push(button);
+      // Grid düzenini ayarla
+      if (buttonCount <= 4) {
+        audioButtonsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      } else if (buttonCount <= 6) {
+        audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      } else {
+        audioButtonsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      }
+      
+      // Butonları oluştur
+      buttons = [];
+      for (let i = 0; i < buttonCount; i++) {
+        const button = document.createElement('button');
+        button.className = `audio-btn audio-btn-${(i % 4) + 1}`;
+        button.dataset.index = i;
+        
+        // Buton içerik ekle (görünürlüğü artırmak için)
+        const glow = document.createElement('div');
+        glow.className = 'btn-icon';
+        button.appendChild(glow);
+        
+        // Buton tıklama olayı
+        button.addEventListener('click', () => {
+          if (!isPlayerTurn || gamePaused) return;
+          
+          // Butonu aktif et ve ses çal
+          activateButton(i);
+          
+          // Oyuncu sırasını kontrol et
+          checkPlayerSequence(i);
+        });
+        
+        // Grid'e ekle
+        audioButtonsGrid.appendChild(button);
+        buttons.push(button);
+      }
+      
+      console.log(`${buttonCount} buton oluşturuldu`);
+    } catch (error) {
+      console.error('Buton oluşturma hatası:', error);
+      // Hata durumunda varsayılan butonları kullan
+      buttons = Array.from(audioButtonsGrid.querySelectorAll('.audio-btn'));
+      console.log('Varsayılan butonlar kullanılıyor:', buttons.length);
     }
-    
-    console.log(`${buttonCount} buton oluşturuldu`);
   }
   
   /**
