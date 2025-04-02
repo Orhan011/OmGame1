@@ -90,8 +90,26 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Create a placeholder for missing sounds
       sound.onerror = function() {
-        this.src = 'data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAGA...';
-        console.log('Sound file not found, using placeholder');
+        // Use an existing sound file if the specific one isn't found
+        const fallbackSounds = {
+          'flip': '/static/sounds/click.mp3',
+          'match': '/static/sounds/correct.mp3',
+          'noMatch': '/static/sounds/wrong.mp3',
+          'gameComplete': '/static/sounds/success.mp3',
+          'hint': '/static/sounds/click.mp3'
+        };
+        
+        // Get the sound name from src path
+        const soundName = this.src.split('/').pop().split('.')[0];
+        
+        // Try to use fallback sound if available
+        if (fallbackSounds[soundName]) {
+          this.src = fallbackSounds[soundName];
+        } else {
+          // Empty sound as last resort
+          this.src = 'data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAGA...';
+        }
+        console.log('Sound file not found, using fallback sound');
       };
     });
   }
