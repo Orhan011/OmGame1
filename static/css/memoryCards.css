@@ -8,7 +8,7 @@
   --memory-card-size: 85px;
   --memory-card-font-size: 2.2rem;
   --memory-animation-time: 0.5s;
-  
+
   /* Game colors */
   --memory-primary: #6a5ae0;
   --memory-secondary: #5246c0;
@@ -24,7 +24,7 @@
   --memory-border-color: rgba(106, 90, 224, 0.2);
   --memory-border-light: rgba(255, 255, 255, 0.1);
   --transition-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  
+
   /* Animations */
   --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -251,18 +251,18 @@
 .memory-controls {
   display: flex;
   gap: 15px;
-  margin: 15px 0 5px;
+  margin: 25px 0 10px;
   justify-content: center;
 }
 
 .memory-controls .btn {
-  min-width: 150px;
-  transition: all 0.3s var(--transition-bounce);
+  min-width: 180px;
+  transition: all 0.4s var(--transition-bounce);
 }
 
 .memory-controls .btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
 }
 
 /* Game Board */
@@ -428,7 +428,7 @@
   .memory-grid {
     gap: 10px;
   }
-  
+
   :root {
     --memory-card-size: 75px;
     --memory-card-font-size: 2rem;
@@ -439,7 +439,7 @@
   .memory-grid {
     gap: 8px;
   }
-  
+
   :root {
     --memory-card-size: 60px;
     --memory-card-font-size: 1.8rem;
@@ -860,57 +860,57 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .game-stats {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .game-stat {
     padding: 8px 15px;
     min-width: auto;
   }
-  
+
   .stat-value {
     font-size: 1.3rem;
   }
-  
+
   .memory-intro {
     padding: 20px;
   }
-  
+
   .instruction-steps {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .memory-board-container {
     padding: 20px;
   }
-  
+
   .memory-results-header {
     padding: 20px;
   }
-  
+
   .result-badge {
     width: 40px;
     height: 40px;
     font-size: 1.2rem;
     left: 15px;
   }
-  
+
   .memory-results-header h2 {
     font-size: 1.3rem;
   }
-  
+
   .memory-results-body {
     padding: 25px 15px;
   }
-  
+
   .result-stat {
     padding: 15px;
   }
-  
+
   .result-stat-value {
     font-size: 1.8rem;
   }
@@ -920,53 +920,53 @@
   .memory-game-container {
     padding: 20px 15px;
   }
-  
+
   .game-title {
     font-size: 1.5rem;
   }
-  
+
   .game-stat {
     padding: 6px 10px;
   }
-  
+
   .game-stat i {
     font-size: 1.2rem;
   }
-  
+
   .stat-value {
     font-size: 1.1rem;
   }
-  
+
   .level-btn {
     padding: 8px 15px;
     font-size: 0.8rem;
   }
-  
+
   .game-controls-top {
     gap: 10px;
   }
-  
+
   .game-control-btn {
     width: 38px;
     height: 38px;
     font-size: 1rem;
   }
-  
+
   .pause-card {
     padding: 20px 15px;
     width: 90%;
   }
-  
+
   .pause-card h3 {
     font-size: 1.4rem;
   }
-  
+
   .memory-results-footer {
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
   }
-  
+
   .memory-results-footer .btn {
     width: 100%;
     margin: 5px 0;
@@ -977,21 +977,48 @@
 .standard-start-btn {
   background: linear-gradient(135deg, var(--memory-primary), var(--memory-secondary));
   border: none;
-  padding: 12px 25px;
+  padding: 14px 30px;
   border-radius: 50px;
-  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.3);
-  transition: all 0.3s var(--transition-bounce);
+  box-shadow: 0 10px 25px rgba(106, 90, 224, 0.4);
+  transition: all 0.4s var(--transition-bounce);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: white;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+}
+
+.standard-start-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1), 
+    rgba(255, 255, 255, 0.05));
+  transform: translateX(-100%);
+  transition: all 0.6s ease;
 }
 
 .standard-start-btn:hover {
   background: linear-gradient(135deg, #7a6aff, #6255e0);
-  box-shadow: 0 12px 25px rgba(106, 90, 224, 0.5);
-  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(106, 90, 224, 0.6);
+  transform: translateY(-5px) scale(1.03);
+}
+
+.standard-start-btn:hover::before {
+  transform: translateX(0);
+}
+
+.standard-start-btn:active {
+  transform: translateY(-2px) scale(0.98);
 }
 
 .standard-start-btn i {
-  margin-right: 8px;
+  margin-right: 10px;
+  font-size: 1.2rem;
 }
