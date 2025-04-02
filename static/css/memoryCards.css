@@ -5,9 +5,9 @@
  */
 
 :root {
-  --memory-card-size: 110px;
-  --memory-card-font-size: 3.5rem;
-  --memory-animation-time: 0.6s;
+  --memory-card-size: 85px;
+  --memory-card-font-size: 2.2rem;
+  --memory-animation-time: 0.5s;
   
   /* Game colors */
   --memory-primary: #6a5ae0;
@@ -16,8 +16,14 @@
   --memory-warning: #ffb400;
   --memory-danger: #ff4d6b;
   --memory-dark: rgba(18, 18, 36, 0.9);
-  --memory-card-back: linear-gradient(145deg, #6a5ae0, #5246c0);
-  --memory-front-bg: linear-gradient(145deg, rgba(25, 25, 51, 0.85), rgba(35, 35, 70, 0.95));
+  --memory-dark-bg: rgba(15, 15, 30, 0.6);
+  --memory-darker-bg: rgba(10, 10, 20, 0.7);
+  --memory-card-back: linear-gradient(145deg, #7a6aff, #483dc0);
+  --memory-front-bg: linear-gradient(145deg, rgba(106, 90, 224, 0.85), rgba(90, 73, 214, 0.95));
+  --memory-light-text: rgba(255, 255, 255, 0.9);
+  --memory-border-color: rgba(106, 90, 224, 0.2);
+  --memory-border-light: rgba(255, 255, 255, 0.1);
+  --transition-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   
   /* Animations */
   --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -392,11 +398,30 @@
 .memory-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
+  gap: 12px;
   margin: 0 auto;
   perspective: 1200px;
   max-width: 850px;
   justify-items: center;
+}
+
+/* Grid layouts based on difficulty */
+.grid-easy {
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 400px;
+  gap: 12px;
+}
+
+.grid-medium {
+  grid-template-columns: repeat(6, 1fr);
+  max-width: 580px;
+  gap: 10px;
+}
+
+.grid-hard {
+  grid-template-columns: repeat(10, 1fr);
+  max-width: 900px;
+  gap: 8px;
 }
 
 @media (max-width: 768px) {
@@ -451,7 +476,7 @@
   justify-content: center;
   align-items: center;
   font-size: var(--memory-card-font-size);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease;
   overflow: hidden;
 }
@@ -460,16 +485,17 @@
   background: var(--memory-front-bg);
   transform: rotateY(180deg);
   color: white;
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  text-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 3px 7px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 .memory-card__back {
   background: linear-gradient(145deg, #7a6aff, #483dc0);
   color: transparent;
-  border: 3px solid rgba(106, 90, 224, 0.4);
+  border: 3px solid rgba(106, 90, 224, 0.5);
   position: relative;
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 .memory-card__back::before {

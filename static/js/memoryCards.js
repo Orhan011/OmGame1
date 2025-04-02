@@ -188,8 +188,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear previous cards
     memoryGrid.innerHTML = '';
     
-    // Set grid columns based on columns count
-    memoryGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    // Apply grid styles based on difficulty level
+    memoryGrid.className = 'memory-grid';
+    
+    // Add difficulty-specific grid class
+    if (currentLevel === 'easy') {
+      memoryGrid.classList.add('grid-easy');
+    } else if (currentLevel === 'medium') {
+      memoryGrid.classList.add('grid-medium');
+    } else if (currentLevel === 'hard') {
+      memoryGrid.classList.add('grid-hard');
+    }
     
     // Determine number of pairs needed
     totalPairs = (rows * cols) / 2;
