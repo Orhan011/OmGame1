@@ -659,10 +659,12 @@ def memory_cards():
 def number_chain():
     return render_template('games/numberChain.html')
 
-# Audio Memory oyunu kaldırıldı
-# @app.route('/games/audio-memory')
-# def audio_memory():
-#     return render_template('games/audioMemory.html')
+@app.route('/games/audio-memory')
+def audio_memory():
+    """Sesli Hafıza: Melodi oyunu
+    İşitsel hafızayı geliştirmek için tasarlanmış interaktif bir oyun.
+    Doğa sesleri, enstrümanlar veya diğer sesler ile hafıza egzersizi."""
+    return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')
 def n_back():
@@ -1538,7 +1540,7 @@ def get_scores(game_type):
             game_types = [
                 'wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'visualAttention', 'numberSequence',
                 'memoryCards', 'numberChain', 'nBack', 'sudoku', '2048', 'chess', 
-                'logicPuzzles', 'tangram', 'rubikCube'
+                'logicPuzzles', 'tangram', 'rubikCube', 'audioMemory'
             ]
             all_scores = {}
 
@@ -1599,7 +1601,7 @@ def get_scores(game_type):
                 'number-sequence': 'numberSequence',
                 'memory-cards': 'memoryCards',
                 'number-chain': 'numberChain',
-                # 'audio-memory': 'audioMemory',  # Audio Memory oyunu kaldırıldı
+                'audio-memory': 'audioMemory',
                 'n-back': 'nBack',
                 'sudoku': 'sudoku',
                 '2048': '2048',
@@ -1714,7 +1716,7 @@ def get_leaderboard(game_type):
         'puzzle': 'puzzle',
         'memoryCards': 'memorycards',
         'numberChain': 'numberchain',
-        # 'audioMemory': 'audiomemory',  # Audio Memory oyunu kaldırıldı
+        'audioMemory': 'audiomemory',
         'nBack': 'nback',
         'sudoku': 'sudoku',
         '2048': '2048',
