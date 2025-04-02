@@ -1,0 +1,67 @@
+**Sesli Hafıza Oyunu - Prompt ve Oyun Taslağı**  
+
+**Oyunun Adı:** *"Sesli Hafıza: Melodi"*  
+
+**Oyunun Amacı:**  
+Oyuncular, duydukları ses dizilerini hatırlayarak artan zorluk seviyelerinde hafızalarını test ederler. Müzikal notalar, doğa sesleri veya eşsiz efektlerle dolu bu oyun, dinleme becerilerini ve kısa süreli hafızayı geliştirmeyi hedefler.  
+
+---
+
+### **🎮 Oynanış Mekaniği:**  
+1. **Başlangıç:**  
+   - Oyuncu, *"Kolay"*, *"Orta"* veya *"Zor"* modlarından birini seçer.  
+   - Her seviyede, rastgele oluşturulmuş bir **ses dizisi** çalınır (örneğin: *"Kuş sesi – Su damlası – Piyano notası"*).  
+
+2. **Hafıza Testi:**  
+   - Sesler sırayla çalınır ve oyuncunun bu sırayı doğru tekrarlaması gerekir.  
+   - Doğru yanıt verirse, dizinin uzunluğu **+1 ses eklenerek** artar.  
+   - Yanlış yaparsa, oyun biter ve skor kaydedilir.  
+
+3. **Özel Özellikler:**  
+   - **Joker Hakkı:** Her oyunda bir kez, bir sesin tekrar dinlenmesini sağlayabilir.  
+   - **Tema Seçimi:** Farklı ses paketleri (enstrümanlar, hayvanlar, şehir sesleri) kilidi açılabilir.  
+   - **Zaman Modu:** 30 saniyede maksimum ses dizisini tamamlamaya çalış.  
+
+---
+
+### **🎨 Tasarım ve Kullanıcı Deneyimi:**  
+- **Arayüz:** Minimal ve şık bir tema.  
+  - Ana ekran: Koyu gece mavisi arka plan üzerinde **altın rengi** vurgular.  
+  - Ses düğmeleri: Dokunulduğunda hafifçe parlayan yuvarlak ikonlar.  
+- **Animasyonlar:**  
+  - Doğru cevapta yeşil dalga efekti, yanlışta kırmızı titreme.  
+  - Ses çalarken ekranda **vizüel dalga formu** gösterilir.  
+- **Sesler:**  
+  - Doğa teması: Kuş, rüzgâr, yağmur.  
+  - Enstrüman teması: Piyano, keman, davul.  
+  - Nostaljik tema: Telefon çevirme sesi, daktilo, vinil kayıt.  
+
+---
+
+### **📜 Örnek Oyun Diyaloğu (Prompt):**  
+```  
+"Melodi Hafıza'ya hoş geldin!  
+Bugün 'Orman' temasında oynayacaksın.  
+Diziyi dinle ve aynı sırayla tekrarla:  
+🔊 *[Kuş sesi] – [Ağaç hışırtısı] – [Ayak sesi]*  
+Şimdi sıra sende!"  
+```  
+
+**Skor Ekranı:**  
+```  
+"Tebrikler! 7 sesi hatırladın! 🎵  
+Bir sonraki seviyede 1 ses daha uzun olacak.  
+Yeni tema kilidini açmak için 10 puan topla!"  
+```  
+
+---
+
+**🎯 Neden Eğlenceli?**  
+- **Rahatlatıcı:** Doğa sesleriyle stres azaltır.  
+- **Eğitici:** Çocuklar için hafıza geliştirici.  
+- **Rekabetçi:** Arkadaşlarla skor yarışı yapılabilir.  
+
+*"Seslerin büyüsüne kapıl, hafızanı zorla!"* 🎶  
+
+---  
+Bu tasarım, **hem görsel hem işitsel** bir deneyim sunarken basit ve bağımlılık yapıcı bir oynanış vaat ediyor. İstersen detayları özelleştirebiliriz!
