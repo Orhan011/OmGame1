@@ -78,57 +78,46 @@ document.addEventListener('DOMContentLoaded', function() {
    * Initialize game sounds with placeholder paths, files will be created later
    */
   function initSounds() {
-    // Ses dosyalarını kontrollü bir şekilde yükleyelim
+    // Ses dosyaları - statik url'ler ile mutlak yollar kullanarak
     const soundFiles = {
-      flip: '/static/sounds/card-flip.mp3',
-      match: '/static/sounds/match.mp3',
-      noMatch: '/static/sounds/no-match.mp3',
-      gameComplete: '/static/sounds/game-complete.mp3',
-      hint: '/static/sounds/hint.mp3'
-    };
-    
-    // Fallback ses dosyaları
-    const fallbackSounds = {
-      'flip': '/static/sounds/click.mp3',
-      'match': '/static/sounds/correct.mp3',
-      'noMatch': '/static/sounds/wrong.mp3',
-      'gameComplete': '/static/sounds/success.mp3',
-      'hint': '/static/sounds/click.mp3'
+      flip: '/static/sounds/click.mp3', // Direkt olarak mevcut olan dosyayı kullanalım
+      match: '/static/sounds/correct.mp3',
+      noMatch: '/static/sounds/wrong.mp3',
+      gameComplete: '/static/sounds/success.mp3',
+      hint: '/static/sounds/click.mp3'
     };
     
     // Her bir ses dosyasını yükleme ve hata kontrolü
     Object.keys(soundFiles).forEach(soundName => {
       try {
+        // Güvenli bir şekilde ses nesnesi oluşturalım
         sounds[soundName] = new Audio(soundFiles[soundName]);
         
         // Ses yüklenemezse
         sounds[soundName].onerror = function() {
-          try {
-            console.log(`${soundName} yüklenemedi, yedek ses kullanılıyor`);
-            // Yedek ses dosyasını dene
-            if (fallbackSounds[soundName]) {
-              this.src = fallbackSounds[soundName];
-            } else {
-              // Boş ses dosyası
-              this.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
-            }
-          } catch (e) {
-            console.log('Ses yükleme hatası:', e);
-          }
+          console.log(`${soundName} ses dosyası yüklenemedi`);
+          // Basitleştirilmiş boş ses dosyası
+          this.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
         };
         
         // Ses seviyesini ayarla
         sounds[soundName].volume = 0.5;
       } catch (e) {
         console.log('Ses oluşturma hatası:', e);
-        // Hata durumunda boş bir Audio objesi oluştur
+        // Hata durumunda dummy (sahte) ses nesnesi oluşturalım
         sounds[soundName] = { 
-          play: function() { return Promise.resolve(); },
+          play: function() { 
+            console.log(`${soundName} ses çalma simule ediliyor`);
+            return Promise.resolve(); 
+          },
           currentTime: 0,
           volume: 0.5
         };
       }
     });
+    
+    // Ses yükleme durumunu kontrol et
+    console.log('Ses dosyaları yüklendi');
   }
   
   /**
@@ -137,26 +126,33 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function playSound(soundName) {
     try {
-      if (soundEnabled && sounds[soundName]) {
-        // Ses dosyasını resetle ve çal
+      // Ses açık mı ve ses nesnesi mevcut mu kontrolü
+      if (!soundEnabled) return;
+      if (!sounds[soundName]) {
+        console.log(`${soundName} ses dosyası bulunamadı`);
+        return;
+      }
+      
+      // Ses nesnesinin çalınabilirlik kontrolü
+      if (typeof sounds[soundName].play === 'function') {
+        // Ses dosyasını başa sar
         if (sounds[soundName].currentTime) {
           sounds[soundName].currentTime = 0;
         }
         
-        // Promise destekleyen bir play metodu varsa çalıştır
-        if (typeof sounds[soundName].play === 'function') {
-          const playPromise = sounds[soundName].play();
-          
-          // Promise dönerse hata yakalama ile çalıştır
-          if (playPromise !== undefined) {
-            playPromise.catch(e => {
-              console.log('Ses çalma hatası:', e);
-            });
-          }
+        // Asenkron ses çalma ve hata yönetimi
+        const playPromise = sounds[soundName].play();
+        
+        // Play işlemi başarısız olursa sessizce devam et
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            console.log(`${soundName} çalma başarısız, devam ediliyor`);
+          });
         }
       }
     } catch (e) {
-      console.log('Ses çalma işlemi başarısız:', e);
+      // Hata durumunda oyunu etkilememesi için sessizce devam et
+      console.log('Ses çalma işlemi başarısız, oyuna devam ediliyor');
     }
   }
   
@@ -212,7 +208,25 @@ document.addEventListener('DOMContentLoaded', function() {
    * Start the game
    */
   function startGame() {
+    console.log('Oyun başlatılıyor...');
+    
     try {
+      // Arayüz elemanlarını kontrol edelim
+      if (!gameIntro || !gameBoard || !memoryGrid) {
+        console.error('Game elements missing, checking and recovering...');
+        
+        // Eksik elementleri tekrar seçelim
+        gameIntro = document.getElementById('gameIntro') || gameIntro;
+        gameBoard = document.getElementById('gameBoard') || gameBoard;
+        gameResults = document.getElementById('gameResults') || gameResults;
+        memoryGrid = document.getElementById('memoryGrid') || memoryGrid;
+      }
+      
+      // Gerekli DOM elementleri varmı kontrol edelim
+      if (!memoryGrid) {
+        throw new Error('Memory grid element not found!');
+      }
+      
       // Hide intro, show game board
       if (gameIntro) gameIntro.style.display = 'none';
       if (gameResults) gameResults.style.display = 'none';
@@ -224,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Generate cards
       generateCards();
       
+      console.log('Kartlar oluşturuldu, timer başlatılıyor...');
+      
       // Start timer
       startTimer();
       
@@ -234,13 +250,15 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Show game board with animation
       if (gameBoard) {
-        if (typeof gameBoard.classList.add === 'function') {
-          gameBoard.classList.add('animate__animated', 'animate__fadeIn');
-          setTimeout(() => {
-            if (gameBoard) gameBoard.classList.remove('animate__animated', 'animate__fadeIn');
-          }, 1000);
-        }
+        gameBoard.classList.add('animate__animated', 'animate__fadeIn');
+        setTimeout(() => {
+          if (gameBoard) {
+            gameBoard.classList.remove('animate__animated', 'animate__fadeIn');
+          }
+        }, 1000);
       }
+      
+      console.log('Oyun başarıyla başlatıldı!');
     } catch (e) {
       console.error('Oyun başlatma hatası:', e);
       alert('Oyun başlatılırken bir hata oluştu. Lütfen sayfayı yenileyin.');
