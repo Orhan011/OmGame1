@@ -618,10 +618,9 @@ def login():
 # Profile routes have been removed from the application
 
 # Game routes
-# 3D Labirent oyunu kaldırıldı
-# @app.route('/games/3d-labyrinth')
-# def three_d_labyrinth():
-#     return render_template('games/3dLabyrinth.html')
+@app.route('/games/3d-rotation')
+def three_d_rotation():
+    return render_template('games/3dRotation.html')
 
 @app.route('/games/word-puzzle')
 def word_puzzle():
@@ -631,11 +630,9 @@ def word_puzzle():
 def memory_match():
     return render_template('games/memory_match.html')
 
-# Labirent oyunu kaldırıldı
 @app.route('/games/labyrinth')
 def labyrinth():
-    flash('Labirent oyunu artık kullanılamıyor.', 'warning')
-    return redirect(url_for('all_games'))
+    return render_template('games/labyrinth.html')
 
 @app.route('/games/puzzle')
 def puzzle():
@@ -661,7 +658,9 @@ def memory_cards():
 def number_chain():
     return render_template('games/numberChain.html')
 
-# Audio Memory oyunu kaldırıldı
+@app.route('/games/audio-memory')
+def audio_memory():
+    return render_template('games/audioMemory.html')
 
 @app.route('/games/n-back')
 def n_back():

@@ -29,13 +29,13 @@
     </div>
 
     <!-- Labirent -->
-    <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
-      <div class="game-icon" style="color: #6c757d;"><i class="fas fa-route"></i></div>
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-route"></i></div>
       <div class="game-info">
-        <h3>Labirent <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
-        <p>Bu oyun şu an bakımda.</p>
+        <h3>Labirent</h3>
+        <p>Karmaşık labirentlerden çıkış yolunu bularak mekansal zekânızı geliştirin.</p>
       </div>
-      <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Yapboz -->
@@ -68,14 +68,14 @@
       <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
     </div>
 
-    <!-- Sesli Hafıza - Onarımda -->
-    <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
-      <div class="game-icon" style="color: #6c757d;"><i class="fas fa-volume-up"></i></div>
+    <!-- Sesli Hafıza -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
       <div class="game-info">
-        <h3>Sesli Hafıza <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
-        <p>Bu oyun şu an bakımda.</p>
+        <h3>Sesli Hafıza</h3>
+        <p>İşitsel hafızanızı geliştirin, ses dizilerini doğru sırayla tekrarlayın.</p>
       </div>
-      <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- N-Back Test -->
@@ -88,14 +88,14 @@
       <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
     </div>
 
-    <!-- 3D Labirent - Onarımda -->
-    <div class="game-card" style="background-color: #f8f9fa; opacity: 0.8;">
-      <div class="game-icon" style="color: #6c757d;"><i class="fas fa-cube"></i></div>
+    <!-- 3D Döndürme -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-cube"></i></div>
       <div class="game-info">
-        <h3>3D Labirent <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Onarımda</span></h3>
-        <p>Bu oyun şu an bakımda.</p>
+        <h3>3D Döndürme</h3>
+        <p>Uzamsal algı yeteneklerinizi geliştirmek için 3D şekilleri doğru açılarla döndürün.</p>
       </div>
-      <span class="game-btn" style="background-color: #6c757d; cursor: not-allowed;">Onarımda</span>
+      <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
     </div>
 
     <!-- Sudoku -->

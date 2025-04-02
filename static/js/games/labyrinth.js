@@ -1,14 +1,15 @@
 /**
- * Labirent Oyunu - 1.0
+ * Labirent Oyunu - v2.0
  * 
- * Kullanıcının çeşitli labirentlerde yolu bulmasını gerektiren 2D labirent oyunu
+ * Kullanıcının çeşitli labirentlerde yolu bulmasını gerektiren modern 2D labirent oyunu
  * 
  * Özellikler:
- * - Dinamik olarak oluşturulan labirentler
- * - Zorluk seviyeleri
- * - Görsel efektler ve animasyonlar
- * - Puanlama sistemi
- * - Tüm cihazlara uygun responsive tasarım
+ * - Dinamik olarak oluşturulan labirentler 
+ * - Çoklu zorluk seviyeleri (Kolay, Orta, Zor)
+ * - Gelişmiş görsel efektler ve animasyonlar
+ * - Kapsamlı puanlama sistemi
+ * - Responsive tasarım - tüm cihazlarda uyumlu çalışma
+ * - Dokunmatik, fare ve klavye kontrolleri
  */
 
 document.addEventListener('DOMContentLoaded', function() {

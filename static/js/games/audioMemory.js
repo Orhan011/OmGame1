@@ -1,7 +1,15 @@
 /**
- * Sesli Hafıza Oyunu (Simon) - v1.0
+ * Sesli Hafıza Oyunu (Simon) - v2.0
  * Ses sıralarını hafızada tutmaya dayalı interaktif oyun.
  * Kullanıcı, rastgele oluşturulan ses dizilerini doğru sırada tekrarlamaya çalışır.
+ * 
+ * Özellikler:
+ * - Çoklu zorluk seviyeleri
+ * - Görsel ve işitsel geri bildirim
+ * - Puanlama sistemi
+ * - Sıralı hafıza geliştirme
+ * - Hızlı tepki ve odaklanma pratikleri
+ * - Web Audio API ile yüksek kaliteli ses üretimi
  */
 
 document.addEventListener('DOMContentLoaded', function() {
