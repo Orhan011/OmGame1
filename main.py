@@ -628,8 +628,8 @@ def word_puzzle():
 
 @app.route('/games/memory-match')
 def memory_match():
-    # Eski Hafıza Kartları oyunu artık kullanılmıyor, yeni sürüme yönlendir
-    return redirect(url_for('memory_cards'))
+    # Bu sayfa artık mevcut değil, ana sayfaya yönlendir
+    return redirect(url_for('index'))
 
 @app.route('/games/labyrinth')
 def labyrinth():
@@ -650,10 +650,7 @@ def number_sequence():
 
 # Yeni Hafıza Güçlendirme Oyunları
 # Route for "Kim Nerede?" game has been removed
-
-@app.route('/games/memory-cards')
-def memory_cards():
-    return render_template('games/memoryCards.html')
+# Memory Cards game has been removed
 
 @app.route('/games/number-chain')
 def number_chain():
