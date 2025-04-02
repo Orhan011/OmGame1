@@ -84,34 +84,46 @@ document.addEventListener('DOMContentLoaded', function() {
    * Initialize game sounds with placeholder paths, files will be created later
    */
   function initSounds() {
-    // Set volume for all sounds
-    Object.values(sounds).forEach(sound => {
-      sound.volume = 0.5;
-      
-      // Create a placeholder for missing sounds
-      sound.onerror = function() {
-        // Use an existing sound file if the specific one isn't found
-        const fallbackSounds = {
-          'flip': '/static/sounds/click.mp3',
-          'match': '/static/sounds/correct.mp3',
-          'noMatch': '/static/sounds/wrong.mp3',
-          'gameComplete': '/static/sounds/success.mp3',
-          'hint': '/static/sounds/click.mp3'
-        };
-        
-        // Get the sound name from src path
-        const soundName = this.src.split('/').pop().split('.')[0];
-        
-        // Try to use fallback sound if available
-        if (fallbackSounds[soundName]) {
-          this.src = fallbackSounds[soundName];
-        } else {
-          // Empty sound as last resort
-          this.src = 'data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAGA...';
+    try {
+      // Set volume for all sounds
+      Object.values(sounds).forEach(sound => {
+        if (sound && sound instanceof Audio) {
+          sound.volume = 0.5;
+          
+          // Create a placeholder for missing sounds
+          sound.onerror = function() {
+            try {
+              // Use an existing sound file if the specific one isn't found
+              const fallbackSounds = {
+                'flip': '/static/sounds/click.mp3',
+                'match': '/static/sounds/correct.mp3',
+                'noMatch': '/static/sounds/wrong.mp3',
+                'gameComplete': '/static/sounds/success.mp3',
+                'hint': '/static/sounds/click.mp3'
+              };
+              
+              // Get the sound name from src path
+              const soundName = this.src.split('/').pop().split('.')[0];
+              
+              // Try to use fallback sound if available
+              if (fallbackSounds[soundName]) {
+                this.src = fallbackSounds[soundName];
+              } else {
+                // Disable sound as last resort
+                soundEnabled = false;
+                console.log('Sound file not found, disabling sound');
+              }
+            } catch (e) {
+              console.error('Error handling sound fallback:', e);
+              soundEnabled = false;
+            }
+          };
         }
-        console.log('Sound file not found, using fallback sound');
-      };
-    });
+      });
+    } catch (e) {
+      console.error('Error initializing sounds:', e);
+      soundEnabled = false;
+    }
   }
   
   /**
@@ -119,9 +131,28 @@ document.addEventListener('DOMContentLoaded', function() {
    * @param {string} soundName - The name of the sound to play
    */
   function playSound(soundName) {
-    if (soundEnabled && sounds[soundName]) {
-      sounds[soundName].currentTime = 0;
-      sounds[soundName].play().catch(e => console.log('Sound play error:', e));
+    try {
+      if (soundEnabled && sounds[soundName]) {
+        sounds[soundName].currentTime = 0;
+        const playPromise = sounds[soundName].play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+            console.log('Sound play error:', e);
+            // Autoplay engellenmesi durumunda sesler kapatılsın
+            if (e.name === 'NotAllowedError') {
+              soundEnabled = false;
+              if (soundToggleBtn) {
+                const soundIcon = soundToggleBtn.querySelector('i');
+                if (soundIcon) soundIcon.className = 'bi bi-volume-mute-fill';
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Error playing sound:', e);
+      soundEnabled = false;
     }
   }
   
@@ -139,18 +170,26 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function setupEventListeners() {
     // Start game button
-    startGameBtn.addEventListener('click', startGame);
+    if (startGameBtn) {
+      startGameBtn.addEventListener('click', startGame);
+    } else {
+      console.error("startGameBtn bulunamadı!");
+    }
     
     // Level selection
-    levelButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        levelButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        currentLevel = button.dataset.level;
-        rows = levelConfig[currentLevel].rows;
-        cols = levelConfig[currentLevel].cols;
+    if (levelButtons && levelButtons.length > 0) {
+      levelButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          levelButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          currentLevel = button.dataset.level;
+          rows = levelConfig[currentLevel].rows;
+          cols = levelConfig[currentLevel].cols;
+        });
       });
-    });
+    } else {
+      console.error("levelButtons bulunamadı veya boş!");
+    }
     
     // Theme selection
     themeButtons.forEach(button => {
@@ -177,26 +216,42 @@ document.addEventListener('DOMContentLoaded', function() {
    * Start the game
    */
   function startGame() {
-    // Hide intro, show game board
-    gameIntro.style.display = 'none';
-    gameResults.style.display = 'none';
-    gameBoard.style.display = 'block';
-    
-    // Reset game state
-    resetGameState();
-    
-    // Generate cards
-    generateCards();
-    
-    // Start timer
-    startTimer();
-    
-    // Update theme display
-    currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
-    
-    // Show game board with animation
-    gameBoard.classList.add('animate__animated', 'animate__fadeIn');
-    setTimeout(() => gameBoard.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
+    try {
+      // Elementlerin var olduğunu kontrol et
+      if (!gameIntro || !gameBoard || !memoryGrid) {
+        console.error("Gerekli elementler bulunamadı!");
+        return;
+      }
+      
+      // Hide intro, show game board
+      if (gameIntro) gameIntro.style.display = 'none';
+      if (gameResults) gameResults.style.display = 'none';
+      if (gameBoard) gameBoard.style.display = 'block';
+      
+      // Reset game state
+      resetGameState();
+      
+      // Generate cards
+      generateCards();
+      
+      // Start timer
+      startTimer();
+      
+      // Update theme display
+      if (currentThemeDisplay) currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
+      
+      // Show game board with animation
+      if (gameBoard) {
+        gameBoard.classList.add('animate__animated', 'animate__fadeIn');
+        setTimeout(() => gameBoard.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
+      }
+      
+      console.log("Oyun başarıyla başlatıldı.");
+    } catch (error) {
+      console.error("Oyun başlatılırken hata oluştu:", error);
+      // Hata durumunda kullanıcıya görsel geri bildirim
+      showAlert("Oyun başlatılırken bir hata oluştu. Lütfen sayfayı yenileyin.", "error");
+    }
   }
   
   /**
@@ -718,4 +773,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize the game
   init();
+  
+  // Oyun bu şekilde başlamazsa, direkt olarak gameIntro elementinin var olup olmadığını kontrol et
+  window.addEventListener('load', function() {
+    if (gameIntro) {
+      gameIntro.style.display = 'block';
+      if (gameBoard) gameBoard.style.display = 'none';
+      if (gameResults) gameResults.style.display = 'none';
+    } else {
+      console.error("gameIntro elementi bulunamadı!");
+    }
+  });
 });
