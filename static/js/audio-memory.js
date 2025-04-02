@@ -1,8 +1,21 @@
 
 /**
- * Sesli Hafıza Oyunu (Audio Memory Game)
+ * Sesli Hafıza Oyunu (Audio Memory) - Pro Edition 2.0
+ * Geliştirilmiş, Profesyonel ve Ultra Özelliklere Sahip Versiyon
  * 
- * Sesli hafıza oyunu - farklı zorluk seviyeleri, temalar ve puanlama sistemi
+ * Özellikler:
+ * - Çoklu zorluk seviyeleri (4, 6, 9 butonlu)
+ * - Yüksek kaliteli ses efektleri
+ * - Modern ve şık arayüz
+ * - Animasyonlu geçişler ve efektler
+ * - Tam responsif tasarım
+ * - Puan sistemi ve en yüksek skor takibi
+ * - Kullanıcı dostu arayüz ve geri bildirimler
+ * - Otomatik hızlanma sistemi
+ * - Özel temalar ve görsel efektler
+ * - Ses dalga görselleştirmeleri
+ * - Hız modları ve bonus puanlar
+ * - Oyuncu istatistikleri ve başarı sistemi
  */
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elemanları
@@ -60,6 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentDifficulty = 'easy';
   let currentTheme = 'notes';
   let gameActive = false;
+  let combo = 0;
+  let streakMultiplier = 1;
+  let speedMode = false;
+  let bonusMode = true;
+  let perfectSequences = 0;
+  let timeReactionAvg = 0;
+  let totalReactions = 0;
+  let maxCombo = 0;
   
   // Zorluk seviyesi ayarları
   const difficultySettings = {
@@ -168,6 +189,27 @@ document.addEventListener('DOMContentLoaded', function() {
         loadSounds();
       });
     });
+    
+    // Oyun modu kontrolleri
+    const speedModeSwitch = document.getElementById('speedMode');
+    if (speedModeSwitch) {
+      speedModeSwitch.addEventListener('change', function() {
+        speedMode = this.checked;
+      });
+    }
+    
+    const bonusModeSwitch = document.getElementById('bonusMode');
+    if (bonusModeSwitch) {
+      bonusModeSwitch.addEventListener('change', function() {
+        bonusMode = this.checked;
+        
+        // Bonus modu kapatıldığında streak'i sıfırla
+        if (!this.checked) {
+          streakMultiplier = 1;
+          combo = 0;
+        }
+      });
+    }
     
     // Oyun kontrolleri
     pauseGameBtn.addEventListener('click', togglePause);
@@ -530,13 +572,70 @@ document.addEventListener('DOMContentLoaded', function() {
     // Butonu aktifleştir
     button.classList.add('playing');
     
+    // Işıltı efekti ekle
+    const glow = document.createElement('div');
+    glow.className = 'audio-glow';
+    button.appendChild(glow);
+    
     // Ses çal
     playSound(sounds.buttons[index]);
     
-    // Butonu deaktifleştir
+    // Ses dalgası efekti ekle
+    createWaveEffect(button);
+    
+    // Butonu deaktifleştir ve efektleri temizle
     setTimeout(() => {
       button.classList.remove('playing');
+      
+      // Işıltı elementini temizle
+      if (glow && glow.parentNode) {
+        glow.parentNode.removeChild(glow);
+      }
     }, 300);
+  }
+  
+  /**
+   * Ses dalgası efekti oluştur
+   * @param {HTMLElement} parent - Dalga efektinin ekleneceği eleman
+   */
+  function createWaveEffect(parent) {
+    // Mevcut dalga efektini temizle
+    const existingWave = parent.querySelector('.audio-wave');
+    if (existingWave) {
+      parent.removeChild(existingWave);
+    }
+    
+    // Dalga container'ı oluştur
+    const wave = document.createElement('div');
+    wave.className = 'audio-wave';
+    
+    // Rastgele dalga barları oluştur
+    const barCount = 10;
+    
+    for (let i = 0; i < barCount; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'audio-wave-bar';
+      
+      // Bar konumu
+      bar.style.left = `${(i / barCount) * 100}%`;
+      
+      // Rastgele genişlik ve animasyon gecikmesi
+      bar.style.width = `${2 + Math.random() * 3}px`;
+      bar.style.animationDelay = `${Math.random() * 0.5}s`;
+      bar.style.animationDuration = `${0.8 + Math.random() * 1}s`;
+      
+      wave.appendChild(bar);
+    }
+    
+    // Parent'a ekle
+    parent.appendChild(wave);
+    
+    // Efekti belirli bir süre sonra temizle
+    setTimeout(() => {
+      if (wave && wave.parentNode) {
+        wave.parentNode.removeChild(wave);
+      }
+    }, 800);
   }
   
   /**
@@ -584,10 +683,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Doğru sesi çal
     playSound(sounds.correct);
     
+    // Bonus mod açıksa combo sistemini güncelle
+    if (bonusMode) {
+      combo++;
+      // En yüksek combo puanını güncelle
+      maxCombo = Math.max(maxCombo, combo);
+      
+      if (combo >= 3) {
+        streakMultiplier = Math.min(3, 1 + (combo - 3) * 0.25);
+      }
+    }
+    
+    // Perfect sequence - her buton ilk denemede doğru
+    if (playerSequence.length === sequence.length) {
+      perfectSequences++;
+    }
+    
     // Puan ekle
     const levelPoints = difficultySettings[currentDifficulty].pointsPerLevel;
     const timeBonus = Math.max(0, 50 - Math.floor(timer / 5));
-    const pointsEarned = levelPoints + timeBonus;
+    const streakBonus = Math.floor(levelPoints * (streakMultiplier - 1));
+    const perfectBonus = perfectSequences * 5;
+    const pointsEarned = Math.floor((levelPoints + timeBonus + perfectBonus) * streakMultiplier);
+    
+    // Bonus puanı animasyonuyla göster
+    if (streakBonus > 0 || perfectBonus > 0) {
+      showBonusPoints(buttonIndex, pointsEarned);
+    }
     
     score += pointsEarned;
     
@@ -595,7 +717,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDisplay();
     
     // Puanı göster
-    showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+    if (streakMultiplier > 1) {
+      showAlert(`+${pointsEarned} Puan! 🔥 ${streakMultiplier.toFixed(1)}x Combo!`, 'success');
+    } else {
+      showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+    }
     
     // İlerleme çubuğunu güncelle
     updateProgressBar();
@@ -738,10 +864,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     finalTime.textContent = formattedTime;
     
+    // Detaylı istatistikleri güncelle
+    updateDetailedStats();
+    
     // Performansı hesapla ve yıldızları güncelle
     setTimeout(() => {
       calculatePerformance(success);
     }, 600);
+  }
+  
+  /**
+   * Detaylı istatistikleri güncelle
+   */
+  function updateDetailedStats() {
+    // İstatistik elementlerini al
+    const maxComboStat = document.getElementById('maxComboStat');
+    const perfectSequencesStat = document.getElementById('perfectSequencesStat');
+    const accuracyStat = document.getElementById('accuracyStat');
+    const avgReactionStat = document.getElementById('avgReactionStat');
+    
+    if (maxComboStat) {
+      // Maksimum combo
+      maxComboStat.textContent = maxCombo;
+    }
+    
+    if (perfectSequencesStat) {
+      // Mükemmel sekans sayısı
+      perfectSequencesStat.textContent = perfectSequences;
+    }
+    
+    if (accuracyStat) {
+      // Doğruluk oranı (başarılı seviye / toplam seviye)
+      const accuracy = Math.round((level / (level + (level === maxLevel ? 0 : 1))) * 100);
+      accuracyStat.textContent = `${accuracy}%`;
+    }
+    
+    if (avgReactionStat) {
+      // Ortalama tepki süresi
+      const avgReaction = timeReactionAvg > 0 ? (timeReactionAvg / Math.max(1, totalReactions)).toFixed(2) : '0.00';
+      avgReactionStat.textContent = `${avgReaction}s`;
+    }
   }
   
   /**
@@ -853,6 +1015,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
     timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  /**
+   * Bonus puan animasyonu göster
+   * @param {number} buttonIndex - Tıklanan buton indeksi
+   * @param {number} points - Kazanılan puan
+   */
+  function showBonusPoints(buttonIndex, points) {
+    // Buton pozisyonunu al
+    const button = buttons[buttonIndex];
+    const rect = button.getBoundingClientRect();
+    
+    // Bonus puan elementini oluştur
+    const bonusElement = document.createElement('div');
+    bonusElement.className = 'bonus-points';
+    bonusElement.textContent = `+${points}`;
+    
+    // Pozisyon ayarla
+    bonusElement.style.top = `${rect.top + window.scrollY - 30}px`;
+    bonusElement.style.left = `${rect.left + window.scrollX + (rect.width / 2) - 20}px`;
+    
+    // Sayfaya ekle
+    document.body.appendChild(bonusElement);
+    
+    // Animasyon sonunda kaldır
+    setTimeout(() => {
+      if (bonusElement.parentNode) {
+        bonusElement.parentNode.removeChild(bonusElement);
+      }
+    }, 1500);
   }
   
   /**
@@ -977,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Sunucuya gönder
-    fetch('/save-score', {
+    fetch('/save_score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

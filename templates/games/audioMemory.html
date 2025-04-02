@@ -66,6 +66,19 @@
               <button class="theme-btn" data-theme="instruments">Enstrümanlar</button>
             </div>
           </div>
+          
+          <!-- Oyun Modu Seçimi -->
+          <div class="audio-memory-settings mt-4">
+            <h3 class="level-label">Oyun Özellikleri</h3>
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" id="speedMode">
+              <label class="form-check-label" for="speedMode">Hız Modu (Hızlı Tempo)</label>
+            </div>
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" id="bonusMode" checked>
+              <label class="form-check-label" for="bonusMode">Combo Bonusları</label>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -156,6 +169,29 @@
               <i class="bi bi-star"></i>
             </div>
             <div class="rating-text" id="performanceText">İyi Performans!</div>
+          </div>
+          
+          <!-- Detaylı İstatistikler -->
+          <div class="stats-box mt-4">
+            <h4 class="mb-3"><i class="bi bi-graph-up"></i> Detaylı İstatistikler</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">En Yüksek Combo</div>
+                <div class="stat-value" id="maxComboStat">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Mükemmel Turlar</div>
+                <div class="stat-value" id="perfectSequencesStat">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Doğruluk Oranı</div>
+                <div class="stat-value" id="accuracyStat">0%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Ortalama Tepki</div>
+                <div class="stat-value" id="avgReactionStat">0s</div>
+              </div>
+            </div>
           </div>
         </div>
 
