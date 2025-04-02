@@ -145,7 +145,7 @@
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
-  gap: 25px;
+  gap: 30px;
   width: 100%;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
@@ -154,13 +154,25 @@
 .game-stat-horizontal {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 15px;
+  gap: 12px;
+  padding: 8px 16px;
+  position: relative;
+}
+
+.game-stat-horizontal:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  right: -15px;
+  height: 60%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .game-stat-horizontal i {
   font-size: 1.3rem;
   color: var(--memory-primary);
+  filter: drop-shadow(0 2px 5px rgba(106, 90, 224, 0.5));
 }
 
 .game-stat-horizontal .stat-label {
@@ -175,6 +187,7 @@
   font-weight: 700;
   color: #fff;
   margin-left: 5px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .game-title {
