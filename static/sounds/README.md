@@ -18,12 +18,33 @@ The sounds are in MP3 format, but JavaScript creates AudioContext for games that
 
 Bu klasör, Sesli Hafıza Oyunu için gerekli ses dosyalarını içerir. 
 
+## Ses Dosyaları Hakkında
+
+Bu klasörde Sesli Hafıza: Melodi oyunu için kullanılan ses dosyaları bulunmaktadır.
+
+## Sesler
+Oyun için kullanılan sesler şu şekildedir:
+
+- `note1.mp3` - `note8.mp3`: Farklı notalar
+- `correct.mp3`: Doğru cevap sesi
+- `wrong.mp3`: Yanlış cevap sesi
+- `level-up.mp3`: Seviye atlama sesi
+- `game-over.mp3`: Oyun bitiş sesi
+- `success.mp3`: Başarı sesi
+
+## Kullanım
+Oyun, bu ses dosyalarını hafıza kutucuklarına ve oyun olaylarına atayarak kullanır. Farklı temalar için farklı ses grupları kullanılabilir.
+
+## Not
+Eğer sesler çalışmıyorsa, tarayıcınızın ses izinlerini kontrol edin ve oyunun ses kontrolünün açık olduğundan emin olun.
+
+
 ## Mevcut Sesler
 
 Oyun şu ses dosyalarını kullanır:
 
 - **Temel Sesler:**
-  - `note1.mp3`, `note2.mp3`, `note3.mp3`, `note4.mp3`: Temel müzikal notalar (These might be superseded by the more detailed list below)
+  - `note1.mp3`, `note2.mp3`, `note3.mp3`, `note4.mp3`: Temel müzikal notalar (These might be superseded by the more detailed list above)
   - `match.mp3`: Doğru eşleşme sesi
   - `no-match.mp3`: Yanlış eşleşme sesi
   - `hint.mp3`: İpucu kullanıldığında çalan ses

@@ -719,6 +719,10 @@ p {
   box-shadow: var(--shadow-lg);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.175);
   border: 2px solid transparent;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .audio-tile::before {
@@ -732,6 +736,14 @@ p {
   opacity: 0.7;
   z-index: 1;
   pointer-events: none;
+}
+
+.audio-tile i {
+  transition: all 0.3s ease;
+}
+
+.audio-tile:hover i {
+  transform: translate(-50%, -50%) scale(1.2);
 }
 
 .audio-tile-1 { background: linear-gradient(135deg, #4a67f7, #3051d3); }
@@ -795,15 +807,18 @@ p {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 60%;
   z-index: 2;
   pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .audio-wave-bar {
   position: absolute;
-  bottom: 10%;
+  bottom: 0;
   background-color: rgba(255, 255, 255, 0.7);
   width: 5px;
   height: 20%;
@@ -812,11 +827,30 @@ p {
   animation: wave-animation 1s infinite ease-in-out;
   z-index: 2;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  opacity: 0;
+}
+
+.audio-tile.active .audio-wave-bar {
+  opacity: 1;
 }
 
 @keyframes wave-animation {
   0%, 100% { height: 20%; }
   50% { height: 65%; }
+}
+
+/* Aktif kutu animasyonu */
+.audio-tile.active {
+  transform: scale(0.92);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 10px var(--primary-light);
+  border-color: rgba(255, 255, 255, 0.4);
+  animation: tile-pulse 0.4s ease;
+}
+
+.audio-tile.active i {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.3);
+  color: white;
 }
 
 .audio-glow {

@@ -379,6 +379,35 @@ document.addEventListener('DOMContentLoaded', function() {
       tile.className = `audio-tile audio-tile-${(i % 8) + 1}`;
       tile.dataset.index = i;
       
+      // Ses dalgası içeriği ekle
+      const waveContainer = document.createElement('div');
+      waveContainer.className = 'audio-wave';
+      
+      // Dalga çubukları oluştur
+      for (let j = 0; j < 5; j++) {
+        const bar = document.createElement('div');
+        bar.className = 'audio-wave-bar';
+        bar.style.left = `${(j * 20) + 10}%`;
+        bar.style.animationDelay = `${j * 0.1}s`;
+        waveContainer.appendChild(bar);
+      }
+      
+      // İkon veya sembol ekle (opsiyonel)
+      const icon = document.createElement('i');
+      icon.className = 'bi bi-music-note';
+      icon.style.position = 'absolute';
+      icon.style.top = '50%';
+      icon.style.left = '50%';
+      icon.style.transform = 'translate(-50%, -50%)';
+      icon.style.fontSize = '1.8rem';
+      icon.style.color = 'rgba(255, 255, 255, 0.7)';
+      icon.style.zIndex = '1';
+      icon.style.opacity = '0.5';
+      
+      // İçerikleri tile'a ekle
+      tile.appendChild(icon);
+      tile.appendChild(waveContainer);
+      
       // Kutucuğa tıklama olayı
       tile.addEventListener('click', () => {
         if (!isPlayerTurn || gamePaused) return;
