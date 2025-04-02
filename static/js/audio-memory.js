@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
         waveContainer.appendChild(bar);
       }
       
-      // İkon veya sembol ekle (opsiyonel)
+      // İkon veya sembol ekle
       const icon = document.createElement('i');
       icon.className = 'bi bi-music-note';
       icon.style.position = 'absolute';
@@ -403,6 +403,19 @@ document.addEventListener('DOMContentLoaded', function() {
       icon.style.color = 'rgba(255, 255, 255, 0.7)';
       icon.style.zIndex = '1';
       icon.style.opacity = '0.5';
+      icon.style.transition = 'all 0.3s ease';
+      icon.style.pointerEvents = 'none';
+      
+      // Dalga çubukları oluştur (statik kutular için)
+      for (let j = 0; j < 5; j++) {
+        const bar = document.createElement('div');
+        bar.className = 'audio-wave-bar';
+        bar.style.left = `${(j / 4) * 80 + 10}%`;
+        bar.style.animationDelay = `${j * 0.1}s`;
+        bar.style.width = '4px';
+        bar.style.opacity = '0';
+        waveContainer.appendChild(bar);
+      }
       
       // İçerikleri tile'a ekle
       tile.appendChild(icon);
@@ -561,6 +574,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const tile = tiles[tileIndex];
     
+    // Eğer kutucuk zaten aktif ise, işlemi tekrarlama
+    if (tile.classList.contains('active')) return;
+    
     // Kutucuğu aktifleştir
     tile.classList.add('active');
     
@@ -573,10 +589,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ses dalgası efekti oluştur
     createWaveEffect(tile);
     
+    // İkonu belirginleştir
+    const icon = tile.querySelector('i');
+    if (icon) {
+      icon.style.opacity = '1';
+    }
+    
     // Kutucuğu belirli bir süre sonra deaktifleştir
     setTimeout(() => {
       tile.classList.remove('active');
-    }, 300);
+      
+      // İkonu normal haline getir
+      if (icon) {
+        icon.style.opacity = '0.5';
+      }
+    }, 350);
   }
   
   // Kutucuğa ışıltı efekti ekle
@@ -602,30 +629,51 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Kutucuğa ses dalgası efekti ekle
   function createWaveEffect(tile) {
-    // Mevcut dalga efektini temizle
+    // Zaten var olan wave barları aktifleştir
     const existingWave = tile.querySelector('.audio-wave');
     if (existingWave) {
-      tile.removeChild(existingWave);
+      const bars = existingWave.querySelectorAll('.audio-wave-bar');
+      bars.forEach(bar => {
+        // Görünürlüğü aktifleştir
+        bar.style.opacity = '1';
+        
+        // Rastgele yükseklik animasyonu
+        bar.style.height = `${20 + Math.random() * 50}%`;
+        
+        // Animasyon gecikmesi
+        bar.style.animationDelay = `${Math.random() * 0.3}s`;
+      });
+      
+      // Belirli bir süre sonra dalgaları gizle
+      setTimeout(() => {
+        bars.forEach(bar => {
+          bar.style.opacity = '0';
+          bar.style.height = '20%';
+        });
+      }, 300);
+      
+      return;
     }
     
-    // Dalga container'ı oluştur
+    // Dalga yoksa, yeni dalga container'ı oluştur
     const wave = document.createElement('div');
     wave.className = 'audio-wave';
     
-    // Rastgele dalga barları oluştur
-    const barCount = 12;
+    // Dalga barları oluştur
+    const barCount = 5;
     for (let i = 0; i < barCount; i++) {
       const bar = document.createElement('div');
       bar.className = 'audio-wave-bar';
       bar.style.setProperty('--i', i);
       
       // Bar konumu
-      bar.style.left = `${(i / barCount) * 100}%`;
+      bar.style.left = `${(i / (barCount - 1)) * 80 + 10}%`;
       
-      // Rastgele genişlik ve animasyon gecikmesi
-      bar.style.width = `${3 + Math.random() * 3}px`;
-      bar.style.animationDelay = `${Math.random() * 0.5}s`;
-      bar.style.animationDuration = `${0.7 + Math.random() * 0.6}s`;
+      // Genişlik ve animasyon gecikmesi
+      bar.style.width = '4px';
+      bar.style.opacity = '1';
+      bar.style.height = `${20 + Math.random() * 50}%`;
+      bar.style.animationDelay = `${Math.random() * 0.3}s`;
       
       wave.appendChild(bar);
     }
@@ -633,12 +681,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Tile'a ekle
     tile.appendChild(wave);
     
-    // Belirli bir süre sonra efekti temizle
+    // Belirli bir süre sonra dalgaları gizle
     setTimeout(() => {
-      if (wave && wave.parentNode) {
-        wave.parentNode.removeChild(wave);
-      }
-    }, 800);
+      const bars = wave.querySelectorAll('.audio-wave-bar');
+      bars.forEach(bar => {
+        bar.style.opacity = '0';
+        bar.style.height = '20%';
+      });
+    }, 300);
   }
   
   // Oyuncu sırasını kontrol et
