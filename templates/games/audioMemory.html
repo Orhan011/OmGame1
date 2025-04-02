@@ -1,244 +1,214 @@
-
-{% extends 'layout.html' %}
-
-{% block title %}Sesli Hafıza: Melodi - ZekaPark{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Sesli Hafıza: Melodi - Beyin Geliştirici Hafıza Oyunu{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/audio-memory.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="audio-memory-container">
-    <!-- Dekoratif elementler -->
-    <div class="decoration-element decoration-1"></div>
-    <div class="decoration-element decoration-2"></div>
-    
-    <!-- Oyun Başlığı ve Açıklama -->
-    <div class="audio-memory-header">
-      <h1 class="game-title">Sesli Hafıza: Melodi</h1>
-      <div class="audio-subtitle">Sesleri dinle, sıralamayı hatırla, hafızanı geliştir</div>
-    </div>
-    
-    <!-- Oyun İstatistikleri -->
-    <div class="audio-stats-bar" id="statsBar">
-      <div class="audio-stat">
-        <div class="stat-icon"><i class="bi bi-trophy-fill"></i></div>
-        <div class="stat-content">
-          <div class="stat-label">PUAN</div>
-          <div class="stat-value" id="scoreValue">0</div>
-        </div>
+<div class="container mt-4 mb-5 audio-memory-container">
+  <!-- Oyun Başlık Bölümü -->
+  <div class="audio-memory-header">
+    <h1 class="game-title">
+      <i class="bi bi-music-note-beamed"></i> Sesli Hafıza: Melodi
+    </h1>
+    <div class="game-stats-row">
+      <div class="game-stat-horizontal">
+        <i class="bi bi-star-fill"></i>
+        <span class="stat-label">Skor:</span>
+        <span class="stat-value" id="score">0</span>
       </div>
-      
-      <div class="audio-stat">
-        <div class="stat-icon"><i class="bi bi-stopwatch-fill"></i></div>
-        <div class="stat-content">
-          <div class="stat-label">SÜRE</div>
-          <div class="stat-value" id="timeValue">00:00</div>
-        </div>
+      <div class="game-stat-horizontal">
+        <i class="bi bi-layers-fill"></i>
+        <span class="stat-label">Seviye:</span>
+        <span class="stat-value" id="level">1</span>
       </div>
-      
-      <div class="audio-stat">
-        <div class="stat-icon"><i class="bi bi-brightness-high-fill"></i></div>
-        <div class="stat-content">
-          <div class="stat-label">SEVİYE</div>
-          <div class="stat-value" id="levelValue">1</div>
-        </div>
-      </div>
-      
-      <div class="audio-stat">
-        <div class="stat-icon"><i class="bi bi-music-note-list"></i></div>
-        <div class="stat-content">
-          <div class="stat-label">SES</div>
-          <div class="stat-value" id="sequenceValue">0</div>
-        </div>
+      <div class="game-stat-horizontal">
+        <i class="bi bi-stopwatch"></i>
+        <span class="stat-label">Süre:</span>
+        <span class="stat-value" id="timer">00:00</span>
       </div>
     </div>
+  </div>
+
+  <!-- Giriş Ekranı -->
+  <div id="gameIntro">
+    <div class="audio-memory-intro">
+      <h2 class="instruction-title">
+        <i class="bi bi-info-circle-fill"></i> Oyun Kuralları
+      </h2>
+      <p>Sesli Hafıza: Melodi, hafızanızı ve dikkatinizi geliştiren profesyonel bir hafıza oyunudur. Kutuların çalma sırasını izleyin ve ardından aynı sırayla tekrarlayın.</p>
+      
+      <div class="instruction-steps">
+        <div class="instruction-step">
+          <div class="step-number">1</div>
+          <div class="step-text">Renkli kutular belirli bir sırayla sesler çıkaracak ve yanıp sönecek.</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-number">2</div>
+          <div class="step-text">Sırayı dikkatlice izleyin ve sıra size geldiğinde aynı sırayı tekrarlayın.</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-number">3</div>
+          <div class="step-text">Her seviye başarıyla tamamlandığında, sıraya yeni bir adım eklenir.</div>
+        </div>
+        <div class="instruction-step">
+          <div class="step-number">4</div>
+          <div class="step-text">Yanlış bir kutuya basarsanız veya sırayı unutursanız oyun sona erer.</div>
+        </div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+          <div class="audio-memory-settings">
+            <h3 class="level-label">
+              <i class="bi bi-speedometer2"></i> Zorluk Seviyesi
+            </h3>
+            <div class="level-buttons">
+              <button class="level-btn active" data-level="easy">Kolay (4 Kutu)</button>
+              <button class="level-btn" data-level="medium">Orta (6 Kutu)</button>
+              <button class="level-btn" data-level="hard">Zor (8 Kutu)</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+          <div class="audio-memory-settings">
+            <h3 class="level-label">
+              <i class="bi bi-music-note"></i> Ses Teması
+            </h3>
+            <div class="theme-buttons">
+              <button class="theme-btn active" data-theme="electronic">Elektronik</button>
+              <button class="theme-btn" data-theme="musical">Müzikal</button>
+              <button class="theme-btn" data-theme="drums">Davul</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="audio-memory-settings">
+            <h3 class="level-label">
+              <i class="bi bi-sliders"></i> Oyun Modları
+            </h3>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="speedMode">
+              <label class="form-check-label" for="speedMode">Hız Modu - Daha hızlı tempo, daha fazla zorluk</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="bonusMode" checked>
+              <label class="form-check-label" for="bonusMode">Combo Modu - Art arda doğru diziler için puan çarpanı</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
-    <!-- Başlangıç Ekranı -->
-    <div class="audio-intro-screen" id="introScreen">
-      <div class="audio-intro-content">
-        <div class="audio-intro-header">
-          <i class="bi bi-soundwave"></i>
-          <h2>Nasıl Oynanır?</h2>
-        </div>
-        
-        <div class="audio-intro-steps">
-          <div class="intro-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h3>Dinle</h3>
-              <p>Çalınan ses dizisini dikkatle dinle</p>
-            </div>
-          </div>
-          
-          <div class="intro-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h3>Hatırla</h3>
-              <p>Seslerin sırasını hafızanda tut</p>
-            </div>
-          </div>
-          
-          <div class="intro-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h3>Tekrarla</h3>
-              <p>Aynı sırayla butonlara basarak sesleri tekrarla</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Zorluk Seviyesi Seçimi -->
-        <div class="audio-difficulty-selector">
-          <h3 class="selector-label">Zorluk Seviyesi</h3>
-          <div class="difficulty-buttons">
-            <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
-            <button class="difficulty-btn" data-difficulty="medium">Orta</button>
-            <button class="difficulty-btn" data-difficulty="hard">Zor</button>
-          </div>
-        </div>
-        
-        <!-- Tema Seçimi -->
-        <div class="audio-theme-selector">
-          <h3 class="selector-label">Tema Seçimi</h3>
-          <div class="theme-buttons">
-            <button class="theme-btn active" data-theme="nature">
-              <i class="bi bi-tree-fill"></i>
-              <span>Doğa</span>
-            </button>
-            <button class="theme-btn" data-theme="instruments">
-              <i class="bi bi-music-note-beamed"></i>
-              <span>Enstrümanlar</span>
-            </button>
-            <button class="theme-btn" data-theme="retro">
-              <i class="bi bi-vinyl-fill"></i>
-              <span>Nostaljik</span>
-            </button>
-          </div>
-        </div>
-        
-        <div class="audio-start-controls">
-          <button class="btn-primary start-game" id="startGameBtn">
-            <i class="bi bi-play-fill"></i> Oyunu Başlat
+    <div class="audio-memory-controls">
+      <button id="startGame" class="play-btn">
+        <i class="bi bi-play-fill"></i> Oyunu Başlat
+      </button>
+    </div>
+  </div>
+
+  <!-- Oyun Tahtası -->
+  <div id="gameBoard" style="display: none;">
+    <div class="audio-memory-board">
+      <div class="board-header">
+        <h3 class="current-level" id="currentLevelDisplay">Seviye 1</h3>
+        <div class="game-controls-top">
+          <button id="pauseGame" class="game-control-btn" title="Oyunu Duraklat">
+            <i class="bi bi-pause-fill"></i>
           </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Oyun Ekranı -->
-    <div class="audio-game-screen" id="gameScreen" style="display: none;">
-      <div class="audio-visualizer" id="audioVisualizer">
-        <div class="visualizer-label" id="playbackStatus">Ses dizisini dinleyin...</div>
-        <div class="wave-container" id="waveContainer">
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-          <div class="wave-bar"></div>
-        </div>
-      </div>
-      
-      <div class="game-status-message" id="statusMessage">
-        <div class="status-icon"><i class="bi bi-headphones"></i></div>
-        <div class="status-text">Dinle ve hatırla</div>
-      </div>
-      
-      <!-- Ses Butonları Alanı -->
-      <div class="audio-buttons-container" id="audioButtonsContainer">
-        <!-- Butonlar JavaScript ile dinamik olarak oluşturulacak -->
-      </div>
-      
-      <!-- Oyun Kontrolleri -->
-      <div class="game-controls-bar">
-        <div class="game-control-buttons">
-          <button class="control-btn" id="replayBtn" title="Tekrar Dinle" disabled>
-            <i class="bi bi-arrow-repeat"></i>
-            <span class="btn-hint">Tekrar Dinle</span>
-            <span class="joker-counter" id="jokerCounter">1</span>
-          </button>
-          
-          <button class="control-btn" id="soundToggleBtn" title="Sesi Aç/Kapat">
+          <button id="soundToggle" class="game-control-btn" title="Sesi Aç/Kapat">
             <i class="bi bi-volume-up-fill"></i>
-            <span class="btn-hint">Ses</span>
           </button>
         </div>
-        
-        <button class="control-btn btn-danger" id="endGameBtn" title="Oyunu Bitir">
-          <i class="bi bi-x-circle-fill"></i>
-          <span class="btn-hint">Oyunu Bitir</span>
+      </div>
+      
+      <div class="status-message">
+        <span id="statusText">Sırayı İzleyin...</span>
+        <div class="status-progress">
+          <div class="status-progress-bar" id="statusProgressBar"></div>
+        </div>
+      </div>
+      
+      <div id="tilesContainer" class="tiles-container"></div>
+      
+      <div class="audio-memory-progress">
+        <div class="progress-label">
+          <span>İlerleme</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sonuç Ekranı -->
+  <div id="gameResults" class="audio-memory-results" style="display: none;">
+    <div class="results-card">
+      <div class="results-header">
+        <div class="result-badge">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <h2>Oyun Sona Erdi!</h2>
+      </div>
+      
+      <div class="results-stats">
+        <div class="result-stat">
+          <div class="result-stat-value" id="finalScore">0</div>
+          <div class="result-stat-label">Toplam Puan</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" id="finalLevel">0</div>
+          <div class="result-stat-label">Seviye</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-value" id="finalTime">00:00</div>
+          <div class="result-stat-label">Süre</div>
+        </div>
+      </div>
+      
+      <div class="performance-rating">
+        <div class="rating-stars" id="performanceStars">
+          <i class="bi bi-star-fill" style="--i: 0"></i>
+          <i class="bi bi-star-fill" style="--i: 1"></i>
+          <i class="bi bi-star-fill" style="--i: 2"></i>
+          <i class="bi bi-star" style="--i: 3"></i>
+          <i class="bi bi-star" style="--i: 4"></i>
+        </div>
+        <div class="rating-text" id="performanceText">İyi Performans!</div>
+      </div>
+      
+      <div class="results-footer">
+        <button id="playAgainBtn" class="btn-outline-light">
+          <i class="bi bi-arrow-repeat"></i> Tekrar Oyna
+        </button>
+        <button id="saveScoreBtn" class="btn-primary">
+          <i class="bi bi-save"></i> Skoru Kaydet
         </button>
       </div>
     </div>
-    
-    <!-- Sonuç Ekranı -->
-    <div class="audio-results-screen" id="resultsScreen" style="display: none;">
-      <div class="results-content">
-        <div class="results-header">
-          <div class="result-badge"><i class="bi bi-trophy-fill"></i></div>
-          <h2>Oyun Bitti!</h2>
-        </div>
-        
-        <div class="results-body">
-          <div class="result-message" id="resultMessage">
-            Harika! Hafızanı test etmeyi başardın.
-          </div>
-          
-          <div class="results-stats">
-            <div class="result-stat">
-              <div class="result-stat-icon"><i class="bi bi-trophy-fill"></i></div>
-              <div class="result-stat-label">Toplam Puan</div>
-              <div class="result-stat-value" id="finalScore">0</div>
-            </div>
-            
-            <div class="result-stat">
-              <div class="result-stat-icon"><i class="bi bi-soundwave"></i></div>
-              <div class="result-stat-label">Hatırlanan Sesler</div>
-              <div class="result-stat-value" id="finalSequence">0</div>
-            </div>
-            
-            <div class="result-stat">
-              <div class="result-stat-icon"><i class="bi bi-alarm-fill"></i></div>
-              <div class="result-stat-label">Toplam Süre</div>
-              <div class="result-stat-value" id="finalTime">00:00</div>
-            </div>
-          </div>
-          
-          <div class="result-share">
-            <div class="share-message">Sonucunu paylaş:</div>
-            <div class="share-buttons">
-              <button class="share-btn" id="shareWhatsapp">
-                <i class="bi bi-whatsapp"></i>
-              </button>
-              <button class="share-btn" id="shareTwitter">
-                <i class="bi bi-twitter-x"></i>
-              </button>
-              <button class="share-btn" id="shareFacebook">
-                <i class="bi bi-facebook"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="results-footer">
-          <button class="btn-secondary" id="returnHomeBtn">
-            <i class="bi bi-house-fill"></i> Ana Sayfa
-          </button>
-          <button class="btn-primary" id="playAgainBtn">
-            <i class="bi bi-play-fill"></i> Tekrar Oyna
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Oyun Bildirim Alanı -->
-    <div class="audio-notification" id="notification"></div>
-    
   </div>
+  
+  <!-- Duraklatma Ekranı -->
+  <div id="pauseOverlay" class="game-pause-overlay" style="display: none;">
+    <div class="pause-card">
+      <h3><i class="bi bi-pause-circle-fill"></i> Oyun Duraklatıldı</h3>
+      <p>Oyuna devam etmek için aşağıdaki butona tıklayın.</p>
+      <button id="resumeBtn" class="btn-primary">
+        <i class="bi bi-play-fill"></i> Devam Et
+      </button>
+    </div>
+  </div>
+  
+  <!-- Uyarı Mesajları -->
+  <div id="gameAlerts" class="audio-memory-alert"></div>
 </div>
 {% endblock %}
 
