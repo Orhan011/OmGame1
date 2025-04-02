@@ -25,7 +25,7 @@
   --grey-700: #495057;
   --grey-800: #343a40;
   --grey-900: #212529;
-  
+
   /* Tile Colors */
   --tile-color-1: #4a67f7;
   --tile-color-2: #8c42f4;
@@ -35,13 +35,13 @@
   --tile-color-6: #e74c3c;
   --tile-color-7: #3498db;
   --tile-color-8: #9b59b6;
-  
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
   --gradient-primary-hover: linear-gradient(135deg, var(--primary-light), var(--secondary));
   --gradient-secondary: linear-gradient(135deg, var(--secondary), var(--accent));
   --gradient-card: linear-gradient(160deg, var(--dark-card), #1a1c25);
-  
+
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -51,7 +51,7 @@
   --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
   --shadow-primary: 0 0 15px rgba(74, 103, 247, 0.3);
   --shadow-secondary: 0 0 15px rgba(140, 66, 244, 0.3);
-  
+
   /* Borders */
   --border-radius-sm: 0.25rem;
   --border-radius-md: 0.5rem;
@@ -703,7 +703,7 @@ p {
   .tiles-container[data-count="6"] {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .tiles-container[data-count="8"] {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -757,21 +757,19 @@ p {
 
 .audio-tile:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
 .audio-tile.active {
-  transform: scale(0.92);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(0.95);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
   animation: tile-pulse 0.4s ease;
 }
 
 @keyframes tile-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.9); }
-  100% { transform: scale(0.92); }
+  0% { transform: scale(1); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); }
+  50% { transform: scale(0.9); box-shadow: 0 0 35px rgba(255, 255, 255, 0.6); }
+  100% { transform: scale(0.95); box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
 }
 
 /* Tile Effects */
@@ -846,8 +844,8 @@ p {
 
 /* Aktif kutu animasyonu */
 .audio-tile.active {
-  transform: scale(0.92);
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 10px var(--primary-light);
+  transform: scale(0.95);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 10px var(--primary-light);
   border-color: rgba(255, 255, 255, 0.4);
   animation: tile-pulse 0.4s ease;
 }
@@ -861,7 +859,7 @@ p {
 @keyframes tile-pulse {
   0% { transform: scale(1); box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
   50% { transform: scale(0.9); box-shadow: 0 0 30px rgba(255, 255, 255, 0.4), 0 0 15px var(--primary-light); }
-  100% { transform: scale(0.92); box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 10px var(--primary-light); }
+  100% { transform: scale(0.95); box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 10px var(--primary-light); }
 }
 
 .audio-glow {
@@ -1260,21 +1258,21 @@ p {
     padding: 0.8rem 2rem;
     font-size: 1.1rem;
   }
-  
+
   .instruction-title,
   .results-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .game-title {
     font-size: 2.3rem;
   }
-  
+
   .level-btn, .theme-btn {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .result-stat-value {
     font-size: 1.7rem;
   }
@@ -1287,34 +1285,34 @@ p {
   .pause-card {
     padding: 1.5rem;
   }
-  
+
   .game-title {
     font-size: 1.8rem;
   }
-  
+
   .game-stats-row {
     gap: 1rem;
     padding: 0.5rem 1rem;
   }
-  
+
   .result-badge {
     width: 70px;
     height: 70px;
   }
-  
+
   .result-badge i {
     font-size: 2rem;
   }
-  
+
   .results-stats {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
-  
+
   .result-stat-value {
     font-size: 1.5rem;
   }
-  
+
   .rating-stars {
     font-size: 1.7rem;
   }
@@ -1324,31 +1322,31 @@ p {
   .tiles-container {
     gap: 0.8rem;
   }
-  
+
   .board-header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .game-controls-top {
     align-self: center;
   }
-  
+
   .results-footer {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .btn-outline-light, .btn-primary {
     width: 100%;
     padding: 0.75rem 0;
   }
-  
+
   #statusText {
     font-size: 1rem;
   }
-  
+
   .status-message {
     padding: 1rem 0.75rem;
   }
