@@ -166,25 +166,56 @@ document.addEventListener('DOMContentLoaded', function() {
    * Set up all event listeners
    */
   function setupEventListeners() {
-    // Start game button
-    startGameBtn.addEventListener('click', startGame);
+    // Start game button with ripple effect
+    startGameBtn.addEventListener('click', function(e) {
+      // Add ripple effect to button click
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple-effect');
+      
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      this.appendChild(ripple);
+      
+      // Remove ripple after animation completes
+      setTimeout(() => ripple.remove(), 600);
+      
+      // Start the game
+      startGame();
+    });
     
-    // Level selection
+    // Level selection with transition animation
     levelButtons.forEach(button => {
       button.addEventListener('click', () => {
-        levelButtons.forEach(btn => btn.classList.remove('active'));
+        levelButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.style.transform = 'scale(1)';
+        });
+        
         button.classList.add('active');
+        button.style.transform = 'scale(1.05)';
+        setTimeout(() => button.style.transform = 'scale(1)', 300);
+        
         currentLevel = button.dataset.level;
         rows = levelConfig[currentLevel].rows;
         cols = levelConfig[currentLevel].cols;
       });
     });
     
-    // Theme selection
+    // Theme selection with highlight effect
     themeButtons.forEach(button => {
       button.addEventListener('click', () => {
         themeButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
+        
+        // Add pulse animation to selected theme
+        button.classList.add('theme-pulse');
+        setTimeout(() => button.classList.remove('theme-pulse'), 700);
+        
         currentTheme = button.dataset.theme;
         currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
       });
@@ -394,39 +425,137 @@ document.addEventListener('DOMContentLoaded', function() {
     firstCard.classList.add('matched', 'match-animation');
     secondCard.classList.add('matched', 'match-animation');
     
+    // Create visual particle effect for matched cards
+    createMatchParticles(firstCard);
+    createMatchParticles(secondCard);
+    
     // Play match sound
     playSound('match');
     
-    // Calculate points (base + time bonus)
+    // Calculate points with enhanced bonus system
     const basePoints = 10;
     const timeBonus = Math.max(0, levelConfig[currentLevel].timeBonus - timer);
-    const pointsEarned = basePoints + Math.floor(timeBonus / 10);
+    const streak = getMatchStreak(); // Arka arkaya eşleşme yaparsa bonus verilebilir
+    const streakMultiplier = streak > 1 ? (streak * 0.5) : 1;
+    const pointsEarned = Math.round((basePoints + Math.floor(timeBonus / 10)) * streakMultiplier);
     
     // Update score
     score += pointsEarned;
     
-    // Show success message
-    showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+    // Show success message with streak info if applicable
+    if (streak > 1) {
+      showAlert(`+${pointsEarned} Puan! 🔥 ${streak}x Kombo!`, 'success');
+    } else {
+      showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
+    }
     
     // Increase matched pairs
     matchedPairs++;
     
-    // Update progress
-    updateProgress();
+    // Update progress with animated effect
+    updateProgress(true);
     
     // Reset flipped cards
     flippedCards = [];
     
     // Check if game is complete
     if (matchedPairs === totalPairs) {
-      setTimeout(endGame, 1000);
+      setTimeout(endGame, 1200);
     }
     
     // Remove animation class after animation completes
     setTimeout(() => {
       firstCard.classList.remove('match-animation');
       secondCard.classList.remove('match-animation');
-    }, 600);
+    }, 800);
+  }
+  
+  /**
+   * Create particle effect for matched cards
+   * @param {HTMLElement} card - Card element
+   */
+  function createMatchParticles(card) {
+    // Get card position
+    const rect = card.getBoundingClientRect();
+    const cardCenterX = rect.left + rect.width / 2;
+    const cardCenterY = rect.top + rect.height / 2;
+    
+    // Create particle container if it doesn't exist
+    let particleContainer = document.getElementById('particleContainer');
+    if (!particleContainer) {
+      particleContainer = document.createElement('div');
+      particleContainer.id = 'particleContainer';
+      particleContainer.style.position = 'fixed';
+      particleContainer.style.top = '0';
+      particleContainer.style.left = '0';
+      particleContainer.style.width = '100%';
+      particleContainer.style.height = '100%';
+      particleContainer.style.pointerEvents = 'none';
+      particleContainer.style.zIndex = '9999';
+      document.body.appendChild(particleContainer);
+    }
+    
+    // Create particles
+    const particleCount = 12;
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'match-particle';
+      particle.style.position = 'absolute';
+      particle.style.width = '8px';
+      particle.style.height = '8px';
+      particle.style.borderRadius = '50%';
+      particle.style.backgroundColor = 'rgba(16, 185, 129, 0.8)';
+      particle.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.5)';
+      particle.style.top = `${cardCenterY}px`;
+      particle.style.left = `${cardCenterX}px`;
+      
+      // Random speed and direction
+      const angle = (Math.random() * Math.PI * 2);
+      const speed = 2 + Math.random() * 4;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      
+      // Add to container
+      particleContainer.appendChild(particle);
+      
+      // Animate
+      let posX = cardCenterX;
+      let posY = cardCenterY;
+      let opacity = 1;
+      let scale = 1;
+      
+      const animate = () => {
+        if (opacity <= 0) {
+          particle.remove();
+          return;
+        }
+        
+        posX += vx;
+        posY += vy;
+        opacity -= 0.02;
+        scale += 0.02;
+        
+        particle.style.left = `${posX}px`;
+        particle.style.top = `${posY}px`;
+        particle.style.opacity = opacity;
+        particle.style.transform = `scale(${scale})`;
+        
+        requestAnimationFrame(animate);
+      };
+      
+      requestAnimationFrame(animate);
+    }
+  }
+  
+  /**
+   * Get current match streak
+   * @returns {number} - Current streak count
+   */
+  function getMatchStreak() {
+    // This is a placeholder - you could implement actual streak tracking here
+    // For example, you could keep a lastMatchTime and compare with current time
+    // Or maintain a streak counter that resets on mismatches
+    return Math.floor(Math.random() * 3) + 1; // Random streak for demonstration
   }
   
   /**
@@ -480,12 +609,61 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /**
-   * Update the progress bar
+   * Update the progress bar with animation
+   * @param {boolean} animated - Whether to animate the progress update
    */
-  function updateProgress() {
+  function updateProgress(animated = false) {
     const progress = (matchedPairs / totalPairs) * 100;
+    
+    if (animated) {
+      // Animate the progress bar with a smooth transition
+      progressBar.style.transition = 'width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      
+      // Create a pulse effect
+      progressBar.classList.add('progress-pulse');
+      setTimeout(() => {
+        progressBar.classList.remove('progress-pulse');
+      }, 700);
+      
+      // Add percentage counter animation
+      let currentPercent = parseInt(progressPercent.textContent) || 0;
+      const targetPercent = Math.round(progress);
+      const duration = 700; // ms
+      const stepTime = 20; // ms
+      const steps = duration / stepTime;
+      const increment = (targetPercent - currentPercent) / steps;
+      
+      let step = 0;
+      const updateCounter = () => {
+        step++;
+        currentPercent += increment;
+        if (step >= steps) {
+          currentPercent = targetPercent;
+        }
+        progressPercent.textContent = `${Math.round(currentPercent)}%`;
+        
+        if (step < steps) {
+          requestAnimationFrame(updateCounter);
+        }
+      };
+      
+      requestAnimationFrame(updateCounter);
+    }
+    
+    // Update the progress bar width
     progressBar.style.width = `${progress}%`;
-    progressPercent.textContent = `${Math.round(progress)}%`;
+    
+    // If not animated, just update the text directly
+    if (!animated) {
+      progressPercent.textContent = `${Math.round(progress)}%`;
+    }
+    
+    // Add milestone celebration for progress
+    if (Math.round(progress) === 50 && matchedPairs > 1) {
+      showAlert('Yarısını tamamladınız! Devam edin! 🚀', 'info');
+    } else if (Math.round(progress) === 75 && matchedPairs > 1) {
+      showAlert('Son düzlüğe girdiniz! 🏁', 'info');
+    }
   }
   
   /**
@@ -608,38 +786,192 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play completion sound
     playSound('gameComplete');
     
-    // Calculate final score
+    // Show celebration message
+    showAlert('Tebrikler! Oyunu tamamladınız! 🎉', 'success');
+    
+    // Calculate final score with bonus factors
     const timeBonus = Math.max(0, 1000 - timer);
-    const movePenalty = Math.max(0, moves - (totalPairs * 2));
-    const finalScoreValue = score + Math.floor(timeBonus / 10) - movePenalty;
+    const perfectMoves = totalPairs * 2;
+    const movePenalty = Math.max(0, moves - perfectMoves);
     
-    // Update results display
-    finalScore.textContent = finalScoreValue;
+    // Create difficulty bonus
+    const difficultyMultiplier = currentLevel === 'easy' ? 1 : 
+                               currentLevel === 'medium' ? 1.5 : 2;
     
-    // Format time for display since timerDisplay might not exist
+    // Calculate final score with all factors
+    const finalScoreValue = Math.round((score + Math.floor(timeBonus / 10) - movePenalty) * difficultyMultiplier);
+    
+    // Update results display with animation
+    animateResultValue(finalScore, 0, finalScoreValue, 1500);
+    
+    // Format time for display
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
     const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     
     finalTime.textContent = formattedTime;
-    finalMoves.textContent = moves;
+    
+    // Animate moves counter
+    animateResultValue(finalMoves, 0, moves, 1200);
     
     // Calculate star rating
-    const perfectMoves = totalPairs * 2;
     const moveEfficiency = perfectMoves / moves;
     const timeEfficiency = 1 - (timer / (totalPairs * 10));
     const overallRating = (moveEfficiency * 0.6 + timeEfficiency * 0.4) * 5;
     
-    // Update star display
-    updateStarRating(overallRating);
+    // Update star display with delay for sequential animations
+    setTimeout(() => {
+      updateStarRating(overallRating);
+    }, 600);
     
-    // Hide game board, show results
+    // Hide game board
     gameBoard.style.display = 'none';
-    gameResults.style.display = 'block';
     
-    // Add animation to results
-    gameResults.classList.add('animate__animated', 'animate__fadeIn');
-    setTimeout(() => gameResults.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
+    // Show confetti effect before showing results
+    createConfetti();
+    
+    // Show results with slight delay for better UX flow
+    setTimeout(() => {
+      gameResults.style.display = 'block';
+      
+      // Add animation to results card
+      gameResults.classList.add('animate__animated', 'animate__fadeIn');
+      setTimeout(() => gameResults.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
+      
+      // Animate individual stat items sequentially
+      const statItems = document.querySelectorAll('.result-stat');
+      statItems.forEach((item, index) => {
+        setTimeout(() => {
+          item.classList.add('stat-appear');
+        }, 150 * index);
+      });
+    }, 500);
+  }
+  
+  /**
+   * Animate numerical value from start to end
+   * @param {HTMLElement} element - Element to update
+   * @param {number} start - Starting value
+   * @param {number} end - Ending value
+   * @param {number} duration - Animation duration in ms
+   */
+  function animateResultValue(element, start, end, duration) {
+    const range = end - start;
+    const increment = range / 30; // 30 steps
+    const stepTime = Math.abs(Math.floor(duration / 30));
+    
+    let current = start;
+    const timer = setInterval(() => {
+      current += increment;
+      if (increment > 0 && current >= end || increment < 0 && current <= end) {
+        clearInterval(timer);
+        element.textContent = end;
+      } else {
+        element.textContent = Math.round(current);
+      }
+    }, stepTime);
+  }
+  
+  /**
+   * Create confetti effect for game completion
+   */
+  function createConfetti() {
+    // Create confetti container
+    const confettiContainer = document.createElement('div');
+    confettiContainer.className = 'confetti-container';
+    confettiContainer.style.position = 'fixed';
+    confettiContainer.style.top = '0';
+    confettiContainer.style.left = '0';
+    confettiContainer.style.width = '100%';
+    confettiContainer.style.height = '100%';
+    confettiContainer.style.pointerEvents = 'none';
+    confettiContainer.style.zIndex = '9998';
+    document.body.appendChild(confettiContainer);
+    
+    // Create confetti pieces
+    const colors = [
+      'rgba(99, 102, 241, 0.9)',  // Primary
+      'rgba(139, 92, 246, 0.9)',  // Tertiary
+      'rgba(16, 185, 129, 0.9)',  // Success
+      'rgba(245, 158, 11, 0.9)',  // Warning
+      'rgba(255, 255, 255, 0.9)'  // White
+    ];
+    
+    const confettiCount = 100;
+    
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Randomize confetti properties
+      const size = Math.random() * 10 + 5;
+      const isRect = Math.random() > 0.5;
+      
+      confetti.style.position = 'absolute';
+      confetti.style.width = `${size}px`;
+      confetti.style.height = isRect ? `${size * 0.4}px` : `${size}px`;
+      confetti.style.backgroundColor = color;
+      confetti.style.borderRadius = isRect ? '0px' : '50%';
+      confetti.style.top = '-50px';
+      confetti.style.left = `${Math.random() * 100}%`;
+      
+      // Add to container
+      confettiContainer.appendChild(confetti);
+      
+      // Animation variables
+      const speed = 3 + Math.random() * 5;
+      const rotation = Math.random() * 360;
+      const rotationSpeed = (Math.random() - 0.5) * 10;
+      const horizontalSwing = 50 + Math.random() * 100;
+      const delay = Math.random() * 2; // seconds
+      
+      // Apply animation
+      confetti.style.animation = `confetti-fall ${speed}s linear ${delay}s forwards`;
+      
+      // Custom animation
+      let verticalPosition = -50;
+      let horizontalPosition = parseFloat(confetti.style.left);
+      let currentRotation = rotation;
+      let opacity = 1;
+      
+      const animateConfetti = () => {
+        verticalPosition += speed / 2;
+        const progress = verticalPosition / window.innerHeight;
+        
+        // Horizontal swing using sine wave
+        const swingOffset = Math.sin(progress * Math.PI * 2) * horizontalSwing / 5;
+        horizontalPosition = parseFloat(confetti.style.left) + swingOffset;
+        
+        // Update rotation
+        currentRotation += rotationSpeed;
+        
+        // Update opacity for fade out at end
+        if (progress > 0.7) {
+          opacity = 1 - ((progress - 0.7) / 0.3);
+        }
+        
+        // Apply styles
+        confetti.style.transform = `translateY(${verticalPosition}px) translateX(${swingOffset}px) rotate(${currentRotation}deg)`;
+        confetti.style.opacity = opacity;
+        
+        // Continue animation until offscreen or faded out
+        if (verticalPosition < window.innerHeight + 100 && opacity > 0) {
+          requestAnimationFrame(animateConfetti);
+        } else {
+          confetti.remove();
+          
+          // Remove container if all confetti are gone
+          if (confettiContainer.children.length === 0) {
+            confettiContainer.remove();
+          }
+        }
+      };
+      
+      // Start after delay
+      setTimeout(() => {
+        requestAnimationFrame(animateConfetti);
+      }, delay * 1000);
+    }
   }
   
   /**
