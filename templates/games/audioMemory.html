@@ -1,108 +1,248 @@
 {% extends "layout.html" %}
 
-{% block title %}Sesli Hafıza Oyunu{% endblock %}
+{% block title %}Sesli Hafıza Oyunu - Pro Edition{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row mb-4">
-    <div class="col text-center">
-      <h1 class="display-4 game-title">Sesli Hafıza Oyunu</h1>
-      <p class="lead">Duyduğunuz ses dizisini doğru sırada hatırlayın ve tekrar edin. Her seviyede dizi daha da uzar!</p>
+<div class="container py-4">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1 class="game-title">Sesli Hafıza Oyunu</h1>
+      <p class="game-description">Duyduğunuz ses dizisini doğru sırada hatırlayın ve tekrar edin. Her seviyede dizi uzar ve oyun zorlaşır. Hafızanızı ve ses tanıma becerilerinizi geliştirin!</p>
     </div>
   </div>
-
-  <div class="row justify-content-center mb-3">
-    <div class="col-md-6 text-center">
-      <div class="game-stats">
-        <div class="game-stat">
-          <i class="fas fa-star"></i>
-          <div class="stat-label">SKOR</div>
-          <div class="stat-value" id="score">0</div>
-        </div>
-        <div class="game-stat">
-          <i class="fas fa-level-up-alt"></i>
-          <div class="stat-label">SEVİYE</div>
-          <div class="stat-value" id="level">1</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-      <div id="game-container" class="simon-game-container">
-        <div id="status-display" class="status-display glass-panel mt-4">Başlamak için "Başlat" butonuna tıklayın</div>
-
-        <!-- Zorluk Seviyesi Seçenekleri -->
-        <div class="difficulty-selector">
-          <label>Zorluk: </label>
-          <div class="btn-group" role="group">
-            <button type="button" class="btn difficulty-btn active" data-difficulty="easy">Kolay</button>
-            <button type="button" class="btn difficulty-btn" data-difficulty="medium">Orta</button>
-            <button type="button" class="btn difficulty-btn" data-difficulty="hard">Zor</button>
+  
+  <div class="row">
+    <div class="col-12">
+      <div class="audio-memory-container">
+        <!-- Oyun İstatistikleri -->
+        <div class="game-stats">
+          <div class="game-stat">
+            <div class="stat-label">SKOR</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+          <div class="game-stat">
+            <div class="stat-label">SEVİYE</div>
+            <div class="stat-value" id="level">1</div>
+          </div>
+          <div class="game-stat">
+            <div class="stat-label">EN YÜKSEK</div>
+            <div class="stat-value" id="high-score">0</div>
           </div>
         </div>
-
-        <!-- Oyun butonları - Kolay mod (4 buton) -->
-        <div id="easy-buttons" class="simon-buttons easy-mode">
-          <button id="btn0" class="simon-btn red" data-sound="0"></button>
-          <button id="btn1" class="simon-btn green" data-sound="1"></button>
-          <button id="btn2" class="simon-btn blue" data-sound="2"></button>
-          <button id="btn3" class="simon-btn yellow" data-sound="3"></button>
+        
+        <!-- Durum Mesajı -->
+        <div id="status-display" class="status-display">
+          Oyuna başlamak için "Başlat" butonuna tıklayın
         </div>
-
-        <!-- Oyun butonları - Orta mod (6 buton) -->
-        <div id="medium-buttons" class="simon-buttons medium-mode" style="display: none;">
-          <button id="btn0-medium" class="simon-btn red" data-sound="0"></button>
-          <button id="btn1-medium" class="simon-btn green" data-sound="1"></button>
-          <button id="btn2-medium" class="simon-btn blue" data-sound="2"></button>
-          <button id="btn3-medium" class="simon-btn yellow" data-sound="3"></button>
-          <button id="btn4-medium" class="simon-btn purple" data-sound="4"></button>
-          <button id="btn5-medium" class="simon-btn orange" data-sound="5"></button>
+        
+        <!-- Zorluk Seviyesi Seçici -->
+        <div class="difficulty-selector">
+          <h5>Zorluk Seviyesi</h5>
+          <div class="difficulty-btn-group">
+            <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
+            <button class="difficulty-btn" data-difficulty="medium">Orta</button>
+            <button class="difficulty-btn" data-difficulty="hard">Zor</button>
+          </div>
         </div>
-
-        <!-- Oyun butonları - Zor mod (8 buton) -->
-        <div id="hard-buttons" class="simon-buttons hard-mode" style="display: none;">
-          <button id="btn0-hard" class="simon-btn red" data-sound="0"></button>
-          <button id="btn1-hard" class="simon-btn green" data-sound="1"></button>
-          <button id="btn2-hard" class="simon-btn blue" data-sound="2"></button>
-          <button id="btn3-hard" class="simon-btn yellow" data-sound="3"></button>
-          <button id="btn4-hard" class="simon-btn purple" data-sound="4"></button>
-          <button id="btn5-hard" class="simon-btn orange" data-sound="5"></button>
-          <button id="btn6-hard" class="simon-btn pink" data-sound="6"></button>
-          <button id="btn7-hard" class="simon-btn teal" data-sound="7"></button>
+        
+        <!-- Oyun Alanı - Ses Butonları -->
+        <div class="audio-buttons-container">
+          <!-- Kolay Mod (2x2 Grid - 4 Buton) -->
+          <div id="audio-buttons-easy" class="audio-buttons grid-2x2">
+            <div id="btn-0" class="audio-button red" data-index="0">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-1" class="audio-button blue" data-index="1">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-2" class="audio-button green" data-index="2">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-3" class="audio-button yellow" data-index="3">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Orta Mod (3x2 Grid - 6 Buton) -->
+          <div id="audio-buttons-medium" class="audio-buttons grid-3x2" style="display: none;">
+            <div id="btn-0-medium" class="audio-button red" data-index="0">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-1-medium" class="audio-button blue" data-index="1">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-2-medium" class="audio-button green" data-index="2">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-3-medium" class="audio-button yellow" data-index="3">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-4-medium" class="audio-button purple" data-index="4">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-5-medium" class="audio-button orange" data-index="5">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Zor Mod (3x3 Grid - 9 Buton) -->
+          <div id="audio-buttons-hard" class="audio-buttons grid-3x3" style="display: none;">
+            <div id="btn-0-hard" class="audio-button red" data-index="0">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-1-hard" class="audio-button blue" data-index="1">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-2-hard" class="audio-button green" data-index="2">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-3-hard" class="audio-button yellow" data-index="3">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-4-hard" class="audio-button purple" data-index="4">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-5-hard" class="audio-button orange" data-index="5">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-6-hard" class="audio-button teal" data-index="6">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-7-hard" class="audio-button pink" data-index="7">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div id="btn-8-hard" class="audio-button lime" data-index="8">
+              <div class="sound-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
         </div>
-
+        
+        <!-- Oyun Kontrol Butonları -->
         <div class="game-controls">
-          <button id="start-button" class="game-control-btn start"><i class="fas fa-play me-2"></i>Başlat</button>
-          <button id="reset-button" class="game-control-btn reset" disabled><i class="fas fa-redo me-2"></i>Sıfırla</button>
+          <button id="start-button" class="game-btn start">
+            <i class="fas fa-play"></i> Başlat
+          </button>
+          <button id="reset-button" class="game-btn reset" disabled>
+            <i class="fas fa-redo"></i> Sıfırla
+          </button>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col-md-8 mx-auto">
-      <div class="game-instructions card">
-        <div class="card-body">
-          <h5 class="card-title">Nasıl Oynanır?</h5>
+        
+        <!-- Oyun Talimatları -->
+        <div class="game-instructions">
+          <div class="instructions-title">
+            <i class="fas fa-info-circle"></i> Nasıl Oynanır?
+          </div>
           <ol class="instruction-list">
-            <li>Oyun, renkli düğmelerin bir sırayla yanıp sönerek ses çıkarmasıyla başlar.</li>
-            <li>Sırayı dikkatle izleyin ve aynı düğmelere aynı sırayla basın.</li>
-            <li>Her başarılı turda, sıraya bir düğme daha eklenir.</li>
-            <li>Yanlış bir düğmeye basarsanız oyun sona erer.</li>
-            <li>Zorlu modlarda daha fazla buton ve daha hızlı tempo ile oynayın!</li>
+            <li>Oyun, renkli butonların belirli bir sırayla yanıp sönerek ses çıkarmasıyla başlar.</li>
+            <li>Sırayı dikkatle izleyin ve aynı butonlara aynı sırayla basın.</li>
+            <li>Her başarılı turda diziye bir buton daha eklenir ve zorluk artar.</li>
+            <li>Yanlış bir butona basarsanız oyun sona erer.</li>
+            <li>Zorlu modlarda daha fazla buton ve daha hızlı tempo ile hafızanızı test edin!</li>
           </ol>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="row mt-4 mb-5">
-    <div class="col text-center">
-      <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left"></i> Tüm Oyunlara Dön
-      </a>
+      
+      <!-- Geri Dönüş Butonu -->
+      <div class="text-center mt-4 mb-4">
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-light">
+          <i class="fas fa-arrow-left me-2"></i> Tüm Oyunlara Dön
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -113,5 +253,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/games/audioMemory.js') }}"></script>
+<script src="{{ url_for('static', filename='js/audio-memory.js') }}"></script>
 {% endblock %}
