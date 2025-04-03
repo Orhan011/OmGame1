@@ -1,13 +1,15 @@
 
-/* iOS-style swipe navigation styles */
+/* iOS-tarzı geri kaydırma gezinme stilleri */
 body {
-  transition: transform 0.1s ease;
   position: relative;
   overflow-x: hidden;
-  transform: translateX(0);
-  /* Hardware acceleration for smoother animations */
+  transform: translate3d(0, 0, 0);
+  /* Hardware hızlandırma ve pürüzsüz animasyonlar için */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  will-change: transform;
+  perspective: 1000px;
+  touch-action: pan-y;
 }
 
 .swipe-overlay {
@@ -20,6 +22,8 @@ body {
   z-index: 9997;
   opacity: 0;
   pointer-events: none;
+  will-change: opacity;
+  transition: opacity 0.05s linear;
 }
 
 .content-shadow {
@@ -29,9 +33,10 @@ body {
   width: 100%;
   height: 100%;
   z-index: 9998;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+  box-shadow: -10px 0 25px rgba(0, 0, 0, 0.25);
   pointer-events: none;
   opacity: 0;
+  will-change: opacity, box-shadow;
 }
 
 .previous-page-preview {
@@ -40,12 +45,24 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(30, 30, 60, 0.95);
+  /* iOS koyu arka plan renkleri */
+  background-color: rgba(25, 25, 30, 0.97);
   z-index: 9996;
-  transform: translateX(-20%);
+  transform: translate3d(-20%, 0, 0);
   opacity: 0;
   pointer-events: none;
   display: none;
+  will-change: transform, opacity;
+  
+  /* iOS tarzı hafif gradyan */
+  background-image: linear-gradient(to right, 
+    rgba(20, 20, 30, 0.97) 0%, 
+    rgba(35, 35, 45, 0.97) 100%);
+}
+
+/* Swipe aktif olduğunda tüm diğer etkileşimleri engelle */
+.swipe-active {
+  user-select: none;
 }
 
 /* Prevent other elements from interfering with swipe */
@@ -59,21 +76,44 @@ body {
   z-index: 10000;
 }
 
-/* Animation classes */
+/* iOS tarzı animasyon sınıfları */
 @keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from { transform: translate3d(100%, 0, 0); opacity: 0.7; }
+  to { transform: translate3d(0, 0, 0); opacity: 1; }
 }
 
 @keyframes slideOut {
-  from { transform: translateX(0); }
-  to { transform: translateX(100%); }
+  from { transform: translate3d(0, 0, 0); opacity: 1; }
+  to { transform: translate3d(100%, 0, 0); opacity: 0.7; }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* iOS geçiş animasyonları */
 .page-transition-enter {
-  animation: slideIn 0.3s ease-out forwards;
+  animation: slideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  transform-origin: left center;
+  will-change: transform, opacity;
 }
 
 .page-transition-exit {
-  animation: slideOut 0.3s ease-out forwards;
+  animation: slideOut 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+.overlay-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* iOS için duraklama ve devam etme animasyonları */
+.page-transition-pause {
+  animation-play-state: paused !important;
+}
+
+.page-transition-resume {
+  animation-play-state: running !important;
 }
