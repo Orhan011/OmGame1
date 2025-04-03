@@ -7,6 +7,42 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Enhanced iOS Swipe Back Navigation initialized');
   
+  // Sayfa geçmişi için array (son gezilen sayfaları takip etmek için)
+  let pageHistory = [];
+  
+  // Geçerli sayfayı geçmişe ekle
+  if (window.location.pathname) {
+    // Aynı sayfayı tekrar tekrar eklemeyi önle
+    if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
+      pageHistory.push(window.location.pathname);
+      // Sadece son 10 sayfayı sakla (performans için)
+      if (pageHistory.length > 10) {
+        pageHistory.shift();
+      }
+      // LocalStorage'a kaydet (sayfa yenilenmelerinde bile korunsun)
+      localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+    }
+  }
+  
+  // Sayfa geçmişini localStorage'dan al (sayfa yenilendiğinde kaybolmasın)
+  try {
+    const savedHistory = localStorage.getItem('zekapark_page_history');
+    if (savedHistory) {
+      pageHistory = JSON.parse(savedHistory);
+      
+      // Şu anki sayfa zaten geçmişte varsa, ondan sonrasını temizle 
+      // (kullanıcı ileri-geri yapmış olabilir)
+      const currentIndex = pageHistory.indexOf(window.location.pathname);
+      if (currentIndex !== -1 && currentIndex < pageHistory.length - 1) {
+        pageHistory = pageHistory.slice(0, currentIndex + 1);
+        localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+      }
+    }
+  } catch (e) {
+    console.log('Geçmiş yükleme hatası:', e);
+    pageHistory = [window.location.pathname];
+  }
+  
   // Kaydırma efekti için gerekli değişkenler
   let startX = null;
   let startY = null;
@@ -250,15 +286,31 @@ document.addEventListener('DOMContentLoaded', function() {
     if (diffX > threshold || isQuickSwipe) {
       completeSwipeAnimation(true);
       
-      // Geçmiş kaydına geri dön, but don't go directly to index if we have history
+      // Önce kendi sakladığımız geçmişe bak, sonra tarayıcı geçmişini dene
       setTimeout(() => {
-        if (window.history.length > 2) {
+        // Geçmişte en az 2 sayfa varsa, bir önceki sayfaya git
+        if (pageHistory.length >= 2) {
+          const previousPage = pageHistory[pageHistory.length - 2];
+          
+          // Geçmiş listesinden şu anki sayfayı çıkar 
+          pageHistory.pop();
+          
+          // LocalStorage'ı güncelle
+          localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+          
+          // Önceki sayfaya git
+          window.location.href = previousPage;
+        } 
+        // İç hafızada yeterli geçmiş yoksa tarayıcı geçmişini kullan
+        else if (window.history.length > 2) {
           window.history.back();
-        } else if (document.referrer && document.referrer.includes(window.location.host)) {
-          // Referrer'a yönlendir (farklı domain'den gelmediyse)
+        } 
+        // Referrer'a bak
+        else if (document.referrer && document.referrer.includes(window.location.host)) {
           window.location.href = document.referrer;
-        } else {
-          // Fallback olarak ana sayfaya git
+        } 
+        // Son çare ana sayfaya git
+        else {
           window.location.href = '/';
         }
       }, 150);
