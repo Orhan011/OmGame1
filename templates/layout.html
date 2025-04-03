@@ -229,30 +229,58 @@ function loadArticleContent() {
   </body>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 <script>
-  // Tema ve sayfa tipi desteği
+  // Gelişmiş tema ve sayfa tipi desteği
   document.addEventListener('DOMContentLoaded', function() {
     const bodyElement = document.body;
     const htmlElement = document.documentElement;
     
-    // URL'ye göre sayfa türü sınıfları ekle (iOS kaydırma navigasyonu için)
-    if (window.location.pathname.includes('/games/')) {
-      bodyElement.classList.add('game-page');
-    } else if (window.location.pathname.includes('/profile')) {
-      bodyElement.classList.add('profile-page');
+    // Sayfa türü algılama ve sınıf ekleme (iOS swipe arka plan uyumu için)
+    function detectPageType() {
+      // Mevcut tüm sayfa tipi sınıflarını temizle
+      bodyElement.classList.remove('game-page', 'profile-page', 'article-page', 'auth-page', 'home-page');
+      
+      // Yol tabanlı otomatik sayfa türü algılama
+      const path = window.location.pathname;
+      
+      if (path.includes('/games/')) {
+        bodyElement.classList.add('game-page');
+      } else if (path.includes('/profile')) {
+        bodyElement.classList.add('profile-page');
+      } else if (path.includes('/article') || path.includes('/tips')) {
+        bodyElement.classList.add('article-page');
+      } else if (path.includes('/login') || path.includes('/register')) {
+        bodyElement.classList.add('auth-page');
+      } else if (path === '/' || path === '/index.html') {
+        bodyElement.classList.add('home-page');
+      }
+      
+      // Veri özniteliği olarak sayfa yolunu sakla (ek işlevsellik için)
+      bodyElement.setAttribute('data-current-path', path);
     }
     
-    // Tema değişimlerini izleyen gözlemci
+    // Sayfa türünü algıla
+    detectPageType();
+    
+    // Tema değişikliklerini izleyen gelişmiş gözlemci
     const themeObserver = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.attributeName === 'class' && 
             (mutation.target === htmlElement || mutation.target === bodyElement)) {
           
-          // Tema değişimi iOS navigasyon elementlerine otomatik yansıtılacak
-          // CSS değişkenlerle tema entegrasyonu yapıldı
+          // Güncel tema bilgisini veri özniteliği olarak sakla
+          const isDarkTheme = htmlElement.classList.contains('dark');
+          document.body.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
           
-          // Mevcut tema bilgisini veri attributesi olarak sakla
-          document.body.setAttribute('data-theme', 
-            htmlElement.classList.contains('dark') ? 'dark' : 'light');
+          // CSS değişkenlerini güncelle (tema geçişlerinde uyum için)
+          document.documentElement.style.setProperty(
+            '--ios-bg-color', 
+            isDarkTheme ? 'var(--ios-bg-dark)' : 'var(--ios-bg-light)'
+          );
+          
+          document.documentElement.style.setProperty(
+            '--ios-text-color', 
+            isDarkTheme ? 'var(--ios-text-dark)' : 'var(--ios-text-light)'
+          );
         }
       });
     });
@@ -261,18 +289,33 @@ function loadArticleContent() {
     themeObserver.observe(htmlElement, { attributes: true });
     themeObserver.observe(bodyElement, { attributes: true });
     
-    // İpucu oluştur (yalnızca mobil cihazlarda)
-    if (window.innerWidth <= 768 && !sessionStorage.getItem('swipe_tip_shown')) {
-      const swipeTip = document.createElement('div');
-      swipeTip.className = 'swipe-hint-area';
-      document.body.appendChild(swipeTip);
+    // URL değişikliklerini izle (SPA benzeri davranış için)
+    function setupURLChangeListener() {
+      // Orijinal pushState ve replaceState metodlarını sakla
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
       
-      // İpucunu bir süre sonra kaldır
-      setTimeout(() => {
-        swipeTip.remove();
-        sessionStorage.setItem('swipe_tip_shown', 'true');
-      }, 5000);
+      // pushState metodunu geçersiz kıl
+      history.pushState = function() {
+        originalPushState.apply(this, arguments);
+        detectPageType(); // URL değiştiğinde sayfa türünü yeniden algıla
+      };
+      
+      // replaceState metodunu geçersiz kıl
+      history.replaceState = function() {
+        originalReplaceState.apply(this, arguments);
+        detectPageType(); // URL değiştiğinde sayfa türünü yeniden algıla
+      };
+      
+      // Tarayıcı geri/ileri düğmeleri için popstate olayını dinle
+      window.addEventListener('popstate', function() {
+        detectPageType();
+      });
     }
+    
+    // URL değişikliği dinleyicisini kur
+    setupURLChangeListener();
   });
 </script>
+</html>
 </html>
