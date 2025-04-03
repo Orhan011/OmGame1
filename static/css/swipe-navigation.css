@@ -1,5 +1,5 @@
 
-/* iOS-like swipe navigation styles */
+/* Gelişmiş iOS-tarzı kaydırma navigasyon stilleri */
 .ios-swipe-container {
   will-change: transform, opacity;
   overflow: hidden;
@@ -7,10 +7,12 @@
   transform: translateZ(0); /* GPU hızlandırma */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  z-index: 99999;
+  pointer-events: none;
 }
 
 .ios-swipe-overlay {
-  transition: background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: background-color;
   transform: translateZ(0); /* GPU hızlandırma */
 }
@@ -23,15 +25,16 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   will-change: transform;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-  border-radius: 0 8px 8px 0;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25), 0 0 10px rgba(0, 0, 0, 0.15);
+  border-radius: 0 12px 12px 0;
   transform: translateZ(0); /* GPU hızlandırma */
   backface-visibility: hidden;
   perspective: 1000px;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ios-back-arrow {
-  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 10;
   will-change: opacity;
   transform: translateZ(0); /* GPU hızlandırma */
@@ -45,16 +48,19 @@
 }
 
 .ios-fake-header {
-  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity;
   transform: translateZ(0); /* GPU hızlandırma */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .ios-prev-page-title {
-  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
-              transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
   transform: translateZ(0); /* GPU hızlandırma */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .ios-prev-page-content {
@@ -62,49 +68,54 @@
   -webkit-overflow-scrolling: touch;
   padding-bottom: 30px;
   transform: translateZ(0); /* GPU hızlandırma */
+  -webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%);
+  mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%);
 }
 
-/* Add subtle animation on page load */
+/* Kenar göstergesi için etki geliştirmeleri */
 @keyframes pulseEdge {
   0% { opacity: 0; }
   50% { opacity: 0.3; }
   100% { opacity: 0; }
 }
 
-/* Prevent browser's own elastic scrolling effect while swiping */
+/* Tarayıcının elastik kaydırma efektini engelle */
 html, body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   touch-action: pan-y;
 }
 
-/* Fix for any potential white flicker during animations */
+/* Animasyonlar sırasında potansiyel beyaz titremeleri önle */
 .ios-swipe-container * {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Improve shadow rendering */
+/* Gölge iyileştirmeleri */
 .ios-prev-page-preview {
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 
+    0 0 25px rgba(0, 0, 0, 0.2),
+    0 0 10px rgba(0, 0, 0, 0.1),
+    0 0 5px rgba(0, 0, 0, 0.05);
   border-radius: 0 12px 12px 0;
 }
 
-/* Soften the edge gradient */
+/* Kenar gradyan yumuşatma */
 .ios-edge-puller {
   transition: opacity 0.2s ease;
 }
 
-/* Smoother animations on all devices */
+/* Tüm cihazlarda daha pürüzsüz animasyonlar */
 .ios-swipe-container,
 .ios-prev-page-preview,
 .ios-swipe-overlay,
 .ios-prev-page-title,
 .ios-back-arrow {
-  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Device specific optimizations */
+/* Cihaza özel optimizasyonlar */
 @media (max-width: 390px) {
   .ios-prev-page-preview {
     width: 85%;
@@ -113,7 +124,7 @@ html, body {
 
 @media (min-width: 391px) and (max-width: 767px) {
   .ios-prev-page-preview {
-    width: 87%;
+    width: 88%;
   }
 }
 
@@ -124,7 +135,7 @@ html, body {
   }
 }
 
-/* Dark mode support - improve contrast & colors */
+/* Koyu mod desteği - kontrast ve renk iyileştirmeleri */
 @media (prefers-color-scheme: dark) {
   .ios-prev-page-preview {
     background-color: #1c1c1e;
@@ -140,24 +151,32 @@ html, body {
   
   .ios-prev-page-title {
     color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
   
   .ios-back-arrow {
     border-color: #0a84ff;
   }
   
-  /* Darker overlay for better contrast in dark mode */
+  /* Koyu modda daha iyi kontrast için koyu overlay */
   .ios-swipe-overlay {
     background-color: rgba(0, 0, 0, 0);
   }
   
-  /* Improve the gradient edge in dark mode */
+  /* Koyu modda gradyan iyileştirme */
   .ios-prev-page-preview .ios-edge-puller {
     background: linear-gradient(to right, rgba(28, 28, 30, 0), rgba(28, 28, 30, 0.5));
   }
+  
+  /* Koyu modda gölgeler */
+  .ios-prev-page-preview {
+    box-shadow: 
+      0 0 25px rgba(0, 0, 0, 0.5),
+      0 0 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
-/* Support for light/dark themes */
+/* Açık/koyu tema desteği */
 .dark-theme .ios-prev-page-preview {
   background-color: #1c1c1e;
   color: #fff;
@@ -176,7 +195,7 @@ html, body {
   border-color: #0a84ff;
 }
 
-/* Better performance on all browsers */
+/* Tüm tarayıcılarda daha iyi performans */
 @supports (-webkit-appearance:none) {
   .ios-swipe-container,
   .ios-prev-page-preview,
@@ -185,5 +204,26 @@ html, body {
   .ios-back-arrow,
   .ios-fake-header {
     -webkit-transform: translateZ(0);
+  }
+}
+
+/* Animasyon sırasında hareket eden diğer sayfa için iyileştirmeler */
+main, .container, #content {
+  will-change: transform, opacity;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Dokunma hedefi geliştirmeleri */
+.ios-edge-indicator {
+  width: 8px !important;
+}
+
+/* iOS 15+ stili yuvarlak köşe geliştirmeleri */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  .ios-prev-page-preview {
+    border-radius: 0 14px 14px 0;
   }
 }
