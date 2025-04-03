@@ -2,6 +2,7 @@
 /**
  * Modern iOS 17 style swipe navigation
  * Professional implementation with physics-based animations and depth effects
+ * Goes back to previous page in history instead of home page
  */
 document.addEventListener('DOMContentLoaded', function() {
   // Create overlay container
@@ -113,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.style.transform = `translateX(${horizontalDistance}px)`;
       document.body.style.overflow = 'hidden'; // Prevent scrolling
       
-      // Move previous page preview
+      // Move previous page preview with subtle parallax effect (iOS style)
       prevPagePreview.style.transform = `translateX(${-20 + (easedProgress * 20)}%)`;
       
-      // Update shadow and dim overlay
+      // Update shadow and dim overlay with iOS-style depth effect
       edgeShadow.style.opacity = Math.min(easedProgress * 0.15, 0.15).toString();
       edgeShadow.style.left = `${horizontalDistance}px`;
       dimOverlay.style.opacity = Math.min(easedProgress * 0.1, 0.1).toString();
@@ -132,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const distance = currentX - startX;
     const velocity = distance / timeElapsed; // px/ms
     
-    // Determine if swipe should complete
+    // Determine if swipe should complete based on distance or velocity (iOS behavior)
     const shouldComplete = (distance > completionThreshold) || 
                           (distance > minSwipeDistance && velocity > velocityThreshold);
     
@@ -158,11 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Complete swipe animation and navigation
   function completeSwipe() {
-    // Set transition for smooth animation
-    document.body.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
-    prevPagePreview.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
-    dimOverlay.style.transition = 'opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
-    edgeShadow.style.transition = 'all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    // Set transition for smooth animation (iOS spring effect)
+    document.body.style.transition = 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
+    prevPagePreview.style.transition = 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
+    dimOverlay.style.transition = 'opacity 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
+    edgeShadow.style.transition = 'all 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
     
     // Animate to final state
     document.body.style.transform = `translateX(${window.innerWidth}px)`;
@@ -173,18 +174,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Wait for animation to complete before navigation
     setTimeout(function() {
+      // Go back to previous page in history instead of home
       window.history.back();
       resetSwipeElements();
     }, 350);
   }
   
-  // Cancel swipe with spring-back effect
+  // Cancel swipe with spring-back effect (iOS bounce)
   function cancelSwipe() {
-    // Set transition for spring-back effect
-    document.body.style.transition = 'transform 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
-    prevPagePreview.style.transition = 'transform 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
-    dimOverlay.style.transition = 'opacity 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
-    edgeShadow.style.transition = 'all 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
+    // Set transition for spring-back effect with iOS physics
+    document.body.style.transition = 'transform 0.3s cubic-bezier(0.36, 0.66, 0.04, 1.12)';
+    prevPagePreview.style.transition = 'transform 0.3s cubic-bezier(0.36, 0.66, 0.04, 1.12)';
+    dimOverlay.style.transition = 'opacity 0.3s cubic-bezier(0.36, 0.66, 0.04, 1.12)';
+    edgeShadow.style.transition = 'all 0.3s cubic-bezier(0.36, 0.66, 0.04, 1.12)';
     
     // Animate back to initial state
     document.body.style.transform = 'translateX(0)';
@@ -208,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dimOverlay.style.transition = '';
   }
   
-  // Cubic easing function for smooth animations
+  // Cubic easing function for smooth animations (iOS style)
   function easeOutCubic(x) {
     return 1 - Math.pow(1 - x, 3);
   }

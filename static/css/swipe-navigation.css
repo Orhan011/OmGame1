@@ -22,6 +22,7 @@ body {
   pointer-events: none;
   z-index: 9990;
   display: none;
+  overflow: hidden;
 }
 
 .ios-prev-page {
@@ -35,13 +36,14 @@ body {
   transform: translateX(-20%);
   will-change: transform;
   border-radius: 0;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
 }
 
 .ios-edge-shadow {
   position: absolute;
   top: 0;
   left: 0;
-  width: 16px;
+  width: 14px;
   height: 100%;
   z-index: 9994;
   background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
