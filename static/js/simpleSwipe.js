@@ -1,4 +1,3 @@
-
 /**
  * iOS-benzeri kaydırma navigasyonu
  * Kullanıcıya parmağıyla ekranı soldan sağa doğru kaydırarak önceki sayfaya dönme imkanı sağlar
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const storedHistory = localStorage.getItem('navigationHistory');
       if (storedHistory) {
         navigationHistory = JSON.parse(storedHistory);
-        
+
         // Çok uzun geçmiş listesini temizle (maksimum 20 kayıt tut)
         if (navigationHistory.length > 20) {
           navigationHistory = navigationHistory.slice(-20);
@@ -159,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (document.referrer && document.referrer !== window.location.href) {
         const referrerDomain = new URL(document.referrer).hostname;
         const currentDomain = window.location.hostname;
-        
+
         // Sadece aynı domain içindeki referrer ise ekle
         if (referrerDomain === currentDomain && 
             !navigationHistory.includes(document.referrer)) {
@@ -172,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addToHistory(window.location.href);
       }
     });
-    
+
     // Popstate (geri/ileri butonları) olayını dinle
     window.addEventListener('popstate', function(e) {
       // Mevcut URL'yi geçmişe ekle (tarayıcı geçmişiyle uyumlu olması için)
@@ -190,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (navigationHistory.length >= 20) {
         navigationHistory = navigationHistory.slice(-19);
       }
-      
+
       // URL'yi geçmişe ekle
       navigationHistory.push(url);
 
@@ -253,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const htmlBgColor = window.getComputedStyle(html).backgroundColor;
     const bodyStyle = window.getComputedStyle(document.body);
     const bodyBgColor = bodyStyle.backgroundColor || htmlBgColor;
-    
+
     // Arkaplan rengini hemen güncelle
     backgroundFixer.style.backgroundColor = bodyBgColor;
     previousPagePreview.style.backgroundColor = bodyBgColor;
@@ -264,13 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (navigationHistory.length > 1) {
       // Arka plan rengini önceden hazırla
       prepareBackgroundColor();
-      
+
       // Site teması renklerini algıla ve kullan
       const html = document.documentElement;
       const htmlBgColor = window.getComputedStyle(html).backgroundColor;
       const bodyStyle = window.getComputedStyle(document.body);
       const bodyBgColor = bodyStyle.backgroundColor || htmlBgColor;
-      
+
       // Önceki sayfa önizlemesini oluştur - sadece arka plan rengiyle
       previousPagePreview.innerHTML = `
         <div class="previous-page-content" style="height: 100%; width: 100%; background-color: ${bodyBgColor}; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
@@ -284,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Dokunma başladığında
   function handleTouchStart(e) {
     if (!isEnabled) return;
-    
+
     // Sadece ekranın sol kenarından başlayan dokunmaları kabul et (30px içinde)
     if (e.touches[0].clientX < 30) {
       touchStartX = e.touches[0].clientX;
@@ -327,22 +326,22 @@ document.addEventListener('DOMContentLoaded', function() {
       if (deltaX > 0 && deltaX > deltaY) {
         // Kaydırma animasyonunu GPU hızlandırmalı şekilde uygula
         pageClone.style.transform = `translate3d(${deltaX}px, 0, 0)`;
-        
+
         // Kaydırma ilerlemesini hesapla
         const progress = Math.min(1, deltaX / (window.innerWidth * 0.7));
-        
+
         // Önceki sayfayı göster - hardware accelerated
         const prevPageTranslate = -10 + (progress * 10);
-        
+
         // Arka plan rengi geçişlerini düzenle - buzlanmayı önle
         if (progress > 0.05) {
           backgroundFixer.style.opacity = progress * 0.5;
         }
-        
+
         // Opaklık ve transformu güncelle - daha akıcı hareket için tek seferde
         previousPagePreview.style.opacity = Math.min(1, progress * 2);
         previousPagePreview.style.transform = `translate3d(${prevPageTranslate}%, 0, 0) scale(${0.98 + (progress * 0.02)})`;
-        
+
         // Hafif gölgelendirme
         const opacity = Math.min(0.15, progress * 0.2);
         overlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
@@ -358,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (touchStartX > 0 && !isAnimating && isEnabled) {
       // Dokunmayı devre dışı bırak
       isEnabled = false;
-      
+
       // Bitiş zamanı ve pozisyonu
       const endTime = new Date().getTime();
       const touchEndX = e.changedTouches[0].clientX;
@@ -386,16 +385,16 @@ document.addEventListener('DOMContentLoaded', function() {
         pageClone.style.transition = `transform ${animDuration}ms cubic-bezier(0.2, 0, 0.1, 1)`;
         overlay.style.transition = `all ${animDuration}ms cubic-bezier(0.2, 0, 0.1, 1)`;
         previousPagePreview.style.transition = `all ${animDuration}ms cubic-bezier(0.2, 0, 0.1, 1)`;
-        
+
         // Animasyon karesini güncelle
         requestAnimationFrame(() => {
           // Mevcut sayfayı ekrandan çıkar
           pageClone.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
-          
+
           // Önceki sayfayı tam pozisyona getir
           previousPagePreview.style.opacity = 1;
           previousPagePreview.style.transform = 'translate3d(0, 0, 0) scale(1)';
-          
+
           // Gölge efekti
           overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
 
@@ -428,14 +427,14 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(() => {
           // Mevcut sayfayı geri pozisyona getir
           pageClone.style.transform = 'translate3d(0, 0, 0)';
-          
+
           // Önceki sayfayı gizle
           previousPagePreview.style.opacity = 0;
           previousPagePreview.style.transform = 'translate3d(-10%, 0, 0) scale(0.98)';
-          
+
           // Gölgelendirmeyi kaldır
           overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-          
+
           // Arka plan fikseri gizle
           backgroundFixer.style.opacity = 0;
         });
@@ -457,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (touchStartX > 0 && !isAnimating && isEnabled) {
       // Dokunmayı devre dışı bırak
       isEnabled = false;
-      
+
       // Animasyonu resetle
       isAnimating = true;
 
@@ -473,14 +472,14 @@ document.addEventListener('DOMContentLoaded', function() {
       requestAnimationFrame(() => {
         // Mevcut sayfayı geri pozisyona getir
         pageClone.style.transform = 'translate3d(0, 0, 0)';
-        
+
         // Önceki sayfayı gizle
         previousPagePreview.style.opacity = 0;
         previousPagePreview.style.transform = 'translate3d(-10%, 0, 0) scale(0.98)';
-        
+
         // Gölgelendirmeyi kaldır
         overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-        
+
         // Arka plan fikseri gizle
         backgroundFixer.style.opacity = 0;
       });
@@ -551,15 +550,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.body.appendChild(backButton);
   }
-  
-  // Performans iyileştirmesi: Sayfa yüklendikten sonra kaydırma hazırlığı
+
+  // Sayfa yüklendikten sonra kaydırma hazırlığı - daha hızlı ve tarayıcı uyumlu
   window.addEventListener('load', function() {
-    // Sayfa arkaplan rengini hazırla
-    prepareBackgroundColor();
-    
-    // Kaydırma hazır durumuna getir
-    setTimeout(() => {
-      isEnabled = true;
-    }, 300);
+    // Hata kontrolü ile arka plan rengini hazırla
+    try {
+      prepareBackgroundColor();
+    } catch (e) {
+      console.warn('Arka plan rengi hazırlanırken hata:', e.message);
+      // Yedek olarak doğrudan body rengi ayarla
+      document.body.style.backgroundColor = document.body.style.backgroundColor || '#0a0a18';
+    }
+
+    // RequestAnimationFrame ile daha verimli şekilde kaydırma etkinleştirme
+    requestAnimationFrame(() => {
+      // Kaydırma hazır durumuna getir
+      setTimeout(() => {
+        isEnabled = true;
+
+        // Console mesajını sadece geliştirme modunda göster
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.log('ZekaPark iOS benzeri kaydırma navigasyonu hazır');
+        }
+      }, 200); // Daha hızlı etkinleştirme
+    });
   });
+
+  // iOS benzeri kaydırma kullanılabilirliğini konsola bildir
+  console.log('ZekaPark Premium iOS Navigation aktif');
 });

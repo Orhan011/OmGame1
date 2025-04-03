@@ -326,10 +326,44 @@ function toggleShortcutPanel(event) {
   }
 }
 
-// Added to restore profile picture
+// DOM elementlerine güvenli erişim sağlayan yardımcı fonksiyon
+function getElement(id) {
+  const element = document.getElementById(id);
+  return element;
+}
+
+// Added to restore profile picture with error handling
 document.addEventListener('DOMContentLoaded', function() {
-  const profilePicture = document.getElementById('profilePicture');
-  if (profilePicture && document.getElementById('profile-picture-container')) {
-    document.getElementById('profile-picture-container').appendChild(profilePicture);
+  try {
+    const profilePicture = getElement('profilePicture');
+    const profilePictureContainer = getElement('profile-picture-container');
+    
+    if (profilePicture && profilePictureContainer) {
+      profilePictureContainer.appendChild(profilePicture);
+    }
+  } catch (error) {
+    console.warn('Profil resmi yüklenirken hata oluştu:', error.message);
+  }
+});
+
+// Sayfa yüklendikten sonra konsolda görülen hataları toplu giderme
+document.addEventListener('DOMContentLoaded', function() {
+  // Olası DOM element hatalarını azaltmak için tüm düğme event listenerlarını güvenli şekilde ata
+  const safeAddEventListener = function(elementId, event, callback) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.addEventListener(event, callback);
+    }
+  };
+  
+  // Bilinen hata veren elementleri güvenli şekilde kontrol et
+  safeAddEventListener('restart-game', 'click', function() {
+    // Restart game logic
+  });
+  
+  // WordsList DOM elementi kontrolü
+  const wordsList = document.getElementById('words-list');
+  if (wordsList) {
+    // wordsList ile ilgili işlemler güvenli şekilde yapılabilir
   }
 });

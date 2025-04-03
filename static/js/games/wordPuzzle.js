@@ -1,3 +1,155 @@
+
+/**
+ * Kelime Bulmaca Oyunu
+ * DOM elemanlarını güvenli bir şekilde yükleyen ve kontrol eden geliştirilmiş sürüm
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Element Güvenli Erişim Yardımcısı
+  function getElement(id) {
+    const element = document.getElementById(id);
+    if (!element) {
+      console.warn(`Kelime Bulmaca: '${id}' ID'li element bulunamadı.`);
+      return null;
+    }
+    return element;
+  }
+
+  // DOM Elementlerini Güvenli Şekilde Al
+  const introSection = getElement('intro-section');
+  const gameSection = getElement('game-section');
+  const wordsList = getElement('words-list');
+  const timerDisplay = getElement('timer');
+  const scoreDisplay = getElement('score');
+  const startButton = getElement('start-game');
+  const restartButton = getElement('restart-game');
+  
+  // Oyunu başlatmak için gereken minimum elementleri kontrol et
+  if (!introSection || !gameSection) {
+    console.warn('Kelime Bulmaca: Temel oyun elementleri eksik. Oyun başlatılamadı.');
+    return; // Oyunu başlatma
+  }
+
+  // Event Listener'ları sadece elementler varsa ekle
+  if (startButton) {
+    startButton.addEventListener('click', startGame);
+  }
+  
+  if (restartButton) {
+    restartButton.addEventListener('click', restartGame);
+  }
+
+  // Oyun Değişkenleri
+  let timer;
+  let timeLeft = 60;
+  let score = 0;
+  let gameActive = false;
+  let foundWords = [];
+  let allWords = [
+    'ELMA', 'ARMUT', 'KİRAZ', 'ÇİLEK', 'PORTAKAL',
+    'KARPUZ', 'ÜZÜM', 'MUZ', 'KAVUN', 'ŞEFTALİ',
+    'VİŞNE', 'AYVA', 'İNCİR', 'HURMA', 'NAR',
+    'MANDALİNA', 'LİMON', 'BÖĞÜRTLEN', 'AHUDUDU', 'DÖVME'
+  ];
+  
+  // Oyunu Başlat
+  function startGame() {
+    if (gameActive) return;
+    gameActive = true;
+    score = 0;
+    timeLeft = 60;
+    foundWords = [];
+    
+    // Skorları güncelle
+    if (scoreDisplay) scoreDisplay.textContent = score;
+    
+    // Kelime listesini temizle ve yeniden oluştur
+    if (wordsList) {
+      wordsList.innerHTML = '';
+      generateWordsList();
+    }
+    
+    // Zamanlayıcıyı başlat
+    if (timerDisplay) {
+      timerDisplay.textContent = timeLeft;
+      timer = setInterval(updateTimer, 1000);
+    }
+    
+    // Bölümleri göster/gizle
+    if (introSection) introSection.style.display = 'none';
+    if (gameSection) gameSection.style.display = 'block';
+  }
+  
+  // Zamanlayıcıyı Güncelle
+  function updateTimer() {
+    if (!gameActive) return;
+    
+    timeLeft--;
+    if (timerDisplay) timerDisplay.textContent = timeLeft;
+    
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }
+  
+  // Oyunu Bitir
+  function endGame() {
+    gameActive = false;
+    clearInterval(timer);
+    
+    // Skorları kaydet
+    if (window.saveScore && typeof window.saveScore === 'function') {
+      window.saveScore('wordPuzzle', score);
+    }
+    
+    // Sonuç ekranını göster
+    alert(`Oyun bitti! Skorunuz: ${score}`);
+    
+    // Bölümleri göster/gizle
+    if (introSection) introSection.style.display = 'block';
+    if (gameSection) gameSection.style.display = 'none';
+  }
+  
+  // Kelime Listesini Oluştur
+  function generateWordsList() {
+    if (!wordsList) return;
+    
+    // Oyun için rasgele 10 kelime seç
+    const gameWords = [...allWords].sort(() => 0.5 - Math.random()).slice(0, 10);
+    
+    gameWords.forEach(word => {
+      const wordElement = document.createElement('div');
+      wordElement.classList.add('word-item');
+      wordElement.textContent = word;
+      wordElement.addEventListener('click', () => checkWord(word, wordElement));
+      wordsList.appendChild(wordElement);
+    });
+  }
+  
+  // Kelimeyi Kontrol Et
+  function checkWord(word, element) {
+    if (!gameActive || foundWords.includes(word)) return;
+    
+    foundWords.push(word);
+    element.classList.add('found');
+    score += 10;
+    
+    if (scoreDisplay) scoreDisplay.textContent = score;
+    
+    // Tüm kelimeler bulundu mu kontrol et
+    if (foundWords.length === 10) {
+      endGame();
+    }
+  }
+  
+  // Oyunu Yeniden Başlat
+  function restartGame() {
+    if (gameActive) {
+      clearInterval(timer);
+    }
+    startGame();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const startScreen = document.getElementById('start-screen');
