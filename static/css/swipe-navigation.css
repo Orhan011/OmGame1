@@ -1,5 +1,4 @@
-
-/* Advanced iOS 18+ style swipe navigation styles */
+/* iOS 18+ Edge Swipe Navigation Styles */
 .ios-swipe-container {
   will-change: transform, opacity;
   overflow: hidden;
@@ -90,28 +89,21 @@
   mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 8%);
 }
 
-/* Edge indicator enhancements */
-@keyframes pulseEdge {
-  0% { opacity: 0; }
-  50% { opacity: 0.3; }
-  100% { opacity: 0; }
-}
-
-/* Prevent browser's elastic scroll effect */
+/* Prevent browser's elastic scroll during gestures */
 html, body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   touch-action: pan-y;
 }
 
-/* Reliable rendering for Safari and iOS */
+/* Optimize for Safari and iOS */
 .ios-swipe-container * {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Device-specific optimizations */
+/* Responsive width adjustments */
 @media (max-width: 390px) {
   .ios-prev-page-preview {
     width: 86%;
@@ -149,7 +141,7 @@ html, body {
   }
 }
 
-/* Light/dark theme support */
+/* Dark theme class support */
 .dark-theme .ios-prev-page-preview {
   background-color: #1c1c1e !important;
   color: #fff !important;
@@ -165,7 +157,7 @@ html, body {
   color: #fff !important;
 }
 
-/* Optimized settings especially for iOS 18+ */
+/* iOS-specific optimizations */
 @supports (-webkit-touch-callout: none) {
   .ios-prev-page-preview, 
   .ios-swipe-overlay,
@@ -182,21 +174,21 @@ html, body {
   }
 }
 
-/* iOS 18+ style rounded corner enhancements */
+/* Higher resolution screens */
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
   .ios-prev-page-preview {
     border-radius: 0 14px 14px 0;
   }
 }
 
-/* Sharper corners for real iOS devices */
+/* Consistently rounded corners */
 @supports (border-radius: max(0px)) {
   .ios-prev-page-preview {
     border-radius: 0 13px 13px 0;
   }
 }
 
-/* Extra optimizations for 60fps animation */
+/* Performance optimizations for smooth animations */
 .ios-swipe-container, 
 .ios-prev-page-preview, 
 .ios-swipe-overlay, 
@@ -210,7 +202,7 @@ html, body {
   -webkit-backface-visibility: hidden;
 }
 
-/* Shadow improvements */
+/* Enhanced shadow effects */
 .ios-prev-page-preview {
   box-shadow: 
     0 0 25px rgba(0, 0, 0, 0.22),
@@ -219,12 +211,7 @@ html, body {
   border-radius: 0 13px 13px 0;
 }
 
-/* Edge gradient smoothing */
-.ios-edge-puller {
-  transition: opacity 0.2s ease;
-}
-
-/* Smoother animations on all devices */
+/* Smooth animation timing */
 .ios-swipe-container,
 .ios-prev-page-preview,
 .ios-swipe-overlay,
@@ -234,25 +221,7 @@ html, body {
   transition-timing-function: cubic-bezier(0.22, 0.84, 0.38, 0.96);
 }
 
-/* Touch target enhancements */
-.ios-edge-indicator {
-  width: 8px !important;
-}
-
-/* Better performance in all browsers */
-@supports (-webkit-appearance:none) {
-  .ios-swipe-container,
-  .ios-prev-page-preview,
-  .ios-swipe-overlay,
-  .ios-prev-page-title,
-  .ios-back-arrow,
-  .ios-fake-header,
-  .ios-current-page-snapshot {
-    -webkit-transform: translateZ(0);
-  }
-}
-
-/* Improvements for moving page during animation */
+/* Improved page movement during animation */
 main, .container, #content {
   will-change: transform, opacity;
   transition: transform 0.25s cubic-bezier(0.22, 0.84, 0.38, 0.96),
@@ -261,7 +230,7 @@ main, .container, #content {
   backface-visibility: hidden;
 }
 
-/* iOS 18 specific improvements */
+/* 3D perspective for iOS 18-style animation */
 .ios-current-page-snapshot {
   transform-origin: center left;
   perspective: 1000px;

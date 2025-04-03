@@ -1,34 +1,34 @@
 
 /**
- * iOS 18+ Premium Swipe Navigation System
- * Enhanced with real Apple Safari/iOS Edge Swipe animation physics
+ * iOS 18+ Edge Swipe Navigation
+ * Authentic implementation of iOS edge swipe navigation with realistic physics
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Core variables and configuration
+  // Core variables
   let touchStartX = 0;
   let touchStartY = 0;
   let touchCurrentX = 0;
   let touchCurrentY = 0;
   let touchEndX = 0;
   let touchEndY = 0;
-  const minSwipeDistance = 70; // Minimum swipe distance
-  const maxSwipeTime = 350; // Maximum swipe time (ms)
-  const edgeSize = 30; // Edge area size (pixels)
+  const minSwipeDistance = 80; // Minimum distance required
+  const maxSwipeTime = 400; // Maximum time for a swipe
+  const edgeSize = 30; // Edge detection zone in pixels
   let touchStartTime = 0;
   let touchEndTime = 0;
   let isSwipingBack = false;
   let initialScrollY = 0;
-  let velocity = 0; // Velocity variable
+  let velocity = 0;
   let lastX = 0;
   let lastTime = 0;
   
   // Animation state
   let animationId = null;
   
-  // Main application content reference
+  // Main content reference
   const mainContent = document.querySelector('main') || document.querySelector('.container') || document.querySelector('#content') || document.body;
   
-  // Animation container
+  // Create the iOS swipe container
   const swipeContainer = document.createElement('div');
   swipeContainer.className = 'ios-swipe-container';
   swipeContainer.style.position = 'fixed';
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
   swipeContainer.style.pointerEvents = 'none';
   document.body.appendChild(swipeContainer);
 
-  // Dark overlay layer (between current and previous page)
+  // Create darkening overlay
   const darkOverlay = document.createElement('div');
   darkOverlay.className = 'ios-swipe-overlay';
   darkOverlay.style.position = 'absolute';
@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
   darkOverlay.style.transition = 'none';
   swipeContainer.appendChild(darkOverlay);
 
-  // Previous page preview panel
+  // Create previous page preview panel
   const prevPagePreview = document.createElement('div');
   prevPagePreview.className = 'ios-prev-page-preview';
   prevPagePreview.style.position = 'absolute';
   prevPagePreview.style.top = '0';
   prevPagePreview.style.left = '-100%';
-  prevPagePreview.style.width = '86%'; // iOS-style width
+  prevPagePreview.style.width = '86%'; // iOS standard width
   prevPagePreview.style.height = '100%';
   prevPagePreview.style.backgroundColor = getBackgroundColor();
   prevPagePreview.style.boxShadow = '0 0 28px rgba(0, 0, 0, 0.25)';
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
   prevPagePreview.style.willChange = 'transform';
   prevPagePreview.style.overflow = 'hidden';
   
-  // Right edge shadow
+  // Edge shadow effect
   const gradient = document.createElement('div');
   gradient.style.position = 'absolute';
   gradient.style.top = '0';
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
   gradient.style.opacity = '0';
   prevPagePreview.appendChild(gradient);
 
-  // Back arrow icon
+  // Back arrow chevron
   const backArrow = document.createElement('div');
   backArrow.className = 'ios-back-arrow';
   backArrow.style.position = 'absolute';
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
   backArrow.style.zIndex = '5';
   prevPagePreview.appendChild(backArrow);
 
-  // Fake previous page header area
+  // Create iOS-style header
   const fakeHeader = document.createElement('div');
   fakeHeader.className = 'ios-fake-header';
   fakeHeader.style.position = 'absolute';
@@ -131,14 +131,13 @@ document.addEventListener('DOMContentLoaded', function() {
   prevPageTitle.style.transition = 'none';
   prevPageTitle.textContent = 'Önceki Sayfa';
 
-  // Determine title with smart system
-  const pageTitle = document.title || 'Anasayfa';
+  // Determine previous page title
   determinePreviousPageTitle();
 
   fakeHeader.appendChild(prevPageTitle);
   prevPagePreview.appendChild(fakeHeader);
 
-  // Content area
+  // Content area for previous page
   const contentArea = document.createElement('div');
   contentArea.className = 'ios-content-area';
   contentArea.style.position = 'absolute';
@@ -150,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
   contentArea.style.backgroundColor = getBackgroundColor();
   prevPagePreview.appendChild(contentArea);
 
-  // Fake previous page content
+  // Create placeholder content for previous page
   const fakePrevPageContent = document.createElement('div');
   fakePrevPageContent.className = 'ios-prev-page-content';
   fakePrevPageContent.style.width = '100%';
@@ -160,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   swipeContainer.appendChild(prevPagePreview);
 
-  // Current page snapshot for 3D effect
+  // Current page snapshot for parallax effect
   const currentPageSnapshot = document.createElement('div');
   currentPageSnapshot.className = 'ios-current-page-snapshot';
   currentPageSnapshot.style.position = 'absolute';
@@ -177,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
   currentPageSnapshot.style.visibility = 'hidden';
   swipeContainer.appendChild(currentPageSnapshot);
 
-  // Left edge indicator (shows user swipe is available)
+  // Edge indicator to show swipe is available
   const edgeIndicator = document.createElement('div');
   edgeIndicator.className = 'ios-edge-indicator';
   edgeIndicator.style.position = 'fixed';
@@ -190,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
   edgeIndicator.style.opacity = '0';
   document.body.appendChild(edgeIndicator);
 
-  // Show edge indicator briefly when page loads
+  // Briefly show edge indicator when page loads
   if (window.history.length > 1) {
     setTimeout(() => {
       edgeIndicator.style.transition = 'opacity 0.6s ease';
@@ -210,10 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Handle touch start
   function handleTouchStart(event) {
-    // Don't affect game controls by checking some elements
+    // Skip interactive elements
     const target = event.target;
     if (target.closest('.game-container, canvas, .control-btn, .simon-pad, input, button, .card, audio, video, [role="button"]')) {
-      return; // Disable swipe feature on interactive elements
+      return;
     }
 
     touchStartX = event.touches[0].clientX;
@@ -226,36 +225,31 @@ document.addEventListener('DOMContentLoaded', function() {
     initialScrollY = window.scrollY;
     velocity = 0;
 
-    // Check if touch is on left edge
-    if (touchStartX <= edgeSize) {
-      // Only enable edge swipe if history exists
-      if (window.history.length > 1) {
-        isSwipingBack = true;
+    // Check if touch is on left edge and history exists
+    if (touchStartX <= edgeSize && window.history.length > 1) {
+      isSwipingBack = true;
 
-        // Prepare animation elements
-        swipeContainer.style.visibility = 'visible';
-        setupFakePreviousPage();
-        
-        // Create current page snapshot for 3D effect
-        createCurrentPageSnapshot();
+      // Setup animation elements
+      swipeContainer.style.visibility = 'visible';
+      setupFakePreviousPage();
+      
+      // Create current page snapshot
+      createCurrentPageSnapshot();
 
-        // Prevent default behavior
-        event.preventDefault();
-      }
+      // Prevent default to avoid scrolling
+      event.preventDefault();
     }
   }
   
-  // Create current page snapshot for realistic 3D transition
+  // Create snapshot of current page
   function createCurrentPageSnapshot() {
-    // Create a live snapshot of current page
     currentPageSnapshot.innerHTML = '';
     currentPageSnapshot.style.visibility = 'visible';
     
     try {
-      // Clone current visible content to snapshot
+      // Clone the main content
       const contentClone = mainContent.cloneNode(true);
       
-      // Adjust for proper positioning
       contentClone.style.position = 'absolute';
       contentClone.style.top = '0';
       contentClone.style.left = '0';
@@ -264,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
       contentClone.style.overflow = 'hidden';
       contentClone.style.transform = 'translateZ(0)';
       
-      // Remove any interactive elements from the clone
+      // Disable interactive elements in the clone
       const interactiveElements = contentClone.querySelectorAll('button, input, select, textarea, [role="button"]');
       interactiveElements.forEach(el => {
         el.style.pointerEvents = 'none';
@@ -272,34 +266,30 @@ document.addEventListener('DOMContentLoaded', function() {
       
       currentPageSnapshot.appendChild(contentClone);
       
-      // Position the snapshot at same scroll position
+      // Maintain scroll position
       if (window.scrollY > 0) {
         contentClone.style.transform = `translateY(-${window.scrollY}px)`;
       }
     } catch (error) {
-      // Fallback to basic color if cloning fails
+      // Fallback if cloning fails
       currentPageSnapshot.style.backgroundColor = getBackgroundColor();
     }
   }
 
-  // Setup fake previous page
+  // Setup previous page preview
   function setupFakePreviousPage() {
-    // Adjust style based on current color theme
     updateColorScheme();
-
-    // Create previous page content
     generatePlaceholderContent();
 
-    // Show title with slight delay (iOS-style animation)
+    // Show title with iOS-style animation timing
     setTimeout(() => {
       prevPageTitle.style.opacity = '1';
       prevPageTitle.style.transform = 'translateX(0)';
     }, 120);
   }
 
-  // Determine previous page title
+  // Determine previous page title from referrer or logical context
   function determinePreviousPageTitle() {
-    // Determine title from referrer URL or other methods
     try {
       if (document.referrer) {
         const referrerUrl = new URL(document.referrer);
@@ -311,10 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
           if (lastSegment === 'index' || lastSegment === '') {
             prevPageTitle.textContent = 'Anasayfa';
           } else {
-            // Create title from URL
+            // Format title from URL
             const cleanTitle = lastSegment
               .replace(/[-_]/g, " ")
-              .replace(/\b\w/g, l => l.toUpperCase()); // Capitalize first letter of each word
+              .replace(/\b\w/g, l => l.toUpperCase());
               
             prevPageTitle.textContent = cleanTitle;
           }
@@ -322,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
           prevPageTitle.textContent = 'Anasayfa';
         }
       } else {
-        // Determine title with logical assumption
+        // Logical context-based title
         const currentPath = window.location.pathname;
         
         if (currentPath.includes('games/')) {
@@ -338,15 +328,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Generate placeholder content
+  // Generate iOS-style placeholder content for previous page
   function generatePlaceholderContent() {
     fakePrevPageContent.innerHTML = '';
 
-    // iOS-style list content
+    // Create iOS-style list content
     const listContainer = document.createElement('div');
     listContainer.style.padding = '12px 15px';
 
-    // Generate random number of list items
+    // Random number of list items (5-8)
     const numItems = Math.floor(Math.random() * 4) + 5;
 
     for (let i = 0; i < numItems; i++) {
@@ -358,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
       listItem.style.display = 'flex';
       listItem.style.alignItems = 'center';
 
-      // Icon area
+      // Icon placeholder
       const iconPlaceholder = document.createElement('div');
       iconPlaceholder.style.width = '36px';
       iconPlaceholder.style.height = '36px';
@@ -367,11 +357,11 @@ document.addEventListener('DOMContentLoaded', function() {
       iconPlaceholder.style.marginRight = '16px';
       iconPlaceholder.style.flexShrink = '0';
 
-      // Text area
+      // Text container
       const textContainer = document.createElement('div');
       textContainer.style.flex = '1';
 
-      // Title
+      // Title placeholder
       const title = document.createElement('div');
       title.style.height = '14px';
       title.style.borderRadius = '4px';
@@ -381,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function() {
       title.style.width = `${40 + Math.random() * 40}%`;
       title.style.marginBottom = '8px';
 
-      // Subtitle
+      // Subtitle placeholder
       const subtitle = document.createElement('div');
       subtitle.style.height = '10px';
       subtitle.style.borderRadius = '4px';
@@ -393,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
       textContainer.appendChild(title);
       textContainer.appendChild(subtitle);
 
-      // Forward chevron
+      // Chevron indicator
       const chevron = document.createElement('div');
       chevron.style.width = '8px';
       chevron.style.height = '8px';
@@ -420,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleTouchMove(event) {
     if (!isSwipingBack) return;
 
-    // Prevent default behavior
+    // Prevent scrolling
     event.preventDefault();
 
     const now = Date.now();
@@ -429,20 +419,20 @@ document.addEventListener('DOMContentLoaded', function() {
     touchCurrentX = event.touches[0].clientX;
     touchCurrentY = event.touches[0].clientY;
 
-    // Calculate horizontal and vertical distance
+    // Calculate deltas
     const deltaX = touchCurrentX - touchStartX;
     const deltaY = touchCurrentY - touchStartY;
 
-    // Cancel if vertical swipe is much greater than horizontal
+    // Cancel if more vertical than horizontal
     if (Math.abs(deltaY) > Math.abs(deltaX) * 2.2 && Math.abs(deltaX) < 40) {
       handleTouchCancel();
       return;
     }
 
-    // Calculate velocity (pixels/ms)
+    // Calculate velocity for physics
     if (dt > 0) {
       const instantVelocity = (touchCurrentX - lastX) / dt;
-      // Calculate velocity more smoothly
+      // Smooth velocity calculation
       velocity = instantVelocity * 0.6 + velocity * 0.4;
     }
 
@@ -450,44 +440,41 @@ document.addEventListener('DOMContentLoaded', function() {
     lastTime = now;
 
     if (deltaX > 0) {
-      // Calculate progress based on maximum distance
+      // Calculate progress based on screen width
       const maxDistance = window.innerWidth * 0.88;
       let progress = Math.min(deltaX / maxDistance, 1);
 
-      // Curve adjustment
-      // This curve gives the real iOS system motion feel
+      // Apply iOS physics curve
       progress = cubicBezier(0.25, 0.46, 0.45, 0.94, progress);
 
-      // Apply transformations to elements
+      // Apply transformations
       const translateX = Math.min(deltaX, maxDistance);
       prevPagePreview.style.transform = `translateX(${translateX}px)`;
       
-      // 3D perspective effect (iOS 18+ style)
+      // 3D perspective effect
       currentPageSnapshot.style.visibility = 'visible';
       currentPageSnapshot.style.transform = `translate3d(${translateX}px, 0, 0)`;
       
-      // Parallax effect - current page moves slightly faster
+      // Subtle parallax effect on main content
       mainContent.style.transform = `translate3d(${translateX * 0.05}px, 0, 0)`;
       mainContent.style.transition = 'none';
 
-      // Show shadow
+      // Update visual elements
       gradient.style.opacity = Math.min(1, progress * 1.4);
 
-      // Darken overlay
-      const alpha = Math.max(0, Math.min(0.4, progress * 0.4)); // 0.4 maximum opacity
+      // Darken overlay progressively
+      const alpha = Math.max(0, Math.min(0.4, progress * 0.4));
       darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
 
-      // Show back arrow
+      // Show back arrow and title
       backArrow.style.opacity = Math.min(1, progress * 1.5);
-
-      // Move title
       prevPageTitle.style.opacity = Math.min(1, progress * 1.5);
       prevPageTitle.style.transform = `translateX(${Math.max(0, 15 - progress * 15)}px)`;
 
-      // Add slight spring effect if progress exceeds 90%
+      // Add spring effect near the end of swipe
       if (progress > 0.85) {
         const overProgress = (progress - 0.85) / 0.15;
-        // Gradual elastic effect
+        // Elastic effect calculation
         const elasticity = Math.sin(overProgress * Math.PI / 2) * Math.min(12, overProgress * 22);
         prevPagePreview.style.transform = `translateX(${translateX + elasticity}px)`;
         currentPageSnapshot.style.transform = `translate3d(${translateX + elasticity}px, 0, 0)`;
@@ -503,65 +490,65 @@ document.addEventListener('DOMContentLoaded', function() {
     touchEndY = touchCurrentY;
     touchEndTime = Date.now();
 
-    // Calculate swipe distance and time
+    // Calculate metrics
     const swipeDistance = touchEndX - touchStartX;
     const swipeTime = touchEndTime - touchStartTime;
     const swipeSpeed = swipeDistance / swipeTime;
 
-    // If swipe distance or velocity is sufficient (iOS style)
+    // Determine if swipe should complete
     const screenWidth = window.innerWidth;
-    const minDistance = screenWidth * 0.3; // 30% of screen
-    const minVelocity = 0.5; // Pixels/ms (fast movement)
+    const minDistance = screenWidth * 0.3; // 30% of screen width
+    const minVelocity = 0.5; // px/ms
     
     // Get current position
     const currentPosition = parseFloat(getComputedStyle(prevPagePreview).transform.split(',')[4]) || 0;
 
     if (swipeDistance > minDistance || (swipeDistance > screenWidth * 0.12 && velocity > minVelocity)) {
-      // Complete back navigation animation
+      // Complete navigation
       completeSwipeAnimation(currentPosition);
     } else {
-      // Cancel back navigation
+      // Cancel navigation
       cancelSwipeWithAnimation(currentPosition);
     }
 
     isSwipingBack = false;
   }
 
-  // Complete swipe animation
+  // Animation to complete the swipe
   function completeSwipeAnimation(currentPosition) {
-    // Cancel current animation
+    // Cancel any running animation
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
 
-    const targetX = window.innerWidth + 20; // Slightly extend
+    const targetX = window.innerWidth + 20; // Slightly beyond screen
     const distance = targetX - currentPosition;
     const startTime = Date.now();
     let duration;
     
-    // Adjust duration based on movement intensity
+    // Adaptive duration based on velocity
     if (velocity > 1.8) {
-      // Fast movement - complete much faster
+      // Fast flick - complete quickly
       duration = 180;
     } else if (velocity > 0.9) {
-      // Medium speed movement
+      // Medium speed
       duration = 230;
     } else {
-      // Slow movement
+      // Slow, deliberate movement
       duration = 280;
     }
 
-    // Realistic bezier timing function for iOS spring effect
+    // Animation loop with physics
     function animate() {
       const elapsed = Date.now() - startTime;
       const rawProgress = Math.min(elapsed / duration, 1);
       
-      // iOS curve - accelerates at start, then decelerates
+      // iOS-style easing curve
       const easedProgress = cubicBezier(0.22, 0.84, 0.38, 0.96, rawProgress);
       
       const newX = currentPosition + (distance * easedProgress);
 
-      // Update elements
+      // Update all elements
       prevPagePreview.style.transform = `translateX(${newX}px)`;
       currentPageSnapshot.style.transform = `translate3d(${newX}px, 0, 0)`;
       mainContent.style.transform = `translate3d(${newX * 0.05}px, 0, 0)`;
@@ -575,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (rawProgress < 1) {
         animationId = requestAnimationFrame(animate);
       } else {
-        // Animation completed, go to previous page
+        // Animation complete, navigate back
         window.history.back();
         resetSwipeElements();
       }
@@ -593,9 +580,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Cancel swipe and show back animation
+  // Animation to cancel the swipe
   function cancelSwipeWithAnimation(currentPosition) {
-    // Cancel current animation
+    // Cancel any running animation
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
@@ -603,39 +590,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetX = 0;
     const distance = targetX - currentPosition;
     const startTime = Date.now();
-    let duration = 260; // ms
+    let duration = 260;
 
-    // Speed up animation if distance is very short
+    // Shorter duration for small movements
     if (Math.abs(currentPosition) < 60) {
       duration = 160;
     }
 
-    // Realistic timing function for iOS retraction animation
+    // Animation loop with iOS-style spring physics
     function animate() {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Advanced return curve for real iOS motion feel
+      // iOS-style return curve
       const easedProgress = cubicBezier(0.25, 0.74, 0.22, 0.99, progress);
       
       let newX = currentPosition * (1 - easedProgress);
       
-      // Add advanced elastic effect (between 0.7-0.95 progress)
+      // Add subtle spring effect during return
       if (progress > 0.7 && progress < 0.95) {
         const springEffect = Math.sin((progress - 0.7) * 8) * 5 * (1 - progress);
         newX += springEffect;
       }
 
-      // Update all positions
+      // Update positions
       prevPagePreview.style.transform = `translateX(${newX}px)`;
       currentPageSnapshot.style.transform = `translate3d(${newX}px, 0, 0)`;
       mainContent.style.transform = `translate3d(${newX * 0.05}px, 0, 0)`;
       
-      // Remove background darkening
+      // Fade out overlay
       const alphaProgress = cubicBezier(0.4, 0, 0.2, 1, easedProgress);
       darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - alphaProgress)})`;
       
-      // Update other elements
+      // Update UI elements
       backArrow.style.opacity = Math.max(0, 1 - easedProgress * 1.8);
       prevPageTitle.style.opacity = Math.max(0, 1 - easedProgress * 2);
       prevPageTitle.style.transform = `translateX(${(easedProgress * 15)}px)`;
@@ -644,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (progress < 1) {
         animationId = requestAnimationFrame(animate);
       } else {
-        // Animation completed
+        // Animation complete
         resetSwipeElements();
       }
     }
@@ -652,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
     animationId = requestAnimationFrame(animate);
   }
 
-  // Reset swipe elements
+  // Reset all elements to initial states
   function resetSwipeElements() {
     // Clear animation
     if (animationId) {
@@ -660,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function() {
       animationId = null;
     }
 
-    // Return all elements to default positions
+    // Reset positions and states
     prevPagePreview.style.transform = 'translateX(0)';
     prevPagePreview.style.transition = 'none';
     currentPageSnapshot.style.transform = 'translate3d(0, 0, 0)';
@@ -686,13 +673,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Helper functions
   function getRandomPastelColor() {
-    // Darker colors for dark mode, pastel for light mode
     if (isDarkMode()) {
-      // More vibrant colors for dark mode
+      // Vibrant dark mode colors
       const hue = Math.floor(Math.random() * 360);
       return `hsl(${hue}, 65%, 35%)`;
     } else {
-      // Pastel colors for light mode
+      // Pastel light mode colors
       const hue = Math.floor(Math.random() * 360);
       return `hsl(${hue}, 70%, 80%)`;
     }
@@ -700,23 +686,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Dark mode detection
   function isDarkMode() {
-    // Check user preference
+    // Check system preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
     }
     
-    // Check if page background color is dark
+    // Check body background color
     const bodyBg = getComputedStyle(document.body).backgroundColor;
     if (bodyBg) {
       const rgb = bodyBg.match(/\d+/g);
       if (rgb && rgb.length >= 3) {
-        // If average of RGB values is less than 128, it's dark mode
         const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
         return brightness < 128;
       }
     }
     
-    // Check if page has .dark-theme class
+    // Check for dark theme classes
     if (document.documentElement.classList.contains('dark-theme') || 
         document.body.classList.contains('dark-theme')) {
       return true;
@@ -725,16 +710,16 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   }
 
-  // Determine background color
+  // Get background color based on theme
   function getBackgroundColor() {
     if (isDarkMode()) {
-      return '#1c1c1e'; // iOS dark mode background
+      return '#1c1c1e'; // iOS dark mode
     } else {
-      return '#f2f2f7'; // iOS light mode background
+      return '#f2f2f7'; // iOS light mode
     }
   }
 
-  // Update color scheme
+  // Update colors based on theme
   function updateColorScheme() {
     const isDark = isDarkMode();
     
@@ -744,16 +729,16 @@ document.addEventListener('DOMContentLoaded', function() {
     fakeHeader.style.borderBottom = isDark ? '0.5px solid rgba(255, 255, 255, 0.12)' : '0.5px solid rgba(0, 0, 0, 0.12)';
     prevPageTitle.style.color = isDark ? '#fff' : '#000';
     
-    backArrow.style.borderColor = '#007aff'; // Keep iOS blue
+    // iOS blue is consistent in both themes
+    backArrow.style.borderColor = '#007aff';
   }
 
-  // Cubic bezier easing function
+  // Cubic bezier easing function for realistic iOS physics
   function cubicBezier(x1, y1, x2, y2, t) {
     if (t <= 0) return 0;
     if (t >= 1) return 1;
     
-    // Calculate t value using Newton-Raphson iteration method
-    // This mathematical algorithm mimics iOS animation curves
+    // Newton-Raphson iteration for precision
     let x = t, i;
     const epsilon = 1e-6;
     
