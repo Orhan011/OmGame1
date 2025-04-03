@@ -231,31 +231,48 @@ function loadArticleContent() {
 <script>
   // Sayfalar arası geçişlerde sayfaları geçmişe kaydet (link tıklamaları için)
   document.addEventListener('DOMContentLoaded', function() {
+    // Mevcut URL'yi geçmişe ekleyelim (sayfa ilk yüklendiğinde)
+    try {
+      let pageHistory = [];
+      const savedHistory = localStorage.getItem('zekapark_page_history');
+      
+      if (savedHistory) {
+        pageHistory = JSON.parse(savedHistory);
+      }
+      
+      // Mevcut URL'yi ekle (eğer farklıysa)
+      if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
+        console.log('Sayfa ilk yüklenirken geçmişe ekleniyor:', window.location.pathname);
+        pageHistory.push(window.location.pathname);
+        
+        // Sadece son 10 sayfayı sakla
+        if (pageHistory.length > 10) {
+          pageHistory.shift();
+        }
+        
+        // Geçmişi kaydet
+        localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+        console.log('Güncel geçmiş:', pageHistory);
+      }
+    } catch (err) {
+      console.error('Sayfa geçmişi başlatma hatası:', err);
+    }
+    
     // Tüm linkleri bul ve tıklama olayını dinle
     document.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', function(e) {
         // Dış linkleri atlayın, sadece site içi navigasyonu kaydedin
         if (this.href && this.href.includes(window.location.host) && !this.href.includes('#') && !this.target) {
           try {
-            // Geçerli geçmişi al
-            let pageHistory = [];
-            try {
-              const savedHistory = localStorage.getItem('zekapark_page_history');
-              if (savedHistory) pageHistory = JSON.parse(savedHistory);
-            } catch (err) {}
+            // Tıklanan linkin URL'sini geçmişe eklemeyi localStorage.setItem yaparak ekleme
+            // Bu kısım aslında gereksiz, çünkü zaten yeni sayfaya geçildiğinde o sayfa kendi 
+            // geçmişini güncelleyecek. Burada gidilecek sayfayı önceden kaydetmeye gerek yok.
             
-            // Şu anki URL'yi geçmişe ekle (eğer yoksa)
-            if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
-              pageHistory.push(window.location.pathname);
-            }
-            
-            // Boyut sınırı
-            if (pageHistory.length > 10) pageHistory.shift();
-            
-            // Geçmişi kaydet
-            localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+            // Şu anki sayfa yolunu konsola yazdır
+            console.log('Link tıklandı, mevcut sayfa:', window.location.pathname);
+            console.log('Hedef sayfa:', this.pathname || this.href);
           } catch (err) {
-            console.error('Sayfa geçmişi kaydetme hatası:', err);
+            console.error('Link tıklama işleme hatası:', err);
           }
         }
       });

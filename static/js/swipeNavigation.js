@@ -10,37 +10,36 @@ document.addEventListener('DOMContentLoaded', function() {
   // Sayfa geçmişi için array (son gezilen sayfaları takip etmek için)
   let pageHistory = [];
   
-  // Geçerli sayfayı geçmişe ekle
+  // Önce localStorage'dan geçmiş bilgisini al
+  try {
+    const savedHistory = localStorage.getItem('zekapark_page_history');
+    if (savedHistory) {
+      pageHistory = JSON.parse(savedHistory);
+      console.log('Yüklenen sayfa geçmişi:', pageHistory);
+    } else {
+      // LocalStorage boşsa ilk kez başlat
+      pageHistory = [];
+    }
+  } catch (e) {
+    console.log('Geçmiş yükleme hatası:', e);
+    pageHistory = [];
+  }
+  
+  // Geçerli sayfayı geçmişe ekle (sadece farklıysa)
   if (window.location.pathname) {
-    // Aynı sayfayı tekrar tekrar eklemeyi önle
+    // Eğer geçmiş varsa ve son sayfa şu anki sayfadan farklıysa ekle
     if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
+      console.log('Geçmişe ekleniyor:', window.location.pathname);
       pageHistory.push(window.location.pathname);
       // Sadece son 10 sayfayı sakla (performans için)
       if (pageHistory.length > 10) {
         pageHistory.shift();
       }
-      // LocalStorage'a kaydet (sayfa yenilenmelerinde bile korunsun)
-      localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
     }
-  }
-  
-  // Sayfa geçmişini localStorage'dan al (sayfa yenilendiğinde kaybolmasın)
-  try {
-    const savedHistory = localStorage.getItem('zekapark_page_history');
-    if (savedHistory) {
-      pageHistory = JSON.parse(savedHistory);
-      
-      // Şu anki sayfa zaten geçmişte varsa, ondan sonrasını temizle 
-      // (kullanıcı ileri-geri yapmış olabilir)
-      const currentIndex = pageHistory.indexOf(window.location.pathname);
-      if (currentIndex !== -1 && currentIndex < pageHistory.length - 1) {
-        pageHistory = pageHistory.slice(0, currentIndex + 1);
-        localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
-      }
-    }
-  } catch (e) {
-    console.log('Geçmiş yükleme hatası:', e);
-    pageHistory = [window.location.pathname];
+    
+    // LocalStorage'ı her zaman güncelle
+    localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+    console.log('Güncellenmiş geçmiş:', pageHistory);
   }
   
   // Kaydırma efekti için gerekli değişkenler
@@ -288,9 +287,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Önce kendi sakladığımız geçmişe bak, sonra tarayıcı geçmişini dene
       setTimeout(() => {
+        console.log('Navigasyon geçmişi:', pageHistory);
+        
         // Geçmişte en az 2 sayfa varsa, bir önceki sayfaya git
         if (pageHistory.length >= 2) {
+          // Şu anki sayfanın bir önceki sayfası
           const previousPage = pageHistory[pageHistory.length - 2];
+          console.log('Önceki sayfaya gidiliyor:', previousPage);
           
           // Geçmiş listesinden şu anki sayfayı çıkar 
           pageHistory.pop();
@@ -300,17 +303,20 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Önceki sayfaya git
           window.location.href = previousPage;
-        } 
+        }
         // İç hafızada yeterli geçmiş yoksa tarayıcı geçmişini kullan
         else if (window.history.length > 2) {
+          console.log('Tarayıcı geçmişi kullanılıyor');
           window.history.back();
-        } 
+        }
         // Referrer'a bak
         else if (document.referrer && document.referrer.includes(window.location.host)) {
+          console.log('Referrer kullanılıyor:', document.referrer);
           window.location.href = document.referrer;
-        } 
+        }
         // Son çare ana sayfaya git
         else {
+          console.log('Ana sayfaya yönlendiriliyor (son çare)');
           window.location.href = '/';
         }
       }, 150);
