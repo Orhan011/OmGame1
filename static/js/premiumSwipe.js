@@ -98,25 +98,14 @@
         try {
           localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(STATE.navigationHistory));
         } catch (e) {
-          console.warn("Gezinme geçmişi saklanırken hata oluştu:", e);
-          
-          // LocalStorage hatası durumunda tarayıcı geçmişine güven
-          if (window.history.length > 1) {
-            return true;
-          }
+          console.warn("Gezinme geçmişi kaydedilirken hata oluştu:", e);
         }
-      } else {
-        console.log("URL zaten geçmişte var, eklenmedi:", currentUrl);
       }
-      
-      // En az 2 sayfa varsa navigasyon yapılabilir
-      return STATE.navigationHistory.length > 1;
     },
 
     /**
-     * Önceki sayfaya git
+     * Önceki sayfaya navigasyon yap
      */
-  };
     navigateBack() {
       if (STATE.navigationHistory.length > 1) {
         // Son sayfayı mevcut geçmişten çıkar (mevcut sayfa)
@@ -163,13 +152,12 @@
         }
       }
     }
+  };
 
-  // DOM ile ilgili tüm işlemleri bir araya toplama
   const DOMManager = {
     /**
-     * Tüm DOM elementlerini oluştur
+     * DOM elemanlarını oluştur (kapsayıcı, önceki sayfa ve overlay)
      */
-      
     createElements() {
       if (STATE.domNodesReady) return;
       
@@ -265,14 +253,14 @@
       
       // Tek seferde DOM'a ekle (daha hızlı)
       document.body.appendChild(fragment);
+      
+      // DOM elemanları hazır
       STATE.domNodesReady = true;
     },
-    
+
     /**
      * Kaydırma animasyonu için sayfayı hazırla
      */
-      DOM.previousPagePreview.style.opacity = '1';
-      DOM.previousPagePreview.appendChild(previousPageContent);
     prepareForSwipe() {
       if (!STATE.domNodesReady) {
         this.createElements();
@@ -343,7 +331,6 @@
         overflow: hidden;
       `;
       
-      
       // Sayfa snapshot'ını ekle
       DOM.pageClone.appendChild(pageSnapshot);
       
@@ -370,6 +357,16 @@
     /**
      * Gerçek zamanlı kaydırma animasyonunu güncelle
      */
+    updateSwipeAnimation(progress) {
+      if (!STATE.domNodesReady || !STATE.isSwipeActive) return;
+      
+      // Daha hızlı, daha akıcı bir ease fonksiyonu kullan
+      const easedProgress = Math.min(1, progress * 1.05);
+      
+      // Daha optimize edilmiş transform (3 boyutlu ve GPU hızlandırmalı)
+      // translateZ(0) ekleyerek GPU'yu zorunlu kullanıma al
+      DOM.pageClone.style.transform = `translate3d(${progress * window.innerWidth}px, 0, 0) translateZ(0)`;
+      
       // Daha hafif gölge efekti, renk bulanıklığı riskini azalt
       const shadowOpacity = Math.min(0.15, easedProgress * 0.18);
       DOM.overlay.style.backgroundColor = `rgba(0, 0, 0, ${shadowOpacity})`;
@@ -383,17 +380,14 @@
       DOM.previousPagePreview.style.opacity = Math.min(1, easedProgress * 3); // Daha hızlı görünüm
     },
     
-     * Cubic easing fonksiyonu - daha pürüzsüz animasyonlar için
-     */
-    easeOutCubic(t) {
-      return 1 - Math.pow(1 - t, 3);
+    // Cubic ease-out fonksiyonu - daha doğal hareket eğrisi
+    easeOutCubic(x) {
+      return 1 - Math.pow(1 - x, 3);
     },
     
     /**
-     * Kaydırma animasyonunu tamamla
+     * Kaydırma animasyonunu tamamla (önceki sayfaya git)
      */
-    resetSwipeAnimation(duration = 180) {
-        transition: transform ${duration}ms ${CONFIG.TRANSITION_BASE_CURVE};
     completeSwipeAnimation(duration = CONFIG.ANIMATION_DURATION_MIN) {
       // Süreyi sabit 20ms olarak ayarla (kullanıcı isteği)
       const animDuration = 20; // Kesin olarak 20ms
@@ -433,7 +427,6 @@
       return new Promise(resolve => setTimeout(resolve, animDuration));
     },
     
-          DOM.previousPagePreview.style.visibility = 'hidden';
     resetSwipeAnimation(duration = 20) {
       // Ultra hızlı sıfırlama - 20ms hedefi için optimize
       const resetDuration = 20; // Kesin olarak 20ms
@@ -464,59 +457,21 @@
       // İşlem gecikmeden tamamlandı olarak işaretle
       return Promise.resolve();
     }
-          resolve();
-        }, duration);
-      });
-    }
   };
 
-  // Dokunma ve kaydırma ile ilgili tüm işlemleri bir araya toplama
-  const TouchManager = {
-    /**
-     * Dokunma başlangıcı
-     */
-    handleTouchStart(e) {
-      // Edge bölgesinde mi kontrol et
-      if (e.touches[0].clientX > CONFIG.EDGE_THRESHOLD) return;
-      
-      // Geçmiş kontrolü
-      const hasHistory = HistoryManager.saveCurrentPage();
-      if (!hasHistory) return;
-      
-      // Dokunma durumunu kaydet
-      STATE.touchStartX = e.touches[0].clientX;
-      STATE.touchStartY = e.touches[0].clientY;
-      STATE.currentX = STATE.touchStartX;
-      STATE.lastX = STATE.touchStartX;
-      STATE.startTime = Date.now();
-      STATE.isSwipeActive = true;
-      STATE.velocities = [];
-      
-      // DOM'u hazırla
-      DOMManager.prepareForSwipe();
-    },
-    
-    /**
-     * Dokunma hareketi - pürüzsüz kaydırma
-     */
-    handleTouchMove(e) {
-      if (!STATE.isSwipeActive || STATE.isAnimating) return;
-      
-      // Mevcut pozisyonu güncelle
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      
-      // Hareket yönü kontrolü
-      const deltaX = currentX - STATE.touchStartX;
-      const deltaY = Math.abs(currentY - STATE.touchStartY);
-      
-      // Hızı hesapla ve kaydet (her 10ms'de bir kaydet)
+  // iOS benzeri kaydırma fiziği için gelişmiş hesaplamaları yöneten bileşen
+  const PhysicsManager = {
+    // Hızı yakalama ve analiz etme
+    recordVelocity(currentX) {
       const now = Date.now();
-      if (now - STATE.lastVelocityRecord > 10) {
-        const instantVelocity = (currentX - STATE.lastX) / (now - STATE.lastVelocityRecord);
-        STATE.velocities.push(instantVelocity);
+      const elapsed = now - STATE.lastVelocityRecord;
+      
+      if (elapsed > 0) {
+        // Anlık hızı hesapla (piksel/ms)
+        const instantVelocity = (currentX - STATE.lastX) / elapsed;
         
-        // En fazla son 5 hız kaydını tut
+        // Son 5 hız değerini tut
+        STATE.velocities.push(instantVelocity);
         if (STATE.velocities.length > 5) {
           STATE.velocities.shift();
         }
@@ -524,214 +479,254 @@
         STATE.lastX = currentX;
         STATE.lastVelocityRecord = now;
       }
-      
-      // Yatay kaydırma kontrolü
-      if (deltaX > 0 && deltaX > deltaY * 1.2) {
-        STATE.currentX = currentX;
-        
-        // Kaydırma ilerlemesini hesapla (0-1 arası)
-        const maxWidth = window.innerWidth * 0.9; // Maksimum kaydırma mesafesi
-        const rawProgress = deltaX / maxWidth;
-        const progress = Math.min(0.999, rawProgress);
-        
-        // Kaydırma animasyonunu güncelle
-        DOMManager.updateSwipeAnimation(progress);
-        
-        // Sayfa kaydırmayı engelle
-        e.preventDefault();
-      }
     },
-    
-    /**
-     * Dokunma bitişi - animasyonu tamamla veya iptal et
-     */
-    async handleTouchEnd(e) {
-      if (!STATE.isSwipeActive || STATE.isAnimating) return;
+
+    // Son ölçülen ortalama hızı hesapla
+    getAverageVelocity() {
+      if (STATE.velocities.length === 0) return 0;
       
-      STATE.isAnimating = true;
+      // Hızların ağırlıklı ortalamasını hesapla (en son ölçümlere daha fazla ağırlık ver)
+      let totalWeight = 0;
+      let weightedSum = 0;
       
-      // Son pozisyon ve süre
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchDuration = Date.now() - STATE.startTime;
-      const touchDistance = touchEndX - STATE.touchStartX;
-      
-      // Ortalama hızı hesapla
-      let averageVelocity = 0;
-      if (STATE.velocities.length > 0) {
-        const sum = STATE.velocities.reduce((acc, vel) => acc + vel, 0);
-        averageVelocity = sum / STATE.velocities.length;
+      for (let i = 0; i < STATE.velocities.length; i++) {
+        const weight = i + 1;  // Daha yeni ölçümler daha yüksek ağırlığa sahip
+        weightedSum += STATE.velocities[i] * weight;
+        totalWeight += weight;
       }
       
-      // Kaydırma tamamlama kriteri
-      const isFastSwipe = touchDuration < CONFIG.MAX_SWIPE_TIME && 
-                          touchDistance > CONFIG.MIN_SWIPE_THRESHOLD;
-      const isFarSwipe = touchDistance > window.innerWidth * 0.4;
-      const isHighVelocity = averageVelocity > CONFIG.CRITICAL_VELOCITY;
+      return weightedSum / totalWeight;
+    },
+
+    // Kaydırma hareketi tamamlandığında sonraki eylemi belirle
+    determineAction() {
+      // Kaydırma/hareket süresi
+      const swipeDuration = Date.now() - STATE.startTime;
       
-      // Kaydırma işlemi tamamlanmalı mı?
-      if (isFastSwipe || isFarSwipe || isHighVelocity) {
-        // Hıza dayalı bir animasyon süresi hesapla - daha hızlı kaydırma = daha hızlı animasyon
-        const speedBasedDuration = isHighVelocity 
-          ? CONFIG.ANIMATION_DURATION_MIN 
-          : CONFIG.ANIMATION_DURATION_MAX - (Math.abs(averageVelocity) * 500);
-          
-        // Animasyonu tamamla
-        await DOMManager.completeSwipeAnimation(speedBasedDuration);
-        
-        // Sayfaya git
-        HistoryManager.navigateBack();
+      // Kaydırma mesafesi ve yönü
+      const swipeDistance = STATE.currentX - STATE.touchStartX;
+      
+      // Ortalama hız (px/ms)
+      const averageVelocity = this.getAverageVelocity();
+      
+      console.log(`Kaydırma mesafesi: ${swipeDistance}px, Süre: ${swipeDuration}ms, Hız: ${averageVelocity.toFixed(3)}px/ms`);
+      
+      const screenWidth = window.innerWidth;
+      const progress = Math.max(0, swipeDistance / screenWidth);
+      
+      // Hız veya mesafe kritik eşiği geçerse kaydırmayı tamamla
+      if (
+        (averageVelocity > CONFIG.CRITICAL_VELOCITY) || 
+        (progress > 0.39) // Yaklaşık 1/3 kaydırma eşiği
+      ) {
+        return {
+          action: 'complete',
+          velocity: averageVelocity
+        };
       } else {
-        // Animasyonu iptal et
-        await DOMManager.resetSwipeAnimation();
+        return {
+          action: 'cancel',
+          velocity: averageVelocity
+        };
       }
-      
-      // Durumu sıfırla
-      STATE.isSwipeActive = false;
-      STATE.isAnimating = false;
-      STATE.touchStartX = 0;
-      STATE.touchStartY = 0;
-      STATE.currentX = 0;
-    },
-    
-    /**
-     * Dokunma iptali
-     */
-    async handleTouchCancel() {
-      if (!STATE.isSwipeActive) return;
-      
-      STATE.isAnimating = true;
-      
-      // Animasyonu sıfırla
-      await DOMManager.resetSwipeAnimation();
-      
-      // Durumu sıfırla
-      STATE.isSwipeActive = false;
-      STATE.isAnimating = false;
-      STATE.touchStartX = 0;
-      STATE.touchStartY = 0;
-      STATE.currentX = 0;
     }
   };
 
-  // EventListener kurulumu ve başlangıç işlemleri
-  const SwipeNavigation = {
-    /**
-     * Navigasyon sistemini başlat
-     */
-    initialize() {
-      // Geçmişi yükle
+  /**
+   * Ana Kontrol Bileşeni
+   * Dokunma olayları, gezinme ve animasyon kontrolü
+   */
+  const EdgeSwipeController = {
+    init() {
+      console.log("iOS kenar kaydırma navigasyonu başlatılıyor...");
+      
+      // DOM elemanlarını ve geçmişi yükle
+      DOMManager.createElements();
       HistoryManager.loadHistory();
       
-      // DOM elementlerini oluştur
-      DOMManager.createElements();
-      
-      // Event dinleyicileri ekle
-      this.setupEventListeners();
-      
-      // Mevcut sayfayı geçmişe ekle
+      // Mevcut sayfayı kaydet
       HistoryManager.saveCurrentPage();
       
-      // Dokunmasız cihazlar için geri butonu ekle
-      this.setupBackButtonForDesktop();
+      // Dokunma olaylarını dinlemeye başla
+      this.setupEventListeners();
       
-      console.log("ZekaPark Premium iOS Navigation aktif");
+      // Debug butonu ekle (opsiyonel)
+      this.addDebugButton();
+      
+      console.log("iOS kenar kaydırma navigasyonu aktif");
     },
-    
-    /**
-     * Event dinleyicileri
-     */
+
     setupEventListeners() {
-      // Dokunma olayları
-      document.addEventListener('touchstart', TouchManager.handleTouchStart.bind(TouchManager), { passive: true });
-      document.addEventListener('touchmove', TouchManager.handleTouchMove.bind(TouchManager), { passive: false });
-      document.addEventListener('touchend', TouchManager.handleTouchEnd.bind(TouchManager), { passive: true });
-      document.addEventListener('touchcancel', TouchManager.handleTouchCancel.bind(TouchManager), { passive: true });
-      
-      // Bağlantı tıklamalarını izle ve geçmişi güncelle
-      document.addEventListener('click', (e) => {
-        const link = e.target.closest('a');
-        if (link && link.href && !link.target && !link.hasAttribute('download')) {
-          // Mevcut sayfayı gezinme geçmişine ekle
-          const url = window.location.pathname;
-          const clickedUrl = link.pathname;
+      // Touchstart olayı
+      document.addEventListener('touchstart', (e) => {
+        // Yalnızca sol kenardan yapılan kaydırmalar için
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        
+        if (touchX <= CONFIG.EDGE_THRESHOLD && !STATE.isAnimating) {
+          STATE.touchStartX = touchX;
+          STATE.touchStartY = touchY;
+          STATE.currentX = touchX;
+          STATE.lastX = touchX;
+          STATE.startTime = Date.now();
+          STATE.velocities = [];
           
-          console.log("Tıklanan bağlantı:", clickedUrl);
+          // Durum bilgilerini sıfırla
+          STATE.isSwipeActive = true;
           
-          // Aynı sayfaya gidilmiyorsa geçmişe ekle
-          if (url !== clickedUrl) {
-            HistoryManager.saveCurrentPage();
+          // Kaydırma için sayfayı hazırla
+          DOMManager.prepareForSwipe();
+        }
+      }, { passive: false });
+
+      // Touchmove olayı
+      document.addEventListener('touchmove', (e) => {
+        if (STATE.isSwipeActive && !STATE.isAnimating) {
+          const touchX = e.touches[0].clientX;
+          const touchY = e.touches[0].clientY;
+          
+          // Yatay/dikey hareketi ölç ve açıyı belirle
+          const deltaX = touchX - STATE.touchStartX;
+          const deltaY = touchY - STATE.touchStartY;
+          
+          // Mesafe > 20px ve açı > 45 derece ise, dikey kaydırma olarak kabul et
+          if (
+            Math.abs(deltaY) > 20 && 
+            Math.abs(deltaY) > Math.abs(deltaX) * 1.3
+          ) {
+            // Dikey kaydırmaya izin ver, yatay kaydırmayı iptal et
+            STATE.isSwipeActive = false;
+            DOMManager.resetSwipeAnimation();
+            return;
+          }
+          
+          // Sayfanın sağa doğru fazla çekilmesini engelle
+          const restrictedX = Math.min(touchX, window.innerWidth * 0.95);
+          
+          STATE.currentX = restrictedX;
+          
+          // Yeni konum için hız hesapla
+          PhysicsManager.recordVelocity(STATE.currentX);
+          
+          // İlerlemeyi hesapla (0-1 arası)
+          const progress = Math.max(0, (STATE.currentX - STATE.touchStartX) / window.innerWidth);
+          
+          // DOM animasyonunu güncelle
+          DOMManager.updateSwipeAnimation(progress);
+          
+          // Varsayılan davranışı engelle (önemli, sayfanın kaymasını durdurur)
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // Touchend olayı
+      document.addEventListener('touchend', async (e) => {
+        if (STATE.isSwipeActive && !STATE.isAnimating) {
+          STATE.isAnimating = true;
+          
+          // Sonraki adımı belirle
+          const { action, velocity } = PhysicsManager.determineAction();
+          
+          // Hıza göre animasyon süresini belirle
+          const averageVelocity = Math.abs(velocity);
+          const speedBasedDuration = averageVelocity > CONFIG.CRITICAL_VELOCITY 
+            ? CONFIG.ANIMATION_DURATION_MIN 
+            : CONFIG.ANIMATION_DURATION_MAX - (Math.abs(averageVelocity) * 500);
+            
+          // Animasyonu tamamla
+          await DOMManager.completeSwipeAnimation(speedBasedDuration);
+          
+          if (action === 'complete') {
+            // Önceki sayfaya git
+            HistoryManager.navigateBack();
           } else {
-            console.log("Aynı sayfaya tıklandı, geçmişe eklenmedi");
+            // Kaydırmayı iptal et ve geri dön
+            await DOMManager.resetSwipeAnimation();
+            
+            // Kaydırmayı deaktive et
+            STATE.isSwipeActive = false;
+            STATE.isAnimating = false;
+          }
+        }
+      }, { passive: false });
+
+      // Touchcancel olayı
+      document.addEventListener('touchcancel', async () => {
+        if (STATE.isSwipeActive) {
+          await DOMManager.resetSwipeAnimation();
+          
+          STATE.isSwipeActive = false;
+          STATE.isAnimating = false;
+        }
+      }, { passive: false });
+      
+      // Hızlı navigasyon bağlantıları için click olayı
+      document.addEventListener('click', (e) => {
+        // A etiketlerini kontrol et
+        const link = e.target.closest('a');
+        if (link && !link.target && link.href) {
+          // Sayfa içi tıklamalarda geçmişi takip et
+          const url = new URL(link.href);
+          
+          // Aynı origin'deki bağlantılar için
+          if (url.origin === window.location.origin) {
+            e.preventDefault(); // Varsayılan tıklama davranışını engelle
+            
+            // Mevcut sayfayı önce geçmişe ekle
+            HistoryManager.saveCurrentPage();
+            
+            // Tıklanan sayfaya git
+            window.location.href = link.href;
           }
         }
       });
-      
-      // Tarayıcı tarihçesi değişiklikleri
-      window.addEventListener('popstate', () => {
-        console.log("Tarayıcı geçmişi değişti (popstate)");
-        HistoryManager.saveCurrentPage();
-      });
     },
     
-    /**
-     * Masaüstü cihazlar için geri butonu
-     */
-    setupBackButtonForDesktop() {
-      if ('ontouchstart' in window) return;
+    // Debug butonu ekleme (opsiyonel, geliştirici modu için)
+    addDebugButton() {
+      if (document.getElementById('debug-back-button')) return;
       
-      const backButton = document.createElement('div');
-      backButton.id = 'zp-ios-back-button';
-      backButton.setAttribute('aria-label', 'Geri dön');
-      backButton.setAttribute('role', 'button');
-      backButton.style.cssText = `
+      const debugButton = document.createElement('button');
+      debugButton.id = 'debug-back-button';
+      debugButton.innerText = 'Geri';
+      debugButton.style.cssText = `
         position: fixed;
         bottom: 20px;
         left: 20px;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background-color: rgba(24, 24, 28, 0.7);
+        z-index: 10000;
+        padding: 10px 20px;
+        background: #007bff;
         color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 9999;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        transition: transform 0.15s ease, background-color 0.2s ease;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        font-size: 16px;
       `;
       
-      backButton.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-      `;
-      
-      backButton.addEventListener('mouseenter', () => {
-        backButton.style.backgroundColor = 'rgba(40, 40, 48, 0.85)';
+      debugButton.addEventListener('click', () => {
+        HistoryManager.navigateBack();
       });
       
-      backButton.addEventListener('mouseleave', () => {
-        backButton.style.backgroundColor = 'rgba(24, 24, 28, 0.7)';
-      });
-      
-      backButton.addEventListener('click', () => {
-        backButton.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          backButton.style.transform = 'scale(1)';
-          HistoryManager.navigateBack();
-        }, 140);
-      });
-      
-      document.body.appendChild(backButton);
+      document.body.appendChild(debugButton);
     }
   };
 
-  // Web sayfası yüklendiğinde sistemi başlat
+  // İnit sadece bir kez çalışsın, çoklu yüklemeleri önle
+  let isInitialized = false;
+  
+  // Sayfa yüklendiğinde başlat
   document.addEventListener('DOMContentLoaded', () => {
-    SwipeNavigation.initialize();
+    if (!isInitialized) {
+      EdgeSwipeController.init();
+      isInitialized = true;
+    }
   });
+  
+  // İlk yükleme kaçırıldıysa, şimdi hemen yükle
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    if (!isInitialized) {
+      EdgeSwipeController.init();
+      isInitialized = true;
+    }
+  }
 })();

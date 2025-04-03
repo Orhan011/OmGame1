@@ -73,6 +73,19 @@ args = "pkill gunicorn || true"
 task = "shell.exec"
 args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 
+[[workflows.workflow]]
+name = "Optimize ZekaPark"
+author = 41116230
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill gunicorn || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m gunicorn --workers=2 --threads=4 --bind 0.0.0.0:5000 --timeout 120 --access-logfile - --error-logfile - main:app"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
