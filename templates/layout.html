@@ -229,43 +229,50 @@ function loadArticleContent() {
   </body>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 <script>
-  // Tema desteği için sayfa sınıfları ekle
+  // Tema ve sayfa tipi desteği
   document.addEventListener('DOMContentLoaded', function() {
-    // Tema için body sınıfını kontrol et ve ayarla
     const bodyElement = document.body;
     const htmlElement = document.documentElement;
     
-    // URL'ye göre sayfa türü sınıfları ekle
+    // URL'ye göre sayfa türü sınıfları ekle (iOS kaydırma navigasyonu için)
     if (window.location.pathname.includes('/games/')) {
       bodyElement.classList.add('game-page');
     } else if (window.location.pathname.includes('/profile')) {
       bodyElement.classList.add('profile-page');
     }
     
-    // Tema değişikliklerini dinle
-    const observer = new MutationObserver(function(mutations) {
+    // Tema değişimlerini izleyen gözlemci
+    const themeObserver = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.attributeName === 'class' && 
             (mutation.target === htmlElement || mutation.target === bodyElement)) {
-          // Tema değişikliği algılandı, renk uyumluluğu için iOS kaydırma elementlerini güncelle
-          const swipeElements = document.querySelectorAll('.ios-current-page, .ios-previous-page');
-          const isDark = htmlElement.classList.contains('dark');
           
-          swipeElements.forEach(el => {
-            if (el.classList.contains('ios-current-page')) {
-              el.style.backgroundColor = isDark ? '#1a1a2e' : '#fff';
-            } else if (el.classList.contains('ios-previous-page')) {
-              el.style.backgroundColor = isDark ? '#1a1a2e' : '#fff';
-              el.style.boxShadow = isDark ? '5px 0 15px rgba(0, 0, 0, 0.4)' : '5px 0 15px rgba(0, 0, 0, 0.2)';
-            }
-          });
+          // Tema değişimi iOS navigasyon elementlerine otomatik yansıtılacak
+          // CSS değişkenlerle tema entegrasyonu yapıldı
+          
+          // Mevcut tema bilgisini veri attributesi olarak sakla
+          document.body.setAttribute('data-theme', 
+            htmlElement.classList.contains('dark') ? 'dark' : 'light');
         }
       });
     });
     
     // Tema değişikliği gözlemcisini başlat
-    observer.observe(htmlElement, { attributes: true });
-    observer.observe(bodyElement, { attributes: true });
+    themeObserver.observe(htmlElement, { attributes: true });
+    themeObserver.observe(bodyElement, { attributes: true });
+    
+    // İpucu oluştur (yalnızca mobil cihazlarda)
+    if (window.innerWidth <= 768 && !sessionStorage.getItem('swipe_tip_shown')) {
+      const swipeTip = document.createElement('div');
+      swipeTip.className = 'swipe-hint-area';
+      document.body.appendChild(swipeTip);
+      
+      // İpucunu bir süre sonra kaldır
+      setTimeout(() => {
+        swipeTip.remove();
+        sessionStorage.setItem('swipe_tip_shown', 'true');
+      }, 5000);
+    }
   });
 </script>
 </html>

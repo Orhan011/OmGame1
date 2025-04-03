@@ -1,109 +1,177 @@
 
-/* Gelişmiş iOS tarzı kaydırarak geri gitme navigasyonu için stil tanımlamaları
-   Versiyon: 1.0.2 - Profesyonel Sürüm
-*/
+/**
+ * Gerçek iOS Kaydırma Navigasyonu - Pro CSS
+ * Versiyon: 2.0.0 - Gelişmiş Profesyonel Sürüm
+ */
 
+/* Temel animasyon eğrileri ve geçişler */
+:root {
+  --ios-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ios-duration: 300ms;
+  --ios-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  --ios-shadow-dark: 0 0 15px rgba(0, 0, 0, 0.4);
+  --ios-prev-offset: -30%;
+}
+
+/* Kaydırma esnasında scroll'u devre dışı bırak */
+body.ios-swiping {
+  overflow: hidden !important;
+}
+
+/* Overlay - Arka plan karartma efekti */
 .ios-swipe-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0);
-  z-index: 9998;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 99999;
   pointer-events: none;
-  transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity;
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
+  transition: background-color var(--ios-duration) var(--ios-easing);
+  will-change: background-color;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
 }
 
-.ios-previous-page {
+/* Önceki sayfa önizlemesi */
+.ios-swipe-prev-page {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 9996;
-  transform: translateX(-30%);
+  z-index: 99998;
+  transform: translateX(var(--ios-prev-offset));
   pointer-events: none;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--ios-duration) var(--ios-easing);
   will-change: transform;
   overflow: hidden;
-  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+  background-color: var(--primary-bg, #ffffff);
 }
 
-.ios-current-page {
+/* Şu anki sayfa önizlemesi */
+.ios-swipe-curr-page {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 9997;
+  background-color: var(--primary-bg, #ffffff);
+  z-index: 99997;
   transform: translateX(0);
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  transition: transform var(--ios-duration) var(--ios-easing);
   will-change: transform;
   overflow: hidden;
+  box-shadow: var(--ios-shadow);
 }
 
-/* Tema renkleri için düzeltmeler */
-html.dark .ios-current-page {
-  background-color: #1a1a2e;
+/* Geri göstergesi animasyonu */
+.ios-swipe-back-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  opacity: 0.8;
+  color: var(--primary-text, #000000);
+  animation: backIndicatorPulse 2s infinite;
 }
 
-html:not(.dark) .ios-current-page {
-  background-color: #fff;
+@keyframes backIndicatorPulse {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-html.dark .ios-previous-page {
-  background-color: #1a1a2e;
-  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.4);
-}
-
-html:not(.dark) .ios-previous-page {
-  background-color: #fff;
-  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Yeni sayfalara özel renk temaları için özelleştirmeler */
-.game-page .ios-current-page {
-  background-color: #0f0f1a;
-}
-
-.profile-page .ios-current-page {
-  background-color: #131326;
-}
-
-/* Kaydırma alanı - ekranın sol kenarında */
-.swipe-detection-area {
+/* Kenar gölgesi */
+.ios-swipe-shadow {
   position: fixed;
   top: 0;
   left: 0;
   width: 20px;
   height: 100%;
+  z-index: 99996;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity var(--ios-duration) ease, transform var(--ios-duration) var(--ios-easing);
+}
+
+/* Tema desteği */
+.dark .ios-swipe-prev-page,
+.dark .ios-swipe-curr-page {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark .ios-swipe-shadow {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+}
+
+/* Özel sayfa tipleri için özelleştirmeler */
+.game-page .ios-swipe-prev-page,
+.game-page .ios-swipe-curr-page {
+  background-color: #0f0f1a;
+}
+
+.profile-page .ios-swipe-prev-page,
+.profile-page .ios-swipe-curr-page {
+  background-color: #131326;
+}
+
+/* Mevcut sayfa içerik konteyner */
+.ios-swipe-current-content {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform-origin: left center;
+}
+
+/* Kaydırma sırasında perspektif efekti için ince ayarlar */
+.ios-swiping .ios-swipe-curr-page {
+  transition: transform var(--ios-duration) var(--ios-easing), box-shadow var(--ios-duration) ease;
+}
+
+/* Hızlı kaydırma ipucu - ekranın solunda ince bir çizgi */
+.swipe-hint-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.2), transparent);
   z-index: 9000;
-  pointer-events: auto;
+  pointer-events: none;
+  opacity: 0;
+  animation: hintPulse 2s infinite;
 }
 
-/* Geri simgesi animasyonu */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
+@keyframes hintPulse {
+  0% { opacity: 0; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0; }
 }
 
-.ios-previous-page i {
-  animation: pulse 2s infinite;
-  color: inherit;
+/* Mobil cihazlar için optimizasyonlar */
+@media (max-width: 768px) {
+  .ios-swipe-back-indicator i {
+    font-size: 3rem !important;
+  }
+  
+  .ios-swipe-back-indicator div {
+    font-size: 1.2rem !important;
+  }
 }
