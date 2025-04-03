@@ -1,13 +1,18 @@
 
 /* iOS-like swipe navigation styles */
 .ios-swipe-container {
-  will-change: transform;
+  will-change: transform, opacity;
   overflow: hidden;
   background-color: transparent;
+  transform: translateZ(0); /* GPU hızlandırma */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .ios-swipe-overlay {
-  transition: background-color 0.2s ease;
+  transition: background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: background-color;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 .ios-prev-page-preview {
@@ -18,30 +23,45 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   will-change: transform;
   overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  border-radius: 0 8px 8px 0;
+  transform: translateZ(0); /* GPU hızlandırma */
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .ios-back-arrow {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 10;
+  will-change: opacity;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 .ios-edge-indicator {
   pointer-events: none;
   z-index: 9999;
+  will-change: opacity;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 .ios-fake-header {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 .ios-prev-page-title {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
+              transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity, transform;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 .ios-prev-page-content {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 30px;
+  transform: translateZ(0); /* GPU hızlandırma */
 }
 
 /* Add subtle animation on page load */
@@ -51,19 +71,37 @@
   100% { opacity: 0; }
 }
 
-/* Prvent browser's own elastic scrolling effect while swiping */
+/* Prevent browser's own elastic scrolling effect while swiping */
 html, body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }
 
-/* Smoother animations on mobile */
-@media (max-width: 767px) {
-  .ios-swipe-container,
-  .ios-prev-page-preview,
-  .ios-swipe-overlay {
-    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
+/* Fix for any potential white flicker during animations */
+.ios-swipe-container * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Improve shadow rendering */
+.ios-prev-page-preview {
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  border-radius: 0 12px 12px 0;
+}
+
+/* Soften the edge gradient */
+.ios-edge-puller {
+  transition: opacity 0.2s ease;
+}
+
+/* Smoother animations on all devices */
+.ios-swipe-container,
+.ios-prev-page-preview,
+.ios-swipe-overlay,
+.ios-prev-page-title,
+.ios-back-arrow {
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* Device specific optimizations */
@@ -73,7 +111,20 @@ html, body {
   }
 }
 
-/* Dark mode support */
+@media (min-width: 391px) and (max-width: 767px) {
+  .ios-prev-page-preview {
+    width: 87%;
+  }
+}
+
+@media (min-width: 768px) {
+  .ios-prev-page-preview {
+    width: 450px;
+    max-width: 90%;
+  }
+}
+
+/* Dark mode support - improve contrast & colors */
 @media (prefers-color-scheme: dark) {
   .ios-prev-page-preview {
     background-color: #1c1c1e;
@@ -81,11 +132,58 @@ html, body {
   }
   
   .ios-fake-header {
-    background-color: rgba(28, 28, 30, 0.95);
+    background-color: rgba(28, 28, 30, 0.92);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
   }
   
   .ios-prev-page-title {
     color: #fff;
+  }
+  
+  .ios-back-arrow {
+    border-color: #0a84ff;
+  }
+  
+  /* Darker overlay for better contrast in dark mode */
+  .ios-swipe-overlay {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  
+  /* Improve the gradient edge in dark mode */
+  .ios-prev-page-preview .ios-edge-puller {
+    background: linear-gradient(to right, rgba(28, 28, 30, 0), rgba(28, 28, 30, 0.5));
+  }
+}
+
+/* Support for light/dark themes */
+.dark-theme .ios-prev-page-preview {
+  background-color: #1c1c1e;
+  color: #fff;
+}
+
+.dark-theme .ios-fake-header {
+  background-color: rgba(28, 28, 30, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .ios-prev-page-title {
+  color: #fff;
+}
+
+.dark-theme .ios-back-arrow {
+  border-color: #0a84ff;
+}
+
+/* Better performance on all browsers */
+@supports (-webkit-appearance:none) {
+  .ios-swipe-container,
+  .ios-prev-page-preview,
+  .ios-swipe-overlay,
+  .ios-prev-page-title,
+  .ios-back-arrow,
+  .ios-fake-header {
+    -webkit-transform: translateZ(0);
   }
 }

@@ -351,8 +351,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hız hesapla (piksel/ms)
     if (dt > 0) {
       const instantVelocity = (touchCurrentX - lastX) / dt;
-      // Ani hızın %20'sini ve önceki hızın %80'ini ağırlıklı ortalamasını al
-      velocity = instantVelocity * 0.2 + velocity * 0.8;
+      // Hız hesaplamasını daha hassas yap
+      velocity = instantVelocity * 0.3 + velocity * 0.7;
     }
     
     lastX = touchCurrentX;
@@ -360,26 +360,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (deltaX > 0) {
       // Maksimum mesafeye göre 0 ile 1 arasında ilerlemeyi hesapla
-      const maxDistance = window.innerWidth * 0.6; // %60 ekran genişliği maksimum mesafe
+      const maxDistance = window.innerWidth * 0.7; // %70 ekran genişliği maksimum mesafe
       let progress = Math.min(deltaX / maxDistance, 1);
       
-      // iOS tarzı doğal hızlanma/yavaşlama için kübik eğri
-      progress = Math.pow(progress, 0.8);
+      // Daha doğal görünüm için cubic-bezier eğrisi kullan
+      // Easing fonksiyonu uygulaması (easeOutCubic)
+      progress = 1 - Math.pow(1 - progress, 3);
       
-      // Öğelere dönüşüm uygula
-      const translateX = deltaX * (0.95 - progress * 0.3); // İlerledikçe yavaşla
+      // Öğelere dönüşüm uygula - daha akıcı bir kayma için eğri düzeltme
+      const translateX = deltaX * (1 - progress * 0.15);
       prevPagePreview.style.transform = `translateX(${translateX}px)`;
       
-      // Overlay'ı ilerlemeye göre karart
-      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${progress * 0.4})`;
+      // Gölge efektini güçlendir
+      gradient.style.opacity = Math.min(1, progress * 1.5);
       
-      // İlerlemeye göre geri oku
-      backArrow.style.opacity = Math.min(1, progress * 2.5);
+      // Overlay'ı daha yumuşak geçiş ile karart
+      const alpha = progress * 0.35; // Maksimum opaklık azaltıldı
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
       
-      // İlerleme %80'i geçtiğinde, "yapışkanlaştır"
-      if (progress > 0.8) {
-        const overProgress = (progress - 0.8) / 0.2; // 0-1 arasında skalala
-        const extra = overProgress * 5; // İlave piksel miktarı
+      // Geri oku daha yumuşak göster
+      backArrow.style.opacity = Math.min(1, progress * 2);
+      
+      // Başlığı hareket ettir
+      prevPageTitle.style.opacity = Math.min(1, progress * 1.5);
+      prevPageTitle.style.transform = `translateX(${Math.min(20, 20 - (progress * 20))}px)`;
+      
+      // İlerleme %85'i geçtiğinde, "yapışkanlaştır" ve hafif titreşim efekti ekle
+      if (progress > 0.85) {
+        const overProgress = (progress - 0.85) / 0.15;
+        const springEffect = Math.sin(overProgress * Math.PI) * 3;
+        const extra = overProgress * 6 + springEffect;
         prevPagePreview.style.transform = `translateX(${translateX + extra}px)`;
       }
     }
@@ -424,34 +434,69 @@ document.addEventListener('DOMContentLoaded', function() {
       cancelAnimationFrame(animationId);
     }
     
-    const targetX = window.innerWidth;
+    const targetX = window.innerWidth * 1.05; // Hedefi biraz uzat (daha pürüzsüz geçiş için)
     const distance = targetX - currentPosition;
     const startTime = Date.now();
-    const maxDuration = 350; // ms
+    const maxDuration = 300; // Daha hızlı animasyon
     
-    // Hızı dikkate alarak süreyi hesapla
-    let duration = Math.abs(distance / (velocity * 1000));
-    duration = Math.min(maxDuration, Math.max(250, duration)); // 250-350ms arasında sınırla
+    // Hızı dikkate alarak süreyi hesapla ve hızlı hareketleri ödüllendir
+    let duration = Math.abs(distance / ((velocity + 0.2) * 1000));
+    duration = Math.min(maxDuration, Math.max(220, duration)); // 220-300ms arasında sınırla
+    
+    // Yumuşak geçiş için animasyon zamanlama fonksiyonu
+    const timingFunction = bezier(0.23, 1, 0.32, 1); // cubic-bezier(0.23, 1, 0.32, 1)
     
     function animate() {
       const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+      const rawProgress = Math.min(elapsed / duration, 1);
       
-      // Hareketin sonuna doğru yavaşlayan kübik eğri kullan
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      // Özel bezier timing fonksiyonu uygula
+      const easedProgress = timingFunction(rawProgress);
       const newX = currentPosition + (distance * easedProgress);
       
-      // Öğeleri güncelle
+      // Öğeleri güncelle - hızlı ve akıcı animasyon
       prevPagePreview.style.transform = `translateX(${newX}px)`;
-      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - progress)})`;
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.35 * (1 - easedProgress)})`;
+      backArrow.style.opacity = Math.max(0, 1 - easedProgress * 2);
+      prevPageTitle.style.opacity = Math.max(0, 1 - easedProgress * 2.5);
       
-      if (progress < 1) {
+      // Gölgeyi animasyonla azalt
+      gradient.style.opacity = Math.max(0, 1 - easedProgress * 1.5);
+      
+      if (rawProgress < 1) {
         animationId = requestAnimationFrame(animate);
       } else {
         // Animasyon tamamlandığında önceki sayfaya git
         window.history.back();
         resetSwipeElements();
       }
+    }
+    
+    // Cubic bezier easing fonksiyonu (daha pürüzsüz iOS animasyonları için)
+    function bezier(x1, y1, x2, y2) {
+      return function(t) {
+        if (t <= 0) return 0;
+        if (t >= 1) return 1;
+        
+        // Newton-Raphson iterasyonu ile t değerini hesaplama
+        let x = t, t0, t1, t2, x2, d2, i;
+        
+        for (i = 0; i < 4; ++i) {
+          t2 = x * x;
+          t1 = t2 * x;
+          x2 = 3 * x * (1 - x);
+          
+          d2 = 3 * t2 * (1 - x) - t1 + x1;
+          t0 = 1 - x;
+          t1 = 3 * x * t0 * t0;
+          t2 = 3 * x * x * t0;
+          
+          x -= (t1 + t2 + t1 - x1) / (t1 + 2 * t2 + 3 * t1);
+        }
+        
+        // Y değerini hesapla
+        return 3 * x * (1 - x) * (1 - x) * y1 + 3 * x * x * (1 - x) * y2 + x * x * x;
+      };
     }
     
     animationId = requestAnimationFrame(animate);
@@ -476,28 +521,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetX = 0;
     const distance = targetX - currentPosition;
     const startTime = Date.now();
-    let duration = 300; // ms
+    let duration = 280; // ms - daha hızlı geri dönüş
     
     // Mesafe kısa ise daha hızlı tamamla
     if (Math.abs(currentPosition) < 100) {
-      duration = 200;
+      duration = 180;
     }
+    
+    // iOS'un yay etkisi için özel timing fonksiyonu
+    const springTiming = bezierSpring(0.17, 0.67, 0.32, 0.98);
     
     function animate() {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // iOS tarzı yay efekti için "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-      // JavaScript ile benzetmek için kuadratik eğri
-      const t = progress;
-      const easedProgress = t * (2 - t);
+      // Yay etkisi için gelişmiş eğri fonksiyonu
+      const easedProgress = springTiming(progress);
       
-      const newX = currentPosition + (distance * easedProgress);
+      // Yay efekti için ek salınım (küçük overshoot)
+      let newX = distance * easedProgress + currentPosition;
+      
+      // Yay efekti ekle
+      if (progress > 0.7 && progress < 0.99) {
+        const springFactor = Math.sin((progress - 0.7) * 8) * (1 - progress) * 7;
+        newX += springFactor;
+      }
       
       // Öğeleri güncelle
       prevPagePreview.style.transform = `translateX(${newX}px)`;
-      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - progress)})`;
-      backArrow.style.opacity = `${1 * (1 - progress)}`;
+      
+      // Overlay'ı yumuşak geçişle karartma
+      const alphaMultiplier = Math.max(0, 1 - easedProgress * 1.8); // Daha hızlı şeffaflaşma
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.35 * alphaMultiplier})`;
+      
+      // Diğer görsel öğeleri güncelle
+      backArrow.style.opacity = `${Math.max(0, 1 - easedProgress * 2.2)}`;
+      prevPageTitle.style.opacity = `${Math.max(0, 1 - easedProgress * 2.5)}`;
+      gradient.style.opacity = `${Math.max(0, 1 - easedProgress * 2)}`;
+      
+      // Başlık efektini geri al
+      prevPageTitle.style.transform = `translateX(${Math.min(20, easedProgress * 20)}px)`;
       
       if (progress < 1) {
         animationId = requestAnimationFrame(animate);
@@ -505,6 +568,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Animasyon tamamlandığında elemanları sıfırla
         resetSwipeElements();
       }
+    }
+    
+    // Yay etkisi için özel bezier fonksiyonu
+    function bezierSpring(x1, y1, x2, y2) {
+      const bezierFn = function(t) {
+        if (t <= 0) return 0;
+        if (t >= 1) return 1;
+        
+        let x = t, i;
+        for (i = 0; i < 8; ++i) {
+          const f = (3 * x * (1 - x) * (1 - x) * x1 + 3 * x * x * (1 - x) * x2 + x * x * x - t);
+          const df = (3 * (1 - x) * (1 - x) * x1 + 6 * x * (1 - x) * (x2 - x1) + 3 * x * x * (1 - x2));
+          if (Math.abs(f) < 1e-6) break;
+          x -= f / df;
+        }
+        
+        return 3 * x * (1 - x) * (1 - x) * y1 + 3 * x * x * (1 - x) * y2 + x * x * x;
+      };
+      
+      return bezierFn;
     }
     
     animationId = requestAnimationFrame(animate);
