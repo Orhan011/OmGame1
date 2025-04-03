@@ -1,236 +1,220 @@
 
 /**
- * Advanced iOS-style swipe navigation
- * Professionally implemented with physics-based animations and previous page preview
+ * Modern iOS 17 style swipe navigation
+ * Professional implementation with physics-based animations and depth effects
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Create container for previous page preview
-  const pagePreview = document.createElement('div');
-  pagePreview.className = 'ios-page-preview';
+  // Create overlay container
+  const swipeContainer = document.createElement('div');
+  swipeContainer.className = 'ios-swipe-container';
+  document.body.appendChild(swipeContainer);
   
-  // Create shadow element for depth effect
+  // Create previous page preview element
+  const prevPagePreview = document.createElement('div');
+  prevPagePreview.className = 'ios-prev-page';
+  swipeContainer.appendChild(prevPagePreview);
+  
+  // Create edge shadow for depth effect
   const edgeShadow = document.createElement('div');
   edgeShadow.className = 'ios-edge-shadow';
+  swipeContainer.appendChild(edgeShadow);
   
-  // Create overlay for current page dimming
+  // Create subtle overlay for darkening current page
   const dimOverlay = document.createElement('div');
   dimOverlay.className = 'ios-dim-overlay';
+  swipeContainer.appendChild(dimOverlay);
   
-  // Variables for touch tracking
-  let touchStartX = 0;
-  let touchCurrentX = 0;
-  let touchStartY = 0;
-  let touchCurrentY = 0;
-  let touchStartTime = 0;
-  let isSwipingBack = false;
-  let isScrollingVertically = false;
+  // Variables for tracking touch interaction
+  let startX = 0;
+  let currentX = 0;
+  let startY = 0;
+  let currentY = 0;
+  let startTime = 0;
+  let isActive = false;
+  let isVerticalScroll = false;
+  let initialBodyOverflow = '';
   
   // Configuration
-  const edgeTriggerSize = 30; // px from left edge that triggers swipe
+  const edgeThreshold = 30; // Area from left edge that triggers swipe (px)
   const minSwipeDistance = 50; // Minimum distance to register swipe
-  const autoCompleteThreshold = window.innerWidth * 0.35; // Auto-complete threshold
-  const springBackSpeed = 0.3; // Speed for spring-back animation (seconds)
-  const completeSwipeSpeed = 0.35; // Speed for completed swipe animation (seconds)
+  const completionThreshold = window.innerWidth * 0.4; // Auto-complete threshold
+  const velocityThreshold = 0.5; // Velocity to trigger completion (px/ms)
   
-  // Append elements to body
-  document.body.appendChild(pagePreview);
-  document.body.appendChild(edgeShadow);
-  document.body.appendChild(dimOverlay);
-  
-  // Touch start - initialize swipe
+  // Touch start handler
   document.addEventListener('touchstart', function(e) {
-    // Only detect swipes starting from left edge
-    if (e.touches[0].clientX > edgeTriggerSize) return;
+    // Only detect touches starting from left edge
+    if (e.touches[0].clientX > edgeThreshold) return;
     
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchCurrentX = touchStartX;
-    touchCurrentY = touchStartY;
-    touchStartTime = new Date().getTime();
+    // Only activate if we have history to go back to
+    if (window.history.length <= 1) return;
     
-    // Check if we have a previous page to return to
-    if (window.history.length > 1) {
-      isSwipingBack = true;
-      
-      // Prepare the animation elements
-      pagePreview.style.display = 'block';
-      edgeShadow.style.display = 'block';
-      dimOverlay.style.display = 'block';
-      
-      // Initialize positions
-      pagePreview.style.transform = 'translateX(-30%)';
-      pagePreview.style.opacity = '1';
-      dimOverlay.style.opacity = '0';
-      edgeShadow.style.opacity = '0';
-      
-      // Take a "screenshot" of current and previous page
-      // (In a real iOS implementation, this would be a snapshot of the previous page)
-      // Here we create a placeholder with a subtle gradient
-      let bgColorStart = getComputedStyle(document.body).backgroundColor;
-      let bgColorEnd = bgColorStart;
-      
-      // Adjust if using RGB format
-      if (bgColorStart.startsWith('rgb')) {
-        const rgb = bgColorStart.match(/\d+/g);
-        if (rgb && rgb.length >= 3) {
-          // Create a slightly darker/lighter version for the gradient
-          const darken = Math.max(parseInt(rgb[0]) - 15, 0);
-          const lighten = Math.min(parseInt(rgb[1]) + 10, 255);
-          bgColorEnd = `rgb(${darken}, ${lighten}, ${rgb[2]})`;
-        }
-      }
-      
-      pagePreview.style.background = `linear-gradient(to right, ${bgColorEnd}, ${bgColorStart})`;
+    // Store initial touch position and time
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    currentX = startX;
+    currentY = startY;
+    startTime = Date.now();
+    
+    // Prepare visual elements
+    swipeContainer.style.display = 'block';
+    prevPagePreview.style.transform = 'translateX(-20%)';
+    prevPagePreview.style.opacity = '1';
+    
+    // Take a "screenshot" of previous page (simulated with gradient)
+    // In real iOS, this would be a snapshot of the previous page
+    const bodyBgColor = getComputedStyle(document.body).backgroundColor || '#ffffff';
+    const isDarkMode = bodyBgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/) ? 
+                       parseInt(bodyBgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/)[1]) < 100 : false;
+    
+    if (isDarkMode) {
+      // Dark mode colors
+      prevPagePreview.style.background = 'linear-gradient(to right, #131314, #1c1c1e)';
+    } else {
+      // Light mode colors
+      prevPagePreview.style.background = 'linear-gradient(to right, #f5f5f7, #ffffff)';
     }
+    
+    // Store original body overflow to restore later
+    initialBodyOverflow = document.body.style.overflow;
+    
+    isActive = true;
   }, { passive: true });
   
-  // Touch move - update animation based on finger position
+  // Touch move handler
   document.addEventListener('touchmove', function(e) {
-    if (!isSwipingBack) return;
+    if (!isActive) return;
     
-    touchCurrentX = e.touches[0].clientX;
-    touchCurrentY = e.touches[0].clientY;
+    currentX = e.touches[0].clientX;
+    currentY = e.touches[0].clientY;
     
-    // Calculate vertical movement to detect scrolling
-    const verticalDistance = Math.abs(touchCurrentY - touchStartY);
-    const horizontalDistance = touchCurrentX - touchStartX;
+    // Detect vertical scrolling to cancel swipe
+    const verticalDistance = Math.abs(currentY - startY);
+    const horizontalDistance = currentX - startX;
     
-    // If vertical movement is significantly more than horizontal, cancel swipe
-    if (verticalDistance > horizontalDistance * 1.2 && horizontalDistance < 30) {
-      isScrollingVertically = true;
-      resetSwipeAnimation();
-      isSwipingBack = false;
+    // Cancel swipe if clearly scrolling vertically
+    if (verticalDistance > horizontalDistance * 1.3 && horizontalDistance < 40) {
+      isVerticalScroll = true;
+      cancelSwipe();
       return;
     }
     
+    // Only process horizontal movement to the right
     if (horizontalDistance > 0) {
-      // Calculate progress as a percentage (0-1)
-      const progress = Math.min(horizontalDistance / window.innerWidth, 1);
+      e.preventDefault(); // Prevent scrolling while swiping
       
-      // Apply non-linear easing for more natural feel
+      // Calculate progress (0-1)
+      const maxDistance = window.innerWidth;
+      const progress = Math.min(horizontalDistance / maxDistance, 1);
+      
+      // Apply cubic easing for natural feel
       const easedProgress = easeOutCubic(progress);
       
-      // Transform current page (slide right)
+      // Move current page
       document.body.style.transform = `translateX(${horizontalDistance}px)`;
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
       
-      // Transform previous page preview (slide from left)
-      pagePreview.style.transform = `translateX(${-30 + (easedProgress * 30)}%)`;
+      // Move previous page preview
+      prevPagePreview.style.transform = `translateX(${-20 + (easedProgress * 20)}%)`;
       
-      // Update shadow opacity and position
-      edgeShadow.style.opacity = (0.2 * easedProgress).toString();
+      // Update shadow and dim overlay
+      edgeShadow.style.opacity = Math.min(easedProgress * 0.15, 0.15).toString();
       edgeShadow.style.left = `${horizontalDistance}px`;
-      
-      // Update dim overlay for subtle darkening effect
-      dimOverlay.style.opacity = (0.3 * easedProgress).toString();
-      
-      // Prevent scrolling while swiping
-      if (horizontalDistance > 10) {
-        e.preventDefault();
-      }
+      dimOverlay.style.opacity = Math.min(easedProgress * 0.1, 0.1).toString();
     }
   }, { passive: false });
   
-  // Touch end - finalize the animation
-  document.addEventListener('touchend', function(e) {
-    if (!isSwipingBack || isScrollingVertically) {
-      isSwipingBack = false;
-      isScrollingVertically = false;
-      return;
-    }
+  // Touch end handler
+  document.addEventListener('touchend', function() {
+    if (!isActive) return;
     
-    const touchEndTime = new Date().getTime();
-    const swipeTime = touchEndTime - touchStartTime;
-    const swipeDistance = touchCurrentX - touchStartX;
-    const swipeVelocity = swipeDistance / swipeTime; // pixels per ms
+    const endTime = Date.now();
+    const timeElapsed = endTime - startTime;
+    const distance = currentX - startX;
+    const velocity = distance / timeElapsed; // px/ms
     
-    // Determine if swipe should complete based on distance and velocity
-    const shouldComplete = 
-      (swipeDistance > autoCompleteThreshold) || // Dragged past threshold
-      (swipeDistance > minSwipeDistance && swipeVelocity > 0.5); // Quick flick
+    // Determine if swipe should complete
+    const shouldComplete = (distance > completionThreshold) || 
+                          (distance > minSwipeDistance && velocity > velocityThreshold);
     
-    if (shouldComplete) {
-      // Complete the transition with physics-based animation
-      completeSwipeAnimation();
-      
-      // Wait for animation to complete before navigating
-      setTimeout(() => {
-        window.history.back();
-      }, completeSwipeSpeed * 1000);
+    if (shouldComplete && !isVerticalScroll) {
+      completeSwipe();
     } else {
-      // Cancel the transition with spring-back effect
-      cancelSwipeAnimation();
+      cancelSwipe();
     }
     
-    isSwipingBack = false;
-    isScrollingVertically = false;
+    // Reset state
+    isActive = false;
+    isVerticalScroll = false;
   });
   
-  // Touch cancel - reset everything
+  // Touch cancel handler
   document.addEventListener('touchcancel', function() {
-    if (isSwipingBack) {
-      resetSwipeAnimation();
-      isSwipingBack = false;
-      isScrollingVertically = false;
+    if (isActive) {
+      cancelSwipe();
+      isActive = false;
+      isVerticalScroll = false;
     }
   });
   
-  // Function to complete swipe animation
-  function completeSwipeAnimation() {
-    // Update transition property for smooth animation
-    document.body.style.transition = `transform ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
-    pagePreview.style.transition = `transform ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
-    dimOverlay.style.transition = `opacity ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
-    edgeShadow.style.transition = `all ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
+  // Complete swipe animation and navigation
+  function completeSwipe() {
+    // Set transition for smooth animation
+    document.body.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    prevPagePreview.style.transition = 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    dimOverlay.style.transition = 'opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    edgeShadow.style.transition = 'all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)';
     
-    // Animate to completed state
+    // Animate to final state
     document.body.style.transform = `translateX(${window.innerWidth}px)`;
-    pagePreview.style.transform = 'translateX(0)';
-    dimOverlay.style.opacity = '0.3';
-    edgeShadow.style.opacity = '0.2';
+    prevPagePreview.style.transform = 'translateX(0)';
+    dimOverlay.style.opacity = '0.1';
+    edgeShadow.style.opacity = '0.15';
     edgeShadow.style.left = `${window.innerWidth}px`;
+    
+    // Wait for animation to complete before navigation
+    setTimeout(function() {
+      window.history.back();
+      resetSwipeElements();
+    }, 350);
   }
   
-  // Function to cancel swipe animation with spring-back effect
-  function cancelSwipeAnimation() {
-    // Update transition property for spring-back effect
-    document.body.style.transition = `transform ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
-    pagePreview.style.transition = `transform ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
-    dimOverlay.style.transition = `opacity ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
-    edgeShadow.style.transition = `all ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
+  // Cancel swipe with spring-back effect
+  function cancelSwipe() {
+    // Set transition for spring-back effect
+    document.body.style.transition = 'transform 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
+    prevPagePreview.style.transition = 'transform 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
+    dimOverlay.style.transition = 'opacity 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
+    edgeShadow.style.transition = 'all 0.3s cubic-bezier(0.3, 0.8, 0.4, 1.2)';
     
-    // Animate back to starting position
+    // Animate back to initial state
     document.body.style.transform = 'translateX(0)';
-    pagePreview.style.transform = 'translateX(-30%)';
+    prevPagePreview.style.transform = 'translateX(-20%)';
     dimOverlay.style.opacity = '0';
     edgeShadow.style.opacity = '0';
     
-    // Reset after animation completes
-    setTimeout(resetSwipeAnimation, springBackSpeed * 1000);
+    // Reset elements after animation
+    setTimeout(resetSwipeElements, 300);
   }
   
-  // Function to reset animation states
-  function resetSwipeAnimation() {
-    // Reset transitions and transforms
+  // Reset all elements to initial state
+  function resetSwipeElements() {
     document.body.style.transition = '';
     document.body.style.transform = '';
+    document.body.style.overflow = initialBodyOverflow;
     
-    pagePreview.style.transition = '';
-    pagePreview.style.display = 'none';
-    
-    dimOverlay.style.transition = '';
-    dimOverlay.style.display = 'none';
-    
+    swipeContainer.style.display = 'none';
+    prevPagePreview.style.transition = '';
     edgeShadow.style.transition = '';
-    edgeShadow.style.display = 'none';
+    dimOverlay.style.transition = '';
   }
   
-  // Easing function for smoother animations (cubic ease-out)
+  // Cubic easing function for smooth animations
   function easeOutCubic(x) {
     return 1 - Math.pow(1 - x, 3);
   }
   
-  // Update threshold on orientation/resize changes
+  // Handle window resize
   window.addEventListener('resize', function() {
-    autoCompleteThreshold = window.innerWidth * 0.35;
+    completionThreshold = window.innerWidth * 0.4;
   });
 });
