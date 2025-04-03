@@ -1,8 +1,8 @@
 /**
- * Profesyonel iOS tarzı soldan sağa kaydırma navigasyonu
+ * Gerçekçi iOS tarzı soldan sağa kaydırma navigasyonu
  * 
  * Web sitesinde parmakla soldan sağa kaydırma ile önceki sayfaya dönme işlevi
- * Referrer-based Navigation - tarayıcı geçmişinden bağımsız çalışır
+ * Tam iOS animasyonu, fiziksel tepki ve dokunma hassasiyeti ile
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,22 +13,28 @@ document.addEventListener('DOMContentLoaded', function() {
   let touchMoveY = 0;
   let startTime = 0;
   let isSwipeActive = false;
+  let isAnimating = false;
+  let previousPageUrl = null;
+  let previousPageContent = null;
+  let currentPageSnapshot = null;
   
   // Ayarlar
-  const swipeThreshold = 100; // px cinsinden eşik değeri
-  const edgeThreshold = 30;   // Ekranın kenarından başlama mesafesi (px)
-  const timeThreshold = 300;  // Maksimum kaydırma süresi (ms)
-  const maxVisualOffset = 150; // Maksimum görsel feedback uzaklığı (px)
+  const swipeThreshold = 100;     // px cinsinden eşik değeri
+  const edgeThreshold = 35;       // Ekranın kenarından başlama mesafesi (px)
+  const timeThreshold = 300;      // Maksimum kaydırma süresi (ms)
+  const transitionDuration = 300; // Geçiş animasyonu süresi (ms)
   
-  // Görsel elemanlar için
-  let swipeOverlay = null;
-  let arrowElement = null;
+  // Konteynerler için
+  let pageContainer = null;
+  let sceneContainer = null;
+  let shadowOverlay = null;
   
   // Ziyaret edilen sayfaları takip eden localStorage anahtarı
   const NAVIGATION_HISTORY_KEY = 'zeka_park_navigation_history';
+  const CURRENT_PAGE_SNAPSHOT_KEY = 'zeka_park_current_page_snapshot';
   
-  // Görsel elementi oluştur
-  createSwipeElements();
+  // Konteyner elementlerini oluştur
+  createContainers();
   
   // Önceki sayfanın URL'sini almak için fonksiyonlar
   function saveCurrentPageToHistory() {
@@ -50,6 +56,15 @@ document.addEventListener('DOMContentLoaded', function() {
         navigationHistory.push(currentUrl);
         localStorage.setItem(NAVIGATION_HISTORY_KEY, JSON.stringify(navigationHistory));
       }
+      
+      // Anlık sayfa görüntüsünü kaydet
+      try {
+        currentPageSnapshot = document.documentElement.innerHTML;
+        localStorage.setItem(CURRENT_PAGE_SNAPSHOT_KEY, currentPageSnapshot);
+      } catch (snapshotError) {
+        console.warn('Sayfa görüntüsü kaydedilemedi:', snapshotError);
+      }
+      
     } catch (e) {
       console.error('Navigasyon geçmişi kaydedilemedi:', e);
     }
@@ -83,61 +98,189 @@ document.addEventListener('DOMContentLoaded', function() {
   // Sayfa yüklendiğinde geçmişe ekle
   saveCurrentPageToHistory();
   
-  // Görsel geribildirim öğelerini oluştur
-  function createSwipeElements() {
-    // Zaten oluşturulmuşsa atla
-    if (document.getElementById('swipeOverlay')) return;
-    
-    // Kaydırma için overlay
-    swipeOverlay = document.createElement('div');
-    swipeOverlay.id = 'swipeOverlay';
-    swipeOverlay.style.cssText = `
+  // Konteyner elementlerini oluştur
+  function createContainers() {
+    // Mevcut sayfayı kapsayan konteyner
+    pageContainer = document.createElement('div');
+    pageContainer.id = 'ios-swipe-page-container';
+    pageContainer.style.cssText = `
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.1);
+      overflow: hidden;
+      z-index: -1;
       pointer-events: none;
-      opacity: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      transition: opacity 0.2s ease;
+      perspective: 1200px;
     `;
     
-    // Ok simgesi
-    arrowElement = document.createElement('div');
-    arrowElement.id = 'swipeArrow';
-    arrowElement.style.cssText = `
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+    // 3D sahne konteynerı
+    sceneContainer = document.createElement('div');
+    sceneContainer.id = 'ios-swipe-scene-container';
+    sceneContainer.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    `;
+    
+    // Gölge overlay
+    shadowOverlay = document.createElement('div');
+    shadowOverlay.id = 'ios-swipe-shadow-overlay';
+    shadowOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0);
+      pointer-events: none;
+      z-index: 10000;
+      transition: background-color 0.3s ease;
+    `;
+    
+    // Geri butonu için ok simgesi
+    const backIndicator = document.createElement('div');
+    backIndicator.id = 'ios-swipe-back-indicator';
+    backIndicator.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%) scale(0);
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
       background-color: rgba(255,255,255,0.9);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.25);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-left: 20px;
-      transform: translateX(-100px);
       transition: transform 0.2s ease;
+      z-index: 10001;
     `;
     
-    // Ok içine simge
-    arrowElement.innerHTML = `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    // Ok içindeki simge
+    backIndicator.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
     `;
     
-    swipeOverlay.appendChild(arrowElement);
-    document.body.appendChild(swipeOverlay);
+    shadowOverlay.appendChild(backIndicator);
+    document.body.appendChild(shadowOverlay);
+    pageContainer.appendChild(sceneContainer);
+    document.body.appendChild(pageContainer);
+  }
+  
+  // Sayfa yükleme ve içerik değiştirme fonksiyonları
+  function preloadPreviousPage() {
+    previousPageUrl = getPreviousPage();
+    
+    if (previousPageUrl === window.location.pathname) {
+      previousPageUrl = '/'; // Eğer aynı sayfaya dönecekse ana sayfaya git
+    }
+    
+    // Önceki sayfayı yükle
+    if (previousPageUrl) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', previousPageUrl, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(xhr.responseText, 'text/html');
+          previousPageContent = htmlDoc.documentElement.innerHTML;
+        }
+      };
+      xhr.send();
+    }
+  }
+  
+  // Sayfa geçiş animasyonu
+  function animatePageTransition(progress) {
+    if (!sceneContainer) return;
+    
+    // Sayfayı kaydır
+    const translateX = Math.min(progress * window.innerWidth * 0.8, window.innerWidth * 0.8);
+    const scale = 0.95 + (progress * 0.05);
+    const opacity = Math.min(progress * 0.7, 0.7);
+    
+    // 3D efekti
+    const rotateY = progress * -10;
+    
+    document.body.style.overflow = 'hidden';
+    sceneContainer.style.transform = `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`;
+    shadowOverlay.style.backgroundColor = `rgba(0,0,0,${opacity})`;
+    
+    // Geri butonu göster
+    const backIndicator = document.getElementById('ios-swipe-back-indicator');
+    if (backIndicator) {
+      backIndicator.style.transform = `translateY(-50%) scale(${progress > 0.1 ? 1 : 0})`;
+    }
+  }
+  
+  // Geçiş tamamlandığında sayfayı yükle
+  function completeTransition() {
+    if (previousPageUrl) {
+      isAnimating = true;
+      
+      // Tam sayfa geçiş efekti
+      sceneContainer.style.transition = `transform ${transitionDuration}ms ease-out`;
+      shadowOverlay.style.transition = `background-color ${transitionDuration}ms ease-out`;
+      
+      // Animasyonu tamamla
+      sceneContainer.style.transform = `translateX(${window.innerWidth}px) scale(1) rotateY(-10deg)`;
+      shadowOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+      
+      // Animasyon tamamlandığında sayfayı yükle
+      setTimeout(() => {
+        window.location.href = previousPageUrl;
+      }, transitionDuration * 0.7);
+    }
+  }
+  
+  // Geçişi iptal et - sayfayı eski haline getir
+  function cancelTransition() {
+    if (!sceneContainer) return;
+    
+    sceneContainer.style.transition = `transform ${transitionDuration}ms ease-out`;
+    shadowOverlay.style.transition = `background-color ${transitionDuration}ms ease-out`;
+    
+    // Animasyonu sıfırla
+    sceneContainer.style.transform = 'translateX(0) scale(1) rotateY(0deg)';
+    shadowOverlay.style.backgroundColor = 'rgba(0,0,0,0)';
+    
+    // Geri butonu gizle
+    const backIndicator = document.getElementById('ios-swipe-back-indicator');
+    if (backIndicator) {
+      backIndicator.style.transform = 'translateY(-50%) scale(0)';
+    }
+    
+    setTimeout(() => {
+      document.body.style.overflow = '';
+      isAnimating = false;
+    }, transitionDuration);
+  }
+  
+  // Sayfa içeriğini hazırla
+  function preparePageForAnimation() {
+    if (!sceneContainer) return;
+    
+    sceneContainer.style.zIndex = '10000';
+    sceneContainer.innerHTML = document.documentElement.innerHTML;
+    document.body.style.overflow = 'hidden';
+    pageContainer.style.zIndex = '9999';
+    pageContainer.style.pointerEvents = 'auto';
   }
   
   // Dokunma başlangıcı
   document.addEventListener('touchstart', function(e) {
+    if (isAnimating) return;
+    
     const touch = e.touches[0];
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
@@ -145,11 +288,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Sadece ekranın sol kenarından başlayan dokunmaları izle
     isSwipeActive = touchStartX <= edgeThreshold;
+    
+    if (isSwipeActive) {
+      // Önceki sayfayı yükle
+      preloadPreviousPage();
+      
+      // Sayfayı animasyon için hazırla
+      preparePageForAnimation();
+    }
   }, false);
   
   // Dokunma hareketi
   document.addEventListener('touchmove', function(e) {
-    if (!isSwipeActive) return;
+    if (!isSwipeActive || isAnimating) return;
     
     const touch = e.touches[0];
     touchMoveX = touch.clientX;
@@ -160,50 +311,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const deltaY = Math.abs(touchMoveY - touchStartY);
     
     // Görsel geri bildirim
-    if (deltaX > 10 && deltaX > deltaY * 1.5) {
+    if (deltaX > 5 && deltaX > deltaY * 1.2) {
       // Sayfanın kaymasını engelle
       e.preventDefault();
       
-      // Görsel geri bildirim göster
-      const opacity = Math.min(deltaX / 150, 0.3);
-      const arrowOffset = Math.min(deltaX * 0.5, maxVisualOffset);
+      // Kaydırma ilerlemesi (0-1 arası)
+      const progress = Math.min(deltaX / (window.innerWidth * 0.8), 1);
       
-      if (swipeOverlay && arrowElement) {
-        swipeOverlay.style.opacity = opacity;
-        arrowElement.style.transform = `translateX(${arrowOffset - 100}px)`;
-      }
+      // Sayfa geçiş animasyonu
+      animatePageTransition(progress);
     }
   }, { passive: false });
   
   // Dokunma sonu
   document.addEventListener('touchend', function(e) {
-    if (!isSwipeActive) return;
+    if (!isSwipeActive || isAnimating) return;
     
     const deltaX = touchMoveX - touchStartX;
     const deltaY = Math.abs(touchMoveY - touchStartY);
     const swipeTime = Date.now() - startTime;
     
     // Yatay kaydırma, dikey kaydırmadan daha belirginse ve eşik değerini aşıyorsa
-    const isHorizontalSwipe = deltaX > deltaY * 1.5;
+    const isHorizontalSwipe = deltaX > deltaY * 1.2;
     const isQuickSwipe = swipeTime < timeThreshold && deltaX > swipeThreshold * 0.5;
-    const isLongSwipe = deltaX > swipeThreshold;
-    
-    // Geri bildirim efektini sıfırla
-    if (swipeOverlay && arrowElement) {
-      swipeOverlay.style.opacity = '0';
-      arrowElement.style.transform = 'translateX(-100px)';
-    }
+    const isLongSwipe = deltaX > window.innerWidth * 0.3; // Ekranın %30'u kadar kaydırma
     
     if ((isHorizontalSwipe && (isQuickSwipe || isLongSwipe)) && deltaX > 0) {
-      // Önceki sayfaya dön
-      const previousPage = getPreviousPage();
-      
-      if (previousPage) {
-        console.log('Önceki sayfaya dönülüyor:', previousPage);
-        window.location.href = previousPage;
-      } else {
-        console.log('Geçmiş boş, geri gidilecek sayfa yok');
-      }
+      // Önceki sayfaya geçiş animasyonunu tamamla
+      completeTransition();
+    } else {
+      // Geçişi iptal et, sayfayı eski haline getir
+      cancelTransition();
     }
     
     // Sıfırla
@@ -212,13 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Dokunma iptali
   document.addEventListener('touchcancel', function() {
-    isSwipeActive = false;
-    // Geri bildirim efektini sıfırla
-    if (swipeOverlay && arrowElement) {
-      swipeOverlay.style.opacity = '0';
-      arrowElement.style.transform = 'translateX(-100px)';
+    if (isSwipeActive && !isAnimating) {
+      // Geçişi iptal et
+      cancelTransition();
     }
+    
+    // Sıfırla
+    isSwipeActive = false;
   }, false);
   
-  console.log('Profesyonel iOS tarzı kaydırma navigasyonu aktif');
+  console.log('Gerçekçi iOS tarzı kaydırma navigasyonu aktif');
 });
