@@ -179,9 +179,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Önceki sayfa görüntüsünü oluştur
+  // Önceki sayfa görüntüsünü oluştur - site temasına uygun arkaplan rengiyle
   let previousPagePreview = document.createElement('div');
   previousPagePreview.id = 'previous-page-preview';
+  // Sitenin mevcut arkaplan rengini algıla
+  const computedBodyStyle = window.getComputedStyle(document.body);
+  const bodyBgColor = computedBodyStyle.backgroundColor || '#0a0a18'; // Varsayılan koyu tema rengi
+  
   previousPagePreview.style.cssText = `
     position: fixed;
     top: 0;
@@ -191,9 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: translateX(-20%);
     opacity: 0;
     z-index: 9997;
-    background-color: var(--bs-body-bg, #fff);
-    color: var(--bs-body-color, #212529);
-    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease;
+    background-color: ${bodyBgColor};
+    color: var(--bs-body-color, #fff);
+    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease;
     overflow: hidden;
     will-change: transform, opacity;
     pointer-events: none;
@@ -212,14 +216,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (navigationHistory.length > 1) {
       const previousUrl = navigationHistory[navigationHistory.length - 2];
       try {
-        // Önceki sayfanın önizlemesini göster - minimal yükleme göstergesi
+        // Sayfanın gerçek arkaplan rengini kullan
+        const html = document.documentElement;
+        const htmlBgColor = window.getComputedStyle(html).backgroundColor;
+        // Sayfa rengini koruyarak önceki sayfa önizlemesini göster
         previousPagePreview.innerHTML = `
-          <div class="previous-page-content" style="height: 100%; width: 100%; background-color: var(--primary-bg, #0a0a18);"></div>
+          <div class="previous-page-content" style="height: 100%; width: 100%; background-color: ${bodyBgColor}; position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
         `;
 
         // Sayfa içeriğini hemen göster, yükleme animasyonu olmadan
         previousPagePreview.style.opacity = '1';
         previousPagePreview.style.transform = 'translate3d(-15%, 0, 0) scale(0.98)';
+
+        // Sayfanın rengini dinamik olarak güncelle
+        previousPagePreview.style.backgroundColor = bodyBgColor;
 
         console.log("Önceki sayfa:", previousUrl);
         return true;
@@ -231,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return false;
   }
 
-  // Dokunma hareket ettiğinde - optimize edilmiş ve daha akıcı
+  // Dokunma hareket ettiğinde - daha akıcı ve hızlı animasyon
   function handleTouchMove(e) {
     if (touchStartX > 0 && !isAnimating) {
       // Şu anki X pozisyonu
@@ -243,26 +253,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Yatay kaydırma miktarı dikey kaydırmadan fazlaysa
       if (deltaX > 0 && deltaX > deltaY) {
-        // Kaydırma animasyonunu uygula - hardware acceleration için transform kullan
-        requestAnimationFrame(() => {
-          // Daha doğal bir ivme ile kaydırma için eğriyi ayarla
-          const dampenedDelta = Math.pow(deltaX, 0.95); // Biraz daha lineer hareket
-          pageClone.style.transform = `translate3d(${dampenedDelta}px, 0, 0)`;
+        // Kaydırma animasyonunu GPU hızlandırmalı şekilde uygula
+        // requestAnimationFrame yerine doğrudan stil değiştirme - daha düşük gecikme
+        // Daha doğal bir ivme ile kaydırma için eğriyi ayarla
+        const dampenedDelta = Math.pow(deltaX, 0.92); // Daha lineer hareket için azaltıldı
+        pageClone.style.transform = `translate3d(${dampenedDelta}px, 0, 0)`;
 
-          // iOS tarzında ilerlemeli arka plan efektleri - daha az opacity değişimi
-          const progress = deltaX / window.innerWidth;
-          const opacity = Math.min(0.3, progress * 0.4); // Daha da hafif gölgelendirme
-          overlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
+        // iOS tarzında ilerlemeli arka plan efektleri - en düşük opacity değişimi
+        const progress = deltaX / window.innerWidth;
+        const opacity = Math.min(0.2, progress * 0.3); // Daha da hafif gölgelendirme
+        overlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
 
-          // Bulanıklık efektini tamamen kaldırıyoruz (renk buzulmasına neden oluyor)
-          overlay.style.backdropFilter = 'none';
-          overlay.style.webkitBackdropFilter = 'none';
+        // Arka planda hiçbir filtre efekti kullanma (performans için)
+        overlay.style.backdropFilter = 'none';
+        overlay.style.webkitBackdropFilter = 'none';
 
-          // Önceki sayfayı daha akıcı bir şekilde göster
-          const prevPageTranslate = -15 + (progress * 15); // -15% başlangıç, daha yakın konumdan başlat
-          previousPagePreview.style.opacity = Math.min(1, progress * 2); // Daha hızlı görünür olsun
-          previousPagePreview.style.transform = `translate3d(${prevPageTranslate}%, 0, 0) scale(${0.98 + (progress * 0.02)})`;
-        });
+        // Önceki sayfayı daha akıcı ve hızlı şekilde göster
+        const prevPageTranslate = -10 + (progress * 10); // -10% başlangıç, çok daha yakın
+        previousPagePreview.style.opacity = Math.min(1, progress * 3); // Çok daha hızlı görünür olsun
+        previousPagePreview.style.transform = `translate3d(${prevPageTranslate}%, 0, 0) scale(${0.99 + (progress * 0.01)})`;
 
         // Sayfa kaydırma davranışını engelle
         e.preventDefault();
@@ -270,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Dokunma bittiğinde - daha hızlı ve optimum geçişler
+  // Dokunma bittiğinde - ultra hızlı geçişler ve geliştirilmiş sayfa geçişi
   function handleTouchEnd(e) {
     if (touchStartX > 0 && !isAnimating) {
       // Bitiş zamanı ve pozisyonu
@@ -284,87 +293,87 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Yeterli mesafe veya hız varsa geri dön, yoksa animasyonu resetle
       if ((touchDistance > minSwipeDistance && touchDuration < maxSwipeTime) || 
-          touchEndX > halfPageWidth || swipeSpeed > 1.5) {
+          touchEndX > halfPageWidth || swipeSpeed > 1.2) { // Daha hassas hız algılama
 
         // Geri dönüş animasyonu - kullanıcının swipe hızına göre süreyi ayarla
         isAnimating = true;
 
-        // Daha hızlı animasyon süresi - her zaman 50ms'den az olsun
-        const baseSpeed = Math.max(2.0, swipeSpeed);
-        const animDuration = Math.max(20, Math.min(50, 200 / baseSpeed)); // 20-50ms aralığında
+        // Hemen hemen anında animasyon süresi - ultra hızlı geçiş
+        const baseSpeed = Math.max(2.5, swipeSpeed);
+        // 15-30ms aralığında süper hızlı animasyon
+        const animDuration = Math.max(15, Math.min(30, 150 / baseSpeed)); 
 
-        // Daha lineer ve hızlı animasyon eğrisi
-        const animationCurve = 'cubic-bezier(0.25, 0.1, 0.25, 1)'; // Daha hızlı iOS eğrisi
+        // En hızlı ve en doğal animasyon eğrisi
+        const animationCurve = 'cubic-bezier(0.1, 0, 0.1, 1)'; // Daha da hızlı iOS eğrisi
 
-        // Geçiş animasyonlarını senkronize et
+        // Animasyondan önce önceki sayfanın arkaplan rengini kaydet
+        const computedBodyStyle = window.getComputedStyle(document.body);
+        const bodyBgColor = computedBodyStyle.backgroundColor || '#0a0a18';
+        
+        // Geçiş animasyonlarını senkronize et - daha kısa sürede
         pageClone.style.transition = `transform ${animDuration}ms ${animationCurve}`;
         overlay.style.transition = `all ${animDuration}ms ${animationCurve}`;
         previousPagePreview.style.transition = `all ${animDuration}ms ${animationCurve}`;
+        
+        // Önceki sayfanın arka plan rengini güncelle
+        previousPagePreview.style.backgroundColor = bodyBgColor;
+        document.body.style.backgroundColor = bodyBgColor;
 
-        // Yeni sayfaya geçmeden önce önceki sayfayı hazırla
-        requestAnimationFrame(() => {
-          // Mevcut sayfayı ekrandan hızlıca çıkar
-          pageClone.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
+        // Yeni sayfaya geçmeden önce önceki sayfayı hazırla - bu animasyon framelerini beklemez
+        // Mevcut sayfayı ekrandan hızlıca çıkar
+        pageClone.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
 
-          // Önceki sayfayı anında tam pozisyona getir
-          previousPagePreview.style.opacity = '1';
-          previousPagePreview.style.transform = 'translate3d(0, 0, 0) scale(1)';
+        // Önceki sayfayı anında tam pozisyona getir
+        previousPagePreview.style.opacity = '1';
+        previousPagePreview.style.transform = 'translate3d(0, 0, 0) scale(1)';
 
-          // Minimum gölge efekti - performans için
-          overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-        });
+        // Gölge efekti - performans için minimize edildi
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.15)';
 
         // Animasyonun bitmesini beklemeden önce bir pre-fetch işlemi başlat
-        setTimeout(() => {
-          // Pre-fetch - sayfayı API'den almadan hazırla
-          if (navigationHistory.length > 1) {
-            const previousUrl = navigationHistory[navigationHistory.length - 2];
-            const link = document.createElement('link');
-            link.rel = 'prerender';
-            link.href = previousUrl;
-            document.head.appendChild(link);
-          }
-        }, 50);
+        if (navigationHistory.length > 1) {
+          const previousUrl = navigationHistory[navigationHistory.length - 2];
+          // Prefetch için link elementi yerine daha basit bir yaklaşım - gereksiz DOM işlemleri yok
+          fetch(previousUrl, { method: 'HEAD', cache: 'force-cache' });
+        }
 
-        // Animasyon tamamlandığında önceki sayfaya git, gecikmeyi azalt
+        // Gecikmeyi en aza indiren anında sayfa geçişi
+        // Animasyon süresinin yarısında geçiş başlat - animasyon tamamlanmasını bekleme
         setTimeout(() => {
           goBack();
           isAnimating = false;
-        }, animDuration); // Gecikme olmadan direkt git
+        }, Math.floor(animDuration * 0.5)); // Animasyonun yarısında git
       } else {
-        // Animasyonu resetle - daha hızlı geri dönüş
+        // Animasyonu resetle - anında geri dönüş
         isAnimating = true;
 
-        // Daha hızlı geri dönüş
-        const returnDuration = 50; // 150ms'den 50ms'ye düşürüldü
-        const returnCurve = 'cubic-bezier(0.25, 0.1, 0.25, 1)'; // Daha hızlı eğri
+        // Anında geri dönüş için minimum süre
+        const returnDuration = 20; // 50ms'den 20ms'ye düşürüldü
 
         // Tüm animasyonları senkronize et
-        pageClone.style.transition = `transform ${returnDuration}ms ${returnCurve}`;
-        overlay.style.transition = `all ${returnDuration}ms ${returnCurve}`;
-        previousPagePreview.style.transition = `all ${returnDuration}ms ${returnCurve}`;
+        pageClone.style.transition = `transform ${returnDuration}ms cubic-bezier(0, 0, 0.1, 1)`;
+        overlay.style.transition = `all ${returnDuration}ms cubic-bezier(0, 0, 0.1, 1)`;
+        previousPagePreview.style.transition = `all ${returnDuration}ms cubic-bezier(0, 0, 0.1, 1)`;
 
-        requestAnimationFrame(() => {
-          // Mevcut sayfayı geri pozisyona getir
-          pageClone.style.transform = 'translate3d(0, 0, 0)';
+        // Mevcut sayfayı geri pozisyona getir
+        pageClone.style.transform = 'translate3d(0, 0, 0)';
 
-          // Önceki sayfayı gizle
-          previousPagePreview.style.opacity = '0';
-          previousPagePreview.style.transform = 'translate3d(-15%, 0, 0) scale(0.98)';
+        // Önceki sayfayı gizle
+        previousPagePreview.style.opacity = '0';
+        previousPagePreview.style.transform = 'translate3d(-10%, 0, 0) scale(0.99)';
 
-          // Gölgelendirmeyi kaldır
-          overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-          overlay.style.backdropFilter = 'blur(0px)';
-          overlay.style.webkitBackdropFilter = 'blur(0px)';
-        });
+        // Gölgelendirmeyi tamamen kaldır
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+        overlay.style.backdropFilter = 'none';
+        overlay.style.webkitBackdropFilter = 'none';
 
-        // Çok kısa bir süre sonra animasyon durumunu sıfırla
+        // Çok daha kısa sürede animasyon durumunu sıfırla
         setTimeout(() => {
           isAnimating = false;
           touchStartX = 0;
           touchStartY = 0;
           currentX = 0;
-        }, returnDuration);
+        }, 10); // 10ms'de bile yeterli olabilir
       }
     }
   }
