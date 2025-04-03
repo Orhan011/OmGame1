@@ -180,11 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   };
 
-  function formatTime(seconds) {
+  // Zaman biçimlendirme yardımcı fonksiyonu - global scope'ta tanımla
+  window.formatTime = function(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  }
+  };
 
   // Button Loading Animation Functionality
   function setupButtonLoadingStates() {

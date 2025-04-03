@@ -1349,3 +1349,285 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM elementleri
+  const gameContainer = document.getElementById('wordPuzzleGame');
+  const startScreen = document.getElementById('startScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const endScreen = document.getElementById('endScreen');
+  const wordsList = document.getElementById('wordsList');
+  const hintDisplay = document.getElementById('hint');
+  const wordInput = document.getElementById('wordInput');
+  const timerDisplay = document.getElementById('timer');
+  const scoreDisplay = document.getElementById('score');
+  const finalScoreDisplay = document.getElementById('finalScore');
+  const startButton = document.getElementById('startButton');
+  const restartButton = document.getElementById('restartButton');
+  const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+  const skipButton = document.getElementById('skipButton');
+  
+  // Oyun değişkenleri
+  let timeLeft = 60;
+  let score = 0;
+  let currentWordIndex = 0;
+  let timerInterval;
+  let currentDifficulty = 'medium';
+  let words = [];
+  let gameActive = false;
+  
+  // Zorluk seviyesine göre kelime ve süre ayarları
+  const difficultySettings = {
+    easy: {
+      words: 15,
+      time: 90,
+      points: 5
+    },
+    medium: {
+      words: 20,
+      time: 70,
+      points: 10
+    },
+    hard: {
+      words: 25,
+      time: 60,
+      points: 15
+    }
+  };
+  
+  // Kelime havuzu ve ipuçları
+  const wordPool = [
+    { word: "bilgisayar", hint: "Elektronik bir cihaz, veri işleme ve hesaplama için kullanılır" },
+    { word: "algoritma", hint: "Problem çözümü için adım adım izlenen yöntem" },
+    { word: "internet", hint: "Bilgisayarları birbirine bağlayan küresel ağ" },
+    { word: "yazılım", hint: "Bilgisayarın çalışmasını sağlayan programlar bütünü" },
+    { word: "bellek", hint: "Bilgisayarda verilerin depolandığı birim" },
+    { word: "klavye", hint: "Harfleri ve karakterleri girmek için kullanılan giriş cihazı" },
+    { word: "ekran", hint: "Bilgisayar çıktısını görüntüleyen cihaz" },
+    { word: "tarayıcı", hint: "Web sayfalarını görüntülemek için kullanılan program" },
+    { word: "veritabanı", hint: "Organize edilmiş bilgi koleksiyonu" },
+    { word: "sunucu", hint: "Ağdaki diğer bilgisayarlara hizmet sağlayan sistem" },
+    { word: "fare", hint: "İmleci hareket ettirmek için kullanılan giriş cihazı" },
+    { word: "dosya", hint: "Bilgisayarda saklanan veri birimi" },
+    { word: "klasör", hint: "Dosyaları düzenleme ve kategorize etme birimi" },
+    { word: "şifre", hint: "Güvenlik için kullanılan gizli karakter dizisi" },
+    { word: "bağlantı", hint: "İki nokta veya sistem arasındaki iletişim kanalı" },
+    { word: "program", hint: "Belirli bir görevi yerine getiren yazılım" },
+    { word: "grafik", hint: "Görsel veri temsili" },
+    { word: "uygulama", hint: "Belirli bir amaca hizmet eden yazılım" },
+    { word: "kodlama", hint: "Bilgisayarın anlayacağı komutları yazma işlemi" },
+    { word: "ağ", hint: "Birbirine bağlı bilgisayar veya cihazlar sistemi" },
+    { word: "arabirim", hint: "Kullanıcı ve sistem arasındaki etkileşim katmanı" },
+    { word: "bulut", hint: "İnternet üzerinden erişilen uzak depolama ve hesaplama kaynakları" },
+    { word: "işletim", hint: "Bilgisayarın temel fonksiyonlarını yöneten sistem" },
+    { word: "oyun", hint: "Eğlence amaçlı interaktif yazılım" },
+    { word: "zeka", hint: "Öğrenme, anlama ve problem çözme yeteneği" },
+    { word: "donanım", hint: "Bilgisayarın fiziksel bileşenleri" },
+    { word: "labirent", hint: "Karmaşık yollardan oluşan bulmaca" },
+    { word: "bulmaca", hint: "Zeka ve problem çözme yeteneğini test eden oyun" },
+    { word: "hafıza", hint: "Bilgilerin depolandığı zihinsel veya fiziksel alan" },
+    { word: "beyin", hint: "Vücudun düşünme ve kontrolden sorumlu organı" }
+  ];
+  
+  // Oyunu başlat
+  function startGame() {
+    // Oyun değişkenlerini sıfırla
+    currentWordIndex = 0;
+    score = 0;
+    gameActive = true;
+    
+    // Süre ve skor göstergelerini güncelle
+    timeLeft = difficultySettings[currentDifficulty].time;
+    updateTimerDisplay();
+    updateScoreDisplay();
+    
+    // Kelimeleri karıştır ve seç
+    words = [...wordPool]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, difficultySettings[currentDifficulty].words);
+    
+    // İlk kelimeyi göster
+    showNextWord();
+    
+    // Zamanlayıcıyı başlat
+    startTimer();
+    
+    // Ekranları ayarla
+    startScreen.classList.add('d-none');
+    gameScreen.classList.remove('d-none');
+    endScreen.classList.add('d-none');
+    
+    // Input'a fokuslan
+    wordInput.focus();
+  }
+  
+  // Bir sonraki kelimeyi göster
+  function showNextWord() {
+    if (currentWordIndex < words.length) {
+      if (hintDisplay) {
+        hintDisplay.textContent = words[currentWordIndex].hint;
+      }
+      // Input'u temizle ve fokusla
+      if (wordInput) {
+        wordInput.value = "";
+        wordInput.focus();
+      }
+    } else {
+      // Tüm kelimeler tamamlandı, oyunu bitir
+      endGame(true);
+    }
+  }
+  
+  // Zamanlayıcıyı başlat
+  function startTimer() {
+    // Var olan bir timer varsa temizle
+    clearInterval(timerInterval);
+    
+    // Yeni timer başlat
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      
+      if (timeLeft <= 0) {
+        endGame(false);
+      }
+    }, 1000);
+  }
+  
+  // Zamanlayıcı görüntüsünü güncelle
+  function updateTimerDisplay() {
+    if (timerDisplay) {
+      timerDisplay.textContent = timeLeft;
+    }
+  }
+  
+  // Skor görüntüsünü güncelle
+  function updateScoreDisplay() {
+    if (scoreDisplay) {
+      scoreDisplay.textContent = score;
+    }
+  }
+  
+  // Kelimeyi kontrol et
+  function checkWord() {
+    if (!gameActive) return;
+    
+    const userInput = wordInput ? wordInput.value.trim().toLowerCase() : "";
+    const currentWord = words[currentWordIndex].word.toLowerCase();
+    
+    if (userInput === currentWord) {
+      // Doğru cevap
+      score += difficultySettings[currentDifficulty].points;
+      updateScoreDisplay();
+      
+      // Sonraki kelimeye geç
+      currentWordIndex++;
+      showNextWord();
+      
+      // Doğru cevap animasyonu veya sesi
+      playCorrectSound();
+    } else if (userInput.length > 0) {
+      // Yanlış cevap animasyonu
+      wordInput.classList.add('shake');
+      setTimeout(() => {
+        wordInput.classList.remove('shake');
+      }, 500);
+    }
+  }
+  
+  // Kelimeyi atla
+  function skipCurrentWord() {
+    if (!gameActive) return;
+    
+    // Sonraki kelimeye geç
+    currentWordIndex++;
+    showNextWord();
+    
+    // Atladığı için puan cezası (isteğe bağlı)
+    score = Math.max(0, score - Math.floor(difficultySettings[currentDifficulty].points / 2));
+    updateScoreDisplay();
+  }
+  
+  // Oyunu bitir
+  function endGame(completed) {
+    // Oyun durumunu güncelle
+    gameActive = false;
+    
+    // Zamanlayıcıyı durdur
+    clearInterval(timerInterval);
+    
+    // Sonuç ekranını göster
+    gameScreen.classList.add('d-none');
+    endScreen.classList.remove('d-none');
+    
+    // Final skorunu göster
+    if (finalScoreDisplay) {
+      finalScoreDisplay.textContent = score;
+    }
+    
+    // Tamamlanan kelime listesini göster
+    if (wordsList) {
+      wordsList.innerHTML = "";
+      
+      for (let i = 0; i < Math.min(currentWordIndex, words.length); i++) {
+        const wordItem = document.createElement('li');
+        wordItem.textContent = words[i].word;
+        wordsList.appendChild(wordItem);
+      }
+    }
+    
+    // Skoru kaydet (global save fonksiyonu varsa)
+    if (window.saveScore && typeof window.saveScore === 'function') {
+      window.saveScore('wordPuzzle', score);
+    }
+  }
+  
+  // Doğru cevap sesi çal
+  function playCorrectSound() {
+    // Ses çalma kodu (opsiyonel)
+    try {
+      const correctSound = new Audio('/static/sounds/correct.mp3');
+      correctSound.play();
+    } catch (e) {
+      console.error('Ses çalma hatası:', e);
+    }
+  }
+  
+  // Olay dinleyicileri
+  if (startButton) {
+    startButton.addEventListener('click', startGame);
+  }
+  
+  if (restartButton) {
+    restartButton.addEventListener('click', startGame);
+  }
+  
+  if (skipButton) {
+    skipButton.addEventListener('click', skipCurrentWord);
+  }
+  
+  // Enter tuşu ile kelime kontrolü
+  if (wordInput) {
+    wordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkWord();
+      }
+    });
+  }
+  
+  // Zorluk seçimi
+  if (difficultyButtons && difficultyButtons.length) {
+    difficultyButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        difficultyButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        currentDifficulty = this.dataset.difficulty;
+      });
+    });
+  }
+  
+  // URL'den otomatik başlatma parametresi
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('autoStart') === 'true') {
+    startGame();
+  }
+});

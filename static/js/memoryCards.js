@@ -441,6 +441,211 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update score
     score += pointsEarned;
+    updateScore();
+    
+    // Show floating score animation
+    showPointsAnimation(firstCard, pointsEarned);
+    
+    // Check if all pairs are matched
+    const matchedPairs = document.querySelectorAll('.card.matched').length / 2;
+    if (matchedPairs === totalPairs) {
+      handleLevelComplete();
+    }
+    
+    // Reset flipped cards array
+    flippedCards = [];
+    
+    // Increment matched pairs counter
+    matchedPairs++;
+    
+    // Update match streak
+    updateMatchStreak(true);
+  }
+  
+  /**
+   * Handle mismatched cards
+   * @param {HTMLElement} firstCard - First card element
+   * @param {HTMLElement} secondCard - Second card element
+   */
+  function handleMismatch(firstCard, secondCard) {
+    // Add mismatch animation class
+    firstCard.classList.add('mismatched');
+    secondCard.classList.add('mismatched');
+    
+    // Play no-match sound
+    playSound('no-match');
+    
+    // Reset match streak
+    updateMatchStreak(false);
+    
+    // Briefly show the cards, then flip them back
+    setTimeout(() => {
+      firstCard.classList.remove('flipped', 'mismatched');
+      secondCard.classList.remove('flipped', 'mismatched');
+      
+      // Reset flipped cards array
+      flippedCards = [];
+      
+      // Allow flipping again
+      isProcessing = false;
+    }, 1000);
+  }
+  
+  /**
+   * Create particle effect for matched cards
+   * @param {HTMLElement} card - Card element
+   */
+  function createMatchParticles(card) {
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Create particle container
+    const particleContainer = document.createElement('div');
+    particleContainer.className = 'particle-container';
+    particleContainer.style.position = 'fixed';
+    particleContainer.style.left = centerX + 'px';
+    particleContainer.style.top = centerY + 'px';
+    particleContainer.style.pointerEvents = 'none';
+    particleContainer.style.zIndex = '9999';
+    
+    document.body.appendChild(particleContainer);
+    
+    // Create particles
+    const particleCount = 15;
+    const colors = ['#FFD700', '#FFA500', '#FF6347', '#9370DB', '#3CB371'];
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      
+      const size = Math.random() * 10 + 5;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      
+      // Random direction
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 70 + 30;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      
+      // Set initial position
+      particle.style.left = '0px';
+      particle.style.top = '0px';
+      
+      particleContainer.appendChild(particle);
+      
+      // Animate using keyframes
+      particle.animate([
+        { 
+          transform: 'translate(0, 0) scale(1)', 
+          opacity: 1 
+        },
+        { 
+          transform: `translate(${vx}px, ${vy}px) scale(0)`, 
+          opacity: 0 
+        }
+      ], {
+        duration: Math.random() * 500 + 500,
+        easing: 'cubic-bezier(0,.9,.57,1)',
+        fill: 'forwards'
+      });
+    }
+    
+    // Remove particle container after animation
+    setTimeout(() => {
+      document.body.removeChild(particleContainer);
+    }, 1000);
+  }
+  
+  /**
+   * Get current match streak
+   * @returns {number} Current streak count
+   */
+  function getMatchStreak() {
+    return currentStreak;
+  }
+  
+  /**
+   * Update match streak counter
+   * @param {boolean} matched - Whether cards matched
+   */
+  function updateMatchStreak(matched) {
+    if (matched) {
+      currentStreak++;
+      if (currentStreak > 1) {
+        showStreakMessage(currentStreak);
+      }
+    } else {
+      currentStreak = 0;
+    }
+  }
+  
+  /**
+   * Show streak message
+   * @param {number} streak - Current streak count
+   */
+  function showStreakMessage(streak) {
+    const messages = [
+      null, // 0
+      null, // 1
+      'İyi!', // 2
+      'Harika!', // 3
+      'Muhteşem!', // 4
+      'İnanılmaz!', // 5
+      'Olağanüstü!', // 6+
+    ];
+    
+    const message = messages[Math.min(streak, messages.length - 1)];
+    if (!message) return;
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = 'streak-message';
+    messageElement.textContent = message;
+    
+    gameContainer.appendChild(messageElement);
+    
+    setTimeout(() => {
+      messageElement.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+      messageElement.classList.remove('show');
+      setTimeout(() => {
+        gameContainer.removeChild(messageElement);
+      }, 300);
+    }, 1500);
+  }
+  
+  /**
+   * Show points animation
+   * @param {HTMLElement} element - Element to show points over
+   * @param {number} points - Points to display
+   */
+  function showPointsAnimation(element, points) {
+    const rect = element.getBoundingClientRect();
+    
+    const pointsElement = document.createElement('div');
+    pointsElement.className = 'points-animation';
+    pointsElement.textContent = `+${points}`;
+    
+    pointsElement.style.left = rect.left + rect.width / 2 + 'px';
+    pointsElement.style.top = rect.top + 'px';
+    
+    document.body.appendChild(pointsElement);
+    
+    setTimeout(() => {
+      pointsElement.classList.add('animate');
+    }, 10);
+    
+    setTimeout(() => {
+      document.body.removeChild(pointsElement);
+    }, 1500);
+  }Multiplier);
+    
+    // Update score
+    score += pointsEarned;
     
     // Show success message with streak info if applicable
     if (streak > 1) {

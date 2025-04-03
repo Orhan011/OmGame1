@@ -246,12 +246,25 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Renk buzlanmasını önlemek için arka plan rengini önceden hazırla
+  // Performans için arka plan rengini önbelleğe alarak hazırla
+  let cachedBodyBgColor = null;
+
   function prepareBackgroundColor() {
+    // Eğer renk önbellekte varsa ve sayfa yükleli 1 saniyeden az olduysa, önbelleği kullan
+    if (cachedBodyBgColor && (performance.now() < 1000)) {
+      backgroundFixer.style.backgroundColor = cachedBodyBgColor;
+      previousPagePreview.style.backgroundColor = cachedBodyBgColor;
+      return;
+    }
+
     // Root elemanların renklerini al
     const html = document.documentElement;
     const htmlBgColor = window.getComputedStyle(html).backgroundColor;
     const bodyStyle = window.getComputedStyle(document.body);
-    const bodyBgColor = bodyStyle.backgroundColor || htmlBgColor;
+    const bodyBgColor = bodyStyle.backgroundColor || htmlBgColor || '#0a0a18';
+
+    // Rengi önbelleğe al
+    cachedBodyBgColor = bodyBgColor;
 
     // Arkaplan rengini hemen güncelle
     backgroundFixer.style.backgroundColor = bodyBgColor;
@@ -551,31 +564,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(backButton);
   }
 
-  // Sayfa yüklendikten sonra kaydırma hazırlığı - daha hızlı ve tarayıcı uyumlu
+  // Performans iyileştirmesi: Sayfa yüklendikten sonra kaydırma hazırlığı
   window.addEventListener('load', function() {
-    // Hata kontrolü ile arka plan rengini hazırla
-    try {
-      prepareBackgroundColor();
-    } catch (e) {
-      console.warn('Arka plan rengi hazırlanırken hata:', e.message);
-      // Yedek olarak doğrudan body rengi ayarla
-      document.body.style.backgroundColor = document.body.style.backgroundColor || '#0a0a18';
-    }
+    // Sayfa arkaplan rengini hazırla
+    prepareBackgroundColor();
 
-    // RequestAnimationFrame ile daha verimli şekilde kaydırma etkinleştirme
-    requestAnimationFrame(() => {
-      // Kaydırma hazır durumuna getir
-      setTimeout(() => {
-        isEnabled = true;
-
-        // Console mesajını sadece geliştirme modunda göster
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          console.log('ZekaPark iOS benzeri kaydırma navigasyonu hazır');
-        }
-      }, 200); // Daha hızlı etkinleştirme
-    });
+    // Kaydırma hazır durumuna getir
+    setTimeout(() => {
+      isEnabled = true;
+    }, 300);
   });
-
-  // iOS benzeri kaydırma kullanılabilirliğini konsola bildir
-  console.log('ZekaPark Premium iOS Navigation aktif');
 });

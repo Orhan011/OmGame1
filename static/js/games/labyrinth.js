@@ -845,3 +845,714 @@ document.addEventListener('DOMContentLoaded', function() {
   // Oyunu başlat
   init();
 });
+// Labirent oyunu için JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  // Oyun sabitleri
+  const CELL_TYPES = {
+    WALL: 0,
+    PATH: 1,
+    PLAYER: 2,
+    GOAL: 3,
+    VISITED: 4,
+    BREADCRUMB: 5
+  };
+
+  // Yön sabitleri
+  const DIRECTIONS = [
+    { x: 0, y: -1 }, // Yukarı
+    { x: 1, y: 0 },  // Sağ
+    { x: 0, y: 1 },  // Aşağı
+    { x: -1, y: 0 }  // Sol
+  ];
+
+  // Oyun değişkenleri
+  let gameActive = false;
+  let maze = [];
+  let mazeWidth = 15;
+  let mazeHeight = 15;
+  let playerPosition = { x: 1, y: 1 };
+  let goalPosition = { x: mazeWidth - 2, y: mazeHeight - 2 };
+  let difficulty = 'medium'; // kolay, orta, zor
+  let timeLeft = 60;
+  let timerInterval;
+  let visitedCells = {};
+  let breadcrumbs = [];
+  let currentLevel = 1;
+  let totalScore = 0;
+  let keyState = {};
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  // DOM öğeleri
+  const canvas = document.getElementById('mazeCanvas');
+  const ctx = canvas.getContext('2d');
+  const gameSettings = document.getElementById('gameSettings');
+  const tutorial = document.getElementById('tutorial');
+  const gamePlay = document.getElementById('gamePlay');
+  const gameOver = document.getElementById('gameOver');
+  const timerDisplay = document.getElementById('timer');
+  const levelDisplay = document.getElementById('level');
+  const scoreDisplay = document.getElementById('score');
+  const finalScoreDisplay = document.getElementById('finalScore');
+  const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+  const startButton = document.getElementById('startButton');
+  const tryAgainButton = document.getElementById('tryAgainButton');
+  const restartButton = document.getElementById('restartButton');
+  
+  // Event listeners ekle
+  if (startButton) {
+    startButton.addEventListener('click', startGame);
+  }
+  
+  if (tryAgainButton) {
+    tryAgainButton.addEventListener('click', startGame);
+  }
+  
+  if (restartButton) {
+    restartButton.addEventListener('click', function() {
+      gameActive = false;
+      clearInterval(timerInterval);
+      gameSettings.classList.remove('d-none');
+      gamePlay.classList.add('d-none');
+      gameOver.classList.add('d-none');
+    });
+  }
+
+  difficultyButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      difficultyButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      difficulty = this.dataset.difficulty;
+    });
+  });
+
+  // Zorluk seviyesine göre labirent boyutu
+  function difficultyToSize(diff) {
+    switch (diff) {
+      case 'easy': return 11;
+      case 'hard': return 21;
+      default: return 15; // medium
+    }
+  }
+
+  // Zorluk seviyesine göre süre
+  function difficultyToTime(diff) {
+    switch (diff) {
+      case 'easy': return 120;
+      case 'hard': return 180;
+      default: return 150; // medium
+    }
+  }
+
+  // Oyunu başlat
+  function startGame() {
+    // Zorluk seviyesine göre labirent boyutunu belirle
+    mazeWidth = difficultyToSize(difficulty);
+    mazeHeight = difficultyToSize(difficulty);
+    
+    // Başlangıç konumunu ayarla
+    playerPosition = { x: 1, y: 1 };
+    goalPosition = { x: mazeWidth - 2, y: mazeHeight - 2 };
+    
+    // Zamanı ayarla (zorluk seviyesine göre)
+    timeLeft = difficultyToTime(difficulty);
+    
+    // Skoru sıfırla ve seviyeyi ayarla
+    totalScore = 0;
+    currentLevel = 1;
+    
+    // Ziyaret edilen hücreleri sıfırla
+    visitedCells = {};
+    breadcrumbs = [];
+    
+    // Canvas boyutunu ayarla
+    resizeCanvas();
+    
+    // Labirent oluştur
+    generateMaze();
+    
+    // Görünümü güncelle
+    gameSettings.classList.add('d-none');
+    tutorial.classList.add('d-none');
+    gamePlay.classList.remove('d-none');
+    gameOver.classList.add('d-none');
+    
+    // Oyun durumunu güncelle
+    gameActive = true;
+    
+    // Oyun zamanını başlat
+    startTimer();
+    
+    // Kontrol dinleyicilerini ekle
+    addControlListeners();
+    
+    // Görünümü güncelle
+    updateUI();
+    drawMaze();
+    
+    // Başlangıç hücresini işaretle
+    markCellAsVisited(playerPosition.x, playerPosition.y);
+  }
+  
+  // Labirent oluşturma fonksiyonu (Recursive Backtracking algoritması)
+  function generateMaze() {
+    // Labirent dizisini başlat (tüm hücreler duvar)
+    maze = Array(mazeHeight).fill().map(() => Array(mazeWidth).fill(CELL_TYPES.WALL));
+    
+    // Rastgele DFS algoritması ile labirent oluştur
+    carvePassagesFrom(1, 1);
+    
+    // Oyuncu ve hedef konumlarını ayarla
+    maze[playerPosition.y][playerPosition.x] = CELL_TYPES.PLAYER;
+    maze[goalPosition.y][goalPosition.x] = CELL_TYPES.GOAL;
+  }
+  
+  // Recursive DFS labirent oluşturma algoritması
+  function carvePassagesFrom(cx, cy) {
+    // Mevcut hücreyi yol olarak işaretle
+    maze[cy][cx] = CELL_TYPES.PATH;
+    
+    // Yönleri karıştır
+    const directions = shuffleArray([...DIRECTIONS]);
+    
+    // Her yönü dene
+    for (const direction of directions) {
+      // İki hücre uzağa bak (arada duvar bırakmak için)
+      const nx = cx + direction.x * 2;
+      const ny = cy + direction.y * 2;
+      
+      // Sınır kontrolü
+      if (nx > 0 && nx < mazeWidth - 1 && ny > 0 && ny < mazeHeight - 1) {
+        // Eğer o hücre daha önce ziyaret edilmediyse (duvarsa)
+        if (maze[ny][nx] === CELL_TYPES.WALL) {
+          // Aradaki hücreyi de yol yap
+          maze[cy + direction.y][cx + direction.x] = CELL_TYPES.PATH;
+          // Recursive olarak devam et
+          carvePassagesFrom(nx, ny);
+        }
+      }
+    }
+  }
+  
+  // Dizi elemanlarını karıştırma (Fisher-Yates algoritması)
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+  
+  // Labirent çizim fonksiyonu
+  function drawMaze() {
+    if (!ctx) return;
+    
+    // Canvas'ı temizle
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Hücre boyutlarını hesapla
+    const cellWidth = canvas.width / mazeWidth;
+    const cellHeight = canvas.height / mazeHeight;
+    
+    // Labirenti çiz
+    for (let y = 0; y < mazeHeight; y++) {
+      for (let x = 0; x < mazeWidth; x++) {
+        const cellType = maze[y][x];
+        
+        // Hücre pozisyonunu hesapla
+        const px = x * cellWidth;
+        const py = y * cellHeight;
+        
+        // Hücre tipine göre renk belirle
+        let fillColor;
+        
+        switch (cellType) {
+          case CELL_TYPES.WALL:
+            fillColor = '#34495e'; // Koyu mavi-gri duvarlar
+            break;
+          case CELL_TYPES.PATH:
+            fillColor = '#ecf0f1'; // Açık gri yollar
+            break;
+          case CELL_TYPES.PLAYER:
+            fillColor = '#3498db'; // Mavi oyuncu
+            break;
+          case CELL_TYPES.GOAL:
+            fillColor = '#e74c3c'; // Kırmızı hedef
+            break;
+          case CELL_TYPES.VISITED:
+            fillColor = '#bdc3c7'; // Hafif gri ziyaret edilen hücreler
+            break;
+          case CELL_TYPES.BREADCRUMB:
+            fillColor = '#95a5a6'; // Orta gri breadcrumb
+            break;
+          default:
+            fillColor = '#ffffff';
+        }
+        
+        // Hücreyi çiz
+        ctx.fillStyle = fillColor;
+        ctx.fillRect(px, py, cellWidth, cellHeight);
+        
+        // Hücre için özel çizimler
+        if (cellType === CELL_TYPES.PLAYER) {
+          // Oyuncu için daire çiz
+          ctx.fillStyle = '#2980b9';
+          ctx.beginPath();
+          ctx.arc(
+            px + cellWidth / 2,
+            py + cellHeight / 2,
+            Math.min(cellWidth, cellHeight) / 2.5,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        } else if (cellType === CELL_TYPES.GOAL) {
+          // Hedef için yıldız çiz
+          ctx.fillStyle = '#c0392b';
+          const size = Math.min(cellWidth, cellHeight) / 2;
+          drawStar(
+            ctx,
+            px + cellWidth / 2,
+            py + cellHeight / 2,
+            5,
+            size / 2,
+            size
+          );
+        }
+      }
+    }
+    
+    // Ziyaret edilen hücreleri çiz
+    for (const key in visitedCells) {
+      if (visitedCells[key]) {
+        const [x, y] = key.split(',').map(Number);
+        
+        // Oyuncu veya hedef hücresiyse, ziyaret işaretini gösterme
+        if ((x === playerPosition.x && y === playerPosition.y) || 
+            (x === goalPosition.x && y === goalPosition.y)) {
+          continue;
+        }
+        
+        const px = x * cellWidth;
+        const py = y * cellHeight;
+        
+        // Hafif gri arka plan
+        ctx.fillStyle = 'rgba(189, 195, 199, 0.5)';
+        ctx.fillRect(px, py, cellWidth, cellHeight);
+      }
+    }
+    
+    // Breadcrumbs çiz (oyuncunun geçtiği yollar)
+    for (const crumb of breadcrumbs) {
+      const px = crumb.x * cellWidth;
+      const py = crumb.y * cellHeight;
+      
+      // Orta nokta
+      const centerX = px + cellWidth / 2;
+      const centerY = py + cellHeight / 2;
+      
+      // Küçük daire çiz
+      ctx.fillStyle = 'rgba(41, 128, 185, 0.3)';
+      ctx.beginPath();
+      ctx.arc(
+        centerX,
+        centerY,
+        Math.min(cellWidth, cellHeight) / 6,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+  }
+  
+  // Yıldız çizme yardımcı fonksiyonu
+  function drawStar(ctx, cx, cy, spikes, innerRadius, outerRadius) {
+    let rot = Math.PI / 2 * 3;
+    let x = cx;
+    let y = cy;
+    const step = Math.PI / spikes;
+    
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - outerRadius);
+    
+    for (let i = 0; i < spikes; i++) {
+      x = cx + Math.cos(rot) * outerRadius;
+      y = cy + Math.sin(rot) * outerRadius;
+      ctx.lineTo(x, y);
+      rot += step;
+      
+      x = cx + Math.cos(rot) * innerRadius;
+      y = cy + Math.sin(rot) * innerRadius;
+      ctx.lineTo(x, y);
+      rot += step;
+    }
+    
+    ctx.lineTo(cx, cy - outerRadius);
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  // UI güncelleme fonksiyonu
+  function updateUI() {
+    if (levelDisplay) levelDisplay.textContent = currentLevel;
+    if (scoreDisplay) scoreDisplay.textContent = totalScore;
+    if (timerDisplay) timerDisplay.textContent = formatTime(timeLeft);
+  }
+  
+  // Zamanı biçimlendirme
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+  
+  // Zamanlayıcıyı başlat
+  function startTimer() {
+    clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      
+      updateUI();
+      
+      if (timeLeft <= 0) {
+        endGame(false);
+      }
+    }, 1000);
+  }
+  
+  // Canvas boyutunu ayarla
+  function resizeCanvas() {
+    if (!canvas) return;
+    
+    // 16:9 en-boy oranı (mobil cihazlarda daha iyi görünüm için)
+    let containerWidth = gamePlay.clientWidth;
+    let containerHeight = gamePlay.clientHeight;
+    
+    // En fazla yükseklik
+    const maxHeight = window.innerHeight * 0.7;
+    
+    // Kare bir labirent alanı için
+    const size = Math.min(containerWidth, maxHeight);
+    
+    canvas.width = size;
+    canvas.height = size;
+    
+    // Eğer oyun aktifse, labirenti yeniden çiz
+    if (gameActive) {
+      drawMaze();
+    }
+  }
+  
+  // Pencere boyutu değiştiğinde
+  window.addEventListener('resize', resizeCanvas);
+  
+  // Ziyaret edilen hücreyi işaretle
+  function markCellAsVisited(x, y) {
+    visitedCells[`${x},${y}`] = true;
+    
+    // Breadcrumb ekle (son X adımı göster)
+    breadcrumbs.push({ x, y });
+    if (breadcrumbs.length > 15) { // Son 15 adımı tut
+      breadcrumbs.shift();
+    }
+  }
+  
+  // Oyuncuyu hareket ettir
+  function movePlayer(direction) {
+    // Eski konumu sakla
+    const oldX = playerPosition.x;
+    const oldY = playerPosition.y;
+    
+    // Yeni konumu hesapla
+    const newX = oldX + direction.x;
+    const newY = oldY + direction.y;
+    
+    // Sınır kontrolü ve duvar kontrolü
+    if (
+      newX >= 0 && newX < mazeWidth &&
+      newY >= 0 && newY < mazeHeight &&
+      maze[newY][newX] !== CELL_TYPES.WALL
+    ) {
+      // Eski konumu yol veya ziyaret edilmiş olarak işaretle
+      maze[oldY][oldX] = CELL_TYPES.PATH;
+      
+      // Yeni konumu oyuncu olarak işaretle
+      maze[newY][newX] = CELL_TYPES.PLAYER;
+      
+      // Oyuncu pozisyonunu güncelle
+      playerPosition = { x: newX, y: newY };
+      
+      // Ziyaret edilen hücreyi işaretle
+      markCellAsVisited(newX, newY);
+      
+      // Labirenti yeniden çiz
+      drawMaze();
+      
+      // Hedefe ulaşılıp ulaşılmadığını kontrol et
+      checkGoal();
+    }
+  }
+  
+  // Hedefe ulaşılıp ulaşılmadığını kontrol et
+  function checkGoal() {
+    if (playerPosition.x === goalPosition.x && playerPosition.y === goalPosition.y) {
+      // Seviye puanını hesapla
+      const levelScore = calculateLevelScore();
+      totalScore += levelScore;
+      
+      // Bir sonraki seviyeye geç
+      currentLevel++;
+      
+      // UI'yı güncelle
+      updateUI();
+      
+      // Seviye sonu açılır penceresi
+      showLevelComplete(levelScore);
+      
+      // Süreyi durdur
+      clearInterval(timerInterval);
+      
+      // Bir sonraki seviyeyi hazırla (gecikmeli)
+      setTimeout(() => {
+        // Labirent boyutlarını değiştir (her 3 seviyede bir)
+        if (currentLevel % 3 === 0) {
+          mazeWidth = Math.min(mazeWidth + 2, 31);
+          mazeHeight = Math.min(mazeHeight + 2, 31);
+        }
+        
+        // Başlangıç ve hedef pozisyonlarını güncelle
+        playerPosition = { x: 1, y: 1 };
+        goalPosition = { x: mazeWidth - 2, y: mazeHeight - 2 };
+        
+        // Ekstra süre ekle (zorluk seviyesine göre)
+        timeLeft += difficultyToTime(difficulty) / 2;
+        
+        // Ziyaret edilen hücreleri sıfırla
+        visitedCells = {};
+        breadcrumbs = [];
+        
+        // Yeni labirent oluştur
+        generateMaze();
+        
+        // Labirenti yeniden çiz
+        drawMaze();
+        
+        // Zamanı yeniden başlat
+        startTimer();
+        
+        // İlk hücreyi işaretle
+        markCellAsVisited(playerPosition.x, playerPosition.y);
+      }, 2000);
+    }
+  }
+  
+  // Seviye puanını hesapla
+  function calculateLevelScore() {
+    // Temel puan (zorluk seviyesine göre)
+    let baseScore;
+    switch (difficulty) {
+      case 'easy': baseScore = 100; break;
+      case 'hard': baseScore = 300; break;
+      default: baseScore = 200; // medium
+    }
+    
+    // Zaman bonusu
+    const timeBonus = timeLeft * 2;
+    
+    // Labirent büyüklüğü bonusu
+    const sizeBonus = (mazeWidth * mazeHeight) / 10;
+    
+    // Seviye bonusu
+    const levelBonus = currentLevel * 50;
+    
+    // Toplam puanı hesapla
+    return Math.floor(baseScore + timeBonus + sizeBonus + levelBonus);
+  }
+  
+  // Seviye tamamlandı mesajını göster
+  function showLevelComplete(score) {
+    const levelCompleteEl = document.createElement('div');
+    levelCompleteEl.className = 'level-complete-popup';
+    levelCompleteEl.innerHTML = `
+      <div class="level-complete-content">
+        <h3>Seviye ${currentLevel - 1} Tamamlandı!</h3>
+        <p>Puan: ${score}</p>
+        <p>Toplam Puan: ${totalScore}</p>
+        <p>Sonraki seviye hazırlanıyor...</p>
+      </div>
+    `;
+    
+    document.body.appendChild(levelCompleteEl);
+    
+    // Animasyon
+    setTimeout(() => {
+      levelCompleteEl.classList.add('show');
+    }, 10);
+    
+    // Belirli bir süre sonra kaldır
+    setTimeout(() => {
+      levelCompleteEl.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(levelCompleteEl);
+      }, 500);
+    }, 1800);
+  }
+  
+  // Oyunu bitir
+  function endGame(completed) {
+    // Oyun durumunu güncelle
+    gameActive = false;
+    
+    // Zamanlayıcıyı durdur
+    clearInterval(timerInterval);
+    
+    // Olay dinleyicilerini kaldır
+    removeControlListeners();
+    
+    // Oyun sonu ekranını göster
+    gamePlay.classList.add('d-none');
+    gameOver.classList.remove('d-none');
+    
+    // Skorları güncelle
+    if (finalScoreDisplay) finalScoreDisplay.textContent = totalScore;
+    
+    // Oyun skorunu sunucuya gönder
+    if (window.saveScore && typeof window.saveScore === 'function') {
+      window.saveScore('labyrinth', totalScore);
+    } else {
+      console.error('saveScore fonksiyonu bulunamadı');
+    }
+  }
+  
+  // Kontrol dinleyicilerini ekle
+  function addControlListeners() {
+    // Klavye olayları
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    
+    // Dokunmatik olaylar
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Oyuncu hareketini işlemeye başla
+    requestAnimationFrame(processPlayerMovement);
+  }
+  
+  // Kontrol dinleyicilerini kaldır
+  function removeControlListeners() {
+    document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener('keyup', handleKeyUp);
+    
+    canvas.removeEventListener('touchstart', handleTouchStart);
+    canvas.removeEventListener('touchmove', handleTouchMove);
+    canvas.removeEventListener('touchend', handleTouchEnd);
+  }
+  
+  // Klavye olayı işleyici - tuşa basma
+  function handleKeyDown(e) {
+    keyState[e.key] = true;
+    
+    // Sayfa kaydırma gibi varsayılan browser davranışını engellemek için (sayfa kaydırma gibi)
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+      e.preventDefault();
+    }
+  }
+  
+  // Klavye olayı işleyici - tuşu bırakma
+  function handleKeyUp(e) {
+    keyState[e.key] = false;
+  }
+  
+  // Oyuncu hareketi işleme
+  function processPlayerMovement() {
+    if (gameActive) {
+      // Yukarı
+      if (keyState['ArrowUp'] || keyState['w']) {
+        movePlayer(DIRECTIONS[0]);
+      }
+      // Sağ
+      else if (keyState['ArrowRight'] || keyState['d']) {
+        movePlayer(DIRECTIONS[1]);
+      }
+      // Aşağı
+      else if (keyState['ArrowDown'] || keyState['s']) {
+        movePlayer(DIRECTIONS[2]);
+      }
+      // Sol
+      else if (keyState['ArrowLeft'] || keyState['a']) {
+        movePlayer(DIRECTIONS[3]);
+      }
+      
+      // Animasyonu sürdür
+      requestAnimationFrame(processPlayerMovement);
+    }
+  }
+  
+  // Dokunmatik başlangıç olayı
+  function handleTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  }
+  
+  // Dokunmatik hareket olayı
+  function handleTouchMove(e) {
+    e.preventDefault();
+  }
+  
+  // Dokunmatik sonlanma olayı
+  function handleTouchEnd(e) {
+    e.preventDefault();
+    
+    if (!gameActive) return;
+    
+    if (e.changedTouches.length > 0) {
+      const touch = e.changedTouches[0];
+      const touchEndX = touch.clientX;
+      const touchEndY = touch.clientY;
+      
+      // X ve Y eksenlerindeki hareket farkını hesapla
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      
+      // Minimum kaydırma mesafesi
+      const minSwipeDistance = 30;
+      
+      // Yatay hareket dikey hareketten daha fazla mı?
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Sağa kaydırma
+        if (deltaX > minSwipeDistance) {
+          movePlayer(DIRECTIONS[1]); // Sağ
+        }
+        // Sola kaydırma
+        else if (deltaX < -minSwipeDistance) {
+          movePlayer(DIRECTIONS[3]); // Sol
+        }
+      } else {
+        // Aşağı kaydırma
+        if (deltaY > minSwipeDistance) {
+          movePlayer(DIRECTIONS[2]); // Aşağı
+        }
+        // Yukarı kaydırma
+        else if (deltaY < -minSwipeDistance) {
+          movePlayer(DIRECTIONS[0]); // Yukarı
+        }
+      }
+    }
+  }
+  
+  // Ekran otomatik yönlendirme değişikliğini dinle
+  window.addEventListener('orientationchange', resizeCanvas);
+  
+  // İlk yükleme
+  resizeCanvas();
+  
+  // Eğer URL parametreleri ile otomatik başlatma isteniyorsa
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('autoStart') === 'true') {
+    startGame();
+  }
+});

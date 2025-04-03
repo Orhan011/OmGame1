@@ -39,9 +39,14 @@ def send_verification_email(to_email, verification_code):
     from email.mime.multipart import MIMEMultipart
     import ssl
 
-    # Gmail hesap bilgileri (güvenlik için çevresel değişkenlerden alınmalı)
+    # Gmail hesap bilgileri (çevresel değişkenlerden alınır)
     sender_email = "omgameee@gmail.com"
-    sender_password = os.environ.get("EMAIL_PASSWORD", "htvh fmfz eeic kkls")  # Daha güvenli bir yöntem kullanılmalı
+    sender_password = os.environ.get("EMAIL_PASSWORD")  # Çevresel değişkenden alınır
+    
+    # Eğer şifre çevresel değişkenden alınamazsa hata ver
+    if not sender_password:
+        logger.error("EMAIL_PASSWORD çevresel değişkeni tanımlanmamış")
+        raise ValueError("Email gönderimi için şifre eksik. Lütfen yönetici ile iletişime geçin.")
 
     if not sender_password:
         logger.error("Gmail app password not found")
