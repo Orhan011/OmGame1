@@ -1,6 +1,6 @@
 
-/* iOS tarzı kaydırarak geri gitme navigasyonu için stil tanımlamaları */
-.swipe-navigation-overlay {
+/* Gerçek iOS tarzı kaydırarak geri gitme navigasyonu için stil tanımlamaları */
+.ios-swipe-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,48 +9,49 @@
   background: rgba(0, 0, 0, 0);
   z-index: 9998;
   pointer-events: none;
-  transition: background 0.3s ease;
+  transition: background 0.25s ease;
+  will-change: opacity;
 }
 
-.previous-page-preview {
+.ios-previous-page {
   position: fixed;
   top: 0;
   left: 0;
-  width: 85%;
-  height: 100%;
-  background: rgba(20, 20, 40, 0.9);
-  z-index: 9999;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
-  border-right: 1px solid rgba(106, 90, 224, 0.2);
-}
-
-.preview-content {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  text-align: center;
-  padding: 20px;
+  background-color: rgba(30, 30, 40, 0.95);
+  z-index: 9996;
+  transform: translateX(-30%);
+  pointer-events: none;
+  transition: transform 0.25s ease;
+  will-change: transform;
 }
 
-.back-icon {
-  font-size: 3rem;
-  margin-bottom: 15px;
-  color: rgba(106, 90, 224, 1);
-  animation: pulse 2s infinite;
+.ios-current-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  z-index: 9997;
+  transform: translateX(0);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  transition: transform 0.25s ease;
+  will-change: transform;
 }
 
-.back-text {
-  font-size: 1.5rem;
-  font-weight: 500;
+/* Dark mode support */
+html.dark .ios-current-page {
+  background-color: #1a1a2e;
 }
 
+html.dark .ios-previous-page {
+  background-color: rgba(20, 20, 30, 0.95);
+}
+
+/* Geri simgesi animasyonu */
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -66,13 +67,26 @@
   }
 }
 
-/* Kullanıcı etkileşimini ekranın sol kenarına sınırla */
+.ios-previous-page i {
+  animation: pulse 2s infinite;
+}
+
+/* Dokunmatik algılama bölgesi - ekranın sol kenarında */
 .swipe-detection-area {
   position: fixed;
   top: 0;
   left: 0;
-  width: 30px;
+  width: 20px;
   height: 100%;
-  z-index: 9997;
+  z-index: 9000;
   pointer-events: auto;
+}
+
+/* Sayfalara özel renk temaları için özelleştirmeler */
+.game-page .ios-current-page {
+  background-color: #0f0f1a;
+}
+
+.profile-page .ios-current-page {
+  background-color: #131326;
 }
