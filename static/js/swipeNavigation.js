@@ -1,9 +1,10 @@
+
 /**
- * Enhanced iOS-like swipe navigation
- * Simulates iOS 16+ style edge swipe back navigation with realistic physics
+ * iOS 16+ kaydırma navigasyon sistemi
+ * Apple'ın Native Safari/iOS Edge Swipe geri animasyonu
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Ana değişkenler
+  // Ana değişkenler ve yapılandırma
   let touchStartX = 0;
   let touchStartY = 0;
   let touchCurrentX = 0;
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let touchEndY = 0;
   const minSwipeDistance = 80; // Minimum kaydırma mesafesi
   const maxSwipeTime = 300; // Maksimum kaydırma süresi (ms)
-  const edgeSize = 20; // Kenar bölgesi büyüklüğü (piksel)
+  const edgeSize = 25; // Kenar bölgesi büyüklüğü (piksel)
   let touchStartTime = 0;
   let touchEndTime = 0;
   let isSwipingBack = false;
@@ -20,15 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
   let velocity = 0; // Hız değişkeni
   let lastX = 0;
   let lastTime = 0;
-
-  // Önceki sayfanın ekran görüntüsünü simüle etmek için
-  let fakePrevPageContent = null;
-  const cachedImages = {};
-
+  
   // Animasyon durumu
   let animationId = null;
-
-  // Kapsayıcı konteynerı oluştur
+  
+  // Animasyon kapsayıcısı
   const swipeContainer = document.createElement('div');
   swipeContainer.className = 'ios-swipe-container';
   swipeContainer.style.position = 'fixed';
@@ -36,13 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
   swipeContainer.style.left = '0';
   swipeContainer.style.width = '100%';
   swipeContainer.style.height = '100%';
-  swipeContainer.style.pointerEvents = 'none';
-  swipeContainer.style.zIndex = '9999';
+  swipeContainer.style.zIndex = '99999';
   swipeContainer.style.visibility = 'hidden';
   swipeContainer.style.overflow = 'hidden';
+  swipeContainer.style.pointerEvents = 'none';
   document.body.appendChild(swipeContainer);
 
-  // Karartma overlay'ı oluştur
+  // Arka plan karartma katmanı
   const darkOverlay = document.createElement('div');
   darkOverlay.className = 'ios-swipe-overlay';
   darkOverlay.style.position = 'absolute';
@@ -54,41 +51,33 @@ document.addEventListener('DOMContentLoaded', function() {
   darkOverlay.style.transition = 'none';
   swipeContainer.appendChild(darkOverlay);
 
-  // Önceki sayfa önizleme elemanı
+  // Önceki sayfa önizleme paneli
   const prevPagePreview = document.createElement('div');
   prevPagePreview.className = 'ios-prev-page-preview';
   prevPagePreview.style.position = 'absolute';
   prevPagePreview.style.top = '0';
-  prevPagePreview.style.left = '-100%'; // Ekran dışından başla
-  prevPagePreview.style.width = '90%'; // iOS stili genişlik
+  prevPagePreview.style.left = '-100%';
+  prevPagePreview.style.width = '88%'; // iOS tarzı genişlik
   prevPagePreview.style.height = '100%';
-  prevPagePreview.style.backgroundColor = '#f8f8f8';
-  prevPagePreview.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
-  prevPagePreview.style.borderRadius = '0 4px 4px 0'; // Sağ kenarda hafif yuvarlama
+  prevPagePreview.style.backgroundColor = getBackgroundColor();
+  prevPagePreview.style.boxShadow = '0 0 25px rgba(0, 0, 0, 0.22)';
+  prevPagePreview.style.borderTopRightRadius = '10px';
+  prevPagePreview.style.borderBottomRightRadius = '10px';
   prevPagePreview.style.transform = 'translateX(0)';
   prevPagePreview.style.willChange = 'transform';
-
-  // Kenar gölgesi oluştur (daha gerçekçi görünüm için)
+  prevPagePreview.style.overflow = 'hidden';
+  
+  // Sağ kenar gölgesi
   const gradient = document.createElement('div');
   gradient.style.position = 'absolute';
   gradient.style.top = '0';
   gradient.style.right = '0';
-  gradient.style.width = '6px';
+  gradient.style.width = '5px';
   gradient.style.height = '100%';
-  gradient.style.background = 'linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.15))';
+  gradient.style.background = 'linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1))';
   gradient.style.pointerEvents = 'none';
+  gradient.style.opacity = '0';
   prevPagePreview.appendChild(gradient);
-
-  // iOS tarzı yapışkan kısıtlama efekti için çekme bölümü
-  const edgePuller = document.createElement('div');
-  edgePuller.className = 'ios-edge-puller';
-  edgePuller.style.position = 'absolute';
-  edgePuller.style.top = '0';
-  edgePuller.style.left = '-10px';
-  edgePuller.style.width = '10px';
-  edgePuller.style.height = '100%';
-  edgePuller.style.opacity = '0';
-  prevPagePreview.appendChild(edgePuller);
 
   // Geri oku simgesi
   const backArrow = document.createElement('div');
@@ -96,144 +85,102 @@ document.addEventListener('DOMContentLoaded', function() {
   backArrow.style.position = 'absolute';
   backArrow.style.top = '50%';
   backArrow.style.left = '15px';
-  backArrow.style.width = '14px';
-  backArrow.style.height = '14px';
-  backArrow.style.borderTop = '2.5px solid #007aff';
-  backArrow.style.borderLeft = '2.5px solid #007aff';
-  backArrow.style.borderRadius = '1px';
+  backArrow.style.width = '12px';
+  backArrow.style.height = '12px';
+  backArrow.style.borderTop = '2px solid #007aff';
+  backArrow.style.borderLeft = '2px solid #007aff';
   backArrow.style.transform = 'translateY(-50%) rotate(-45deg)';
   backArrow.style.opacity = '0';
   backArrow.style.transition = 'opacity 0.15s ease';
+  backArrow.style.zIndex = '5';
   prevPagePreview.appendChild(backArrow);
 
-  // İçerik alanı
-  const contentArea = document.createElement('div');
-  contentArea.className = 'ios-content-area';
-  contentArea.style.position = 'absolute';
-  contentArea.style.top = '55px'; // Navbar altından başla
-  contentArea.style.left = '0';
-  contentArea.style.width = '100%';
-  contentArea.style.height = 'calc(100% - 55px)';
-  contentArea.style.overflow = 'hidden';
-  contentArea.style.backgroundColor = '#f8f8f8';
-  prevPagePreview.appendChild(contentArea);
-
-  // Sahte önceki sayfanın içeriğini oluştur (çerçeve olarak)
-  fakePrevPageContent = document.createElement('div');
-  fakePrevPageContent.className = 'ios-prev-page-content';
-  fakePrevPageContent.style.width = '100%';
-  fakePrevPageContent.style.height = '100%';
-  contentArea.appendChild(fakePrevPageContent);
-
-  // Sahte header oluştur
+  // Sahte önceki sayfa başlığı alanı
   const fakeHeader = document.createElement('div');
   fakeHeader.className = 'ios-fake-header';
   fakeHeader.style.position = 'absolute';
   fakeHeader.style.top = '0';
   fakeHeader.style.left = '0';
   fakeHeader.style.width = '100%';
-  fakeHeader.style.height = '55px';
-  fakeHeader.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+  fakeHeader.style.height = '54px';
+  fakeHeader.style.backgroundColor = isDarkMode() ? 'rgba(29, 29, 31, 0.8)' : 'rgba(248, 248, 248, 0.8)';
   fakeHeader.style.backdropFilter = 'blur(10px)';
-  fakeHeader.style.borderBottom = '1px solid rgba(0, 0, 0, 0.1)';
+  fakeHeader.style.WebkitBackdropFilter = 'blur(10px)';
+  fakeHeader.style.borderBottom = isDarkMode() ? '0.5px solid rgba(255, 255, 255, 0.1)' : '0.5px solid rgba(0, 0, 0, 0.1)';
   fakeHeader.style.display = 'flex';
   fakeHeader.style.alignItems = 'center';
   fakeHeader.style.padding = '0 15px';
   fakeHeader.style.zIndex = '2';
 
-  // Önceki sayfa başlığı
+  // Önceki sayfa başlığı 
   const prevPageTitle = document.createElement('div');
   prevPageTitle.className = 'ios-prev-page-title';
-  prevPageTitle.style.color = '#000';
+  prevPageTitle.style.color = isDarkMode() ? '#fff' : '#000';
   prevPageTitle.style.fontSize = '17px';
-  prevPageTitle.style.fontWeight = '600';
+  prevPageTitle.style.fontWeight = '500';
   prevPageTitle.style.textAlign = 'center';
   prevPageTitle.style.width = '100%';
   prevPageTitle.style.overflow = 'hidden';
   prevPageTitle.style.textOverflow = 'ellipsis';
   prevPageTitle.style.whiteSpace = 'nowrap';
   prevPageTitle.style.opacity = '0';
-  prevPageTitle.style.transform = 'translateX(20px)';
-  prevPageTitle.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  prevPageTitle.style.transform = 'translateX(15px)';
+  prevPageTitle.style.transition = 'none';
   prevPageTitle.textContent = 'Önceki Sayfa';
 
-  // Başlık belirlemek için önceki sayfalara bakalım
-  if (document.referrer) {
-    try {
-      const referrerUrl = new URL(document.referrer);
-      const pathSegments = referrerUrl.pathname.split('/').filter(Boolean);
-      if (pathSegments.length > 0) {
-        const lastSegment = pathSegments[pathSegments.length - 1];
-        if (lastSegment) {
-          // Dosya uzantısını kaldır ve tire/-/alt çizgilerle değiştir
-          const cleanTitle = lastSegment.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-          // İlk harfi büyük yap
-          prevPageTitle.textContent = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
-        }
-      }
-    } catch (e) {
-      console.error("URL ayrıştırma hatası:", e);
-    }
-  }
-
-  // Gerçek önceki sayfa önizlemesi için capturet ve cache
-  const prevPageCache = {};
-
-  // Sayfa yüklemesi tamamlandığında mevcut sayfayı önbelleğe al
-  window.addEventListener('load', function() {
-    try {
-      // Mevcut sayfanın URL'sini ve içeriğinin bir kopyasını al
-      const currentUrl = window.location.pathname;
-      const mainContent = document.querySelector('main') || document.querySelector('.container') || document.querySelector('.content');
-
-      if (mainContent) {
-        // Sayfanın DOM yapısının bir klonunu oluştur
-        const contentClone = mainContent.cloneNode(true);
-
-        // İçeriği önbelleğe al
-        prevPageCache[currentUrl] = {
-          content: contentClone.innerHTML,
-          title: document.title
-        };
-
-        // Sadece son 5 sayfayı önbellekte tut
-        const cacheKeys = Object.keys(prevPageCache);
-        if (cacheKeys.length > 5) {
-          delete prevPageCache[cacheKeys[0]];
-        }
-      }
-    } catch (e) {
-      console.error("Sayfa önbelleğe alma hatası:", e);
-    }
-  });
+  // Başlık belirlemek için akıllı sistem
+  const pageTitle = document.title || 'Anasayfa';
+  determinePreviousPageTitle();
 
   fakeHeader.appendChild(prevPageTitle);
   prevPagePreview.appendChild(fakeHeader);
 
+  // İçerik alanı
+  const contentArea = document.createElement('div');
+  contentArea.className = 'ios-content-area';
+  contentArea.style.position = 'absolute';
+  contentArea.style.top = '54px';
+  contentArea.style.left = '0';
+  contentArea.style.width = '100%';
+  contentArea.style.height = 'calc(100% - 54px)';
+  contentArea.style.overflow = 'hidden';
+  contentArea.style.backgroundColor = getBackgroundColor();
+  prevPagePreview.appendChild(contentArea);
+
+  // Sahte önceki sayfa içeriği
+  const fakePrevPageContent = document.createElement('div');
+  fakePrevPageContent.className = 'ios-prev-page-content';
+  fakePrevPageContent.style.width = '100%';
+  fakePrevPageContent.style.height = '100%';
+  fakePrevPageContent.style.paddingBottom = '40px';
+  contentArea.appendChild(fakePrevPageContent);
+
   swipeContainer.appendChild(prevPagePreview);
 
-  // Kenar göstergesi (kullanıcıya kaydırmanın mevcut olduğunu gösterir)
+  // Soldan kenar göstergesi (kullanıcıya kaydırmanın mevcut olduğunu gösterir)
   const edgeIndicator = document.createElement('div');
   edgeIndicator.className = 'ios-edge-indicator';
   edgeIndicator.style.position = 'fixed';
   edgeIndicator.style.top = '0';
   edgeIndicator.style.left = '0';
-  edgeIndicator.style.width = '3px';
+  edgeIndicator.style.width = '2.5px';
   edgeIndicator.style.height = '100%';
-  edgeIndicator.style.background = 'linear-gradient(to right, rgba(0, 122, 255, 0.2), rgba(0, 122, 255, 0))';
+  edgeIndicator.style.background = 'linear-gradient(to right, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0))';
   edgeIndicator.style.pointerEvents = 'none';
   edgeIndicator.style.opacity = '0';
   document.body.appendChild(edgeIndicator);
 
   // Sayfa yüklendiğinde kenar göstergesini kısa süreliğine göster
-  setTimeout(() => {
-    edgeIndicator.style.transition = 'opacity 0.5s ease';
-    edgeIndicator.style.opacity = '1';
-
+  if (window.history.length > 1) {
     setTimeout(() => {
-      edgeIndicator.style.opacity = '0';
-    }, 1500);
-  }, 800);
+      edgeIndicator.style.transition = 'opacity 0.5s ease';
+      edgeIndicator.style.opacity = '1';
+
+      setTimeout(() => {
+        edgeIndicator.style.opacity = '0';
+      }, 1500);
+    }, 800);
+  }
 
   // Dokunma olayı dinleyicileri
   document.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -245,8 +192,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleTouchStart(event) {
     // Oyun kontrollerini etkilememek için bazı elementleri kontrol et
     const target = event.target;
-    if (target.closest('.game-container, canvas, .control-btn, .simon-pad')) {
-      return; // Oyun elementlerinde kaydırma özelliğini devre dışı bırak
+    if (target.closest('.game-container, canvas, .control-btn, .simon-pad, input, button, .card, audio, video, [role="button"]')) {
+      return; // Etkileşimli elementlerde kaydırma özelliğini devre dışı bırak
     }
 
     touchStartX = event.touches[0].clientX;
@@ -277,95 +224,143 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Sahte önceki sayfayı kur
   function setupFakePreviousPage() {
-    // Gelişmiş iOS görünümü için örüntüler oluştur
+    // Geçerli renk temasına göre stili ayarla
+    updateColorScheme();
+
+    // Önceki sayfa içeriği oluştur
     generatePlaceholderContent();
 
     // Hafif bir gecikmeyle başlığı göster (iOS tarzı animasyon)
     setTimeout(() => {
       prevPageTitle.style.opacity = '1';
       prevPageTitle.style.transform = 'translateX(0)';
-    }, 150);
+    }, 120);
+  }
+
+  // Önceki sayfa başlığını belirle
+  function determinePreviousPageTitle() {
+    // Referrer URL'den veya diğer yöntemlerle başlık belirleme
+    try {
+      if (document.referrer) {
+        const referrerUrl = new URL(document.referrer);
+        const pathSegments = referrerUrl.pathname.split('/').filter(Boolean);
+        
+        if (pathSegments.length > 0) {
+          const lastSegment = pathSegments[pathSegments.length - 1].replace(/\.html$/, "");
+          
+          if (lastSegment === 'index' || lastSegment === '') {
+            prevPageTitle.textContent = 'Anasayfa';
+          } else {
+            // URL'den başlık oluşturma
+            const cleanTitle = lastSegment
+              .replace(/[-_]/g, " ")
+              .replace(/\b\w/g, l => l.toUpperCase()); // Her kelimenin ilk harfini büyüt
+              
+            prevPageTitle.textContent = cleanTitle;
+          }
+        } else {
+          prevPageTitle.textContent = 'Anasayfa';
+        }
+      } else {
+        // Tahmini mantıkla başlığı belirle
+        const currentPath = window.location.pathname;
+        
+        if (currentPath.includes('games/')) {
+          prevPageTitle.textContent = 'Oyunlar';
+        } else if (currentPath.includes('profile')) {
+          prevPageTitle.textContent = 'Anasayfa';
+        } else {
+          prevPageTitle.textContent = 'Anasayfa';
+        }
+      }
+    } catch (e) {
+      prevPageTitle.textContent = 'Geri';
+    }
   }
 
   // Dolgu içeriği oluştur
   function generatePlaceholderContent() {
-    const referrer = document.referrer;
-    if (referrer && prevPageCache[window.location.pathname]) {
-      fakePrevPageContent.innerHTML = prevPageCache[window.location.pathname].content;
-      prevPageTitle.textContent = prevPageCache[window.location.pathname].title;
-    } else {
-      fakePrevPageContent.innerHTML = '';
+    fakePrevPageContent.innerHTML = '';
 
-      // Liste öğeleri
-      const listContainer = document.createElement('div');
-      listContainer.style.padding = '10px 15px';
+    // iOS tarzı liste içeriği
+    const listContainer = document.createElement('div');
+    listContainer.style.padding = '10px 15px';
 
-      // 6-8 arası rasgele sayıda liste öğesi oluştur
-      const numItems = Math.floor(Math.random() * 3) + 6;
+    // Rastgele sayıda liste öğesi oluştur
+    const numItems = Math.floor(Math.random() * 3) + 6;
 
-      for (let i = 0; i < numItems; i++) {
-        const listItem = document.createElement('div');
-        listItem.style.padding = '12px 0';
-        listItem.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
-        listItem.style.display = 'flex';
-        listItem.style.alignItems = 'center';
+    for (let i = 0; i < numItems; i++) {
+      const listItem = document.createElement('div');
+      listItem.style.padding = '12px 0';
+      listItem.style.borderBottom = isDarkMode() ? 
+        '0.5px solid rgba(255, 255, 255, 0.1)' : 
+        '0.5px solid rgba(0, 0, 0, 0.05)';
+      listItem.style.display = 'flex';
+      listItem.style.alignItems = 'center';
 
-        // Simge alanı
-        const iconPlaceholder = document.createElement('div');
-        iconPlaceholder.style.width = '32px';
-        iconPlaceholder.style.height = '32px';
-        iconPlaceholder.style.borderRadius = '8px';
-        iconPlaceholder.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 75%)`;
-        iconPlaceholder.style.marginRight = '15px';
-        iconPlaceholder.style.flexShrink = '0';
+      // İkon alanı
+      const iconPlaceholder = document.createElement('div');
+      iconPlaceholder.style.width = '32px';
+      iconPlaceholder.style.height = '32px';
+      iconPlaceholder.style.borderRadius = '8px';
+      iconPlaceholder.style.backgroundColor = getRandomPastelColor();
+      iconPlaceholder.style.marginRight = '15px';
+      iconPlaceholder.style.flexShrink = '0';
 
-        // Metin alanı
-        const textContainer = document.createElement('div');
-        textContainer.style.flex = '1';
+      // Metin alanı
+      const textContainer = document.createElement('div');
+      textContainer.style.flex = '1';
 
-        // Başlık
-        const title = document.createElement('div');
-        title.style.height = '14px';
-        title.style.borderRadius = '4px';
-        title.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-        title.style.width = `${40 + Math.random() * 40}%`;
-        title.style.marginBottom = '6px';
+      // Başlık
+      const title = document.createElement('div');
+      title.style.height = '14px';
+      title.style.borderRadius = '4px';
+      title.style.backgroundColor = isDarkMode() ? 
+        'rgba(255, 255, 255, 0.12)' : 
+        'rgba(0, 0, 0, 0.08)';
+      title.style.width = `${40 + Math.random() * 40}%`;
+      title.style.marginBottom = '6px';
 
-        // Alt metin
-        const subtitle = document.createElement('div');
-        subtitle.style.height = '10px';
-        subtitle.style.borderRadius = '4px';
-        subtitle.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
-        subtitle.style.width = `${60 + Math.random() * 30}%`;
+      // Alt metin
+      const subtitle = document.createElement('div');
+      subtitle.style.height = '10px';
+      subtitle.style.borderRadius = '4px';
+      subtitle.style.backgroundColor = isDarkMode() ? 
+        'rgba(255, 255, 255, 0.08)' : 
+        'rgba(0, 0, 0, 0.05)';
+      subtitle.style.width = `${60 + Math.random() * 30}%`;
 
-        textContainer.appendChild(title);
-        textContainer.appendChild(subtitle);
+      textContainer.appendChild(title);
+      textContainer.appendChild(subtitle);
 
-        // Okuma göstergesi
-        const chevron = document.createElement('div');
-        chevron.style.width = '8px';
-        chevron.style.height = '8px';
-        chevron.style.borderTop = '2px solid rgba(0, 0, 0, 0.2)';
-        chevron.style.borderRight = '2px solid rgba(0, 0, 0, 0.2)';
-        chevron.style.transform = 'rotate(45deg)';
-        chevron.style.marginLeft = '5px';
+      // İleri oku
+      const chevron = document.createElement('div');
+      chevron.style.width = '7px';
+      chevron.style.height = '7px';
+      chevron.style.borderTop = isDarkMode() ? 
+        '1.5px solid rgba(255, 255, 255, 0.3)' : 
+        '1.5px solid rgba(0, 0, 0, 0.2)';
+      chevron.style.borderRight = isDarkMode() ? 
+        '1.5px solid rgba(255, 255, 255, 0.3)' : 
+        '1.5px solid rgba(0, 0, 0, 0.2)';
+      chevron.style.transform = 'rotate(45deg)';
+      chevron.style.margin = '0 5px';
 
-        listItem.appendChild(iconPlaceholder);
-        listItem.appendChild(textContainer);
-        listItem.appendChild(chevron);
+      listItem.appendChild(iconPlaceholder);
+      listItem.appendChild(textContainer);
+      listItem.appendChild(chevron);
 
-        listContainer.appendChild(listItem);
-      }
-
-      fakePrevPageContent.appendChild(listContainer);
+      listContainer.appendChild(listItem);
     }
+
+    fakePrevPageContent.appendChild(listContainer);
   }
 
   // Dokunma hareketini işle
   function handleTouchMove(event) {
     if (!isSwipingBack) return;
 
-    // Varsayılan kaydırma davranışını önle
+    // Varsayılan davranışı önle
     event.preventDefault();
 
     const now = Date.now();
@@ -378,8 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const deltaX = touchCurrentX - touchStartX;
     const deltaY = touchCurrentY - touchStartY;
 
-    // Kullanıcı dikey olarak daha fazla kaydırıyorsa, geri kaydırma hareketini iptal et
-    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5 && Math.abs(deltaX) < 30) {
+    // Dikey kaydırma, yataydan çok daha fazlaysa iptal et
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 2 && Math.abs(deltaX) < 30) {
       handleTouchCancel();
       return;
     }
@@ -387,46 +382,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Hız hesapla (piksel/ms)
     if (dt > 0) {
       const instantVelocity = (touchCurrentX - lastX) / dt;
-      // Hız hesaplamasını daha hassas yap
-      velocity = instantVelocity * 0.3 + velocity * 0.7;
+      // Hızı daha pürüzsüz hesapla
+      velocity = instantVelocity * 0.5 + velocity * 0.5;
     }
 
     lastX = touchCurrentX;
     lastTime = now;
 
     if (deltaX > 0) {
-      // Maksimum mesafeye göre 0 ile 1 arasında ilerlemeyi hesapla
-      const maxDistance = window.innerWidth * 0.7; // %70 ekran genişliği maksimum mesafe
+      // Maksimum mesafeye göre ilerlemeyi hesapla
+      const maxDistance = window.innerWidth * 0.85;
       let progress = Math.min(deltaX / maxDistance, 1);
 
-      // Daha doğal görünüm için cubic-bezier eğrisi kullan
-      // Easing fonksiyonu uygulaması (easeOutCubic)
-      progress = 1 - Math.pow(1 - progress, 3);
+      // Eğri düzeltme
+      // Bu eğri, iOS sistemindeki gerçek hareket hissini verir
+      progress = cubicBezier(0.25, 0.46, 0.45, 0.94, progress);
 
-      // Öğelere dönüşüm uygula - daha akıcı bir kayma için eğri düzeltme
-      const translateX = deltaX * (1 - progress * 0.15);
+      // Öğelere dönüşüm uygula
+      const translateX = Math.min(deltaX, maxDistance);
       prevPagePreview.style.transform = `translateX(${translateX}px)`;
 
-      // Gölge efektini güçlendir
-      gradient.style.opacity = Math.min(1, progress * 1.5);
+      // Gölgeyi göster
+      gradient.style.opacity = Math.min(1, progress * 1.3);
 
-      // Overlay'ı daha yumuşak geçiş ile karart
-      const alpha = progress * 0.35; // Maksimum opaklık azaltıldı
+      // Overlay'ı karart
+      const alpha = Math.max(0, Math.min(0.4, progress * 0.4)); // 0.4 maksimum opaklık
       darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${alpha})`;
 
-      // Geri oku daha yumuşak göster
-      backArrow.style.opacity = Math.min(1, progress * 2);
+      // Geri oku göster
+      backArrow.style.opacity = Math.min(1, progress * 1.5);
 
       // Başlığı hareket ettir
       prevPageTitle.style.opacity = Math.min(1, progress * 1.5);
-      prevPageTitle.style.transform = `translateX(${Math.min(20, 20 - (progress * 20))}px)`;
+      prevPageTitle.style.transform = `translateX(${Math.max(0, 15 - progress * 15)}px)`;
 
-      // İlerleme %85'i geçtiğinde, "yapışkanlaştır" ve hafif titreşim efekti ekle
+      // İlerleme %90'ı aşarsa hafif yay efekti ekle
       if (progress > 0.85) {
         const overProgress = (progress - 0.85) / 0.15;
-        const springEffect = Math.sin(overProgress * Math.PI) * 3;
-        const extra = overProgress * 6 + springEffect;
-        prevPagePreview.style.transform = `translateX(${translateX + extra}px)`;
+        // Kademeli elastik efekt
+        const elasticity = Math.sin(overProgress * Math.PI / 2) * Math.min(10, overProgress * 20);
+        prevPagePreview.style.transform = `translateX(${translateX + elasticity}px)`;
       }
     }
   }
@@ -439,25 +434,25 @@ document.addEventListener('DOMContentLoaded', function() {
     touchEndY = touchCurrentY;
     touchEndTime = Date.now();
 
-    // Kaydırma verilerini hesapla
+    // Kaydırma mesafesi ve süresini hesapla
     const swipeDistance = touchEndX - touchStartX;
     const swipeTime = touchEndTime - touchStartTime;
     const swipeSpeed = swipeDistance / swipeTime;
 
-    // Gezinmeyi tetiklemek için gereken kaydırma 
-    // Ya mesafeye bağlı olarak veya hıza bağlı olarak (hızlı hareketler için)
-    const minDistance = window.innerWidth * 0.35; // Ekran genişliğinin %35'i
-    const minSpeed = 0.6; // Piksel/milisaniye
+    // Kaydırma mesafesi veya hızı yeterli ise (iOS tarzı)
+    const screenWidth = window.innerWidth;
+    const minDistance = screenWidth * 0.35; // Ekranın %35'i
+    const minVelocity = 0.5; // Piksel/ms (hızlı hareket)
+    
+    // Mevcut pozisyonu al
+    const currentPosition = parseFloat(getComputedStyle(prevPagePreview).transform.split(',')[4]) || 0;
 
-    // Mevcut transform pozisyonunu al
-    const currentTranslateX = parseFloat(prevPagePreview.style.transform.replace(/[^0-9\-.]/g, '')) || 0;
-
-    if ((swipeDistance > minDistance) || (swipeDistance > minSwipeDistance && velocity > minSpeed)) {
-      // Animasyonu tamamla
-      completeSwipeAnimation(currentTranslateX);
+    if (swipeDistance > minDistance || (swipeDistance > screenWidth * 0.15 && velocity > minVelocity)) {
+      // Geri gitme animasyonunu tamamla
+      completeSwipeAnimation(currentPosition);
     } else {
-      // Geri hareket iptal
-      cancelSwipeWithAnimation(currentTranslateX);
+      // Geri gitmeyi iptal et
+      cancelSwipeWithAnimation(currentPosition);
     }
 
     isSwipingBack = false;
@@ -470,69 +465,48 @@ document.addEventListener('DOMContentLoaded', function() {
       cancelAnimationFrame(animationId);
     }
 
-    const targetX = window.innerWidth * 1.05; // Hedefi biraz uzat (daha pürüzsüz geçiş için)
+    const targetX = window.innerWidth + 20; // Biraz fazla uzat
     const distance = targetX - currentPosition;
     const startTime = Date.now();
-    const maxDuration = 300; // Daha hızlı animasyon
+    let duration;
+    
+    // Hareketin şiddetine göre süreyi ayarla
+    if (velocity > 1.5) {
+      // Hızlı hareket - çok daha hızlı tamamla
+      duration = 220;
+    } else if (velocity > 0.8) {
+      // Orta hızlı hareket
+      duration = 260;
+    } else {
+      // Yavaş hareket
+      duration = 300;
+    }
 
-    // Hızı dikkate alarak süreyi hesapla ve hızlı hareketleri ödüllendir
-    let duration = Math.abs(distance / ((velocity + 0.2) * 1000));
-    duration = Math.min(maxDuration, Math.max(220, duration)); // 220-300ms arasında sınırla
-
-    // Yumuşak geçiş için animasyon zamanlama fonksiyonu
-    const timingFunction = bezier(0.23, 1, 0.32, 1); // cubic-bezier(0.23, 1, 0.32, 1)
-
+    // iOS'un yay efekti için gerçekçi bezier zamanlama fonksiyonu
     function animate() {
       const elapsed = Date.now() - startTime;
       const rawProgress = Math.min(elapsed / duration, 1);
-
-      // Özel bezier timing fonksiyonu uygula
-      const easedProgress = timingFunction(rawProgress);
+      
+      // iOS eğrisi - hızlanarak başlar, sonra yavaşlar
+      const easedProgress = cubicBezier(0.32, 0.72, 0, 1, rawProgress);
+      
       const newX = currentPosition + (distance * easedProgress);
 
-      // Öğeleri güncelle - hızlı ve akıcı animasyon
+      // Öğeleri güncelle
       prevPagePreview.style.transform = `translateX(${newX}px)`;
-      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.35 * (1 - easedProgress)})`;
-      backArrow.style.opacity = Math.max(0, 1 - easedProgress * 2);
-      prevPageTitle.style.opacity = Math.max(0, 1 - easedProgress * 2.5);
-
-      // Gölgeyi animasyonla azalt
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - easedProgress)})`;
       gradient.style.opacity = Math.max(0, 1 - easedProgress * 1.5);
+      
+      backArrow.style.opacity = Math.max(0, 1 - easedProgress * 1.5);
+      prevPageTitle.style.opacity = Math.max(0, 1 - easedProgress * 1.8);
 
       if (rawProgress < 1) {
         animationId = requestAnimationFrame(animate);
       } else {
-        // Animasyon tamamlandığında önceki sayfaya git
+        // Animasyon tamamlandı, önceki sayfaya git
         window.history.back();
         resetSwipeElements();
       }
-    }
-
-    // Cubic bezier easing fonksiyonu (daha pürüzsüz iOS animasyonları için)
-    function bezier(x1, y1, x2, y2) {
-      return function(t) {
-        if (t <= 0) return 0;
-        if (t >= 1) return 1;
-
-        // Newton-Raphson iterasyonu ile t değerini hesaplama
-        let x = t, t0, t1, t2, x2, d2, i;
-
-        for (i = 0; i < 4; ++i) {
-          t2 = x * x;
-          t1 = t2 * x;
-          x2 = 3 * x * (1 - x);
-
-          d2 = 3 * t2 * (1 - x) - t1 + x1;
-          t0 = 1 - x;
-          t1 = 3 * x * t0 * t0;
-          t2 = 3 * x * x * t0;
-
-          x -= (t1 + t2 + t1 - x1) / (t1 + 2 * t2 + 3 * t1);
-        }
-
-        // Y değerini hesapla
-        return 3 * x * (1 - x) * (1 - x) * y1 + 3 * x * x * (1 - x) * y2 + x * x * x;
-      };
     }
 
     animationId = requestAnimationFrame(animate);
@@ -541,13 +515,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Dokunma iptalini işle
   function handleTouchCancel() {
     if (isSwipingBack) {
-      const currentTranslateX = parseFloat(prevPagePreview.style.transform.replace(/[^0-9\-.]/g, '')) || 0;
-      cancelSwipeWithAnimation(currentTranslateX);
+      const currentPosition = parseFloat(getComputedStyle(prevPagePreview).transform.split(',')[4]) || 0;
+      cancelSwipeWithAnimation(currentPosition);
       isSwipingBack = false;
     }
   }
 
-  // Kaydırmayı yay etkisiyle iptal et
+  // Kaydırmayı iptal et ve geri animasyonu göster
   function cancelSwipeWithAnimation(currentPosition) {
     // Mevcut animasyonu iptal et
     if (animationId) {
@@ -557,79 +531,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetX = 0;
     const distance = targetX - currentPosition;
     const startTime = Date.now();
-    let duration = 280; // ms - daha hızlı geri dönüş
+    let duration = 280; // ms
 
-    // Mesafe kısa ise daha hızlı tamamla
-    if (Math.abs(currentPosition) < 100) {
+    // Mesafe çok kısaysa animasyonu hızlandır
+    if (Math.abs(currentPosition) < 60) {
       duration = 180;
     }
 
-    // iOS'un yay etkisi için özel timing fonksiyonu
-    const springTiming = bezierSpring(0.17, 0.67, 0.32, 0.98);
-
+    // iOS'un geri çekilme animasyonu için gerçekçi zamanlama fonksiyonu
     function animate() {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Yay etkisi için gelişmiş eğri fonksiyonu
-      const easedProgress = springTiming(progress);
-
-      // Yay efekti için ek salınım (küçük overshoot)
-      let newX = distance * easedProgress + currentPosition;
-
-      // Yay efekti ekle
-      if (progress > 0.7 && progress < 0.99) {
-        const springFactor = Math.sin((progress - 0.7) * 8) * (1 - progress) * 7;
-        newX += springFactor;
+      
+      // iOS'un gerçek hareket hissi için gelişmiş geri dönüş eğrisi
+      const easedProgress = cubicBezier(0.25, 0.74, 0.22, 0.99, progress);
+      
+      let newX = currentPosition * (1 - easedProgress);
+      
+      // İleri seviye elastik efekti ekle (0.7-0.95 aralığında)
+      if (progress > 0.7 && progress < 0.95) {
+        const springEffect = Math.sin((progress - 0.7) * 8) * 5 * (1 - progress);
+        newX += springEffect;
       }
 
-      // Öğeleri güncelle
+      // Tüm pozisyonları güncelle
       prevPagePreview.style.transform = `translateX(${newX}px)`;
-
-      // Overlay'ı yumuşak geçişle karartma
-      const alphaMultiplier = Math.max(0, 1 - easedProgress * 1.8); // Daha hızlı şeffaflaşma
-      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.35 * alphaMultiplier})`;
-
-      // Diğer görsel öğeleri güncelle
-      backArrow.style.opacity = `${Math.max(0, 1 - easedProgress * 2.2)}`;
-      prevPageTitle.style.opacity = `${Math.max(0, 1 - easedProgress * 2.5)}`;
-      gradient.style.opacity = `${Math.max(0, 1 - easedProgress * 2)}`;
-
-      // Başlık efektini geri al
-      prevPageTitle.style.transform = `translateX(${Math.min(20, easedProgress * 20)}px)`;
+      
+      // Arkaplanı karartmayı kaldır
+      const alphaProgress = cubicBezier(0.4, 0, 0.2, 1, easedProgress);
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - alphaProgress)})`;
+      
+      // Diğer elementleri güncelle
+      backArrow.style.opacity = Math.max(0, 1 - easedProgress * 1.8);
+      prevPageTitle.style.opacity = Math.max(0, 1 - easedProgress * 2);
+      prevPageTitle.style.transform = `translateX(${(easedProgress * 15)}px)`;
+      gradient.style.opacity = Math.max(0, 1 - easedProgress * 1.5);
 
       if (progress < 1) {
         animationId = requestAnimationFrame(animate);
       } else {
-        // Animasyon tamamlandığında elemanları sıfırla
+        // Animasyon tamamlandı
         resetSwipeElements();
       }
-    }
-
-    // Yay etkisi için özel bezier fonksiyonu
-    function bezierSpring(x1, y1, x2, y2) {
-      const bezierFn = function(t) {
-        if (t <= 0) return 0;
-        if (t >= 1) return 1;
-
-        let x = t, i;
-        for (i = 0; i < 8; ++i) {
-          const f = (3 * x * (1 - x) * (1 - x) * x1 + 3 * x * x * (1 - x) * x2 + x * x * x - t);
-          const df = (3 * (1 - x) * (1 - x) * x1 + 6 * x * (1 - x) * (x2 - x1) + 3 * x * x * (1 - x2));
-          if (Math.abs(f) < 1e-6) break;
-          x -= f / df;
-        }
-
-        return 3 * x * (1 - x) * (1 - x) * y1 + 3 * x * x * (1 - x) * y2 + x * x * x;
-      };
-
-      return bezierFn;
     }
 
     animationId = requestAnimationFrame(animate);
   }
 
-  // Kaydırma elemanlarını sıfırla
+  // Kaydırma elementlerini sıfırla
   function resetSwipeElements() {
     // Animasyonu temizle
     if (animationId) {
@@ -637,20 +586,117 @@ document.addEventListener('DOMContentLoaded', function() {
       animationId = null;
     }
 
-    // Geçişleri sıfırla
-    prevPagePreview.style.transition = '';
-    darkOverlay.style.transition = '';
-    prevPageTitle.style.transition = '';
-    prevPageTitle.style.opacity = '0';
-    prevPageTitle.style.transform = 'translateX(20px)';
-
-    // Dönüşümleri ve stilleri sıfırla
+    // Tüm elementleri varsayılan konumlarına getir
     prevPagePreview.style.transform = 'translateX(0)';
+    prevPagePreview.style.transition = 'none';
     darkOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    darkOverlay.style.transition = 'none';
+    
     backArrow.style.opacity = '0';
-
+    prevPageTitle.style.opacity = '0';
+    prevPageTitle.style.transform = 'translateX(15px)';
+    gradient.style.opacity = '0';
+    
     // Konteyneri gizle
     swipeContainer.style.visibility = 'hidden';
+    
+    // İçeriği temizle
     fakePrevPageContent.innerHTML = '';
+  }
+
+  // Yardımcı fonksiyonlar
+  function getRandomPastelColor() {
+    // Koyu mod için daha koyu, açık mod için pastel renkler
+    if (isDarkMode()) {
+      // Koyu mod için daha canlı renkler
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 65%, 35%)`;
+    } else {
+      // Açık mod için pastel renkler
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 70%, 80%)`;
+    }
+  }
+
+  // Koyu mod tespiti
+  function isDarkMode() {
+    // Kullanıcının tercihini kontrol et
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return true;
+    }
+    
+    // Sayfanın arkaplan rengi koyu mu kontrol et
+    const bodyBg = getComputedStyle(document.body).backgroundColor;
+    if (bodyBg) {
+      const rgb = bodyBg.match(/\d+/g);
+      if (rgb && rgb.length >= 3) {
+        // RGB değerlerinin ortalaması 128'den küçükse koyu mod
+        const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
+        return brightness < 128;
+      }
+    }
+    
+    // Sayfada .dark-theme sınıfı var mı kontrol et
+    if (document.documentElement.classList.contains('dark-theme') || 
+        document.body.classList.contains('dark-theme')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  // Arkaplan rengini belirle
+  function getBackgroundColor() {
+    if (isDarkMode()) {
+      return '#1c1c1e'; // iOS koyu mod arka planı
+    } else {
+      return '#f2f2f7'; // iOS açık mod arka planı
+    }
+  }
+
+  // Renk şemasını güncelle
+  function updateColorScheme() {
+    const isDark = isDarkMode();
+    
+    prevPagePreview.style.backgroundColor = isDark ? '#1c1c1e' : '#f2f2f7';
+    contentArea.style.backgroundColor = isDark ? '#1c1c1e' : '#f2f2f7';
+    fakeHeader.style.backgroundColor = isDark ? 'rgba(29, 29, 31, 0.8)' : 'rgba(248, 248, 248, 0.8)';
+    fakeHeader.style.borderBottom = isDark ? '0.5px solid rgba(255, 255, 255, 0.1)' : '0.5px solid rgba(0, 0, 0, 0.1)';
+    prevPageTitle.style.color = isDark ? '#fff' : '#000';
+    
+    backArrow.style.borderColor = '#007aff'; // iOS mavi korunsun
+  }
+
+  // Cubic bezier easing fonksiyonu
+  function cubicBezier(x1, y1, x2, y2, t) {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    
+    // Newton-Raphson iterasyon yöntemiyle t değeri hesaplama
+    // Bu matematiksel algoritma, iOS'un animasyon eğrilerini taklit eder
+    let x = t, i;
+    const epsilon = 1e-6;
+    
+    for (i = 0; i < 8; i++) {
+      const currentT = getCubicBezierPoint(x1, x2, x);
+      const derivative = getCubicBezierDerivative(x1, x2, x);
+      
+      if (Math.abs(currentT - t) < epsilon) break;
+      
+      x = x - (currentT - t) / derivative;
+      
+      if (x <= 0) x = 0;
+      if (x >= 1) x = 1;
+    }
+    
+    return getCubicBezierPoint(y1, y2, x);
+  }
+  
+  function getCubicBezierPoint(p1, p2, t) {
+    return 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t;
+  }
+  
+  function getCubicBezierDerivative(p1, p2, t) {
+    return 3 * (1 - t) * (1 - t) * p1 + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (1 - p2);
   }
 });

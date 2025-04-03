@@ -1,10 +1,10 @@
-
 /* Gelişmiş iOS-tarzı kaydırma navigasyon stilleri */
 .ios-swipe-container {
   will-change: transform, opacity;
   overflow: hidden;
   background-color: transparent;
-  transform: translateZ(0); /* GPU hızlandırma */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   z-index: 99999;
@@ -12,64 +12,71 @@
 }
 
 .ios-swipe-overlay {
-  transition: background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 0.25s cubic-bezier(0.22, 0.84, 0.38, 0.98);
   will-change: background-color;
-  transform: translateZ(0); /* GPU hızlandırma */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .ios-prev-page-preview {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
   color: #000;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   will-change: transform;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25), 0 0 10px rgba(0, 0, 0, 0.15);
-  border-radius: 0 12px 12px 0;
-  transform: translateZ(0); /* GPU hızlandırma */
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 0 10px 10px 0;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   backface-visibility: hidden;
-  perspective: 1000px;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .ios-back-arrow {
-  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.2s cubic-bezier(0.22, 0.84, 0.38, 0.98);
   z-index: 10;
   will-change: opacity;
-  transform: translateZ(0); /* GPU hızlandırma */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .ios-edge-indicator {
   pointer-events: none;
   z-index: 9999;
   will-change: opacity;
-  transform: translateZ(0); /* GPU hızlandırma */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .ios-fake-header {
-  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.2s cubic-bezier(0.22, 0.84, 0.38, 0.98);
   will-change: opacity;
-  transform: translateZ(0); /* GPU hızlandırma */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 5;
 }
 
 .ios-prev-page-title {
-  transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
-              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.2s cubic-bezier(0.22, 0.84, 0.38, 0.98), 
+              transform 0.2s cubic-bezier(0.22, 0.84, 0.38, 0.98);
   will-change: opacity, transform;
-  transform: translateZ(0); /* GPU hızlandırma */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .ios-prev-page-content {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 30px;
-  transform: translateZ(0); /* GPU hızlandırma */
-  -webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%);
-  mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 10%);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 8%);
+  mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 8%);
 }
 
 /* Kenar göstergesi için etki geliştirmeleri */
@@ -86,8 +93,106 @@ html, body {
   touch-action: pan-y;
 }
 
-/* Animasyonlar sırasında potansiyel beyaz titremeleri önle */
+/* Safari ve iOS için güvenilir rendering */
 .ios-swipe-container * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Cihaza özel optimizasyonlar */
+@media (max-width: 390px) {
+  .ios-prev-page-preview {
+    width: 88%;
+  }
+}
+
+@media (min-width: 391px) and (max-width: 767px) {
+  .ios-prev-page-preview {
+    width: 88%;
+  }
+}
+
+@media (min-width: 768px) {
+  .ios-prev-page-preview {
+    width: 420px;
+    max-width: 88%;
+  }
+}
+
+/* Koyu mod desteği */
+@media (prefers-color-scheme: dark) {
+  .ios-prev-page-preview {
+    background-color: #1c1c1e !important;
+    color: #fff !important;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .ios-fake-header {
+    background-color: rgba(29, 29, 31, 0.85) !important;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .ios-prev-page-title {
+    color: #fff !important;
+  }
+}
+
+/* Açık/koyu tema desteği */
+.dark-theme .ios-prev-page-preview {
+  background-color: #1c1c1e !important;
+  color: #fff !important;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark-theme .ios-fake-header {
+  background-color: rgba(29, 29, 31, 0.85) !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-theme .ios-prev-page-title {
+  color: #fff !important;
+}
+
+/* Özellikle iOS 16+ için geliştirilmiş optimize ayarlar */
+@supports (-webkit-touch-callout: none) {
+  .ios-prev-page-preview, 
+  .ios-swipe-overlay,
+  .ios-fake-header,
+  .ios-prev-page-title,
+  .ios-back-arrow,
+  .ios-edge-indicator {
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .ios-prev-page-preview {
+    border-radius: 0 13px 13px 0;
+  }
+}
+
+/* iOS 15+ stili yuvarlak köşe geliştirmeleri */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  .ios-prev-page-preview {
+    border-radius: 0 13px 13px 0;
+  }
+}
+
+/* Gerçek iOS cihazları için daha keskin köşeler */
+@supports (border-radius: max(0px)) {
+  .ios-prev-page-preview {
+    border-radius: 0 10px 10px 0;
+  }
+}
+
+/* 60fps animasyon için ekstra optimizasyonlar */
+.ios-swipe-container, 
+.ios-prev-page-preview, 
+.ios-swipe-overlay, 
+.ios-back-arrow, 
+.ios-prev-page-title {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -115,84 +220,9 @@ html, body {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Cihaza özel optimizasyonlar */
-@media (max-width: 390px) {
-  .ios-prev-page-preview {
-    width: 85%;
-  }
-}
-
-@media (min-width: 391px) and (max-width: 767px) {
-  .ios-prev-page-preview {
-    width: 88%;
-  }
-}
-
-@media (min-width: 768px) {
-  .ios-prev-page-preview {
-    width: 450px;
-    max-width: 90%;
-  }
-}
-
-/* Koyu mod desteği - kontrast ve renk iyileştirmeleri */
-@media (prefers-color-scheme: dark) {
-  .ios-prev-page-preview {
-    background-color: #1c1c1e;
-    color: #fff;
-  }
-  
-  .ios-fake-header {
-    background-color: rgba(28, 28, 30, 0.92);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-  }
-  
-  .ios-prev-page-title {
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-  
-  .ios-back-arrow {
-    border-color: #0a84ff;
-  }
-  
-  /* Koyu modda daha iyi kontrast için koyu overlay */
-  .ios-swipe-overlay {
-    background-color: rgba(0, 0, 0, 0);
-  }
-  
-  /* Koyu modda gradyan iyileştirme */
-  .ios-prev-page-preview .ios-edge-puller {
-    background: linear-gradient(to right, rgba(28, 28, 30, 0), rgba(28, 28, 30, 0.5));
-  }
-  
-  /* Koyu modda gölgeler */
-  .ios-prev-page-preview {
-    box-shadow: 
-      0 0 25px rgba(0, 0, 0, 0.5),
-      0 0 10px rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* Açık/koyu tema desteği */
-.dark-theme .ios-prev-page-preview {
-  background-color: #1c1c1e;
-  color: #fff;
-}
-
-.dark-theme .ios-fake-header {
-  background-color: rgba(28, 28, 30, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark-theme .ios-prev-page-title {
-  color: #fff;
-}
-
-.dark-theme .ios-back-arrow {
-  border-color: #0a84ff;
+/* Dokunma hedefi geliştirmeleri */
+.ios-edge-indicator {
+  width: 8px !important;
 }
 
 /* Tüm tarayıcılarda daha iyi performans */
@@ -214,16 +244,4 @@ main, .container, #content {
               opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   transform: translateZ(0);
   backface-visibility: hidden;
-}
-
-/* Dokunma hedefi geliştirmeleri */
-.ios-edge-indicator {
-  width: 8px !important;
-}
-
-/* iOS 15+ stili yuvarlak köşe geliştirmeleri */
-@media screen and (-webkit-min-device-pixel-ratio: 2) {
-  .ios-prev-page-preview {
-    border-radius: 0 14px 14px 0;
-  }
 }
