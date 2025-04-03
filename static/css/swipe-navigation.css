@@ -3,25 +3,45 @@
 .ios-swipe-container {
   will-change: transform;
   overflow: hidden;
+  background-color: transparent;
+}
+
+.ios-swipe-overlay {
+  transition: background-color 0.2s ease;
 }
 
 .ios-prev-page-preview {
   display: flex;
-  align-items: center;
-  background-color: #f8f8f8;
-  color: #333;
-  font-size: 18px;
-  font-weight: 500;
-  transition: transform 0.05s linear;
+  flex-direction: column;
+  background-color: #ffffff;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  will-change: transform;
+  overflow: hidden;
 }
 
 .ios-back-arrow {
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
+  z-index: 10;
 }
 
 .ios-edge-indicator {
   pointer-events: none;
   z-index: 9999;
+}
+
+.ios-fake-header {
+  transition: opacity 0.2s ease;
+}
+
+.ios-prev-page-title {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ios-prev-page-content {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 30px;
 }
 
 /* Add subtle animation on page load */
@@ -31,6 +51,41 @@
   100% { opacity: 0; }
 }
 
-body {
-  overscroll-behavior-x: none; /* Prevent browser's own overscroll effect */
+/* Prvent browser's own elastic scrolling effect while swiping */
+html, body {
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
+}
+
+/* Smoother animations on mobile */
+@media (max-width: 767px) {
+  .ios-swipe-container,
+  .ios-prev-page-preview,
+  .ios-swipe-overlay {
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+}
+
+/* Device specific optimizations */
+@media (max-width: 390px) {
+  .ios-prev-page-preview {
+    width: 85%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .ios-prev-page-preview {
+    background-color: #1c1c1e;
+    color: #fff;
+  }
+  
+  .ios-fake-header {
+    background-color: rgba(28, 28, 30, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .ios-prev-page-title {
+    color: #fff;
+  }
 }

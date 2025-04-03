@@ -1,25 +1,35 @@
 
 /**
  * Enhanced iOS-like swipe navigation
- * Provides fluid, realistic edge-swipe back navigation with iOS-like animation
+ * Simulates iOS 16+ style edge swipe back navigation with realistic physics
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Main variables
+  // Ana değişkenler
   let touchStartX = 0;
   let touchStartY = 0;
   let touchCurrentX = 0;
   let touchCurrentY = 0;
   let touchEndX = 0;
   let touchEndY = 0;
-  const minSwipeDistance = 80; // Minimum distance required for a swipe
-  const maxSwipeTime = 300; // Maximum time in ms for a swipe
-  const edgeSize = 20; // Size of the edge area in pixels (smaller for more precise edge detection)
+  const minSwipeDistance = 80; // Minimum kaydırma mesafesi
+  const maxSwipeTime = 300; // Maksimum kaydırma süresi (ms)
+  const edgeSize = 20; // Kenar bölgesi büyüklüğü (piksel)
   let touchStartTime = 0;
   let touchEndTime = 0;
   let isSwipingBack = false;
   let initialScrollY = 0;
+  let velocity = 0; // Hız değişkeni
+  let lastX = 0;
+  let lastTime = 0;
   
-  // Create overlay container (will contain both the dark overlay and the screenshot)
+  // Önceki sayfanın ekran görüntüsünü simüle etmek için
+  let fakePrevPageContent = null;
+  const cachedImages = {};
+  
+  // Animasyon durumu
+  let animationId = null;
+  
+  // Kapsayıcı konteynerı oluştur
   const swipeContainer = document.createElement('div');
   swipeContainer.className = 'ios-swipe-container';
   swipeContainer.style.position = 'fixed';
@@ -30,9 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
   swipeContainer.style.pointerEvents = 'none';
   swipeContainer.style.zIndex = '9999';
   swipeContainer.style.visibility = 'hidden';
+  swipeContainer.style.overflow = 'hidden';
   document.body.appendChild(swipeContainer);
   
-  // Create dark overlay (mimics iOS darkening effect during swipe)
+  // Karartma overlay'ı oluştur
   const darkOverlay = document.createElement('div');
   darkOverlay.className = 'ios-swipe-overlay';
   darkOverlay.style.position = 'absolute';
@@ -41,51 +52,137 @@ document.addEventListener('DOMContentLoaded', function() {
   darkOverlay.style.width = '100%';
   darkOverlay.style.height = '100%';
   darkOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-  darkOverlay.style.transition = 'background-color 0.1s ease';
+  darkOverlay.style.transition = 'none';
   swipeContainer.appendChild(darkOverlay);
   
-  // Create "previous page" preview element (mimics iOS page preview)
+  // Önceki sayfa önizleme elemanı
   const prevPagePreview = document.createElement('div');
   prevPagePreview.className = 'ios-prev-page-preview';
   prevPagePreview.style.position = 'absolute';
   prevPagePreview.style.top = '0';
-  prevPagePreview.style.left = '-100%'; // Start off-screen
-  prevPagePreview.style.width = '85%'; // iOS style - doesn't take full width
+  prevPagePreview.style.left = '-100%'; // Ekran dışından başla
+  prevPagePreview.style.width = '90%'; // iOS stili genişlik
   prevPagePreview.style.height = '100%';
   prevPagePreview.style.backgroundColor = '#f8f8f8';
   prevPagePreview.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
-  prevPagePreview.style.borderRadius = '0 3px 3px 0'; // Slight rounding on right edge
+  prevPagePreview.style.borderRadius = '0 4px 4px 0'; // Sağ kenarda hafif yuvarlama
   prevPagePreview.style.transform = 'translateX(0)';
   prevPagePreview.style.willChange = 'transform';
   
-  // Add subtle gradient to edge
+  // Kenar gölgesi oluştur (daha gerçekçi görünüm için)
   const gradient = document.createElement('div');
   gradient.style.position = 'absolute';
   gradient.style.top = '0';
   gradient.style.right = '0';
   gradient.style.width = '6px';
   gradient.style.height = '100%';
-  gradient.style.background = 'linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1))';
+  gradient.style.background = 'linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.15))';
+  gradient.style.pointerEvents = 'none';
   prevPagePreview.appendChild(gradient);
   
-  // Create back arrow indicator
+  // iOS tarzı yapışkan kısıtlama efekti için çekme bölümü
+  const edgePuller = document.createElement('div');
+  edgePuller.className = 'ios-edge-puller';
+  edgePuller.style.position = 'absolute';
+  edgePuller.style.top = '0';
+  edgePuller.style.left = '-10px';
+  edgePuller.style.width = '10px';
+  edgePuller.style.height = '100%';
+  edgePuller.style.opacity = '0';
+  prevPagePreview.appendChild(edgePuller);
+  
+  // Geri oku simgesi
   const backArrow = document.createElement('div');
   backArrow.className = 'ios-back-arrow';
   backArrow.style.position = 'absolute';
   backArrow.style.top = '50%';
-  backArrow.style.left = '12px';
-  backArrow.style.width = '12px';
-  backArrow.style.height = '12px';
-  backArrow.style.borderTop = '2px solid #007aff';
-  backArrow.style.borderLeft = '2px solid #007aff';
+  backArrow.style.left = '15px';
+  backArrow.style.width = '14px';
+  backArrow.style.height = '14px';
+  backArrow.style.borderTop = '2.5px solid #007aff';
+  backArrow.style.borderLeft = '2.5px solid #007aff';
+  backArrow.style.borderRadius = '1px';
   backArrow.style.transform = 'translateY(-50%) rotate(-45deg)';
   backArrow.style.opacity = '0';
-  backArrow.style.transition = 'opacity 0.2s ease';
+  backArrow.style.transition = 'opacity 0.15s ease';
   prevPagePreview.appendChild(backArrow);
+  
+  // İçerik alanı
+  const contentArea = document.createElement('div');
+  contentArea.className = 'ios-content-area';
+  contentArea.style.position = 'absolute';
+  contentArea.style.top = '55px'; // Navbar altından başla
+  contentArea.style.left = '0';
+  contentArea.style.width = '100%';
+  contentArea.style.height = 'calc(100% - 55px)';
+  contentArea.style.overflow = 'hidden';
+  contentArea.style.backgroundColor = '#f8f8f8';
+  prevPagePreview.appendChild(contentArea);
+  
+  // Sahte önceki sayfanın içeriğini oluştur (çerçeve olarak)
+  fakePrevPageContent = document.createElement('div');
+  fakePrevPageContent.className = 'ios-prev-page-content';
+  fakePrevPageContent.style.width = '100%';
+  fakePrevPageContent.style.height = '100%';
+  contentArea.appendChild(fakePrevPageContent);
+  
+  // Sahte header oluştur
+  const fakeHeader = document.createElement('div');
+  fakeHeader.className = 'ios-fake-header';
+  fakeHeader.style.position = 'absolute';
+  fakeHeader.style.top = '0';
+  fakeHeader.style.left = '0';
+  fakeHeader.style.width = '100%';
+  fakeHeader.style.height = '55px';
+  fakeHeader.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+  fakeHeader.style.backdropFilter = 'blur(10px)';
+  fakeHeader.style.borderBottom = '1px solid rgba(0, 0, 0, 0.1)';
+  fakeHeader.style.display = 'flex';
+  fakeHeader.style.alignItems = 'center';
+  fakeHeader.style.padding = '0 15px';
+  fakeHeader.style.zIndex = '2';
+  
+  // Önceki sayfa başlığı
+  const prevPageTitle = document.createElement('div');
+  prevPageTitle.className = 'ios-prev-page-title';
+  prevPageTitle.style.color = '#000';
+  prevPageTitle.style.fontSize = '17px';
+  prevPageTitle.style.fontWeight = '600';
+  prevPageTitle.style.textAlign = 'center';
+  prevPageTitle.style.width = '100%';
+  prevPageTitle.style.overflow = 'hidden';
+  prevPageTitle.style.textOverflow = 'ellipsis';
+  prevPageTitle.style.whiteSpace = 'nowrap';
+  prevPageTitle.style.opacity = '0';
+  prevPageTitle.style.transform = 'translateX(20px)';
+  prevPageTitle.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  prevPageTitle.textContent = 'Önceki Sayfa';
+  
+  // Başlık belirlemek için önceki sayfalara bakalım
+  if (document.referrer) {
+    try {
+      const referrerUrl = new URL(document.referrer);
+      const pathSegments = referrerUrl.pathname.split('/').filter(Boolean);
+      if (pathSegments.length > 0) {
+        const lastSegment = pathSegments[pathSegments.length - 1];
+        if (lastSegment) {
+          // Dosya uzantısını kaldır ve tire/-/alt çizgilerle değiştir
+          const cleanTitle = lastSegment.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+          // İlk harfi büyük yap
+          prevPageTitle.textContent = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+        }
+      }
+    } catch (e) {
+      console.error("URL ayrıştırma hatası:", e);
+    }
+  }
+  
+  fakeHeader.appendChild(prevPageTitle);
+  prevPagePreview.appendChild(fakeHeader);
   
   swipeContainer.appendChild(prevPagePreview);
   
-  // Create subtle edge indicator to show user swipe is available
+  // Kenar göstergesi (kullanıcıya kaydırmanın mevcut olduğunu gösterir)
   const edgeIndicator = document.createElement('div');
   edgeIndicator.className = 'ios-edge-indicator';
   edgeIndicator.style.position = 'fixed';
@@ -93,164 +190,348 @@ document.addEventListener('DOMContentLoaded', function() {
   edgeIndicator.style.left = '0';
   edgeIndicator.style.width = '3px';
   edgeIndicator.style.height = '100%';
-  edgeIndicator.style.backgroundColor = 'rgba(0, 122, 255, 0.1)';
+  edgeIndicator.style.background = 'linear-gradient(to right, rgba(0, 122, 255, 0.2), rgba(0, 122, 255, 0))';
   edgeIndicator.style.pointerEvents = 'none';
   edgeIndicator.style.opacity = '0';
   document.body.appendChild(edgeIndicator);
   
-  // Show edge indicator briefly on page load
+  // Sayfa yüklendiğinde kenar göstergesini kısa süreliğine göster
   setTimeout(() => {
     edgeIndicator.style.transition = 'opacity 0.5s ease';
     edgeIndicator.style.opacity = '1';
     
     setTimeout(() => {
       edgeIndicator.style.opacity = '0';
-    }, 2000);
-  }, 1000);
+    }, 1500);
+  }, 800);
   
-  // Add event listeners for touch events
+  // Dokunma olayı dinleyicileri
   document.addEventListener('touchstart', handleTouchStart, { passive: false });
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
   document.addEventListener('touchend', handleTouchEnd, { passive: false });
   document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
   
-  // Handle touch start
+  // Dokunma başlangıcını işle
   function handleTouchStart(event) {
+    // Oyun kontrollerini etkilememek için bazı elementleri kontrol et
+    const target = event.target;
+    if (target.closest('.game-container, canvas, .control-btn, .simon-pad')) {
+      return; // Oyun elementlerinde kaydırma özelliğini devre dışı bırak
+    }
+
     touchStartX = event.touches[0].clientX;
     touchStartY = event.touches[0].clientY;
     touchCurrentX = touchStartX;
     touchCurrentY = touchStartY;
-    touchStartTime = new Date().getTime();
+    lastX = touchStartX;
+    lastTime = Date.now();
+    touchStartTime = lastTime;
     initialScrollY = window.scrollY;
+    velocity = 0;
     
-    // Check if touch started from left edge
+    // Dokunma sol kenarda mı kontrol et
     if (touchStartX <= edgeSize) {
-      // Only enable edge swipe if we have browser history to go back to
+      // Sadece geçmiş varsa kenar kaydırmayı etkinleştir
       if (window.history.length > 1) {
         isSwipingBack = true;
         
-        // Prepare animation elements
+        // Animasyon elementlerini hazırla
         swipeContainer.style.visibility = 'visible';
+        setupFakePreviousPage();
         
-        // Show back arrow
-        backArrow.style.opacity = '0.8';
-        
-        // Prevent default to avoid scrolling while swiping from edge
+        // Varsayılan davranışı önle
         event.preventDefault();
       }
     }
   }
   
-  // Handle touch move
+  // Sahte önceki sayfayı kur
+  function setupFakePreviousPage() {
+    // Gelişmiş iOS görünümü için örüntüler oluştur
+    generatePlaceholderContent();
+    
+    // Hafif bir gecikmeyle başlığı göster (iOS tarzı animasyon)
+    setTimeout(() => {
+      prevPageTitle.style.opacity = '1';
+      prevPageTitle.style.transform = 'translateX(0)';
+    }, 150);
+  }
+  
+  // Dolgu içeriği oluştur
+  function generatePlaceholderContent() {
+    fakePrevPageContent.innerHTML = '';
+    
+    // Liste öğeleri
+    const listContainer = document.createElement('div');
+    listContainer.style.padding = '10px 15px';
+    
+    // 6-8 arası rasgele sayıda liste öğesi oluştur
+    const numItems = Math.floor(Math.random() * 3) + 6;
+    
+    for (let i = 0; i < numItems; i++) {
+      const listItem = document.createElement('div');
+      listItem.style.padding = '12px 0';
+      listItem.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
+      listItem.style.display = 'flex';
+      listItem.style.alignItems = 'center';
+      
+      // Simge alanı
+      const iconPlaceholder = document.createElement('div');
+      iconPlaceholder.style.width = '32px';
+      iconPlaceholder.style.height = '32px';
+      iconPlaceholder.style.borderRadius = '8px';
+      iconPlaceholder.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 75%)`;
+      iconPlaceholder.style.marginRight = '15px';
+      iconPlaceholder.style.flexShrink = '0';
+      
+      // Metin alanı
+      const textContainer = document.createElement('div');
+      textContainer.style.flex = '1';
+      
+      // Başlık
+      const title = document.createElement('div');
+      title.style.height = '14px';
+      title.style.borderRadius = '4px';
+      title.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+      title.style.width = `${40 + Math.random() * 40}%`;
+      title.style.marginBottom = '6px';
+      
+      // Alt metin
+      const subtitle = document.createElement('div');
+      subtitle.style.height = '10px';
+      subtitle.style.borderRadius = '4px';
+      subtitle.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+      subtitle.style.width = `${60 + Math.random() * 30}%`;
+      
+      textContainer.appendChild(title);
+      textContainer.appendChild(subtitle);
+      
+      // Okuma göstergesi
+      const chevron = document.createElement('div');
+      chevron.style.width = '8px';
+      chevron.style.height = '8px';
+      chevron.style.borderTop = '2px solid rgba(0, 0, 0, 0.2)';
+      chevron.style.borderRight = '2px solid rgba(0, 0, 0, 0.2)';
+      chevron.style.transform = 'rotate(45deg)';
+      chevron.style.marginLeft = '5px';
+      
+      listItem.appendChild(iconPlaceholder);
+      listItem.appendChild(textContainer);
+      listItem.appendChild(chevron);
+      
+      listContainer.appendChild(listItem);
+    }
+    
+    fakePrevPageContent.appendChild(listContainer);
+  }
+  
+  // Dokunma hareketini işle
   function handleTouchMove(event) {
     if (!isSwipingBack) return;
     
-    // Prevent default scrolling behavior when swiping from edge
+    // Varsayılan kaydırma davranışını önle
     event.preventDefault();
+    
+    const now = Date.now();
+    const dt = now - lastTime;
     
     touchCurrentX = event.touches[0].clientX;
     touchCurrentY = event.touches[0].clientY;
     
-    // Calculate horizontal and vertical distance
+    // Yatay ve dikey mesafeyi hesapla
     const deltaX = touchCurrentX - touchStartX;
     const deltaY = touchCurrentY - touchStartY;
     
-    // If user starts swiping more vertically than horizontally, cancel the back gesture
+    // Kullanıcı dikey olarak daha fazla kaydırıyorsa, geri kaydırma hareketini iptal et
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5 && Math.abs(deltaX) < 30) {
       handleTouchCancel();
       return;
     }
     
+    // Hız hesapla (piksel/ms)
+    if (dt > 0) {
+      const instantVelocity = (touchCurrentX - lastX) / dt;
+      // Ani hızın %20'sini ve önceki hızın %80'ini ağırlıklı ortalamasını al
+      velocity = instantVelocity * 0.2 + velocity * 0.8;
+    }
+    
+    lastX = touchCurrentX;
+    lastTime = now;
+    
     if (deltaX > 0) {
-      // Calculate progress from 0 to 1 based on swipe distance
-      const maxDistance = window.innerWidth * 0.6; // Max distance for 100% progress
-      const progress = Math.min(deltaX / maxDistance, 1);
+      // Maksimum mesafeye göre 0 ile 1 arasında ilerlemeyi hesapla
+      const maxDistance = window.innerWidth * 0.6; // %60 ekran genişliği maksimum mesafe
+      let progress = Math.min(deltaX / maxDistance, 1);
       
-      // Apply transform to preview element (multiplied by width to convert to actual pixels)
-      const translateX = deltaX * (1 - progress * 0.4); // Slow down as we swipe further
+      // iOS tarzı doğal hızlanma/yavaşlama için kübik eğri
+      progress = Math.pow(progress, 0.8);
+      
+      // Öğelere dönüşüm uygula
+      const translateX = deltaX * (0.95 - progress * 0.3); // İlerledikçe yavaşla
       prevPagePreview.style.transform = `translateX(${translateX}px)`;
       
-      // Darken the overlay based on progress
+      // Overlay'ı ilerlemeye göre karart
       darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${progress * 0.4})`;
       
-      // Animate back arrow opacity based on progress
-      backArrow.style.opacity = Math.min(0.8, progress * 2);
+      // İlerlemeye göre geri oku
+      backArrow.style.opacity = Math.min(1, progress * 2.5);
+      
+      // İlerleme %80'i geçtiğinde, "yapışkanlaştır"
+      if (progress > 0.8) {
+        const overProgress = (progress - 0.8) / 0.2; // 0-1 arasında skalala
+        const extra = overProgress * 5; // İlave piksel miktarı
+        prevPagePreview.style.transform = `translateX(${translateX + extra}px)`;
+      }
     }
   }
   
-  // Handle touch end
+  // Dokunma sonlandırmayı işle
   function handleTouchEnd(event) {
     if (!isSwipingBack) return;
     
     touchEndX = touchCurrentX;
     touchEndY = touchCurrentY;
-    touchEndTime = new Date().getTime();
+    touchEndTime = Date.now();
     
-    // Calculate swipe data
+    // Kaydırma verilerini hesapla
     const swipeDistance = touchEndX - touchStartX;
     const swipeTime = touchEndTime - touchStartTime;
     const swipeSpeed = swipeDistance / swipeTime;
     
-    // Determine if swipe should trigger navigation
-    // Either by distance or by speed (for quick flicks)
-    const minDistance = window.innerWidth * 0.3; // 30% of screen width
-    const minSpeed = 0.5; // Pixels per millisecond
+    // Gezinmeyi tetiklemek için gereken kaydırma 
+    // Ya mesafeye bağlı olarak veya hıza bağlı olarak (hızlı hareketler için)
+    const minDistance = window.innerWidth * 0.35; // Ekran genişliğinin %35'i
+    const minSpeed = 0.6; // Piksel/milisaniye
     
-    if ((swipeDistance > minDistance) || (swipeDistance > minSwipeDistance && swipeSpeed > minSpeed)) {
-      // Complete the animation with a transition
-      prevPagePreview.style.transition = 'transform 0.25s ease-out';
-      prevPagePreview.style.transform = `translateX(${window.innerWidth * 0.85}px)`;
-      
-      darkOverlay.style.transition = 'background-color 0.25s ease-out';
-      darkOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-      
-      // Navigate back after animation completes
-      setTimeout(() => {
-        window.history.back();
-        resetSwipeElements();
-      }, 250);
+    // Mevcut transform pozisyonunu al
+    const currentTranslateX = parseFloat(prevPagePreview.style.transform.replace(/[^0-9\-.]/g, '')) || 0;
+    
+    if ((swipeDistance > minDistance) || (swipeDistance > minSwipeDistance && velocity > minSpeed)) {
+      // Animasyonu tamamla
+      completeSwipeAnimation(currentTranslateX);
     } else {
-      // Cancel the back action with a springy animation
-      cancelSwipeWithAnimation();
+      // Geri hareket iptal
+      cancelSwipeWithAnimation(currentTranslateX);
     }
     
     isSwipingBack = false;
   }
   
-  // Handle touch cancel
+  // Kaydırma animasyonunu tamamla
+  function completeSwipeAnimation(currentPosition) {
+    // Mevcut animasyonu iptal et
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+    
+    const targetX = window.innerWidth;
+    const distance = targetX - currentPosition;
+    const startTime = Date.now();
+    const maxDuration = 350; // ms
+    
+    // Hızı dikkate alarak süreyi hesapla
+    let duration = Math.abs(distance / (velocity * 1000));
+    duration = Math.min(maxDuration, Math.max(250, duration)); // 250-350ms arasında sınırla
+    
+    function animate() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Hareketin sonuna doğru yavaşlayan kübik eğri kullan
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      const newX = currentPosition + (distance * easedProgress);
+      
+      // Öğeleri güncelle
+      prevPagePreview.style.transform = `translateX(${newX}px)`;
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - progress)})`;
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
+      } else {
+        // Animasyon tamamlandığında önceki sayfaya git
+        window.history.back();
+        resetSwipeElements();
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate);
+  }
+  
+  // Dokunma iptalini işle
   function handleTouchCancel() {
     if (isSwipingBack) {
-      cancelSwipeWithAnimation();
+      const currentTranslateX = parseFloat(prevPagePreview.style.transform.replace(/[^0-9\-.]/g, '')) || 0;
+      cancelSwipeWithAnimation(currentTranslateX);
       isSwipingBack = false;
     }
   }
   
-  // Animate the cancellation of swipe with a springy effect
-  function cancelSwipeWithAnimation() {
-    prevPagePreview.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    prevPagePreview.style.transform = 'translateX(0)';
+  // Kaydırmayı yay etkisiyle iptal et
+  function cancelSwipeWithAnimation(currentPosition) {
+    // Mevcut animasyonu iptal et
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
     
-    darkOverlay.style.transition = 'background-color 0.3s ease';
-    darkOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    const targetX = 0;
+    const distance = targetX - currentPosition;
+    const startTime = Date.now();
+    let duration = 300; // ms
     
-    backArrow.style.opacity = '0';
+    // Mesafe kısa ise daha hızlı tamamla
+    if (Math.abs(currentPosition) < 100) {
+      duration = 200;
+    }
     
-    // Hide elements after animation
-    setTimeout(resetSwipeElements, 300);
+    function animate() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // iOS tarzı yay efekti için "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+      // JavaScript ile benzetmek için kuadratik eğri
+      const t = progress;
+      const easedProgress = t * (2 - t);
+      
+      const newX = currentPosition + (distance * easedProgress);
+      
+      // Öğeleri güncelle
+      prevPagePreview.style.transform = `translateX(${newX}px)`;
+      darkOverlay.style.backgroundColor = `rgba(0, 0, 0, ${0.4 * (1 - progress)})`;
+      backArrow.style.opacity = `${1 * (1 - progress)}`;
+      
+      if (progress < 1) {
+        animationId = requestAnimationFrame(animate);
+      } else {
+        // Animasyon tamamlandığında elemanları sıfırla
+        resetSwipeElements();
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate);
   }
   
-  // Reset swipe elements to their initial state
+  // Kaydırma elemanlarını sıfırla
   function resetSwipeElements() {
-    // Reset transitions
+    // Animasyonu temizle
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    
+    // Geçişleri sıfırla
     prevPagePreview.style.transition = '';
     darkOverlay.style.transition = '';
+    prevPageTitle.style.transition = '';
+    prevPageTitle.style.opacity = '0';
+    prevPageTitle.style.transform = 'translateX(20px)';
     
-    // Reset transforms and styles
+    // Dönüşümleri ve stilleri sıfırla
     prevPagePreview.style.transform = 'translateX(0)';
     darkOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
     backArrow.style.opacity = '0';
     
-    // Hide container
+    // Konteyneri gizle
     swipeContainer.style.visibility = 'hidden';
+    fakePrevPageContent.innerHTML = '';
   }
 });
