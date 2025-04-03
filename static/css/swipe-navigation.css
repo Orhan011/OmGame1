@@ -1,0 +1,36 @@
+
+/* iOS-like swipe navigation styles */
+.ios-swipe-container {
+  will-change: transform;
+  overflow: hidden;
+}
+
+.ios-prev-page-preview {
+  display: flex;
+  align-items: center;
+  background-color: #f8f8f8;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  transition: transform 0.05s linear;
+}
+
+.ios-back-arrow {
+  transition: opacity 0.15s ease;
+}
+
+.ios-edge-indicator {
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Add subtle animation on page load */
+@keyframes pulseEdge {
+  0% { opacity: 0; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+body {
+  overscroll-behavior-x: none; /* Prevent browser's own overscroll effect */
+}
