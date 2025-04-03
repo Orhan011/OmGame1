@@ -14,7 +14,7 @@
     EDGE_REGION_WIDTH: 20,                        // Ekranın kenarından başlama bölgesi (piksel)
     VELOCITY_THRESHOLD: 0.3,                      // Hız eşiği (px/ms): iOS'taki 300 points/second
     CRITICAL_THRESHOLD: 0.39,                     // Kritik mesafe eşiği (ekran genişliğinin yüzdesi)
-    ANIMATION_DURATION: 15,                       // Navigasyon animasyonu süresi (ms): iOS'taki 0.25s'den daha kısa
+    ANIMATION_DURATION: 0,                       // Navigasyon animasyonu süresi (ms): iOS'taki 0.25s'den daha kısa
     SPRING_ANIMATION_MASS: 0.6,                   // Fizik tabanlı yay kütlesi
     SPRING_ANIMATION_STIFFNESS: 350,              // Yay sertliği
     SPRING_ANIMATION_DAMPING: 15,                 // Sönümleme değeri
