@@ -1,175 +1,236 @@
 
 /**
- * iOS-style swipe navigation
- * Advanced implementation with visual preview of previous page
+ * Advanced iOS-style swipe navigation
+ * Professionally implemented with physics-based animations and previous page preview
  */
 document.addEventListener('DOMContentLoaded', function() {
   // Create container for previous page preview
-  const pageContainer = document.createElement('div');
-  pageContainer.className = 'ios-page-container';
-  
-  // Create overlay for dimming current page
-  const dimOverlay = document.createElement('div');
-  dimOverlay.className = 'ios-dim-overlay';
+  const pagePreview = document.createElement('div');
+  pagePreview.className = 'ios-page-preview';
   
   // Create shadow element for depth effect
   const edgeShadow = document.createElement('div');
   edgeShadow.className = 'ios-edge-shadow';
   
+  // Create overlay for current page dimming
+  const dimOverlay = document.createElement('div');
+  dimOverlay.className = 'ios-dim-overlay';
+  
   // Variables for touch tracking
   let touchStartX = 0;
   let touchCurrentX = 0;
+  let touchStartY = 0;
+  let touchCurrentY = 0;
   let touchStartTime = 0;
   let isSwipingBack = false;
-  let swipeThreshold = 100; // Minimum distance to trigger navigation
-  let autoCompleteThreshold = window.innerWidth * 0.3; // Auto-complete threshold
-  let maxTime = 300; // Maximum time for swipe in ms
-  let lastPageURL = document.referrer; // Store the previous page URL
+  let isScrollingVertically = false;
+  
+  // Configuration
+  const edgeTriggerSize = 30; // px from left edge that triggers swipe
+  const minSwipeDistance = 50; // Minimum distance to register swipe
+  const autoCompleteThreshold = window.innerWidth * 0.35; // Auto-complete threshold
+  const springBackSpeed = 0.3; // Speed for spring-back animation (seconds)
+  const completeSwipeSpeed = 0.35; // Speed for completed swipe animation (seconds)
   
   // Append elements to body
-  document.body.appendChild(dimOverlay);
-  document.body.appendChild(pageContainer);
+  document.body.appendChild(pagePreview);
   document.body.appendChild(edgeShadow);
+  document.body.appendChild(dimOverlay);
   
   // Touch start - initialize swipe
   document.addEventListener('touchstart', function(e) {
-    // Only detect swipes starting from left edge (40px)
-    if (e.touches[0].clientX > 40) return;
+    // Only detect swipes starting from left edge
+    if (e.touches[0].clientX > edgeTriggerSize) return;
     
     touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
     touchCurrentX = touchStartX;
+    touchCurrentY = touchStartY;
     touchStartTime = new Date().getTime();
-    isSwipingBack = true;
     
     // Check if we have a previous page to return to
     if (window.history.length > 1) {
-      // Prepare the page container for animation
-      pageContainer.style.display = 'block';
-      dimOverlay.style.display = 'block';
+      isSwipingBack = true;
+      
+      // Prepare the animation elements
+      pagePreview.style.display = 'block';
       edgeShadow.style.display = 'block';
+      dimOverlay.style.display = 'block';
       
       // Initialize positions
-      pageContainer.style.transform = 'translateX(-30%)';
+      pagePreview.style.transform = 'translateX(-30%)';
+      pagePreview.style.opacity = '1';
       dimOverlay.style.opacity = '0';
       edgeShadow.style.opacity = '0';
       
-      // Prevent scrolling while swiping
-      document.body.style.overflow = 'hidden';
-      e.preventDefault();
-    } else {
-      isSwipingBack = false;
+      // Take a "screenshot" of current and previous page
+      // (In a real iOS implementation, this would be a snapshot of the previous page)
+      // Here we create a placeholder with a subtle gradient
+      let bgColorStart = getComputedStyle(document.body).backgroundColor;
+      let bgColorEnd = bgColorStart;
+      
+      // Adjust if using RGB format
+      if (bgColorStart.startsWith('rgb')) {
+        const rgb = bgColorStart.match(/\d+/g);
+        if (rgb && rgb.length >= 3) {
+          // Create a slightly darker/lighter version for the gradient
+          const darken = Math.max(parseInt(rgb[0]) - 15, 0);
+          const lighten = Math.min(parseInt(rgb[1]) + 10, 255);
+          bgColorEnd = `rgb(${darken}, ${lighten}, ${rgb[2]})`;
+        }
+      }
+      
+      pagePreview.style.background = `linear-gradient(to right, ${bgColorEnd}, ${bgColorStart})`;
     }
-  }, { passive: false });
+  }, { passive: true });
   
   // Touch move - update animation based on finger position
   document.addEventListener('touchmove', function(e) {
     if (!isSwipingBack) return;
     
     touchCurrentX = e.touches[0].clientX;
-    let swipeDistance = touchCurrentX - touchStartX;
+    touchCurrentY = e.touches[0].clientY;
     
-    // Calculate how far we've swiped as a percentage of screen width
-    let percentComplete = Math.min(swipeDistance / window.innerWidth, 1);
+    // Calculate vertical movement to detect scrolling
+    const verticalDistance = Math.abs(touchCurrentY - touchStartY);
+    const horizontalDistance = touchCurrentX - touchStartX;
     
-    if (percentComplete > 0) {
-      // Update current page position (slide right)
-      document.body.style.transform = `translateX(${swipeDistance}px)`;
+    // If vertical movement is significantly more than horizontal, cancel swipe
+    if (verticalDistance > horizontalDistance * 1.2 && horizontalDistance < 30) {
+      isScrollingVertically = true;
+      resetSwipeAnimation();
+      isSwipingBack = false;
+      return;
+    }
+    
+    if (horizontalDistance > 0) {
+      // Calculate progress as a percentage (0-1)
+      const progress = Math.min(horizontalDistance / window.innerWidth, 1);
       
-      // Update previous page position (sliding in from left)
-      pageContainer.style.transform = `translateX(${-30 + (percentComplete * 30)}%)`;
+      // Apply non-linear easing for more natural feel
+      const easedProgress = easeOutCubic(progress);
       
-      // Update overlay opacity for dimming effect
-      dimOverlay.style.opacity = (0.4 * percentComplete).toString();
+      // Transform current page (slide right)
+      document.body.style.transform = `translateX(${horizontalDistance}px)`;
       
-      // Update shadow for depth effect
-      edgeShadow.style.opacity = (0.3 * percentComplete).toString();
-      edgeShadow.style.left = `${swipeDistance}px`;
+      // Transform previous page preview (slide from left)
+      pagePreview.style.transform = `translateX(${-30 + (easedProgress * 30)}%)`;
       
-      e.preventDefault();
+      // Update shadow opacity and position
+      edgeShadow.style.opacity = (0.2 * easedProgress).toString();
+      edgeShadow.style.left = `${horizontalDistance}px`;
+      
+      // Update dim overlay for subtle darkening effect
+      dimOverlay.style.opacity = (0.3 * easedProgress).toString();
+      
+      // Prevent scrolling while swiping
+      if (horizontalDistance > 10) {
+        e.preventDefault();
+      }
     }
   }, { passive: false });
   
   // Touch end - finalize the animation
   document.addEventListener('touchend', function(e) {
-    if (!isSwipingBack) return;
+    if (!isSwipingBack || isScrollingVertically) {
+      isSwipingBack = false;
+      isScrollingVertically = false;
+      return;
+    }
     
-    let touchEndTime = new Date().getTime();
-    let swipeTime = touchEndTime - touchStartTime;
-    let swipeDistance = touchCurrentX - touchStartX;
-    let swipeSpeed = swipeDistance / swipeTime;
+    const touchEndTime = new Date().getTime();
+    const swipeTime = touchEndTime - touchStartTime;
+    const swipeDistance = touchCurrentX - touchStartX;
+    const swipeVelocity = swipeDistance / swipeTime; // pixels per ms
     
-    // Logic to determine if we should complete the navigation
-    let shouldNavigateBack = 
-      (swipeDistance > swipeThreshold && swipeTime < maxTime) || // Fast swipe
+    // Determine if swipe should complete based on distance and velocity
+    const shouldComplete = 
       (swipeDistance > autoCompleteThreshold) || // Dragged past threshold
-      (swipeDistance > 60 && swipeSpeed > 0.5); // Quick flick
+      (swipeDistance > minSwipeDistance && swipeVelocity > 0.5); // Quick flick
     
-    if (shouldNavigateBack) {
-      // Complete the animation
-      completeSwipeAnimation(true);
+    if (shouldComplete) {
+      // Complete the transition with physics-based animation
+      completeSwipeAnimation();
       
-      // Navigate after animation completes
+      // Wait for animation to complete before navigating
       setTimeout(() => {
         window.history.back();
-      }, 300);
+      }, completeSwipeSpeed * 1000);
     } else {
-      // Cancel the animation
-      completeSwipeAnimation(false);
+      // Cancel the transition with spring-back effect
+      cancelSwipeAnimation();
     }
     
     isSwipingBack = false;
+    isScrollingVertically = false;
   });
   
   // Touch cancel - reset everything
   document.addEventListener('touchcancel', function() {
     if (isSwipingBack) {
-      completeSwipeAnimation(false);
+      resetSwipeAnimation();
       isSwipingBack = false;
+      isScrollingVertically = false;
     }
   });
   
-  // Function to complete or cancel swipe animation
-  function completeSwipeAnimation(complete) {
-    if (complete) {
-      // Animate to completed state
-      document.body.style.transform = `translateX(${window.innerWidth}px)`;
-      pageContainer.style.transform = 'translateX(0)';
-      dimOverlay.style.opacity = '0.4';
-      edgeShadow.style.opacity = '0.3';
-      edgeShadow.style.left = `${window.innerWidth}px`;
-    } else {
-      // Animate back to starting position
-      document.body.style.transform = 'translateX(0)';
-      pageContainer.style.transform = 'translateX(-30%)';
-      dimOverlay.style.opacity = '0';
-      edgeShadow.style.opacity = '0';
-    }
+  // Function to complete swipe animation
+  function completeSwipeAnimation() {
+    // Update transition property for smooth animation
+    document.body.style.transition = `transform ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
+    pagePreview.style.transition = `transform ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
+    dimOverlay.style.transition = `opacity ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
+    edgeShadow.style.transition = `all ${completeSwipeSpeed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
     
-    // Reset after animation completes
-    setTimeout(() => {
-      if (!isSwipingBack) {
-        document.body.style.transform = '';
-        document.body.style.overflow = '';
-        pageContainer.style.display = 'none';
-        dimOverlay.style.display = 'none';
-        edgeShadow.style.display = 'none';
-      }
-    }, 300);
+    // Animate to completed state
+    document.body.style.transform = `translateX(${window.innerWidth}px)`;
+    pagePreview.style.transform = 'translateX(0)';
+    dimOverlay.style.opacity = '0.3';
+    edgeShadow.style.opacity = '0.2';
+    edgeShadow.style.left = `${window.innerWidth}px`;
   }
   
-  // Handle orientation changes
-  window.addEventListener('resize', function() {
-    autoCompleteThreshold = window.innerWidth * 0.3;
-  });
+  // Function to cancel swipe animation with spring-back effect
+  function cancelSwipeAnimation() {
+    // Update transition property for spring-back effect
+    document.body.style.transition = `transform ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
+    pagePreview.style.transition = `transform ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
+    dimOverlay.style.transition = `opacity ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
+    edgeShadow.style.transition = `all ${springBackSpeed}s cubic-bezier(0.3, 0.8, 0.4, 1.2)`;
+    
+    // Animate back to starting position
+    document.body.style.transform = 'translateX(0)';
+    pagePreview.style.transform = 'translateX(-30%)';
+    dimOverlay.style.opacity = '0';
+    edgeShadow.style.opacity = '0';
+    
+    // Reset after animation completes
+    setTimeout(resetSwipeAnimation, springBackSpeed * 1000);
+  }
   
-  // Snapshot the current page when navigating to have it for "back" animation
-  window.addEventListener('beforeunload', function() {
-    try {
-      // Store the current URL as the previous page for any next page
-      sessionStorage.setItem('previousPageURL', window.location.href);
-    } catch (e) {
-      // Handle potential sessionStorage errors
-      console.warn('Could not store previous page URL', e);
-    }
+  // Function to reset animation states
+  function resetSwipeAnimation() {
+    // Reset transitions and transforms
+    document.body.style.transition = '';
+    document.body.style.transform = '';
+    
+    pagePreview.style.transition = '';
+    pagePreview.style.display = 'none';
+    
+    dimOverlay.style.transition = '';
+    dimOverlay.style.display = 'none';
+    
+    edgeShadow.style.transition = '';
+    edgeShadow.style.display = 'none';
+  }
+  
+  // Easing function for smoother animations (cubic ease-out)
+  function easeOutCubic(x) {
+    return 1 - Math.pow(1 - x, 3);
+  }
+  
+  // Update threshold on orientation/resize changes
+  window.addEventListener('resize', function() {
+    autoCompleteThreshold = window.innerWidth * 0.35;
   });
 });
