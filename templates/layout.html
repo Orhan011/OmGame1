@@ -223,8 +223,8 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
 <!-- Swipe Navigation -->
-    <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/removeBackButtons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/removeBackButtons.js') }}" defer></script>
     <!-- End Navigation Scriptsons -->
     <script src="{{ url_for('static', filename='js/removeBackButtons.js') }}"></script>
   </body>

@@ -1,10 +1,11 @@
+
 /**
- * iOS-style swipe back navigation
+ * iOS-style swipe back navigation - Enhanced Version
  * Simulates the natural iOS gesture for going back in browser history
  */
 document.addEventListener('DOMContentLoaded', function() {
   // Don't initialize on pages where swiping might interfere with game mechanics
-  const gameContainers = document.querySelectorAll('.game-container, .puzzle-container, #gameBoard');
+  const gameContainers = document.querySelectorAll('.game-container, .puzzle-container, #gameBoard, .memory-game, [data-disable-swipe="true"]');
   if (gameContainers.length > 0) return;
 
   let startX, startY;
@@ -12,27 +13,40 @@ document.addEventListener('DOMContentLoaded', function() {
   let swipeStarted = false;
   let threshold = 50; // Minimum distance to trigger back navigation
   let animationFrame;
+  let hasHistory = window.history.length > 1;
 
-  // Create overlay elements for visual feedback
-  const overlay = document.createElement('div');
-  overlay.className = 'swipe-overlay';
-  overlay.style.display = 'none';
+  // Don't initialize if there's no history to go back to
+  if (!hasHistory) return;
 
-  const contentShadow = document.createElement('div');
-  contentShadow.className = 'content-shadow';
-  contentShadow.style.display = 'none';
+  // Create overlay elements for visual feedback if they don't exist
+  let overlay = document.querySelector('.swipe-overlay');
+  let contentShadow = document.querySelector('.content-shadow');
+  let previousPagePreview = document.querySelector('.previous-page-preview');
 
-  const previousPagePreview = document.createElement('div');
-  previousPagePreview.className = 'previous-page-preview';
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'swipe-overlay';
+    overlay.style.display = 'none';
+    document.body.appendChild(overlay);
+  }
 
-  document.body.appendChild(overlay);
-  document.body.appendChild(contentShadow);
-  document.body.appendChild(previousPagePreview);
+  if (!contentShadow) {
+    contentShadow = document.createElement('div');
+    contentShadow.className = 'content-shadow';
+    contentShadow.style.display = 'none';
+    document.body.appendChild(contentShadow);
+  }
+
+  if (!previousPagePreview) {
+    previousPagePreview = document.createElement('div');
+    previousPagePreview.className = 'previous-page-preview';
+    document.body.appendChild(previousPagePreview);
+  }
 
   // Touch event listeners
-  document.addEventListener('touchstart', handleTouchStart, { passive: false });
+  document.addEventListener('touchstart', handleTouchStart, { passive: true });
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
   function handleTouchStart(e) {
     // Only trigger for touches starting from left edge (30px margin)
@@ -76,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.style.display = 'block';
         contentShadow.style.display = 'block';
         previousPagePreview.style.display = 'block';
+        document.body.classList.add('swipe-active');
       }
 
       // Calculate progress percentage (max at 75% of screen width)
@@ -111,8 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     animationFrame = requestAnimationFrame(() => {
-      // Move page content
-      document.body.style.transform = `translateX(${progress * window.innerWidth * 0.75}px)`;
+      // Apply 3D transform for better performance
+      document.body.style.transform = `translate3d(${progress * window.innerWidth * 0.75}px, 0, 0)`;
 
       // Fade overlay
       overlay.style.opacity = 0.3 * progress;
@@ -121,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
       contentShadow.style.opacity = 0.5 * progress;
 
       // Show previous page preview
-      previousPagePreview.style.transform = `translateX(${-window.innerWidth * 0.2 * (1 - progress)}px)`;
+      previousPagePreview.style.transform = `translate3d(${-window.innerWidth * 0.2 * (1 - progress)}px, 0, 0)`;
       previousPagePreview.style.opacity = progress;
     });
   }
@@ -130,15 +145,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Animate to fully swiped state
     const duration = 300; // ms
     const startTime = performance.now();
-    const startTransform = parseFloat(document.body.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
+    const startTransform = parseFloat(document.body.style.transform.replace('translate3d(', '').replace('px, 0, 0)', '')) || 0;
     const targetTransform = window.innerWidth;
 
     function animate(currentTime) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutQuint(progress); //Using easeOutQuint here
+      const eased = easeOutQuint(progress);
 
-      document.body.style.transform = `translateX(${startTransform + (targetTransform - startTransform) * eased}px)`;
+      document.body.style.transform = `translate3d(${startTransform + (targetTransform - startTransform) * eased}px, 0, 0)`;
       overlay.style.opacity = 0.3 + 0.7 * eased;
 
       if (progress < 1) {
@@ -155,17 +170,17 @@ document.addEventListener('DOMContentLoaded', function() {
   function cancelSwipeAnimation() {
     const duration = 300; // ms
     const startTime = performance.now();
-    const startTransform = parseFloat(document.body.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
+    const startTransform = parseFloat(document.body.style.transform.replace('translate3d(', '').replace('px, 0, 0)', '')) || 0;
 
     function animate(currentTime) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutQuint(progress); //Using easeOutQuint here
+      const eased = easeOutQuint(progress);
 
-      document.body.style.transform = `translateX(${startTransform * (1 - eased)}px)`;
+      document.body.style.transform = `translate3d(${startTransform * (1 - eased)}px, 0, 0)`;
       overlay.style.opacity = 0.3 * (1 - eased);
       contentShadow.style.opacity = 0.5 * (1 - eased);
-      previousPagePreview.style.transform = `translateX(${-window.innerWidth * 0.2 * eased}px)`;
+      previousPagePreview.style.transform = `translate3d(${-window.innerWidth * 0.2 * eased}px, 0, 0)`;
       previousPagePreview.style.opacity = 1 - eased;
 
       if (progress < 1) {
@@ -187,25 +202,14 @@ document.addEventListener('DOMContentLoaded', function() {
     contentShadow.style.opacity = 0;
     previousPagePreview.style.opacity = 0;
     previousPagePreview.style.transform = '';
+    document.body.classList.remove('swipe-active');
   }
 
-  // iOS benzeri animasyon easing fonksiyonları
+  // Easing functions
   function easeOutQuint(t) {
     return 1 - Math.pow(1 - t, 5);
   }
 
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function easeOutBack(t) {
-    const c1 = 1.70158;
-    const c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-
-  function easeOutElastic(t) {
-    const c4 = (2 * Math.PI) / 3;
-    return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
-  }
+  // Debug info - check if the swipe navigation is initialized
+  console.log('iOS Swipe Back Navigation initialized');
 });

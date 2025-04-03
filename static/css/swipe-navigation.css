@@ -63,15 +63,18 @@ body {
 /* Swipe aktif olduğunda tüm diğer etkileşimleri engelle */
 .swipe-active {
   user-select: none;
-}
-
-/* Prevent other elements from interfering with swipe */
-.swipe-active * {
   pointer-events: none;
 }
 
+/* Swipe aktif olduğunda yalnızca swipe ilgili elementlere etkileşim izni ver */
+.swipe-overlay,
+.content-shadow,
+.previous-page-preview {
+  pointer-events: auto;
+}
+
 /* Disable swipe on game pages */
-.game-container, .puzzle-container, #gameBoard {
+.game-container, .puzzle-container, #gameBoard, .memory-game, [data-disable-swipe="true"] {
   position: relative;
   z-index: 10000;
 }
@@ -116,4 +119,19 @@ body {
 
 .page-transition-resume {
   animation-play-state: running !important;
+}
+
+/* Chrome ve Safari için hızlandırılmış animasyonlar */
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .swipe-overlay,
+  .content-shadow,
+  .previous-page-preview {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
 }
