@@ -229,106 +229,43 @@ function loadArticleContent() {
   </body>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 <script>
-  // Sayfalar arası geçişlerde sayfaları geçmişe kaydet (link tıklamaları için)
+  // Tema desteği için sayfa sınıfları ekle
   document.addEventListener('DOMContentLoaded', function() {
-    // Mevcut URL'yi geçmişe ekleyelim (sayfa ilk yüklendiğinde)
-    try {
-      let pageHistory = [];
-      const savedHistory = localStorage.getItem('zekapark_page_history');
-      
-      if (savedHistory) {
-        try {
-          pageHistory = JSON.parse(savedHistory);
-          if (!Array.isArray(pageHistory)) {
-            throw new Error('Geçerli bir dizi değil');
-          }
-        } catch (e) {
-          console.error('Geçmiş okuma hatası, sıfırlanıyor:', e);
-          pageHistory = [];
-          localStorage.removeItem('zekapark_page_history');
-        }
-      }
-      
-      // Mevcut URL'yi ekle (eğer farklıysa ve geçerli bir URL ise)
-      if (window.location.pathname && (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname)) {
-        console.log('Sayfa ilk yüklenirken geçmişe ekleniyor:', window.location.pathname);
-        
-        // Eğer mevcut sayfa zaten geçmişte varsa, o noktadan sonrasını temizle
-        const existingIndex = pageHistory.indexOf(window.location.pathname);
-        if (existingIndex !== -1) {
-          console.log('Bu sayfa zaten geçmişte var, temizleniyor:', existingIndex);
-          pageHistory = pageHistory.slice(0, existingIndex);
-        }
-        
-        pageHistory.push(window.location.pathname);
-        
-        // Sadece son 10 sayfayı sakla
-        if (pageHistory.length > 10) {
-          pageHistory.shift();
-        }
-        
-        // Geçmişi kaydet ve doğrula
-        localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
-        
-        // Kaydettiğimizi doğrula
-        const test = localStorage.getItem('zekapark_page_history');
-        if (!test || test === 'null' || test === 'undefined') {
-          console.error('Geçmiş kaydedilemedi!');
-          localStorage.setItem('zekapark_page_history', JSON.stringify([window.location.pathname]));
-        }
-        
-        console.log('Güncel geçmiş:', pageHistory);
-      }
-    } catch (err) {
-      console.error('Sayfa geçmişi başlatma hatası:', err);
-      // Tamamen sıfırla
-      localStorage.removeItem('zekapark_page_history');
-      localStorage.setItem('zekapark_page_history', JSON.stringify([window.location.pathname]));
+    // Tema için body sınıfını kontrol et ve ayarla
+    const bodyElement = document.body;
+    const htmlElement = document.documentElement;
+    
+    // URL'ye göre sayfa türü sınıfları ekle
+    if (window.location.pathname.includes('/games/')) {
+      bodyElement.classList.add('game-page');
+    } else if (window.location.pathname.includes('/profile')) {
+      bodyElement.classList.add('profile-page');
     }
     
-    // Tüm linkleri bul ve tıklama olayını dinle
-    document.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        // Dış linkleri atlayın, sadece site içi navigasyonu kaydedin
-        if (this.href && this.href.includes(window.location.host) && !this.href.includes('#') && !this.target) {
-          try {
-            // Geçmiş verilerini al
-            let pageHistory = [];
-            const savedHistory = localStorage.getItem('zekapark_page_history');
-            
-            if (savedHistory) {
-              try {
-                pageHistory = JSON.parse(savedHistory);
-                if (!Array.isArray(pageHistory)) {
-                  throw new Error('Geçerli bir dizi değil');
-                }
-              } catch (e) {
-                console.error('Geçmiş okuma hatası:', e);
-                pageHistory = [];
-              }
+    // Tema değişikliklerini dinle
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class' && 
+            (mutation.target === htmlElement || mutation.target === bodyElement)) {
+          // Tema değişikliği algılandı, renk uyumluluğu için iOS kaydırma elementlerini güncelle
+          const swipeElements = document.querySelectorAll('.ios-current-page, .ios-previous-page');
+          const isDark = htmlElement.classList.contains('dark');
+          
+          swipeElements.forEach(el => {
+            if (el.classList.contains('ios-current-page')) {
+              el.style.backgroundColor = isDark ? '#1a1a2e' : '#fff';
+            } else if (el.classList.contains('ios-previous-page')) {
+              el.style.backgroundColor = isDark ? '#1a1a2e' : '#fff';
+              el.style.boxShadow = isDark ? '5px 0 15px rgba(0, 0, 0, 0.4)' : '5px 0 15px rgba(0, 0, 0, 0.2)';
             }
-            
-            // Mevcut sayfayı geçmişe ekle (tıklamadan önce)
-            if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
-              pageHistory.push(window.location.pathname);
-              
-              // Sadece son 10 sayfayı sakla
-              if (pageHistory.length > 10) {
-                pageHistory.shift();
-              }
-              
-              localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
-            }
-            
-            console.log('Link tıklandı, mevcut sayfa:', window.location.pathname);
-            console.log('Hedef sayfa:', this.pathname || this.href);
-            console.log('Geçmiş güncellendi:', pageHistory);
-          } catch (err) {
-            console.error('Link tıklama işleme hatası:', err);
-          }
+          });
         }
       });
     });
+    
+    // Tema değişikliği gözlemcisini başlat
+    observer.observe(htmlElement, { attributes: true });
+    observer.observe(bodyElement, { attributes: true });
   });
 </script>
 </html>
