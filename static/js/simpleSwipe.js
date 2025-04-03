@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const edgeThreshold = 30;   // Ekranın kenarından başlama mesafesi (px)
   const timeThreshold = 300;  // Maksimum kaydırma süresi (ms)
   
+  // Sayfaya geldiğinizde geçmişe eklemeyi sağla
+  // Bu, sayfa ziyaret edildiğinde history'nin doğru çalışmasına yardımcı olur
+  // Buradaki state null olarak ayarlanmıştır, bu yeni bir giriş eklemez, sadece mevcut sayfayı günceller
+  // Bu şekilde, aynı sayfayı birden fazla kez history'ye eklemekten kaçınırız
+  window.history.replaceState(null, document.title, window.location.href);
+  
   // Dokunma başlangıcı
   document.addEventListener('touchstart', function(e) {
     const touch = e.touches[0];
@@ -61,7 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if ((isHorizontalSwipe && (isQuickSwipe || isLongSwipe)) && deltaX > 0) {
       // Önceki sayfaya dön
-      window.history.back();
+      // Geçmiş uzunluğunu kontrol et, 1'den büyükse (yani geri gidecek bir sayfa varsa) geri git
+      if (window.history.length > 1) {
+        console.log('Önceki sayfaya dönülüyor...');
+        window.history.back();
+      } else {
+        console.log('Geçmiş boş, geri gidilecek sayfa yok');
+      }
     }
     
     // Sıfırla
@@ -72,6 +84,16 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('touchcancel', function() {
     isSwipeActive = false;
   }, false);
+  
+  // Önbellekteki link'leri de (nav çubuğu gibi) düzgün history oluşturmaya ayarla
+  const navLinks = document.querySelectorAll('a:not([href^="#"]):not([href^="javascript"]):not([target="_blank"])');
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Bu linkin yeni bir sayfa yükleyeceğini işaretle, böylece history düzgün çalışır
+      // replaceState ile geçerli sayfayı güncelle, böylece tıklandıktan sonra yeni bir geçmiş durumu oluşur
+      window.history.replaceState({navigatedFrom: window.location.href}, document.title, window.location.href);
+    });
+  });
   
   console.log('Basit iOS tarzı kaydırma navigasyonu aktif');
 });
