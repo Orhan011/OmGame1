@@ -30,9 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     pointer-events: none;
     transition: background-color 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 9998;
-    will-change: background-color, backdrop-filter;
-    -webkit-backdrop-filter: blur(0px);
-    backdrop-filter: blur(0px);
+    will-change: background-color;
     transform: translateZ(0);
   `;
   
@@ -256,12 +254,8 @@ document.addEventListener('DOMContentLoaded', function() {
           const opacity = Math.min(0.3, progress * 0.4); // Daha da hafif gölgelendirme
           overlay.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
           
-          // Daha az bulanıklık ile performans artışı
-          const blurAmount = Math.min(2, progress * 3); // Çok daha az bulanıklık
-          if (progress > 0.1) {
-            overlay.style.backdropFilter = `blur(${blurAmount}px)`;
-            overlay.style.webkitBackdropFilter = `blur(${blurAmount}px)`;
-          }
+          // Bulanıklık efektini tamamen kaldırıyoruz (renk buzulmasına neden oluyor)
+          // Blur efekti yerine sadece hafif gölgelendirme kullanacağız
           
           // Önceki sayfayı daha akıcı bir şekilde göster
           const prevPageTranslate = -15 + (progress * 15); // -15% başlangıç, daha yakın konumdan başlat
@@ -317,8 +311,6 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Minimum gölge efekti - performans için
           overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
-          overlay.style.backdropFilter = 'blur(0px)';
-          overlay.style.webkitBackdropFilter = 'blur(0px)';
         });
         
         // Animasyonun bitmesini beklemeden önce bir pre-fetch işlemi başlat
@@ -400,8 +392,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Gölgelendirmeyi kaldır
         overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-        overlay.style.backdropFilter = 'blur(0px)';
-        overlay.style.webkitBackdropFilter = 'blur(0px)';
       });
       
       // Çok kısa bir süre sonra animasyon durumunu sıfırla
