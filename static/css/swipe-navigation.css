@@ -1,1 +1,68 @@
-/* iOS swipe navigation styles have been disabled */
+
+/* iOS style swipe navigation styles */
+body {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overscroll-behavior-x: none; /* Prevent browser default overscroll */
+  position: relative;
+  will-change: transform;
+  overflow-x: hidden;
+}
+
+.ios-page-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9997;
+  background-color: #f5f5f7; /* Light background similar to iOS */
+  transform: translateX(-30%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: none;
+  will-change: transform;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+}
+
+.ios-dim-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: none;
+  pointer-events: none;
+}
+
+.ios-edge-shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 100%;
+  z-index: 9999;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: none;
+  pointer-events: none;
+}
+
+/* Adjust animations for dark mode if present */
+@media (prefers-color-scheme: dark) {
+  .ios-page-container {
+    background-color: #1c1c1e; /* Dark background similar to iOS */
+  }
+}
+
+/* Disable page transition for screens under 360px width */
+@media (max-width: 360px) {
+  .ios-page-container,
+  .ios-dim-overlay,
+  .ios-edge-shadow {
+    display: none !important;
+  }
+}
