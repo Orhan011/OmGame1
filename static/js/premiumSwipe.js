@@ -13,15 +13,15 @@
   // Yapılandırma sabitlerini bir nesne içinde toplayarak kod yönetimini kolaylaştırma
   const CONFIG = {
     EDGE_THRESHOLD: 20,                      // Ekranın kenarından başlama eşiği (piksel)
-    MIN_SWIPE_THRESHOLD: 50,                 // Minimum kaydırma mesafesi (piksel)
+    MIN_SWIPE_THRESHOLD: 40,                 // Minimum kaydırma mesafesi (piksel) - azaltıldı
     MAX_SWIPE_TIME: 300,                     // Maksimum kaydırma süresi (ms)
     SPRING_TENSION: 0.85,                    // Yay gerginliği (0-1 arası)
-    CRITICAL_VELOCITY: 0.35,                 // Kritik hız eşiği (px/ms)
-    ANIMATION_DURATION_MIN: 180,             // Minimum animasyon süresi (ms)
-    ANIMATION_DURATION_MAX: 280,             // Maksimum animasyon süresi (ms)
-    TRANSITION_BASE_CURVE: 'cubic-bezier(0.42, 0, 0.1, 1)',  // Apple tarzı hızlanma eğrisi
+    CRITICAL_VELOCITY: 0.3,                  // Kritik hız eşiği (px/ms) - azaltıldı
+    ANIMATION_DURATION_MIN: 20,              // Minimum animasyon süresi (ms) - istenen 20ms hız
+    ANIMATION_DURATION_MAX: 40,              // Maksimum animasyon süresi (ms) - daha da hızlandırıldı
+    TRANSITION_BASE_CURVE: 'cubic-bezier(0.25, 0.1, 0.25, 1)',  // Daha hızlı animasyon eğrisi
     STORAGE_KEY: 'zeka_park_navigation_history',
-    SHADOW_COLOR: 'rgba(0, 0, 0, 0.18)',     // Daha doğal bir gölge rengi
+    SHADOW_COLOR: 'rgba(0, 0, 0, 0.15)',     // Daha hafif gölge rengi
     Z_INDEX_BASE: 10000                      // z-index temel değeri
   };
 
@@ -253,36 +253,69 @@
     /**
      * Kaydırma animasyonu için sayfayı hazırla
      */
+      DOM.previousPagePreview.style.opacity = '1';
     prepareForSwipe() {
       if (!STATE.domNodesReady) {
         this.createElements();
       }
       
-      // Mevcut sayfanın kopyasını al (daha iyi performans için lightweight klon)
-      const pageClone = document.createElement('div');
-      pageClone.innerHTML = document.documentElement.innerHTML;
+      // Mevcut sayfayı daha verimli şekilde kopyalama (performans iyileştirmesi)
+      const documentClone = document.documentElement.cloneNode(false);
+      const bodyClone = document.body.cloneNode(false);
+      documentClone.appendChild(bodyClone);
       
-      // Stil bilgilerini kopyala
+      // Stil bilgilerini kopyala ve hızlı erişim için önbelleğe al
       const computedStyle = window.getComputedStyle(document.body);
-      const bgColor = computedStyle.backgroundColor;
-      const textColor = computedStyle.color;
+      const bgColor = computedStyle.backgroundColor || '#ffffff';
+      const textColor = computedStyle.color || '#212529';
       
-      // Mevcut sayfa stilini ayarla
-      DOM.pageClone.style.backgroundColor = bgColor;
-      DOM.pageClone.style.color = textColor;
-      DOM.previousPagePreview.style.backgroundColor = bgColor;
-      DOM.previousPagePreview.style.color = textColor;
+      // Sabit arka plan ve metin renkleri ile performansı artır
+      DOM.pageClone.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translate3d(0, 0, 0);
+        background-color: ${bgColor};
+        color: ${textColor};
+        transition: transform 20ms ${CONFIG.TRANSITION_BASE_CURVE};
+        overflow: hidden;
+        z-index: ${CONFIG.Z_INDEX_BASE};
+        pointer-events: none;
+        box-shadow: 0 0 20px ${CONFIG.SHADOW_COLOR};
+        will-change: transform;
+        visibility: visible;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      `;
       
-      // Klonu göster ve interaktif hale getir
+      DOM.previousPagePreview.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translate3d(-8%, 0, 0) scale(0.97);
+        opacity: 0;
+        z-index: ${CONFIG.Z_INDEX_BASE - 1};
+        background-color: ${bgColor};
+        color: ${textColor};
+        transition: transform 20ms ${CONFIG.TRANSITION_BASE_CURVE}, opacity 20ms ease-out;
+        overflow-x: hidden;
+        pointer-events: none;
+        will-change: transform, opacity;
+        visibility: visible;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      `;
+      
+      // Yeni HTML içeriğini daha hızlı ekle (sadece gerekli olanı)
       DOM.pageClone.innerHTML = '';
-      DOM.pageClone.appendChild(pageClone);
-      DOM.pageClone.style.visibility = 'visible';
-      DOM.previousPagePreview.style.visibility = 'visible';
+      DOM.pageClone.appendChild(documentClone);
       
-      // Minimal önceki sayfa içeriği göster (performans için)
+      // Basit arka planda önceki sayfa gösterimini yap (daha az bellek kullanımı)
       DOM.previousPagePreview.innerHTML = '';
-      
-      // Önceki sayfanın minimal versiyonunu göster
       const previousPageContent = document.createElement('div');
       previousPageContent.style.cssText = `
         width: 100%;
@@ -294,8 +327,10 @@
       `;
       DOM.previousPagePreview.appendChild(previousPageContent);
       
-      // Önceki sayfa içeriğini göster
+      // Ön plandaki sayfa içeriğini hemen göster
       DOM.previousPagePreview.style.opacity = '1';
+      DOM.previousPagePreview.style.transform = 'translate3d(-8%, 0, 0) scale(0.97)';
+    },
       DOM.previousPagePreview.style.transform = 'translate3d(-8%, 0, 0) scale(0.97)';
     },
     
@@ -332,42 +367,66 @@
     /**
      * Kaydırma animasyonunu tamamla
      */
+    resetSwipeAnimation(duration = 180) {
     completeSwipeAnimation(duration = CONFIG.ANIMATION_DURATION_MIN) {
-      // Süreyi sınırla
-      const animDuration = Math.max(
-        CONFIG.ANIMATION_DURATION_MIN, 
-        Math.min(CONFIG.ANIMATION_DURATION_MAX, duration)
-      );
+      // Süreyi sabit 20ms olarak ayarla (kullanıcı isteği)
+      const animDuration = CONFIG.ANIMATION_DURATION_MIN;
       
-      // Animasyon zamanlamasını ayarla
-      DOM.pageClone.style.transition = `transform ${animDuration}ms ${CONFIG.TRANSITION_BASE_CURVE}`;
-      DOM.overlay.style.transition = `background-color ${animDuration}ms ease-out`;
-      DOM.previousPagePreview.style.transition = `transform ${animDuration}ms ${CONFIG.TRANSITION_BASE_CURVE}, opacity ${animDuration}ms ease-out`;
+      // Daha hızlı animasyon için CSS değişkenlerini minimize et
+      DOM.pageClone.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translate3d(${window.innerWidth}px, 0, 0);
+        transition: transform ${animDuration}ms ${CONFIG.TRANSITION_BASE_CURVE};
+        z-index: ${CONFIG.Z_INDEX_BASE};
+        visibility: visible;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      `;
       
-      // Kaydırma animasyonunu tamamla
-      DOM.pageClone.style.transform = `translate3d(${window.innerWidth}px, 0, 0)`;
-      DOM.overlay.style.backgroundColor = CONFIG.SHADOW_COLOR;
       DOM.previousPagePreview.style.transform = 'translate3d(0%, 0, 0) scale(1)';
       DOM.previousPagePreview.style.opacity = '1';
+      DOM.previousPagePreview.style.transition = `transform ${animDuration}ms ${CONFIG.TRANSITION_BASE_CURVE}, opacity ${animDuration}ms ease-out`;
       
-      // Animasyon tamamlandığında sayfayı yükle
-      return new Promise(resolve => {
-        setTimeout(() => {
-          this.resetSwipeAnimation();
-          resolve();
-        }, animDuration);
-      });
-    },
-    
-    /**
-     * Kaydırma animasyonunu iptal et/sıfırla
-     */
-    resetSwipeAnimation(duration = 180) {
-      // Animasyon özelliklerini ayarla
-      DOM.pageClone.style.transition = `transform ${duration}ms ${CONFIG.TRANSITION_BASE_CURVE}`;
-      DOM.overlay.style.transition = `background-color ${duration}ms ease-out`;
+      // Preload önceki sayfayı hızlandırmak için
+      try {
+        const previousUrl = STATE.navigationHistory[STATE.navigationHistory.length - 2] || '/';
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = previousUrl;
+      
+    resetSwipeAnimation(duration = 20) {
+      // Daha hızlı sıfırlama için animasyon süresini azalt (sabit 20ms)
+      
+      // Hızlı sıfırlama için CSS değişkenlerini minimize et
+      DOM.pageClone.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transform: translate3d(0, 0, 0);
+        transition: transform ${duration}ms ${CONFIG.TRANSITION_BASE_CURVE};
+        z-index: ${CONFIG.Z_INDEX_BASE};
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      `;
+      
+      DOM.overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+      DOM.previousPagePreview.style.transform = 'translate3d(-8%, 0, 0) scale(0.97)';
+      DOM.previousPagePreview.style.opacity = '0';
       DOM.previousPagePreview.style.transition = `transform ${duration}ms ${CONFIG.TRANSITION_BASE_CURVE}, opacity ${duration}ms ease-out`;
       
+      // Görünürlüğü hemen kapat (animasyon beklemeden)
+      DOM.pageClone.style.visibility = 'hidden';
+      DOM.previousPagePreview.style.visibility = 'hidden';
+      
+      // Hemen çözümle (beklemeden)
+      return Promise.resolve();
+    }
       // Elementleri başlangıç durumuna getir
       DOM.pageClone.style.transform = 'translate3d(0, 0, 0)';
       DOM.overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
