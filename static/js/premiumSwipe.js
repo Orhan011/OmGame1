@@ -74,9 +74,13 @@
      * Mevcut URL'yi gezinme geçmişine ekle
      */
     saveCurrentPage() {
-      const currentUrl = window.location.href;
+      // Tam sayfa URL'sini kullan (pathname yerine)
+      const currentUrl = window.location.pathname || '/';
       
-      // Aynı URL'yi tekrar eklemeyi önle
+      // Mevcut geçmiş durumunu logla
+      console.log("Mevcut geçmiş durumu:", [...STATE.navigationHistory]);
+      
+      // Önceki sayfayla aynı sayfaya eklemeyi önle
       if (STATE.navigationHistory.length === 0 || 
           STATE.navigationHistory[STATE.navigationHistory.length - 1] !== currentUrl) {
         
@@ -85,19 +89,27 @@
           STATE.navigationHistory.shift();
         }
         
+        // Mevcut sayfayı geçmişe ekle
         STATE.navigationHistory.push(currentUrl);
+        console.log("Geçmişe yeni URL eklendi:", currentUrl);
+        console.log("Güncellenmiş geçmiş:", [...STATE.navigationHistory]);
         
+        // localStorage'a kaydet
         try {
           localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(STATE.navigationHistory));
         } catch (e) {
           console.warn("Gezinme geçmişi saklanırken hata oluştu:", e);
-          // LocalStorage hatası durumunda session geçmişine geri dön
+          
+          // LocalStorage hatası durumunda tarayıcı geçmişine güven
           if (window.history.length > 1) {
             return true;
           }
         }
+      } else {
+        console.log("URL zaten geçmişte var, eklenmedi:", currentUrl);
       }
       
+      // En az 2 sayfa varsa navigasyon yapılabilir
       return STATE.navigationHistory.length > 1;
     },
 
@@ -106,20 +118,31 @@
      */
     navigateBack() {
       if (STATE.navigationHistory.length > 1) {
-        // Son sayfayı geçmişten çıkar (mevcut sayfa)
-        STATE.navigationHistory.pop();
+        // Son sayfayı mevcut geçmişten çıkar (mevcut sayfa)
+        const currentUrl = STATE.navigationHistory.pop();
+        console.log("Çıkarılan mevcut URL:", currentUrl);
         
         // Önceki sayfaya git
         const previousUrl = STATE.navigationHistory[STATE.navigationHistory.length - 1];
+        console.log("Gidilecek önceki URL:", previousUrl);
         
+        // Geçmişin son halini kaydet
         try {
           localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(STATE.navigationHistory));
         } catch (e) {
           console.warn("Gezinme geçmişi güncellenirken hata:", e);
         }
         
-        // Sayfayı yükle
-        window.location.href = previousUrl;
+        // Tam URL mi yoksa yol mu kontrol et ve sayfayı yükle
+        if (previousUrl.startsWith('http')) {
+          window.location.href = previousUrl;
+        } else {
+          // Relative URL'leri düzgün şekilde işle
+          const baseUrl = window.location.origin;
+          window.location.href = previousUrl.startsWith('/') ? 
+            baseUrl + previousUrl : 
+            baseUrl + '/' + previousUrl;
+        }
         return true;
       } else {
         // Geçmiş yoksa tarayıcı geçmişini kullan
@@ -539,16 +562,28 @@
       document.addEventListener('touchend', TouchManager.handleTouchEnd.bind(TouchManager), { passive: true });
       document.addEventListener('touchcancel', TouchManager.handleTouchCancel.bind(TouchManager), { passive: true });
       
-      // Bağlantı tıklamaları
+      // Bağlantı tıklamalarını izle ve geçmişi güncelle
       document.addEventListener('click', (e) => {
         const link = e.target.closest('a');
         if (link && link.href && !link.target && !link.hasAttribute('download')) {
-          HistoryManager.saveCurrentPage();
+          // Mevcut sayfayı gezinme geçmişine ekle
+          const url = window.location.pathname;
+          const clickedUrl = link.pathname;
+          
+          console.log("Tıklanan bağlantı:", clickedUrl);
+          
+          // Aynı sayfaya gidilmiyorsa geçmişe ekle
+          if (url !== clickedUrl) {
+            HistoryManager.saveCurrentPage();
+          } else {
+            console.log("Aynı sayfaya tıklandı, geçmişe eklenmedi");
+          }
         }
       });
       
       // Tarayıcı tarihçesi değişiklikleri
       window.addEventListener('popstate', () => {
+        console.log("Tarayıcı geçmişi değişti (popstate)");
         HistoryManager.saveCurrentPage();
       });
     },
