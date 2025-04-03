@@ -1,6 +1,5 @@
-
 /**
- * Kaydırma navigasyonu CSS stilleri
+ * Swipe navigasyon stilleri kaldırıldı
  */
 
 body {
@@ -11,81 +10,18 @@ body {
   touch-action: pan-y; /* Dikey kaydırmaya izin ver ancak yatay hareketleri yakala */
 }
 
-.ios-swipe-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9990;
-  display: none;
-  overflow: hidden;
-}
-
-.ios-prev-page {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9991;
-  background-color: #f5f5f7; /* Varsayılan açık arka plan */
-  transform: translateX(-20%);
-  will-change: transform;
-  border-radius: 0;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
-}
-
-.ios-edge-shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 14px;
-  height: 100%;
-  z-index: 9994;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
-  opacity: 0;
-  will-change: opacity, left;
-}
-
-.ios-dim-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9992;
-  background-color: rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  will-change: opacity;
-}
-
-/* Performans optimizasyonları */
-.ios-prev-page,
+/* Performans optimizasyonları -  kaldırıldı çünkü artık gereksiz */
+/* .ios-prev-page,
 .ios-edge-shadow,
 .ios-dim-overlay {
   backface-visibility: hidden;
   perspective: 1000px;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-}
+} */
 
-/* iOS hissi için durum çubuğu katmanı */
-.ios-status-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 44px;
-  z-index: 9993;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.07), transparent);
-  opacity: 0;
-  will-change: opacity;
-}
-
-/* Karanlık mod desteği */
-@media (prefers-color-scheme: dark) {
+/* Karanlık mod desteği -  kaldırıldı çünkü artık gereksiz */
+/* @media (prefers-color-scheme: dark) {
   .ios-prev-page {
     background-color: #1c1c1e; /* Karanlık mod için koyu arka plan */
   }
@@ -97,28 +33,28 @@ body {
   .ios-dim-overlay {
     background-color: rgba(0, 0, 0, 0.25);
   }
-}
+} */
 
-/* Küçük ekran optimizasyonu */
-@media (max-width: 360px) {
+/* Küçük ekran optimizasyonu - kaldırıldı çünkü artık gereksiz */
+/* @media (max-width: 360px) {
   .ios-edge-shadow {
     width: 12px;
   }
-}
+} */
 
-/* Erişilebilirlik - kullanıcı azaltılmış hareketi tercih ediyorsa animasyonları devre dışı bırak */
-@media (prefers-reduced-motion: reduce) {
+/* Erişilebilirlik - kullanıcı azaltılmış hareketi tercih ediyorsa animasyonları devre dışı bırak - kaldırıldı çünkü artık gereksiz */
+/* @media (prefers-reduced-motion: reduce) {
   .ios-prev-page,
   .ios-edge-shadow,
   .ios-dim-overlay,
   body {
     transition-duration: 0.1s !important;
   }
-}
+} */
 
-/* Yazdırma ortamı - elementleri gizle */
-@media print {
+/* Yazdırma ortamı - elementleri gizle - kaldırıldı çünkü artık gereksiz */
+/* @media print {
   .ios-swipe-container {
     display: none !important;
   }
-}
+} */
