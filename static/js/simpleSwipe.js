@@ -1,7 +1,8 @@
 /**
- * Basit iOS tarzı soldan sağa kaydırma navigasyonu
+ * Profesyonel iOS tarzı soldan sağa kaydırma navigasyonu
  * 
  * Web sitesinde parmakla soldan sağa kaydırma ile önceki sayfaya dönme işlevi
+ * Referrer-based Navigation - tarayıcı geçmişinden bağımsız çalışır
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,12 +18,123 @@ document.addEventListener('DOMContentLoaded', function() {
   const swipeThreshold = 100; // px cinsinden eşik değeri
   const edgeThreshold = 30;   // Ekranın kenarından başlama mesafesi (px)
   const timeThreshold = 300;  // Maksimum kaydırma süresi (ms)
+  const maxVisualOffset = 150; // Maksimum görsel feedback uzaklığı (px)
   
-  // Sayfaya geldiğinizde geçmişe eklemeyi sağla
-  // Bu, sayfa ziyaret edildiğinde history'nin doğru çalışmasına yardımcı olur
-  // Buradaki state null olarak ayarlanmıştır, bu yeni bir giriş eklemez, sadece mevcut sayfayı günceller
-  // Bu şekilde, aynı sayfayı birden fazla kez history'ye eklemekten kaçınırız
-  window.history.replaceState(null, document.title, window.location.href);
+  // Görsel elemanlar için
+  let swipeOverlay = null;
+  let arrowElement = null;
+  
+  // Ziyaret edilen sayfaları takip eden localStorage anahtarı
+  const NAVIGATION_HISTORY_KEY = 'zeka_park_navigation_history';
+  
+  // Görsel elementi oluştur
+  createSwipeElements();
+  
+  // Önceki sayfanın URL'sini almak için fonksiyonlar
+  function saveCurrentPageToHistory() {
+    try {
+      // Geçmiş verisini al veya boş bir dizi oluştur
+      let navigationHistory = JSON.parse(localStorage.getItem(NAVIGATION_HISTORY_KEY) || '[]');
+      
+      // Mevcut sayfa URL'sini ekle
+      const currentUrl = window.location.pathname;
+      
+      // Aynı sayfaya tekrar tekrar eklemeyi önle
+      if (navigationHistory.length === 0 || navigationHistory[navigationHistory.length - 1] !== currentUrl) {
+        // Geçmişi maksimum 20 sayfa ile sınırla
+        if (navigationHistory.length >= 20) {
+          navigationHistory.shift(); // En eski sayfayı çıkar
+        }
+        
+        // Yeni sayfayı ekle
+        navigationHistory.push(currentUrl);
+        localStorage.setItem(NAVIGATION_HISTORY_KEY, JSON.stringify(navigationHistory));
+      }
+    } catch (e) {
+      console.error('Navigasyon geçmişi kaydedilemedi:', e);
+    }
+  }
+  
+  function getPreviousPage() {
+    try {
+      let navigationHistory = JSON.parse(localStorage.getItem(NAVIGATION_HISTORY_KEY) || '[]');
+      
+      // Geçmişte en az 2 sayfa olmalı
+      if (navigationHistory.length >= 2) {
+        // Son girişi kaldır (mevcut sayfa)
+        navigationHistory.pop();
+        
+        // Şimdi en son sayfa, önceki sayfa olur
+        const previousPage = navigationHistory.pop();
+        
+        // Güncellenen geçmişi kaydet
+        localStorage.setItem(NAVIGATION_HISTORY_KEY, JSON.stringify(navigationHistory));
+        
+        return previousPage;
+      }
+    } catch (e) {
+      console.error('Önceki sayfa alınamadı:', e);
+    }
+    
+    // Hiçbir şey bulunamadıysa ana sayfaya git
+    return '/';
+  }
+  
+  // Sayfa yüklendiğinde geçmişe ekle
+  saveCurrentPageToHistory();
+  
+  // Görsel geribildirim öğelerini oluştur
+  function createSwipeElements() {
+    // Zaten oluşturulmuşsa atla
+    if (document.getElementById('swipeOverlay')) return;
+    
+    // Kaydırma için overlay
+    swipeOverlay = document.createElement('div');
+    swipeOverlay.id = 'swipeOverlay';
+    swipeOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.1);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      transition: opacity 0.2s ease;
+    `;
+    
+    // Ok simgesi
+    arrowElement = document.createElement('div');
+    arrowElement.id = 'swipeArrow';
+    arrowElement.style.cssText = `
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 20px;
+      transform: translateX(-100px);
+      transition: transform 0.2s ease;
+    `;
+    
+    // Ok içine simge
+    arrowElement.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    `;
+    
+    swipeOverlay.appendChild(arrowElement);
+    document.body.appendChild(swipeOverlay);
+  }
   
   // Dokunma başlangıcı
   document.addEventListener('touchstart', function(e) {
@@ -47,8 +159,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const deltaX = touchMoveX - touchStartX;
     const deltaY = Math.abs(touchMoveY - touchStartY);
     
-    if (deltaX > 30 && deltaX > deltaY * 2) {
+    // Görsel geri bildirim
+    if (deltaX > 10 && deltaX > deltaY * 1.5) {
+      // Sayfanın kaymasını engelle
       e.preventDefault();
+      
+      // Görsel geri bildirim göster
+      const opacity = Math.min(deltaX / 150, 0.3);
+      const arrowOffset = Math.min(deltaX * 0.5, maxVisualOffset);
+      
+      if (swipeOverlay && arrowElement) {
+        swipeOverlay.style.opacity = opacity;
+        arrowElement.style.transform = `translateX(${arrowOffset - 100}px)`;
+      }
     }
   }, { passive: false });
   
@@ -65,12 +188,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const isQuickSwipe = swipeTime < timeThreshold && deltaX > swipeThreshold * 0.5;
     const isLongSwipe = deltaX > swipeThreshold;
     
+    // Geri bildirim efektini sıfırla
+    if (swipeOverlay && arrowElement) {
+      swipeOverlay.style.opacity = '0';
+      arrowElement.style.transform = 'translateX(-100px)';
+    }
+    
     if ((isHorizontalSwipe && (isQuickSwipe || isLongSwipe)) && deltaX > 0) {
       // Önceki sayfaya dön
-      // Geçmiş uzunluğunu kontrol et, 1'den büyükse (yani geri gidecek bir sayfa varsa) geri git
-      if (window.history.length > 1) {
-        console.log('Önceki sayfaya dönülüyor...');
-        window.history.back();
+      const previousPage = getPreviousPage();
+      
+      if (previousPage) {
+        console.log('Önceki sayfaya dönülüyor:', previousPage);
+        window.location.href = previousPage;
       } else {
         console.log('Geçmiş boş, geri gidilecek sayfa yok');
       }
@@ -83,17 +213,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Dokunma iptali
   document.addEventListener('touchcancel', function() {
     isSwipeActive = false;
+    // Geri bildirim efektini sıfırla
+    if (swipeOverlay && arrowElement) {
+      swipeOverlay.style.opacity = '0';
+      arrowElement.style.transform = 'translateX(-100px)';
+    }
   }, false);
   
-  // Önbellekteki link'leri de (nav çubuğu gibi) düzgün history oluşturmaya ayarla
-  const navLinks = document.querySelectorAll('a:not([href^="#"]):not([href^="javascript"]):not([target="_blank"])');
-  navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      // Bu linkin yeni bir sayfa yükleyeceğini işaretle, böylece history düzgün çalışır
-      // replaceState ile geçerli sayfayı güncelle, böylece tıklandıktan sonra yeni bir geçmiş durumu oluşur
-      window.history.replaceState({navigatedFrom: window.location.href}, document.title, window.location.href);
-    });
-  });
-  
-  console.log('Basit iOS tarzı kaydırma navigasyonu aktif');
+  console.log('Profesyonel iOS tarzı kaydırma navigasyonu aktif');
 });
