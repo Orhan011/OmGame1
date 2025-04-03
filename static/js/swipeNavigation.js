@@ -30,16 +30,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eğer geçmiş varsa ve son sayfa şu anki sayfadan farklıysa ekle
     if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
       console.log('Geçmişe ekleniyor:', window.location.pathname);
+      
+      // Eğer mevcut sayfa zaten geçmişte varsa, o noktadan sonrasını temizle
+      const existingIndex = pageHistory.indexOf(window.location.pathname);
+      if (existingIndex !== -1) {
+        console.log('Bu sayfa zaten geçmişte var, temizleniyor:', existingIndex);
+        pageHistory = pageHistory.slice(0, existingIndex);
+      }
+      
+      // Şimdi yeni sayfayı ekle
       pageHistory.push(window.location.pathname);
+      
       // Sadece son 10 sayfayı sakla (performans için)
       if (pageHistory.length > 10) {
         pageHistory.shift();
       }
     }
     
-    // LocalStorage'ı her zaman güncelle
-    localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
-    console.log('Güncellenmiş geçmiş:', pageHistory);
+    // LocalStorage'ı her zaman güncelle ve MUTLAKA kontrol et
+    try {
+      localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+      // Hemen doğrula
+      const testRead = localStorage.getItem('zekapark_page_history');
+      const parsed = JSON.parse(testRead);
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        throw new Error('Geçmiş doğru kaydedilmedi');
+      }
+      console.log('Güncellenmiş geçmiş:', pageHistory);
+    } catch (e) {
+      console.error('Geçmiş kaydetme hatası:', e);
+      // Son çare olarak localStorage'ı sıfırla ve yeniden dene
+      localStorage.removeItem('zekapark_page_history');
+      localStorage.setItem('zekapark_page_history', JSON.stringify([window.location.pathname]));
+    }
   }
   
   // Kaydırma efekti için gerekli değişkenler
@@ -289,23 +312,42 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         console.log('Navigasyon geçmişi:', pageHistory);
         
-        // Geçmişte en az 2 sayfa varsa, bir önceki sayfaya git
-        if (pageHistory.length >= 2) {
-          // Şu anki sayfanın bir önceki sayfası
-          const previousPage = pageHistory[pageHistory.length - 2];
+        // SORUN GİDERME: Doğrudan geçmişi kontrol et ve debugla
+        console.log('Şu anki URL:', window.location.pathname);
+        console.log('Geçmiş uzunluğu:', pageHistory.length);
+        
+        // Geçmiş MUTLAKA kontrol et ve doğru bir şekilde uygula
+        if (pageHistory && Array.isArray(pageHistory) && pageHistory.length >= 2) {
+          // Şu anki sayfanın geçmişteki konumunu bul 
+          const currentIndex = pageHistory.indexOf(window.location.pathname);
+          console.log('Geçmişteki mevcut konum indeksi:', currentIndex);
+          
+          let previousPage = null;
+          
+          if (currentIndex > 0) {
+            // Eğer geçmişte bulunuyorsa, bir önceki sayfaya git
+            previousPage = pageHistory[currentIndex - 1];
+            // Güncelleme yapma, sadece git
+          } else {
+            // Eğer bulunamadıysa, son sayfadan bir öncekine git
+            previousPage = pageHistory[pageHistory.length - 2];
+            // Son sayfayı çıkar
+            pageHistory.pop();
+            // LocalStorage'ı güncelle
+            localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+          }
+          
           console.log('Önceki sayfaya gidiliyor:', previousPage);
           
-          // Geçmiş listesinden şu anki sayfayı çıkar 
-          pageHistory.pop();
-          
-          // LocalStorage'ı güncelle
-          localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
-          
-          // Önceki sayfaya git
-          window.location.href = previousPage;
+          if (previousPage) {
+            // Mutlaka bir önceki sayfaya git, asla ana sayfaya değil!
+            window.location.href = previousPage;
+            return; // Diğer yönlendirmeleri engelle
+          }
         }
-        // İç hafızada yeterli geçmiş yoksa tarayıcı geçmişini kullan
-        else if (window.history.length > 2) {
+        
+        // Son çare olarak bunları dene
+        if (window.history.length > 2) {
           console.log('Tarayıcı geçmişi kullanılıyor');
           window.history.back();
         }

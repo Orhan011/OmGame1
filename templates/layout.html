@@ -237,12 +237,29 @@ function loadArticleContent() {
       const savedHistory = localStorage.getItem('zekapark_page_history');
       
       if (savedHistory) {
-        pageHistory = JSON.parse(savedHistory);
+        try {
+          pageHistory = JSON.parse(savedHistory);
+          if (!Array.isArray(pageHistory)) {
+            throw new Error('Geçerli bir dizi değil');
+          }
+        } catch (e) {
+          console.error('Geçmiş okuma hatası, sıfırlanıyor:', e);
+          pageHistory = [];
+          localStorage.removeItem('zekapark_page_history');
+        }
       }
       
-      // Mevcut URL'yi ekle (eğer farklıysa)
-      if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
+      // Mevcut URL'yi ekle (eğer farklıysa ve geçerli bir URL ise)
+      if (window.location.pathname && (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname)) {
         console.log('Sayfa ilk yüklenirken geçmişe ekleniyor:', window.location.pathname);
+        
+        // Eğer mevcut sayfa zaten geçmişte varsa, o noktadan sonrasını temizle
+        const existingIndex = pageHistory.indexOf(window.location.pathname);
+        if (existingIndex !== -1) {
+          console.log('Bu sayfa zaten geçmişte var, temizleniyor:', existingIndex);
+          pageHistory = pageHistory.slice(0, existingIndex);
+        }
+        
         pageHistory.push(window.location.pathname);
         
         // Sadece son 10 sayfayı sakla
@@ -250,12 +267,23 @@ function loadArticleContent() {
           pageHistory.shift();
         }
         
-        // Geçmişi kaydet
+        // Geçmişi kaydet ve doğrula
         localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+        
+        // Kaydettiğimizi doğrula
+        const test = localStorage.getItem('zekapark_page_history');
+        if (!test || test === 'null' || test === 'undefined') {
+          console.error('Geçmiş kaydedilemedi!');
+          localStorage.setItem('zekapark_page_history', JSON.stringify([window.location.pathname]));
+        }
+        
         console.log('Güncel geçmiş:', pageHistory);
       }
     } catch (err) {
       console.error('Sayfa geçmişi başlatma hatası:', err);
+      // Tamamen sıfırla
+      localStorage.removeItem('zekapark_page_history');
+      localStorage.setItem('zekapark_page_history', JSON.stringify([window.location.pathname]));
     }
     
     // Tüm linkleri bul ve tıklama olayını dinle
@@ -264,13 +292,37 @@ function loadArticleContent() {
         // Dış linkleri atlayın, sadece site içi navigasyonu kaydedin
         if (this.href && this.href.includes(window.location.host) && !this.href.includes('#') && !this.target) {
           try {
-            // Tıklanan linkin URL'sini geçmişe eklemeyi localStorage.setItem yaparak ekleme
-            // Bu kısım aslında gereksiz, çünkü zaten yeni sayfaya geçildiğinde o sayfa kendi 
-            // geçmişini güncelleyecek. Burada gidilecek sayfayı önceden kaydetmeye gerek yok.
+            // Geçmiş verilerini al
+            let pageHistory = [];
+            const savedHistory = localStorage.getItem('zekapark_page_history');
             
-            // Şu anki sayfa yolunu konsola yazdır
+            if (savedHistory) {
+              try {
+                pageHistory = JSON.parse(savedHistory);
+                if (!Array.isArray(pageHistory)) {
+                  throw new Error('Geçerli bir dizi değil');
+                }
+              } catch (e) {
+                console.error('Geçmiş okuma hatası:', e);
+                pageHistory = [];
+              }
+            }
+            
+            // Mevcut sayfayı geçmişe ekle (tıklamadan önce)
+            if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== window.location.pathname) {
+              pageHistory.push(window.location.pathname);
+              
+              // Sadece son 10 sayfayı sakla
+              if (pageHistory.length > 10) {
+                pageHistory.shift();
+              }
+              
+              localStorage.setItem('zekapark_page_history', JSON.stringify(pageHistory));
+            }
+            
             console.log('Link tıklandı, mevcut sayfa:', window.location.pathname);
             console.log('Hedef sayfa:', this.pathname || this.href);
+            console.log('Geçmiş güncellendi:', pageHistory);
           } catch (err) {
             console.error('Link tıklama işleme hatası:', err);
           }
