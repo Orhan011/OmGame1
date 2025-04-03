@@ -1,4 +1,5 @@
-/* Gelişmiş iOS-tarzı kaydırma navigasyon stilleri */
+
+/* Advanced iOS 18+ style swipe navigation styles */
 .ios-swipe-container {
   will-change: transform, opacity;
   overflow: hidden;
@@ -25,8 +26,8 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   will-change: transform;
   overflow: hidden;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.05);
-  border-radius: 0 10px 10px 0;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.22), 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 0 13px 13px 0;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   backface-visibility: hidden;
@@ -34,12 +35,22 @@
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+.ios-current-page-snapshot {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+}
+
 .ios-back-arrow {
   transition: opacity 0.2s cubic-bezier(0.22, 0.84, 0.38, 0.98);
   z-index: 10;
   will-change: opacity;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  transform: translateZ(0) rotate(-45deg) scale(1.1);
+  -webkit-transform: translateZ(0) rotate(-45deg) scale(1.1);
 }
 
 .ios-edge-indicator {
@@ -55,8 +66,8 @@
   will-change: opacity;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   z-index: 5;
 }
 
@@ -79,48 +90,48 @@
   mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 8%);
 }
 
-/* Kenar göstergesi için etki geliştirmeleri */
+/* Edge indicator enhancements */
 @keyframes pulseEdge {
   0% { opacity: 0; }
   50% { opacity: 0.3; }
   100% { opacity: 0; }
 }
 
-/* Tarayıcının elastik kaydırma efektini engelle */
+/* Prevent browser's elastic scroll effect */
 html, body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   touch-action: pan-y;
 }
 
-/* Safari ve iOS için güvenilir rendering */
+/* Reliable rendering for Safari and iOS */
 .ios-swipe-container * {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Cihaza özel optimizasyonlar */
+/* Device-specific optimizations */
 @media (max-width: 390px) {
   .ios-prev-page-preview {
-    width: 88%;
+    width: 86%;
   }
 }
 
 @media (min-width: 391px) and (max-width: 767px) {
   .ios-prev-page-preview {
-    width: 88%;
+    width: 86%;
   }
 }
 
 @media (min-width: 768px) {
   .ios-prev-page-preview {
-    width: 420px;
-    max-width: 88%;
+    width: 410px;
+    max-width: 86%;
   }
 }
 
-/* Koyu mod desteği */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .ios-prev-page-preview {
     background-color: #1c1c1e !important;
@@ -130,7 +141,7 @@ html, body {
 
   .ios-fake-header {
     background-color: rgba(29, 29, 31, 0.85) !important;
-    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.12) !important;
   }
 
   .ios-prev-page-title {
@@ -138,7 +149,7 @@ html, body {
   }
 }
 
-/* Açık/koyu tema desteği */
+/* Light/dark theme support */
 .dark-theme .ios-prev-page-preview {
   background-color: #1c1c1e !important;
   color: #fff !important;
@@ -147,22 +158,23 @@ html, body {
 
 .dark-theme .ios-fake-header {
   background-color: rgba(29, 29, 31, 0.85) !important;
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 .dark-theme .ios-prev-page-title {
   color: #fff !important;
 }
 
-/* Özellikle iOS 16+ için geliştirilmiş optimize ayarlar */
+/* Optimized settings especially for iOS 18+ */
 @supports (-webkit-touch-callout: none) {
   .ios-prev-page-preview, 
   .ios-swipe-overlay,
   .ios-fake-header,
   .ios-prev-page-title,
   .ios-back-arrow,
-  .ios-edge-indicator {
-    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  .ios-edge-indicator,
+  .ios-current-page-snapshot {
+    transition-timing-function: cubic-bezier(0.22, 0.84, 0.38, 0.96);
   }
 
   .ios-prev-page-preview {
@@ -170,26 +182,27 @@ html, body {
   }
 }
 
-/* iOS 15+ stili yuvarlak köşe geliştirmeleri */
+/* iOS 18+ style rounded corner enhancements */
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
   .ios-prev-page-preview {
+    border-radius: 0 14px 14px 0;
+  }
+}
+
+/* Sharper corners for real iOS devices */
+@supports (border-radius: max(0px)) {
+  .ios-prev-page-preview {
     border-radius: 0 13px 13px 0;
   }
 }
 
-/* Gerçek iOS cihazları için daha keskin köşeler */
-@supports (border-radius: max(0px)) {
-  .ios-prev-page-preview {
-    border-radius: 0 10px 10px 0;
-  }
-}
-
-/* 60fps animasyon için ekstra optimizasyonlar */
+/* Extra optimizations for 60fps animation */
 .ios-swipe-container, 
 .ios-prev-page-preview, 
 .ios-swipe-overlay, 
 .ios-back-arrow, 
-.ios-prev-page-title {
+.ios-prev-page-title,
+.ios-current-page-snapshot {
   will-change: transform, opacity;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
@@ -197,51 +210,60 @@ html, body {
   -webkit-backface-visibility: hidden;
 }
 
-/* Gölge iyileştirmeleri */
+/* Shadow improvements */
 .ios-prev-page-preview {
   box-shadow: 
-    0 0 25px rgba(0, 0, 0, 0.2),
-    0 0 10px rgba(0, 0, 0, 0.1),
+    0 0 25px rgba(0, 0, 0, 0.22),
+    0 0 15px rgba(0, 0, 0, 0.12),
     0 0 5px rgba(0, 0, 0, 0.05);
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 13px 13px 0;
 }
 
-/* Kenar gradyan yumuşatma */
+/* Edge gradient smoothing */
 .ios-edge-puller {
   transition: opacity 0.2s ease;
 }
 
-/* Tüm cihazlarda daha pürüzsüz animasyonlar */
+/* Smoother animations on all devices */
 .ios-swipe-container,
 .ios-prev-page-preview,
 .ios-swipe-overlay,
 .ios-prev-page-title,
-.ios-back-arrow {
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+.ios-back-arrow,
+.ios-current-page-snapshot {
+  transition-timing-function: cubic-bezier(0.22, 0.84, 0.38, 0.96);
 }
 
-/* Dokunma hedefi geliştirmeleri */
+/* Touch target enhancements */
 .ios-edge-indicator {
   width: 8px !important;
 }
 
-/* Tüm tarayıcılarda daha iyi performans */
+/* Better performance in all browsers */
 @supports (-webkit-appearance:none) {
   .ios-swipe-container,
   .ios-prev-page-preview,
   .ios-swipe-overlay,
   .ios-prev-page-title,
   .ios-back-arrow,
-  .ios-fake-header {
+  .ios-fake-header,
+  .ios-current-page-snapshot {
     -webkit-transform: translateZ(0);
   }
 }
 
-/* Animasyon sırasında hareket eden diğer sayfa için iyileştirmeler */
+/* Improvements for moving page during animation */
 main, .container, #content {
   will-change: transform, opacity;
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.25s cubic-bezier(0.22, 0.84, 0.38, 0.96),
+              opacity 0.25s cubic-bezier(0.22, 0.84, 0.38, 0.96);
   transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* iOS 18 specific improvements */
+.ios-current-page-snapshot {
+  transform-origin: center left;
+  perspective: 1000px;
   backface-visibility: hidden;
 }
