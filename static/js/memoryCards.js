@@ -1064,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Send score to server
-    fetch('/save-score', {
+    fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1077,6 +1077,21 @@ document.addEventListener('DOMContentLoaded', function() {
         showAlert('Skorunuz başarıyla kaydedildi!', 'success');
         saveScoreBtn.textContent = '✓ Kaydedildi';
         saveScoreBtn.classList.add('btn-success');
+      } else if (data.message === 'Login required') {
+        // Giriş yapmamış kullanıcılar için giriş yapma butonu göster
+        showAlert('Skorunuzu kaydetmek için giriş yapmalısınız.', 'warning');
+        saveScoreBtn.textContent = '🔑 Giriş Yap';
+        saveScoreBtn.classList.remove('btn-primary');
+        saveScoreBtn.classList.add('btn-warning');
+        saveScoreBtn.disabled = false;
+        
+        // Butonu giriş sayfasına yönlendirme işlevine güncelleyin
+        saveScoreBtn.removeEventListener('click', saveScore);
+        saveScoreBtn.addEventListener('click', function() {
+          // API'den gelen yönlendirme URL'sini kullan, yoksa varsayılan URL'yi kullan
+          const redirectUrl = data.redirect_url || '/login?redirect=games/memory-cards';
+          window.location.href = redirectUrl;
+        });
       } else {
         showAlert('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
         saveScoreBtn.disabled = false;

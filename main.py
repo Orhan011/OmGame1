@@ -583,19 +583,24 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Yönlendirme parametresini al (varsa)
+    redirect_to = request.args.get('redirect', '')
+    
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        # Form'dan yönlendirme bilgisini al
+        redirect_to = request.form.get('redirect', '')
 
         if not email or not password:
             flash('Lütfen email ve şifrenizi girin.', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', redirect=redirect_to))
 
         user = User.query.filter_by(email=email).first()
 
         if not user or not check_password_hash(user.password_hash, password):
             flash('Geçersiz email veya şifre.', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', redirect=redirect_to))
 
         # Kullanıcı oturum bilgilerini kaydet
         session['user_id'] = user.id
@@ -608,12 +613,27 @@ def login():
             session['avatar_url'] = 'images/default-avatar.png'
 
         flash('Başarıyla giriş yaptınız!', 'success')
-        return redirect(url_for('index'))
+        
+        # Eğer bir yönlendirme varsa, oraya git
+        if redirect_to:
+            if redirect_to.startswith('/'):
+                return redirect(redirect_to)
+            else:
+                return redirect('/' + redirect_to)
+        else:
+            return redirect(url_for('index'))
 
     if session.get('user_id'):
-        return redirect(url_for('index'))
+        # Kullanıcı zaten giriş yapmışsa
+        if redirect_to:
+            if redirect_to.startswith('/'):
+                return redirect(redirect_to)
+            else:
+                return redirect('/' + redirect_to)
+        else:
+            return redirect(url_for('index'))
 
-    return render_template('login.html')
+    return render_template('login.html', redirect=redirect_to)
 
 # Profile routes have been removed from the application
 
@@ -1423,11 +1443,23 @@ def save_score():
 
     # Kullanıcı giriş yapmamışsa
     if not user_id:
+        # Şu anki sayfayı belirle (geri dönmek için)
+        current_page = request.headers.get('Referer', '')
+        
+        # URL'den domain kısmını çıkar, sadece path kısmını al
+        if current_page:
+            from urllib.parse import urlparse
+            parsed_url = urlparse(current_page)
+            current_path = parsed_url.path
+        else:
+            current_path = ''
+        
         # Skorları kaydetmeyi devre dışı bırak ve kullanıcıya bildir
         return jsonify({
             'success': False, 
             'message': 'Login required',
-            'score': data.get('score', 0)
+            'score': data.get('score', 0),
+            'redirect_url': url_for('login', redirect=current_path)
         })
 
     # Kullanıcı bilgilerini getir
@@ -1757,12 +1789,37 @@ def get_leaderboard_data(game_type):
         # Oyun türü adını düzgün formata dönüştür
         internal_game_type = game_type.replace("-", "")
         
+        # Oyun türü eşleştirme haritası - API isteklerinden veritabanı formatına dönüşüm
+        # Eğer veritabanındaki oyun tipleri büyük/küçük harf duyarlı ise
+        game_type_map = {
+            'wordpuzzle': 'wordPuzzle',
+            'memorymatch': 'memoryMatch',
+            'numbersequence': 'numberSequence',
+            'labyrinth': 'labyrinth',
+            'puzzle': 'puzzle',
+            'memorycards': 'memoryCards',
+            'numberchain': 'numberChain',
+            'audiomemory': 'audioMemory',
+            'nback': 'nBack',
+            'sudoku': 'sudoku',
+            '2048': '2048', 
+            'chess': 'chess',
+            'logicpuzzles': 'logicPuzzles',
+            'tangram': 'tangram',
+            'rubikcube': 'rubikCube',
+            '3drotation': '3dRotation',
+            '3dlabyrinth': '3dLabyrinth'
+        }
+        
+        # Veritabanında kullanılan oyun türünü bul
+        db_game_type = game_type_map.get(internal_game_type.lower(), internal_game_type)
+        
         # Her oyun türü için en yüksek puanları bul
         max_scores_subquery = db.session.query(
             Score.user_id, 
             func.max(Score.score).label('max_score')
         ).filter_by(
-            game_type=internal_game_type
+            game_type=db_game_type
         ).group_by(
             Score.user_id
         ).subquery()
@@ -1773,7 +1830,7 @@ def get_leaderboard_data(game_type):
             db.and_(
                 Score.user_id == max_scores_subquery.c.user_id,
                 Score.score == max_scores_subquery.c.max_score,
-                Score.game_type == internal_game_type
+                Score.game_type == db_game_type
             )
         ).join(
             User, 

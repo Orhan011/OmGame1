@@ -31,7 +31,8 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+            <form method="POST" action="{{ url_for('login', redirect=redirect) }}" class="auth-form">
+                <input type="hidden" name="redirect" value="{{ redirect }}">
                 <div class="form-group floating-label">
                     <div class="input-icon-wrapper">
                         <i class="fas fa-envelope input-icon"></i>

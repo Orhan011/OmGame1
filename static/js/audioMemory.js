@@ -667,21 +667,40 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(response => response.json())
     .then(data => {
+      console.log("Score saved:", data);
       if (data.success) {
         saveScoreBtn.innerHTML = '<i class="fas fa-check"></i> Kaydedildi!';
         
         // Başarı mesajı göster
         statusMessage.textContent = 'Skorun başarıyla kaydedildi!';
       } else {
-        saveScoreBtn.innerHTML = '<i class="fas fa-times"></i> Hata!';
-        
-        // Hata mesajı göster
-        statusMessage.textContent = 'Skor kaydedilirken bir hata oluştu!';
+        // Giriş yapılmadıysa login sayfasına yönlendirme öner
+        if (data.message === 'Login required') {
+          saveScoreBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Giriş Yap';
+          saveScoreBtn.disabled = false;
+          
+          // Giriş yapma mesajı göster
+          statusMessage.textContent = 'Skor kaydetmek için giriş yapmalısınız!';
+          
+          // Giriş sayfasına yönlendirme ekle
+          saveScoreBtn.addEventListener('click', function() {
+            // API'den gelen yönlendirme URL'sini kullan, yoksa varsayılan URL'yi kullan
+            const redirectUrl = data.redirect_url || '/login?redirect=games/audio-memory';
+            window.location.href = redirectUrl;
+          }, { once: true }); // once: true ile tek seferlik dinleyici olarak ekle
+        } else {
+          saveScoreBtn.innerHTML = '<i class="fas fa-times"></i> Hata!';
+          saveScoreBtn.disabled = false;
+          
+          // Hata mesajı göster
+          statusMessage.textContent = 'Skor kaydedilirken bir hata oluştu!';
+        }
       }
     })
     .catch(error => {
       console.error('Error:', error);
       saveScoreBtn.innerHTML = '<i class="fas fa-times"></i> Hata!';
+      saveScoreBtn.disabled = false;
       
       // Hata mesajı göster
       statusMessage.textContent = 'Skor kaydedilirken bir hata oluştu!';
