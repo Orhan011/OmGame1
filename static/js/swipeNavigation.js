@@ -76,7 +76,62 @@ document.addEventListener('DOMContentLoaded', function() {
       will-change: transform;
     `;
     
-    // Önceki sayfa içeriği
+    // Önceki sayfa içeriği - gerçek sayfa içeriğini gösterme girişimi
+  try {
+    // Son sayfadaki içeriği almaya çalış
+    if (document.referrer && document.referrer.includes(window.location.host)) {
+      // previousPagePreview'in içeriğini boşalt
+      previousPagePreview.innerHTML = '';
+      
+      // Önceki sayfanın stilini ayarla
+      previousPagePreview.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        z-index: 9996;
+        transform: translateX(-30%);
+        pointer-events: none;
+        transition: transform 0.25s ease;
+        will-change: transform;
+        overflow: hidden;
+      `;
+      
+      // Dark mode desteği
+      if (document.documentElement.classList.contains('dark')) {
+        previousPagePreview.style.backgroundColor = '#1a1a2e';
+      }
+    } else {
+      // Fallback içerik - referrer yoksa
+      const prevContent = document.createElement('div');
+      prevContent.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+      `;
+      
+      // Geri simgesi
+      const backIcon = document.createElement('div');
+      backIcon.innerHTML = '<i class="fas fa-arrow-left" style="font-size: 3rem; margin-bottom: 15px; color: #fff;"></i>';
+      
+      // Geri metni
+      const backText = document.createElement('div');
+      backText.textContent = 'Önceki Sayfa';
+      backText.style.cssText = 'font-size: 1.5rem; font-weight: 500;';
+      
+      prevContent.appendChild(backIcon);
+      prevContent.appendChild(backText);
+      previousPagePreview.appendChild(prevContent);
+    }
+  } catch (e) {
+    console.log('Önceki sayfa gösterimi hatası:', e);
+    
+    // Hata durumunda fallback göster
     const prevContent = document.createElement('div');
     prevContent.style.cssText = `
       position: absolute;
@@ -99,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     prevContent.appendChild(backIcon);
     prevContent.appendChild(backText);
     previousPagePreview.appendChild(prevContent);
+  }
     
     // HTML'e ekle
     document.body.appendChild(previousPagePreview);
@@ -194,9 +250,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (diffX > threshold || isQuickSwipe) {
       completeSwipeAnimation(true);
       
-      // Geçmiş kaydına geri dön
+      // Geçmiş kaydına geri dön, but don't go directly to index if we have history
       setTimeout(() => {
-        window.history.back();
+        if (window.history.length > 2) {
+          window.history.back();
+        } else if (document.referrer && document.referrer.includes(window.location.host)) {
+          // Referrer'a yönlendir (farklı domain'den gelmediyse)
+          window.location.href = document.referrer;
+        } else {
+          // Fallback olarak ana sayfaya git
+          window.location.href = '/';
+        }
       }, 150);
     } else {
       // Yetersiz kaydırma, animasyonu geri al
