@@ -120,6 +120,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const storedHistory = localStorage.getItem('navigationHistory');
       if (storedHistory) {
         navigationHistory = JSON.parse(storedHistory);
+        
+        // Çok uzun geçmiş listesini temizle (maksimum 20 kayıt tut)
+        if (navigationHistory.length > 20) {
+          navigationHistory = navigationHistory.slice(-20);
+          try {
+            localStorage.setItem('navigationHistory', JSON.stringify(navigationHistory));
+          } catch (e) {
+            // Hata durumunda sessizce devam et
+          }
+        }
       }
     } catch (e) {
       navigationHistory = [];
@@ -128,24 +138,47 @@ document.addEventListener('DOMContentLoaded', function() {
     // Link tıklamalarını dinle
     document.addEventListener('click', function(e) {
       const link = e.target.closest('a');
-      if (link && link.href && !link.getAttribute('target')) {
+      if (link && link.href && !link.getAttribute('target') && !link.getAttribute('download')) {
         // Sayfanın URL'sini geçmişe ekle
-        addToHistory(link.href);
+        addToHistory(window.location.href); // Önce mevcut sayfayı ekle
+      }
+    });
+
+    // Form gönderimlerini de izle
+    document.addEventListener('submit', function(e) {
+      const form = e.target;
+      if (form && form.method && form.method.toLowerCase() !== 'post') {
+        // GET formlarında mevcut sayfayı geçmişe ekle
+        addToHistory(window.location.href);
       }
     });
 
     // Sayfa yüklendiğinde mevcut URL'yi geçmişe ekle
     window.addEventListener('pageshow', function(e) {
-      // Mevcut URL'yi geçmişe ekle
-      if (document.referrer) {
-        addToHistory(document.referrer);
+      // Referrer varsa ekle
+      if (document.referrer && document.referrer !== window.location.href) {
+        const referrerDomain = new URL(document.referrer).hostname;
+        const currentDomain = window.location.hostname;
+        
+        // Sadece aynı domain içindeki referrer ise ekle
+        if (referrerDomain === currentDomain && 
+            !navigationHistory.includes(document.referrer)) {
+          addToHistory(document.referrer);
+        }
       }
 
-      // Geçmişi güncelle
+      // Şu anki sayfayı geçmişe ekle
       if (window.location.href !== navigationHistory[navigationHistory.length - 1]) {
-        // Mevcut sayfayı geçmişe ekle
         addToHistory(window.location.href);
       }
+    });
+    
+    // Popstate (geri/ileri butonları) olayını dinle
+    window.addEventListener('popstate', function(e) {
+      // Mevcut URL'yi geçmişe ekle (tarayıcı geçmişiyle uyumlu olması için)
+      setTimeout(() => {
+        addToHistory(window.location.href);
+      }, 100);
     });
   }
 
@@ -153,13 +186,25 @@ document.addEventListener('DOMContentLoaded', function() {
   function addToHistory(url) {
     // Eğer geçmişte son URL ile aynı değilse ekle
     if (navigationHistory.length === 0 || navigationHistory[navigationHistory.length - 1] !== url) {
+      // Geçmiş çok büyürse, en eski girişleri kaldır
+      if (navigationHistory.length >= 20) {
+        navigationHistory = navigationHistory.slice(-19);
+      }
+      
+      // URL'yi geçmişe ekle
       navigationHistory.push(url);
 
       // Geçmişi sakla
       try {
         localStorage.setItem('navigationHistory', JSON.stringify(navigationHistory));
       } catch (e) {
-        // Hata durumunda sessizce devam et
+        // LocalStorage hatası durumunda geçmişi temizle
+        try {
+          localStorage.removeItem('navigationHistory');
+          localStorage.setItem('navigationHistory', JSON.stringify([url]));
+        } catch (innerError) {
+          // Hiçbir şekilde çalışmıyorsa sessizce devam et
+        }
       }
     }
   }
@@ -183,9 +228,21 @@ document.addEventListener('DOMContentLoaded', function() {
       window.location.href = previousPage;
       return true;
     } else {
-      // Geçmişte sayfa yoksa ana sayfaya dön
-      window.location.href = '/';
-      return false;
+      // Geçmişte sayfa yoksa tarayıcı geçmişini kullan
+      if (window.history.length > 1) {
+        window.history.back();
+        return true;
+      } else {
+        // En son çare olarak referrer kullan
+        if (document.referrer) {
+          window.location.href = document.referrer;
+          return true;
+        } else {
+          // Hiçbir geçmiş yoksa ana sayfaya dön
+          window.location.href = '/';
+          return false;
+        }
+      }
     }
   }
 
