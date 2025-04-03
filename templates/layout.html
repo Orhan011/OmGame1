@@ -12,10 +12,6 @@
 
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
-
-<!-- Swipe navigation CSS removed -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
@@ -225,97 +221,6 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
-<!-- Swipe Navigation scripts removed -->
+<!-- Swipe Navigation removed -->
   </body>
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
-<script>
-  // Gelişmiş tema ve sayfa tipi desteği
-  document.addEventListener('DOMContentLoaded', function() {
-    const bodyElement = document.body;
-    const htmlElement = document.documentElement;
-    
-    // Sayfa türü algılama ve sınıf ekleme (iOS swipe arka plan uyumu için)
-    function detectPageType() {
-      // Mevcut tüm sayfa tipi sınıflarını temizle
-      bodyElement.classList.remove('game-page', 'profile-page', 'article-page', 'auth-page', 'home-page');
-      
-      // Yol tabanlı otomatik sayfa türü algılama
-      const path = window.location.pathname;
-      
-      if (path.includes('/games/')) {
-        bodyElement.classList.add('game-page');
-      } else if (path.includes('/profile')) {
-        bodyElement.classList.add('profile-page');
-      } else if (path.includes('/article') || path.includes('/tips')) {
-        bodyElement.classList.add('article-page');
-      } else if (path.includes('/login') || path.includes('/register')) {
-        bodyElement.classList.add('auth-page');
-      } else if (path === '/' || path === '/index.html') {
-        bodyElement.classList.add('home-page');
-      }
-      
-      // Veri özniteliği olarak sayfa yolunu sakla (ek işlevsellik için)
-      bodyElement.setAttribute('data-current-path', path);
-    }
-    
-    // Sayfa türünü algıla
-    detectPageType();
-    
-    // Tema değişikliklerini izleyen gelişmiş gözlemci
-    const themeObserver = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.attributeName === 'class' && 
-            (mutation.target === htmlElement || mutation.target === bodyElement)) {
-          
-          // Güncel tema bilgisini veri özniteliği olarak sakla
-          const isDarkTheme = htmlElement.classList.contains('dark');
-          document.body.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
-          
-          // CSS değişkenlerini güncelle (tema geçişlerinde uyum için)
-          document.documentElement.style.setProperty(
-            '--ios-bg-color', 
-            isDarkTheme ? 'var(--ios-bg-dark)' : 'var(--ios-bg-light)'
-          );
-          
-          document.documentElement.style.setProperty(
-            '--ios-text-color', 
-            isDarkTheme ? 'var(--ios-text-dark)' : 'var(--ios-text-light)'
-          );
-        }
-      });
-    });
-    
-    // Tema değişikliği gözlemcisini başlat
-    themeObserver.observe(htmlElement, { attributes: true });
-    themeObserver.observe(bodyElement, { attributes: true });
-    
-    // URL değişikliklerini izle (SPA benzeri davranış için)
-    function setupURLChangeListener() {
-      // Orijinal pushState ve replaceState metodlarını sakla
-      const originalPushState = history.pushState;
-      const originalReplaceState = history.replaceState;
-      
-      // pushState metodunu geçersiz kıl
-      history.pushState = function() {
-        originalPushState.apply(this, arguments);
-        detectPageType(); // URL değiştiğinde sayfa türünü yeniden algıla
-      };
-      
-      // replaceState metodunu geçersiz kıl
-      history.replaceState = function() {
-        originalReplaceState.apply(this, arguments);
-        detectPageType(); // URL değiştiğinde sayfa türünü yeniden algıla
-      };
-      
-      // Tarayıcı geri/ileri düğmeleri için popstate olayını dinle
-      window.addEventListener('popstate', function() {
-        detectPageType();
-      });
-    }
-    
-    // URL değişikliği dinleyicisini kur
-    setupURLChangeListener();
-  });
-</script>
-</html>
 </html>
