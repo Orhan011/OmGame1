@@ -1,3 +1,4 @@
+
 /**
  * iOS-benzeri kaydırma navigasyonu
  * Kullanıcıya parmağıyla ekranı soldan sağa doğru kaydırarak önceki sayfaya dönme imkanı sağlar
@@ -352,123 +353,65 @@ document.addEventListener('DOMContentLoaded', function() {
         previousPagePreview.style.transition = `all ${returnDuration}ms ${returnCurve}`;
         
         requestAnimationFrame(() => {
-          // Mevcut sayfayı geri pozisyona getir
+          // Mevcut sayfayı orijinal konumuna geri getir
           pageClone.style.transform = 'translate3d(0, 0, 0)';
           
-          // Önceki sayfayı gizle
-          previousPagePreview.style.opacity = '0';
-          previousPagePreview.style.transform = 'translate3d(-15%, 0, 0) scale(0.98)';
-          
-          // Gölgelendirmeyi kaldır
+          // Arka plan efektlerini sıfırla
           overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
           overlay.style.backdropFilter = 'blur(0px)';
           overlay.style.webkitBackdropFilter = 'blur(0px)';
+          
+          // Önceki sayfayı başlangıç konumuna geri getir - daha yakın başlangıç konumundan
+          previousPagePreview.style.opacity = '0';
+          previousPagePreview.style.transform = 'translate3d(-15%, 0, 0) scale(0.98)';
         });
         
-        // Çok kısa bir süre sonra animasyon durumunu sıfırla
         setTimeout(() => {
           isAnimating = false;
+          
+          // Durumu sıfırla
           touchStartX = 0;
-          touchStartY = 0;
           currentX = 0;
         }, returnDuration);
       }
     }
-  }
-  
-  // Dokunma iptal
-  function handleTouchCancel() {
-    if (touchStartX > 0 && !isAnimating) {
-      // Animasyonu resetle - daha hızlı geri dönüş
-      isAnimating = true;
-      
-      // Daha hızlı geri dönüş
-      const returnDuration = 50; // 150ms'den 50ms'ye düşürüldü
-      
-      // Tüm animasyonları senkronize et
-      pageClone.style.transition = `transform ${returnDuration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
-      overlay.style.transition = `all ${returnDuration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
-      previousPagePreview.style.transition = `all ${returnDuration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
-      
-      requestAnimationFrame(() => {
-        // Mevcut sayfayı geri pozisyona getir
-        pageClone.style.transform = 'translate3d(0, 0, 0)';
-        
-        // Önceki sayfayı gizle
-        previousPagePreview.style.opacity = '0';
-        previousPagePreview.style.transform = 'translate3d(-15%, 0, 0) scale(0.98)';
-        
-        // Gölgelendirmeyi kaldır
-        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-        overlay.style.backdropFilter = 'blur(0px)';
-        overlay.style.webkitBackdropFilter = 'blur(0px)';
-      });
-      
-      // Çok kısa bir süre sonra animasyon durumunu sıfırla
-      setTimeout(() => {
-        isAnimating = false;
-        touchStartX = 0;
-        touchStartY = 0;
-        currentX = 0;
-      }, returnDuration);
-    }
-  }
-  
-  // Dokunma event listenerlarını ekle
-  document.addEventListener('touchstart', handleTouchStart, { passive: true });
-  document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd, { passive: true });
-  document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
-  
-  // Geçmiş otomatik güncelleme
-  initializeHistory();
-  
-  // Tüm URL'leri tarayıcının geçmişinden izle
-  window.addEventListener('popstate', function(e) {
-    console.log("PopState olayı algılandı, geçmiş durumu güncellendi");
     
-    // Mevcut durumu geçmişe ekle
-    if (window.location.href) {
-      addToHistory(window.location.href);
-    }
+    // Durumu sıfırla
+    touchStartX = 0;
+    currentX = 0;
+  }
+  
+  // Pencere Boyutu Değiştiğinde
+  window.addEventListener('resize', function() {
+    halfPageWidth = window.innerWidth / 2; // Otomatik tamamlama eşiğini güncelle
   });
   
-  // Dokunmasız cihazlarda geri butonu ekle ve normal browser geçmişini kullan  
-  if (!('ontouchstart' in window)) {
-    const backButton = document.createElement('div');
-    backButton.id = 'ios-back-button';
-    backButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 25px;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 9999;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    `;
-    
-    backButton.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-    `;
-    
-    backButton.addEventListener('click', function() {
-      backButton.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        history.back();
-      }, 150);
-    });
-    
-    document.body.appendChild(backButton);
-  }
+  // Dokunma olaylarını dinle
+  document.addEventListener('touchstart', handleTouchStart, { passive: false });
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd, { passive: false });
+  
+  // Geçmişi başlat
+  initializeHistory();
+  
+  // Gezinme geçmişini güncellemek ve görüntülemek için API
+  window.swipeNavigation = {
+    getHistory: function() {
+      console.log("Gezinme geçmişi:", navigationHistory);
+      return [...navigationHistory];
+    },
+    goBack: goBack,
+    disable: function() {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      console.log("Kaydırma navigasyonu devre dışı bırakıldı");
+    },
+    enable: function() {
+      document.addEventListener('touchstart', handleTouchStart, { passive: false });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd, { passive: false });
+      console.log("iOS kaydırma navigasyonu aktif");
+    }
+  };
 });
