@@ -13,8 +13,8 @@
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- iOS Swipe Navigasyon CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
+<!-- iOS Swipe Navigasyon CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
@@ -24,6 +24,9 @@
 
 <!-- Sayfa Özel CSS Dosyaları -->
 <!--  Profil CSS dosyası kaldırıldı -->
+
+<!-- Sayfa Geçmişini Başlat - En öncelikli script -->
+<script src="{{ url_for('static', filename='js/pageInitializer.js') }}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
