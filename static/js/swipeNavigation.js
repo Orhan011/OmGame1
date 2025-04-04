@@ -1,11 +1,11 @@
 /**
  * ZekaPark iOS-Tarzı Swipe Navigasyon
- * Profesyonel Sürüm v2.1
+ * Profesyonel Sürüm v2.0
  * 
  * Özellikler:
  * - A→B→C→D gezmesi ile D→C→B→A geriye dönüş
  * - Gelişmiş dokunma algılama ve kaydırma fiziği
- * - Hata yakalama ve uyumluluk katmanı
+ * - Sessiz hata yönetimi ve uyumluluk katmanı
  * - Animasyonlu geçişler ve görsel geri bildirim
  */
 
@@ -17,7 +17,7 @@
         touchThreshold: 15,        // Sol kenardan kaydırma algılaması için piksel
         swipeThreshold: 50,        // Kaydırma eşik değeri (piksel)
         transitionSpeed: 300,      // Geçiş animasyonu süresi (ms)
-        historyStorageKey: 'zekapark_nav_history',  // sessionStorage key
+        historyStorageKey: 'zekapark_nav_history',  // localStorage key
         debug: false               // Debug modunu aktifleştir/deaktif et
     };
     
@@ -30,24 +30,9 @@
         };
     }
     
-    // Konsol Hatalarını Engelleme
-    window.addEventListener('error', function(event) {
-        // Belirli hataları sessiz şekilde ele al (swipe navigasyon ile ilgili olmayan hatalar)
-        if (event.error && typeof event.error.message === 'string' && 
-            (event.error.message.includes('null is not an object') || 
-             event.error.message.includes('Cannot read property') ||
-             event.error.message.includes('undefined is not an object'))) {
-            console.warn("⚠️ Hata ele alındı:", event.error.message);
-            event.preventDefault();
-        }
-    }, true);
-    
     // Başlatma fonksiyonu
     function initializeSwipeBack() {
         try {
-            console.log("📱 iOS Tarzı Swipe Navigasyon başlatılıyor...");
-            
-            // Geçmişi al veya oluştur
             let history = getNavigationHistory();
             const currentPage = createHistoryItem();
             
@@ -80,37 +65,57 @@
             // Popstate olayını dinle (tarayıcı geri butonu)
             monitorBrowserNavigation();
             
-            // Geri butonu elementi
-            addBackButton();
-            
-            debugLog("📱 Swipe Navigasyon hazır");
+            debugLog("📱 Geliştirilmiş Swipe Navigasyon sistemi başlatıldı");
         } catch (e) {
-            console.warn("Swipe navigasyon başlatma hatası:", e);
+            console.error("Swipe navigasyon başlatma hatası:", e);
         }
     }
     
     // Gölge elementi oluştur
     function setupSwipeShadow() {
-        try {
-            // Varsa mevcut elementi kaldır
-            const existingShadow = document.getElementById('swipe-shadow');
-            if (existingShadow) {
-                existingShadow.remove();
-            }
-            
-            const shadowOverlay = document.createElement('div');
-            shadowOverlay.id = 'swipe-shadow';
-            shadowOverlay.className = 'swipe-shadow-overlay';
-            document.body.appendChild(shadowOverlay);
-            
-            // Mobil gezinti göstergesi
-            const swipeIndicator = document.createElement('div');
-            swipeIndicator.id = 'swipe-indicator';
-            swipeIndicator.className = 'swipe-indicator';
-            document.body.appendChild(swipeIndicator);
-        } catch (e) {
-            console.warn("Swipe gölgesi oluşturma hatası:", e);
+        // Varsa mevcut elementi kaldır
+        const existingShadow = document.getElementById('swipe-shadow');
+        if (existingShadow) {
+            existingShadow.remove();
         }
+        
+        const shadowOverlay = document.createElement('div');
+        shadowOverlay.id = 'swipe-shadow';
+        shadowOverlay.className = 'swipe-shadow-overlay';
+        shadowOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.3s ease;
+        `;
+        document.body.appendChild(shadowOverlay);
+        
+        // Mobil gezinti göstergesi
+        const swipeIndicator = document.createElement('div');
+        swipeIndicator.id = 'swipe-indicator';
+        swipeIndicator.className = 'swipe-indicator';
+        swipeIndicator.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            width: 5px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            transform: translateY(-50%);
+            opacity: 0;
+            z-index: 10000;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        `;
+        document.body.appendChild(swipeIndicator);
     }
     
     // Dokunmatik olayları kur
@@ -247,7 +252,7 @@
     // Geçmiş işlevleri
     function getNavigationHistory() {
         try {
-            const history = sessionStorage.getItem(CONFIG.historyStorageKey);
+            const history = localStorage.getItem(CONFIG.historyStorageKey);
             return history ? JSON.parse(history) : [];
         } catch (e) {
             console.warn('Navigasyon geçmişi okuma hatası:', e);
@@ -257,7 +262,7 @@
     
     function setNavigationHistory(history) {
         try {
-            sessionStorage.setItem(CONFIG.historyStorageKey, JSON.stringify(history));
+            localStorage.setItem(CONFIG.historyStorageKey, JSON.stringify(history));
         } catch (e) {
             console.warn('Navigasyon geçmişi yazma hatası:', e);
         }
@@ -315,47 +320,6 @@
         }
     }
     
-    // Geri butonu ekle
-    function addBackButton() {
-        try {
-            const history = getNavigationHistory();
-            
-            // Eğer geçmişte en az 2 sayfa varsa (geri dönülebilir) geri butonunu göster
-            if (history.length > 1) {
-                // Mevcut butonu kaldır
-                const existingButton = document.getElementById('swipe-back-button');
-                if (existingButton) {
-                    existingButton.remove();
-                }
-                
-                // Yeni butonu ekle
-                const backButton = document.createElement('div');
-                backButton.id = 'swipe-back-button';
-                backButton.className = 'swipe-back-button';
-                
-                // Ana içerik alanı varsa, konumlandırmayı ayarla
-                backButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Geçmişten son sayfayı çıkar
-                    history.pop();
-                    const previousPage = history[history.length - 1];
-                    
-                    // Güncellenmiş geçmişi kaydet
-                    setNavigationHistory(history);
-                    
-                    // Önceki sayfaya git
-                    debugLog("⬅️ Geri butonuna tıklandı, önceki sayfaya dönülüyor:", previousPage.path);
-                    window.location.href = previousPage.path;
-                });
-                
-                document.body.appendChild(backButton);
-            }
-        } catch (e) {
-            console.warn('Geri butonu ekleme hatası:', e);
-        }
-    }
-    
     // Tarayıcı geçmişi olaylarını izle
     function monitorBrowserNavigation() {
         // Tarayıcı geri butonu
@@ -382,10 +346,58 @@
     }
     
     // Sayfa yüklendiğinde başlat
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeSwipeBack);
-    } else {
-        // Sayfa zaten yüklendiyse
+    document.addEventListener('DOMContentLoaded', function() {
+        debugLog("📱 Gelişmiş Swipe Navigasyon başlatılıyor...");
         initializeSwipeBack();
-    }
+    });
+    
+    // Sayfa stili
+    const style = document.createElement('style');
+    style.textContent = `
+        body {
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            will-change: transform;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            touch-action: pan-y;
+        }
+        
+        .swipe-shadow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .swipe-indicator {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            width: 5px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            transform: translateY(-50%);
+            opacity: 0;
+            z-index: 10000;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        @media (prefers-reduced-motion) {
+            body, .swipe-shadow-overlay, .swipe-indicator {
+                transition: none!important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 })();
