@@ -1,3 +1,4 @@
+
 /**
  * ZekaPark iOS Tarzı Navigasyon Sistemi
  * Sayfa Geçmişli Navigasyon: A→B→C→D şeklinde ziyaret, D→C→B→A şeklinde geri dönüş
@@ -12,13 +13,25 @@ document.addEventListener('DOMContentLoaded', function() {
             this.history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
             this.currentPath = window.location.pathname;
             this.maxHistoryLength = 50;
+            
+            // Sayfaların hiyerarşik indekslerini tanımla (isteğe bağlı olarak sunucu tarafında ayarlanabilir)
+            this.pageHierarchy = {
+                '/': 1 // Ana sayfa her zaman 1. seviye
+                // Diğer sayfalar dinamik olarak eklenecek
+            };
         }
 
         init() {
-            if (!this.hasPath(this.currentPath)) {
+            if (this.currentPath === '/') {
+                // Ana sayfadaysak, geçmişi temizle
+                this.clear();
+                this.add('/');
+            } else if (!this.hasPath(this.currentPath)) {
+                // Yeni bir sayfaysa ekle
                 this.add(this.currentPath);
-                this.save();
             }
+            
+            this.save();
             console.log("Mevcut sayfa geçmişi:", this.history);
         }
 
@@ -27,22 +40,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         add(path) {
-            if (path === '/') return;
-
-            // Aynı sayfaya tekrar gidilirse, önceki kaydı sil
+            // Aynı sayfayı tekrar eklemeyi önle
+            if (this.history[this.history.length - 1] === path) {
+                return;
+            }
+            
+            // Geçmişte gezinme sırasında, geri gidip farklı bir yola gidildiğinde
+            // geçmişteki konumdan sonraki tüm sayfaları temizle
             const existingIndex = this.history.indexOf(path);
             if (existingIndex !== -1) {
-                this.history.splice(existingIndex, 1);
+                this.history = this.history.slice(0, existingIndex + 1);
+                return;
             }
 
+            // Maksimum geçmiş limitini kontrol et
             if (this.history.length >= this.maxHistoryLength) {
                 this.history.shift();
             }
+            
             this.history.push(path);
         }
 
         removeLast() {
-            if (this.history.length <= 1) return '/';
+            if (this.history.length <= 1) {
+                return '/';
+            }
             return this.history.pop();
         }
 
@@ -51,13 +73,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         getPrevious() {
-            if (this.history.length <= 1) return '/';
+            if (this.history.length <= 1) {
+                return '/';
+            }
+            
+            // Hiyerarşik bir geçiş için bir önceki sayfayı al
+            const currentPath = this.history[this.history.length - 1];
             const prevPath = this.history[this.history.length - 2];
+            
             return prevPath || '/';
         }
 
         save() {
             localStorage.setItem('siteHistory', JSON.stringify(this.history));
+        }
+        
+        // Sayfa geçiş seviyesini belirle ve kaydet
+        determinePageLevel(path) {
+            // Sayfa seviyesini belirlemede kullanılan mantık:
+            // 1. '/' ana sayfa, seviye 1
+            // 2. '/games', '/profile' gibi 1. seviye sayfalar, seviye 2
+            // 3. '/games/chess' gibi 2. seviye sayfalar, seviye 3
+            
+            if (path === '/') return 1;
+            
+            const pathSegments = path.split('/').filter(Boolean);
+            return pathSegments.length + 1;
+        }
+        
+        // Yeni sayfa seviyesi bilgisini kaydet
+        updatePageHierarchy(path) {
+            if (!this.pageHierarchy[path]) {
+                this.pageHierarchy[path] = this.determinePageLevel(path);
+            }
         }
     }
 
@@ -87,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 z-index: 9999;
                 opacity: 0;
                 display: none;
-                transition: opacity 0.3s ease-out;
+                transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 pointer-events: none;
                 backdrop-filter: blur(3px);
                 -webkit-backdrop-filter: blur(3px);
@@ -138,9 +186,10 @@ document.addEventListener('DOMContentLoaded', function() {
             this.overlay.style.opacity = '0.5';
 
             setTimeout(() => {
+                const previousPage = navHistory.getPrevious();
                 navHistory.removeLast();
                 navHistory.save();
-                window.location.href = navHistory.getPrevious();
+                window.location.href = previousPage;
             }, 300);
         }
 
@@ -175,11 +224,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 !e.ctrlKey && !e.metaKey) {
 
                 const targetPath = new URL(link.href).pathname;
-                if (targetPath === '/') {
-                    navHistory.clear();
-                } else if (!navHistory.hasPath(targetPath)) {
-                    navHistory.add(targetPath);
-                }
+                
+                // Hiyerarşik geçiş mantığı
+                navHistory.updatePageHierarchy(targetPath);
+                navHistory.add(targetPath);
                 navHistory.save();
                 console.log("Geçmişe eklendi:", targetPath);
             }
