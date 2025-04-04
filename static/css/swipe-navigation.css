@@ -1,41 +1,144 @@
 /**
- * Basitleştirilmiş iOS Tarzı Swipe Navigasyon - CSS
- * ZekaPark için özel olarak geliştirilmiştir
+ * ZekaPark - Profesyonel iOS-Tarzı Swipe Navigasyon CSS
+ * v2.0 - Geliştirilmiş Sürüm
+ * 
+ * Yumuşak geçişler ve duyarlı tasarım ile dokunmatik gezinti
  */
 
+/* Ana Yapı */
 body {
     overflow-x: hidden;
     position: relative;
+    min-height: 100vh;
     width: 100%;
-    min-height: 100vh; 
+    touch-action: pan-y;
     will-change: transform;
-    transition: transform 0.3s ease-out;
-    touch-action: pan-y pinch-zoom;
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-#swipe-shadow {
+/* Swipe Gölge Overlay */
+.swipe-shadow-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.35));
     z-index: 9999;
+    pointer-events: none;
     opacity: 0;
     display: none;
-    pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease;
 }
 
-/* Sayfa içerikleri için gerekli düzenlemeler */
+/* Kaydırma Göstergesi */
+.swipe-indicator {
+    position: fixed;
+    top: 50%;
+    left: 8px;
+    width: 4px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* İnteraktif Geri Butonu */
+.swipe-back-button {
+    position: fixed;
+    left: 15px;
+    top: 15px;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    z-index: 9998;
+    opacity: 0.85;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.swipe-back-button::before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-left: 2px solid rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+    transform: rotate(45deg);
+    margin-right: -3px;
+}
+
+.swipe-back-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Kaydırma Animasyonu için CSS Keyframes */
+@keyframes page-slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes page-slide-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+/* Ana içeriğe margin ekleyin (isteğe bağlı) */
 .container {
     position: relative;
     z-index: 1;
 }
 
-/* Mobil uyumluluk için ayarlamalar */
+/* Duyarlı Tasarım için Özelleştirmeler */
 @media (max-width: 768px) {
-    #swipe-shadow {
-        z-index: 9999;
+    .swipe-back-button {
+        left: 10px;
+        top: 10px;
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Hareket Azaltma Tercihli Kullanıcılar için Erişilebilirlik */
+@media (prefers-reduced-motion) {
+    body, 
+    .swipe-shadow-overlay, 
+    .swipe-indicator {
+        transition: none !important;
+    }
+}
+
+/* Hafif ve Koyu Tema Uyumu */
+.light .swipe-back-button {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .swipe-back-button::before {
+    border-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark .swipe-back-button {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Yüksek Kontrast için Erişilebilirlik */
+@media (prefers-contrast: more) {
+    .swipe-back-button {
+        background-color: #000;
+    }
+    
+    .swipe-back-button::before {
+        border-color: #fff;
     }
 }
