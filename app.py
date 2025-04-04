@@ -46,16 +46,3 @@ with app.app_context():
         backup_database()
     except Exception as e:
         app.logger.error(f"Error during initialization: {e}")
-        
-# Yeniden oluşturma ihtiyacı için bu fonksiyonu ekledik
-def reset_database():
-    with app.app_context():
-        try:
-            db.reflect()
-            db.drop_all(bind=None)
-            db.create_all()
-            app.logger.info("Database recreated successfully")
-            return True
-        except Exception as e:
-            app.logger.error(f"Error resetting database: {e}")
-            return False

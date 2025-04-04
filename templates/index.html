@@ -43,21 +43,6 @@
 </div>
 </section>
 
-{% if session.get('user_id') %}
-<section class="mt-4 favorite-games-section">
-  <div class="favorite-games-title">
-    <h2 class="text-center mb-0"><i class="fas fa-star"></i> Favori Oyunlarım</h2>
-  </div>
-  
-  <div class="favorite-games-grid" id="favoriteGamesGrid">
-    <!-- Favori oyunlar JavaScript ile eklenecek -->
-    <div class="no-favorites-message">
-      <p>Henüz favori oyununuz yok. Oyun kartları üzerindeki yıldız simgesine tıklayarak favori oyunlarınızı ekleyebilirsiniz.</p>
-    </div>
-  </div>
-</section>
-{% endif %}
-
 <section class="mt-4">
 <h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
 <div class="game-grid">

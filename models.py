@@ -30,8 +30,6 @@ class User(db.Model):
     email_notifications = db.Column(db.Boolean, default=True)
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
-    # Ana sayfadaki favorit oyunlar - en fazla 4 tane
-    favorite_games = db.Column(db.JSON, default=lambda: [])
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):
@@ -90,10 +88,3 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
-    
-class Favorites(db.Model):
-    __tablename__ = 'favorites'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    game_type = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
