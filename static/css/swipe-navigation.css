@@ -1,8 +1,6 @@
 /**
  * ZekaPark - Profesyonel iOS-Tarzı Swipe Navigasyon CSS
- * v2.0 - Geliştirilmiş Sürüm
- * 
- * Yumuşak geçişler ve duyarlı tasarım ile dokunmatik gezinti
+ * v2.1 - Geliştirilmiş Sürüm
  */
 
 /* Ana Yapı */
@@ -55,7 +53,7 @@ body {
     top: 15px;
     width: 36px;
     height: 36px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -66,6 +64,7 @@ body {
     opacity: 0.85;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .swipe-back-button::before {
@@ -80,7 +79,12 @@ body {
 }
 
 .swipe-back-button:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.swipe-back-button:active {
+    transform: scale(0.95);
 }
 
 /* Kaydırma Animasyonu için CSS Keyframes */
@@ -92,12 +96,6 @@ body {
 @keyframes page-slide-out {
     from { transform: translateX(0); }
     to { transform: translateX(100%); }
-}
-
-/* Ana içeriğe margin ekleyin (isteğe bağlı) */
-.container {
-    position: relative;
-    z-index: 1;
 }
 
 /* Duyarlı Tasarım için Özelleştirmeler */
@@ -114,7 +112,8 @@ body {
 @media (prefers-reduced-motion) {
     body, 
     .swipe-shadow-overlay, 
-    .swipe-indicator {
+    .swipe-indicator,
+    .swipe-back-button {
         transition: none !important;
     }
 }
