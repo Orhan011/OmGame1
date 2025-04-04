@@ -577,38 +577,9 @@ def init_db_route():
 @app.route('/')
 def index():
     user = None
-    favorite_games = []
-    most_played_games = []
-    
-    try:
-        # En çok oynanan oyunları bul
-        top_games = db.session.query(Score.game_type, db.func.count(Score.id).label('count')) \
-            .group_by(Score.game_type) \
-            .order_by(db.desc('count')) \
-            .limit(4) \
-            .all()
-        
-        most_played_games = [game[0] for game in top_games]
-        
-        # Kullanıcı girişi yapılmışsa favori oyunlarını al
-        if 'user_id' in session:
-            user = User.query.get(session['user_id'])
-            if user and hasattr(user, 'favorite_games') and user.favorite_games:
-                favorite_games = user.favorite_games
-                # Maksimum 4 favori oyun göster
-                if len(favorite_games) > 4:
-                    favorite_games = favorite_games[:4]
-    
-    except Exception as e:
-        logger.error(f"Error fetching game data for index page: {e}")
-    
-    return render_template(
-        'index.html', 
-        user=user, 
-        current_user=user,
-        most_played_games=most_played_games,
-        favorite_games=favorite_games
-    )
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+    return render_template('index.html', user=user, current_user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -1728,69 +1699,6 @@ def get_scores(game_type):
 @app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
 def get_scores_alt(game_type):
     return get_scores(game_type)
-
-@app.route('/api/toggle_favorite', methods=['POST'])
-def toggle_favorite():
-    """Oyunu favori listesine ekle veya çıkar."""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Giriş yapmanız gerekiyor.'}), 401
-    
-    data = request.get_json()
-    game_type = data.get('game_type')
-    
-    if not game_type:
-        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi.'}), 400
-    
-    user = User.query.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı.'}), 404
-    
-    try:
-        # Kullanıcının favori oyun listesini al
-        favorite_games = user.favorite_games or []
-        
-        # Oyun zaten favorilerde ise çıkar, değilse ekle
-        if game_type in favorite_games:
-            favorite_games.remove(game_type)
-            message = 'Oyun favorilerden çıkarıldı.'
-        else:
-            # Maksimum 4 favori kontrol et
-            if len(favorite_games) >= 4:
-                return jsonify({
-                    'success': False, 
-                    'message': 'En fazla 4 favori oyun ekleyebilirsiniz. Lütfen önce bir oyunu favorilerden çıkarın.'
-                }), 400
-            
-            favorite_games.append(game_type)
-            message = 'Oyun favorilere eklendi.'
-        
-        # Kullanıcının favori oyunlarını güncelle
-        user.favorite_games = favorite_games
-        db.session.commit()
-        
-        return jsonify({
-            'success': True, 
-            'message': message,
-            'favorite_games': favorite_games
-        })
-    
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Error toggling favorite game: {e}")
-        return jsonify({'success': False, 'message': 'Bir hata oluştu, lütfen tekrar deneyin.'}), 500
-
-@app.route('/api/get_favorites')
-def get_favorites():
-    """Kullanıcının favori oyunlarını getir."""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Giriş yapmanız gerekiyor.'}), 401
-    
-    user = User.query.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı.'}), 404
-    
-    favorite_games = user.favorite_games or []
-    return jsonify({'success': True, 'favorite_games': favorite_games})
 
 @app.route('/api/aggregated_scores')
 def get_aggregated_scores():
