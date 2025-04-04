@@ -22,6 +22,53 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
 
+<!-- Favori oyunlar için CSS -->
+<style>
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+  z-index: 2;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+  color: #f8d568;
+}
+
+.favorite-btn.active {
+  color: #ffcc00;
+}
+
+.favorite-btn i {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.favorite-games, .popular-games {
+  margin-bottom: 30px;
+}
+
+/* Oyun kartları içindeki favori butonu için boşluk */
+.game-card {
+  position: relative;
+  padding-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .favorite-btn {
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+  }
+}
+</style>
+
 <!-- Sayfa Özel CSS Dosyaları -->
 <!--  Profil CSS dosyası kaldırıldı -->
 
@@ -48,183 +95,164 @@ document.addEventListener("DOMContentLoaded", function() {
   const dropdownElements = document.querySelectorAll('.dropdown-toggle');
   if (dropdownElements.length > 0) {
     dropdownElements.forEach(element => {
-      new bootstrap.Dropdown(element);
-    });
-  }
-
-  // Profil dropdown'u için özel event listener ekle
-  const userDropdown = document.getElementById('userDropdown');
-  if (userDropdown) {
-    userDropdown.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const dropdown = bootstrap.Dropdown.getInstance(userDropdown) || new bootstrap.Dropdown(userDropdown);
-      dropdown.toggle();
+      element.addEventListener('click', function(event) {
+        event.preventDefault();
+        const dropdownMenu = this.nextElementSibling;
+        if (dropdownMenu.classList.contains('show')) {
+          dropdownMenu.classList.remove('show');
+        } else {
+          dropdownMenu.classList.add('show');
+        }
+      });
     });
   }
 });
-
-// Makale ve ipucu içeriklerini dinamik olarak yükleme işlevi
-function loadArticleContent() {
-  // Burada AJAX ile içerik yüklenebilir
-  console.log("İçerik yükleniyor...");
-}
 </script>
 
-<!-- THREE.js ve ilgili kütüphaneler -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
-<!-- Meta Tags-->
-<meta name="description" content="Zihinsel becerilerinizi geliştirmek için bilimsel olarak tasarlanmış bilişsel oyunlar. IQ, hafıza, konsantrasyon ve çözüm odaklı düşünmeyi geliştirin.">
-<meta name="keywords" content="OmGame, beyin geliştirme, iq oyunları, zihin oyunları, hafıza geliştirme, bilişsel beceriler">
+<!-- Game Manager Entegrasyonu (Tüm Alanlarda Kullanım İçin) -->
+<script src="{{ url_for('static', filename='js/gameManager.js') }}" defer></script>
+
+{% block head %}{% endblock %}
 </head>
-<body>
-<!-- Dinamik Arkaplan Efekti -->
-<!-- Arka plandaki şekiller kaldırıldı -->
+<body class="page-container">
 
-<!-- Profil Paneli (üstteki kaldırıldı) -->
-{% if session.get('user_id') %}
-{% endif %}
-
-<nav class="navbar navbar-expand-lg navbar-dark">
+<!-- Mobil Navigasyon -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 <div class="container">
-  <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
-    <span class="brand-text">OmGame</span>
-  </a>
-  <button class="navbar-toggler animated-menu" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-    <div class="menu-icon">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item">
-        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
-          <i class="fas fa-home nav-icon"></i>Anasayfa
-        </a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle {% if '/games/' in request.path %}active{% endif %}" href="#" id="gamesDropdown" data-bs-toggle="dropdown">
-          <i class="fas fa-gamepad nav-icon"></i>Oyunlar
-        </a>
-        <ul class="dropdown-menu glass-dropdown">
-          <li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}"><i class="fas fa-spell-check me-2"></i>Kelime Bulmaca</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('memory_match') }}"><i class="fas fa-clone me-2"></i>Hafıza Kartları</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('labyrinth') }}"><i class="fas fa-route me-2"></i>Labirent</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('puzzle') }}"><i class="fas fa-puzzle-piece me-2"></i>Yapboz</a></li>
-          <!-- IQ geliştirme oyunları kaldırıldı -->
-          <li><hr class="dropdown-divider"></li>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
-      <li class="nav-item">
-                  <a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a>
-                </li>
-    </ul>
-
-    {% if session.get('user_id') %}
-    <!-- User menu dropdown - Sağ üstte profil resmi (her zaman görünür) -->
-    <ul class="navbar-nav ms-auto d-flex">
-      <li class="nav-item dropdown">
-        <a class="nav-link user-dropdown d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          {% if get_avatar_url() %}
-          <img src="{{ url_for('static', filename=get_avatar_url()) }}" alt="{{ session.get('username') }}" class="avatar-mini">
-          {% else %}
-          <div class="avatar-mini-placeholder">{{ session.get('username')[0]|upper }}</div>
-          {% endif %}
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="{{ url_for('profile_v2') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
-        </ul>
-      </li>
-    </ul>
-    {% endif %}
-
-  <ul class="navbar-nav ms-auto {% if session.get('user_id') %}d-none d-lg-flex{% endif %}">
-      {% if not session.get('user_id') %}
-        <li class="nav-item"><a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt nav-icon"></i>Giriş Yap</a></li>
-        <li class="nav-item"><a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}"><i class="fas fa-user-plus nav-icon"></i>Kayıt Ol</a></li>
-      {% endif %}
-    </ul>
-  </div>
+<a class="navbar-brand" href="{{ url_for('index') }}">OmGame</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="offcanvas offcanvas-end bg-dark" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+<div class="offcanvas-header">
+<h5 class="offcanvas-title text-white" id="offcanvasNavbarLabel">OmGame</h5>
+<button type="button" class="btn-close bg-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div>
+<div class="offcanvas-body">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Ana Sayfa</a>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="gamesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+Oyunlar
+</a>
+<ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="gamesDropdown">
+<li><a class="dropdown-item" href="{{ url_for('word_puzzle') }}">Kelime Bulmaca</a></li>
+<li><a class="dropdown-item" href="{{ url_for('memory_cards') }}">Hafıza Kartları</a></li>
+<li><a class="dropdown-item" href="{{ url_for('labyrinth') }}">Labirent</a></li>
+<li><a class="dropdown-item" href="{{ url_for('puzzle') }}">Yapboz</a></li>
+<li><a class="dropdown-item" href="{{ url_for('number_sequence') }}">Sayı Dizisi</a></li>
+<li><a class="dropdown-item" href="{{ url_for('number_chain') }}">Sayı Zinciri</a></li>
+<li><a class="dropdown-item" href="{{ url_for('audio_memory') }}">Sesli Hafıza</a></li>
+<li><a class="dropdown-item" href="{{ url_for('n_back') }}">N-Back Test</a></li>
+<li><a class="dropdown-item" href="{{ url_for('sudoku') }}">Sudoku</a></li>
+<li><a class="dropdown-item" href="{{ url_for('chess') }}">Satranç</a></li>
+<li><a class="dropdown-item" href="{{ url_for('three_d_rotation') }}">3D Döndürme</a></li>
+<li><hr class="dropdown-divider"></li>
+<li><a class="dropdown-item" href="{{ url_for('all_games') }}">Tüm Oyunlar</a></li>
+</ul>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="{{ url_for('leaderboard') }}">Skor Tablosu</a>
+</li>
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+Kaynaklar
+</a>
+<ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="resourcesDropdown">
+<li><a class="dropdown-item" href="{{ url_for('articles') }}">Makaleler</a></li>
+<li><a class="dropdown-item" href="{{ url_for('tips') }}">İpuçları</a></li>
+</ul>
+</li>
+</ul>
+<div class="d-flex">
+{% if session.get('user_id') %}
+<a href="{{ url_for('profile_v2') }}" class="btn btn-outline-light me-2">Profil</a>
+<a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Çıkış</a>
+{% else %}
+<a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">Giriş</a>
+<a href="{{ url_for('register') }}" class="btn btn-primary">Kayıt Ol</a>
+{% endif %}
+</div>
+</div>
+</div>
 </div>
 </nav>
 
-<main class="container py-4">
-{% block content %}
+<div class="content-container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
-{% endblock %}
-</main>
+<div class="container mt-3 pb-5">
+{% block content %}{% endblock %}
+</div>
+</div>
 
-<footer class="footer">
+<footer class="bg-dark text-white py-4">
 <div class="container">
-  <div class="row">
-    <div class="col-md-5">
-      <div class="footer-brand">
-        <h5 class="footer-title">OmGame</h5>
-      </div>
-      <p class="footer-text">Bilişsel yeteneklerinizi geliştirmek için tasarlanmış zihin oyunları koleksiyonu. Her gün 10 dakikalık beyin egzersizi, zekânızı katlayabilir.</p>
-      <div class="social-media">
-        <a href="https://instagram.com/orh4nn.1" target="_blank" class="social-icon">
-          <i class="fab fa-instagram"></i>
-        </a>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <h5 class="footer-title">Hızlı Erişim</h5>
-      <ul class="footer-links">
-        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right me-2"></i>Anasayfa</a></li>
-        <li><a href="{{ url_for('articles') }}"><i class="fas fa-chevron-right me-2"></i>Makaleler</a></li>
-        <li><a href="{{ url_for('tips') }}"><i class="fas fa-chevron-right me-2"></i>İpuçları</a></li>
-      </ul>
-    </div>
-    <div class="col-md-4">
-      <h5 class="footer-title">Oyunlar</h5>
-      <div class="footer-games">
-        <a href="{{ url_for('word_puzzle') }}" class="footer-game-button">
-          <i class="fas fa-spell-check"></i>
-          <span>Kelime Bulmaca</span>
-        </a>
-        <a href="{{ url_for('memory_match') }}" class="footer-game-button">
-          <i class="fas fa-clone"></i>
-          <span>Hafıza Kartları</span>
-        </a>
-        <a href="{{ url_for('labyrinth') }}" class="footer-game-button">
-          <i class="fas fa-route"></i>
-          <span>Labirent</span>
-        </a>
-        <a href="{{ url_for('puzzle') }}" class="footer-game-button">
-          <i class="fas fa-puzzle-piece"></i>
-          <span>Yapboz</span>
-        </a>
-        <!-- IQ geliştirme oyunları kaldırıldı -->
-      </div>
-    </div>
-  </div>
-  <hr class="footer-divider">
-  <div class="text-center footer-text">
-    <p>&copy; 2025 OmGame | Her hakkı saklıdır</p>
-  </div>
+<div class="row">
+<div class="col-md-4 col-lg-4 mb-3">
+<h5>OmGame</h5>
+<p class="text-muted">Bilişsel becerileri geliştiren beyin egzersizi oyunları.</p>
+</div>
+<div class="col-md-4 col-lg-3 mb-3">
+<h5>Bağlantılar</h5>
+<ul class="nav flex-column">
+<li class="nav-item mb-2"><a href="{{ url_for('index') }}" class="nav-link p-0 text-muted">Ana Sayfa</a></li>
+<li class="nav-item mb-2"><a href="{{ url_for('all_games') }}" class="nav-link p-0 text-muted">Oyunlar</a></li>
+<li class="nav-item mb-2"><a href="{{ url_for('leaderboard') }}" class="nav-link p-0 text-muted">Skor Tablosu</a></li>
+<li class="nav-item mb-2"><a href="{{ url_for('articles') }}" class="nav-link p-0 text-muted">Makaleler</a></li>
+</ul>
+</div>
+<div class="col-md-4 col-lg-3 mb-3">
+<h5>Takip Et</h5>
+<div class="d-flex gap-3 mt-2">
+<a href="#" class="text-muted"><i class="fab fa-facebook-f"></i></a>
+<a href="#" class="text-muted"><i class="fab fa-twitter"></i></a>
+<a href="#" class="text-muted"><i class="fab fa-instagram"></i></a>
+<a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+</div>
+</div>
+<div class="col-md-4 col-lg-2 mb-3">
+<h5>İletişim</h5>
+<ul class="nav flex-column">
+<li class="nav-item mb-2 text-muted"><i class="fas fa-envelope me-2"></i> info@omgame.com</li>
+<li class="nav-item mb-2 text-muted"><i class="fas fa-phone me-2"></i> +90 500 123 4567</li>
+</ul>
+</div>
+</div>
+<hr>
+<div class="d-flex justify-content-between align-items-center mt-2 flex-wrap">
+<p class="mb-0 text-muted">&copy; 2024 OmGame. Tüm hakları saklıdır.</p>
+<ul class="nav">
+<li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Gizlilik Politikası</a></li>
+<li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Kullanım Koşulları</a></li>
+</ul>
+</div>
 </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Sweet Alert 2 - Gelişmiş ve güzel bildirimler için -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+<!-- Main JavaScript -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Ultra-lightweight swipe navigation script -->
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}" async></script>
+
 {% block scripts %}{% endblock %}
-<!-- iOS Swipe Navigasyon Script -->
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
-  </body>
+</body>
 </html>

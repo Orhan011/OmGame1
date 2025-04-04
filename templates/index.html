@@ -43,8 +43,270 @@
 </div>
 </section>
 
+{% if session.get('user_id') and favorite_games %}
 <section class="mt-4">
-<h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
+<h2 class="text-center mb-3">Favori Oyunlarınız</h2>
+<div class="game-grid favorite-games">
+  {% for game_type in favorite_games %}
+    {% if game_type == "wordPuzzle" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-font"></i></div>
+      <div class="game-info">
+        <h3>Kelime Bulmaca</h3>
+        <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
+      </div>
+      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="wordPuzzle"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "memoryCards" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-clone"></i></div>
+      <div class="game-info">
+        <h3>Hafıza Kartları</h3>
+        <p>Eşleşen kartları bul ve hafızanı test et.</p>
+      </div>
+      <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="memoryCards"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "labyrinth" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-route"></i></div>
+      <div class="game-info">
+        <h3>Labirent</h3>
+        <p>Çıkış yolunu bul ve stratejik düşün.</p>
+      </div>
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="labyrinth"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "puzzle" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+      <div class="game-info">
+        <h3>Yapboz</h3>
+        <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+      </div>
+      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="puzzle"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "numberSequence" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+      <div class="game-info">
+        <h3>Sayı Dizisi</h3>
+        <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+      </div>
+      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="numberSequence"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "numberChain" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-link"></i></div>
+      <div class="game-info">
+        <h3>Sayı Zinciri</h3>
+        <p>Gördüğün sayıları doğru sırayla hatırla.</p>
+      </div>
+      <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="numberChain"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "audioMemory" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+      <div class="game-info">
+        <h3>Sesli Hafıza</h3>
+        <p>Duyduğun ses sıralamasını doğru tekrarla.</p>
+      </div>
+      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="audioMemory"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "nBack" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-brain"></i></div>
+      <div class="game-info">
+        <h3>N-Back Test</h3>
+        <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
+      </div>
+      <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="nBack"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "chess" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-chess"></i></div>
+      <div class="game-info">
+        <h3>Satranç</h3>
+        <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+      </div>
+      <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="chess"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "sudoku" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-th"></i></div>
+      <div class="game-info">
+        <h3>Sudoku</h3>
+        <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
+      </div>
+      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="sudoku"><i class="fas fa-star"></i></button>
+    </div>
+    {% elif game_type == "3dRotation" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-cube"></i></div>
+      <div class="game-info">
+        <h3>3D Döndürme</h3>
+        <p>3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.</p>
+      </div>
+      <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
+      <button class="favorite-btn active" data-game="3dRotation"><i class="fas fa-star"></i></button>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+</section>
+{% elif most_played_games %}
+<section class="mt-4">
+<h2 class="text-center mb-3">En Çok Oynanan Oyunlar</h2>
+<div class="game-grid popular-games">
+  {% for game_type in most_played_games %}
+    {% if game_type == "wordPuzzle" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-font"></i></div>
+      <div class="game-info">
+        <h3>Kelime Bulmaca</h3>
+        <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
+      </div>
+      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="wordPuzzle"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "memoryCards" or game_type == "memoryMatch" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-clone"></i></div>
+      <div class="game-info">
+        <h3>Hafıza Kartları</h3>
+        <p>Eşleşen kartları bul ve hafızanı test et.</p>
+      </div>
+      <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="memoryCards"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "labyrinth" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-route"></i></div>
+      <div class="game-info">
+        <h3>Labirent</h3>
+        <p>Çıkış yolunu bul ve stratejik düşün.</p>
+      </div>
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="labyrinth"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "puzzle" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+      <div class="game-info">
+        <h3>Yapboz</h3>
+        <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+      </div>
+      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="puzzle"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "numberSequence" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+      <div class="game-info">
+        <h3>Sayı Dizisi</h3>
+        <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+      </div>
+      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="numberSequence"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "numberChain" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-link"></i></div>
+      <div class="game-info">
+        <h3>Sayı Zinciri</h3>
+        <p>Gördüğün sayıları doğru sırayla hatırla.</p>
+      </div>
+      <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="numberChain"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "audioMemory" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+      <div class="game-info">
+        <h3>Sesli Hafıza</h3>
+        <p>Duyduğun ses sıralamasını doğru tekrarla.</p>
+      </div>
+      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="audioMemory"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "nBack" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-brain"></i></div>
+      <div class="game-info">
+        <h3>N-Back Test</h3>
+        <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
+      </div>
+      <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="nBack"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "chess" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-chess"></i></div>
+      <div class="game-info">
+        <h3>Satranç</h3>
+        <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+      </div>
+      <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="chess"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "sudoku" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-th"></i></div>
+      <div class="game-info">
+        <h3>Sudoku</h3>
+        <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
+      </div>
+      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="sudoku"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% elif game_type == "3dRotation" %}
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-cube"></i></div>
+      <div class="game-info">
+        <h3>3D Döndürme</h3>
+        <p>3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.</p>
+      </div>
+      <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
+      {% if session.get('user_id') %}
+      <button class="favorite-btn" data-game="3dRotation"><i class="far fa-star"></i></button>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+</section>
+{% endif %}
+
+<section class="mt-4">
+<h2 class="text-center mb-3">Tüm Beyin Egzersizi Oyunları</h2>
 <div class="game-grid">
   <!-- Kelime Bulmaca -->
   <div class="game-card">
@@ -54,6 +316,11 @@
       <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
     </div>
     <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'wordPuzzle' in favorite_games %}active{% endif %}" data-game="wordPuzzle">
+      <i class="{% if favorite_games and 'wordPuzzle' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Hafıza Kartları -->
@@ -64,6 +331,11 @@
       <p>Eşleşen kartları bul ve hafızanı test et.</p>
     </div>
     <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'memoryCards' in favorite_games %}active{% endif %}" data-game="memoryCards">
+      <i class="{% if favorite_games and 'memoryCards' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Labirent -->
@@ -74,6 +346,11 @@
       <p>Çıkış yolunu bul ve stratejik düşün.</p>
     </div>
     <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'labyrinth' in favorite_games %}active{% endif %}" data-game="labyrinth">
+      <i class="{% if favorite_games and 'labyrinth' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Yapboz -->
@@ -84,6 +361,11 @@
       <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
     </div>
     <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'puzzle' in favorite_games %}active{% endif %}" data-game="puzzle">
+      <i class="{% if favorite_games and 'puzzle' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Görsel Dikkat oyunu kaldırıldı
@@ -105,6 +387,11 @@
       <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
     </div>
     <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'numberSequence' in favorite_games %}active{% endif %}" data-game="numberSequence">
+      <i class="{% if favorite_games and 'numberSequence' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Kim Nerede? oyunu kaldırıldı -->
@@ -129,6 +416,11 @@
       <p>Gördüğün sayıları doğru sırayla hatırla.</p>
     </div>
     <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'numberChain' in favorite_games %}active{% endif %}" data-game="numberChain">
+      <i class="{% if favorite_games and 'numberChain' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Sesli Hafıza -->
@@ -139,6 +431,11 @@
       <p>Duyduğun ses sıralamasını doğru tekrarla.</p>
     </div>
     <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'audioMemory' in favorite_games %}active{% endif %}" data-game="audioMemory">
+      <i class="{% if favorite_games and 'audioMemory' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- N-Back Test -->
@@ -149,6 +446,11 @@
       <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
     </div>
     <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'nBack' in favorite_games %}active{% endif %}" data-game="nBack">
+      <i class="{% if favorite_games and 'nBack' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- Satranç -->
@@ -159,6 +461,11 @@
       <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
     </div>
     <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'chess' in favorite_games %}active{% endif %}" data-game="chess">
+      <i class="{% if favorite_games and 'chess' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
   
   <!-- Sudoku -->
@@ -169,6 +476,11 @@
       <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
     </div>
     <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and 'sudoku' in favorite_games %}active{% endif %}" data-game="sudoku">
+      <i class="{% if favorite_games and 'sudoku' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 
   <!-- 3D Döndürme -->
@@ -179,6 +491,11 @@
       <p>3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.</p>
     </div>
     <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
+    {% if session.get('user_id') %}
+    <button class="favorite-btn {% if favorite_games and '3dRotation' in favorite_games %}active{% endif %}" data-game="3dRotation">
+      <i class="{% if favorite_games and '3dRotation' in favorite_games %}fas{% else %}far{% endif %} fa-star"></i>
+    </button>
+    {% endif %}
   </div>
 </div>
 </section>
@@ -231,4 +548,64 @@
 </div>
 </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Favori butonlarına tıklama olayını ekle
+  const favoriteButtons = document.querySelectorAll('.favorite-btn');
+  
+  favoriteButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const gameType = this.getAttribute('data-game');
+      toggleFavorite(gameType, this);
+    });
+  });
+  
+  // Favorilere ekleme/çıkarma fonksiyonu
+  function toggleFavorite(gameType, buttonElement) {
+    // API'ye istek gönder
+    fetch('/api/toggle_favorite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ game_type: gameType })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // UI'ı güncelle
+        const icon = buttonElement.querySelector('i');
+        if (data.message.includes('eklendi')) {
+          buttonElement.classList.add('active');
+          icon.classList.remove('far');
+          icon.classList.add('fas');
+        } else {
+          buttonElement.classList.remove('active');
+          icon.classList.remove('fas');
+          icon.classList.add('far');
+        }
+        
+        // Başarı mesajını göster
+        alert(data.message);
+        
+        // Favoriler değiştiğinde sayfayı yenilememiz gerekiyor
+        if (data.message.includes('eklendi') || data.message.includes('çıkarıldı')) {
+          location.reload();
+        }
+      } else {
+        // Hata mesajını göster
+        alert(data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Bir hata oluştu, lütfen tekrar deneyin.');
+    });
+  }
+});
+</script>
 {% endblock %}
