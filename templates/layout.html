@@ -12,6 +12,8 @@
 
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<!-- iOS Swipe Navigasyon CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
@@ -20,8 +22,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
 
-<!-- Sayfa Geçmişi Yönetimi - HEAD içinde en başta yükleniyor -->
-<script src="{{ url_for('static', filename='js/navigationHistory.js') }}"></script>
+<!-- Sayfa Özel CSS Dosyaları -->
+<!--  Profil CSS dosyası kaldırıldı -->
+
+<!-- Sayfa Geçmişini Başlat - En öncelikli script -->
+<script src="{{ url_for('static', filename='js/pageInitializer.js') }}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -224,7 +229,7 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/globals.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
-<!-- iOS Swipe Geri Navigasyon Script -->
-<script src="{{ url_for('static', filename='js/swipeBack.js') }}"></script>
+<!-- iOS Swipe Navigasyon Script -->
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
   </body>
 </html>
