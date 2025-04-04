@@ -182,25 +182,37 @@ def get_user_home_games(user_id):
     """
     if not user_id:
         return []
+    
+    # Kullanıcının veritabanında olup olmadığını kontrol et
+    user_exists = User.query.get(user_id) is not None
+    if not user_exists:
+        return []
         
     # Kullanıcının ana sayfasına eklediği oyunları getir
     home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
     
     # Eğer oyun eklemediyse varsayılan olarak ilk 4 oyunu göster
     if not home_games:
-        # İlk kez ana sayfa özelleştirmesi yapıyorsa, varsayılan oyunları ekle
-        default_games = ["word_puzzle", "memory_cards", "labyrinth", "puzzle"]
-        for i, game_id in enumerate(default_games):
-            home_game = UserHomeScreen(
-                user_id=user_id,
-                game_type=game_id,
-                display_order=i
-            )
-            db.session.add(home_game)
-        db.session.commit()
-        
-        # Yeni eklenen oyunları getir
-        home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
+        try:
+            # İlk kez ana sayfa özelleştirmesi yapıyorsa, varsayılan oyunları ekle
+            default_games = ["word_puzzle", "memory_cards", "labyrinth", "puzzle"]
+            for i, game_id in enumerate(default_games):
+                home_game = UserHomeScreen(
+                    user_id=user_id,
+                    game_type=game_id,
+                    display_order=i
+                )
+                db.session.add(home_game)
+            db.session.commit()
+            
+            # Yeni eklenen oyunları getir
+            home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
+        except Exception as e:
+            print(f"Kullanıcı ana sayfa oyunları eklenirken hata oluştu: {e}")
+            db.session.rollback()
+            # Hata durumunda varsayılan oyun bilgilerini dön ama veritabanına kaydetme
+            game_info = get_game_info()
+            return game_info[:4]
     
     # Oyun bilgilerini getir
     game_info = get_game_info()
