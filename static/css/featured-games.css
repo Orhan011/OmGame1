@@ -1,0 +1,49 @@
+/* Öne çıkan (favori/popüler) oyunlar için stil */
+.featured-games {
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.featured-games .game-card {
+  border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featured-games .game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.featured-games .game-icon {
+  background-color: rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.featured-games .game-btn {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: white;
+}
+
+.featured-games .game-btn:hover {
+  background-color: var(--bs-primary-dark, #0056b3);
+  border-color: var(--bs-primary-dark, #0056b3);
+}
+
+/* Karanlık tema uyumlu */
+[data-bs-theme="dark"] .featured-games {
+  background-color: rgba(13, 110, 253, 0.1);
+  border-color: rgba(13, 110, 253, 0.2);
+}
+
+[data-bs-theme="dark"] .featured-games .game-card {
+  border-color: rgba(13, 110, 253, 0.3);
+  background-color: rgba(25, 25, 25, 0.8);
+}
+
+[data-bs-theme="dark"] .featured-games .game-icon {
+  background-color: rgba(13, 110, 253, 0.2);
+}

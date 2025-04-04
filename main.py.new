@@ -1,0 +1,86 @@
+import os
+import re
+import time
+import uuid
+import json
+import random
+import secrets
+import logging
+from datetime import datetime, timedelta
+
+from flask import Flask, request, session, redirect, url_for, render_template, make_response, jsonify, flash
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+
+from app import app, db
+from models import User, Score, Article, Game
+
+# Routlar
+@app.route('/add_favorite/<int:game_id>', methods=['POST'])
+def add_favorite():
+    """Oyunu favorilere ekler"""
+    if 'user_id' not in session:
+        flash('Favorilere eklemek için giriş yapmalısınız.', 'warning')
+        return redirect(url_for('login'))
+    
+    game_id = request.form.get('game_id')
+    
+    if not game_id:
+        flash('Geçersiz oyun!', 'danger')
+        return redirect(url_for('all_games'))
+    
+    user = User.query.get(session['user_id'])
+    game = Game.query.get(game_id)
+    
+    if not user or not game:
+        flash('Kullanıcı veya oyun bulunamadı.', 'danger')
+        return redirect(url_for('all_games'))
+    
+    # Kullanıcının zaten favorileri var mı kontrol et
+    if game in user.favorite_games:
+        flash('Bu oyun zaten favorilerinizde.', 'info')
+    else:
+        # Favori sayısı 4'ten fazla mı kontrol et
+        if len(user.favorite_games) >= 4:
+            flash('En fazla 4 oyun favorilere eklenebilir. Lütfen önce bir oyunu favorilerden çıkarın.', 'warning')
+        else:
+            user.favorite_games.append(game)
+            db.session.commit()
+            flash(f'"{game.name}" favorilerinize eklendi.', 'success')
+    
+    return redirect(url_for('all_games'))
+
+@app.route('/remove_favorite', methods=['POST'])
+def remove_favorite():
+    """Oyunu favorilerden çıkarır"""
+    if 'user_id' not in session:
+        flash('Bu işlem için giriş yapmalısınız.', 'warning')
+        return redirect(url_for('login'))
+    
+    game_id = request.form.get('game_id')
+    
+    if not game_id:
+        flash('Geçersiz oyun!', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    user = User.query.get(session['user_id'])
+    game = Game.query.get(game_id)
+    
+    if not user or not game:
+        flash('Kullanıcı veya oyun bulunamadı.', 'danger')
+        return redirect(url_for('profile_v2'))
+    
+    if game in user.favorite_games:
+        user.favorite_games.remove(game)
+        db.session.commit()
+        flash(f'"{game.name}" favorilerinizden çıkarıldı.', 'success')
+    else:
+        flash('Bu oyun favorilerinizde değil.', 'info')
+    
+    # Gelen URL'den döneceğimiz sayfayı belirle (profil veya oyunlar sayfası)
+    referer = request.referrer
+    if referer and 'profile' in referer:
+        return redirect(url_for('profile_v2'))
+    else:
+        return redirect(url_for('all_games'))

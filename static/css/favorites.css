@@ -1,0 +1,106 @@
+/* Favori Oyunlar CSS */
+.favorite-games-container {
+  margin-top: 20px;
+}
+
+.favorite-game-card {
+  display: flex;
+  background-color: var(--bs-body-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.favorite-game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-game-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+  font-size: 2rem;
+  color: var(--bs-primary);
+  min-width: 80px;
+}
+
+.favorite-game-info {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorite-game-info h4 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--bs-heading-color);
+}
+
+.favorite-game-info p {
+  font-size: 0.9rem;
+  color: var(--bs-secondary-color);
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.favorite-game-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.no-favorites {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: rgba(var(--bs-light-rgb), 0.05);
+  border: 1px dashed rgba(var(--bs-secondary-rgb), 0.2);
+}
+
+.no-favorites i {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: rgba(var(--bs-danger-rgb), 0.7);
+}
+
+/* Karanlık tema uyumlu */
+[data-bs-theme="dark"] .favorite-game-card {
+  background-color: rgba(25, 25, 25, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .favorite-game-icon {
+  background-color: rgba(13, 110, 253, 0.2);
+}
+
+[data-bs-theme="dark"] .no-favorites {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Favorileri yönetme fonksiyonları */
+.remove-favorite-btn {
+  background: none;
+  border: none;
+  color: var(--bs-danger);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 5px;
+  font-size: 0.9rem;
+}
+
+.remove-favorite-btn:hover {
+  color: var(--bs-danger-darker, #a52834);
+}
