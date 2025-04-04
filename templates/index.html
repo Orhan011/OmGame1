@@ -44,47 +44,148 @@
 </section>
 
 <section class="mt-4">
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2>Favori Oyunlarınız</h2>
-  <div class="d-flex align-items-center">
-    <span class="me-2 text-muted"><small>Ana ekranda en fazla 4 oyun gösterilir</small></span>
-    <button id="editFavoritesBtn" class="btn btn-sm btn-outline-primary">
-      <i class="fas fa-edit"></i> Düzenle
-    </button>
+<h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
+<div class="game-grid">
+  <!-- Kelime Bulmaca -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-font"></i></div>
+    <div class="game-info">
+      <h3>Kelime Bulmaca</h3>
+      <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
+    </div>
+    <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
   </div>
-</div>
 
-<!-- Favori oyunlar grid -->
-<div class="game-grid" id="favoriteGamesGrid">
-  <!-- Dinamik olarak doldurulacak -->
-</div>
+  <!-- Hafıza Kartları -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-clone"></i></div>
+    <div class="game-info">
+      <h3>Hafıza Kartları</h3>
+      <p>Eşleşen kartları bul ve hafızanı test et.</p>
+    </div>
+    <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+  </div>
 
-<!-- Oyunları düzenleme modu (başlangıçta gizli) -->
-<div id="editFavoritesMode" class="mt-3 mb-3 p-3 border rounded" style="display: none;">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Favori Oyunlarınızı Seçin</h4>
-    <span class="badge bg-primary" id="selectedCount">0/4</span>
+  <!-- Labirent -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-route"></i></div>
+    <div class="game-info">
+      <h3>Labirent</h3>
+      <p>Çıkış yolunu bul ve stratejik düşün.</p>
+    </div>
+    <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
   </div>
-  <div class="game-selection-grid" id="gameSelectionGrid">
-    <!-- Dinamik olarak doldurulacak -->
-  </div>
-  <div class="mt-3 text-end">
-    <button id="cancelEditBtn" class="btn btn-outline-secondary me-2">İptal</button>
-    <button id="saveFavoritesBtn" class="btn btn-primary">Kaydet</button>
-  </div>
-</div>
-</section>
 
-<section class="mt-4">
-<h2 class="text-center mb-3">Tüm Oyunlar</h2>
-<div class="game-grid" id="allGamesGrid">
-  <!-- Dinamik olarak doldurulacak -->
+  <!-- Yapboz -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+    <div class="game-info">
+      <h3>Yapboz</h3>
+      <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
+    </div>
+    <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Görsel Dikkat oyunu kaldırıldı
+  <div class="game-card" style="display: none;">
+    <div class="game-icon"><i class="fas fa-eye"></i></div>
+    <div class="game-info">
+      <h3>Görsel Dikkat</h3>
+      <p>Örüntüleri bul ve dikkatini test et.</p>
+    </div>
+    <a href="#" class="game-btn">Oyna</a>
+  </div>
+  -->
+
+  <!-- Sayı Dizisi -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+    <div class="game-info">
+      <h3>Sayı Dizisi</h3>
+      <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
+    </div>
+    <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Kim Nerede? oyunu kaldırıldı -->
+
+  <!-- Kart Eşleme oyunu kaldırıldı -->
+  <!--
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-th"></i></div>
+    <div class="game-info">
+      <h3>Kart Eşleme</h3>
+      <p>İkonları eşleştir ve görsel hafızanı geliştir.</p>
+    </div>
+    <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
+  </div>
+  -->
+
+  <!-- Sayı Zinciri -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-link"></i></div>
+    <div class="game-info">
+      <h3>Sayı Zinciri</h3>
+      <p>Gördüğün sayıları doğru sırayla hatırla.</p>
+    </div>
+    <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Sesli Hafıza -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+    <div class="game-info">
+      <h3>Sesli Hafıza</h3>
+      <p>Duyduğun ses sıralamasını doğru tekrarla.</p>
+    </div>
+    <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- N-Back Test -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-brain"></i></div>
+    <div class="game-info">
+      <h3>N-Back Test</h3>
+      <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
+    </div>
+    <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- Satranç -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-chess"></i></div>
+    <div class="game-info">
+      <h3>Satranç</h3>
+      <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+    </div>
+    <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+  </div>
+  
+  <!-- Sudoku -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-th"></i></div>
+    <div class="game-info">
+      <h3>Sudoku</h3>
+      <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
+    </div>
+    <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+  </div>
+
+  <!-- 3D Döndürme -->
+  <div class="game-card">
+    <div class="game-icon"><i class="fas fa-cube"></i></div>
+    <div class="game-info">
+      <h3>3D Döndürme</h3>
+      <p>3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.</p>
+    </div>
+    <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
+  </div>
 </div>
 </section>
 
 <section class="text-center mt-4 mb-4">
   <a href="{{ url_for('all_games') }}" class="btn btn-primary btn-lg">
-    <i class="fas fa-gamepad me-2"></i>Daha Fazla Oyun
+    <i class="fas fa-gamepad me-2"></i>Daha Çok Oyunlar
   </a>
 </section>
 
@@ -130,329 +231,4 @@
 </div>
 </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-// Tüm oyunların verileri - normalde backend'den yüklenecek
-const allGames = [
-  {
-    id: "word_puzzle",
-    name: "Kelime Bulmaca",
-    description: "Kelimeleri bul, sözcük hazineni genişlet.",
-    icon: "fa-font",
-    url: "{{ url_for('word_puzzle') }}"
-  },
-  {
-    id: "memory_cards",
-    name: "Hafıza Kartları",
-    description: "Eşleşen kartları bul ve hafızanı test et.",
-    icon: "fa-clone",
-    url: "{{ url_for('memory_cards') }}"
-  },
-  {
-    id: "labyrinth",
-    name: "Labirent",
-    description: "Çıkış yolunu bul ve stratejik düşün.",
-    icon: "fa-route",
-    url: "{{ url_for('labyrinth') }}"
-  },
-  {
-    id: "puzzle",
-    name: "Yapboz",
-    description: "Parçaları birleştir ve görsel zekânı geliştir.",
-    icon: "fa-puzzle-piece",
-    url: "{{ url_for('puzzle') }}"
-  },
-  {
-    id: "number_sequence",
-    name: "Sayı Dizisi",
-    description: "Sayı örüntülerini keşfet ve analitik düşün.",
-    icon: "fa-sort-numeric-up",
-    url: "{{ url_for('number_sequence') }}"
-  },
-  {
-    id: "number_chain",
-    name: "Sayı Zinciri",
-    description: "Gördüğün sayıları doğru sırayla hatırla.",
-    icon: "fa-link",
-    url: "{{ url_for('number_chain') }}"
-  },
-  {
-    id: "audio_memory",
-    name: "Sesli Hafıza",
-    description: "Duyduğun ses sıralamasını doğru tekrarla.",
-    icon: "fa-volume-up",
-    url: "{{ url_for('audio_memory') }}"
-  },
-  {
-    id: "n_back",
-    name: "N-Back Test",
-    description: "Çalışma belleğini ve odaklanma gücünü test et.",
-    icon: "fa-brain",
-    url: "{{ url_for('n_back') }}"
-  },
-  {
-    id: "chess",
-    name: "Satranç",
-    description: "Stratejik düşünme ve planlama becerilerini geliştir.",
-    icon: "fa-chess",
-    url: "{{ url_for('chess') }}"
-  },
-  {
-    id: "sudoku",
-    name: "Sudoku",
-    description: "Mantık gücünü geliştir.",
-    icon: "fa-th",
-    url: "{{ url_for('sudoku') }}"
-  },
-  {
-    id: "three_d_rotation",
-    name: "3D Döndürme",
-    description: "Uzamsal algı yeteneklerini geliştir.",
-    icon: "fa-cube",
-    url: "{{ url_for('three_d_rotation') }}"
-  },
-  {
-    id: "wordle",
-    name: "Kelime Tahmin",
-    description: "5 harfli kelimeleri tahmin et.",
-    icon: "fa-spell-check",
-    url: "{{ url_for('wordle') }}"
-  }
-];
-
-// Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', function() {
-  // Favori oyunları localStorage'dan yükle (yoksa varsayılan olarak ilk 4 oyunu kullan)
-  let favoriteGames = JSON.parse(localStorage.getItem('favoriteGames')) || allGames.slice(0, 4).map(game => game.id);
-  
-  // Favori oyunları ve tüm oyunları göster
-  displayFavoriteGames();
-  displayAllGames();
-  
-  // Düzenle butonuna tıklanınca
-  document.getElementById('editFavoritesBtn').addEventListener('click', function() {
-    document.getElementById('editFavoritesMode').style.display = 'block';
-    displayGameSelection();
-  });
-  
-  // İptal butonuna tıklanınca
-  document.getElementById('cancelEditBtn').addEventListener('click', function() {
-    document.getElementById('editFavoritesMode').style.display = 'none';
-  });
-  
-  // Kaydet butonuna tıklanınca
-  document.getElementById('saveFavoritesBtn').addEventListener('click', function() {
-    saveFavoriteGames();
-    document.getElementById('editFavoritesMode').style.display = 'none';
-  });
-});
-
-// Favori oyunları göster
-function displayFavoriteGames() {
-  const favoriteGamesGrid = document.getElementById('favoriteGamesGrid');
-  favoriteGamesGrid.innerHTML = '';
-  
-  // Favori oyunları localStorage'dan yükle
-  let favoriteGameIds = JSON.parse(localStorage.getItem('favoriteGames')) || allGames.slice(0, 4).map(game => game.id);
-  
-  // Favori oyun yoksa varsayılan mesaj göster
-  if (favoriteGameIds.length === 0) {
-    const emptyMessage = document.createElement('div');
-    emptyMessage.className = 'alert alert-info w-100 text-center';
-    emptyMessage.innerHTML = 'Henüz favori oyun eklemediniz. "Düzenle" butonunu kullanarak favori oyunlarınızı ekleyebilirsiniz.';
-    favoriteGamesGrid.appendChild(emptyMessage);
-    return;
-  }
-  
-  // Favori oyunları göster
-  favoriteGameIds.forEach(gameId => {
-    const game = allGames.find(g => g.id === gameId);
-    if (game) {
-      favoriteGamesGrid.appendChild(createGameCard(game));
-    }
-  });
-}
-
-// Tüm oyunları göster
-function displayAllGames() {
-  const allGamesGrid = document.getElementById('allGamesGrid');
-  allGamesGrid.innerHTML = '';
-  
-  allGames.forEach(game => {
-    allGamesGrid.appendChild(createGameCard(game));
-  });
-}
-
-// Oyun seçim ekranını göster
-function displayGameSelection() {
-  const gameSelectionGrid = document.getElementById('gameSelectionGrid');
-  gameSelectionGrid.innerHTML = '';
-  
-  // Favori oyunları localStorage'dan yükle
-  let favoriteGameIds = JSON.parse(localStorage.getItem('favoriteGames')) || allGames.slice(0, 4).map(game => game.id);
-  
-  // Seçim sayısını güncelle
-  updateSelectedCount(favoriteGameIds.length);
-  
-  // Tüm oyunlar için seçim kartları oluştur
-  allGames.forEach(game => {
-    const gameCard = document.createElement('div');
-    gameCard.className = 'game-selection-card';
-    gameCard.dataset.gameId = game.id;
-    
-    // Oyun favori ise seçili olarak işaretle
-    if (favoriteGameIds.includes(game.id)) {
-      gameCard.classList.add('selected');
-    }
-    
-    gameCard.innerHTML = `
-      <div class="game-selection-icon"><i class="fas ${game.icon}"></i></div>
-      <div class="game-selection-info">
-        <h5>${game.name}</h5>
-      </div>
-      <div class="game-selection-checkbox">
-        <i class="fas fa-check-circle"></i>
-      </div>
-    `;
-    
-    // Kart tıklaması
-    gameCard.addEventListener('click', function() {
-      toggleGameSelection(this);
-    });
-    
-    gameSelectionGrid.appendChild(gameCard);
-  });
-}
-
-// Oyun seçimini değiştir
-function toggleGameSelection(cardElement) {
-  // Favori oyunları localStorage'dan yükle
-  let favoriteGameIds = JSON.parse(localStorage.getItem('favoriteGames')) || allGames.slice(0, 4).map(game => game.id);
-  const gameId = cardElement.dataset.gameId;
-  
-  if (cardElement.classList.contains('selected')) {
-    // Seçimi kaldır
-    cardElement.classList.remove('selected');
-    favoriteGameIds = favoriteGameIds.filter(id => id !== gameId);
-  } else {
-    // En fazla 4 oyun seçilebilir
-    if (favoriteGameIds.length >= 4) {
-      // Uyarı göster
-      alert('En fazla 4 oyun ekleyebilirsiniz. Lütfen önce bir oyunu çıkarın.');
-      return;
-    }
-    
-    // Seçimi ekle
-    cardElement.classList.add('selected');
-    favoriteGameIds.push(gameId);
-  }
-  
-  // Seçim sayısını güncelle
-  updateSelectedCount(favoriteGameIds.length);
-  
-  // Geçici olarak localStorage'a kaydet
-  localStorage.setItem('favoriteGames', JSON.stringify(favoriteGameIds));
-}
-
-// Seçilen oyun sayısını güncelle
-function updateSelectedCount(count) {
-  document.getElementById('selectedCount').textContent = count + '/4';
-}
-
-// Favori oyunları kaydet
-function saveFavoriteGames() {
-  // Favori oyunları localStorage'dan yükle
-  let favoriteGameIds = JSON.parse(localStorage.getItem('favoriteGames')) || [];
-  
-  // Favori oyunları göster
-  displayFavoriteGames();
-  
-  // Başarılı mesajı göster
-  const message = document.createElement('div');
-  message.className = 'alert alert-success mt-3';
-  message.innerHTML = 'Favori oyunlarınız başarıyla kaydedildi!';
-  message.style.transition = 'opacity 0.5s ease-out';
-  
-  // Mesajı ekle
-  document.getElementById('favoriteGamesGrid').insertAdjacentElement('beforebegin', message);
-  
-  // 3 saniye sonra mesajı gizle
-  setTimeout(() => {
-    message.style.opacity = '0';
-    setTimeout(() => message.remove(), 500);
-  }, 3000);
-}
-
-// Oyun kartı oluştur
-function createGameCard(game) {
-  const gameCard = document.createElement('div');
-  gameCard.className = 'game-card';
-  gameCard.innerHTML = `
-    <div class="game-icon"><i class="fas ${game.icon}"></i></div>
-    <div class="game-info">
-      <h3>${game.name}</h3>
-      <p>${game.description}</p>
-    </div>
-    <a href="${game.url}" class="game-btn">Oyna</a>
-  `;
-  return gameCard;
-}
-</script>
-
-<style>
-/* Oyun seçim ekranı stilleri */
-.game-selection-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-}
-
-.game-selection-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-}
-
-.game-selection-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.game-selection-icon {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: #007bff;
-}
-
-.game-selection-info h5 {
-  font-size: 14px;
-  text-align: center;
-  margin: 0;
-}
-
-.game-selection-checkbox {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  color: #ccc;
-  font-size: 18px;
-}
-
-.game-selection-card.selected {
-  border-color: #007bff;
-  background-color: rgba(0, 123, 255, 0.05);
-}
-
-.game-selection-card.selected .game-selection-checkbox {
-  color: #007bff;
-}
-</style>
 {% endblock %}
