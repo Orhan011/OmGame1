@@ -1,126 +1,89 @@
 /**
- * iOS Tarzı Sağa Kaydırma ile Navigasyon Sistemi
- * Özel ZekaPark Uygulaması için geliştirilmiştir.
+ * Basitleştirilmiş iOS Tarzı Swipe Navigasyon 
+ * ZekaPark için özel olarak geliştirilmiştir
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Yeni iOS navigasyon sistemi yükleniyor...");
-    
-    // Temel HTML yapısı
-    const pageContainerId = 'pageContainer';
-    let pageContainer = document.getElementById(pageContainerId);
-    
-    // Eğer pageContainer yoksa, oluştur ve body'nin ilk çocuğu olarak ekle
-    if (!pageContainer) {
-        pageContainer = document.createElement('div');
-        pageContainer.id = pageContainerId;
-        pageContainer.className = 'page-container';
-        
-        // Mevcut body içeriğini kopyala
-        const bodyContent = document.body.innerHTML;
-        
-        // İlk sayfa olarak ekle
-        document.body.innerHTML = '';
-        document.body.appendChild(pageContainer);
-        
-        const homePage = document.createElement('div');
-        homePage.id = 'page-home';
-        homePage.className = 'page active';
-        homePage.innerHTML = bodyContent;
-        pageContainer.appendChild(homePage);
-        
-        // Gölge overlay ekle
-        const shadowOverlay = document.createElement('div');
-        shadowOverlay.id = 'shadowOverlay';
-        shadowOverlay.className = 'shadow-overlay';
-        pageContainer.appendChild(shadowOverlay);
-    }
-    
-    // Sayfa geçmişini takip et - Session kullanımına geç
+    // Basit bir geçmiş tutma sistemi
     if (!sessionStorage.getItem('pageHistory')) {
-        // Ana sayfadaysak, geçmişi sıfırla
-        const initialHistory = JSON.stringify([{
-            id: 'page-home',
-            url: window.location.pathname,
-            title: document.title
-        }]);
-        sessionStorage.setItem('pageHistory', initialHistory);
-        sessionStorage.setItem('currentPageId', 'page-home');
+        // İlk sayfa için geçmişi oluştur
+        sessionStorage.setItem('pageHistory', JSON.stringify([window.location.pathname]));
     } else {
-        // Durumu kontrol et - mevcut sayfa geçmişte var mı?
+        // Mevcut durumu kontrol et
         const history = JSON.parse(sessionStorage.getItem('pageHistory'));
-        const currentUrl = window.location.pathname;
+        const currentPath = window.location.pathname;
         
-        // Eğer son sayfa mevcut URL değilse (yeni bir sayfaya geldik)
-        if (history.length > 0 && history[history.length - 1].url !== currentUrl) {
-            // URL adresini kontrol et ve yeni bir sayfa olarak ekle
-            const newPageId = 'page-' + Math.random().toString(36).substr(2, 9);
-            const newPage = {
-                id: newPageId,
-                url: currentUrl,
-                title: document.title
-            };
-            
-            history.push(newPage);
+        // Eğer farklı bir sayfadaysak ve son sayfa bu sayfa değilse ekle
+        if (history[history.length - 1] !== currentPath) {
+            history.push(currentPath);
             sessionStorage.setItem('pageHistory', JSON.stringify(history));
-            sessionStorage.setItem('currentPageId', newPageId);
-            
-            console.log("Yeni sayfa geçmişe eklendi:", newPage);
         }
     }
     
-    // Log for debugging
-    console.log("Sayfa geçmişi (JSON):", sessionStorage.getItem('pageHistory'));
+    // Kaydırma algılama için shadow overlay ekle
+    const shadowElement = document.createElement('div');
+    shadowElement.id = 'swipe-shadow';
+    shadowElement.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        opacity: 0;
+        display: none;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    `;
+    document.body.appendChild(shadowElement);
     
-    // Swipe için değişkenler
-    let touchStartX = 0;
-    let touchMoveX = 0;
+    // Dokunmatik değişkenler
+    let startX = 0;
+    let currentX = 0;
     let isDragging = false;
-    const threshold = 50; // px cinsinden eşik değeri
     
-    // Dokunmatik olayları
+    // Dokunmatik olaylar
     document.addEventListener('touchstart', function(e) {
-        // Sadece ekranın sol kenarında başlayan dokunuşları algıla (20px)
-        if (e.touches[0].clientX < 20) {
-            touchStartX = e.touches[0].clientX;
+        // Sadece sol kenardan başlayan kaydırmaları algıla (15px)
+        if (e.touches[0].clientX <= 15) {
+            startX = e.touches[0].clientX;
             isDragging = true;
             
-            // Gölge efekti göster
-            const shadowOverlay = document.getElementById('shadowOverlay');
-            if (shadowOverlay) {
-                shadowOverlay.style.display = 'block';
-                shadowOverlay.style.opacity = '0';
-            }
+            // Gölgeyi hazırla
+            shadowElement.style.display = 'block';
+            
+            // Tarayıcı varsayılan davranışını engelle
+            e.preventDefault();
         }
-    });
+    }, {passive: false});
     
     document.addEventListener('touchmove', function(e) {
         if (!isDragging) return;
         
-        touchMoveX = e.touches[0].clientX;
-        const deltaX = touchMoveX - touchStartX;
+        currentX = e.touches[0].clientX;
+        const deltaX = currentX - startX;
         
+        // Sağa doğru kaydırıldıysa
         if (deltaX > 0) {
-            // Varsayılan kaydırma davranışını engelle
-            e.preventDefault();
-            
-            // Animasyon ile sayfayı sağa kaydır
-            const movePercentage = Math.min(100, (deltaX / window.innerWidth) * 100);
-            document.body.style.transform = `translateX(${movePercentage}%)`;
+            // Sayfayı hareket ettir
+            const movePercent = Math.min(deltaX / window.innerWidth * 100, 100);
+            document.body.style.transform = `translateX(${movePercent}%)`;
             document.body.style.transition = 'none';
             
             // Gölge efekti
-            const shadowOverlay = document.getElementById('shadowOverlay');
-            if (shadowOverlay) {
-                shadowOverlay.style.opacity = (movePercentage / 100 * 0.5).toString();
-            }
+            shadowElement.style.opacity = movePercent / 200;
+            
+            // Tarayıcı varsayılan davranışını engelle
+            e.preventDefault();
         }
-    });
+    }, {passive: false});
     
     document.addEventListener('touchend', function(e) {
         if (!isDragging) return;
         
-        const deltaX = touchMoveX - touchStartX;
+        // Kaydırma mesafesini hesapla
+        const deltaX = currentX - startX;
         
         // Geçiş animasyonunu geri yükle
         document.body.style.transition = 'transform 0.3s ease-out';
@@ -128,175 +91,85 @@ document.addEventListener('DOMContentLoaded', function() {
         // Geçmişi al
         const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
         
-        if (deltaX > threshold && history.length > 1) {
-            // Kaydırma eşiği aşıldı ve geçmişte sayfa var - geri dön
+        // Yeterince kaydırıldı mı? (50px)
+        if (deltaX > 50 && history.length > 1) {
+            // Geri dönüş animasyonu
             document.body.style.transform = 'translateX(100%)';
             
-            setTimeout(function() {
-                // Geçmişten son sayfayı çıkar (şu anki sayfa)
+            // 300ms sonra önceki sayfaya git
+            setTimeout(() => {
+                // Son sayfayı çıkar ve önceki sayfaya git
                 history.pop();
                 const previousPage = history[history.length - 1];
                 
                 // Geçmişi güncelle
                 sessionStorage.setItem('pageHistory', JSON.stringify(history));
-                sessionStorage.setItem('currentPageId', previousPage.id);
                 
-                // Önceki sayfaya git 
-                window.location.href = previousPage.url;
+                // Önceki sayfaya git
+                window.location.href = previousPage;
             }, 300);
         } else {
-            // Eşik değeri aşılmadı veya geçmişte sayfa yok - aynı sayfada kal
+            // Yeterli değilse geri al
             document.body.style.transform = '';
         }
         
-        // Gölge efektini sıfırla
-        const shadowOverlay = document.getElementById('shadowOverlay');
-        if (shadowOverlay) {
-            shadowOverlay.style.opacity = '0';
-            setTimeout(() => { shadowOverlay.style.display = 'none'; }, 300);
-        }
+        // Gölgeyi kapat
+        shadowElement.style.opacity = '0';
+        setTimeout(() => {
+            shadowElement.style.display = 'none';
+        }, 300);
         
         isDragging = false;
     });
     
-    // Tüm linkleri izle ve eğer iç link ise geçmişi güncelle
-    document.addEventListener('click', function(e) {
-        const closestLink = e.target.closest('a');
-        
-        if (closestLink && !closestLink.getAttribute('data-swipe-tracked')) {
-            closestLink.setAttribute('data-swipe-tracked', 'true');
+    // Sayfa bağlantılarını işle
+    document.querySelectorAll('a').forEach(link => {
+        // Sadece aynı domain içindeki ve işlenmemiş bağlantılar
+        if (link.hostname === window.location.hostname && 
+            !link.getAttribute('data-tracked')) {
             
-            const originalClickHandler = closestLink.onclick;
+            link.setAttribute('data-tracked', 'true');
             
-            closestLink.onclick = function(e) {
-                // Orijinal click işleyicisi varsa çalıştır
-                if (originalClickHandler) {
-                    const result = originalClickHandler.call(this, e);
+            // Orijinal click işleyiciyi sakla
+            const originalClick = link.onclick;
+            
+            // Yeni click işleyici
+            link.addEventListener('click', function(e) {
+                // Eğer orijinal click işleyici varsa çalıştır
+                if (originalClick) {
+                    const result = originalClick.call(this, e);
                     if (result === false) return false;
                 }
                 
-                // Aynı origin içerisindeki linkler için
-                if (closestLink.origin === window.location.origin &&
-                    !closestLink.href.includes('#') &&
-                    !closestLink.href.includes('javascript:') &&
+                // Özel durumları kontrol et
+                if (!link.href.includes('javascript:') && 
+                    !link.href.includes('#') && 
                     !e.ctrlKey && !e.metaKey) {
                     
-                    // Geçmişi al
+                    // Yeni sayfa için geçmişi güncelle
                     const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
+                    const targetPath = new URL(link.href).pathname;
                     
-                    // URL farklıysa geçmişe ekle
-                    const targetUrl = new URL(closestLink.href).pathname;
-                    if (history.length === 0 || history[history.length - 1].url !== targetUrl) {
-                        const newPageId = 'page-' + Math.random().toString(36).substr(2, 9);
-                        history.push({
-                            id: newPageId,
-                            url: targetUrl,
-                            title: closestLink.textContent.trim() || document.title
-                        });
-                        
+                    // Eğer son sayfa bu değilse ekle
+                    if (history[history.length - 1] !== targetPath) {
+                        history.push(targetPath);
                         sessionStorage.setItem('pageHistory', JSON.stringify(history));
-                        sessionStorage.setItem('currentPageId', newPageId);
-                        
-                        console.log("Link tıklaması ile geçmişe eklendi:", targetUrl);
                     }
-                }
-            };
-        }
-    });
-    
-    // Geriye gitme butonları için destek
-    const backButtons = document.querySelectorAll('.back-button');
-    backButtons.forEach(function(button) {
-        if (!button.getAttribute('data-back-tracked')) {
-            button.setAttribute('data-back-tracked', 'true');
-            
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Geçmişi al
-                const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
-                
-                if (history.length > 1) {
-                    // Şu anki sayfayı çıkar
-                    history.pop();
-                    const previousPage = history[history.length - 1];
-                    
-                    // Geçmişi güncelle
-                    sessionStorage.setItem('pageHistory', JSON.stringify(history));
-                    sessionStorage.setItem('currentPageId', previousPage.id);
-                    
-                    // Önceki sayfaya git
-                    window.location.href = previousPage.url;
                 }
             });
         }
     });
     
-    // Sayfanın ilk yüklenişinde stil ekle
+    // Saf CSS ekle
     const style = document.createElement('style');
     style.textContent = `
         body {
             overflow-x: hidden;
             position: relative;
-            min-height: 100vh;
+            width: 100%;
             will-change: transform;
             transition: transform 0.3s ease-out;
         }
-        
-        .page-container {
-            position: relative;
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-        }
-        
-        .page {
-            width: 100%;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        .shadow-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            pointer-events: none;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-out;
-        }
     `;
     document.head.appendChild(style);
-});
-
-// Sayfalar arası iyileştirilmiş geçiş
-window.addEventListener('pageshow', function(event) {
-    // Önceki sayfadan geri döndüğümüzde (tarayıcı geri butonu)
-    if (event.persisted) {
-        // Geçmişi güncelle
-        const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
-        
-        if (history.length > 1) {
-            // Son sayfayı çıkar (çünkü geri geliyoruz)
-            history.pop();
-            sessionStorage.setItem('pageHistory', JSON.stringify(history));
-            sessionStorage.setItem('currentPageId', history[history.length - 1].id);
-        }
-    }
-});
-
-// Hata önleme için genel hata yakalama
-window.addEventListener('error', function(e) {
-    // Kritik olmayan hatalarla baş et
-    if (e.message.includes('null') && 
-        (e.message.includes('addEventListener') || 
-         e.message.includes('innerHTML'))) {
-        console.warn('Önlenen hata:', e.message);
-        e.preventDefault();
-        return true;
-    }
 });
