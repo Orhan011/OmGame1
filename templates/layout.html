@@ -12,9 +12,9 @@
 
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ios-swipe-navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-swipe-navigation.css') }}">
 
-    <!-- Yeni basit kaydırma navigasyonu eklendi -->
+    <!-- Swipe navigation CSS removed -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
@@ -223,7 +223,7 @@ function loadArticleContent() {
 <!-- Sweet Alert 2 - Gelişmiş ve güzel bildirimler için -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/iosSwipeNavigation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pageSwipeNavigation.js') }}"></script>
 {% block scripts %}{% endblock %}
 <!-- Swipe Navigation scripts removed -->
   </body>
