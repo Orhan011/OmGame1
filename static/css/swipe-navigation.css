@@ -1,58 +1,100 @@
 /**
- * ZekaPark - iOS Swipe Navigasyon Sistemi
- * v2.0.0 - Basitleştirilmiş Sürüm
+ * ZekaPark - Swipe Navigation CSS Stilleri
+ * iOS tarzı kenar kaydırma navigasyonu için stil tanımları
  */
 
+body {
+    overflow-x: hidden; /* Yatay taşmayı engelle */
+    position: relative;
+    min-height: 100vh;
+    will-change: transform; /* Performans optimizasyonu */
+    transition: transform 0.3s ease-out;
+}
+
+/* Swipe için gerekli overlay */
 .swipe-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 30px;
+    width: 30px; /* Sol kenar genişliği */
     height: 100%;
-    z-index: 99999;
-    opacity: 0; /* Görünmez ama dokunma algılaması çalışır */
+    z-index: 9998;
+    touch-action: pan-x; /* Yatay kaydırmayı etkinleştir */
+    opacity: 0; /* Görünmez, sadece dokunmatik alanı tanımlamak için */
 }
 
-/* Kaydırma hareketi için gölge efekti */
+/* Gölgeleme efekti için */
 .shadow-overlay {
     position: fixed;
     top: 0;
-    left: -10px;
-    width: 10px;
+    left: 0;
+    width: 100%;
     height: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    z-index: 99998;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9997;
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    pointer-events: none; /* Dokunmatik olayları engelleme */
+}
+
+/* Geri dönüş animasyonu için hız tanımları */
+.page-transition {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+}
+
+/* Sayfa sağdan sola geçiş animasyonu */
+@keyframes slide-in-right {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(0); }
+}
+
+/* Sayfa soldan sağa geçiş animasyonu */
+@keyframes slide-out-right {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+
+/* Animasyonlar için yardımcı sınıflar */
+.slide-in {
+    animation-name: slide-in-right;
+}
+
+.slide-out {
+    animation-name: slide-out-right;
+}
+
+/* Geriye gitme butonları için stil */
+.back-button {
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.back-button:hover {
+    opacity: 0.8;
+}
+
+/* Kaydırma göstergesi - isteğe bağlı olarak eklenebilir */
+.swipe-indicator {
+    position: fixed;
+    top: 50%;
+    left: 10px;
+    width: 5px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    z-index: 9999;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
     pointer-events: none;
 }
 
-/* iOS tarzı geri butonlar */
-.back-button {
-    color: #007AFF;
-    font-size: 16px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.back-button:before {
-    content: '';
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-left: 2px solid #007AFF;
-    border-bottom: 2px solid #007AFF;
-    transform: rotate(45deg);
-    margin-right: 5px;
-}
-
-/* Koyu tema desteği */
-html.dark .back-button {
-    color: #3694FF;
-}
-
-html.dark .back-button:before {
-    border-color: #3694FF;
+/* Mobil cihazlar için daha fazla optimize edilmiş stiller */
+@media (max-width: 768px) {
+    .swipe-overlay {
+        width: 20px; /* Mobil için daha dar kenar algılama */
+    }
 }

@@ -1,20 +1,32 @@
 /**
  * ZekaPark - iOS Swipe Navigasyon Sistemi
- * Yeni Versiyon - Geliştirilmiş Sürüm
+ * Özelleştirilmiş Geriye Gitme Sistemi
+ * 
+ * Sayfa geçiş sırası:
+ * A -> B -> C -> D ilerlerken
+ * D -> C -> B -> A geriye dönerken
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Ziyaret edilen sayfaları takip et
-    if (!window.visitedPages) {
-        window.visitedPages = [window.location.pathname];
+    console.log("Swipe navigasyon sistemi yükleniyor...");
+    
+    // Sayfa geçmişini yerel depolamada tut
+    if (!sessionStorage.getItem('pageHistory')) {
+        sessionStorage.setItem('pageHistory', JSON.stringify([window.location.pathname]));
+    } else {
+        // Mevcut sayfayı kontrolle ekle
+        const history = JSON.parse(sessionStorage.getItem('pageHistory'));
+        
+        // Eğer son sayfa mevcut sayfa değilse, geçmişe ekle
+        if (history[history.length - 1] !== window.location.pathname) {
+            history.push(window.location.pathname);
+            sessionStorage.setItem('pageHistory', JSON.stringify(history));
+        }
     }
-
-    // Sayfa yüklendiğinde geçmiş kaydını güncelle
-    if (!window.visitedPages.includes(window.location.pathname)) {
-        window.visitedPages.push(window.location.pathname);
-    }
-
-    // Swipe navigasyon sistemini oluştur - Sayfanın kenarından kaydırma yapmak için
+    
+    console.log("Sayfa geçmişi:", JSON.parse(sessionStorage.getItem('pageHistory')));
+    
+    // Swipe navigasyon sistemini oluştur
     const swipeOverlay = document.createElement('div');
     swipeOverlay.id = 'swipeOverlay';
     swipeOverlay.className = 'swipe-overlay';
@@ -76,14 +88,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (deltaX > threshold) {
             // Eşik değeri aşıldı, geri dön
             document.body.style.transform = 'translateX(100%)';
-            setTimeout(function() {
-                // Özel navigasyon fonksiyonumuzu kullan
-                goToPreviousPage();
-                
-                // Stili sıfırla
+            
+            // Geçmiş kontrolü
+            const history = JSON.parse(sessionStorage.getItem('pageHistory'));
+            if (history.length > 1) {
+                setTimeout(function() {
+                    // Önceki sayfaya git (son eklenen sayfayı geçmişten çıkar)
+                    history.pop(); // Mevcut sayfayı çıkar
+                    const previousPage = history[history.length - 1];
+                    
+                    // Geçmişi güncelle
+                    sessionStorage.setItem('pageHistory', JSON.stringify(history));
+                    
+                    // Direkt önceki sayfaya git
+                    window.location.href = previousPage;
+                }, 300);
+            } else {
+                // Tek sayfa varsa, stili geri al
                 document.body.style.transform = '';
-                document.body.style.transition = '';
-            }, 300);
+            }
         } else {
             // Eşik değeri aşılmadı, mevcut sayfada kal
             document.body.style.transform = '';
@@ -98,103 +121,88 @@ document.addEventListener('DOMContentLoaded', function() {
         isDragging = false;
     });
     
-    // Back butonlarını işlevselleştir
-    const backButtons = document.querySelectorAll('.back-button');
-    backButtons.forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            goToPreviousPage();
-        });
+    // Linkleri takip et (a etiketleri)
+    document.querySelectorAll('a').forEach(function(link) {
+        if (!link.getAttribute('data-nav-tracked')) {
+            link.setAttribute('data-nav-tracked', 'true');
+            
+            link.addEventListener('click', function(e) {
+                // Eğer aynı domain içinde gidiyorsa, geçmişi takip et
+                if (link.host === window.location.host && 
+                    !link.href.includes('javascript:') && 
+                    !link.href.includes('#') &&
+                    !e.ctrlKey && !e.metaKey) {
+                    
+                    // Harici bir link değilse ve javascript: veya # değilse
+                    const pathname = new URL(link.href).pathname;
+                    
+                    // Geçmişi al ve güncelle
+                    const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
+                    
+                    // Eğer linke tıklanan sayfaya gidilecekse ekleme
+                    if (history[history.length - 1] !== pathname) {
+                        history.push(pathname);
+                        sessionStorage.setItem('pageHistory', JSON.stringify(history));
+                    }
+                }
+            });
+        }
     });
     
-    // Özel navigasyon fonksiyonu
-    function goToPreviousPage() {
-        if (window.visitedPages.length > 1) {
-            // Son ziyaret edilen sayfayı sil
-            window.visitedPages.pop();
-            
-            // Bir önceki sayfaya git
-            const previousPage = window.visitedPages[window.visitedPages.length - 1];
-            
-            // Tarayıcı geçmişini de güncelle
-            window.location.href = previousPage;
-        } else {
-            // Geçmişte sayfa yoksa ana sayfaya git
-            window.location.href = '/';
+    // Tarayıcı geri butonunu yakalama (isteğe bağlı)
+    window.addEventListener('popstate', function(e) {
+        // Tarayıcı geri butonuna basıldığında
+        const history = JSON.parse(sessionStorage.getItem('pageHistory') || '[]');
+        
+        // Son sayfayı çıkart
+        if (history.length > 1) {
+            history.pop();
+            sessionStorage.setItem('pageHistory', JSON.stringify(history));
         }
-    }
-    
-    // Sayfa bağlantılarını takip et
-    document.querySelectorAll('a').forEach(function(link) {
-        // Eğer link zaten bir olay dinleyicisi varsa ekleme
-        if (link.getAttribute('data-navigation-handled')) return;
-        
-        const originalClick = link.onclick;
-        
-        link.addEventListener('click', function(e) {
-            // Orijinal tıklama olayını çalıştır
-            if (originalClick) {
-                const result = originalClick.call(this, e);
-                if (result === false) return false;
-            }
-            
-            // Eğer link dış bağlantı değilse
-            if (link.hostname === window.location.hostname && 
-                !link.href.startsWith('javascript:') && 
-                !link.href.startsWith('#') && 
-                !e.ctrlKey && !e.metaKey) {
-                
-                // Yeni sayfayı geçmişe ekle
-                if (!window.visitedPages.includes(link.pathname)) {
-                    window.visitedPages.push(link.pathname);
-                }
-            }
-        });
-        
-        // Bu linkin işlendiğini işaretle
-        link.setAttribute('data-navigation-handled', 'true');
     });
 });
 
-// Hata ayıklama - Buton hataları için
-document.addEventListener('DOMContentLoaded', function() {
-    // Oyun sayfalarındaki hataları düzeltmek için
-    // Olmayan elemanların kontrol edilmesi
-    const errorPreventionHandler = function() {
-        // restartButton hatası için
-        const buttons = [
-            'restart-button', 'restart-game', 'restartButton', 
-            'labyrinthRestartButton'
-        ];
-        
-        buttons.forEach(function(buttonId) {
-            const button = document.getElementById(buttonId);
-            if (button) {
-                if (!button.getAttribute('data-handler-attached')) {
-                    button.setAttribute('data-handler-attached', 'true');
-                }
-            }
-        });
-        
+// Hatalardan kaçınmak için oyun sayfaları için ek kontroller
+window.addEventListener('load', function() {
+    try {
         // wordsList hatası için
         const wordsList = document.getElementById('wordsList');
         if (wordsList) {
-            if (!wordsList.getAttribute('data-handler-attached')) {
-                wordsList.setAttribute('data-handler-attached', 'true');
-            }
+            // wordsList.innerHTML değerini güncellemeden önce kontrol
+            const originalInnerHTMLDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+            const originalInnerHTML = wordsList.innerHTML;
+            
+            Object.defineProperty(wordsList, 'innerHTML', {
+                get: function() {
+                    return originalInnerHTML;
+                },
+                set: function(value) {
+                    // Eğer değer null veya undefined ise boş string kullan
+                    originalInnerHTMLDescriptor.set.call(this, value || '');
+                },
+                configurable: true
+            });
         }
-    };
-    
-    // Sayfa yüklendiğinde ve dinamik içerik eklendiğinde çağır
-    errorPreventionHandler();
-    
-    // MutationObserver ile DOM değişikliklerini izle
-    const observer = new MutationObserver(function(mutations) {
-        errorPreventionHandler();
-    });
-    
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true 
-    });
+        
+        // restartButton hatası için
+        const buttonIds = ['restart-button', 'restart-game', 'restartButton', 'labyrinthRestartButton'];
+        
+        buttonIds.forEach(function(id) {
+            const button = document.getElementById(id);
+            if (!button) {
+                // Buton yoksa, bir kukla eleman oluştur
+                const dummyButton = document.createElement('button');
+                dummyButton.id = id;
+                dummyButton.style.display = 'none';
+                document.body.appendChild(dummyButton);
+                
+                // Kukla butona boş bir olay dinleyici ekle
+                dummyButton.addEventListener('click', function() {
+                    console.log(id + ' butonuna tıklandı (kukla eleman)');
+                });
+            }
+        });
+    } catch (e) {
+        console.log('Hata önleme sistemi çalışırken bir hata oluştu:', e);
+    }
 });
