@@ -1,18 +1,19 @@
 /**
- * Basitleştirilmiş iOS Tarzı Swipe Navigasyon - CSS
+ * iOS Tarzı Swipe Navigasyon - CSS
  * ZekaPark için özel olarak geliştirilmiştir
  */
 
+/* Ana sayfa yapısı */
 body {
     overflow-x: hidden;
     position: relative;
     width: 100%;
-    min-height: 100vh; 
     will-change: transform;
     transition: transform 0.3s ease-out;
 }
 
-#swipe-shadow {
+/* Swipe için gölge overlay */
+#swipe-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -22,19 +23,45 @@ body {
     z-index: 9999;
     opacity: 0;
     display: none;
+    transition: opacity 0.3s ease-out;
     pointer-events: none;
-    transition: opacity 0.3s;
 }
 
-/* Sayfa içerikleri için gerekli düzenlemeler */
-.container {
-    position: relative;
-    z-index: 1;
+/* Geri butonu stili */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem;
+    color: #007bff;
+    cursor: pointer;
+    user-select: none;
 }
 
-/* Mobil uyumluluk için ayarlamalar */
+.back-button:before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: rotate(-45deg);
+    margin-right: 0.3rem;
+}
+
+.back-button:hover {
+    opacity: 0.8;
+}
+
+/* Mobil cihazlarda özellikle dikkat edilmesi gereken düzenlemeler */
 @media (max-width: 768px) {
-    #swipe-shadow {
-        z-index: 9999;
+    /* Mobil cihazlarda swipe işlemini daha kolay yapabilmek için */
+    #swipe-overlay {
+        z-index: 10000; /* Daha yüksek z-index */
+    }
+    
+    /* 3D transform performansını artırmak için */
+    body {
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
     }
 }
