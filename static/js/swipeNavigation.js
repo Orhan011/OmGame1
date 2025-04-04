@@ -1,4 +1,3 @@
-
 /**
  * ZekaPark iOS Tarzı Navigasyon Sistemi
  * Sayfa Geçmişli Navigasyon: A→B→C→D şeklinde ziyaret, D→C→B→A şeklinde geri dönüş
@@ -16,20 +15,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         init() {
-            if (this.currentPath === '/') {
-                this.clear();
-            } else if (!this.hasPath(this.currentPath)) {
+            if (!this.hasPath(this.currentPath)) {
                 this.add(this.currentPath);
+                this.save();
             }
-            this.save();
             console.log("Mevcut sayfa geçmişi:", this.history);
         }
 
         hasPath(path) {
-            return this.history[this.history.length - 1] === path;
+            return this.history.includes(path);
         }
 
         add(path) {
+            if (path === '/') return;
+
+            // Aynı sayfaya tekrar gidilirse, önceki kaydı sil
+            const existingIndex = this.history.indexOf(path);
+            if (existingIndex !== -1) {
+                this.history.splice(existingIndex, 1);
+            }
+
             if (this.history.length >= this.maxHistoryLength) {
                 this.history.shift();
             }
@@ -37,15 +42,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         removeLast() {
+            if (this.history.length <= 1) return '/';
             return this.history.pop();
         }
 
         clear() {
-            this.history = ['/'];
+            this.history = [];
         }
 
         getPrevious() {
-            return this.history[this.history.length - 2] || '/';
+            if (this.history.length <= 1) return '/';
+            const prevPath = this.history[this.history.length - 2];
+            return prevPath || '/';
         }
 
         save() {
