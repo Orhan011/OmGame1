@@ -1,29 +1,52 @@
 /**
- * ZekaPark - Swipe Navigation CSS Stilleri
- * iOS tarzı kenar kaydırma navigasyonu için stil tanımları
+ * iOS Tarzı Swipe Navigasyon - CSS Stilleri
+ * ZekaPark için özel olarak geliştirilmiştir
  */
 
-body {
-    overflow-x: hidden; /* Yatay taşmayı engelle */
+/* Ana Sayfa Yapısı */
+.page-container {
     position: relative;
+    width: 100%;
     min-height: 100vh;
-    will-change: transform; /* Performans optimizasyonu */
-    transition: transform 0.3s ease-out;
+    overflow-x: hidden;
 }
 
-/* Swipe için gerekli overlay */
-.swipe-overlay {
-    position: fixed;
+/* Sayfa İçerikleri */
+.page {
+    width: 100%;
+    min-height: 100vh;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 30px; /* Sol kenar genişliği */
-    height: 100%;
-    z-index: 9998;
-    touch-action: pan-x; /* Yatay kaydırmayı etkinleştir */
-    opacity: 0; /* Görünmez, sadece dokunmatik alanı tanımlamak için */
+    transition: transform 0.3s ease-out;
+    background-color: var(--bg-color, #ffffff);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* Gölgeleme efekti için */
+.page.active {
+    z-index: 2;
+    transform: translateX(0);
+}
+
+.page:not(.active) {
+    transform: translateX(100%);
+    z-index: 1;
+}
+
+/* Ana Kaydırma Yapıları */
+body {
+    overflow-x: hidden;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    will-change: transform;
+    transition: transform 0.3s ease-out;
+    touch-action: pan-y;
+}
+
+/* Gölge Efekti Overlay */
 .shadow-overlay {
     position: fixed;
     top: 0;
@@ -31,70 +54,93 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9997;
+    z-index: 9999;
+    pointer-events: none;
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease-out;
-    pointer-events: none; /* Dokunmatik olayları engelleme */
 }
 
-/* Geri dönüş animasyonu için hız tanımları */
-.page-transition {
-    animation-duration: 0.3s;
-    animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
+/* Kaydırma Indicator (sol kenarda) */
+.swipe-indicator {
+    position: fixed;
+    top: 50%;
+    left: 5px;
+    width: 4px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 2px;
+    z-index: 10000;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
-/* Sayfa sağdan sola geçiş animasyonu */
-@keyframes slide-in-right {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(0); }
+.swipe-indicator.visible {
+    opacity: 1;
 }
 
-/* Sayfa soldan sağa geçiş animasyonu */
-@keyframes slide-out-right {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(100%); }
-}
-
-/* Animasyonlar için yardımcı sınıflar */
-.slide-in {
-    animation-name: slide-in-right;
-}
-
-.slide-out {
-    animation-name: slide-out-right;
-}
-
-/* Geriye gitme butonları için stil */
+/* Geri Butonu Stil */
 .back-button {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color, #007AFF);
     cursor: pointer;
-    transition: opacity 0.3s;
+    user-select: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    text-decoration: none;
 }
 
 .back-button:hover {
     opacity: 0.8;
 }
 
-/* Kaydırma göstergesi - isteğe bağlı olarak eklenebilir */
-.swipe-indicator {
-    position: fixed;
-    top: 50%;
-    left: 10px;
-    width: 5px;
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 3px;
-    z-index: 9999;
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
+.back-button::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: rotate(-45deg);
+    margin-right: 6px;
 }
 
-/* Mobil cihazlar için daha fazla optimize edilmiş stiller */
+/* Sayfa Geçiş Animasyonları */
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s forwards;
+}
+
+.slide-out-right {
+    animation: slideOutRight 0.3s forwards;
+}
+
+/* Dokunmatik Cihaz için sol kenar algılama bölgesi */
+.swipe-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    z-index: 9998;
+    touch-action: pan-x;
+}
+
+/* Küçük ekranlar için düzenlemeler */
 @media (max-width: 768px) {
-    .swipe-overlay {
-        width: 20px; /* Mobil için daha dar kenar algılama */
+    .swipe-area {
+        width: 15px; /* Daha dar kenar algılama */
     }
 }
