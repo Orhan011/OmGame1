@@ -1,0 +1,128 @@
+/**
+ * iOS Tarzı Sayfa Kaydırma Navigasyon Sistemi CSS
+ */
+
+:root {
+    --page-transition-timing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --page-transition-duration: 0.3s;
+    --page-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    --page-shadow-dark: -5px 0 15px rgba(0, 0, 0, 0.25);
+}
+
+body {
+    overflow-x: hidden;
+    position: relative;
+    touch-action: pan-y;
+}
+
+/* Sayfa konteyneri */
+.page-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* Sayfa öğesi */
+.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bs-body-bg, #fff);
+    transition: transform var(--page-transition-duration) var(--page-transition-timing);
+    overflow-y: auto;
+    z-index: 1001;
+    transform: translateX(100%);
+}
+
+.page.active {
+    z-index: 1002;
+    transform: translateX(0);
+}
+
+/* Sayfa üst kısmı */
+.page-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: var(--bs-body-bg, #f8f8f8);
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    z-index: 1005;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Geri butonu */
+.back-button {
+    color: #007AFF;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.back-button:before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-left: 2px solid #007AFF;
+    border-bottom: 2px solid #007AFF;
+    transform: rotate(45deg);
+    margin-right: 5px;
+}
+
+/* Sayfa başlığı */
+.page-title {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 17px;
+    margin-left: -15px;
+}
+
+/* Sayfa içeriği */
+.page-content {
+    margin-top: 50px;
+    height: calc(100% - 50px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Gölge kenar efekti */
+.shadow-overlay {
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 10px;
+    height: 100%;
+    box-shadow: var(--page-shadow);
+    opacity: 0;
+    z-index: 1003;
+    pointer-events: none;
+}
+
+/* Karanlık tema desteği */
+html.dark .page {
+    background-color: var(--bs-body-bg, #121212);
+    color: var(--bs-body-color, #fff);
+}
+
+html.dark .page-header {
+    background-color: var(--bs-body-bg, #1e1e1e);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .shadow-overlay {
+    box-shadow: var(--page-shadow-dark);
+}
