@@ -10,6 +10,7 @@ body {
     min-height: 100vh; 
     will-change: transform;
     transition: transform 0.3s ease-out;
+    touch-action: pan-y pinch-zoom;
 }
 
 #swipe-shadow {
