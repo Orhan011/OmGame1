@@ -1,59 +1,608 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
-{% block title %}Profil - {{ user.username }}{% endblock %}
+{% block title %}{{ user.username }} | Profil - OmGame{% endblock %}
 
 {% block content %}
-<div class="profile-container">
-  <!-- Profil Sekmesi -->
-  <div class="profile-tabs">
-    <nav>
-      <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-stats-tab" data-bs-toggle="tab" data-bs-target="#nav-stats" type="button" role="tab" aria-controls="nav-stats" aria-selected="true">İstatistikler</button>
-        <button class="nav-link" id="nav-scores-tab" data-bs-toggle="tab" data-bs-target="#nav-scores" type="button" role="tab" aria-controls="nav-scores" aria-selected="false">Oyun Skorları</button>
-        <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-settings" aria-selected="false">Ayarlar</button>
-        <button class="nav-link" id="nav-favorites-tab" data-bs-toggle="tab" data-bs-target="#nav-favorites" type="button" role="tab" aria-controls="nav-favorites" aria-selected="false">Favori Oyunlar</button>
-      </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-      <!-- Favori Oyunlar Sekmesi -->
-      <div class="tab-pane fade" id="nav-favorites" role="tabpanel" aria-labelledby="nav-favorites-tab">
-        {% if user.favorite_games %}
-        <div class="favorite-games-container">
-          <div class="row">
-            {% for game in user.favorite_games %}
-            <div class="col-md-6 col-lg-4 mb-4">
-              <div class="favorite-game-card">
-                <div class="favorite-game-icon">
-                  <i class="{{ game.icon }}"></i>
-                </div>
-                <div class="favorite-game-info">
-                  <h4>{{ game.name }}</h4>
-                  <p>{{ game.description }}</p>
-                  <div class="favorite-game-actions">
-                    <a href="{{ game.url }}" class="btn btn-primary btn-sm">Oyna</a>
-                    <form action="{{ url_for('remove_favorite') }}" method="post" class="d-inline">
-                      <input type="hidden" name="game_id" value="{{ game.id }}">
-                      <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="fas fa-heart-broken"></i> Favorilerden Çıkar
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endfor %}
+<div class="container profile-container">
+  <div class="row">
+    <!-- Sol Kolon - Profil Bilgileri -->
+    <div class="col-lg-3">
+      <div class="glass-card profile-card">
+        <!-- Profil Resmi ve Statüsü -->
+        <div class="profile-image-container">
+          <div class="profile-avatar">
+            {% if user.avatar_url %}
+              <img src="{{ url_for('static', filename=user.avatar_url) }}" alt="{{ user.username }}" class="profile-img">
+            {% else %}
+              <div class="profile-avatar-placeholder">{{ user.username[0]|upper }}</div>
+            {% endif %}
+            <div class="profile-status online"></div>
           </div>
         </div>
-        {% else %}
-        <div class="no-favorites">
-          <i class="fas fa-heart"></i>
-          <p>Henüz favori oyununuz yok.</p>
-          <p class="text-muted">Sevdiğiniz oyunları favorilere ekleyerek buradan hızlıca erişebilirsiniz.</p>
-          <a href="{{ url_for('all_games') }}" class="btn btn-primary mt-3">Tüm Oyunlar</a>
+        
+        <!-- Kullanıcı Bilgileri -->
+        <div class="profile-info">
+          <h2 class="profile-name">{{ user.username }}</h2>
+          <p class="profile-title">{{ user.rank }}</p>
+          
+          <!-- Seviye Bilgisi -->
+          <div class="level-progress-container">
+            <div class="level-badge">{{ current_level }}</div>
+            <div class="level-progress-bar">
+              <div class="level-progress" style="width: {{ ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current) * 100)|round }}%"></div>
+            </div>
+            <p class="level-text">{{ user.experience_points|int }} / {{ xp_for_next|int }} XP</p>
+          </div>
+        </div>
+        
+        <!-- İstatistikler Kaldırıldı -->
+        
+        <!-- Kişisel Bilgiler -->
+        <div class="personal-info-container">
+          {% if user.full_name %}
+          <div class="info-item">
+            <i class="fas fa-user"></i>
+            <span>{{ user.full_name }}</span>
+          </div>
+          {% endif %}
+          
+          {% if user.location %}
+          <div class="info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ user.location }}</span>
+          </div>
+          {% endif %}
+          
+          <div class="info-item">
+            <i class="fas fa-envelope"></i>
+            <span>{{ user.email }}</span>
+          </div>
+          
+          <div class="info-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Kayıt: {{ user.created_at.strftime('%d.%m.%Y') }}</span>
+          </div>
+        </div>
+        
+        {% if user.bio %}
+        <div class="bio-container">
+          <h3 class="section-title">Hakkımda</h3>
+          <p class="bio-text">{{ user.bio }}</p>
         </div>
         {% endif %}
       </div>
     </div>
+    
+    <!-- Sağ Kolon - Sekmeler -->
+    <div class="col-lg-9">
+      <div class="glass-card">
+        <!-- Sekme Başlıkları -->
+        <div class="profile-tab-container">
+          <div class="tab-navigation">
+            
+            <button class="tab-button" data-tab="security">
+              <i class="fas fa-shield-alt"></i> Güvenlik
+            </button>
+            <button class="tab-button" data-tab="settings">
+              <i class="fas fa-cog"></i> Ayarlar
+            </button>
+            <div class="tab-indicator"></div>
+          </div>
+          
+          <!-- Sekme İçerikleri -->
+          <div class="tab-content-container">
+            <!-- Başarılar ve İstatistikler Sekmeleri Kaldırıldı -->
+            
+            <!-- Güvenlik Sekmesi -->
+            <div class="tab-content" id="security-tab">
+              <h3 class="tab-title">Hesap Güvenliği</h3>
+              
+              <div class="security-settings">
+                <!-- Şifre Değiştirme -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <div class="setting-icon">
+                      <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="setting-info">
+                      <h4>Şifre Değiştir</h4>
+                      <p>Hesabınızın güvenliği için şifrenizi düzenli olarak değiştirin</p>
+                    </div>
+                  </div>
+                  <div class="setting-actions">
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                      Şifre Değiştir
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Email Güncelleme -->
+                <div class="setting-card">
+                  <div class="setting-header">
+                    <div class="setting-icon">
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="setting-info">
+                      <h4>Email Adresi</h4>
+                      <p>Mevcut email adresiniz: {{ user.email }}</p>
+                    </div>
+                  </div>
+                  <div class="setting-actions">
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changeEmailModal">
+                      Email Değiştir
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Hesap Silme -->
+                <div class="setting-card danger-setting">
+                  <div class="setting-header">
+                    <div class="setting-icon danger">
+                      <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="setting-info">
+                      <h4>Hesabı Sil</h4>
+                      <p>Hesabınız ve tüm verileriniz kalıcı olarak silinecektir</p>
+                    </div>
+                  </div>
+                  <div class="setting-actions">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                      Hesabı Sil
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Hesabı Dondurma -->
+                <div class="setting-card warning-setting">
+                  <div class="setting-header">
+                    <div class="setting-icon warning">
+                      <i class="fas fa-snowflake"></i>
+                    </div>
+                    <div class="setting-info">
+                      <h4>Hesabı Dondur</h4>
+                      <p>Hesabınız geçici olarak devre dışı bırakılacak ve istediğiniz zaman tekrar aktifleştirebilirsiniz</p>
+                    </div>
+                  </div>
+                  <div class="setting-actions">
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#suspendAccountModal">
+                      Hesabı Dondur
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Ayarlar Sekmesi -->
+            <div class="tab-content" id="settings-tab">
+              <h3 class="tab-title">Hesap Ayarları</h3>
+              
+              <div class="settings-container">
+                <!-- Profil Bilgileri -->
+                <div class="setting-section">
+                  <h4 class="section-title">Profil Bilgileri</h4>
+                  
+                  <form id="profile-form" action="{{ url_for('update_profile') }}" method="post">
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label for="fullName" class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-control" id="fullName" name="full_name" value="{{ user.full_name or '' }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="username" class="form-label">Kullanıcı Adı</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" disabled>
+                        <small class="text-muted">Kullanıcı adı değiştirilemez</small>
+                      </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label for="location" class="form-label">Konum</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ user.location or '' }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="age" class="form-label">Yaş</label>
+                        <input type="number" class="form-control" id="age" name="age" value="{{ user.age or '' }}">
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="bio" class="form-label">Hakkımda</label>
+                      <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.bio or '' }}</textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                
+                <!-- Profil Fotoğrafı -->
+                <div class="setting-section">
+                  <h4 class="section-title">Profil Fotoğrafı</h4>
+                  
+                  <form id="avatar-form" action="{{ url_for('update_avatar') }}" method="post" enctype="multipart/form-data">
+                    <div class="row align-items-center">
+                      <div class="col-md-4">
+                        <div class="profile-upload-preview">
+                          {% if user.avatar_url %}
+                            <img src="{{ url_for('static', filename=user.avatar_url) }}" alt="{{ user.username }}" id="avatar-preview">
+                          {% else %}
+                            <div class="avatar-placeholder" id="avatar-preview-placeholder">{{ user.username[0]|upper }}</div>
+                          {% endif %}
+                          <div class="avatar-overlay">
+                            <i class="fas fa-camera"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        <div class="mb-3">
+                          <label for="avatarUpload" class="form-label">Fotoğraf Yükle</label>
+                          <input class="form-control" type="file" id="avatarUpload" name="avatar" accept="image/*">
+                          <small class="text-muted">Maksimum dosya boyutu: 5MB. İzin verilen formatlar: JPEG, PNG, GIF</small>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                          <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>Fotoğrafı Güncelle
+                          </button>
+                          {% if user.avatar_url %}
+                          <button type="button" class="btn btn-outline-danger" id="removeAvatar">
+                            <i class="fas fa-trash-alt me-2"></i>Fotoğrafı Kaldır
+                          </button>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                
+                <!-- Bildirim Ayarları -->
+                <div class="setting-section">
+                  <h4 class="section-title">Bildirim Ayarları</h4>
+                  
+                  <form id="notification-form" action="{{ url_for('update_notification_settings') }}" method="post">
+                    <div class="notification-options">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="emailNotifications" name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="emailNotifications">
+                          Email Bildirimleri
+                          <small class="text-muted d-block">Önemli güncellemeler ve özel teklifler hakkında bildirimler alın</small>
+                        </label>
+                      </div>
+                      
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="achievementNotifications" name="achievement_notifications" {% if user.achievement_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="achievementNotifications">
+                          Başarı Bildirimleri
+                          <small class="text-muted d-block">Yeni başarılar kazandığınızda bildirim alın</small>
+                        </label>
+                      </div>
+                      
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="leaderboardNotifications" name="leaderboard_notifications" {% if user.leaderboard_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="leaderboardNotifications">
+                          Skor Tablosu Bildirimleri
+                          <small class="text-muted d-block">Skor tablolarındaki değişiklikler hakkında bildirim alın</small>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Bildirimleri Güncelle
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                
+                <!-- Tema Ayarları -->
+                <div class="setting-section">
+                  <h4 class="section-title">Görünüm Ayarları</h4>
+                  
+                  <form id="theme-form" action="{{ url_for('update_theme') }}" method="post">
+                    <div class="theme-options">
+                      <div class="theme-option-card {% if user.theme_preference == 'dark' %}active{% endif %}" data-theme="dark">
+                        <div class="theme-preview dark-theme">
+                          <div class="theme-preview-header"></div>
+                          <div class="theme-preview-body">
+                            <div class="preview-line"></div>
+                            <div class="preview-line"></div>
+                            <div class="preview-line"></div>
+                          </div>
+                        </div>
+                        <div class="theme-name">
+                          <i class="fas fa-moon me-2"></i>Koyu Tema
+                        </div>
+                        <input type="radio" name="theme_preference" value="dark" class="d-none" {% if user.theme_preference == 'dark' %}checked{% endif %}>
+                      </div>
+                      
+                      <div class="theme-option-card {% if user.theme_preference == 'light' %}active{% endif %}" data-theme="light">
+                        <div class="theme-preview light-theme">
+                          <div class="theme-preview-header"></div>
+                          <div class="theme-preview-body">
+                            <div class="preview-line"></div>
+                            <div class="preview-line"></div>
+                            <div class="preview-line"></div>
+                          </div>
+                        </div>
+                        <div class="theme-name">
+                          <i class="fas fa-sun me-2"></i>Açık Tema
+                        </div>
+                        <input type="radio" name="theme_preference" value="light" class="d-none" {% if user.theme_preference == 'light' %}checked{% endif %}>
+                      </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Temayı Güncelle
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Şifre Değiştirme Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Şifre Değiştir</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="change-password-form" action="{{ url_for('change_password') }}" method="post">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Mevcut Şifre</label>
+            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">Yeni Şifre</label>
+            <input type="password" class="form-control" id="newPassword" name="new_password" required>
+            <small class="text-muted">Şifreniz en az 8 karakter olmalı ve en az bir rakam içermelidir</small>
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Yeni Şifre (Tekrar)</label>
+            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Şifreyi Güncelle
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Değiştirme Modal -->
+<div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeEmailModalLabel">Email Değiştir</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="change-email-form" action="{{ url_for('update_security_settings') }}" method="post">
+          <div class="mb-3">
+            <label for="currentEmail" class="form-label">Mevcut Email</label>
+            <input type="email" class="form-control" id="currentEmail" value="{{ user.email }}" disabled>
+          </div>
+          <div class="mb-3">
+            <label for="newEmail" class="form-label">Yeni Email</label>
+            <input type="email" class="form-control" id="newEmail" name="new_email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Şifreniz</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <small class="text-muted">Güvenlik için lütfen şifrenizi girin</small>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Email'i Güncelle
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hesap Silme Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteAccountModalLabel">Hesabı Sil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Dikkat:</strong> Hesabınızı silmek tüm verilerinizi kalıcı olarak silecektir. Bu işlem geri alınamaz.
+        </div>
+        <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post">
+          <div class="mb-3">
+            <label for="confirmDelete" class="form-label">Onaylamak için "SİL" yazın</label>
+            <input type="text" class="form-control" id="confirmDelete" name="confirm_delete" required>
+          </div>
+          <div class="mb-3">
+            <label for="deletePassword" class="form-label">Şifreniz</label>
+            <input type="password" class="form-control" id="deletePassword" name="password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-trash-alt me-2"></i>Hesabı Kalıcı Olarak Sil
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hesabı Dondurma Modal -->
+<div class="modal fade" id="suspendAccountModal" tabindex="-1" aria-labelledby="suspendAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="suspendAccountModalLabel">Hesabı Dondur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-snowflake me-2"></i>
+          <strong>Bilgi:</strong> Hesabınızı dondurduğunuzda tekrar giriş yapana kadar hesabınız devre dışı kalacaktır.
+        </div>
+        <form id="suspend-account-form" action="{{ url_for('suspend_account') }}" method="post">
+          <div class="mb-3">
+            <label for="suspendDuration" class="form-label">Dondurma Süresi</label>
+            <select class="form-select" id="suspendDuration" name="suspend_duration">
+              <option value="1">1 Hafta</option>
+              <option value="2">2 Hafta</option>
+              <option value="4">1 Ay</option>
+              <option value="12">3 Ay</option>
+              <option value="0">Tekrar giriş yapana kadar</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="suspendPassword" class="form-label">Şifreniz</label>
+            <input type="password" class="form-control" id="suspendPassword" name="password" required>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-warning">
+              <i class="fas fa-snowflake me-2"></i>Hesabı Dondur
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab navigasyonu
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabIndicator = document.querySelector('.tab-indicator');
+    
+    function positionTabIndicator(activeTab) {
+      if (!tabIndicator || !activeTab) return;
+      
+      const tabLeft = activeTab.offsetLeft;
+      const tabWidth = activeTab.offsetWidth;
+      
+      tabIndicator.style.width = `${tabWidth}px`;
+      tabIndicator.style.left = `${tabLeft}px`;
+    }
+    
+    // İlk yüklemede aktif sekmenin altını çiz
+    const activeTab = document.querySelector('.tab-button.active');
+    if (activeTab) {
+      positionTabIndicator(activeTab);
+    }
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Aktif sekme sınıfını kaldır
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        // Tıklanan sekmeyi ve içeriğini aktifleştir
+        button.classList.add('active');
+        const tabId = `${button.dataset.tab}-tab`;
+        document.getElementById(tabId).classList.add('active');
+        
+        // Tab göstergesini konumlandır
+        positionTabIndicator(button);
+      });
+    });
+    
+    // Profil resmi önizleme
+    const avatarUpload = document.getElementById('avatarUpload');
+    const avatarPreview = document.getElementById('avatar-preview');
+    const avatarPlaceholder = document.getElementById('avatar-preview-placeholder');
+    
+    if (avatarUpload) {
+      avatarUpload.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            if (avatarPreview) {
+              avatarPreview.src = e.target.result;
+              avatarPreview.style.display = 'block';
+            }
+            if (avatarPlaceholder) {
+              avatarPlaceholder.style.display = 'none';
+            }
+          }
+          
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+    
+    // Tema seçimi için event listener
+    const themeOptions = document.querySelectorAll('.theme-option-card');
+    themeOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        themeOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        const themeInput = this.querySelector('input[type="radio"]');
+        if (themeInput) {
+          themeInput.checked = true;
+        }
+      });
+    });
+    
+    // Şifre değiştirme formu doğrulama
+    const changePasswordForm = document.getElementById('change-password-form');
+    if (changePasswordForm) {
+      changePasswordForm.addEventListener('submit', function(e) {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (newPassword !== confirmPassword) {
+          e.preventDefault();
+          alert('Yeni şifre ve tekrarı eşleşmiyor!');
+        }
+      });
+    }
+    
+    // Hesap silme formu doğrulama
+    const deleteAccountForm = document.getElementById('delete-account-form');
+    if (deleteAccountForm) {
+      deleteAccountForm.addEventListener('submit', function(e) {
+        const confirmText = document.getElementById('confirmDelete').value;
+        
+        if (confirmText !== 'SİL') {
+          e.preventDefault();
+          alert('Hesabı silmek için metni doğru şekilde yazın!');
+        }
+      });
+    }
+    
+    // Bildirim formunu otomatik gönder
+    const notificationSwitches = document.querySelectorAll('#notification-form .form-check-input');
+    notificationSwitches.forEach(switchElement => {
+      switchElement.addEventListener('change', function() {
+        // Formu otomatik gönder
+        document.getElementById('notification-form').submit();
+      });
+    });
+  });
+</script>
 {% endblock %}

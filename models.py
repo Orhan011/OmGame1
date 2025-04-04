@@ -4,13 +4,6 @@ from datetime import datetime
 # Initialize SQLAlchemy without binding to a specific app
 db = SQLAlchemy()
 
-# Favori oyunlar tablosu (many-to-many ilişki için ara tablo)
-favorites = db.Table('favorites',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-    db.Column('added_at', db.DateTime, default=datetime.utcnow)
-)
-
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,9 +31,6 @@ class User(db.Model):
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
     scores = db.relationship('Score', backref='user', lazy=True)
-    # Favori oyunlar ilişkisi
-    favorite_games = db.relationship('Game', secondary=favorites, 
-                                    lazy='subquery', backref=db.backref('favorited_by', lazy=True))
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -87,22 +77,6 @@ class Achievement(db.Model):
     requirement = db.Column(db.JSON)  # Başarı koşulları
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-class Game(db.Model):
-    __tablename__ = 'games'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    type = db.Column(db.String(50), nullable=False)  # Oyun türü: wordPuzzle, memoryMatch, vb.
-    url = db.Column(db.String(500), nullable=False)  # Oyun URL'i
-    description = db.Column(db.Text)
-    icon = db.Column(db.String(500))  # İkon (FontAwesome class veya URL)
-    difficulty = db.Column(db.String(20), default='medium')  # easy, medium, hard
-    active = db.Column(db.Boolean, default=True)
-    play_count = db.Column(db.Integer, default=0)  # Oynama sayısı
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<Game {self.name}>'
 
 class GameStat(db.Model):
     __tablename__ = 'game_stats'

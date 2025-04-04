@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from models import User, Score, Article, Game
+from models import User, Score, Article
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -175,89 +175,6 @@ def utility_processor():
 def initialize_database():
     """Initialize the database with sample data"""
 
-    # Create sample games
-    if Game.query.count() == 0:
-        games = [
-            Game(
-                name="Kelime Bulmaca",
-                type="wordPuzzle",
-                url="/games/word-puzzle",
-                description="Dil becerilerinizi ve kelime dağarcığınızı geliştiren kelime bulma oyunu.",
-                icon="fas fa-spell-check",
-                difficulty="medium",
-                play_count=85
-            ),
-            Game(
-                name="Hafıza Kartları",
-                type="memoryMatch",
-                url="/games/memory-match",
-                description="Görsel hafızanızı ve eşleştirme becerilerinizi geliştiren klasik hafıza oyunu.",
-                icon="fas fa-clone",
-                difficulty="easy",
-                play_count=72
-            ),
-            Game(
-                name="Labirent",
-                type="labyrinth",
-                url="/games/labyrinth",
-                description="Uzamsal farkındalık ve problem çözme becerilerinizi geliştiren 3D labirent oyunu.",
-                icon="fas fa-route",
-                difficulty="hard",
-                play_count=64
-            ),
-            Game(
-                name="Yapboz",
-                type="puzzle",
-                url="/games/puzzle",
-                description="Görsel algı ve problem çözme becerilerinizi geliştiren yapboz oyunu.",
-                icon="fas fa-puzzle-piece",
-                difficulty="medium",
-                play_count=58
-            ),
-            Game(
-                name="Sayı Dizisi",
-                type="numberSequence",
-                url="/games/number-sequence",
-                description="Hafıza ve sayı işleme becerilerinizi geliştiren dizi oyunu.",
-                icon="fas fa-list-ol",
-                difficulty="medium",
-                play_count=45
-            ),
-            Game(
-                name="Sesli Hafıza",
-                type="audioMemory",
-                url="/games/audio-memory",
-                description="İşitsel hafıza ve odaklanma becerilerinizi geliştiren melodi tekrarlama oyunu.",
-                icon="fas fa-volume-up",
-                difficulty="hard",
-                play_count=37
-            ),
-            Game(
-                name="Wordle",
-                type="wordle",
-                url="/games/wordle",
-                description="Kelime tahmin etme ve mantık yürütme becerilerinizi geliştiren kelime oyunu.",
-                icon="fas fa-font",
-                difficulty="medium",
-                play_count=92
-            ),
-            Game(
-                name="Satranç",
-                type="chess",
-                url="/games/chess",
-                description="Strateji ve planlama becerilerinizi geliştiren klasik satranç oyunu.",
-                icon="fas fa-chess",
-                difficulty="hard",
-                play_count=61
-            )
-        ]
-        
-        for game in games:
-            db.session.add(game)
-        
-        db.session.commit()
-        app.logger.info("Sample games created")
-    
     # Create sample articles
     if Article.query.count() == 0:
         articles = [
@@ -662,18 +579,7 @@ def index():
     user = None
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-        # Kullanıcı giriş yapmışsa, favori oyunlarını göster (max 4 adet)
-        if user and hasattr(user, 'favorite_games') and user.favorite_games:
-            # Kullanıcının favorileri varsa
-            featured_games = user.favorite_games[:4] if len(user.favorite_games) > 4 else user.favorite_games
-        else:
-            # Kullanıcının favorileri yoksa en popüler oyunları göster
-            featured_games = Game.query.order_by(Game.play_count.desc()).limit(4).all()
-    else:
-        # Giriş yapılmamışsa, en çok oynanan oyunları göster
-        featured_games = Game.query.order_by(Game.play_count.desc()).limit(4).all()
-    
-    return render_template('index.html', user=user, current_user=user, featured_games=featured_games)
+    return render_template('index.html', user=user, current_user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -807,11 +713,7 @@ def chess():
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():
-    games = Game.query.filter_by(active=True).order_by(Game.name).all()
-    user = None
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-    return render_template('all_games.html', games=games, user=user)
+    return render_template('all_games.html')
 
 # Skor Tablosu
 @app.route('/leaderboard')
@@ -1976,69 +1878,3 @@ def calculate_level(score):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
-# Favori oyunlar için routelar
-@app.route('/add_favorite/<int:game_id>', methods=['POST'])
-def add_favorite(game_id):
-    """Oyunu favorilere ekler"""
-    if 'user_id' not in session:
-        flash('Favorilere eklemek için giriş yapmalısınız.', 'warning')
-        return redirect(url_for('login'))
-    
-    if not game_id:
-        flash('Geçersiz oyun!', 'danger')
-        return redirect(url_for('all_games'))
-    
-    user = User.query.get(session['user_id'])
-    game = Game.query.get(game_id)
-    
-    if not user or not game:
-        flash('Kullanıcı veya oyun bulunamadı.', 'danger')
-        return redirect(url_for('all_games'))
-    
-    # Kullanıcının zaten favorileri var mı kontrol et
-    if game in user.favorite_games:
-        flash('Bu oyun zaten favorilerinizde.', 'info')
-    else:
-        # Favori sayısı 4'ten fazla mı kontrol et
-        if len(user.favorite_games) >= 4:
-            flash('En fazla 4 oyun favorilere eklenebilir. Lütfen önce bir oyunu favorilerden çıkarın.', 'warning')
-        else:
-            user.favorite_games.append(game)
-            db.session.commit()
-            flash(f'"{game.name}" favorilerinize eklendi.', 'success')
-    
-    return redirect(url_for('all_games'))
-
-@app.route('/remove_favorite', methods=['POST'])
-def remove_favorite():
-    """Oyunu favorilerden çıkarır"""
-    if 'user_id' not in session:
-        flash('Bu işlem için giriş yapmalısınız.', 'warning')
-        return redirect(url_for('login'))
-    
-    game_id = request.form.get('game_id')
-    
-    if not game_id:
-        flash('Geçersiz oyun!', 'danger')
-        return redirect(url_for('profile_v2'))
-    
-    user = User.query.get(session['user_id'])
-    game = Game.query.get(game_id)
-    
-    if not user or not game:
-        flash('Kullanıcı veya oyun bulunamadı.', 'danger')
-        return redirect(url_for('profile_v2'))
-    
-    if game in user.favorite_games:
-        user.favorite_games.remove(game)
-        db.session.commit()
-        flash(f'"{game.name}" favorilerinizden çıkarıldı.', 'success')
-    else:
-        flash('Bu oyun favorilerinizde değil.', 'info')
-    
-    # Gelen URL'den döneceğimiz sayfayı belirle (profil veya oyunlar sayfası)
-    referer = request.referrer
-    if referer and 'profile' in referer:
-        return redirect(url_for('profile_v2'))
-    else:
-        return redirect(url_for('all_games'))
