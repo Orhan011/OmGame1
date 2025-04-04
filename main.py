@@ -13,7 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, request, session, redirect, url_for, render_template, make_response, jsonify, flash
 
 from app import app, db
-from models import User, Score, Article
+from models import User, Score, Article, GameStat, Favorites
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -36,19 +36,19 @@ def send_verification_email(to_email, verification_code):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
-    
+
     # Gmail SMTP sunucu bilgileri
     smtp_server = "smtp.gmail.com"
     port = 587
     sender_email = "omgameee@gmail.com"
     password = os.environ.get("EMAIL_PASSWORD")
-    
+
     # Email içeriği
     message = MIMEMultipart("alternative")
     message["Subject"] = "ZekaPark - Email Doğrulama Kodu"
     message["From"] = sender_email
     message["To"] = to_email
-    
+
     # HTML içeriği
     html = f"""
     <html>
@@ -67,17 +67,17 @@ def send_verification_email(to_email, verification_code):
       </body>
     </html>
     """
-    
+
     # Email'in HTML kısmını ekle
     message.attach(MIMEText(html, "html"))
-    
+
     try:
         # SMTP oturumu başlat
         server = smtplib.SMTP(smtp_server, port)
         server.ehlo()  # SMTP sunucusuyla el sıkışma
         server.starttls()  # TLS şifrelemeyi başlat
         server.ehlo()  # Şifrelenmiş bağlantı üzerinden yeniden el sıkışma
-        
+
         # Giriş yap
         if password:
             server.login(sender_email, password)
@@ -87,7 +87,7 @@ def send_verification_email(to_email, verification_code):
         else:
             logger.error("Email password not set in environment variables")
             raise ValueError("Email gönderimi başarısız: Şifre bulunamadı")
-            
+
     except smtplib.SMTPAuthenticationError:
         logger.error("SMTP authentication failed")
         raise ValueError("Email gönderimi başarısız: Kimlik doğrulama hatası")
@@ -134,17 +134,17 @@ def utility_processor():
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
         return session.get('avatar_url', 'images/default-avatar.png')
-    
+
     def get_user_scores():
         """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
         if 'user_id' not in session:
             return {}
-        
+
         user_id = session['user_id']
-        
+
         # Kullanıcının tüm oyun skorlarını al
         scores = Score.query.filter_by(user_id=user_id).all()
-        
+
         # Oyun türüne göre grupla
         game_scores = {}
         for score in scores:
@@ -154,9 +154,9 @@ def utility_processor():
                 'score': score.score,
                 'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M')
             })
-            
+
         return game_scores
-    
+
     return dict(
         get_current_user=get_current_user,
         get_user_data=get_user_data,
@@ -171,7 +171,7 @@ def initialize_database():
         # Create tables if they don't exist
         db.create_all()
         logger.info("Database tables created successfully")
-        
+
         # Add sample articles if none exist
         if Article.query.count() == 0:
             articles = [
@@ -180,7 +180,7 @@ def initialize_database():
                     content="""
                     <h3>Beyninizi Formda Tutmanın Bilimsel Kanıtları</h3>
                     <p>Düzenli olarak beyin egzersizleri yapmak, tıpkı fiziksel egzersiz gibi bilişsel fonksiyonlarınızı geliştirerek beyninizi zinde tutar. Bilimsel araştırmalar, beyin egzersizlerinin hafıza performansını artırdığını, dikkat süresini uzattığını ve yaşlanmayla ilişkili bilişsel gerilemeye karşı koruma sağladığını göstermiştir.</p>
-                    
+
                     <h4>Düzenli beyin egzersizlerinin sağladığı faydalar:</h4>
                     <ul>
                         <li><strong>Nöroplastisite Artışı:</strong> Beyin egzersizleri, beyindeki nöronlar arasında yeni bağlantılar oluşturarak nöroplastisiteyi artırır. Bu, yeni becerileri daha hızlı öğrenebilmeniz anlamına gelir.</li>
@@ -199,7 +199,7 @@ def initialize_database():
                     content="""
                     <h3>Beyin Performansınızı Artıracak Beslenme Stratejileri</h3>
                     <p>Beyin sağlığı ve bilişsel performans, yalnızca zihinsel egzersizlerle değil, aynı zamanda doğru beslenme ile de desteklenir. Beyniniz, vücut ağırlığınızın sadece %2'sini oluşturmasına rağmen, vücudunuzun tükettiği enerjinin yaklaşık %20'sini kullanır.</p>
-                    
+
                     <h4>Beyin sağlığını destekleyen besinler:</h4>
                     <ul>
                         <li><strong>Omega-3 Yağ Asitleri:</strong> Somon, chia tohumu ve ceviz gibi besinlerde bulunan omega-3'ler, beyin hücresi zarlarının yapısını güçlendirir ve nöronlar arası iletişimi artırır.</li>
@@ -210,14 +210,14 @@ def initialize_database():
                         <li><strong>Flavonoidler:</strong> Kakao, çay ve narenciyede bulunan flavonoidler, hafıza ve öğrenmeyi geliştirir.</li>
                         <li><strong>Kolin:</strong> Yumurta sarısı ve karaciğerde bulunan kolin, hafıza ve düşünme için kritik öneme sahip asetilkolin nörotransmiterinin üretiminde rol oynar.</li>
                     </ul>
-                    
+
                     <h4>Beyin performansını olumsuz etkileyen besinler:</h4>
                     <ul>
                         <li><strong>Rafine Şeker:</strong> Yüksek şeker tüketimi, hafıza ve öğrenme becerilerini zayıflatabilir.</li>
                         <li><strong>Trans Yağlar:</strong> İşlenmiş gıdalarda bulunan trans yağlar, beyin iltihabı ve bilişsel gerileme ile ilişkilidir.</li>
                         <li><strong>Aşırı Alkol:</strong> Kronik alkol tüketimi, beyin hücrelerine zarar verebilir ve hafıza sorunlarına yol açabilir.</li>
                     </ul>
-                    
+
                     <p>Beyin sağlığınızı desteklemek için Akdeniz tarzı beslenme gibi dengeli bir diyet benimsemeyi ve bol su içmeyi unutmayın. Beyniniz %75 su olduğundan, yeterli hidrasyon optimal beyin fonksiyonu için çok önemlidir.</p>
                     """,
                     category="article"
@@ -227,7 +227,7 @@ def initialize_database():
                     content="""
                     <h3>Bilişsel Antrenmanlarınızdan Maksimum Fayda Sağlayın</h3>
                     <p>Beyin egzersizleri yapmak, bilişsel yeteneklerinizi geliştirmek için harika bir yoldur. Ancak, bu egzersizlerden en üst düzeyde fayda sağlamak için bazı temel prensipleri uygulamanız önemlidir.</p>
-                    
+
                     <h4>Beyin egzersizlerinden maksimum fayda sağlamak için 5 altın kural:</h4>
                     <ol>
                         <li><strong>Düzenlilik ve Tutarlılık:</strong> Kısa süreli yoğun çalışmalar yerine, günlük düzenli egzersizler yapmak çok daha etkilidir. Her gün 15-20 dakikalık bir beyin egzersizi rutini oluşturun.</li>
@@ -236,7 +236,7 @@ def initialize_database():
                         <li><strong>Odaklanmış Dikkat:</strong> Egzersiz yaparken tam konsantrasyon sağlayın. Dikkat dağıtıcı unsurlardan uzak, sessiz bir ortamda çalışın ve egzersiz sırasında çoklu görev yapmaktan kaçının.</li>
                         <li><strong>Geri Bildirim ve İzleme:</strong> İlerlemenizi takip edin ve performansınızla ilgili geri bildirim alın. ZekaPark'ın skor takip sistemi, gelişiminizi görmenize yardımcı olacaktır.</li>
                     </ol>
-                    
+
                     <h4>Beyin egzersizi için ideal ortam koşulları:</h4>
                     <ol>
                         <li><strong>Yeterli Uyku:</strong> Düzenli ve kaliteli uyku, beyin fonksiyonlarınız için kritik öneme sahiptir.</li>
@@ -351,7 +351,7 @@ def initialize_database():
                 experience_points=1000,
                 favorite_games=["wordPuzzle", "memoryMatch", "numberSequence"]
             )
-            
+
             # Test kullanıcısı
             test_user = User(
                 username="test",
@@ -362,12 +362,12 @@ def initialize_database():
                 experience_points=500,
                 favorite_games=["labyrinth", "3dRotation"]
             )
-            
+
             db.session.add(admin)
             db.session.add(test_user)
             db.session.commit()
             logger.info("Admin and test users created")
-            
+
             # Add sample scores
             sample_scores = [
                 Score(user_id=1, game_type="wordPuzzle", score=120),
@@ -379,10 +379,10 @@ def initialize_database():
                 Score(user_id=2, game_type="numberSequence", score=110),
                 Score(user_id=2, game_type="3dRotation", score=85)
             ]
-            
+
             for score in sample_scores:
                 db.session.add(score)
-                
+
             db.session.commit()
             logger.info("Sample scores created")
 
@@ -401,10 +401,10 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
-        
+
         # Kullanıcı adı veya email kontrolü
         user = User.query.filter((User.username == username) | (User.email == username)).first()
-        
+
         if user and check_password_hash(user.password_hash, password):
             if user.account_status == 'suspended':
                 if user.suspended_until and user.suspended_until > datetime.utcnow():
@@ -415,26 +415,26 @@ def login():
                     user.account_status = 'active'
                     user.suspended_until = None
                     db.session.commit()
-            
+
             # Kullanıcı bilgilerini session'a ekle
             session['user_id'] = user.id
             session['username'] = user.username
-            
+
             # Avatar URL'sini session'a ekle
             if user.avatar_url:
                 session['avatar_url'] = user.avatar_url
             else:
                 session['avatar_url'] = 'images/default-avatar.png'
-            
+
             # Son giriş zamanını güncelle
             user.last_active = datetime.utcnow()
             db.session.commit()
-            
+
             flash('Başarıyla giriş yaptınız!')
             return redirect(url_for('index'))
         else:
             flash('Geçersiz kullanıcı adı veya şifre.')
-    
+
     return render_template('login.html')
 
 # Game Routes
@@ -538,14 +538,14 @@ def articles():
     # Makaleleri ve ipuçlarını veritabanından al
     articles = Article.query.filter_by(category="article").all()
     tips = Article.query.filter_by(category="tip").all()
-    
+
     return render_template('articles.html', articles=articles, tips=tips)
 
 @app.route('/tips')
 def tips():
     # Sadece ipuçlarını veritabanından al
     tips = Article.query.filter_by(category="tip").all()
-    
+
     return render_template('tips.html', tips=tips)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -555,16 +555,16 @@ def register():
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
-        
+
         # Doğrulama
         if not username or not email or not password:
             flash('Lütfen tüm alanları doldurun.')
             return redirect(url_for('register'))
-        
+
         if password != confirm_password:
             flash('Şifreler eşleşmiyor.')
             return redirect(url_for('register'))
-        
+
         # Email formatı doğrulama
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             flash('Geçersiz email formatı.')
@@ -633,12 +633,12 @@ def get_user_scores():
     """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
     if 'user_id' not in session:
         return {}
-    
+
     user_id = session['user_id']
-    
+
     # Kullanıcının tüm oyun skorlarını al
     scores = Score.query.filter_by(user_id=user_id).all()
-    
+
     # Oyun türüne göre grupla
     game_scores = {}
     for score in scores:
@@ -648,7 +648,7 @@ def get_user_scores():
             'score': score.score,
             'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M')
         })
-        
+
     return game_scores
 
 @app.route('/profile')
@@ -657,23 +657,23 @@ def profile():
     # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     # Kullanıcı bilgilerini veritabanından al
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Kullanıcının oyun skorlarını al
     scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
-    
+
     # Oyun türlerine göre skorları grupla
     game_scores = {}
     for score in scores:
         if score.game_type not in game_scores:
             game_scores[score.game_type] = []
         game_scores[score.game_type].append(score)
-    
+
     # Profil sayfasını render et
     return render_template('profile_new.html', user=user, game_scores=game_scores)
 
@@ -683,23 +683,23 @@ def profile_v2():
     # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     # Kullanıcı bilgilerini veritabanından al
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Kullanıcının oyun skorlarını al
     scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
-    
+
     # Oyun türlerine göre skorları grupla
     game_scores = {}
     for score in scores:
         if score.game_type not in game_scores:
             game_scores[score.game_type] = []
         game_scores[score.game_type].append(score)
-    
+
     return render_template('profile_v2.html', user=user, game_scores=game_scores)
 
 @app.route('/update-profile', methods=['POST'])
@@ -708,22 +708,22 @@ def update_profile():
     # Kullanıcı girişi kontrolü
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Form verilerini al
     full_name = request.form.get('full_name', '').strip()
     bio = request.form.get('bio', '').strip()
     age = request.form.get('age', '')
     location = request.form.get('location', '').strip()
-    
+
     # Verileri güncelle
     user.full_name = full_name
     user.bio = bio
-    
+
     # Yaş doğrulama
     if age:
         try:
@@ -732,19 +732,19 @@ def update_profile():
                 user.age = age
         except ValueError:
             flash('Geçersiz yaş değeri.')
-    
+
     user.location = location
-    
+
     # Veritabanına kaydet
     try:
         db.session.commit()
         flash('Profil bilgileri başarıyla güncellendi.')
-        
+
     except Exception as e:
         db.session.rollback()
         flash('Profil güncellenirken bir hata oluştu.')
         logger.error(f"Profile update error: {e}")
-    
+
     return redirect(url_for('profile_v2'))
 
 @app.route('/update-avatar', methods=['POST'])
@@ -753,58 +753,58 @@ def update_avatar():
     # Kullanıcı girişi kontrolü
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Dosya kontrolü
     if 'avatar' not in request.files:
         flash('Dosya seçilmedi.')
         return redirect(url_for('profile_v2'))
-    
+
     file = request.files['avatar']
-    
+
     # Dosya adı boş ise
     if file.filename == '':
         flash('Dosya seçilmedi.')
         return redirect(url_for('profile_v2'))
-    
+
     # Dosya türü kontrolü
     if file and allowed_file(file.filename):
         # Güvenli dosya adı oluştur
         filename = secure_filename(file.filename)
-        
+
         # Benzersiz bir dosya adı oluştur
         unique_filename = f"{str(uuid.uuid4())}_{filename}"
-        
+
         # Dosya yolunu belirle
         avatar_path = os.path.join('static', 'uploads', 'avatars', unique_filename)
-        
+
         # Dizin yoksa oluştur
         os.makedirs(os.path.dirname(avatar_path), exist_ok=True)
-        
+
         # Dosyayı kaydet
         file.save(avatar_path)
-        
+
         # URL'i veritabanında güncelle (static/ öneki olmadan)
         avatar_url = os.path.join('uploads', 'avatars', unique_filename)
         user.avatar_url = avatar_url
         session['avatar_url'] = avatar_url
-        
+
         # Veritabanına kaydet
         try:
             db.session.commit()
             flash('Profil fotoğrafı başarıyla güncellendi.')
-            
+
         except Exception as e:
             db.session.rollback()
             flash('Profil fotoğrafı güncellenirken bir hata oluştu.')
             logger.error(f"Avatar update error: {e}")
     else:
         flash('İzin verilen dosya türleri: png, jpg, jpeg, gif.')
-    
+
     return redirect(url_for('profile_v2'))
 
 @app.route('/change-password', methods=['POST'])
@@ -813,45 +813,45 @@ def change_password():
     # Kullanıcı girişi kontrolü
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Form verilerini al
     current_password = request.form.get('current_password', '')
     new_password = request.form.get('new_password', '')
     confirm_password = request.form.get('confirm_password', '')
-    
+
     # Mevcut şifre kontrolü
     if not check_password_hash(user.password_hash, current_password):
         flash('Mevcut şifre hatalı.')
         return redirect(url_for('profile_v2'))
-    
+
     # Yeni şifre kontrolü
     if new_password != confirm_password:
         flash('Yeni şifreler eşleşmiyor.')
         return redirect(url_for('profile_v2'))
-    
+
     # Şifre karmaşıklık kontrolü
     if len(new_password) < 6:
         flash('Şifre en az 6 karakter uzunluğunda olmalıdır.')
         return redirect(url_for('profile_v2'))
-    
+
     # Şifreyi güncelle
     user.password_hash = generate_password_hash(new_password)
-    
+
     # Veritabanına kaydet
     try:
         db.session.commit()
         flash('Şifre başarıyla değiştirildi.')
-        
+
     except Exception as e:
         db.session.rollback()
         flash('Şifre değiştirilirken bir hata oluştu.')
         logger.error(f"Password change error: {e}")
-    
+
     return redirect(url_for('profile_v2'))
 
 @app.route('/update-security-settings', methods=['POST'])
@@ -867,22 +867,22 @@ def update_notification_settings():
     """Bildirim ayarlarını güncelleme."""
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Form verilerini al
     email_notifications = request.form.get('email_notifications') == 'on'
     achievement_notifications = request.form.get('achievement_notifications') == 'on'
     leaderboard_notifications = request.form.get('leaderboard_notifications') == 'on'
-    
+
     # Kullanıcı ayarlarını güncelle
     user.email_notifications = email_notifications
     user.achievement_notifications = achievement_notifications
     user.leaderboard_notifications = leaderboard_notifications
-    
+
     # Veritabanına kaydet
     try:
         db.session.commit()
@@ -891,7 +891,7 @@ def update_notification_settings():
         db.session.rollback()
         flash('Bildirim ayarları güncellenirken bir hata oluştu.')
         logger.error(f"Notification settings update error: {e}")
-    
+
     return redirect(url_for('profile_v2'))
 
 @app.route('/update-theme', methods=['POST'])
@@ -899,18 +899,18 @@ def update_theme():
     """Tema tercihini güncelleme."""
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Form verilerini al
     theme = request.form.get('theme', 'dark')
-    
+
     # Kullanıcı temasını güncelle
     user.theme_preference = theme
-    
+
     # Veritabanına kaydet
     try:
         db.session.commit()
@@ -919,7 +919,7 @@ def update_theme():
         db.session.rollback()
         flash('Tema tercihi güncellenirken bir hata oluştu.')
         logger.error(f"Theme preference update error: {e}")
-    
+
     return redirect(url_for('profile_v2'))
 
 @app.route('/delete-account', methods=['POST'])
@@ -927,37 +927,37 @@ def delete_account():
     """Hesabı silme."""
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Şifre kontrolü
     password = request.form.get('password', '')
     if not check_password_hash(user.password_hash, password):
         flash('Şifre hatalı. Hesabınız silinmedi.')
         return redirect(url_for('profile_v2'))
-    
+
     # İlişkili skorları sil
     Score.query.filter_by(user_id=user.id).delete()
-    
+
     # Kullanıcıyı sil
     db.session.delete(user)
-    
+
     try:
         db.session.commit()
-        
+
         # Oturumu kapat
         session.clear()
         flash('Hesabınız başarıyla silindi.')
-        
+
     except Exception as e:
         db.session.rollback()
         flash('Hesap silinirken bir hata oluştu.')
         logger.error(f"Account deletion error: {e}")
         return redirect(url_for('profile_v2'))
-    
+
     return redirect(url_for('index'))
 
 @app.route('/suspend-account', methods=['POST'])
@@ -965,65 +965,65 @@ def suspend_account():
     """Hesabı dondurma."""
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect(url_for('login'))
-    
+
     # Şifre kontrolü
     password = request.form.get('password', '')
     if not check_password_hash(user.password_hash, password):
         flash('Şifre hatalı. Hesabınız dondurulmadı.')
         return redirect(url_for('profile_v2'))
-    
+
     # Hesabı askıya al
     user.account_status = 'suspended'
-    
+
     # Askıya alma süresini belirle (30 gün)
     user.suspended_until = datetime.utcnow() + timedelta(days=30)
-    
+
     try:
         db.session.commit()
-        
+
         # Oturumu kapat
         session.clear()
         flash('Hesabınız 30 günlüğüne donduruldu.')
-        
+
     except Exception as e:
         db.session.rollback()
         flash('Hesap dondurulurken bir hata oluştu.')
         logger.error(f"Account suspension error: {e}")
         return redirect(url_for('profile_v2'))
-    
+
     return redirect(url_for('index'))
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
-        
+
         user = User.query.filter_by(email=email).first()
-        
+
         if user:
             # Reset token oluştur
             token = secrets.token_urlsafe(32)
             user.reset_token = token
             user.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
-            
+
             # Veritabanına kaydet
             try:
                 db.session.commit()
-                
+
                 # Şifre sıfırlama e-postası gönder
                 reset_link = url_for('reset_password', token=token, _external=True)
-                
+
                 # Burada gerçek bir e-posta gönderme işlemi yapılacak
                 # Bu örnekte sadece konsola yazdırıyoruz
                 logger.info(f"Password reset link: {reset_link}")
-                
+
                 flash('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.')
-                
+
             except Exception as e:
                 db.session.rollback()
                 flash('Bir hata oluştu. Lütfen tekrar deneyin.')
@@ -1031,80 +1031,80 @@ def forgot_password():
         else:
             # Kullanıcı bulunamadı, ancak güvenlik nedeniyle aynı mesajı göster
             flash('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.')
-        
+
         return redirect(url_for('login'))
-    
+
     return render_template('forgot_password.html')
 
 @app.route('/reset-code', methods=['GET', 'POST'])
 def reset_code():
     if request.method == 'POST':
         code = request.form.get('code', '').strip()
-        
+
         # Kod kontrolü yapılacak ve geçerliyse şifre sıfırlama sayfasına yönlendirilecek
         flash('Kod doğrulandı. Yeni şifrenizi belirleyin.')
         return redirect(url_for('reset_password'))
-    
+
     return render_template('reset_code.html')
 
 @app.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
     if request.method == 'GET':
         token = request.args.get('token')
-        
+
         if not token:
             flash('Geçersiz veya süresi dolmuş token.')
             return redirect(url_for('login'))
-        
+
         user = User.query.filter_by(reset_token=token).first()
-        
+
         if not user or not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
             flash('Geçersiz veya süresi dolmuş token.')
             return redirect(url_for('login'))
-        
+
         # Token geçerli, şifre sıfırlama formunu göster
         return render_template('reset_password.html', token=token)
-    
+
     elif request.method == 'POST':
         token = request.form.get('token')
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
-        
+
         if not token:
             flash('Geçersiz istek.')
             return redirect(url_for('login'))
-        
+
         user = User.query.filter_by(reset_token=token).first()
-        
+
         if not user or not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
             flash('Geçersiz veya süresi dolmuş token.')
             return redirect(url_for('login'))
-        
+
         # Şifre kontrolü
         if password != confirm_password:
             flash('Şifreler eşleşmiyor.')
             return render_template('reset_password.html', token=token)
-        
+
         if len(password) < 6:
             flash('Şifre en az 6 karakter olmalıdır.')
             return render_template('reset_password.html', token=token)
-        
+
         # Şifreyi güncelle
         user.password_hash = generate_password_hash(password)
-        
+
         # Token'ı temizle
         user.reset_token = None
         user.reset_token_expiry = None
-        
+
         try:
             db.session.commit()
             flash('Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.')
-            
+
         except Exception as e:
             db.session.rollback()
             flash('Şifre sıfırlanırken bir hata oluştu.')
             logger.error(f"Password reset error: {e}")
-        
+
         return redirect(url_for('login'))
 
 # API Routes
@@ -1113,15 +1113,15 @@ def save_score():
     """Oyun skorunu kaydet"""
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     data = request.get_json()
-    
+
     if not data or 'gameType' not in data or 'score' not in data:
         return jsonify({'error': 'Invalid data'}), 400
-    
+
     game_type = data['gameType']
     score_value = data['score']
-    
+
     try:
         # Skoru kaydet
         score = Score(
@@ -1130,24 +1130,24 @@ def save_score():
             score=score_value
         )
         db.session.add(score)
-        
+
         # Kullanıcının deneyim puanlarını güncelle
         user = User.query.get(session['user_id'])
-        
+
         if user:
             # Basit bir formül: skor değerinin %10'u kadar XP
             xp_gain = int(score_value * 0.1)
             user.experience_points += xp_gain
-            
+
             # Toplam oyun sayısını güncelle
             user.total_games_played += 1
-            
+
             # En yüksek skoru güncelle (gerekirse)
             if score_value > user.highest_score:
                 user.highest_score = score_value
-        
+
         db.session.commit()
-        
+
         return jsonify({
             'success': True,
             'message': 'Score saved successfully',
@@ -1156,7 +1156,7 @@ def save_score():
             'total_xp': user.experience_points if user else 0,
             'level': calculate_level(user.experience_points) if user else 1
         })
-        
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error saving score: {e}")
@@ -1167,11 +1167,11 @@ def get_current_user_api():
     """Mevcut kullanıcı kimliğini döndür (API)"""
     if 'user_id' not in session:
         return jsonify({'logged_in': False})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'logged_in': False})
-    
+
     return jsonify({
         'logged_in': True,
         'user_id': user.id,
@@ -1196,7 +1196,7 @@ def get_scores(game_type):
     ).order_by(
         Score.score.desc()
     ).limit(10).all()
-    
+
     scores_list = []
     for score, username in top_scores:
         scores_list.append({
@@ -1207,17 +1207,17 @@ def get_scores(game_type):
             'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
             'is_current_user': score.user_id == session.get('user_id')
         })
-    
+
     return jsonify(scores_list)
 
 @app.route('/api/get-scores-alt/<game_type>', methods=['GET'])
 def get_scores_alt(game_type):
     """Alternatif skor getirme API'si. Skoru olmayan kullanıcılar için daha uygun.
     Oyun kategorisine göre filtreleme yapar ve o oyunu oynamamış kullanıcıları listelemez."""
-    
+
     # Belirli bir oyun türü için skorları al
     scores = Score.query.filter_by(game_type=game_type).order_by(Score.score.desc()).all()
-    
+
     # Kullanıcı bilgilerini birleştir
     results = []
     for score in scores:
@@ -1231,7 +1231,7 @@ def get_scores_alt(game_type):
                 'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
                 'is_current_user': score.user_id == session.get('user_id')
             })
-    
+
     return jsonify(results)
 
 @app.route('/api/get-aggregated-scores', methods=['GET'])
@@ -1249,7 +1249,7 @@ def get_aggregated_scores():
     ).order_by(
         db.desc('total_score')
     ).limit(10).all()
-    
+
     results = []
     for user, total_score, game_count in users_with_total_scores:
         results.append({
@@ -1263,7 +1263,7 @@ def get_aggregated_scores():
             'level': calculate_level(user.experience_points),
             'is_current_user': user.id == session.get('user_id')
         })
-    
+
     return jsonify(results)
 
 @app.route('/leaderboard/<game_type>')
@@ -1284,7 +1284,7 @@ def get_leaderboard_data(game_type):
     ).order_by(
         Score.score.desc()
     ).limit(10).all()
-    
+
     scores_list = []
     for score, username, avatar_url in top_scores:
         scores_list.append({
@@ -1296,7 +1296,7 @@ def get_leaderboard_data(game_type):
             'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
             'is_current_user': score.user_id == session.get('user_id')
         })
-    
+
     return jsonify(scores_list)
 
 @app.route('/api/level/<int:score>')
@@ -1304,12 +1304,12 @@ def calculate_level(score):
     """Belirli bir skor için seviyeyi hesapla"""
     level = 1
     threshold = 100
-    
+
     while score >= threshold:
         level += 1
         # Her seviye için gereken XP'yi artır
         threshold = int(threshold * 1.5)
-    
+
     return jsonify({
         'level': level,
         'score': score,
@@ -1323,11 +1323,11 @@ def get_favorites():
     """Kullanıcının favori oyunlarını getir"""
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    
+
     return jsonify({
         'success': True,
         'favorites': user.favorite_games or []
@@ -1338,23 +1338,23 @@ def toggle_favorite():
     """Oyunu favorilere ekle veya çıkar"""
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     data = request.get_json()
-    
+
     if not data or 'gameType' not in data or 'action' not in data:
         return jsonify({'error': 'Invalid data'}), 400
-    
+
     game_type = data['gameType']
     action = data['action']
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    
+
     # Favori oyunları listesi yoksa oluştur
     if user.favorite_games is None:
         user.favorite_games = []
-    
+
     if action == 'add':
         # Limiti kontrol et (en fazla 4 favori)
         if len(user.favorite_games) >= 4 and game_type not in user.favorite_games:
@@ -1363,25 +1363,25 @@ def toggle_favorite():
                 'message': 'Maksimum 4 favori oyun eklenebilir. Önce bazı favorileri kaldırın.',
                 'favorites': user.favorite_games
             }), 400
-        
+
         # Oyun zaten favorilerde değilse ekle
         if game_type not in user.favorite_games:
             user.favorite_games.append(game_type)
-    
+
     elif action == 'remove':
         # Oyun favorilerde varsa çıkar
         if game_type in user.favorite_games:
             user.favorite_games.remove(game_type)
-    
+
     try:
         db.session.commit()
-        
+
         return jsonify({
             'success': True,
             'message': 'Favori oyunlar güncellendi',
             'favorites': user.favorite_games
         })
-        
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error updating favorites: {e}")
@@ -1389,6 +1389,15 @@ def toggle_favorite():
 
 # Uygulama başlatıldığında veritabanını başlat
 initialize_database()
+
+@app.route('/reset_db')
+def reset_db():
+    try:
+        db.drop_all()
+        db.create_all()
+        return "Veritabanı başarıyla sıfırlandı!"
+    except Exception as e:
+        return f"Hata oluştu: {str(e)}"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
