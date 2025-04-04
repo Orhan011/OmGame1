@@ -13,7 +13,7 @@
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
+    <!-- Swipe navigation CSS removed -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
@@ -160,14 +160,11 @@ function loadArticleContent() {
 </div>
 </nav>
 
-<div id="pageContainer" class="page-container">
-<div id="shadowOverlay" class="shadow-overlay"></div>
-<main id="sayfa1" class="page active container py-4">
+<main class="container py-4">
 {% block content %}
 
 {% endblock %}
 </main>
-</div>
 
 <footer class="footer">
 <div class="container">
@@ -226,7 +223,6 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
-<!-- iOS Style Swipe Navigation -->
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}">
+<!-- Swipe Navigation scripts removed -->
   </body>
 </html>
