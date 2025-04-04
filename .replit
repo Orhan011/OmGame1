@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
 
 [workflows]
-runButton = "Run ZekaPark App"
+runButton = "Veritabanı Sıfırla ve Başlat"
 
 [[workflows.workflow]]
 name = "Project"
@@ -68,6 +68,23 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pkill gunicorn || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
+
+[[workflows.workflow]]
+name = "Veritabanı Sıfırla ve Başlat"
+author = 41140431
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill gunicorn || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"from app import app, db; from models import User, Score, Article, GameStat, Favorites; app.app_context().push(); db.drop_all(); db.create_all()\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
