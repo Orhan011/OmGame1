@@ -162,18 +162,9 @@ function loadArticleContent() {
 </nav>
 
 <main class="container py-4">
-<!-- iOS benzeri kaydırma navigasyonu için gereken göstergeler -->
-<div class="back-indicator" id="backIndicator"></div>
-{% if request.path != '/' %}
-<div class="back-button" onclick="navigateBack()">
-  <i class="fas fa-chevron-left"></i>
-</div>
-{% endif %}
+{% block content %}
 
-<!-- Sayfa içeriği -->
-<div class="page-container" data-index="{{ request.path }}">
-  {% block content %}{% endblock %}
-</div>
+{% endblock %}
 </main>
 
 <footer class="footer">
