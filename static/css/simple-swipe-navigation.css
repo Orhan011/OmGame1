@@ -1,0 +1,26 @@
+/**
+ * Basit Geri Kaydırma CSS
+ * Mevcut yapıya uygun minimal stil
+ */
+
+html, body {
+  overflow-x: hidden;
+}
+
+/* Kaydırma sırasında ek stiller */
+body.swiping-back {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* Kaydırma işareti - sol kenar için gösterge */
+.swipe-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,122,255,0.05), transparent);
+  pointer-events: none;
+  z-index: 9000;
+}
