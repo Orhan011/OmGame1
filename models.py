@@ -30,6 +30,8 @@ class User(db.Model):
     email_notifications = db.Column(db.Boolean, default=True)
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
+    # Ana sayfadaki favorit oyunlar - en fazla 4 tane
+    favorite_games = db.Column(db.JSON, default=lambda: [])
     scores = db.relationship('Score', backref='user', lazy=True)
 
     def __repr__(self):

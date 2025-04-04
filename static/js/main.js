@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup button loading animations
   setupButtonLoadingStates();
 
+  // Ana sayfa oyun kartları yönetimi
+  initHomeGameCards();
+
   // Kısayol panelini kapat - dışa tıklandığında
   document.addEventListener('click', function(e) {
     const shortcutPanel = document.getElementById('shortcutPanel');
@@ -333,3 +336,145 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('profile-picture-container').appendChild(profilePicture);
   }
 });
+// Ana sayfa oyun kartları yönetimi fonksiyonu
+function initHomeGameCards() {
+  // Tüm oyun kartları
+  const allGameCards = document.querySelectorAll(".game-card");
+  // Favorilere ekleme/çıkarma butonları
+  const gameGrid = document.querySelector(".game-grid");
+  
+  if (!gameGrid || !allGameCards.length) return;
+  
+  // Kullanıcı oturum açmışsa
+  if (document.querySelector(".profile-shortcut-container")) {
+    // Her karta "Favorilere Ekle/Çıkar" butonu ekle
+    allGameCards.forEach(card => {
+      if (!card.querySelector(".favorite-toggle")) {
+        const gameTitle = card.querySelector("h3").textContent;
+        const gameType = card.querySelector("a").getAttribute("href").split("/").pop();
+        
+        const favoriteBtn = document.createElement("button");
+        favoriteBtn.className = "favorite-toggle";
+        favoriteBtn.innerHTML = `<i class="far fa-star"></i>`;
+        favoriteBtn.setAttribute("data-game-type", gameType);
+        favoriteBtn.setAttribute("data-game-title", gameTitle);
+        favoriteBtn.setAttribute("title", "Favorilere Ekle");
+        favoriteBtn.addEventListener("click", toggleFavoriteGame);
+        
+        card.appendChild(favoriteBtn);
+      }
+    });
+    
+    // Kullanıcının favori oyunlarını kontrol et ve işaretle
+    checkUserFavorites();
+  }
+}
+
+// Kullanıcının favori oyunlarını kontrol et ve işaretle
+function checkUserFavorites() {
+  fetch("/api/get-favorites")
+    .then(response => response.json())
+    .then(data => {
+      if (data.favorites && Array.isArray(data.favorites)) {
+        // Tüm favori butonları
+        const favoriteButtons = document.querySelectorAll(".favorite-toggle");
+        
+        // Her butonu kontrol et
+        favoriteButtons.forEach(btn => {
+          const gameType = btn.getAttribute("data-game-type");
+          
+          // Eğer oyun favorilerdeyse, butonu aktif et
+          if (data.favorites.includes(gameType)) {
+            btn.classList.add("active");
+            btn.innerHTML = `<i class="fas fa-star"></i>`;
+            btn.setAttribute("title", "Favorilerden Çıkar");
+          }
+        });
+      }
+    })
+    .catch(error => console.error("Favoriler yüklenirken hata:", error));
+}
+
+// Oyunu favorilere ekle/çıkar
+function toggleFavoriteGame(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const btn = event.currentTarget;
+  const gameType = btn.getAttribute("data-game-type");
+  const gameTitle = btn.getAttribute("data-game-title");
+  const isRemoving = btn.classList.contains("active");
+  
+  fetch("/api/toggle-favorite", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      gameType: gameType,
+      gameTitle: gameTitle,
+      action: isRemoving ? "remove" : "add"
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      if (isRemoving) {
+        // Favorilerden çıkar
+        btn.classList.remove("active");
+        btn.innerHTML = `<i class="far fa-star"></i>`;
+        btn.setAttribute("title", "Favorilere Ekle");
+        
+        // Başarılı mesajı göster
+        showToast("Oyun favorilerden çıkarıldı", "success");
+      } else {
+        // Favori limiti kontrolü
+        if (data.favorites && data.favorites.length > 4) {
+          showToast("En fazla 4 oyun favorilere eklenebilir", "warning");
+          return;
+        }
+        
+        // Favorilere ekle
+        btn.classList.add("active");
+        btn.innerHTML = `<i class="fas fa-star"></i>`;
+        btn.setAttribute("title", "Favorilerden Çıkar");
+        
+        // Başarılı mesajı göster
+        showToast("Oyun favorilere eklendi", "success");
+      }
+    } else {
+      // Hata mesajı göster
+      showToast(data.message || "İşlem başarısız oldu", "error");
+    }
+  })
+  .catch(error => {
+    console.error("Favori işlemi sırasında hata:", error);
+    showToast("Bir hata oluştu. Lütfen tekrar deneyin.", "error");
+  });
+}
+
+// Toast mesajı göster
+function showToast(message, type = "info") {
+  const toast = document.createElement("div");
+  toast.className = `toast align-items-center text-white border-0 position-fixed bottom-0 end-0 m-3 bg-${type === "success" ? "success" : type === "error" ? "danger" : type === "warning" ? "warning" : "info"}`;
+  toast.setAttribute("role", "alert");
+  toast.setAttribute("aria-live", "assertive");
+  toast.setAttribute("aria-atomic", "true");
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">
+        ${message}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  `;
+  document.body.appendChild(toast);
+
+  const bsToast = new bootstrap.Toast(toast);
+  bsToast.show();
+
+  // Auto-remove toast after it"s hidden
+  toast.addEventListener("hidden.bs.toast", function() {
+    document.body.removeChild(toast);
+  });
+}
