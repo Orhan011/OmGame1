@@ -1,43 +1,54 @@
-// main.js - Optimize edilmiş ve hızlandırılmış sürüm
-
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize tooltips - Yalnızca gerekli olduğunda başlatılacak şekilde optimize edildi
-  if (document.querySelectorAll('[data-bs-toggle="tooltip"]').length > 0) {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-  }
+  // Initialize tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 
-  // Setup button loading animations - gecikmeyle yükleniyor
-  setTimeout(setupButtonLoadingStates, 100);
+  // Setup button loading animations
+  setupButtonLoadingStates();
 
-  // Kısayol panelini kapat - dışa tıklandığında - performans için iyileştirildi
+  // Kısayol panelini kapat - dışa tıklandığında
   document.addEventListener('click', function(e) {
     const shortcutPanel = document.getElementById('shortcutPanel');
-    
-    // Eğer panel yoksa veya zaten kapalıysa işlem yapma
-    if (!shortcutPanel || shortcutPanel.style.display !== 'block') return;
-    
     const profileShortcut = document.querySelector('.profile-shortcut-avatar-wrapper');
-    
-    if (!shortcutPanel.contains(e.target) && (!profileShortcut || !profileShortcut.contains(e.target))) {
+
+    if (shortcutPanel && 
+        shortcutPanel.style.display === 'block' && 
+        !shortcutPanel.contains(e.target) && 
+        profileShortcut && 
+        !profileShortcut.contains(e.target)) {
       shortcutPanel.style.display = 'none';
     }
   });
 
-  // Save game score - hızlandırılmış
+  // Save game score
   window.saveScore = function(gameType, score) {
-    // Performans için toast oluşturma fonksiyonu ayrıldı
-    function createToast(type, message) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        gameType: gameType,
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+
+      // Show success message
       const toast = document.createElement('div');
-      toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+      toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3';
       toast.setAttribute('role', 'alert');
       toast.setAttribute('aria-live', 'assertive');
       toast.setAttribute('aria-atomic', 'true');
       toast.innerHTML = `
         <div class="d-flex">
-          <div class="toast-body">${message}</div>
+          <div class="toast-body">
+            Score saved successfully!
+          </div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       `;
@@ -46,36 +57,44 @@ document.addEventListener('DOMContentLoaded', function() {
       const bsToast = new bootstrap.Toast(toast);
       bsToast.show();
 
+      // Auto-remove toast after it's hidden
       toast.addEventListener('hidden.bs.toast', function() {
         document.body.removeChild(toast);
       });
-    }
-
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ gameType, score })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-      createToast('success', 'Score saved successfully!');
     })
     .catch(error => {
       console.error('Error saving score:', error);
-      createToast('danger', 'Error saving score. Please try again.');
+
+      // Show error message
+      const toast = document.createElement('div');
+      toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed bottom-0 end-0 m-3';
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            Error saving score. Please try again.
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      document.body.appendChild(toast);
+
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+
+      // Auto-remove toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', function() {
+        document.body.removeChild(toast);
+      });
     });
   };
 
-  // Load leaderboard data - performans için optimize edildi
+  // Load leaderboard data
   window.loadLeaderboard = function(gameType, elementId) {
     const leaderboardElement = document.getElementById(elementId);
     if (!leaderboardElement) return;
-
-    // Yükleniyor göstergesi ekleyelim
-    leaderboardElement.innerHTML = '<div class="text-center p-3"><div class="spinner-border text-light" role="status"></div></div>';
 
     fetch(`/api/get-scores/${gameType}`)
       .then(response => response.json())
@@ -129,11 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   };
 
-  // Helper function for timer - optimize edildi
+  // Helper function for timer
   window.startTimer = function(durationInSeconds, displayElement, onTimeUp) {
     let timer = durationInSeconds;
     const display = document.getElementById(displayElement);
-    if (!display) return null; // Eğer element yoksa işlemi iptal et
+    if (!display) return;
 
     display.textContent = formatTime(timer);
 
@@ -167,74 +186,67 @@ document.addEventListener('DOMContentLoaded', function() {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 
-  // Button Loading Animation - gecikmeyle ve performans iyileştirmeleriyle
+  // Button Loading Animation Functionality
   function setupButtonLoadingStates() {
-    // Yalnızca form butonları için işlem yap
-    document.querySelectorAll('form .btn:not(.no-loading)').forEach(button => {
-      button.addEventListener('click', function(e) {
-        // Skip special buttons or those that should navigate immediately
-        if (this.classList.contains('no-loading') || 
-            this.getAttribute('type') === 'button' || 
-            this.getAttribute('type') === 'reset' ||
-            this.hasAttribute('data-bs-toggle') ||
-            this.hasAttribute('data-bs-dismiss')) {
-          return;
-        }
-
-        // Don't add loading to buttons that are links with href
-        if (this.tagName === 'A' && this.hasAttribute('href') && 
-            !this.href.includes('javascript:void')) {
-          return;
-        }
-
-        // Store the original content if not already stored
-        if (!this.dataset.originalHtml) {
-          this.dataset.originalHtml = this.innerHTML;
-        }
-
-        // Add loading spinner
-        this.classList.add('btn-loading');
-        const originalHtml = this.dataset.originalHtml;
-
-        // Create spinner and text wrapper
-        this.innerHTML = `
-          <span class="btn-spinner"></span>
-          <span class="btn-text">${originalHtml}</span>
-        `;
-
-        // Return to original state after some time (failsafe)
-        setTimeout(() => {
-          if (this.classList.contains('btn-loading')) {
-            this.classList.remove('btn-loading');
-            this.innerHTML = originalHtml;
+    document.querySelectorAll('.btn').forEach(button => {
+      if (!button.classList.contains('no-loading')) {
+        button.addEventListener('click', function(e) {
+          // Skip special buttons or those that should navigate immediately
+          if (this.classList.contains('no-loading') || 
+              this.getAttribute('type') === 'button' || 
+              this.getAttribute('type') === 'reset' ||
+              this.hasAttribute('data-bs-toggle') ||
+              this.hasAttribute('data-bs-dismiss')) {
+            return;
           }
-        }, 3000); // 3 second timeout as fallback
-      });
+
+          // Don't add loading to buttons that are links with href
+          if (this.tagName === 'A' && this.hasAttribute('href') && 
+              !this.href.includes('javascript:void')) {
+            return;
+          }
+
+          // Store the original content if not already stored
+          if (!this.dataset.originalHtml) {
+            this.dataset.originalHtml = this.innerHTML;
+          }
+
+          // Add loading spinner
+          this.classList.add('btn-loading');
+          const originalHtml = this.dataset.originalHtml;
+
+          // Create spinner and text wrapper
+          this.innerHTML = `
+            <span class="btn-spinner"></span>
+            <span class="btn-text">${originalHtml}</span>
+          `;
+
+          // Return to original state after some time (failsafe)
+          setTimeout(() => {
+            if (this.classList.contains('btn-loading')) {
+              this.classList.remove('btn-loading');
+              this.innerHTML = originalHtml;
+            }
+          }, 3000); // 3 second timeout as fallback
+        });
+      }
     });
   }
 });
-
-// Profile related code - optimize edildi ve birleştirildi
+// Profile Modal Lazy Loading
 document.addEventListener('DOMContentLoaded', function() {
-  // Profil ve kısayol fonksiyonlarını bir kerede başlat
-  initProfileFunctions();
-});
-
-// Tüm profil ilgili fonksiyonları tek bir yerde başlat
-function initProfileFunctions() {
-  // Profile Modal Lazy Loading
   const profileButton = document.getElementById('profileButton');
   const profileModal = document.getElementById('profileModal');
+  const profileModalContent = document.getElementById('profileModalContent');
+  const profileContentTemplate = document.getElementById('profileContentTemplate');
+  let isContentLoaded = false;
+
   if (profileButton && profileModal) {
-    const profileModalContent = document.getElementById('profileModalContent');
-    const profileContentTemplate = document.getElementById('profileContentTemplate');
-    let isContentLoaded = false;
-    
     profileButton.addEventListener('click', function() {
       const modal = new bootstrap.Modal(profileModal);
       modal.show();
 
-      if (!isContentLoaded && profileModalContent && profileContentTemplate) {
+      if (!isContentLoaded) {
         // Delay content loading slightly to ensure smooth modal animation
         setTimeout(() => {
           profileModalContent.innerHTML = profileContentTemplate.innerHTML;
@@ -246,7 +258,10 @@ function initProfileFunctions() {
   
   // Navbar'da kullanıcı dropdown menüsünü mobil görünümde her zaman göster
   const adjustUserDropdown = function() {
+    const navbarCollapse = document.querySelector('.navbar-collapse');
     const userDropdownContainer = document.querySelector('.navbar-nav.ms-auto.d-flex');
+    
+    // Null kontrolü ekleyelim
     if (!userDropdownContainer) return;
     
     if (window.innerWidth < 992) { // Bootstrap'ın lg breakpoint değeri
@@ -257,33 +272,26 @@ function initProfileFunctions() {
   };
   
   // İlk yüklemede ayarla
-  adjustUserDropdown();
+  setTimeout(adjustUserDropdown, 100); // DOMContentLoaded olayından sonra bir gecikme ekleyelim
   
-  // Ekran boyutu değiştiğinde ayarla - performans için throttle edildi
-  let resizeTimeout;
-  window.addEventListener('resize', function() {
-    if (resizeTimeout) clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(adjustUserDropdown, 100);
-  });
-  
-  // Profil Panel Event Listener
+  // Ekran boyutu değiştiğinde ayarla
+  window.addEventListener('resize', adjustUserDropdown);
+});
+
+// Yeni profil paneli işlevselliği
+document.addEventListener('DOMContentLoaded', function() {
+  // Tıklama dışında profil menüsünü kapatma işlevi için global event listener
   document.addEventListener('click', function(event) {
-    const profilePanel = document.getElementById('profilePanel');
-    if (!profilePanel || !profilePanel.classList.contains('active')) return;
-    
     const topLeftAvatar = document.getElementById('topLeftAvatar');
-    if (topLeftAvatar && !topLeftAvatar.contains(event.target) && !profilePanel.contains(event.target)) {
+    const profilePanel = document.getElementById('profilePanel');
+
+    if (profilePanel && profilePanel.classList.contains('active') && 
+        topLeftAvatar && !topLeftAvatar.contains(event.target) && 
+        !profilePanel.contains(event.target)) {
       profilePanel.classList.remove('active');
     }
   });
-  
-  // Restore profile picture if needed
-  const profilePicture = document.getElementById('profilePicture');
-  const pictureContainer = document.getElementById('profile-picture-container');
-  if (profilePicture && pictureContainer) {
-    pictureContainer.appendChild(profilePicture);
-  }
-}
+});
 
 // Profil panelini aç/kapat
 function toggleProfilePanel(event) {
@@ -299,9 +307,7 @@ function toggleProfilePanel(event) {
 
 // Kısayol panelini aç/kapat
 function toggleShortcutPanel(event) {
-  if (!event) return;
   event.stopPropagation();
-  
   const panel = document.getElementById('shortcutPanel');
   if (!panel) return;
 
@@ -310,14 +316,20 @@ function toggleShortcutPanel(event) {
   } else {
     panel.style.display = 'block';
     
-    // Panel dışına tıklandığında paneli kapat (tek bir event listener kullanımı için optimize edildi)
-    const closeHandler = function closePanel(e) {
+    // Panel dışına tıklandığında paneli kapat
+    document.addEventListener('click', function closePanel(e) {
       if (!panel.contains(e.target) && e.target !== event.target) {
         panel.style.display = 'none';
-        document.removeEventListener('click', closeHandler);
+        document.removeEventListener('click', closePanel);
       }
-    };
-    
-    document.addEventListener('click', closeHandler);
+    });
   }
 }
+
+// Added to restore profile picture
+document.addEventListener('DOMContentLoaded', function() {
+  const profilePicture = document.getElementById('profilePicture');
+  if (profilePicture && document.getElementById('profile-picture-container')) {
+    document.getElementById('profile-picture-container').appendChild(profilePicture);
+  }
+});
