@@ -44,12 +44,12 @@ def send_verification_email(to_email, verification_code):
     try:
         subject = "Beyin Egzersizleri - E-posta Doğrulama Kodu"
         body = f"Doğrulama kodunuz: {verification_code}"
-        
+
         msg = MIMEText(body)
         msg['Subject'] = subject
         msg['From'] = 'omgameee@gmail.com'
         msg['To'] = to_email
-        
+
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login('omgameee@gmail.com', 'apppassword')  # Use app password
@@ -180,38 +180,62 @@ def get_user_home_games(user_id):
     Kullanıcının ana sayfasına eklediği oyunları getirir.
     Eğer oyun eklemediyse varsayılan olarak ilk 4 oyunu döndürür.
     """
+    # Eğer kullanıcı oturumu yoksa veya geçersizse boş liste döndür
     if not user_id:
-        return []
-        
-    # Kullanıcının ana sayfasına eklediği oyunları getir
-    home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
-    
-    # Eğer oyun eklemediyse varsayılan olarak ilk 4 oyunu göster
-    if not home_games:
-        # İlk kez ana sayfa özelleştirmesi yapıyorsa, varsayılan oyunları ekle
-        default_games = ["word_puzzle", "memory_cards", "labyrinth", "puzzle"]
-        for i, game_id in enumerate(default_games):
-            home_game = UserHomeScreen(
-                user_id=user_id,
-                game_type=game_id,
-                display_order=i
-            )
-            db.session.add(home_game)
-        db.session.commit()
-        
-        # Yeni eklenen oyunları getir
+        game_info = get_game_info()
+        return game_info[:4]  # Varsayılan olarak ilk 4 oyunu göster
+
+    # Kullanıcının veritabanında olup olmadığını kontrol et
+    user = User.query.get(user_id)
+    if not user:
+        # Kullanıcı veritabanında yoksa oturumu temizle ve varsayılan oyunları göster
+        if 'user_id' in session:
+            session.pop('user_id', None)
+            session.pop('username', None)
+        game_info = get_game_info()
+        return game_info[:4]
+
+    try:
+        # Kullanıcının ana sayfasına eklediği oyunları getir
         home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
-    
+
+        # Eğer oyun eklemediyse varsayılan olarak ilk 4 oyunu göster
+        if not home_games:
+            # İlk kez ana sayfa özelleştirmesi yapıyorsa, varsayılan oyunları ekle
+            default_games = ["word_puzzle", "memory_cards", "labyrinth", "puzzle"]
+            try:
+                for i, game_id in enumerate(default_games):
+                    home_game = UserHomeScreen(
+                        user_id=user_id,
+                        game_type=game_id,
+                        display_order=i
+                    )
+                    db.session.add(home_game)
+                db.session.commit()
+
+                # Yeni eklenen oyunları getir
+                home_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
+            except Exception as e:
+                print(f"Kullanıcı ana sayfa oyunları eklenirken hata oluştu: {e}")
+                db.session.rollback()
+                # Hata durumunda varsayılan oyun bilgilerini dön ama veritabanına kaydetme
+                game_info = get_game_info()
+                return game_info[:4]
+    except Exception as e:
+        print(f"Kullanıcı oyunları getirilirken hata oluştu: {e}")
+        game_info = get_game_info()
+        return game_info[:4]
+
     # Oyun bilgilerini getir
     game_info = get_game_info()
     user_home_games = []
-    
+
     for home_game in home_games:
         for game in game_info:
             if game["id"] == home_game.game_type:
                 user_home_games.append(game)
                 break
-    
+
     return user_home_games
 
 # Flask template utility functions
@@ -233,7 +257,7 @@ def utility_processor():
             current_level_xp = xp_for_level(current_level)
             next_level_xp = xp_for_level(next_level)
             xp_progress = (user.experience_points - current_level_xp) / (next_level_xp - current_level_xp) * 100 if next_level_xp > current_level_xp else 0
-            
+
             return {
                 'id': user.id,
                 'username': user.username,
@@ -265,21 +289,21 @@ def utility_processor():
         if user and user.avatar_url:
             return user.avatar_url
         return None
-    
+
     def get_user_scores():
         """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
         user_id = session.get('user_id')
         if not user_id:
             return {}
-            
+
         result = {}
         scores = Score.query.filter_by(user_id=user_id).all()
-        
+
         for score in scores:
             game_type = score.game_type
             if game_type not in result or score.score > result[game_type]:
                 result[game_type] = score.score
-                
+
         return result
 
     return dict(
@@ -294,7 +318,7 @@ def initialize_database():
     """Initialize the database with sample data if needed"""
     with app.app_context():
         db.create_all()
-        
+
         # Example data can be added here when needed
         if not User.query.first():
             # Admin user
@@ -331,22 +355,22 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
+
         user = User.query.filter_by(username=username).first()
-        
+
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             session['username'] = user.username
-            
+
             # Update last active time
             user.last_active = datetime.utcnow()
             db.session.commit()
-            
+
             flash('Başarıyla giriş yaptınız!', 'success')
             return redirect(url_for('index'))
         else:
             flash('Geçersiz kullanıcı adı veya şifre!', 'danger')
-    
+
     return render_template('login.html')
 
 @app.route('/three-d-rotation')
@@ -415,13 +439,13 @@ def all_games():
     """Tüm oyunlar sayfası"""
     games = get_game_info()
     user_id = session.get('user_id')
-    
+
     # Kullanıcının ana sayfasındaki oyunları al
     user_home_game_types = []
     if user_id:
         home_games = UserHomeScreen.query.filter_by(user_id=user_id).all()
         user_home_game_types = [game.game_type for game in home_games]
-    
+
     return render_template('all_games.html', 
                           games=games, 
                           user_home_games=user_home_game_types)
@@ -447,40 +471,40 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        
+
         if password != confirm_password:
             flash('Şifreler eşleşmiyor!', 'danger')
             return render_template('register.html')
-        
+
         # Check if username exists
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash('Bu kullanıcı adı zaten kullanılıyor!', 'danger')
             return render_template('register.html')
-            
+
         # Check if email exists
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
             flash('Bu e-posta adresi zaten kullanılıyor!', 'danger')
             return render_template('register.html')
-        
+
         # Create new user
         new_user = User(
             username=username,
             email=email,
             password_hash=generate_password_hash(password)
         )
-        
+
         db.session.add(new_user)
         db.session.commit()
-        
+
         # Log the user in
         session['user_id'] = new_user.id
         session['username'] = new_user.username
-        
+
         flash('Hesabınız başarıyla oluşturuldu!', 'success')
         return redirect(url_for('index'))
-    
+
     return render_template('register.html')
 
 @app.route('/logout')
@@ -495,15 +519,15 @@ def get_user_scores():
     user_id = session.get('user_id')
     if not user_id:
         return {}
-        
+
     result = {}
     scores = Score.query.filter_by(user_id=user_id).all()
-    
+
     for score in scores:
         game_type = score.game_type
         if game_type not in result or score.score > result[game_type]:
             result[game_type] = score.score
-            
+
     return result
 
 @app.route('/profile')
@@ -512,10 +536,10 @@ def profile():
     if 'user_id' not in session:
         flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     scores = get_user_scores()
-    
+
     return render_template('profile.html', user=user, scores=scores)
 
 @app.route('/profile-v2')
@@ -524,17 +548,17 @@ def profile_v2():
     if 'user_id' not in session:
         flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
     scores = get_user_scores()
-    
+
     # Level ve XP hesapla
     current_level = calculate_level(user.experience_points)
     next_level = current_level + 1
     current_level_xp = xp_for_level(current_level)
     next_level_xp = xp_for_level(next_level)
     xp_progress = (user.experience_points - current_level_xp) / (next_level_xp - current_level_xp) * 100 if next_level_xp > current_level_xp else 0
-    
+
     return render_template('profile_v2.html', 
                            user=user, 
                            scores=scores, 
@@ -549,21 +573,21 @@ def update_profile():
     """Profil bilgilerini güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Form verilerini al ve güncelle
     user.full_name = request.form.get('full_name', user.full_name)
     user.bio = request.form.get('bio', user.bio)
     user.location = request.form.get('location', user.location)
-    
+
     # Yaş alanını integer olarak dönüştür
     age = request.form.get('age')
     if age and age.isdigit():
         user.age = int(age)
-    
+
     db.session.commit()
     flash('Profil bilgileriniz güncellendi!', 'success')
     return jsonify({'success': True})
@@ -573,37 +597,37 @@ def update_avatar():
     """Profil fotoğrafını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Dosya kontrolü
     if 'avatar' not in request.files:
         return jsonify({'success': False, 'error': 'Dosya yüklenemedi!'})
-    
+
     file = request.files['avatar']
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Dosya seçilmedi!'})
-    
+
     if file and allowed_file(file.filename):
         # Dosya adını güvenli hale getir ve kullanıcı ID'si ile kaydet
         filename = secure_filename(file.filename)
         user_filename = f"{user.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], user_filename)
-        
+
         # Dosyayı kaydet
         file.save(filepath)
-        
+
         # Kullanıcı kaydını güncelle
         user.avatar_url = f"uploads/avatars/{user_filename}"
         db.session.commit()
-        
+
         return jsonify({
             'success': True, 
             'avatar_url': url_for('static', filename=f"uploads/avatars/{user_filename}")
         })
-    
+
     return jsonify({'success': False, 'error': 'Geçersiz dosya formatı!'})
 
 @app.route('/change-password', methods=['POST'])
@@ -611,27 +635,27 @@ def change_password():
     """Şifre değiştirme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
-    
+
     # Mevcut şifreyi kontrol et
     if not check_password_hash(user.password_hash, current_password):
         return jsonify({'success': False, 'error': 'Mevcut şifre yanlış!'})
-    
+
     # Yeni şifre ve onay şifresinin eşleştiğini kontrol et
     if new_password != confirm_password:
         return jsonify({'success': False, 'error': 'Yeni şifreler eşleşmiyor!'})
-    
+
     # Şifreyi güncelle
     user.password_hash = generate_password_hash(new_password)
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Şifreniz başarıyla güncellendi!'})
 
 @app.route('/update-security-settings', methods=['POST'])
@@ -639,14 +663,14 @@ def update_security_settings():
     """Güvenlik ayarlarını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # İki faktörlü doğrulama ayarını güncelle
     # Şimdilik sadece şifre güncellemesine izin ver
-    
+
     return jsonify({'success': True, 'message': 'Güvenlik ayarlarınız güncellendi!'})
 
 @app.route('/update-notification-settings', methods=['POST'])
@@ -654,18 +678,18 @@ def update_notification_settings():
     """Bildirim ayarlarını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Bildirim ayarlarını güncelle
     user.email_notifications = 'email_notifications' in request.form
     user.achievement_notifications = 'achievement_notifications' in request.form
     user.leaderboard_notifications = 'leaderboard_notifications' in request.form
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Bildirim ayarlarınız güncellendi!'})
 
 @app.route('/update-theme', methods=['POST'])
@@ -673,17 +697,17 @@ def update_theme():
     """Tema tercihini güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Tema tercihini güncelle
     theme = request.form.get('theme', 'dark')
     user.theme_preference = theme
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Tema tercihiniz güncellendi!'})
 
 @app.route('/delete-account', methods=['POST'])
@@ -691,24 +715,24 @@ def delete_account():
     """Hesabı silme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Kullanıcının şifresini kontrol et
     password = request.form.get('password')
     if not check_password_hash(user.password_hash, password):
         return jsonify({'success': False, 'error': 'Geçersiz şifre!'})
-    
+
     # Kullanıcıyı veritabanından sil
     db.session.delete(user)
     db.session.commit()
-    
+
     # Oturumu sonlandır
     session.pop('user_id', None)
     session.pop('username', None)
-    
+
     return jsonify({'success': True, 'message': 'Hesabınız başarıyla silindi!'})
 
 @app.route('/suspend-account', methods=['POST'])
@@ -716,24 +740,24 @@ def suspend_account():
     """Hesabı dondurma."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'})
-    
+
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'error': 'Kullanıcı bulunamadı!'})
-    
+
     # Hesabı dondurma süresini belirle (30 gün)
     suspension_period = request.form.get('suspension_period', '30')
     try:
         days = int(suspension_period)
         user.suspended_until = datetime.utcnow() + timedelta(days=days)
         user.account_status = 'suspended'
-        
+
         db.session.commit()
-        
+
         # Oturumu sonlandır
         session.pop('user_id', None)
         session.pop('username', None)
-        
+
         return jsonify({'success': True, 'message': f'Hesabınız {days} gün süreyle donduruldu!'})
     except ValueError:
         return jsonify({'success': False, 'error': 'Geçersiz dondurma süresi!'})
@@ -743,20 +767,20 @@ def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email')
         user = User.query.filter_by(email=email).first()
-        
+
         if user:
             # Reset token oluştur
             reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
             user.reset_token = reset_token
             user.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
             db.session.commit()
-            
+
             # E-posta gönder (Demo için sadece token'ı göster)
             flash(f'Parola sıfırlama bağlantınız e-posta adresinize gönderildi. Token: {reset_token}', 'info')
             return redirect(url_for('login'))
         else:
             flash('Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı!', 'danger')
-    
+
     return render_template('forgot_password.html')
 
 @app.route('/reset-code', methods=['GET', 'POST'])
@@ -764,13 +788,13 @@ def reset_code():
     if request.method == 'POST':
         token = request.form.get('token')
         user = User.query.filter_by(reset_token=token).first()
-        
+
         if user and user.reset_token_expiry > datetime.utcnow():
             session['reset_user_id'] = user.id
             return redirect(url_for('reset_password'))
         else:
             flash('Geçersiz veya süresi dolmuş token!', 'danger')
-    
+
     return render_template('reset_code.html')
 
 @app.route('/reset-password', methods=['GET', 'POST'])
@@ -778,46 +802,46 @@ def reset_password():
     if 'reset_user_id' not in session:
         flash('Şifre sıfırlama süresi dolmuş!', 'danger')
         return redirect(url_for('login'))
-    
+
     if request.method == 'POST':
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        
+
         if password != confirm_password:
             flash('Şifreler eşleşmiyor!', 'danger')
             return render_template('reset_password.html')
-        
+
         user = User.query.get(session['reset_user_id'])
         if user:
             user.password_hash = generate_password_hash(password)
             user.reset_token = None
             user.reset_token_expiry = None
             db.session.commit()
-            
+
             session.pop('reset_user_id', None)
             flash('Şifreniz başarıyla sıfırlandı!', 'success')
             return redirect(url_for('login'))
-    
+
     return render_template('reset_password.html')
 
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Kullanıcı girişi yapılmamış'}), 401
-    
+
     data = request.get_json()
     game_type = data.get('game_type')
     score_value = data.get('score')
-    
+
     if not game_type or score_value is None:
         return jsonify({'success': False, 'message': 'Eksik veya geçersiz veriler'}), 400
-    
+
     user_id = session['user_id']
     user = User.query.get(user_id)
-    
+
     if not user:
         return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı'}), 404
-    
+
     # Skoru kaydet
     new_score = Score(
         user_id=user_id,
@@ -825,19 +849,19 @@ def save_score():
         score=score_value
     )
     db.session.add(new_score)
-    
+
     # Kullanıcı istatistiklerini güncelle
     user.total_games_played += 1
     user.experience_points += min(score_value, 100)  # XP sınırla
-    
+
     if score_value > user.highest_score:
         user.highest_score = score_value
-    
+
     db.session.commit()
-    
+
     # Kullanıcının yeni seviyesini hesapla
     current_level = calculate_level(user.experience_points)
-    
+
     return jsonify({
         'success': True, 
         'message': 'Skor başarıyla kaydedildi',
@@ -858,14 +882,14 @@ def get_scores(game_type):
     user_id = session.get('user_id')
     if not user_id:
         return jsonify([])
-    
+
     scores = Score.query.filter_by(user_id=user_id, game_type=game_type).order_by(Score.score.desc()).limit(10).all()
-    
+
     result = [{
         'score': score.score,
         'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     } for score in scores]
-    
+
     return jsonify(result)
 
 @app.route('/api/scores/v2/<game_type>')
@@ -873,20 +897,20 @@ def get_scores_alt(game_type):
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'scores': [], 'max_score': 0})
-    
+
     scores = Score.query.filter_by(user_id=user_id, game_type=game_type).order_by(Score.timestamp.desc()).limit(10).all()
-    
+
     score_data = [{
         'score': score.score,
         'date': score.timestamp.strftime('%d.%m.%Y'),
         'time': score.timestamp.strftime('%H:%M')
     } for score in scores]
-    
+
     # En yüksek skoru bul
     max_score = 0
     if scores:
         max_score = max(score.score for score in scores)
-    
+
     return jsonify({
         'scores': score_data,
         'max_score': max_score
@@ -898,15 +922,15 @@ def get_aggregated_scores():
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'success': False, 'message': 'Kullanıcı girişi yapılmamış'}), 401
-    
+
     # Her oyun için en yüksek skoru bul
     scores = db.session.query(Score.game_type, db.func.max(Score.score).label('max_score')) \
                      .filter(Score.user_id == user_id) \
                      .group_by(Score.game_type) \
                      .all()
-    
+
     result = {score.game_type: score.max_score for score in scores}
-    
+
     return jsonify(result)
 
 @app.route('/api/leaderboard/<game_type>')
@@ -918,7 +942,7 @@ def get_leaderboard(game_type):
                          .order_by(db.desc('max_score')) \
                          .limit(10) \
                          .all()
-    
+
     # Kullanıcı bilgilerini ekle
     result = []
     for user_id, max_score in top_scores:
@@ -932,7 +956,7 @@ def get_leaderboard(game_type):
                 'rank': calculate_rank(max_score),
                 'level': calculate_level(user.experience_points)
             })
-    
+
     return jsonify(result)
 
 @app.route('/api/home-screen/add-game', methods=['POST'])
@@ -940,27 +964,27 @@ def add_game_to_home():
     """Ana ekrana oyun ekleme API'si"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'}), 401
-    
+
     user_id = session['user_id']
     data = request.get_json()
     game_id = data.get('game_id')
-    
+
     if not game_id:
         return jsonify({'success': False, 'error': 'Oyun ID eksik!'}), 400
-    
+
     # Kullanıcının ana sayfasında zaten kaç oyun var?
     existing_count = UserHomeScreen.query.filter_by(user_id=user_id).count()
     if existing_count >= 4:
         return jsonify({'success': False, 'error': 'Ana sayfanıza en fazla 4 oyun ekleyebilirsiniz!'}), 400
-    
+
     # Oyun zaten ana sayfada mı?
     existing_game = UserHomeScreen.query.filter_by(user_id=user_id, game_type=game_id).first()
     if existing_game:
         return jsonify({'success': False, 'error': 'Bu oyun zaten ana sayfanızda!'}), 400
-    
+
     # Yeni sıra numarası belirle
     display_order = existing_count
-    
+
     # Oyunu ana sayfaya ekle
     new_home_game = UserHomeScreen(
         user_id=user_id,
@@ -969,7 +993,7 @@ def add_game_to_home():
     )
     db.session.add(new_home_game)
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Oyun ana sayfanıza eklendi!'})
 
 @app.route('/api/home-screen/remove-game', methods=['POST'])
@@ -977,29 +1001,29 @@ def remove_game_from_home():
     """Ana ekrandan oyun kaldırma API'si"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'}), 401
-    
+
     user_id = session['user_id']
     data = request.get_json()
     game_id = data.get('game_id')
-    
+
     if not game_id:
         return jsonify({'success': False, 'error': 'Oyun ID eksik!'}), 400
-    
+
     # Oyun ana sayfada mı?
     home_game = UserHomeScreen.query.filter_by(user_id=user_id, game_type=game_id).first()
     if not home_game:
         return jsonify({'success': False, 'error': 'Bu oyun ana sayfanızda bulunamadı!'}), 404
-    
+
     # Oyunu ana sayfadan kaldır
     db.session.delete(home_game)
-    
+
     # Sıralama numaralarını güncelle
     remaining_games = UserHomeScreen.query.filter_by(user_id=user_id).order_by(UserHomeScreen.display_order).all()
     for i, game in enumerate(remaining_games):
         game.display_order = i
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Oyun ana sayfanızdan kaldırıldı!'})
 
 @app.route('/api/home-screen/reorder', methods=['POST'])
@@ -1007,22 +1031,22 @@ def reorder_home_games():
     """Ana ekrandaki oyunları yeniden sıralama API'si"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Oturum süresi dolmuş!'}), 401
-    
+
     user_id = session['user_id']
     data = request.get_json()
     game_order = data.get('game_order', [])
-    
+
     if not game_order:
         return jsonify({'success': False, 'error': 'Sıralama bilgisi eksik!'}), 400
-    
+
     # Her oyun için display_order güncelle
     for i, game_id in enumerate(game_order):
         home_game = UserHomeScreen.query.filter_by(user_id=user_id, game_type=game_id).first()
         if home_game:
             home_game.display_order = i
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Oyun sıralaması güncellendi!'})
 
 # Helper Functions
@@ -1034,7 +1058,7 @@ def get_leaderboard_data(game_type):
                          .order_by(db.desc('max_score')) \
                          .limit(10) \
                          .all()
-    
+
     # Kullanıcı bilgilerini ekle
     result = []
     for user_id, max_score in top_scores:
@@ -1045,7 +1069,7 @@ def get_leaderboard_data(game_type):
                 'score': max_score,
                 'level': calculate_level(user.experience_points)
             })
-    
+
     return result
 
 def calculate_rank(score):
@@ -1088,15 +1112,15 @@ function initializePageHistory() {
     // sessionStorage'dan geçmiş bilgisini al
     const storedHistory = sessionStorage.getItem('pageHistory');
     const storedIndex = sessionStorage.getItem('currentHistoryIndex');
-    
+
     if (storedHistory) {
         pageHistory = JSON.parse(storedHistory);
         currentHistoryIndex = parseInt(storedIndex || '0');
-        
+
         // Mevcut URL geçmişte varsa, o indekse ilerle
         const currentPath = window.location.pathname;
         const existingIndex = pageHistory.indexOf(currentPath);
-        
+
         if (existingIndex !== -1) {
             // Eğer geri gittiysek, geçmişteki konumumuza ayarla
             currentHistoryIndex = existingIndex;
@@ -1106,7 +1130,7 @@ function initializePageHistory() {
             if (currentHistoryIndex < pageHistory.length - 1) {
                 pageHistory = pageHistory.slice(0, currentHistoryIndex + 1);
             }
-            
+
             // Yeni sayfayı geçmişe ekle
             pageHistory.push(currentPath);
             currentHistoryIndex = pageHistory.length - 1;
@@ -1116,11 +1140,11 @@ function initializePageHistory() {
         pageHistory = [window.location.pathname];
         currentHistoryIndex = 0;
     }
-    
+
     // Geçmiş bilgisini sessionStorage'a kaydet
     sessionStorage.setItem('pageHistory', JSON.stringify(pageHistory));
     sessionStorage.setItem('currentHistoryIndex', currentHistoryIndex.toString());
-    
+
     console.log('Sayfa geçmişi:', pageHistory);
     console.log('Geçerli indeks:', currentHistoryIndex);
 }
@@ -1131,27 +1155,27 @@ function setupSwipeNavigation() {
     let touchEndX = 0;
     const swipeThreshold = 100; // Minimum kaydırma mesafesi
     const edgeThreshold = 50;   // Ekranın kenarından başlama mesafesi
-    
+
     // Dokunma olaylarını takip et
     document.addEventListener('touchstart', function(e) {
         touchStartX = e.changedTouches[0].screenX;
     }, false);
-    
+
     document.addEventListener('touchend', function(e) {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     }, false);
-    
+
     // Kaydırma işlemini yönet
     function handleSwipe() {
         const swipeDistance = touchEndX - touchStartX;
-        
+
         // Sağdan sola kaydırma için yeterli mesafe var mı?
         if (swipeDistance > swipeThreshold && touchStartX < edgeThreshold) {
             navigateBack();
         }
     }
-    
+
     // Geri gitme düğmesini ayarla (varsa)
     const backButton = document.querySelector('.back-button');
     if (backButton) {
@@ -1164,10 +1188,10 @@ function navigateBack() {
     if (currentHistoryIndex > 0) {
         currentHistoryIndex--;
         const previousPage = pageHistory[currentHistoryIndex];
-        
+
         // Geçmiş bilgisini güncelle
         sessionStorage.setItem('currentHistoryIndex', currentHistoryIndex.toString());
-        
+
         // Önceki sayfaya git
         window.location.href = previousPage;
     }
@@ -1177,26 +1201,26 @@ function navigateBack() {
 document.addEventListener('click', function(e) {
     // Tıklanan eleman bir bağlantı mı?
     const link = e.target.closest('a');
-    
+
     if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#') && 
         !link.getAttribute('target') && !e.ctrlKey && !e.metaKey) {
-        
+
         const url = new URL(link.href);
-        
+
         // Aynı site içinde bir bağlantı mı?
         if (url.origin === window.location.origin) {
             // Geçmiş durumunu güncelle (yeni sayfaya git)
             const newPath = url.pathname;
-            
+
             // Eğer geçmişte bir konumdaysak, o konumdan sonraki tüm sayfaları temizle
             if (currentHistoryIndex < pageHistory.length - 1) {
                 pageHistory = pageHistory.slice(0, currentHistoryIndex + 1);
             }
-            
+
             // Yeni sayfayı geçmişe ekle
             pageHistory.push(newPath);
             currentHistoryIndex = pageHistory.length - 1;
-            
+
             // Geçmiş bilgisini sessionStorage'a kaydet
             sessionStorage.setItem('pageHistory', JSON.stringify(pageHistory));
             sessionStorage.setItem('currentHistoryIndex', currentHistoryIndex.toString());
