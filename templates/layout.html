@@ -13,7 +13,8 @@
 <!-- Temel CSS Dosyaları -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Swipe navigation CSS removed -->
+    <!-- iOS Swipe Navigasyon CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
@@ -223,6 +224,7 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}
-<!-- Swipe Navigation scripts removed -->
+<!-- iOS Swipe Navigasyon Script -->
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
   </body>
 </html>
