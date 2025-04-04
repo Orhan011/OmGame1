@@ -31,6 +31,7 @@ class User(db.Model):
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
     scores = db.relationship('Score', backref='user', lazy=True)
+    favorites = db.relationship('Favorite', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -88,3 +89,17 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
+
+
+class Favorite(db.Model):
+    __tablename__ = 'favorites'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # Oyun türü (wordPuzzle, memoryMatch, vs.)
+    game_name = db.Column(db.String(100), nullable=False)  # Oyun adı
+    game_icon = db.Column(db.String(50), nullable=False)  # Font Awesome icon class
+    game_description = db.Column(db.String(255))  # Kısa açıklama
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Favorite {self.game_name}>'

@@ -14,7 +14,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from models import User, Score, Article
+from models import User, Score, Article, Favorite
+from routes import favorites_bp
+
+# Register blueprints
+app.register_blueprint(favorites_bp)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -160,6 +164,29 @@ def utility_processor():
                 score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
         
         return score_dict
+        
+    def get_user_favorites():
+        """Kullanıcının favori oyunlarını döndürür."""
+        if 'user_id' not in session:
+            return []
+        
+        user_id = session['user_id']
+        
+        # Kullanıcının favorilerini al
+        favorites = Favorite.query.filter_by(user_id=user_id).all()
+        
+        # Basit liste formatına dönüştür
+        favorites_list = []
+        for fav in favorites:
+            favorites_list.append({
+                'id': fav.id,
+                'game_type': fav.game_type,
+                'game_name': fav.game_name,
+                'game_icon': fav.game_icon,
+                'game_description': fav.game_description
+            })
+        
+        return favorites_list
 
     # Tüm yardımcı fonksiyonları şablonlarda kullanılabilir hale getir
     return dict(
@@ -167,6 +194,7 @@ def utility_processor():
         get_user_data=get_user_data,
         get_avatar_url=get_avatar_url,
         get_user_scores=get_user_scores,
+        get_user_favorites=get_user_favorites,
         calculate_level=calculate_level,
         xp_for_level=xp_for_level
     )
@@ -1877,4 +1905,92 @@ def calculate_level(score):
         return "Üstadı"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)# Favori işlemleri için API rotaları
+@app.route('/get_favorites', methods=['GET'])
+def get_favorites_api():
+    """Kullanıcının favori oyunlarını JSON formatında döndürür."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Giriş yapmalısınız'})
+    
+    # Kullanıcının favorilerini al
+    favorites = Favorite.query.filter_by(user_id=user_id).all()
+    
+    # JSON formatına dönüştür
+    favorites_list = []
+    for fav in favorites:
+        favorites_list.append({
+            'id': fav.id,
+            'game_type': fav.game_type,
+            'game_name': fav.game_name,
+            'game_icon': fav.game_icon,
+            'game_description': fav.game_description
+        })
+    
+    return jsonify({'success': True, 'favorites': favorites_list})
+
+@app.route('/add_favorite', methods=['POST'])
+def add_favorite_api():
+    """Yeni bir favori oyun ekler."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Giriş yapmalısınız'})
+    
+    # Favori sayısını kontrol et (maksimum 4)
+    favorites_count = Favorite.query.filter_by(user_id=user_id).count()
+    if favorites_count >= 4:
+        return jsonify({'success': False, 'message': 'En fazla 4 oyunu favorilere ekleyebilirsiniz'})
+    
+    # İstek verilerini al
+    data = request.get_json()
+    game_type = data.get('game_type')
+    game_name = data.get('game_name')
+    game_icon = data.get('game_icon')
+    game_description = data.get('game_description')
+    
+    # Gerekli alanları kontrol et
+    if not all([game_type, game_name, game_icon]):
+        return jsonify({'success': False, 'message': 'Eksik bilgiler'})
+    
+    # Aynı oyunun zaten favorilerde olup olmadığını kontrol et
+    existing_favorite = Favorite.query.filter_by(user_id=user_id, game_type=game_type).first()
+    if existing_favorite:
+        return jsonify({'success': False, 'message': 'Bu oyun zaten favorilerinizde'})
+    
+    # Yeni favori oluştur
+    new_favorite = Favorite(
+        user_id=user_id,
+        game_type=game_type,
+        game_name=game_name,
+        game_icon=game_icon,
+        game_description=game_description
+    )
+    
+    # Veritabanına kaydet
+    db.session.add(new_favorite)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Oyun favorilere eklendi'})
+
+@app.route('/remove_favorite', methods=['POST'])
+def remove_favorite_api():
+    """Favori oyunu kaldırır."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Giriş yapmalısınız'})
+    
+    # İstek verilerini al
+    data = request.get_json()
+    game_type = data.get('game_type')
+    
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi'})
+    
+    # Favorilerden kaldır
+    favorite = Favorite.query.filter_by(user_id=user_id, game_type=game_type).first()
+    if favorite:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Oyun favorilerden kaldırıldı'})
+    else:
+        return jsonify({'success': False, 'message': 'Favori oyun bulunamadı'})

@@ -1,0 +1,42 @@
+/* Favori oyunlar için stil */
+.favorites-grid {
+  margin-bottom: 2rem;
+}
+
+.favorite-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.favorite-toggle:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.favorite-toggle i {
+  color: #f1c40f;
+  font-size: 16px;
+}
+
+.favorite-toggle i.fas {
+  color: #f1c40f;
+}
+
+.favorite-toggle i.far {
+  color: #777;
+}
+
+.text-center.w-100.py-4 {
+  grid-column: 1 / -1;
+}
