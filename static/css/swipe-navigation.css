@@ -1,48 +1,51 @@
 /**
- * Hafif iOS Tarzı Swipe Navigasyon - CSS
- * Optimize edilmiş versiyon
+ * Ultra-Hafif iOS Tarzı Swipe Navigasyon - CSS
  */
 
-/* Temel stiller */
+/* Temel sayfa stili - performans için critical CSS */
 body {
-    overflow-x: hidden;
-    position: relative;
-    width: 100%;
-    will-change: transform;
-    transition: transform 0.3s ease-out;
-    touch-action: pan-y;
+  overflow-x: hidden;
+  position: relative; 
+  width: 100%;
+  transform: translateZ(0); /* GPU hızlandırma */
+  transition: transform 0.2s ease;
+  touch-action: pan-y;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Swipe gölge efekti */
+/* Gölge efekti - JS'den buraya taşındı */
 #swipe-shadow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    opacity: 0;
-    display: none;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  will-change: opacity;
 }
 
-/* Geri buton stili */
+/* Geri buton stili - minimalist */
 .back-button {
-    display: inline-flex;
-    align-items: center;
-    color: #007bff;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: #007bff;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .back-button:before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-top: 2px solid currentColor;
-    border-left: 2px solid currentColor;
-    transform: rotate(-45deg);
-    margin-right: 4px;
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(-45deg);
+  margin-right: 4px;
 }
