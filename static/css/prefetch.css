@@ -1,0 +1,59 @@
+/* Önbelleğe alınacak CSS stilleri */
+
+/* Sayfa geçişleri için optimize edilmiş stil tanımları */
+.page-transition {
+  transform: translateX(0);
+  transition: transform 0ms ease;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.next-page-transition {
+  transform: translateX(100%);
+}
+
+.prev-page-transition {
+  transform: translateX(-100%);
+}
+
+/* Sayfa geçişleri sırasında performans optimizasyonu */
+.app-container {
+  overflow-x: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Zengin animasyonlu içerikler için geçiş modları */
+.content-container {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transition: opacity 0ms ease;
+  will-change: opacity, transform;
+}
+
+/* Kullanıcı arayüzü elementleri için performans iyileştirmeleri */
+.ui-element {
+  transform: translateZ(0);
+  transition: transform 50ms ease-out;
+}
+
+.ui-element:hover {
+  transform: translateZ(0) scale(1.01);
+}
+
+/* Gezinme iyileştirmeleri */
+.navigation-fast-transition {
+  transition-duration: 0ms;
+  transform: translateZ(0);
+}
+
+/* Smooth scrolling */
+html.fast-scroll {
+  scroll-behavior: auto;
+}
+
+/* Yüksek performans modu - ekstra optimizasyonlar */
+.high-performance {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
