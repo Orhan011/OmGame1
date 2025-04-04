@@ -67,6 +67,10 @@
 })();
 </script>
 
+<!-- Hızlı Yükleme ve Performans Optimizasyonu Motoru -->
+<script src="{{ url_for('static', filename='js/performance.js') }}"></script>
+<script src="{{ url_for('static', filename='js/turbo-loader.js') }}"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Navbar mobile toggle
@@ -224,7 +228,10 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 {% block scripts %}{% endblock %}
-<!-- iOS 16 UIKit Direkt Port - Gerçek iOS Cihazlarından Birebir Kopya -->
-<script src="{{ url_for('static', filename='js/UIKit.js') }}"></script>
 </body>
 </html>
+</script>
+
+<!-- Hızlı Yükleme ve Performans Optimizasyonu Motoru -->
+<script src="{{ url_for('static', filename='js/performance.js') }}"></script>
+<script src="{{ url_for('static', filename='js/turbo-loader.js') }}"></script>
