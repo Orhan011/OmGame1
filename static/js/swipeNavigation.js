@@ -1,9 +1,19 @@
 /**
  * ZekaPark - iOS Swipe Navigasyon Sistemi
- * Yeni Versiyon - Hafif ve Verimli
+ * Yeni Versiyon - Geliştirilmiş Sürüm
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Ziyaret edilen sayfaları takip et
+    if (!window.visitedPages) {
+        window.visitedPages = [window.location.pathname];
+    }
+
+    // Sayfa yüklendiğinde geçmiş kaydını güncelle
+    if (!window.visitedPages.includes(window.location.pathname)) {
+        window.visitedPages.push(window.location.pathname);
+    }
+
     // Swipe navigasyon sistemini oluştur - Sayfanın kenarından kaydırma yapmak için
     const swipeOverlay = document.createElement('div');
     swipeOverlay.id = 'swipeOverlay';
@@ -67,8 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Eşik değeri aşıldı, geri dön
             document.body.style.transform = 'translateX(100%)';
             setTimeout(function() {
-                // Sayfa geçişi için history.back() kullan
-                window.history.back();
+                // Özel navigasyon fonksiyonumuzu kullan
+                goToPreviousPage();
+                
                 // Stili sıfırla
                 document.body.style.transform = '';
                 document.body.style.transition = '';
@@ -92,7 +103,98 @@ document.addEventListener('DOMContentLoaded', function() {
     backButtons.forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            window.history.back();
+            goToPreviousPage();
         });
+    });
+    
+    // Özel navigasyon fonksiyonu
+    function goToPreviousPage() {
+        if (window.visitedPages.length > 1) {
+            // Son ziyaret edilen sayfayı sil
+            window.visitedPages.pop();
+            
+            // Bir önceki sayfaya git
+            const previousPage = window.visitedPages[window.visitedPages.length - 1];
+            
+            // Tarayıcı geçmişini de güncelle
+            window.location.href = previousPage;
+        } else {
+            // Geçmişte sayfa yoksa ana sayfaya git
+            window.location.href = '/';
+        }
+    }
+    
+    // Sayfa bağlantılarını takip et
+    document.querySelectorAll('a').forEach(function(link) {
+        // Eğer link zaten bir olay dinleyicisi varsa ekleme
+        if (link.getAttribute('data-navigation-handled')) return;
+        
+        const originalClick = link.onclick;
+        
+        link.addEventListener('click', function(e) {
+            // Orijinal tıklama olayını çalıştır
+            if (originalClick) {
+                const result = originalClick.call(this, e);
+                if (result === false) return false;
+            }
+            
+            // Eğer link dış bağlantı değilse
+            if (link.hostname === window.location.hostname && 
+                !link.href.startsWith('javascript:') && 
+                !link.href.startsWith('#') && 
+                !e.ctrlKey && !e.metaKey) {
+                
+                // Yeni sayfayı geçmişe ekle
+                if (!window.visitedPages.includes(link.pathname)) {
+                    window.visitedPages.push(link.pathname);
+                }
+            }
+        });
+        
+        // Bu linkin işlendiğini işaretle
+        link.setAttribute('data-navigation-handled', 'true');
+    });
+});
+
+// Hata ayıklama - Buton hataları için
+document.addEventListener('DOMContentLoaded', function() {
+    // Oyun sayfalarındaki hataları düzeltmek için
+    // Olmayan elemanların kontrol edilmesi
+    const errorPreventionHandler = function() {
+        // restartButton hatası için
+        const buttons = [
+            'restart-button', 'restart-game', 'restartButton', 
+            'labyrinthRestartButton'
+        ];
+        
+        buttons.forEach(function(buttonId) {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                if (!button.getAttribute('data-handler-attached')) {
+                    button.setAttribute('data-handler-attached', 'true');
+                }
+            }
+        });
+        
+        // wordsList hatası için
+        const wordsList = document.getElementById('wordsList');
+        if (wordsList) {
+            if (!wordsList.getAttribute('data-handler-attached')) {
+                wordsList.setAttribute('data-handler-attached', 'true');
+            }
+        }
+    };
+    
+    // Sayfa yüklendiğinde ve dinamik içerik eklendiğinde çağır
+    errorPreventionHandler();
+    
+    // MutationObserver ile DOM değişikliklerini izle
+    const observer = new MutationObserver(function(mutations) {
+        errorPreventionHandler();
+    });
+    
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true 
     });
 });
