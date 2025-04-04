@@ -88,3 +88,18 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
+
+class UserHomeScreen(db.Model):
+    """Ana ekrana eklenmiş oyunlar"""
+    __tablename__ = 'user_home_screen'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # Oyun türü
+    display_order = db.Column(db.Integer, default=0)  # Gösterim sırası
+    added_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Kullanıcı ile ilişki
+    user = db.relationship('User', backref=db.backref('home_screen_games', lazy=True))
+    
+    # Her kullanıcı - oyun tipi kombinasyonu benzersiz olmalı
+    __table_args__ = (db.UniqueConstraint('user_id', 'game_type', name='_user_game_uc'),)
