@@ -1,6 +1,6 @@
 /**
  * ZekaPark iOS-Tarzı Swipe Navigasyon
- * Profesyonel Sürüm v2.2
+ * Profesyonel Sürüm v2.1
  * 
  * Özellikler:
  * - A→B→C→D gezmesi ile D→C→B→A geriye dönüş
@@ -18,7 +18,7 @@
         swipeThreshold: 50,        // Kaydırma eşik değeri (piksel)
         transitionSpeed: 300,      // Geçiş animasyonu süresi (ms)
         historyStorageKey: 'zekapark_nav_history',  // sessionStorage key
-        debug: true                // Debug modunu etkinleştir
+        debug: false               // Debug modunu aktifleştir/deaktif et
     };
     
     // Temel sayfa geçmişi nesnesi
@@ -30,20 +30,43 @@
         };
     }
     
-    // Konsol Hata Ayıklama
-    function debugLog(...args) {
-        if (CONFIG.debug) {
-            console.log(...args);
+    // Konsol Hatalarını Engelleme
+    window.addEventListener('error', function(event) {
+        // Belirli hataları sessiz şekilde ele al (swipe navigasyon ile ilgili olmayan hatalar)
+        if (event.error && typeof event.error.message === 'string' && 
+            (event.error.message.includes('null is not an object') || 
+             event.error.message.includes('Cannot read property') ||
+             event.error.message.includes('undefined is not an object'))) {
+            console.warn("⚠️ Hata ele alındı:", event.error.message);
+            event.preventDefault();
         }
-    }
+    }, true);
     
     // Başlatma fonksiyonu
     function initializeSwipeBack() {
         try {
-            debugLog("📱 iOS Tarzı Swipe Navigasyon başlatılıyor...");
+            console.log("📱 iOS Tarzı Swipe Navigasyon başlatılıyor...");
             
-            // Sayfa ilk yüklendiğinde geçmiş başlat veya güncelle
-            updateNavigationHistory();
+            // Geçmişi al veya oluştur
+            let history = getNavigationHistory();
+            const currentPage = createHistoryItem();
+            
+            // İlk sayfa veya yeni sayfa
+            if (history.length === 0) {
+                // İlk ziyaret - geçmişi başlat
+                history = [currentPage];
+                setNavigationHistory(history);
+                debugLog("✅ Navigasyon geçmişi oluşturuldu:", history);
+            } else {
+                // Geçmişteki son sayfa bu sayfa değilse ve zaten eklenmemişse
+                const lastPage = history[history.length - 1];
+                
+                if (lastPage.path !== currentPage.path) {
+                    history.push(currentPage);
+                    setNavigationHistory(history);
+                    debugLog("✅ Sayfaya geçiş kaydedildi:", currentPage.path);
+                }
+            }
             
             // Kaydırma gölgesi elementi
             setupSwipeShadow();
@@ -63,36 +86,6 @@
             debugLog("📱 Swipe Navigasyon hazır");
         } catch (e) {
             console.warn("Swipe navigasyon başlatma hatası:", e);
-        }
-    }
-    
-    // Sayfa geçmişini başlat veya güncelle
-    function updateNavigationHistory() {
-        try {
-            let history = getNavigationHistory();
-            const currentPage = createHistoryItem();
-            
-            // İlk ziyaret
-            if (!history || history.length === 0) {
-                history = [currentPage];
-                setNavigationHistory(history);
-                debugLog("🏠 Geçmiş başlatıldı - İlk sayfa:", currentPage.path);
-                return;
-            }
-            
-            // Son ziyaret edilen sayfa bu sayfa mı?
-            const lastPage = history[history.length - 1];
-            if (lastPage.path !== currentPage.path) {
-                // Farklı sayfa, geçmişe ekle
-                history.push(currentPage);
-                setNavigationHistory(history);
-                debugLog("➕ Geçmişe yeni sayfa eklendi:", currentPage.path);
-                debugLog("📜 Güncel geçmiş:", history.map(h => h.path).join(' → '));
-            } else {
-                debugLog("ℹ️ Aynı sayfa tekrar ziyaret edildi, geçmiş güncellenmedi");
-            }
-        } catch (err) {
-            console.warn("Geçmiş güncelleme hatası:", err);
         }
     }
     
@@ -198,7 +191,7 @@
                 const history = getNavigationHistory();
                 
                 // Yeterince kaydırıldı mı ve geçmişte en az 2 sayfa var mı?
-                if (delta > CONFIG.swipeThreshold && history && history.length > 1) {
+                if (delta > CONFIG.swipeThreshold && history.length > 1) {
                     // Geçiş animasyonu
                     document.body.style.transform = 'translateX(100%)';
                     
@@ -210,7 +203,7 @@
                     
                     // Kısa gecikme ve sonra önceki sayfaya git
                     setTimeout(function() {
-                        // Son sayfayı çıkar (mevcut sayfa)
+                        // Son sayfayı çıkar
                         history.pop();
                         const previousPage = history[history.length - 1];
                         
@@ -254,8 +247,8 @@
     // Geçmiş işlevleri
     function getNavigationHistory() {
         try {
-            const historyData = sessionStorage.getItem(CONFIG.historyStorageKey);
-            return historyData ? JSON.parse(historyData) : [];
+            const history = sessionStorage.getItem(CONFIG.historyStorageKey);
+            return history ? JSON.parse(history) : [];
         } catch (e) {
             console.warn('Navigasyon geçmişi okuma hatası:', e);
             return [];
@@ -265,54 +258,8 @@
     function setNavigationHistory(history) {
         try {
             sessionStorage.setItem(CONFIG.historyStorageKey, JSON.stringify(history));
-            debugLog("💾 Navigasyon geçmişi kaydedildi:", history.map(h => h.path).join(' → '));
         } catch (e) {
             console.warn('Navigasyon geçmişi yazma hatası:', e);
-        }
-    }
-    
-    // Geri butonu ekle
-    function addBackButton() {
-        try {
-            const history = getNavigationHistory();
-            
-            // Eğer geçmişte en az 2 sayfa varsa (geri dönülebilir) geri butonunu göster
-            if (history && history.length > 1) {
-                // Mevcut butonu kaldır
-                const existingButton = document.getElementById('swipe-back-button');
-                if (existingButton) {
-                    existingButton.remove();
-                }
-                
-                // Yeni butonu ekle
-                const backButton = document.createElement('div');
-                backButton.id = 'swipe-back-button';
-                backButton.className = 'swipe-back-button';
-                backButton.setAttribute('aria-label', 'Geri git');
-                backButton.setAttribute('role', 'button');
-                
-                backButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Geçmişten son sayfayı çıkar (mevcut sayfa)
-                    history.pop();
-                    const previousPage = history[history.length - 1];
-                    
-                    // Güncellenmiş geçmişi kaydet
-                    setNavigationHistory(history);
-                    
-                    // Önceki sayfaya git
-                    debugLog("⬅️ Geri butonuna tıklandı, önceki sayfaya dönülüyor:", previousPage.path);
-                    window.location.href = previousPage.path;
-                });
-                
-                document.body.appendChild(backButton);
-                debugLog("🔄 Geri butonu eklendi, mevcut geçmiş:", history.map(h => h.path).join(' → '));
-            } else {
-                debugLog("ℹ️ Geçmişte yeterli sayfa yok, geri butonu eklenmedi:", history ? history.length : 0);
-            }
-        } catch (e) {
-            console.warn('Geri butonu ekleme hatası:', e);
         }
     }
     
@@ -328,63 +275,110 @@
                     
                     link.setAttribute('data-swipe-tracked', 'true');
                     
-                    // Link tıklama olayı
+                    // Orijinal tıklama işleyicisini sakla
+                    const originalClick = link.onclick;
+                    
+                    // Yeni click işleyici
                     link.addEventListener('click', function(e) {
+                        // Orijinal click varsa çalıştır
+                        if (originalClick) {
+                            const result = originalClick.call(this, e);
+                            if (result === false) return false;
+                        }
+                        
                         // Özel durumları es geç (ctrl/cmd+click gibi)
                         if (e.ctrlKey || e.metaKey || e.shiftKey) return;
                         
                         try {
-                            const targetPath = new URL(link.href).pathname;
-                            debugLog("✅ Link tıklandı:", targetPath);
-                            
-                            // Özel durum: Aynı sayfa linki (ör. anasayfaya geri dönme)
-                            if (targetPath === window.location.pathname) {
-                                debugLog("ℹ️ Aynı sayfa linki tıklandı, geçmiş güncellenmedi");
-                                return;
-                            }
-                            
-                            // Orijinal geçmişi koru ve yeni hedefi ekle (link tıklaması öncesinde)
+                            // Navigasyon geçmişini güncelle
                             const history = getNavigationHistory();
-                            const currentPage = createHistoryItem();
+                            const targetPath = new URL(link.href).pathname;
                             
-                            // Son eklenen sayfa mevcut sayfa değilse, mevcut sayfayı ekle
-                            if (history.length === 0 || history[history.length - 1].path !== currentPage.path) {
-                                history.push(currentPage);
-                            }
+                            // Geçmişte yoksa ekle
+                            const newItem = {
+                                path: targetPath,
+                                title: link.textContent.trim() || document.title,
+                                timestamp: Date.now()
+                            };
                             
+                            history.push(newItem);
                             setNavigationHistory(history);
-                            debugLog("🔖 Link tıklaması öncesi geçmiş güncellendi:", history.map(h => h.path).join(' → '));
+                            debugLog("✓ Link tıklamasıyla geçmiş güncellendi:", targetPath);
                         } catch (err) {
-                            console.warn('Link tıklama izleme hatası:', err);
+                            console.warn('Link izleme hatası:', err);
                         }
                     });
                 }
             });
-            debugLog("🔗 Sayfa linkleri takip ediliyor");
         } catch (e) {
             console.warn('Link izleme kurulumu hatası:', e);
+        }
+    }
+    
+    // Geri butonu ekle
+    function addBackButton() {
+        try {
+            const history = getNavigationHistory();
+            
+            // Eğer geçmişte en az 2 sayfa varsa (geri dönülebilir) geri butonunu göster
+            if (history.length > 1) {
+                // Mevcut butonu kaldır
+                const existingButton = document.getElementById('swipe-back-button');
+                if (existingButton) {
+                    existingButton.remove();
+                }
+                
+                // Yeni butonu ekle
+                const backButton = document.createElement('div');
+                backButton.id = 'swipe-back-button';
+                backButton.className = 'swipe-back-button';
+                
+                // Ana içerik alanı varsa, konumlandırmayı ayarla
+                backButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Geçmişten son sayfayı çıkar
+                    history.pop();
+                    const previousPage = history[history.length - 1];
+                    
+                    // Güncellenmiş geçmişi kaydet
+                    setNavigationHistory(history);
+                    
+                    // Önceki sayfaya git
+                    debugLog("⬅️ Geri butonuna tıklandı, önceki sayfaya dönülüyor:", previousPage.path);
+                    window.location.href = previousPage.path;
+                });
+                
+                document.body.appendChild(backButton);
+            }
+        } catch (e) {
+            console.warn('Geri butonu ekleme hatası:', e);
         }
     }
     
     // Tarayıcı geçmişi olaylarını izle
     function monitorBrowserNavigation() {
         // Tarayıcı geri butonu
-        window.addEventListener('popstate', function(e) {
+        window.addEventListener('popstate', function() {
             try {
-                debugLog("⬅️ Tarayıcı geri/ileri butonu algılandı");
-                
-                // Geçmişi güncelle
                 const history = getNavigationHistory();
-                if (history && history.length > 0) {
-                    // Son sayfayı çıkar
+                if (history.length > 0) {
+                    // Geçmişten son sayfayı çıkar
                     history.pop();
                     setNavigationHistory(history);
-                    debugLog("🔄 Tarayıcı geri tuşu sonrası geçmiş güncellendi:", history.map(h => h.path).join(' → '));
+                    debugLog("⬅️ Tarayıcı geri butonu algılandı, geçmiş güncellendi");
                 }
             } catch (e) {
                 console.warn('Popstate işleme hatası:', e);
             }
         });
+    }
+    
+    // Debug fonksiyonu
+    function debugLog(...args) {
+        if (CONFIG.debug) {
+            console.log(...args);
+        }
     }
     
     // Sayfa yüklendiğinde başlat
@@ -394,16 +388,4 @@
         // Sayfa zaten yüklendiyse
         initializeSwipeBack();
     }
-    
-    // Global hata yakalama
-    window.addEventListener('error', function(event) {
-        // Belirli hataları sessiz şekilde ele al (swipe navigasyon ile ilgili olmayan hatalar)
-        if (event.error && typeof event.error.message === 'string' && 
-            (event.error.message.includes('null is not an object') || 
-             event.error.message.includes('Cannot read property') ||
-             event.error.message.includes('undefined is not an object'))) {
-            console.warn("⚠️ Hata ele alındı:", event.error.message);
-            event.preventDefault();
-        }
-    }, true);
 })();
