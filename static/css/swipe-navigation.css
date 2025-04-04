@@ -19,12 +19,54 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
     z-index: 9999;
     opacity: 0;
     display: none;
-    transition: opacity 0.3s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+body {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+    will-change: transform;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: var(--accent-color, #007bff);
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+    border-radius: 8px;
+    background: rgba(0, 123, 255, 0.1);
+}
+
+.back-button:hover {
+    background: rgba(0, 123, 255, 0.15);
+}
+
+.back-button:active {
+    transform: scale(0.98);
+}
+
+.back-button::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    transform: rotate(-45deg);
+    margin-right: 8px;
 }
 
 /* Geri butonu stili */

@@ -1,3 +1,4 @@
+
 /**
  * ZekaPark iOS Tarzı Navigasyon Sistemi
  * Sayfa Geçmişli Navigasyon: A→B→C→D şeklinde ziyaret, D→C→B→A şeklinde geri dönüş
@@ -6,101 +7,150 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("==== ZekaPark Swipe Navigasyon Sistemi Başlatılıyor ====");
 
-    // Sayfa geçmişini kontrol et ve güncelle
-    let currentPath = window.location.pathname;
-    let history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
+    // Sayfa geçmişi yönetimi
+    class NavigationHistory {
+        constructor() {
+            this.history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
+            this.currentPath = window.location.pathname;
+            this.maxHistoryLength = 50;
+        }
 
-    // Ana sayfada geçmişi sıfırla
-    if (currentPath === '/') {
-        history = ['/'];
-    } 
-    // Geçmişte olmayan bir sayfaya geldiyse ekle
-    else if (history[history.length - 1] !== currentPath) {
-        history.push(currentPath);
+        init() {
+            if (this.currentPath === '/') {
+                this.clear();
+            } else if (!this.hasPath(this.currentPath)) {
+                this.add(this.currentPath);
+            }
+            this.save();
+            console.log("Mevcut sayfa geçmişi:", this.history);
+        }
+
+        hasPath(path) {
+            return this.history[this.history.length - 1] === path;
+        }
+
+        add(path) {
+            if (this.history.length >= this.maxHistoryLength) {
+                this.history.shift();
+            }
+            this.history.push(path);
+        }
+
+        removeLast() {
+            return this.history.pop();
+        }
+
+        clear() {
+            this.history = ['/'];
+        }
+
+        getPrevious() {
+            return this.history[this.history.length - 2] || '/';
+        }
+
+        save() {
+            localStorage.setItem('siteHistory', JSON.stringify(this.history));
+        }
     }
 
-    localStorage.setItem('siteHistory', JSON.stringify(history));
-    console.log("Mevcut sayfa geçmişi:", history);
+    const navHistory = new NavigationHistory();
+    navHistory.init();
 
-    // Dokunmatik değişkenler
-    let touchStartX = 0;
-    let touchMoveX = 0;
-    let isDragging = false;
-
-    // Gölge efekti
-    const overlay = document.createElement('div');
-    overlay.id = 'swipe-overlay';
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        opacity: 0;
-        display: none;
-        transition: opacity 0.3s ease-out;
-        pointer-events: none;
-    `;
-    document.body.appendChild(overlay);
-
-    // Dokunmatik olaylar
-    document.addEventListener('touchstart', function(e) {
-        if (e.touches[0].clientX < 20) {
-            touchStartX = e.touches[0].clientX;
-            touchMoveX = touchStartX;
-            isDragging = true;
-            overlay.style.display = 'block';
+    // Dokunmatik yönetimi
+    class TouchHandler {
+        constructor() {
+            this.startX = 0;
+            this.moveX = 0;
+            this.isDragging = false;
+            this.threshold = Math.max(50, window.innerWidth * 0.15);
+            this.setupOverlay();
         }
-    }, { passive: true });
 
-    document.addEventListener('touchmove', function(e) {
-        if (!isDragging) return;
-
-        touchMoveX = e.touches[0].clientX;
-        const moveDistance = touchMoveX - touchStartX;
-
-        if (moveDistance > 0) {
-            e.preventDefault();
-            const maxMove = window.innerWidth;
-            const movePercent = Math.min((moveDistance / maxMove) * 100, 100);
-
-            document.body.style.transform = `translateX(${movePercent}%)`;
-            document.body.style.transition = 'none';
-            overlay.style.opacity = movePercent / 200;
+        setupOverlay() {
+            this.overlay = document.createElement('div');
+            this.overlay.id = 'swipe-overlay';
+            this.overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
+                z-index: 9999;
+                opacity: 0;
+                display: none;
+                transition: opacity 0.3s ease-out;
+                pointer-events: none;
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            `;
+            document.body.appendChild(this.overlay);
         }
-    }, { passive: false });
 
-    document.addEventListener('touchend', function(e) {
-        if (!isDragging) return;
+        handleStart(e) {
+            if (e.touches[0].clientX < 20) {
+                this.startX = this.moveX = e.touches[0].clientX;
+                this.isDragging = true;
+                this.overlay.style.display = 'block';
+                document.body.style.transition = 'none';
+            }
+        }
 
-        const moveDistance = touchMoveX - touchStartX;
-        document.body.style.transition = 'transform 0.3s ease-out';
+        handleMove(e) {
+            if (!this.isDragging) return;
 
-        let history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
-        const threshold = Math.max(50, window.innerWidth * 0.15);
+            this.moveX = e.touches[0].clientX;
+            const moveDistance = this.moveX - this.startX;
 
-        if (moveDistance > threshold && history.length > 1) {
+            if (moveDistance > 0) {
+                e.preventDefault();
+                const movePercent = Math.min((moveDistance / window.innerWidth) * 100, 100);
+                document.body.style.transform = `translateX(${movePercent}%)`;
+                this.overlay.style.opacity = movePercent / 200;
+            }
+        }
+
+        handleEnd() {
+            if (!this.isDragging) return;
+
+            const moveDistance = this.moveX - this.startX;
+            document.body.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            if (moveDistance > this.threshold && navHistory.history.length > 1) {
+                this.navigateBack();
+            } else {
+                this.resetPosition();
+            }
+
+            this.isDragging = false;
+        }
+
+        navigateBack() {
             document.body.style.transform = 'translateX(100%)';
-            overlay.style.opacity = '0.5';
+            this.overlay.style.opacity = '0.5';
 
-            setTimeout(function() {
-                // Son sayfayı sil ve önceki sayfaya git
-                history.pop();
-                localStorage.setItem('siteHistory', JSON.stringify(history));
-                window.location.href = history[history.length - 1];
+            setTimeout(() => {
+                navHistory.removeLast();
+                navHistory.save();
+                window.location.href = navHistory.getPrevious();
             }, 300);
-        } else {
-            document.body.style.transform = '';
         }
 
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.style.display = 'none', 300);
-        isDragging = false;
-    });
+        resetPosition() {
+            document.body.style.transform = '';
+            this.overlay.style.opacity = '0';
+            setTimeout(() => this.overlay.style.display = 'none', 300);
+        }
+    }
 
-    // Link tıklamaları
+    const touchHandler = new TouchHandler();
+
+    // Event Listeners
+    document.addEventListener('touchstart', e => touchHandler.handleStart(e), { passive: true });
+    document.addEventListener('touchmove', e => touchHandler.handleMove(e), { passive: false });
+    document.addEventListener('touchend', () => touchHandler.handleEnd());
+
+    // Link tıklama yönetimi
     document.addEventListener('click', function(e) {
         const link = e.target.closest('a');
         if (!link || link.getAttribute('data-swipe-tracked')) return;
@@ -109,30 +159,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const originalClick = link.onclick;
 
         link.onclick = function(e) {
-            if (originalClick) {
-                const result = originalClick.call(this, e);
-                if (result === false) return false;
-            }
+            if (originalClick && originalClick.call(this, e) === false) return false;
 
-            // Sadece iç bağlantılar için geçerli
             if (link.host === window.location.host && 
                 !link.href.includes('#') && 
                 !link.href.includes('javascript:') &&
                 !e.ctrlKey && !e.metaKey) {
 
                 const targetPath = new URL(link.href).pathname;
-                let history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
-
-                // Ana sayfaya gidiyorsa geçmişi sıfırla
                 if (targetPath === '/') {
-                    history = ['/'];
+                    navHistory.clear();
+                } else if (!navHistory.hasPath(targetPath)) {
+                    navHistory.add(targetPath);
                 }
-                // Değilse ve önceki ziyaretlerden farklıysa ekle
-                else if (history[history.length - 1] !== targetPath) {
-                    history.push(targetPath);
-                }
-
-                localStorage.setItem('siteHistory', JSON.stringify(history));
+                navHistory.save();
                 console.log("Geçmişe eklendi:", targetPath);
             }
         };
@@ -142,12 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.back-button').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            let history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
-
-            if (history.length > 1) {
-                history.pop();
-                localStorage.setItem('siteHistory', JSON.stringify(history));
-                window.location.href = history[history.length - 1];
+            if (navHistory.history.length > 1) {
+                navHistory.removeLast();
+                navHistory.save();
+                window.location.href = navHistory.getPrevious();
             } else {
                 window.location.href = '/';
             }
@@ -155,19 +193,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Tarayıcı geri butonu
-    window.addEventListener('popstate', function(e) {
-        let history = JSON.parse(localStorage.getItem('siteHistory') || '[]');
-        if (history.length > 1) {
-            history.pop();
-            localStorage.setItem('siteHistory', JSON.stringify(history));
+    window.addEventListener('popstate', function() {
+        if (navHistory.history.length > 1) {
+            navHistory.removeLast();
+            navHistory.save();
         }
     });
 });
 
-// Hata giderme mekanizması
+// Hata yönetimi
 window.addEventListener('error', function(e) {
+    console.log("Hata giderme mekanizması ile yakalandı:", e.message);
     if (e.message.includes('null') || e.message.includes('undefined')) {
-        console.log("Hata giderme mekanizması ile yakalandı:", e.message);
         e.preventDefault();
         return true;
     }
