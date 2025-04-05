@@ -184,17 +184,18 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleInputChange(e) {
     if (gameState.isGameOver) return;
     
+    // Input'un mevcut değerini al ve hemen temizle
     const input = e.target.value.toUpperCase();
+    e.target.value = '';
+    
     if (input.length > 0) {
+      // Sadece son karakteri al
       const lastChar = input.charAt(input.length - 1);
       
       if (/^[A-ZĞÜŞİÖÇ]$/.test(lastChar)) {
         addLetter(lastChar);
         playSound('keypress');
       }
-      
-      // Input field'ı temizle (tek harf almak için)
-      e.target.value = '';
     }
   }
   
@@ -203,30 +204,35 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function focusInputField() {
     if (inputField && !gameState.isGameOver) {
-      inputField.focus();
-      
-      // Mobil cihazlarda klavyenin açılmasını sağla
+      // Mobil cihazlarda klavyeyi açma yöntemini iyileştir
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        // Klavyenin açılmasını zorla
+        // Önce input field'ı kullanılabilir yap
         inputField.readOnly = false;
-        inputField.blur();
-        inputField.focus();
         
-        // Bazı mobil cihazlarda input alanının görünür olması gerekebilir
-        // Bu sebeple kısa süre görünür yapıp sonra gizliyoruz
-        const originalOpacity = inputField.style.opacity;
-        inputField.style.opacity = "1";
+        // Input'u kullanıcıya gösterme
         inputField.style.position = "fixed";
         inputField.style.top = "50%";
-        inputField.style.transform = "translateY(-50%)";
-        inputField.style.zIndex = "1000";
-        inputField.style.width = "80%";
+        inputField.style.left = "50%";
+        inputField.style.transform = "translate(-50%, -50%)";
+        inputField.style.opacity = "0";
+        inputField.style.pointerEvents = "auto"; // Dokunmaları algıla
+        inputField.style.width = "1px";
+        inputField.style.height = "1px";
+        inputField.style.fontSize = "16px"; // iOS'un yakınlaştırmasını önler
         
+        // Önce blur sonra focus mobil klavyeyi daha iyi açar
+        inputField.blur();
         setTimeout(() => {
-          inputField.style.opacity = originalOpacity;
-          inputField.style.position = "absolute";
-          inputField.style.zIndex = "-1";
+          inputField.focus();
+          // Mobil klavyeyi açtıktan kısa süre sonra görünmez yap
+          setTimeout(() => {
+            inputField.style.opacity = "0";
+            inputField.style.pointerEvents = "none";
+          }, 100);
         }, 50);
+      } else {
+        // Masaüstü tarayıcılar için normal focus yeterli
+        inputField.focus();
       }
     }
   }
@@ -417,10 +423,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
         cell.textContent = gameState.guesses[row][col];
         
+        // Hücrenin sınıflarını düzenle
         if (gameState.guesses[row][col]) {
           cell.classList.add('filled');
         } else {
           cell.classList.remove('filled');
+        }
+        
+        // Aktif satırı vurgula
+        if (row === gameState.currentRow) {
+          cell.classList.add('active-row');
+        } else {
+          cell.classList.remove('active-row');
         }
       }
     }
