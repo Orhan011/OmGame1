@@ -77,11 +77,11 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Wordle Grid -->
+        <!-- Wordle Grid (tıklanabilir) -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
         <!-- Gizli input field - mobil klavye açmak için -->
-        <input type="text" id="wordle-input-field" class="wordle-input-field" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="wordle-input-field" class="wordle-input-field" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         
         <!-- Kontrol Butonları -->
         <div class="wordle-controls">
@@ -200,6 +200,9 @@
     color: white;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; /* Mobil dokunuşta vurgulamayı kaldır */
   }
 
   .wordle-cell.filled {
@@ -262,6 +265,9 @@
     width: 1px;
     height: 1px;
     overflow: hidden;
+    font-size: 16px; /* iOS'da yakınlaştırmayı önlemek için */
+    padding: 5px;
+    border: none;
   }
   
   .wordle-controls {

@@ -162,6 +162,15 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
+        
+        // Kareleri tıklanabilir yapma
+        cell.addEventListener('click', function() {
+          // Sadece aktif satırdaki kareler tıklanabilir olsun
+          if (row === gameState.currentRow && !gameState.isGameOver) {
+            focusInputField();
+          }
+        });
+        
         rowDiv.appendChild(cell);
       }
       
@@ -195,6 +204,30 @@ document.addEventListener('DOMContentLoaded', function() {
   function focusInputField() {
     if (inputField && !gameState.isGameOver) {
       inputField.focus();
+      
+      // Mobil cihazlarda klavyenin açılmasını sağla
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // Klavyenin açılmasını zorla
+        inputField.readOnly = false;
+        inputField.blur();
+        inputField.focus();
+        
+        // Bazı mobil cihazlarda input alanının görünür olması gerekebilir
+        // Bu sebeple kısa süre görünür yapıp sonra gizliyoruz
+        const originalOpacity = inputField.style.opacity;
+        inputField.style.opacity = "1";
+        inputField.style.position = "fixed";
+        inputField.style.top = "50%";
+        inputField.style.transform = "translateY(-50%)";
+        inputField.style.zIndex = "1000";
+        inputField.style.width = "80%";
+        
+        setTimeout(() => {
+          inputField.style.opacity = originalOpacity;
+          inputField.style.position = "absolute";
+          inputField.style.zIndex = "-1";
+        }, 50);
+      }
     }
   }
 
