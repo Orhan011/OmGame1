@@ -703,6 +703,7 @@ def game_2048():
     return render_template('games/2048.html')
 
 @app.route('/games/wordle')
+@app.route('/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
     return render_template('games/wordle.html')
