@@ -48,7 +48,9 @@ let complexityFactor = 1; // Melodilerin karmaşıklık faktörü
 
 // Renkleri ayarla
 soundPads.forEach(pad => {
-  pad.style.backgroundColor = pad.dataset.color;
+  if (pad && pad.dataset && pad.dataset.color) {
+    pad.style.backgroundColor = pad.dataset.color;
+  }
 });
 
 // Ses çalma fonksiyonu
@@ -77,6 +79,8 @@ function playSound(note, duration = 0.5) {
 
 // Pad efekt animasyonu
 function animatePad(pad) {
+  if (!pad) return;
+  
   pad.classList.add('active');
 
   // Parçacık efekti
@@ -89,6 +93,8 @@ function animatePad(pad) {
 
 // Parçacık efekti oluştur
 function createParticles(element) {
+  if (!element) return;
+  
   const rect = element.getBoundingClientRect();
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
@@ -99,7 +105,10 @@ function createParticles(element) {
 
     // Rastgele özellikler
     const size = Math.random() * 10 + 5;
-    const color = element.dataset.color;
+    let color = "#00c6ff";  // Default color
+    if (element.dataset && element.dataset.color) {
+      color = element.dataset.color;
+    }
     const angle = Math.random() * Math.PI * 2;
     const velocity = Math.random() * 3 + 2;
     const lifetime = Math.random() * 1000 + 500;
@@ -124,7 +133,9 @@ function createParticles(element) {
 
       // Kaldır
       setTimeout(() => {
-        document.body.removeChild(particle);
+        if (document.body.contains(particle)) {
+          document.body.removeChild(particle);
+        }
       }, lifetime);
     }, 10);
   }
@@ -167,7 +178,8 @@ function generateComplexPattern() {
   const notesToAdd = initialNotes + (gamePattern.length === 0 ? 0 : 1);
 
   // Görünür pad'leri filtrele
-  const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
+  const visiblePadsList = Array.from(soundPads).filter(pad => 
+    pad && pad.style && pad.style.display !== 'none');
 
   if (visiblePadsList.length === 0) {
     console.error("Görünür pad bulunamadı!");
@@ -178,39 +190,55 @@ function generateComplexPattern() {
     // Tamamen karmaşık seçim için her seferinde rastgele pad seç
     let randomPadIndex = Math.floor(Math.random() * visiblePadsList.length);
 
+    // Null check to ensure pad at this index exists
+    if (!visiblePadsList[randomPadIndex]) {
+      console.error(`Invalid pad index: ${randomPadIndex} of ${visiblePadsList.length} pads`);
+      continue; // Skip this iteration
+    }
+
     // Karmaşıklığı artırmak için bazen aynı notayı tekrarlama
     if (gamePattern.length > 0 && Math.random() > 0.7) {
       // %30 ihtimalle önceki notalardan birini seç
       const randomPrevIndex = Math.floor(Math.random() * gamePattern.length);
       const prevNote = gamePattern[randomPrevIndex];
-      const prevPadIndex = visiblePadsList.findIndex(pad => pad.dataset.note === prevNote);
+      
+      if (prevNote) {
+        const prevPadIndex = visiblePadsList.findIndex(pad => 
+          pad && pad.dataset && pad.dataset.note === prevNote);
 
-      if (prevPadIndex !== -1) {
-        randomPadIndex = prevPadIndex;
+        if (prevPadIndex !== -1) {
+          randomPadIndex = prevPadIndex;
+        }
       }
     }
 
-    const randomNote = visiblePadsList[randomPadIndex].dataset.note;
+    // Make sure the pad and its dataset exist
+    const pad = visiblePadsList[randomPadIndex];
+    if (pad && pad.dataset && pad.dataset.note) {
+      const randomNote = pad.dataset.note;
 
-    // Modlara göre özel melodi oluşturma
-    if (currentMode === 'classic' || currentMode === 'timed') {
-      gamePattern.push(randomNote);
-    } else if (currentMode === 'reverse') {
-      // Ters çevirme modunda dizinin başına ekle
-      gamePattern.unshift(randomNote);
-    } else if (currentMode === 'memory' && gamePattern.length > 0) {
-      // Hafıza modunda tekrarlayan kalıplar ekle
-      const patternLength = gamePattern.length;
-      const patternChunk = Math.floor(Math.random() * patternLength);
-      gamePattern.push(gamePattern[patternChunk]);
-    } else if (currentMode === 'speed') {
-      // Hız modunda daha kısa aralıklarla nota ekle
-      gamePattern.push(randomNote);
-      if (Math.random() > 0.6) { // %40 ihtimalle arka arkaya aynı nota
+      // Modlara göre özel melodi oluşturma
+      if (currentMode === 'classic' || currentMode === 'timed') {
+        gamePattern.push(randomNote);
+      } else if (currentMode === 'reverse') {
+        // Ters çevirme modunda dizinin başına ekle
+        gamePattern.unshift(randomNote);
+      } else if (currentMode === 'memory' && gamePattern.length > 0) {
+        // Hafıza modunda tekrarlayan kalıplar ekle
+        const patternLength = gamePattern.length;
+        const patternChunk = Math.floor(Math.random() * patternLength);
+        gamePattern.push(gamePattern[patternChunk]);
+      } else if (currentMode === 'speed') {
+        // Hız modunda daha kısa aralıklarla nota ekle
+        gamePattern.push(randomNote);
+        if (Math.random() > 0.6) { // %40 ihtimalle arka arkaya aynı nota
+          gamePattern.push(randomNote);
+        }
+      } else {
         gamePattern.push(randomNote);
       }
     } else {
-      gamePattern.push(randomNote);
+      console.error('Missing dataset or pad at index: ' + randomPadIndex);
     }
   }
 }
@@ -244,7 +272,13 @@ function playGamePattern() {
     }
 
     const note = gamePattern[i];
-    const pad = [...soundPads].find(pad => pad.dataset.note === note);
+    if (!note) {
+      i++;
+      return;
+    }
+    
+    const pad = Array.from(soundPads).find(pad => 
+      pad && pad.dataset && pad.dataset.note === note);
 
     if (pad) {
       // Mod bazlı ses efektleri
@@ -315,9 +349,11 @@ function gameOver() {
 
   // Patlama efekti
   soundPads.forEach(pad => {
-    setTimeout(() => {
-      animatePad(pad);
-    }, Math.random() * 500);
+    if (pad) {
+      setTimeout(() => {
+        animatePad(pad);
+      }, Math.random() * 500);
+    }
   });
 
   startBtn.textContent = 'Tekrar Başla';
@@ -378,66 +414,80 @@ function setDifficulty(difficulty) {
       visiblePads = 4;
       // 4 pad göster (2x2), diğerlerini gizle
       soundPads.forEach((pad, index) => {
-        pad.style.display = index < 4 ? 'block' : 'none';
+        if (pad) {
+          pad.style.display = index < 4 ? 'block' : 'none';
+        }
       });
       break;
     case 'medium':
       visiblePads = 9;
       // 9 pad göster (3x3), diğerlerini gizle
       soundPads.forEach((pad, index) => {
-        pad.style.display = index < 9 ? 'block' : 'none';
+        if (pad) {
+          pad.style.display = index < 9 ? 'block' : 'none';
+        }
       });
       break;
     case 'hard':
       visiblePads = 16;
       // 16 pad göster (4x4)
       soundPads.forEach((pad, index) => {
-        pad.style.display = index < 16 ? 'block' : 'none';
+        if (pad) {
+          pad.style.display = index < 16 ? 'block' : 'none';
+        }
       });
       break;
   }
 }
 
 // Olay dinleyicileri
-startBtn.addEventListener('click', () => {
-  if (!gameStarted) {
-    // Ses bağlamını başlat (tarayıcı politikası gereği kullanıcı etkileşimi gerekir)
-    if (audioContext.state === 'suspended') {
-      audioContext.resume();
+if (startBtn) {
+  startBtn.addEventListener('click', () => {
+    if (!gameStarted) {
+      // Ses bağlamını başlat (tarayıcı politikası gereği kullanıcı etkileşimi gerekir)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      gameStarted = true;
+      gamePattern = [];
+      playerPattern = [];
+      level = 1;
+      score = 0;
+      levelCount.textContent = level;
+      scoreCount.textContent = score;
+      startBtn.textContent = 'Devam Et';
+
+      startLevel();
     }
+  });
+}
 
-    gameStarted = true;
-    gamePattern = [];
-    playerPattern = [];
-    level = 1;
-    score = 0;
-    levelCount.textContent = level;
-    scoreCount.textContent = score;
-    startBtn.textContent = 'Devam Et';
-
-    startLevel();
-  }
-});
-
-resetBtn.addEventListener('click', () => {
-  if (gameStarted) {
-    gameStarted = false;
-    updateStatusMessage('Oyun sıfırlandı. Başlamak için "Başla" butonuna basın.');
-    startBtn.textContent = 'Başla';
-  }
-});
+if (resetBtn) {
+  resetBtn.addEventListener('click', () => {
+    if (gameStarted) {
+      gameStarted = false;
+      updateStatusMessage('Oyun sıfırlandı. Başlamak için "Başla" butonuna basın.');
+      startBtn.textContent = 'Başla';
+    }
+  });
+}
 
 soundPads.forEach(pad => {
-  pad.addEventListener('click', () => {
-    if (!playerTurn) return;
+  if (pad) {
+    pad.addEventListener('click', () => {
+      if (!playerTurn) return;
 
-    const note = pad.dataset.note;
-    playSound(note);
-    animatePad(pad);
+      if (pad.dataset && pad.dataset.note) {
+        const note = pad.dataset.note;
+        playSound(note);
+        animatePad(pad);
 
-    playerPattern.push(note);
-    checkAnswer(playerPattern.length - 1);
-  });
+        playerPattern.push(note);
+        checkAnswer(playerPattern.length - 1);
+      }
+    });
+  }
 });
 
 // Modal ile seviye atlamayı kaldırdığımız için bu event listener'a artık ihtiyaç yok
@@ -448,15 +498,22 @@ soundPads.forEach(pad => {
 // Zorluk seçicileri için olay dinleyicileri
 const difficultyBtns = document.querySelectorAll('.difficulty-btn');
 difficultyBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (!gameStarted) {
-      difficultyBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      setDifficulty(btn.dataset.difficulty);
-    } else {
-      updateStatusMessage('Oyun sırasında zorluk seviyesi değiştirilemez.');
-    }
-  });
+  if (btn) {
+    btn.addEventListener('click', () => {
+      if (!gameStarted) {
+        difficultyBtns.forEach(b => {
+          if (b) b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        
+        if (btn.dataset && btn.dataset.difficulty) {
+          setDifficulty(btn.dataset.difficulty);
+        }
+      } else {
+        updateStatusMessage('Oyun sırasında zorluk seviyesi değiştirilemez.');
+      }
+    });
+  }
 });
 
 // İlk durum ayarları
@@ -465,12 +522,13 @@ setDifficulty('easy'); // Varsayılan olarak kolay modu ayarla
 setGameMode('classic'); // Varsayılan olarak klasik modu ayarla
 
 function playRandomSequence() {
-  sequence = [];
-  playerSequence = [];
+  let sequence = [];
+  let playerSequence = [];
   let sequenceLength = getCurrentSequenceLength();
 
   // Sadece görünür pedleri kullan
-  const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
+  const visiblePadsList = Array.from(soundPads).filter(pad => 
+    pad && pad.style && pad.style.display !== 'none');
 
   if (visiblePadsList.length === 0) {
     console.error("Görünür pad bulunamadı!");
@@ -489,9 +547,12 @@ function playRandomSequence() {
       i--; // Geçersiz pad için döngüyü tekrarla
     }
   }
+  
+  return sequence;
 }
 
 // getCurrentSequenceLength fonksiyonu eksik, varsayılan değer döndüren bir fonksiyon ekledim
 function getCurrentSequenceLength() {
-  return 5; // Örnek bir değer, gerçek uygulamanızda burayı değiştirmeniz gerekebilir.
+  // Level'e göre uzunluk belirle
+  return Math.min(5 + Math.floor(level / 2), 20); // Örnek bir değer, gerçek uygulamanızda burayı değiştirmeniz gerekebilir.
 }
