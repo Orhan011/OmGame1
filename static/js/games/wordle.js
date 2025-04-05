@@ -196,103 +196,122 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Mobil klavyeyi göstermek için gizli input oluşturma ve odaklama
   function focusMobileInput() {
-    // Mevcut input varsa kaldır
-    let mobileInput = document.getElementById('mobile-keyboard-input');
-    if (!mobileInput) {
-      // Gizli input oluştur
-      mobileInput = document.createElement('input');
-      mobileInput.id = 'mobile-keyboard-input';
-      mobileInput.type = 'text';
-      mobileInput.maxLength = 1; // Tek bir harf için
-      mobileInput.autocomplete = 'off';
-      mobileInput.spellcheck = false;
-      mobileInput.style.position = 'fixed';
-      mobileInput.style.opacity = '0';
-      mobileInput.style.height = '0';
-      mobileInput.style.width = '0';
+    try {
+      // Mevcut input varsa bul, yoksa oluştur
+      let mobileInput = document.getElementById('mobile-keyboard-input');
+      if (!mobileInput) {
+        // Gizli input oluştur
+        mobileInput = document.createElement('input');
+        mobileInput.id = 'mobile-keyboard-input';
+        mobileInput.type = 'text';
+        mobileInput.maxLength = 1; // Tek bir harf için
+        mobileInput.autocomplete = 'off';
+        mobileInput.autocapitalize = 'none'; // Otomatik büyük harf kullanımını kapat
+        mobileInput.spellcheck = false;
+        mobileInput.style.position = 'fixed';
+        mobileInput.style.opacity = '0';
+        mobileInput.style.height = '0';
+        mobileInput.style.width = '0';
+        mobileInput.style.pointerEvents = 'none';
+        mobileInput.style.touchAction = 'none';
+        mobileInput.style.zIndex = '-1';
 
-      // Yeni, daha sağlam mobil girdi sistemi
-      let lastKey = '';
-      let lastInputTime = 0;
-      let inputProcessing = false;
+        // Yeni, daha sağlam mobil girdi sistemi
+        let lastKey = '';
+        let lastInputTime = 0;
+        let inputProcessing = false;
+        let inputDebounceTimer = null;
 
-      mobileInput.addEventListener('input', (e) => {
-        // Eğer işlem devam ediyorsa çık
-        if (inputProcessing) {
-          e.target.value = '';
-          return;
-        }
-
-        // İşlem başladı
-        inputProcessing = true;
-
-        // İki girdi arasında daha uzun bir zaman aralığı uygula
-        const now = Date.now();
-        if (now - lastInputTime < 50) {
-          // Aynı tuşa hızlı basılırsa engelle
-          e.target.value = '';
-          inputProcessing = false;
-          return;
-        }
-
-        // Girdiyi al
-        const inputValue = e.target.value;
-
-        // Girdiyi hemen temizle
-        e.target.value = '';
-
-        // Sadece tek bir geçerli karakter işle
-        if (inputValue && inputValue.length > 0) {
-          const char = inputValue.charAt(0);
-
-          // Karakter geçerliyse ekle (aynı harf kontrolü kaldırıldı)
-          if (isValidLetter(char)) {
-            addLetter(char);
-            // Önceki harf değerini sıfırla
-            lastKey = '';
-          }
-        }
-
-        // Son işlem zamanını güncelle
-        lastInputTime = now;
-
-        // İşlem tamamlandı
-        setTimeout(() => {
-          inputProcessing = false;
-        }, 50);
-      });
-
-      // Backspace tuşu için silme kontrolü
-      let lastDeleteTime = 0;
-      let deleteProcessing = false;
-
-      mobileInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace') {
-          // Eğer işlem devam ediyorsa işlemi engelle
-          if (deleteProcessing) {
-            e.preventDefault();
+        mobileInput.addEventListener('input', (e) => {
+          // Debounce ile çift girişleri önle
+          clearTimeout(inputDebounceTimer);
+          
+          // Eğer işlem devam ediyorsa çık
+          if (inputProcessing) {
+            e.target.value = '';
             return;
           }
 
-          // Silme işlemi başladı
-          deleteProcessing = true;
+          // İşlem başladı
+          inputProcessing = true;
 
-          // Silme işlemini gerçekleştir
-          deleteLetter();
+          // İki girdi arasında daha uzun bir zaman aralığı uygula
+          const now = Date.now();
+          if (now - lastInputTime < 100) {
+            // Aynı tuşa hızlı basılırsa engelle
+            e.target.value = '';
+            inputProcessing = false;
+            return;
+          }
 
-          // Beklemeden işlemi tamamla, gecikme yok
-          deleteProcessing = false;
+          // Girdiyi al
+          const inputValue = e.target.value;
 
-        } else if (e.key === 'Enter') {
-          handleSubmit();
-        }
-      });
+          // Girdiyi hemen temizle
+          e.target.value = '';
 
-      document.body.appendChild(mobileInput);
+          // Sadece tek bir geçerli karakter işle
+          if (inputValue && inputValue.length > 0) {
+            const char = inputValue.charAt(0);
+
+            // Karakter geçerliyse ekle
+            if (isValidLetter(char)) {
+              addLetter(char.toUpperCase());
+            }
+          }
+
+          // Son işlem zamanını güncelle
+          lastInputTime = now;
+
+          // İşlem tamamlandı (gecikmeli)
+          inputDebounceTimer = setTimeout(() => {
+            inputProcessing = false;
+          }, 150);
+        });
+
+        // Silme ve enter tuşları için güvenli kontrol
+        let lastKeyTime = 0;
+        let keyProcessing = false;
+
+        mobileInput.addEventListener('keydown', (e) => {
+          const now = Date.now();
+          
+          // Hızlı tuş basımlarını engelle
+          if (now - lastKeyTime < 200 || keyProcessing) {
+            e.preventDefault();
+            return;
+          }
+          
+          keyProcessing = true;
+          lastKeyTime = now;
+          
+          if (e.key === 'Backspace') {
+            e.preventDefault();
+            deleteLetter();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSubmit();
+          }
+          
+          // Kısa bir gecikme ile işlem kilidini kaldır
+          setTimeout(() => {
+            keyProcessing = false;
+          }, 100);
+        });
+
+        document.body.appendChild(mobileInput);
+      }
+
+      // Input'a odaklan ve sayfa kaydırmayı engelle
+      const scrollPosition = window.scrollY;
+      setTimeout(() => {
+        mobileInput.focus();
+        window.scrollTo(0, scrollPosition);
+      }, 50);
+      
+    } catch (error) {
+      console.error("Mobil klavye aktivasyonu hatası:", error);
     }
-
-    // Input'a odaklan
-    mobileInput.focus();
   }
 
   // Sanal klavye kullanım dışı - cihaz klavyesini kullanma için
@@ -477,12 +496,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Ses çalma fonksiyonu
+  function playSound(soundName) {
+    try {
+      // Ses çalma başarısız olursa sessizce devam et
+      const sound = new Audio(`/static/sounds/${soundName}.mp3`);
+      sound.volume = 0.5;
+      
+      const playPromise = sound.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          // Ses çalma hatası sessizce yok sayılır
+          console.log("Ses çalma hatası:", error);
+        });
+      }
+    } catch (error) {
+      // Ses çalma hatası sessizce işlenir
+      console.log("Ses çalma hatası:", error);
+    }
+  }
+
   // Mesaj gösterme fonksiyonu
   function showMessage(text, duration = 2000) {
+    if (!messageElement) return;
+    
     messageElement.textContent = text;
     messageElement.classList.remove('hidden');
 
-    clearTimeout(messageElement.timeoutId);
+    if (messageElement.timeoutId) {
+      clearTimeout(messageElement.timeoutId);
+    }
+    
     messageElement.timeoutId = setTimeout(() => {
       messageElement.classList.add('hidden');
     }, duration);
