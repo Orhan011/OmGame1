@@ -6,6 +6,20 @@ let deleteLetter;
 
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Ekran yüksekliğini belirle ve CSS değişkenine kaydet
+  const setWindowHeight = () => {
+    document.documentElement.style.setProperty('--window-height', `${window.innerHeight}px`);
+  };
+  setWindowHeight();
+  window.addEventListener('resize', setWindowHeight);
+  
+  // Klavye durumunu izle
+  window.addEventListener('resize', () => {
+    if (document.activeElement === inputField) {
+      document.body.classList.add('keyboard-open');
+    }
+  });
+  
   // DOM Elements
   const startScreen = document.getElementById('start-screen');
   const gameContainer = document.getElementById('game-container');
@@ -98,6 +112,13 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         submitGuess();
       }
+    });
+    
+    // Klavye kapandığında düzenleme
+    inputField.addEventListener('blur', () => {
+      setTimeout(() => {
+        document.body.classList.remove('keyboard-open');
+      }, 300);
     });
   }
 
@@ -209,26 +230,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // Önce input field'ı kullanılabilir yap
         inputField.readOnly = false;
         
-        // Input'u kullanıcıya gösterme
+        // Sabit pozisyonda tutarak titreme önlenir
+        document.body.classList.add('keyboard-open');
+        
+        // Input'u kullanıcıya gösterme ama klavye için erişilebilir tut
         inputField.style.position = "fixed";
-        inputField.style.top = "50%";
-        inputField.style.left = "50%";
-        inputField.style.transform = "translate(-50%, -50%)";
+        inputField.style.bottom = "0";
+        inputField.style.left = "0";
         inputField.style.opacity = "0";
-        inputField.style.pointerEvents = "auto"; // Dokunmaları algıla
         inputField.style.width = "1px";
         inputField.style.height = "1px";
         inputField.style.fontSize = "16px"; // iOS'un yakınlaştırmasını önler
+        inputField.style.pointerEvents = "none";
         
         // Önce blur sonra focus mobil klavyeyi daha iyi açar
         inputField.blur();
         setTimeout(() => {
           inputField.focus();
-          // Mobil klavyeyi açtıktan kısa süre sonra görünmez yap
-          setTimeout(() => {
-            inputField.style.opacity = "0";
-            inputField.style.pointerEvents = "none";
-          }, 100);
         }, 50);
       } else {
         // Masaüstü tarayıcılar için normal focus yeterli
