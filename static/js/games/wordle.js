@@ -1,4 +1,10 @@
 
+// Dışarıdan erişilebilir fonksiyonlar (butonlar için)
+let submitGuess;
+let deleteLetter;
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const startScreen = document.getElementById('start-screen');
@@ -7,11 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const startBtn = document.getElementById('start-game');
   const playAgainBtn = document.getElementById('play-again');
   const wordleGrid = document.getElementById('wordle-grid');
-  const keyboard = document.getElementById('keyboard');
-  const keyboardRow1 = document.getElementById('keyboard-row-1');
-  const keyboardRow2 = document.getElementById('keyboard-row-2');
-  const keyboardRow3 = document.getElementById('keyboard-row-3');
   const messageContainer = document.getElementById('message-container');
+  const inputField = document.getElementById('wordle-input-field');
   const scoreDisplay = document.getElementById('score-display');
   const guessesDisplay = document.getElementById('guesses-display');
   const streakDisplay = document.getElementById('streak-display');
@@ -68,13 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
     "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
   ];
 
-  // Türkçe klavye düzeni
-  const turkishKeyboard = [
-    ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
-    ["SİL", "Z", "C", "V", "B", "N", "M", "Ö", "Ç", "ENTER"]
-  ];
-
   // Oyun başlat butonu
   startBtn.addEventListener('click', startGame);
 
@@ -91,8 +87,19 @@ document.addEventListener('DOMContentLoaded', function() {
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
 
-  // Klavye tuşu basımı
+  // Klavye girişi için event listener'lar
   document.addEventListener('keydown', handleKeyPress);
+  
+  // Mobil cihazlar için input field ayarları
+  if (inputField) {
+    inputField.addEventListener('input', handleInputChange);
+    inputField.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitGuess();
+      }
+    });
+  }
 
   /**
    * Oyunu başlatır
@@ -126,15 +133,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // İpucu sayacını güncelle
     hintCount.textContent = gameState.hintsLeft;
 
-    // Grid ve klavyeyi oluştur
+    // Grid oluştur
     createWordleGrid();
-    createKeyboard();
 
     // Ses efektlerini sıfırla
     resetSounds();
 
     // Oyun başlangıç sesi çal
     playSound('keypress');
+    
+    // Input field'a odaklan
+    setTimeout(focusInputField, 100);
   }
 
   /**
@@ -161,49 +170,31 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Klavyeyi oluşturur
+   * Input değişimini işler
    */
-  function createKeyboard() {
-    keyboardRow1.innerHTML = '';
-    keyboardRow2.innerHTML = '';
-    keyboardRow3.innerHTML = '';
-    
-    // Klavye düzenini oluştur
-    turkishKeyboard.forEach((row, rowIndex) => {
-      const rowContainer = document.getElementById(`keyboard-row-${rowIndex + 1}`);
-      
-      row.forEach(key => {
-        const keyButton = document.createElement('button');
-        keyButton.className = 'keyboard-key';
-        keyButton.textContent = key;
-        
-        if (key === 'SİL' || key === 'ENTER') {
-          keyButton.classList.add('wide');
-        }
-        
-        keyButton.addEventListener('click', () => {
-          handleKeyboardClick(key);
-        });
-        
-        rowContainer.appendChild(keyButton);
-      });
-    });
-  }
-
-  /**
-   * Klavye tıklaması işleme
-   */
-  function handleKeyboardClick(key) {
+  function handleInputChange(e) {
     if (gameState.isGameOver) return;
     
-    playSound('keypress');
-    
-    if (key === 'ENTER') {
-      submitGuess();
-    } else if (key === 'SİL') {
-      deleteLetter();
-    } else {
-      addLetter(key);
+    const input = e.target.value.toUpperCase();
+    if (input.length > 0) {
+      const lastChar = input.charAt(input.length - 1);
+      
+      if (/^[A-ZĞÜŞİÖÇ]$/.test(lastChar)) {
+        addLetter(lastChar);
+        playSound('keypress');
+      }
+      
+      // Input field'ı temizle (tek harf almak için)
+      e.target.value = '';
+    }
+  }
+  
+  /**
+   * Input field'a otomatik odaklanma
+   */
+  function focusInputField() {
+    if (inputField && !gameState.isGameOver) {
+      inputField.focus();
     }
   }
 
@@ -216,14 +207,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const key = e.key.toUpperCase();
     
     if (key === 'ENTER') {
+      e.preventDefault(); // Form submission'ı engelle
       submitGuess();
-    } else if (key === 'BACKSPACE') {
+    } else if (key === 'BACKSPACE' || key === 'DELETE') {
       deleteLetter();
       playSound('keypress');
     } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
       addLetter(key);
       playSound('keypress');
     }
+    
+    // Her tuş basımından sonra input field'a odaklan
+    focusInputField();
   }
 
   /**
@@ -240,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Harf silme
    */
-  function deleteLetter() {
+  deleteLetter = function() {
     if (gameState.currentCol > 0) {
       gameState.currentCol--;
       gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
@@ -251,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Tahmini gönderme
    */
-  function submitGuess() {
+  submitGuess = function() {
     if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
@@ -269,8 +264,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sonuçları görsel olarak göster
     animateResults(result);
     
-    // Klavyeyi güncelle
-    updateKeyboard(result);
+    // Kullanılan harfleri güncelle
+    updateUsedLetters(result);
+    
+    // Input field'a odaklan
+    setTimeout(focusInputField, 300);
     
     // Skorları güncelle
     updateScore(result);
@@ -358,35 +356,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Klavyeyi günceller
+   * Kullanılan harfleri günceller
    */
-  function updateKeyboard(result) {
+  function updateUsedLetters(result) {
     const guess = gameState.guesses[gameState.currentRow];
     
     for (let i = 0; i < 5; i++) {
       const letter = guess[i];
       const status = result[i];
       
-      // Klavye tuşlarını bul
-      const keyButtons = document.querySelectorAll('.keyboard-key');
-      
-      keyButtons.forEach(button => {
-        if (button.textContent === letter) {
-          // Eğer tuş zaten doğru olarak işaretlenmişse, o durumu koru
-          if (button.classList.contains('correct')) {
-            return;
-          }
-          
-          // Eğer tuş zaten var ama yanlış yerde olarak işaretlenmişse ve şu an doğru değilse, o durumu koru
-          if (button.classList.contains('present') && status !== 'correct') {
-            return;
-          }
-          
-          // Tüm sınıfları temizle ve yeni durumu ekle
-          button.classList.remove('correct', 'present', 'absent');
-          button.classList.add(status);
-        }
-      });
+      if (status === 'correct') {
+        gameState.usedLetters.correct.add(letter);
+      } else if (status === 'present') {
+        gameState.usedLetters.present.add(letter);
+      } else {
+        gameState.usedLetters.absent.add(letter);
+      }
     }
   }
 
