@@ -168,7 +168,7 @@ function generateComplexPattern() {
 
   // Görünür pad'leri filtrele
   const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
-  
+
   if (visiblePadsList.length === 0) {
     console.error("Görünür pad bulunamadı!");
     return;
@@ -463,3 +463,35 @@ difficultyBtns.forEach(btn => {
 updateStatusMessage('Başlamak için "Başla" butonuna basın');
 setDifficulty('easy'); // Varsayılan olarak kolay modu ayarla
 setGameMode('classic'); // Varsayılan olarak klasik modu ayarla
+
+function playRandomSequence() {
+  sequence = [];
+  playerSequence = [];
+  let sequenceLength = getCurrentSequenceLength();
+
+  // Sadece görünür pedleri kullan
+  const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
+
+  if (visiblePadsList.length === 0) {
+    console.error("Görünür pad bulunamadı!");
+    return;
+  }
+
+  for (let i = 0; i < sequenceLength; i++) {
+    // randomPadIndex yerine doğrudan visiblePadsList'ten rastgele öğe seçiyoruz
+    const randomPad = visiblePadsList[Math.floor(Math.random() * visiblePadsList.length)];
+
+    // Null kontrolü ekle
+    if (randomPad && randomPad.dataset && randomPad.dataset.note) {
+      sequence.push(randomPad.dataset.note);
+    } else {
+      console.error("Geçersiz pad algılandı, atlanıyor");
+      i--; // Geçersiz pad için döngüyü tekrarla
+    }
+  }
+}
+
+// getCurrentSequenceLength fonksiyonu eksik, varsayılan değer döndüren bir fonksiyon ekledim
+function getCurrentSequenceLength() {
+  return 5; // Örnek bir değer, gerçek uygulamanızda burayı değiştirmeniz gerekebilir.
+}
