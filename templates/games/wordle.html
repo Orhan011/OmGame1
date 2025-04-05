@@ -6,6 +6,18 @@
 <div class="container">
   <h1 class="game-title text-center">Wordle</h1>
 
+  <div class="controls-container">
+    <button id="theme-toggle" class="theme-toggle-btn">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+  
+  <div class="controls-container">
+    <button id="theme-toggle" class="theme-toggle-btn">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
@@ -249,11 +261,21 @@
 
   /* Keyboard Styles */
   .keyboard-container {
+    position: sticky;
+    bottom: 0;
+    background-color: rgba(20, 20, 35, 0.95);
+    padding: 10px 0;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     gap: 8px;
     max-width: 500px;
     margin: 0 auto;
+    position: sticky;
+    bottom: 0;
+    background-color: rgba(20, 20, 35, 0.95);
+    padding: 10px 0;
+    z-index: 10;
   }
 
   .keyboard-row {
@@ -370,6 +392,18 @@
   }
 
   @media (max-width: 576px) {
+    /* Klavye sorununu gidermek için ekstra stiller */
+    .game-container {
+      overflow: auto;
+      padding-bottom: 60px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html, body {
+      height: var(--vh, 100vh);
+      overflow-x: hidden;
+    }
+
     .wordle-cell {
       font-size: 1.3rem;
     }
@@ -394,3 +428,57 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}
+  /* Tema değiştirici buton */
+  .controls-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .theme-toggle-btn {
+    background: none;
+    border: none;
+    color: #6a5ae0;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .theme-toggle-btn:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+  }
+
+  /* Dark mode */
+  body.dark-mode {
+    background-color: #121212;
+    color: #f5f5f5;
+  }
+
+  body.dark-mode .game-container,
+  body.dark-mode .game-instructions,
+  body.dark-mode .game-over-content {
+    background-color: #1a1a2e;
+    color: #f5f5f5;
+  }
+
+  body.dark-mode .wordle-cell {
+    background-color: #2c2c44;
+    border-color: #3a3a5e;
+    color: #f5f5f5;
+  }
+
+  body.dark-mode .keyboard-key {
+    background-color: #2c2c44;
+    color: #f5f5f5;
+  }
