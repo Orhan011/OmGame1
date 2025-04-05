@@ -7,126 +7,52 @@
     <p>Beyin egzersizi ve zihinsel gelişim için tasarlanmış interaktif oyunlarımız</p>
   </div>
 
+  {% if session.get('user_id') %}
+    <div class="favorite-section">
+      <h2 class="text-center mb-3">Favori Oyunlarınız ({{ favorite_count }}/4)</h2>
+      {% if favorite_count > 0 %}
+        <div class="favorite-games-list mb-4">
+          {% for game in all_games %}
+            {% if game.is_favorite %}
+              <div class="favorite-game-tag">
+                <i class="{{ game.icon }}"></i> {{ game.name }}
+                <button class="btn-remove-favorite-small" data-id="{{ game.favorite_id }}" title="Favorilerden çıkar">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info mb-4">
+          Henüz favori oyun eklemediniz. En çok sevdiğiniz oyunları yıldız simgesine tıklayarak ekleyin.
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
   <div class="game-grid">
-    <!-- Kelime Bulmaca -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-font"></i></div>
-      <div class="game-info">
-        <h3>Kelime Bulmaca</h3>
-        <p>Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin.</p>
+    {% for game in all_games %}
+      <div class="game-card">
+        <div class="game-icon"><i class="{{ game.icon }}"></i></div>
+        <div class="game-info">
+          <h3>{{ game.name }}</h3>
+          <p>{{ game.description if game.description }}</p>
+        </div>
+        <a href="{{ game.url }}" class="game-btn">Oyna</a>
+        {% if session.get('user_id') %}
+          {% if game.is_favorite %}
+            <button class="btn-remove-favorite" data-id="{{ game.favorite_id }}" title="Favorilerden çıkar">
+              <i class="fas fa-star"></i>
+            </button>
+          {% else %}
+            <button class="btn-add-favorite" data-type="{{ game.type }}" title="Favorilere ekle" {% if favorite_count >= 4 %}disabled{% endif %}>
+              <i class="far fa-star"></i>
+            </button>
+          {% endif %}
+        {% endif %}
       </div>
-      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Labirent -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-route"></i></div>
-      <div class="game-info">
-        <h3>Labirent</h3>
-        <p>Karmaşık labirentlerden çıkış yolunu bularak mekansal zekânızı geliştirin.</p>
-      </div>
-      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Yapboz -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
-      <div class="game-info">
-        <h3>Yapboz</h3>
-        <p>Parçaları doğru yerleştirerek resimleri tamamlayın.</p>
-      </div>
-      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Sayı Dizisi -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
-      <div class="game-info">
-        <h3>Sayı Dizisi</h3>
-        <p>Sayı dizilerindeki mantıksal örüntüleri keşfedin.</p>
-      </div>
-      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Sayı Zinciri -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-link"></i></div>
-      <div class="game-info">
-        <h3>Sayı Zinciri</h3>
-        <p>Ekranda beliren sayıları doğru sırayla hatırlayın.</p>
-      </div>
-      <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Sesli Hafıza -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
-      <div class="game-info">
-        <h3>Sesli Hafıza</h3>
-        <p>İşitsel hafızanızı geliştirin, ses dizilerini doğru sırayla tekrarlayın.</p>
-      </div>
-      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- N-Back Test -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-brain"></i></div>
-      <div class="game-info">
-        <h3>N-Back Test</h3>
-        <p>Belirli bir zaman önce gösterilen uyaranı hatırlayın.</p>
-      </div>
-      <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- 3D Döndürme -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-cube"></i></div>
-      <div class="game-info">
-        <h3>3D Döndürme</h3>
-        <p>Uzamsal algı yeteneklerinizi geliştirmek için 3D şekilleri doğru açılarla döndürün.</p>
-      </div>
-      <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Sudoku -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-th"></i></div>
-      <div class="game-info">
-        <h3>Sudoku</h3>
-        <p>Mantık becerinizi geliştirin, her satır, sütun ve 3x3 kutuya 1-9 arası sayıları yerleştirin.</p>
-      </div>
-      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- 2048 -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-cubes"></i></div>
-      <div class="game-info">
-        <h3>2048</h3>
-        <p>Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!</p>
-      </div>
-      <a href="{{ url_for('game_2048') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Wordle -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-spell-check"></i></div>
-      <div class="game-info">
-        <h3>Wordle</h3>
-        <p>5 harfli gizli kelimeyi 6 denemede bulun. Türkçe kelime hazinesi!</p>
-      </div>
-      <a href="{{ url_for('wordle') }}" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Satranç -->
-    <div class="game-card">
-      <div class="game-icon"><i class="fas fa-chess"></i></div>
-      <div class="game-info">
-        <h3>Satranç</h3>
-        <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
-      </div>
-      <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
-    </div>
+    {% endfor %}
   </div>
 
   <div class="row mt-5 mb-5">
@@ -137,6 +63,101 @@
     </div>
   </div>
 </div>
+
+<!-- JavaScript kodu - Favori oyun ekleme/çıkarma -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Favori ekle düğmeleri
+  const addFavoriteButtons = document.querySelectorAll('.btn-add-favorite');
+  addFavoriteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      if (this.hasAttribute('disabled')) {
+        showNotification('En fazla 4 favori oyun ekleyebilirsiniz', 'warning');
+        return;
+      }
+      const gameType = this.getAttribute('data-type');
+      addToFavorites(gameType);
+    });
+  });
+  
+  // Favorilerden çıkar düğmeleri
+  const removeFavoriteButtons = document.querySelectorAll('.btn-remove-favorite, .btn-remove-favorite-small');
+  removeFavoriteButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const favoriteId = this.getAttribute('data-id');
+      removeFromFavorites(favoriteId);
+    });
+  });
+  
+  // Favorilere ekle
+  function addToFavorites(gameType) {
+    fetch('/api/favorites/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ game_type: gameType })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Oyun favorilerinize eklendi', 'success');
+        // Sayfayı yeniden yükle
+        setTimeout(() => { location.reload(); }, 1000);
+      } else {
+        showNotification(data.error || 'Bir hata oluştu', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('Bir hata oluştu', 'error');
+    });
+  }
+  
+  // Favorilerden çıkar
+  function removeFromFavorites(favoriteId) {
+    fetch('/api/favorites/remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ favorite_id: favoriteId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Oyun favorilerinizden çıkarıldı', 'success');
+        // Sayfayı yeniden yükle
+        setTimeout(() => { location.reload(); }, 1000);
+      } else {
+        showNotification(data.error || 'Bir hata oluştu', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('Bir hata oluştu', 'error');
+    });
+  }
+  
+  // Bildirim göster
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+    
+    // 3 saniye sonra bildirim kaybolsun
+    setTimeout(() => {
+      notification.classList.add('fade-out');
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 2500);
+  }
+});
+</script>
 {% endblock %}
 
 {% block extra_css %}
@@ -268,34 +289,6 @@
     transform: translateY(-2px);
   }
 
-  /* Onarımda olan oyunlar için stiller */
-  .game-card[style*="opacity: 0.8"] {
-    position: relative;
-  }
-
-  .game-card[style*="opacity: 0.8"]::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 15px;
-    z-index: 1;
-  }
-
-  .game-card[style*="opacity: 0.8"] .game-icon,
-  .game-card[style*="opacity: 0.8"] .game-info,
-  .game-card[style*="opacity: 0.8"] .game-btn {
-    position: relative;
-    z-index: 2;
-  }
-
-  .game-card[style*="opacity: 0.8"] .game-icon {
-    color: #6c757d;
-  }
-
   /* Sayfa başlığı */
   .page-title-section {
     text-align: center;
@@ -353,6 +346,111 @@
 
   .home-button i {
     margin-right: 8px;
+  }
+
+  /* Favori oyunlar bölümü */
+  .favorite-section {
+    margin-bottom: 3rem;
+  }
+
+  .favorite-games-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .favorite-game-tag {
+    background: linear-gradient(to right, #6a5ae0, #8170ff);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(106, 90, 224, 0.3);
+  }
+
+  .favorite-game-tag i {
+    margin-right: 8px;
+  }
+
+  .btn-remove-favorite-small {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 8px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.2);
+  }
+
+  .btn-remove-favorite-small:hover {
+    opacity: 1;
+    background-color: rgba(255,255,255,0.3);
+  }
+
+  /* Favori buton stilleri */
+  .btn-add-favorite, .btn-remove-favorite {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #FFD700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-add-favorite:hover {
+    transform: scale(1.2);
+  }
+
+  .btn-remove-favorite:hover {
+    transform: scale(1.2);
+  }
+
+  .btn-add-favorite[disabled] {
+    color: #999;
+    cursor: not-allowed;
+  }
+
+  .btn-add-favorite[disabled]:hover {
+    transform: none;
+  }
+
+  /* Bildirim Stili */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: opacity 0.5s;
+  }
+  .notification.success {
+    background-color: #4CAF50;
+  }
+  .notification.error {
+    background-color: #f44336;
+  }
+  .notification.warning {
+    background-color: #ff9800;
+  }
+  .notification.fade-out {
+    opacity: 0;
   }
 </style>
 {% endblock %}
