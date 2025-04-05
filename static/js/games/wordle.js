@@ -198,31 +198,40 @@ document.addEventListener('DOMContentLoaded', function() {
    * Mobil klavyeyi açar
    */
   function openMobileKeyboard() {
+    // İşlem durumlarını sıfırla
+    isProcessing = false;
+    if (typeof isComposing !== 'undefined') isComposing = false;
+    lastInputValue = '';
+    lastBackspaceTime = 0;
+    lastInputTime = 0;
+    
     // Önce input değerini temizle
     inputField.value = '';
     
     // Sayfa konumunu hatırla ve klavye odaklandıktan sonra geri al
     const scrollPos = window.scrollY;
     
-    // Klavyeyi odakla
-    inputField.focus();
-    gameState.mobileKeyboardActive = true;
-    
-    // Sayfanın otomatik kaydırmasını önlemek için konum düzeltmesi
-    setTimeout(() => {
-      window.scrollTo(0, scrollPos);
-      
-      // İnput alanının görünür olmasını engelle
-      inputField.style.position = 'fixed';
-      inputField.style.top = '50%';
-      inputField.style.opacity = '0';
-    }, 50);
-    
-    // Mobil klavye açıldığında UI'ı düzenle
-    document.body.classList.add('keyboard-visible');
-    
     // Aktif satırı vurgula
     highlightActiveRow();
+    
+    // Klavyeyi odakla (daha kısa sürede)
+    setTimeout(() => {
+      inputField.focus();
+      gameState.mobileKeyboardActive = true;
+      
+      // Sayfanın otomatik kaydırmasını önlemek için konum düzeltmesi
+      setTimeout(() => {
+        window.scrollTo(0, scrollPos);
+        
+        // İnput alanının görünür olmasını engelle
+        inputField.style.position = 'fixed';
+        inputField.style.top = '50%';
+        inputField.style.opacity = '0';
+      }, 20);
+      
+      // Mobil klavye açıldığında UI'ı düzenle
+      document.body.classList.add('keyboard-visible');
+    }, 20);
   }
   
   /**
@@ -241,39 +250,70 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Kompozisyon olaylarını izle (IME giriş sistemi için)
+    // Kompozisyon olaylarını daha iyi şekilde izle (IME giriş sistemi için)
+    let isComposing = false;
+    
     inputField.addEventListener('compositionstart', function() {
+      isComposing = true;
       isProcessing = true;
     });
     
     inputField.addEventListener('compositionend', function() {
-      isProcessing = false;
-      // Kompozisyon bittiğinde değeri temizle
-      inputField.value = '';
-    });
-    
-    // Harf girişi için input eventini kullan
-    inputField.addEventListener('input', function(e) {
-      if (isProcessing || gameState.isGameOver) return;
+      isComposing = false;
       
-      // İşlem yapılıyor olarak işaretle
-      isProcessing = true;
-      
-      const input = e.target.value.trim().toUpperCase();
-      
-      if (input && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
-        addLetter(input);
-        playSound('keypress');
-      }
-      
-      // Input alanını temizle
+      // Kompozisyon bittiğinde değeri hemen temizle
       setTimeout(() => {
         inputField.value = '';
         isProcessing = false;
-      }, 50);
+      }, 10);
     });
     
-    // Silme ve enter tuşları için keydown kullan
+    // Odak değişikliklerini daha iyi yönet
+    inputField.addEventListener('focus', function() {
+      // Odaklandığında temiz başla
+      inputField.value = '';
+      isProcessing = false;
+      isComposing = false;
+    });
+    
+    // Harf girişi için input eventini daha güvenilir şekilde yönet
+    let lastInputValue = '';
+    let lastInputTime = 0;
+    
+    inputField.addEventListener('input', function(e) {
+      if (isProcessing || gameState.isGameOver) return;
+      
+      // Çift girişleri önlemek için zaman kontrolü ekle
+      const now = Date.now();
+      if (now - lastInputTime < 150) {
+        e.preventDefault();
+        inputField.value = '';
+        return;
+      }
+      
+      // İşlem yapılıyor olarak işaretle
+      isProcessing = true;
+      lastInputTime = now;
+      
+      const input = e.target.value.trim().toUpperCase();
+      
+      // Sadece yeni karakter girildiğinde işlem yap
+      if (input && input !== lastInputValue && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
+        addLetter(input);
+        playSound('keypress');
+        lastInputValue = input;
+      }
+      
+      // Input alanını hemen temizle
+      setTimeout(() => {
+        inputField.value = '';
+        isProcessing = false;
+      }, 10);
+    });
+    
+    // Silme ve enter tuşları için daha güvenilir event yönetimi
+    let lastBackspaceTime = 0;
+    
     inputField.addEventListener('keydown', function(e) {
       if (gameState.isGameOver) return;
       
@@ -281,9 +321,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         submitGuess();
       } else if (e.key === 'Backspace') {
-        // Silme işlemini sadece input boşsa yap (çift silmeyi önler)
-        if (inputField.value === '') {
+        const now = Date.now();
+        
+        // Çift silmeyi önlemek için zaman kontrolü
+        if (now - lastBackspaceTime < 300) {
           e.preventDefault();
+          return;
+        }
+        
+        lastBackspaceTime = now;
+        e.preventDefault();
+        
+        // Silme işlemini gerçekleştir
+        if (gameState.currentCol > 0) {
           deleteLetter();
           playSound('keypress');
         }
