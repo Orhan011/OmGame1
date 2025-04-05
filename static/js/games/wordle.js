@@ -140,8 +140,18 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Wordle ızgarasını oluşturur
    */
+  // Mobil klavye yönetimi için değişken
+  let isKeyboardOpen = false;
+  const inputField = document.createElement('input');
+  inputField.type = 'text';
+  inputField.className = 'wordle-input-field';
+  inputField.maxLength = 1; // Tek harf için
+  inputField.autocomplete = 'off';
+  inputField.autocapitalize = 'characters';
+  
   function createWordleGrid() {
     wordleGrid.innerHTML = '';
+    document.body.appendChild(inputField);
     
     for (let row = 0; row < 6; row++) {
       const rowDiv = document.createElement('div');
@@ -153,11 +163,66 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
+        
+        // Hücreye tıklandığında klavyeyi açma
+        cell.addEventListener('click', function() {
+          if (gameState.isGameOver) return;
+          if (parseInt(cell.dataset.row) === gameState.currentRow) {
+            openMobileKeyboard();
+          }
+        });
+        
         rowDiv.appendChild(cell);
       }
       
       wordleGrid.appendChild(rowDiv);
     }
+    
+    // Klavye yönetimini ayarla
+    setupKeyboardInput();
+  }
+  
+  /**
+   * Mobil klavyeyi açar
+   */
+  function openMobileKeyboard() {
+    inputField.value = '';
+    inputField.focus();
+    isKeyboardOpen = true;
+  }
+  
+  /**
+   * Klavye giriş olaylarını ayarlar
+   */
+  function setupKeyboardInput() {
+    inputField.addEventListener('input', function(e) {
+      if (gameState.isGameOver) return;
+      
+      const input = e.target.value.toUpperCase();
+      if (input && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
+        addLetter(input);
+        inputField.value = ''; // Değeri temizle
+        playSound('keypress');
+      }
+    });
+    
+    inputField.addEventListener('keydown', function(e) {
+      if (gameState.isGameOver) return;
+      
+      if (e.key === 'Enter') {
+        submitGuess();
+      } else if (e.key === 'Backspace') {
+        deleteLetter();
+        playSound('keypress');
+      }
+    });
+    
+    // Klavye kapandığında durumu güncelle
+    inputField.addEventListener('blur', function() {
+      setTimeout(() => {
+        isKeyboardOpen = false;
+      }, 100);
+    });
   }
 
   /**
@@ -234,6 +299,19 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
       updateGrid();
       gameState.currentCol++;
+      
+      // Otomatik gönderme (5 harf tamamlandığında)
+      if (gameState.currentCol === 5) {
+        // Tam dolduğunda otomatik submit ekleyebilirsiniz (isteğe bağlı)
+        // setTimeout(() => submitGuess(), 500);
+      }
+      
+      // Harf ekledikten sonra tekrar klavyeye odaklan
+      if (isKeyboardOpen) {
+        setTimeout(() => {
+          inputField.focus();
+        }, 10);
+      }
     }
   }
 
@@ -245,6 +323,13 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.currentCol--;
       gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
       updateGrid();
+      
+      // Silme işleminden sonra tekrar klavyeye odaklan
+      if (isKeyboardOpen) {
+        setTimeout(() => {
+          inputField.focus();
+        }, 10);
+      }
     }
   }
 
@@ -290,6 +375,18 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         endGame(false);
       }, 1500);
+    } else {
+      // Sonraki satıra geçildiğinde ızgarayı güncelle ve otomatik klavye aç
+      setTimeout(() => {
+        updateGrid();
+        
+        // Mobil cihazda otomatik klavye açma
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            openMobileKeyboard();
+          }, 300);
+        }
+      }, 1600); // Animasyondan sonra
     }
     
     // Tahmin sayısını güncelle
@@ -399,11 +496,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
         cell.textContent = gameState.guesses[row][col];
         
+        // Hücre dolu mu kontrol et
         if (gameState.guesses[row][col]) {
           cell.classList.add('filled');
         } else {
           cell.classList.remove('filled');
         }
+        
+        // Aktif satır vurgusu
+        if (row === gameState.currentRow) {
+          cell.classList.add('current-row');
+        } else {
+          cell.classList.remove('current-row');
+        }
+      }
+    }
+    
+    // Aktif satıra tıklayınca otomatik klavye aç
+    if (gameState.currentRow < 6 && !gameState.isGameOver) {
+      const currentRow = document.querySelector(`.wordle-row[data-row="${gameState.currentRow}"]`);
+      if (currentRow) {
+        currentRow.addEventListener('click', function() {
+          openMobileKeyboard();
+        });
       }
     }
   }

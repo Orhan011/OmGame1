@@ -1,4 +1,3 @@
-
 {% extends "layout.html" %}
 
 {% block title %}Wordle - Kelime Tahmin Oyunu{% endblock %}
@@ -6,7 +5,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center">Wordle</h1>
-  
+
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
@@ -342,14 +341,51 @@
     100% { opacity: 0; }
   }
 
+  /* Mobil klavye input alanı */
+  .wordle-input-field {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    z-index: -10;
+    font-size: 16px; /* iOS'da yakınlaştırmayı önler */
+  }
+
+  /* Aktif satır vurgusu */
+  .wordle-row[data-row="0"] .wordle-cell,
+  .wordle-row[data-row="1"] .wordle-cell,
+  .wordle-row[data-row="2"] .wordle-cell,
+  .wordle-row[data-row="3"] .wordle-cell,
+  .wordle-row[data-row="4"] .wordle-cell,
+  .wordle-row[data-row="5"] .wordle-cell {
+    cursor: pointer;
+  }
+
+  /* Aktif satırın hücrelerini vurgula */
+  .wordle-cell.current-row {
+    border-color: rgba(150, 150, 200, 0.8);
+    box-shadow: 0 0 5px rgba(150, 150, 200, 0.5);
+  }
+
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
     }
-    
+
     .keyboard-key {
       padding: 10px 8px;
       font-size: 0.9rem;
+    }
+
+    .wordle-grid {
+      margin-bottom: 80px; /* Mobil klavye açıldığında ekstra alan */
+    }
+
+    /* Mobil klavye açıkken body stilini düzenle */
+    body.keyboard-visible {
+      padding-bottom: 150px;
     }
   }
 </style>
