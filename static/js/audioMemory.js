@@ -168,7 +168,7 @@ function generateComplexPattern() {
 
   // Görünür pad'leri filtrele
   const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
-
+  
   if (visiblePadsList.length === 0) {
     console.error("Görünür pad bulunamadı!");
     return;
