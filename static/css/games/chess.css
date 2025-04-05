@@ -32,8 +32,10 @@ html, body {
   justify-content: space-between;
   width: 100%;
   max-width: 500px;
-  margin: 0 auto 15px;
+  margin: 0 auto 20px;
   padding: 0 20px;
+  position: relative;
+  z-index: 10;
 }
 
 .timer {
@@ -46,9 +48,10 @@ html, body {
 }
 
 .timer-display {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: bold;
   font-family: monospace;
+  padding: 2px 0;
 }
 
 .player-name {
@@ -88,6 +91,7 @@ h2 {
   background-color: #1a1d29;
   overflow: hidden;
   padding: 10px;
+  margin-top: 30px; /* Sayfa içeriğini biraz aşağıya kaydırır */
 }
 
 .game-area {
@@ -167,7 +171,7 @@ h2 {
 .controls {
   display: flex;
   gap: 15px;
-  margin: 20px 0;
+  margin: 25px 0 30px;
   padding-bottom: 15px;
   justify-content: center;
   flex-wrap: wrap;

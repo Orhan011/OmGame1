@@ -282,9 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
     isAiThinking = true;
     statusEl.textContent = 'Yapay Zeka düşünüyor...';
 
-    // Continue black's timer during AI thinking
-    // NOT: Siyah (AI) düşünürken zamanlayıcı devam etmeli
-    if (!timerInterval) {
+    // Her durumda siyahın zamanlayıcısının çalışmaya devam etmesini sağla
+    // Önceki zamanlayıcıyı durdurma, sadece kontrol et ve gerekirse yeniden başlat
+    if (!timerInterval || activeTimer !== 'b') {
       startTimer('b');
     }
 
@@ -297,7 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Switch timer only after AI makes its move
       if (!game.game_over()) {
-        startTimer('w');
+        // Sırası beyaza geçtiği için zamanlayıcıyı değiştir
+        stopTimer(); // Önce durdur
+        startTimer('w'); // Sonra beyazınkini başlat
       } else {
         stopTimer(); // Stop timer if game is over
       }
