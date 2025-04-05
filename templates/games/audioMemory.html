@@ -1,81 +1,65 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MelodiX - Sesli Hafıza Oyunu</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="{{ url_for('static', filename='css/audio-memory.css') }}" rel="stylesheet" type="text/css" />
-</head>
+{% extends "layout.html" %}
 
-<body>
-  <div class="game-container">
-    <div class="game-panel">
-      <div class="info-display">
-        <div class="level">Seviye: <span id="level-count">1</span></div>
-        <div class="score">Puan: <span id="score-count">0</span></div>
-      </div>
-
-      <div class="sound-pads">
-        <!-- İlk satır (kolay mod için yeterli) -->
-        <div class="sound-pad" data-note="do" data-color="#FF0000"></div>
-        <div class="sound-pad" data-note="re" data-color="#9966FF"></div>
-        <div class="sound-pad" data-note="mi" data-color="#0000FF"></div>
-        <div class="sound-pad" data-note="fa" data-color="#993399"></div>
-
-        <!-- İkinci satır (orta mod için) -->
-        <div class="sound-pad" data-note="sol" data-color="#FF9966"></div>
-        <div class="sound-pad" data-note="la" data-color="#00FF99"></div>
-        <div class="sound-pad" data-note="si" data-color="#33CCFF"></div>
-        <div class="sound-pad" data-note="do2" data-color="#FF33CC"></div>
-        <div class="sound-pad" data-note="re2" data-color="#FFFFFF"></div>
-
-        <!-- Üçüncü satır (orta mod için) -->
-        <div class="sound-pad" data-note="mi2" data-color="#003399"></div>
-        <div class="sound-pad" data-note="fa2" data-color="#99FFCC"></div>
-        <div class="sound-pad" data-note="sol2" data-color="#FF99CC"></div>
-
-        <!-- Dördüncü satır (zor mod için) -->
-        <div class="sound-pad" data-note="la2" data-color="#996600"></div>
-        <div class="sound-pad" data-note="si2" data-color="#66CC00"></div>
-        <div class="sound-pad" data-note="do3" data-color="#FFCC66"></div>
-        <div class="sound-pad" data-note="re3" data-color="#00FFFF"></div>
-      </div>
-
-      <div class="controls">
-        <button id="start-btn" class="btn">Başla</button>
-        <button id="reset-btn" class="btn">Sıfırla</button>
-      </div>
-
-      <div class="difficulty-selector">
-        <h3>Zorluk:</h3>
-        <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
-        <button class="difficulty-btn" data-difficulty="medium">Orta</button>
-        <button class="difficulty-btn" data-difficulty="hard">Zor</button>
-      </div>
-
-      <!-- Mode selector removed -->
+{% block content %}
+<div class="game-container">
+  <div class="game-panel">
+    <div class="info-display">
+      <div class="level">Seviye: <span id="level-count">1</span></div>
+      <div class="score">Puan: <span id="score-count">0</span></div>
     </div>
 
-    <div class="game-status">
-      <p id="status-message">Başlamak için "Başla" butonuna basın</p>
-      <div id="progress-bar"></div>
+    <div class="sound-pads">
+      <!-- İlk satır (kolay mod için yeterli) -->
+      <div class="sound-pad" data-note="do" data-color="#FF0000"></div>
+      <div class="sound-pad" data-note="re" data-color="#9966FF"></div>
+      <div class="sound-pad" data-note="mi" data-color="#0000FF"></div>
+      <div class="sound-pad" data-note="fa" data-color="#993399"></div>
+
+      <!-- İkinci satır (orta mod için) -->
+      <div class="sound-pad" data-note="sol" data-color="#FF9966"></div>
+      <div class="sound-pad" data-note="la" data-color="#00FF99"></div>
+      <div class="sound-pad" data-note="si" data-color="#33CCFF"></div>
+      <div class="sound-pad" data-note="do2" data-color="#FF33CC"></div>
+      <div class="sound-pad" data-note="re2" data-color="#FFFFFF"></div>
+
+      <!-- Üçüncü satır (orta mod için) -->
+      <div class="sound-pad" data-note="mi2" data-color="#003399"></div>
+      <div class="sound-pad" data-note="fa2" data-color="#99FFCC"></div>
+      <div class="sound-pad" data-note="sol2" data-color="#FF99CC"></div>
+
+      <!-- Dördüncü satır (zor mod için) -->
+      <div class="sound-pad" data-note="la2" data-color="#996600"></div>
+      <div class="sound-pad" data-note="si2" data-color="#66CC00"></div>
+      <div class="sound-pad" data-note="do3" data-color="#FFCC66"></div>
+      <div class="sound-pad" data-note="re3" data-color="#00FFFF"></div>
     </div>
 
-    <div class="modal" id="level-up-modal">
-      <div class="modal-content">
-        <h2>Tebrikler!</h2>
-        <p>Seviye <span id="new-level">2</span>'e ulaştınız!</p>
-        <button id="continue-btn" class="btn">Devam Et</button>
-      </div>
+    <div class="controls">
+      <button id="start-btn" class="btn">Başla</button>
+      <button id="reset-btn" class="btn">Sıfırla</button>
+    </div>
+
+    <div class="difficulty-selector">
+      <h3>Zorluk:</h3>
+      <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
+      <button class="difficulty-btn" data-difficulty="medium">Orta</button>
+      <button class="difficulty-btn" data-difficulty="hard">Zor</button>
     </div>
   </div>
 
-  <footer>
-    <p>&copy; 2025 OmGame | Sesli Hafıza Oyunu</p>
-  </footer>
+  <div class="game-status">
+    <p id="status-message">Başlamak için "Başla" butonuna basın</p>
+    <div id="progress-bar"></div>
+  </div>
 
-  <script src="{{ url_for('static', filename='js/audioMemory.js') }}"></script>
-</body>
-</html>
+  <div class="modal" id="level-up-modal">
+    <div class="modal-content">
+      <h2>Tebrikler!</h2>
+      <p>Seviye <span id="new-level">2</span>'e ulaştınız!</p>
+      <button id="continue-btn" class="btn">Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/audioMemory.js') }}"></script>
+{% endblock %}
