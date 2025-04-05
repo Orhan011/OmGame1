@@ -80,17 +80,11 @@
         <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Gizli input field - mobil klavye açmak için -->
-        <input type="text" id="wordle-input-field" class="wordle-input-field" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        
-        <!-- Kontrol Butonları -->
-        <div class="wordle-controls">
-          <button id="submit-guess-btn" class="wordle-control-btn" onclick="submitGuess()">
-            <i class="fas fa-check"></i> Tahmin Et
-          </button>
-          <button id="delete-letter-btn" class="wordle-control-btn" onclick="deleteLetter()">
-            <i class="fas fa-backspace"></i> Sil
-          </button>
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard-container">
+          <div class="keyboard-row" id="keyboard-row-1"></div>
+          <div class="keyboard-row" id="keyboard-row-2"></div>
+          <div class="keyboard-row" id="keyboard-row-3"></div>
         </div>
       </div>
 
@@ -254,51 +248,56 @@
     100% { transform: rotateX(0); }
   }
 
-  /* Input Field ve Kontrol Butonları Stilleri */
-  .wordle-input-field {
-    opacity: 0;
-    position: absolute;
-    z-index: -1;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
+  /* Keyboard Styles */
+  .keyboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
   }
-  
-  .wordle-controls {
+
+  .keyboard-row {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin: 25px auto;
-    max-width: 350px;
+    gap: 6px;
   }
-  
-  .wordle-control-btn {
-    flex: 1;
-    padding: 12px 20px;
+
+  .keyboard-key {
+    padding: 15px 12px;
+    min-width: 30px;
+    text-align: center;
     background-color: rgba(60, 60, 80, 0.8);
     color: white;
     border: none;
-    border-radius: 50px;
+    border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    user-select: none;
+    flex: 1;
   }
-  
-  .wordle-control-btn:hover {
+
+  .keyboard-key:hover {
     background-color: rgba(80, 80, 100, 0.9);
-    transform: translateY(-2px);
   }
-  
-  .wordle-control-btn:active {
-    transform: translateY(0);
+
+  .keyboard-key.correct {
+    background-color: rgba(46, 204, 113, 0.7);
   }
-  
-  .wordle-control-btn i {
-    font-size: 1rem;
+
+  .keyboard-key.present {
+    background-color: rgba(241, 196, 15, 0.7);
+  }
+
+  .keyboard-key.absent {
+    background-color: rgba(30, 30, 40, 0.9);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .keyboard-key.wide {
+    flex: 1.5;
+    font-size: 0.9rem;
   }
 
   /* Message Styles */
