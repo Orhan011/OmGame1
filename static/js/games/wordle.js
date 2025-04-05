@@ -99,12 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
         submitGuess();
       }
     });
-    
-    // Klavye kapandığında durumu güncelle
-    inputField.addEventListener('blur', function() {
-      // Klavyenin kapandığını belirt
-      isKeyboardOpen = false;
-    });
   }
 
   /**
@@ -168,15 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
-        
-        // Kareleri tıklanabilir yapma
-        cell.addEventListener('click', function() {
-          // Sadece aktif satırdaki kareler tıklanabilir olsun
-          if (row === gameState.currentRow && !gameState.isGameOver) {
-            focusInputField();
-          }
-        });
-        
         rowDiv.appendChild(cell);
       }
       
@@ -190,63 +175,26 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleInputChange(e) {
     if (gameState.isGameOver) return;
     
-    // Input'un mevcut değerini al ve hemen temizle
     const input = e.target.value.toUpperCase();
-    e.target.value = '';
-    
     if (input.length > 0) {
-      // Sadece son karakteri al
       const lastChar = input.charAt(input.length - 1);
       
       if (/^[A-ZĞÜŞİÖÇ]$/.test(lastChar)) {
         addLetter(lastChar);
         playSound('keypress');
       }
-    }
-    
-    // Input alanına odağı sürdür ancak klavyeyi tekrar açmaya çalışma
-    // Bu, gereksiz odaklanma/odağı kaybetme döngüsünü önler
-    if (document.activeElement !== inputField && isKeyboardOpen) {
-      inputField.focus();
+      
+      // Input field'ı temizle (tek harf almak için)
+      e.target.value = '';
     }
   }
   
   /**
    * Input field'a otomatik odaklanma
    */
-  // Klavye açılma durumunu izlemek için değişken
-  let isKeyboardOpen = false;
-
   function focusInputField() {
     if (inputField && !gameState.isGameOver) {
-      // Klavye zaten açıksa tekrar açmaya çalışma
-      if (isKeyboardOpen) {
-        return;
-      }
-      
-      // Mobil cihazlarda klavyeyi açma yöntemini iyileştir
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        // Önce input field'ı kullanılabilir yap
-        inputField.readOnly = false;
-        
-        // Input'u kullanıcıya gösterme ama erişilebilir tut
-        inputField.style.position = "fixed";
-        inputField.style.bottom = "0";
-        inputField.style.left = "0";
-        inputField.style.opacity = "0";
-        inputField.style.width = "1px";
-        inputField.style.height = "1px";
-        inputField.style.fontSize = "16px"; // iOS'un yakınlaştırmasını önler
-        
-        // Klavye açılma durumunu belirle
-        isKeyboardOpen = true;
-        
-        // Sadece bir kez focus yaparak klavyeyi aç
-        inputField.focus();
-      } else {
-        // Masaüstü tarayıcılar için normal focus yeterli
-        inputField.focus();
-      }
+      inputField.focus();
     }
   }
 
@@ -436,18 +384,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
         cell.textContent = gameState.guesses[row][col];
         
-        // Hücrenin sınıflarını düzenle
         if (gameState.guesses[row][col]) {
           cell.classList.add('filled');
         } else {
           cell.classList.remove('filled');
-        }
-        
-        // Aktif satırı vurgula
-        if (row === gameState.currentRow) {
-          cell.classList.add('active-row');
-        } else {
-          cell.classList.remove('active-row');
         }
       }
     }

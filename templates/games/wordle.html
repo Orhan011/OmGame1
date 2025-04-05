@@ -77,11 +77,11 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Wordle Grid (tıklanabilir) -->
+        <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
         <!-- Gizli input field - mobil klavye açmak için -->
-        <input type="text" id="wordle-input-field" class="wordle-input-field" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="wordle-input-field" class="wordle-input-field" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         
         <!-- Kontrol Butonları -->
         <div class="wordle-controls">
@@ -200,19 +200,11 @@
     color: white;
     text-transform: uppercase;
     transition: all 0.3s ease;
-    cursor: pointer;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent; /* Mobil dokunuşta vurgulamayı kaldır */
   }
 
   .wordle-cell.filled {
     border-color: rgba(150, 150, 200, 0.5);
     transform: scale(1.05);
-  }
-  
-  .wordle-cell.active-row {
-    border-color: rgba(100, 140, 255, 0.8);
-    box-shadow: 0 0 5px rgba(100, 140, 255, 0.5);
   }
 
   .wordle-cell.correct {
@@ -270,9 +262,6 @@
     width: 1px;
     height: 1px;
     overflow: hidden;
-    font-size: 16px; /* iOS'da yakınlaştırmayı önlemek için */
-    padding: 5px;
-    border: none;
   }
   
   .wordle-controls {
@@ -354,24 +343,6 @@
     100% { opacity: 0; }
   }
 
-  /* Mobil klavye titreme önleme */
-  body.keyboard-visible {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  /* Input field mobil düzenlemesi */
-  .wordle-input-field {
-    bottom: 0;
-    position: fixed;
-    opacity: 0;
-    height: 1px;
-    width: 1px;
-    z-index: -1;
-  }
-  
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
@@ -380,10 +351,6 @@
     .keyboard-key {
       padding: 10px 8px;
       font-size: 0.9rem;
-    }
-    
-    .wordle-grid {
-      margin-bottom: 50px; /* Mobil klavye açıldığında ekstra alan */
     }
   }
 </style>
