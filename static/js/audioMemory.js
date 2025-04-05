@@ -146,6 +146,9 @@ function startLevel() {
 
 // Karmaşık melodi üret
 function generateComplexPattern() {
+  // Görünür padleri al
+  const visiblePadElements = [...soundPads].filter(pad => pad.style.display !== 'none');
+
   // Zorluk seviyesine göre başlangıç nota sayısını belirle
   let initialNotes = 0;
 
@@ -161,14 +164,11 @@ function generateComplexPattern() {
   }
 
   // Seviyeye ve zorluğa göre eklenecek nota sayısı
-  // Kolay mod: Her seviyede 1 nota ekle
-  // Orta mod: Her seviyede 1 nota ekle, başlangıç 3
-  // Zor mod: Her seviyede 1 nota ekle, başlangıç 4
   const notesToAdd = initialNotes + (gamePattern.length === 0 ? 0 : 1);
 
   for (let i = 0; i < notesToAdd; i++) {
-    // Tamamen karmaşık seçim için her seferinde rastgele pad seç
-    let randomPadIndex = Math.floor(Math.random() * visiblePads);
+    if (visiblePadElements.length === 0) break;
+    let randomPadIndex = Math.floor(Math.random() * visiblePadElements.length);
 
     // Karmaşıklığı artırmak için bazen aynı notayı tekrarlama
     if (gamePattern.length > 0 && Math.random() > 0.7) {
@@ -182,7 +182,7 @@ function generateComplexPattern() {
       }
     }
 
-    const randomNote = soundPads[randomPadIndex].dataset.note;
+    const randomNote = visiblePadElements[randomPadIndex].dataset.note;
 
     // Modlara göre özel melodi oluşturma
     if (currentMode === 'classic' || currentMode === 'timed') {
