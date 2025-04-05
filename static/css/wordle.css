@@ -865,3 +865,41 @@ body {
     margin-top: 0.5rem;
   }
 }
+
+/**
+   * Tema ayarını uygular
+   */
+  function applyTheme() {
+    try {
+      console.log("Tema uygulanıyor:", isDarkTheme ? "Karanlık" : "Aydınlık");
+
+      if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        document.body.classList.remove('light-theme');
+        document.documentElement.style.setProperty('--wordle-background', '#111827');
+        document.documentElement.style.setProperty('--wordle-surface', '#1f2937');
+        document.documentElement.style.setProperty('--wordle-border', '#374151');
+        document.documentElement.style.setProperty('--wordle-text-primary', '#f9fafb');
+        document.documentElement.style.setProperty('--wordle-text-secondary', '#9ca3af');
+        document.documentElement.style.setProperty('--wordle-key', '#374151');
+        document.documentElement.style.setProperty('--wordle-key-text', '#e5e7eb');
+      } else {
+        document.body.classList.add('light-theme');
+        document.body.classList.remove('dark-theme');
+        document.documentElement.style.setProperty('--wordle-background', '#f3f4f6');
+        document.documentElement.style.setProperty('--wordle-surface', '#ffffff');
+        document.documentElement.style.setProperty('--wordle-border', '#e5e7eb');
+        document.documentElement.style.setProperty('--wordle-text-primary', '#1f2937');
+        document.documentElement.style.setProperty('--wordle-text-secondary', '#4b5563');
+        document.documentElement.style.setProperty('--wordle-key', '#e5e7eb');
+        document.documentElement.style.setProperty('--wordle-key-text', '#1f2937');
+      }
+
+      // Oyun alanı ve klavye elementlerini yeniden görünür yap
+      if (guessGrid) guessGrid.style.visibility = "visible";
+      if (keyboard) keyboard.style.visibility = "visible";
+
+    } catch (error) {
+      console.error("Tema uygulanırken hata oluştu:", error);
+    }
+  }

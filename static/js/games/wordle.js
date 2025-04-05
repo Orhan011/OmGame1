@@ -1,10 +1,12 @@
 /**
  * Wordle Premium Sürüm
  * Profesyonel ve modern kullanıcı deneyimi ile 5 harfli kelimeyi 6 denemede tahmin edin
- * Versiyon: 2.1
+ * Versiyon: 2.2
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+  console.log("Wordle oyunu yükleniyor...");
+  
   // DOM Elementleri
   const guessGrid = document.getElementById('guess-grid');
   const keyboard = document.getElementById('keyboard');
@@ -12,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const newGameBtn = document.getElementById('new-game-btn');
   const shareResultBtn = document.getElementById('share-result-btn');
   const modalOverlay = document.querySelector('.wordle-modal-overlay');
+  
+  if (!guessGrid) console.error("Guess Grid bulunamadı!");
+  if (!keyboard) console.error("Keyboard bulunamadı!");
+  if (!messageDisplay) console.error("Message Display bulunamadı!");
   
   // Modal elementleri
   const helpBtn = document.getElementById('help-btn');
@@ -81,6 +87,19 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function initializeGame() {
     try {
+      console.log("Oyun başlatılıyor...");
+      
+      // DOM elementlerinin varlığını kontrol et
+      if (!guessGrid) {
+        console.error("guess-grid elementi bulunamadı! HTML yapısını kontrol edin.");
+        throw new Error("guess-grid elementi bulunamadı");
+      }
+      
+      if (!keyboard) {
+        console.error("keyboard elementi bulunamadı! HTML yapısını kontrol edin.");
+        throw new Error("keyboard elementi bulunamadı");
+      }
+      
       // Yerel depolamadan istatistikleri, ayarları ve oyun durumunu yükle
       loadGameData();
       
@@ -98,9 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Geri süresi kontrolü (Günde bir kelime özelliği için)
       checkDailyWordStatus();
+      
+      console.log("Oyun başarıyla başlatıldı!");
+      showMessage("Oyun başarıyla yüklendi!", "success", 2000);
     } catch (error) {
       console.error("Oyun başlatılırken hata oluştu:", error);
-      showMessage("Oyun yüklenirken bir hata oluştu, sayfayı yenileyin.", "error");
+      showMessage("Oyun yüklenirken bir hata oluştu: " + error.message, "error");
+      
+      // Kritik bir hata durumunda sayfayı otomatik yenilemeyi öner
+      setTimeout(() => {
+        if (confirm("Oyun yüklenirken bir sorun oluştu. Sayfayı yenilemek ister misiniz?")) {
+          window.location.reload();
+        }
+      }, 1500);
     }
   }
   
@@ -300,6 +329,16 @@ document.addEventListener('DOMContentLoaded', function() {
       today.setHours(0, 0, 0, 0);
       const todayString = today.toISOString().split('T')[0];
       
+      // Kelime listesi var mı kontrol et
+      if (typeof WORDLE_WORDS === 'undefined' || !Array.isArray(WORDLE_WORDS) || WORDLE_WORDS.length === 0) {
+        console.error("Kelime listesi bulunamadı veya boş!");
+        // Varsayılan kelimeler
+        const defaultWords = ["kalem", "kitap", "araba", "balık", "bulut"];
+        targetWord = defaultWords[Math.floor(Math.random() * defaultWords.length)].toUpperCase();
+        console.log("Varsayılan kelime seçildi:", targetWord);
+        return;
+      }
+      
       // Önceden kaydedilmiş günlük kelime var mı ve bugünkü mü kontrol et
       if (gameStats.dailyWordDate === todayString && gameStats.dailyWord) {
         targetWord = gameStats.dailyWord.toUpperCase();
@@ -316,8 +355,9 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Hedef kelime:", targetWord); // Geliştirme için, canlıda kaldırılmalı
     } catch (error) {
       console.error("Hedef kelime seçilirken hata oluştu:", error);
-      // Herhangi bir hata durumunda yeni bir kelime seç
-      targetWord = getRandomWordleWord().toUpperCase();
+      // Herhangi bir hata durumunda varsayılan bir kelime seç
+      targetWord = "BULUT";
+      console.log("Hata durumunda varsayılan kelime seçildi:", targetWord);
     }
   }
   
@@ -686,13 +726,20 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function createGameBoard() {
     try {
-      if (!guessGrid) return;
+      console.log("Oyun tahtası oluşturuluyor...");
+      
+      if (!guessGrid) {
+        console.error("GuessGrid bulunamadı!");
+        return;
+      }
       
       guessGrid.innerHTML = '';
+      guessGrid.style.display = 'grid'; // Görünürlük sorunu için
       
       for (let i = 0; i < MAX_GUESSES; i++) {
         const row = document.createElement('div');
         row.classList.add('row');
+        row.style.display = 'grid'; // Satır görünürlüğü sağla
         
         for (let j = 0; j < WORD_LENGTH; j++) {
           const box = document.createElement('div');
@@ -700,14 +747,21 @@ document.addEventListener('DOMContentLoaded', function() {
           box.classList.add('empty');
           box.dataset.row = i;
           box.dataset.col = j;
+          box.style.visibility = 'visible'; // Her kutuyu görünür yap
+          
+          // DOM'a eklenmeden önce içeriği kontrol et
+          console.log(`Kutu oluşturuldu: Satır ${i}, Sütun ${j}`);
           
           row.appendChild(box);
         }
         
         guessGrid.appendChild(row);
       }
+      
+      console.log("Oyun tahtası başarıyla oluşturuldu.");
     } catch (error) {
       console.error("Oyun tahtası oluşturulurken hata oluştu:", error);
+      showMessage("Oyun tahtası oluşturulamadı.", "error");
     }
   }
   
