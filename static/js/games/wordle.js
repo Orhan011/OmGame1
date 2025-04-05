@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
   inputField.maxLength = 1; // Tek harf için
   inputField.autocomplete = 'off';
   inputField.autocapitalize = 'characters';
+  inputField.inputMode = 'text'; // Mobil cihazlarda tam klavye
   
   function createWordleGrid() {
     wordleGrid.innerHTML = '';
@@ -164,10 +165,19 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         
-        // Hücreye tıklandığında klavyeyi açma
+        // Hücreye tıklandığında klavyeyi açma - mobil klavye için
         cell.addEventListener('click', function() {
           if (gameState.isGameOver) return;
           if (parseInt(cell.dataset.row) === gameState.currentRow) {
+            openMobileKeyboard();
+          }
+        });
+        
+        // Ayrıca dokunma olayı ekle - dokunmatik cihazlar için
+        cell.addEventListener('touchstart', function(e) {
+          if (gameState.isGameOver) return;
+          if (parseInt(cell.dataset.row) === gameState.currentRow) {
+            e.preventDefault(); // Varsayılan dokunma davranışını engelle
             openMobileKeyboard();
           }
         });
@@ -180,15 +190,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Klavye yönetimini ayarla
     setupKeyboardInput();
+    
+    // Oyun başladığında otomatik olarak mobil klavyeyi aç
+    setTimeout(() => {
+      if (!gameState.isGameOver) {
+        openMobileKeyboard();
+      }
+    }, 500);
   }
   
   /**
    * Mobil klavyeyi açar
    */
   function openMobileKeyboard() {
+    // Değeri temizle ve odakla
     inputField.value = '';
-    inputField.focus();
-    isKeyboardOpen = true;
+    
+    // iOS için klavyeyi açmak için daha güvenilir bir yöntem
+    setTimeout(() => {
+      inputField.focus();
+      inputField.click(); // Bazı mobil tarayıcılar için ekstra tıklama
+      isKeyboardOpen = true;
+      
+      // body sınıfını ekleyerek mobil klavye açık olduğunda sayfa düzenini koru
+      document.body.classList.add('keyboard-visible');
+    }, 10);
   }
   
   /**
@@ -226,33 +252,20 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Klavyeyi oluşturur
+   * Klavyeyi oluşturur - Ekran klavyesi kaldırılmıştır
    */
   function createKeyboard() {
-    keyboardRow1.innerHTML = '';
-    keyboardRow2.innerHTML = '';
-    keyboardRow3.innerHTML = '';
+    // Ekran klavyesi kullanılmayacak
+    // Mobil cihaz klavyesi kullanılacak
     
-    // Klavye düzenini oluştur
-    turkishKeyboard.forEach((row, rowIndex) => {
-      const rowContainer = document.getElementById(`keyboard-row-${rowIndex + 1}`);
-      
-      row.forEach(key => {
-        const keyButton = document.createElement('button');
-        keyButton.className = 'keyboard-key';
-        keyButton.textContent = key;
-        
-        if (key === 'SİL' || key === 'ENTER') {
-          keyButton.classList.add('wide');
-        }
-        
-        keyButton.addEventListener('click', () => {
-          handleKeyboardClick(key);
-        });
-        
-        rowContainer.appendChild(keyButton);
-      });
-    });
+    // Klavye container'ı gizle
+    const keyboardContainer = document.getElementById('keyboard');
+    if (keyboardContainer) {
+      keyboardContainer.style.display = 'none';
+    }
+    
+    // Aktif satıra tıklandığında hemen mobil klavyeyi aç
+    updateGrid();
   }
 
   /**
