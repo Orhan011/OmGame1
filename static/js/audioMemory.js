@@ -166,23 +166,31 @@ function generateComplexPattern() {
   // Zor mod: Her seviyede 1 nota ekle, başlangıç 4
   const notesToAdd = initialNotes + (gamePattern.length === 0 ? 0 : 1);
 
+  // Görünür pad'leri filtrele
+  const visiblePadsList = [...soundPads].filter(pad => pad.style.display !== 'none');
+  
+  if (visiblePadsList.length === 0) {
+    console.error("Görünür pad bulunamadı!");
+    return;
+  }
+
   for (let i = 0; i < notesToAdd; i++) {
     // Tamamen karmaşık seçim için her seferinde rastgele pad seç
-    let randomPadIndex = Math.floor(Math.random() * visiblePads);
+    let randomPadIndex = Math.floor(Math.random() * visiblePadsList.length);
 
     // Karmaşıklığı artırmak için bazen aynı notayı tekrarlama
     if (gamePattern.length > 0 && Math.random() > 0.7) {
       // %30 ihtimalle önceki notalardan birini seç
       const randomPrevIndex = Math.floor(Math.random() * gamePattern.length);
       const prevNote = gamePattern[randomPrevIndex];
-      const prevPadIndex = [...soundPads].findIndex(pad => pad.dataset.note === prevNote && pad.style.display !== 'none');
+      const prevPadIndex = visiblePadsList.findIndex(pad => pad.dataset.note === prevNote);
 
       if (prevPadIndex !== -1) {
         randomPadIndex = prevPadIndex;
       }
     }
 
-    const randomNote = soundPads[randomPadIndex].dataset.note;
+    const randomNote = visiblePadsList[randomPadIndex].dataset.note;
 
     // Modlara göre özel melodi oluşturma
     if (currentMode === 'classic' || currentMode === 'timed') {
@@ -212,7 +220,7 @@ function playGamePattern() {
   let i = 0;
 
   // İlerleme çubuğunu ayarla
-  progressBar.style.setProperty('--progress', '0%');
+  progressBar.style.width = '0%';
 
   // Mod ve zorluk seviyesine göre hız ayarla
   let speed = 1000; // Varsayılan hız
@@ -255,7 +263,7 @@ function playGamePattern() {
 
     // İlerleme çubuğunu güncelle
     const progress = ((i + 1) / gamePattern.length) * 100;
-    progressBar.style.setProperty('--progress', `${progress}%`);
+    progressBar.style.width = `${progress}%`;
 
     i++;
   }, speed);
@@ -322,7 +330,7 @@ function updateStatusMessage(message) {
 
 // İlerleme çubuğunu güncelle
 function updateProgressBar(percent) {
-  progressBar.style.setProperty('--progress', `${percent}%`);
+  progressBar.style.width = `${percent}%`;
 }
 
 // Oyun modunu ayarla
