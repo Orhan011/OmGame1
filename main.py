@@ -18,6 +18,8 @@ from models import User, Score, Article
 
 # Configure logging
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+app.config['DEBUG'] = True
 
 # İzin verilen dosya uzantıları - avatar yüklemeleri için
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
