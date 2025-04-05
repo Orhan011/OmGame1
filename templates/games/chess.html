@@ -1,145 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Beyin Egzersizi - Satranç</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+</head>
 
-{% extends "layout.html" %}
-
-{% block title %}Satranç - ZekaPark{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/games/chess.css') }}">
-{% endblock %}
-
-{% block content %}
-<div class="container">
-  <header>
-    <div class="title-area">
-      <h1>Satranç</h1>
-      <p class="subtitle">Klasik satranç oyunu - stratejik düşünce becerilerinizi geliştirin</p>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <h1>Beyin Egzersizi Oyunları</h1>
+      <h2></h2>
     </div>
+
+    <div class="timer-container">
+      <div class="timer black-timer">
+        <div id="blackTimerDisplay" class="timer-display">5:00</div>
+        <div class="player-name">Siyah</div>
+      </div>
+      <div class="timer white-timer">
+        <div id="whiteTimerDisplay" class="timer-display">5:00</div>
+        <div class="player-name">Beyaz</div>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <div id="status" class="status">Zorluk seviyesini seçip "YENİ OYUN" butonuna tıklayın</div>
+      <div id="board" class="board"></div>
+    </div>
+
     <div class="game-options">
-      <button class="option-btn" id="helpBtn" title="Nasıl Oynanır">
-        <i class="fas fa-question"></i>
-      </button>
-      <button class="option-btn" id="settingsBtn" title="Ayarlar">
-        <i class="fas fa-cog"></i>
-      </button>
+      <div class="difficulty-selection">
+        <h3>Zorluk Seviyesi</h3>
+        <div class="radio-container">
+          <input type="radio" id="easyLevel" name="difficulty" value="easy" checked>
+          <label for="easyLevel">Kolay</label>
+          <input type="radio" id="mediumLevel" name="difficulty" value="medium">
+          <label for="mediumLevel">Orta</label>
+          <input type="radio" id="hardLevel" name="difficulty" value="hard">
+          <label for="hardLevel">Zor</label>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <div class="chess-game-container">
-    <div class="game-info">
-      <div class="player-info black-player">
-        <span class="player-name">Siyah</span>
-        <span class="player-time" id="blackTime">10:00</span>
-      </div>
-      
-      <div class="turn-indicator" id="turnIndicator">
-        Beyaz Oyuncunun Sırası
-      </div>
-      
-      <div class="player-info white-player">
-        <span class="player-name">Beyaz</span>
-        <span class="player-time" id="whiteTime">10:00</span>
-      </div>
+    <div class="controls">
+      <button id="startBtn">YENİ OYUN</button>
+      <button id="undoBtn">GERİ AL</button>
     </div>
-    
-    <div class="board-notation">
-      <div class="chess-board" id="chessBoard">
-        <!-- Tahtayı JavaScript ile oluşturacağız -->
-      </div>
-      
-      <div class="notation-rank">
-        <div class="notation-label">8</div>
-        <div class="notation-label">7</div>
-        <div class="notation-label">6</div>
-        <div class="notation-label">5</div>
-        <div class="notation-label">4</div>
-        <div class="notation-label">3</div>
-        <div class="notation-label">2</div>
-        <div class="notation-label">1</div>
-      </div>
-      
-      <div class="notation-file">
-        <div class="notation-label">a</div>
-        <div class="notation-label">b</div>
-        <div class="notation-label">c</div>
-        <div class="notation-label">d</div>
-        <div class="notation-label">e</div>
-        <div class="notation-label">f</div>
-        <div class="notation-label">g</div>
-        <div class="notation-label">h</div>
-      </div>
-    </div>
-    
-    <div class="game-status" id="gameStatus">
-      Oyuna başlamak için düğmeye basın
-    </div>
-    
-    <div class="game-controls">
-      <button class="chess-btn primary-btn" id="startBtn">
-        <i class="fas fa-play"></i> Oyunu Başlat
-      </button>
-      <button class="chess-btn secondary-btn" id="undoBtn" disabled>
-        <i class="fas fa-undo"></i> Hamleyi Geri Al
-      </button>
-      <button class="chess-btn secondary-btn" id="flipBtn">
-        <i class="fas fa-retweet"></i> Tahtayı Çevir
-      </button>
-      <button class="chess-btn danger-btn" id="restartBtn">
-        <i class="fas fa-sync-alt"></i> Yeniden Başlat
-      </button>
-    </div>
-    
-    <div class="move-history">
-      <div class="move-history-title">Hamle Geçmişi</div>
-      <div class="move-list" id="moveList">
-        <!-- Hamle geçmişi JavaScript ile doldurulacak -->
-      </div>
+
+    <div class="hidden-info">
+      <div id="fen"></div>
+      <div id="pgn"></div>
     </div>
   </div>
-</div>
 
-<!-- Piyon Terfi Modalı -->
-<div class="promotion-modal" id="promotionModal" style="display: none;">
-  <div class="promotion-content">
-    <div class="promotion-title">Piyon Terfisi</div>
-    <p>Piyonunuzu terfi ettirmek için bir taş seçin:</p>
-    <div class="promotion-options">
-      <div class="promotion-piece" data-piece="queen"></div>
-      <div class="promotion-piece" data-piece="rook"></div>
-      <div class="promotion-piece" data-piece="bishop"></div>
-      <div class="promotion-piece" data-piece="knight"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Oyun Sonu Modalı -->
-<div class="game-over-modal" id="gameOverModal" style="display: none;">
-  <div class="game-over-content">
-    <div class="game-over-title">Oyun Bitti</div>
-    <div class="game-over-message" id="gameOverMessage"></div>
-    
-    <div class="game-over-stats">
-      <div class="game-over-stat">
-        <div class="stat-value" id="totalMoves">0</div>
-        <div class="stat-label">Toplam Hamle</div>
-      </div>
-      <div class="game-over-stat">
-        <div class="stat-value" id="gameTime">00:00</div>
-        <div class="stat-label">Oyun Süresi</div>
-      </div>
-    </div>
-    
-    <div class="game-over-actions">
-      <button class="chess-btn primary-btn" id="playAgainBtn">
-        <i class="fas fa-play"></i> Tekrar Oyna
-      </button>
-      <button class="chess-btn secondary-btn" id="analysisBtn">
-        <i class="fas fa-search"></i> Analiz Et
-      </button>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/games/chess.js') }}"></script>
-{% endblock %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
