@@ -670,28 +670,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Ensure responsive design
   window.addEventListener('resize', board.resize);
+// Define these functions in global scope
+  function enableBoardInteraction() {
+    const squares = document.querySelectorAll('.square-55d63');
+    squares.forEach(square => {
+      square.style.pointerEvents = 'auto';
+    });
+  }
+
+  function disableBoardInteraction() {
+    const squares = document.querySelectorAll('.square-55d63');
+    squares.forEach(square => {
+      square.style.pointerEvents = 'none';
+    });
+  }
+
+  function endGame() {
+    gameStarted = false;
+    disableBoardInteraction();
+    stopTimer();
+
+    // Re-enable difficulty selection for next game
+    document.querySelectorAll('input[name="difficulty"]').forEach(option => {
+      option.disabled = false;
+    });
+  }
 });
-function enableBoardInteraction() {
-  const squares = document.querySelectorAll('.square-55d63');
-  squares.forEach(square => {
-    square.style.pointerEvents = 'auto';
-  });
-}
-
-function disableBoardInteraction() {
-  const squares = document.querySelectorAll('.square-55d63');
-  squares.forEach(square => {
-    square.style.pointerEvents = 'none';
-  });
-}
-
-function endGame() {
-  gameStarted = false;
-  disableBoardInteraction();
-  stopTimer();
-
-  // Re-enable difficulty selection for next game
-  document.querySelectorAll('input[name="difficulty"]').forEach(option => {
-    option.disabled = false;
-  });
-}
