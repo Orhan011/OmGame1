@@ -353,20 +353,6 @@
     90% { opacity: 1; }
     100% { opacity: 0; }
   }
-  
-  /* Klavye açılınca titremeyi önlemek için */
-  body.keyboard-open {
-    position: fixed;
-    width: 100%;
-    height: var(--window-height, 100%);
-    overflow: hidden;
-  }
-  
-  /* Klavye açıldığında görünüm düzenlemesi */
-  .wordle-grid {
-    margin-bottom: calc(env(safe-area-inset-bottom, 0) + 20px);
-    transition: margin-bottom 0.3s ease;
-  }
 
   @media (max-width: 576px) {
     .wordle-cell {
