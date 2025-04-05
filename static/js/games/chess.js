@@ -251,6 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
     board.position(game.fen());
 
     // Switch timer on successful move
+    stopTimer(); // Önce mevcut zamanlayıcıyı durdur
+    
     if (move.color === 'w') {
       startTimer('b'); // Switch to black's timer
     } else {
@@ -280,7 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
     isAiThinking = true;
     statusEl.textContent = 'Yapay Zeka düşünüyor...';
 
-    // Continue black's timer during AI thinking instead of stopping it
+    // Continue black's timer during AI thinking
+    // NOT: Siyah (AI) düşünürken zamanlayıcı devam etmeli
+    if (!timerInterval) {
+      startTimer('b');
+    }
 
     // Use setTimeout to give a visual effect of "thinking"
     setTimeout(() => {
