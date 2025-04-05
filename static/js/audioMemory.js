@@ -2,12 +2,6 @@
 
 // Ses öğelerini yükle
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const audioFiles = {
-  success: new Audio('/static/sounds/success.mp3'),
-  wrong: new Audio('/static/sounds/wrong.mp3'),
-  levelUp: new Audio('/static/sounds/level-up.mp3'),
-  gameOver: new Audio('/static/sounds/game-over.mp3')
-};
 const notes = {
   do: 261.63, // C4
   re: 293.66, // D4
@@ -426,11 +420,7 @@ resetBtn.addEventListener('click', () => {
 });
 
 soundPads.forEach(pad => {
-  ['click', 'touchstart'].forEach(evt => {
-    pad.addEventListener(evt, (e) => {
-      if(evt === 'touchstart') {
-        e.preventDefault(); // Prevent double-firing on mobile
-      }
+  pad.addEventListener('click', () => {
     if (!playerTurn) return;
 
     const note = pad.dataset.note;
