@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const trButton = document.getElementById('tr-button');
   const enButton = document.getElementById('en-button');
   // stats modal artık kullanılmadığı için kaldırıldı
+  
+  // Oyun ayarları objesi
+  const gameState = {
+    soundEnabled: true, // Ses açık varsayılan
+    keyboardOpen: false // Klavye kapalı varsayılan
+  };
 
   // Modaller için kapatma düğmelerini seç
   const closeButtons = document.querySelectorAll('.close-button');
@@ -314,19 +320,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Sanal klavye kullanım dışı - cihaz klavyesini kullanma için
-  function showVirtualKeyboard() {
-    // Artık klavye gösterilmediğinden işlem yapmaya gerek yok
-    // Sadece inputu aktif eder
-    if (selectedTile) {
-      selectedTile.focus();
+  // Tema geçişi için fonksiyon
+  function toggleTheme() {
+    const body = document.body;
+    if (body.classList.contains('dark-theme')) {
+      body.classList.remove('dark-theme');
+      body.classList.add('light-theme');
+    } else {
+      body.classList.remove('light-theme');
+      body.classList.add('dark-theme');
     }
   }
 
-  // Klavye tuşlarının renklerini güncelleme fonksiyonu
-  // Artık sanal klavye olmadığı için bu fonksiyon kullanılmıyor
-  function updateKeyStatus(keyElement, char) {
-    // Kullanılmıyor
+  // Kullanıcı arabirimini güncellemek için fonksiyon
+  function updateUI() {
+    // İstatistikleri göster
+    const guessesDisplay = document.getElementById('guesses-display');
+    if (guessesDisplay) {
+      guessesDisplay.textContent = `${currentAttempt}/${MAX_ATTEMPTS}`;
+    }
   }
 
   // Oyun tahtasını oluşturma fonksiyonu
@@ -484,11 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
             tile.classList.add('absent');
           }
 
-          // Son kare değerlendirildikten sonra klavyeyi güncelle
+          // Son kare değerlendirildikten sonra arayüzü güncelle
           if (i === WORD_LENGTH - 1) {
             setTimeout(() => {
-              // Sanal klavyeyi yeniden göster (renkleri güncellemek için)
-              showVirtualKeyboard();
+              // Kullanıcı arayüzünü güncelle
+              updateUI();
             }, 100);
           }
         }, 250);
@@ -498,18 +510,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Ses çalma fonksiyonu
   function playSound(soundName) {
+    // Eğer ses devre dışı bırakıldıysa çalmayı atla
+    if (!gameState.soundEnabled) {
+      return;
+    }
+    
     try {
       // Ses çalma başarısız olursa sessizce devam et
       const sound = new Audio(`/static/sounds/${soundName}.mp3`);
       sound.volume = 0.5;
       
-      const playPromise = sound.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          // Ses çalma hatası sessizce yok sayılır
-          console.log("Ses çalma hatası:", error);
-        });
-      }
+      // Ses dosyası önce yüklesin
+      sound.addEventListener('canplaythrough', () => {
+        try {
+          const playPromise = sound.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              // Kullanıcı etkileşimi olmadan ses çalınamıyor olabilir, hatayı sessizce geç
+              console.log("Ses çalma hatası:", error);
+            });
+          }
+        } catch (e) {
+          console.log("Ses çalma hatası:", e);
+        }
+      });
+      
+      // Ses dosyası yüklenemezse
+      sound.addEventListener('error', () => {
+        console.log(`${soundName} ses dosyası yüklenemedi`);
+      });
+      
     } catch (error) {
       // Ses çalma hatası sessizce işlenir
       console.log("Ses çalma hatası:", error);
