@@ -1,0 +1,264 @@
+
+/* Wordle Oyunu Stilleri */
+:root {
+  --tile-size: 62px;
+  --tile-gap: 5px;
+  --tile-font-size: 2rem;
+  --key-height: 58px;
+  --correct-color: #6aaa64;
+  --present-color: #c9b458;
+  --absent-color: #787c7e;
+  --key-bg: rgba(255, 255, 255, 0.1);
+  --keyboard-height: 200px;
+}
+
+/* Oyun Kuralları */
+.game-rules {
+  margin-top: 15px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.rule-item i {
+  color: var(--accent-color);
+  margin-right: 10px;
+  font-size: 1rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.square {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.correct-sample {
+  background-color: var(--correct-color);
+}
+
+.present-sample {
+  background-color: var(--present-color);
+}
+
+.absent-sample {
+  background-color: var(--absent-color);
+}
+
+/* Wordle Grid Stilleri */
+.wordle-grid-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.wordle-grid {
+  display: grid;
+  grid-template-rows: repeat(6, var(--tile-size));
+  gap: var(--tile-gap);
+  margin-bottom: 30px;
+}
+
+.wordle-row {
+  display: grid;
+  grid-template-columns: repeat(5, var(--tile-size));
+  gap: var(--tile-gap);
+}
+
+.wordle-tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--tile-font-size);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  user-select: none;
+  position: relative;
+  background: rgba(15, 15, 30, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.wordle-tile.filled {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.wordle-tile.correct {
+  background-color: var(--correct-color);
+  border-color: var(--correct-color);
+}
+
+.wordle-tile.present {
+  background-color: var(--present-color);
+  border-color: var(--present-color);
+}
+
+.wordle-tile.absent {
+  background-color: var(--absent-color);
+  border-color: var(--absent-color);
+}
+
+.wordle-tile.shake {
+  animation: shake 0.5s;
+}
+
+.wordle-tile.flip {
+  animation: flip 0.5s;
+}
+
+.wordle-tile.pop {
+  animation: pop 0.1s;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Klavye Stilleri */
+.keyboard {
+  margin-top: 20px;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.keyboard-row {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 6px;
+}
+
+.keyboard-key {
+  height: var(--key-height);
+  min-width: 40px;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--key-bg);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 0 8px;
+  transition: all 0.2s ease;
+}
+
+.keyboard-key:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.keyboard-key:active {
+  transform: scale(0.95);
+}
+
+.keyboard-key.correct {
+  background-color: var(--correct-color);
+  color: white;
+}
+
+.keyboard-key.present {
+  background-color: var(--present-color);
+  color: white;
+}
+
+.keyboard-key.absent {
+  background-color: var(--absent-color);
+  color: white;
+}
+
+#enter-key, #backspace-key {
+  min-width: 65px;
+  font-size: 0.9rem;
+}
+
+/* Sonuç İstatistikleri */
+.final-grid {
+  max-width: 300px;
+  margin: 15px auto;
+}
+
+.final-row {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.final-tile {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+}
+
+/* İpucu Butonu */
+#hint-button {
+  margin-left: auto;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 576px) {
+  :root {
+    --tile-size: 50px;
+    --tile-font-size: 1.7rem;
+    --key-height: 45px;
+  }
+  
+  .keyboard-key {
+    min-width: 25px;
+    font-size: 0.9rem;
+    padding: 0 4px;
+  }
+  
+  #enter-key, #backspace-key {
+    min-width: 50px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --tile-size: 45px;
+    --tile-font-size: 1.5rem;
+    --key-height: 40px;
+  }
+  
+  .keyboard-key {
+    min-width: 20px;
+    font-size: 0.8rem;
+  }
+}
