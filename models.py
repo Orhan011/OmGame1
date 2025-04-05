@@ -88,19 +88,3 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
-
-
-class FavoriteGame(db.Model):
-    """Kullanıcının ana ekranında gösterilen favori oyunları"""
-    __tablename__ = 'favorite_games'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    game_type = db.Column(db.String(50), nullable=False)  # wordPuzzle, memoryMatch, numberSequence, etc.
-    display_order = db.Column(db.Integer, default=0)  # Görüntüleme sırası
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # User ilişkisi
-    user = db.relationship('User', backref=db.backref('favorite_games', lazy=True))
-    
-    def __repr__(self):
-        return f'<FavoriteGame {self.game_type} for user {self.user_id}>'

@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from models import User, Score, Article, FavoriteGame
+from models import User, Score, Article
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -577,61 +577,9 @@ def init_db_route():
 @app.route('/')
 def index():
     user = None
-    favorite_games = []
-    
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-        if user:
-            # Kullanıcının favori oyunlarını al (en fazla 4)
-            favorite_games = FavoriteGame.query.filter_by(user_id=user.id).order_by(FavoriteGame.display_order).limit(4).all()
-    
-    # Tüm oyun türleri - yeni oyunlar ekledikçe bu listeyi güncelleyin
-    all_games = [
-        {'type': 'word_puzzle', 'name': 'Kelime Bulmaca', 'icon': 'fas fa-spell-check', 'url': url_for('word_puzzle')},
-        {'type': 'memory_match', 'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'url': url_for('memory_match')},
-        {'type': 'labyrinth', 'name': 'Labirent', 'icon': 'fas fa-route', 'url': url_for('labyrinth')},
-        {'type': 'puzzle', 'name': 'Yapboz', 'icon': 'fas fa-puzzle-piece', 'url': url_for('puzzle')},
-        {'type': 'number_sequence', 'name': 'Sayı Dizisi', 'icon': 'fas fa-sort-numeric-up', 'url': url_for('number_sequence')},
-        {'type': 'memory_cards', 'name': 'Hafıza Kartları', 'icon': 'fas fa-brain', 'url': url_for('memory_cards')},
-        {'type': 'number_chain', 'name': 'Sayı Zinciri', 'icon': 'fas fa-link', 'url': url_for('number_chain')},
-        {'type': 'audio_memory', 'name': 'Sesli Hafıza', 'icon': 'fas fa-music', 'url': url_for('audio_memory')},
-        {'type': 'n_back', 'name': 'N-Geri', 'icon': 'fas fa-undo', 'url': url_for('n_back')},
-        {'type': 'sudoku', 'name': 'Sudoku', 'icon': 'fas fa-th', 'url': url_for('sudoku')},
-        {'type': 'game_2048', 'name': '2048', 'icon': 'fas fa-boxes', 'url': url_for('game_2048')},
-        {'type': 'wordle', 'name': 'Wordle', 'icon': 'fas fa-font', 'url': url_for('wordle')},
-        {'type': 'chess', 'name': 'Satranç', 'icon': 'fas fa-chess', 'url': url_for('chess')}
-    ]
-    
-    # Kullanıcının favori oyunlarının tiplerini al
-    favorite_game_types = [game.game_type for game in favorite_games]
-    
-    # Favori olan ve olmayan oyunları ayır
-    user_favorites = []
-    other_games = []
-    
-    for game in all_games:
-        # Favori oyunlara oyun nesnelerini eşle
-        if game['type'] in favorite_game_types:
-            # Favori oyunun bilgilerini ve veritabanı kaydını birleştir
-            for fav in favorite_games:
-                if fav.game_type == game['type']:
-                    game_data = game.copy()
-                    game_data['favorite_id'] = fav.id
-                    game_data['display_order'] = fav.display_order
-                    user_favorites.append(game_data)
-                    break
-        else:
-            other_games.append(game)
-    
-    # Favori oyunları sıralama düzenine göre sırala
-    user_favorites.sort(key=lambda x: x['display_order'])
-    
-    return render_template('index.html', 
-                          user=user, 
-                          current_user=user, 
-                          favorite_games=user_favorites,
-                          other_games=other_games,
-                          all_games=all_games)
+    return render_template('index.html', user=user, current_user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -765,50 +713,7 @@ def chess():
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():
-    user = None
-    favorite_games = []
-    
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-        if user:
-            # Kullanıcının favori oyunlarını al
-            favorite_games = FavoriteGame.query.filter_by(user_id=user.id).all()
-    
-    # Tüm oyun türleri - index() ile aynı liste kullanılıyor
-    all_games = [
-        {'type': 'word_puzzle', 'name': 'Kelime Bulmaca', 'icon': 'fas fa-spell-check', 'url': url_for('word_puzzle')},
-        {'type': 'memory_match', 'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'url': url_for('memory_match')},
-        {'type': 'labyrinth', 'name': 'Labirent', 'icon': 'fas fa-route', 'url': url_for('labyrinth')},
-        {'type': 'puzzle', 'name': 'Yapboz', 'icon': 'fas fa-puzzle-piece', 'url': url_for('puzzle')},
-        {'type': 'number_sequence', 'name': 'Sayı Dizisi', 'icon': 'fas fa-sort-numeric-up', 'url': url_for('number_sequence')},
-        {'type': 'memory_cards', 'name': 'Hafıza Kartları', 'icon': 'fas fa-brain', 'url': url_for('memory_cards')},
-        {'type': 'number_chain', 'name': 'Sayı Zinciri', 'icon': 'fas fa-link', 'url': url_for('number_chain')},
-        {'type': 'audio_memory', 'name': 'Sesli Hafıza', 'icon': 'fas fa-music', 'url': url_for('audio_memory')},
-        {'type': 'n_back', 'name': 'N-Geri', 'icon': 'fas fa-undo', 'url': url_for('n_back')},
-        {'type': 'sudoku', 'name': 'Sudoku', 'icon': 'fas fa-th', 'url': url_for('sudoku')},
-        {'type': 'game_2048', 'name': '2048', 'icon': 'fas fa-boxes', 'url': url_for('game_2048')},
-        {'type': 'wordle', 'name': 'Wordle', 'icon': 'fas fa-font', 'url': url_for('wordle')},
-        {'type': 'chess', 'name': 'Satranç', 'icon': 'fas fa-chess', 'url': url_for('chess')}
-    ]
-    
-    # Kullanıcının favori oyunlarının tiplerini al
-    favorite_game_types = [game.game_type for game in favorite_games]
-    
-    # Her oyun için favori durumunu belirt
-    for game in all_games:
-        game['is_favorite'] = game['type'] in favorite_game_types
-        
-        # Favori oyunsa FavoriteGame nesnesini de ekle
-        if game['is_favorite']:
-            for fav in favorite_games:
-                if fav.game_type == game['type']:
-                    game['favorite_id'] = fav.id
-                    break
-    
-    return render_template('all_games.html', 
-                          user=user, 
-                          all_games=all_games, 
-                          favorite_count=len(favorite_game_types))
+    return render_template('all_games.html')
 
 # Skor Tablosu
 @app.route('/leaderboard')
@@ -1656,161 +1561,6 @@ def get_current_user_api():
         'user_id': user_id
     })
 
-# Favori oyun ekleme/kaldırma API'leri
-@app.route('/api/favorites/add', methods=['POST'])
-def add_favorite_game():
-    """Bir oyunu kullanıcının favorilerine ekle"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
-    
-    data = request.get_json()
-    game_type = data.get('game_type')
-    
-    if not game_type:
-        return jsonify({'success': False, 'error': 'Oyun türü belirtilmedi'}), 400
-    
-    user_id = session['user_id']
-    
-    # Kullanıcının mevcut favori oyunlarını kontrol et
-    favorite_count = FavoriteGame.query.filter_by(user_id=user_id).count()
-    
-    # Maksimum 4 favori oyun sınırlaması
-    if favorite_count >= 4:
-        return jsonify({
-            'success': False, 
-            'error': 'En fazla 4 favori oyun ekleyebilirsiniz. Önce bir oyunu favorilerden çıkarın.'
-        }), 400
-    
-    # Bu oyun zaten favori mi kontrol et
-    existing_favorite = FavoriteGame.query.filter_by(user_id=user_id, game_type=game_type).first()
-    if existing_favorite:
-        return jsonify({'success': False, 'error': 'Bu oyun zaten favorilerinizde'}), 400
-    
-    # Eklenecek oyunun sırasını belirle
-    next_order = favorite_count
-    
-    # Yeni favori oyun oluştur
-    new_favorite = FavoriteGame(
-        user_id=user_id,
-        game_type=game_type,
-        display_order=next_order
-    )
-    
-    try:
-        db.session.add(new_favorite)
-        db.session.commit()
-        return jsonify({
-            'success': True, 
-            'message': 'Oyun favorilerinize eklendi',
-            'favorite_id': new_favorite.id,
-            'display_order': new_favorite.display_order
-        })
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Favori oyun eklenirken hata: {e}")
-        return jsonify({'success': False, 'error': 'Bir hata oluştu'}), 500
-
-@app.route('/api/favorites/remove', methods=['POST'])
-def remove_favorite_game():
-    """Bir oyunu kullanıcının favorilerinden çıkar"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
-    
-    data = request.get_json()
-    favorite_id = data.get('favorite_id')
-    
-    if not favorite_id:
-        return jsonify({'success': False, 'error': 'Favori ID belirtilmedi'}), 400
-    
-    user_id = session['user_id']
-    
-    # Favori oyunu bul
-    favorite = FavoriteGame.query.filter_by(id=favorite_id, user_id=user_id).first()
-    
-    if not favorite:
-        return jsonify({'success': False, 'error': 'Favori oyun bulunamadı'}), 404
-    
-    try:
-        # Silinecek oyunun sıra numarasını al
-        removed_order = favorite.display_order
-        
-        # Favori oyunu sil
-        db.session.delete(favorite)
-        
-        # Diğer favori oyunların sıra numaralarını güncelle
-        favorites_to_update = FavoriteGame.query.filter(
-            FavoriteGame.user_id == user_id,
-            FavoriteGame.display_order > removed_order
-        ).all()
-        
-        for fav in favorites_to_update:
-            fav.display_order -= 1
-        
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Oyun favorilerinizden çıkarıldı'})
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Favori oyun çıkarılırken hata: {e}")
-        return jsonify({'success': False, 'error': 'Bir hata oluştu'}), 500
-
-@app.route('/api/favorites/reorder', methods=['POST'])
-def reorder_favorite_games():
-    """Favori oyunların sırasını değiştir"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
-    
-    data = request.get_json()
-    order_data = data.get('order', [])
-    
-    if not order_data or not isinstance(order_data, list):
-        return jsonify({'success': False, 'error': 'Geçersiz sıralama verisi'}), 400
-    
-    user_id = session['user_id']
-    
-    try:
-        # Her favori oyun için yeni sıra numarasını ayarla
-        for item in order_data:
-            favorite_id = item.get('id')
-            new_order = item.get('order')
-            
-            if favorite_id is None or new_order is None:
-                continue
-            
-            favorite = FavoriteGame.query.filter_by(id=favorite_id, user_id=user_id).first()
-            if favorite:
-                favorite.display_order = new_order
-        
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Favori oyunların sırası güncellendi'})
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Favori oyun sıralaması güncellenirken hata: {e}")
-        return jsonify({'success': False, 'error': 'Bir hata oluştu'}), 500
-
-@app.route('/api/favorites/list', methods=['GET'])
-def list_favorite_games():
-    """Kullanıcının favori oyunlarını listele"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
-    
-    user_id = session['user_id']
-    
-    try:
-        favorites = FavoriteGame.query.filter_by(user_id=user_id).order_by(FavoriteGame.display_order).all()
-        
-        result = []
-        for fav in favorites:
-            result.append({
-                'id': fav.id,
-                'game_type': fav.game_type,
-                'display_order': fav.display_order
-            })
-        
-        return jsonify({'success': True, 'favorites': result})
-    except Exception as e:
-        logger.error(f"Favori oyunlar listelenirken hata: {e}")
-        return jsonify({'success': False, 'error': 'Bir hata oluştu'}), 500
-
 @app.route('/api/get-scores/<game_type>')
 def get_scores(game_type):
     from sqlalchemy import func
@@ -2112,7 +1862,7 @@ def get_leaderboard_data(game_type):
         return []
         
 # Puana göre seviye hesaplama fonksiyonu
-def calculate_level_rank(score):
+def calculate_level(score):
     if score < 100:
         return "Başlangıç"
     elif score < 300:
