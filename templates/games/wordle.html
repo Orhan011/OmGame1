@@ -344,16 +344,19 @@
   /* Mobil klavye input alanı */
   .wordle-input-field {
     position: fixed;
-    top: -100px;
-    left: 0;
-    width: 1px;
-    height: 1px;
+    top: -9999px;
+    left: -9999px;
+    width: 0;
+    height: 0;
     opacity: 0;
     z-index: -10;
     font-size: 16px; /* iOS'da yakınlaştırmayı önler */
     caret-color: transparent; /* İmleç görünmez */
     user-select: none; /* Seçimi devre dışı bırak */
     -webkit-user-select: none;
+    pointer-events: auto; /* Kullanıcı girişini kabul et */
+    background: transparent;
+    border: none;
   }
 
   /* Aktif satır vurgusu */
@@ -386,11 +389,23 @@
     100% { box-shadow: 0 0 8px rgba(120, 130, 255, 0.7); }
   }
 
-  /* Klavye görünür olduğunda uygun boşluk bırak */
-  body.keyboard-visible {
-    padding-bottom: 250px !important;
+  /* Aktif hücreleri daha da belirgin yap */
+  .wordle-row[data-row="0"] .wordle-cell,
+  .wordle-row[data-row="1"] .wordle-cell,
+  .wordle-row[data-row="2"] .wordle-cell,
+  .wordle-row[data-row="3"] .wordle-cell,
+  .wordle-row[data-row="4"] .wordle-cell,
+  .wordle-row[data-row="5"] .wordle-cell {
+    transition: all 0.3s ease;
   }
 
+  /* Ekran kaydırma sorununu önlemek için sabit pozisyon ayarları */
+  .keyboard-visible .wordle-grid {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Mobil için ek düzenlemeler */
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
@@ -402,12 +417,23 @@
     }
 
     .wordle-grid {
-      margin-bottom: 80px; /* Mobil klavye açıldığında ekstra alan */
+      margin-bottom: 20px; /* Daha az boşluk */
     }
-
-    /* Mobil klavye açıkken body stilini düzenle */
-    body.keyboard-visible {
-      padding-bottom: 150px;
+    
+    /* Oyun alanını her zaman ekranda tut */
+    #game-container {
+      position: relative;
+      z-index: 1;
+      padding-bottom: 20px;
+    }
+    
+    /* Daha görünür talimat */
+    .wordle-instruction {
+      background-color: rgba(50, 50, 70, 0.7);
+      color: white;
+      font-weight: bold;
+      padding: 8px;
+      margin: 10px 0;
     }
   }
 </style>

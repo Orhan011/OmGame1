@@ -149,6 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
   inputField.autocomplete = 'off';
   inputField.autocapitalize = 'characters';
   inputField.inputMode = 'text'; // Mobil klavyeyi daha iyi destekler
+  // Otomatik düzeltmeyi kapatıp çift harf girişini engelle
+  inputField.autocorrect = 'off';
+  inputField.spellcheck = false;
   
   function createWordleGrid() {
     wordleGrid.innerHTML = '';
@@ -196,9 +199,25 @@ document.addEventListener('DOMContentLoaded', function() {
    * Mobil klavyeyi açar
    */
   function openMobileKeyboard() {
+    // Önce input değerini temizle
     inputField.value = '';
+    
+    // Sayfa konumunu hatırla ve klavye odaklandıktan sonra geri al
+    const scrollPos = window.scrollY;
+    
+    // Klavyeyi odakla
     inputField.focus();
     gameState.mobileKeyboardActive = true;
+    
+    // Sayfanın otomatik kaydırmasını önlemek için konum düzeltmesi
+    setTimeout(() => {
+      window.scrollTo(0, scrollPos);
+      
+      // İnput alanının görünür olmasını engelle
+      inputField.style.position = 'fixed';
+      inputField.style.top = '50%';
+      inputField.style.opacity = '0';
+    }, 50);
     
     // Mobil klavye açıldığında UI'ı düzenle
     document.body.classList.add('keyboard-visible');
@@ -211,14 +230,32 @@ document.addEventListener('DOMContentLoaded', function() {
    * Klavye giriş olaylarını ayarlar
    */
   function setupKeyboardInput() {
+    // Çift harf girmesini önlemek için inpur olayı yerine keyup kullan
+    let lastInputTime = 0;
+    
     inputField.addEventListener('input', function(e) {
       if (gameState.isGameOver) return;
+      
+      // Çift harf girişini engellemek için zaman kontrolü yap
+      const now = Date.now();
+      if (now - lastInputTime < 100) {
+        inputField.value = '';
+        return;
+      }
       
       const input = e.target.value.toUpperCase();
       if (input && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
         addLetter(input);
-        inputField.value = ''; // Değeri temizle
+        lastInputTime = now;
+        
+        // Değeri hemen temizle
+        setTimeout(() => {
+          inputField.value = '';
+        }, 10);
+        
         playSound('keypress');
+      } else {
+        inputField.value = '';
       }
     });
     
@@ -229,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault(); // Formları önle
         submitGuess();
       } else if (e.key === 'Backspace') {
+        e.preventDefault(); // Varsayılan davranışı engelle
         deleteLetter();
         playSound('keypress');
       }
@@ -318,9 +356,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Harf ekledikten sonra tekrar klavyeye odaklan
-      if (isKeyboardOpen) {
+      if (gameState.mobileKeyboardActive) {
         setTimeout(() => {
           inputField.focus();
+          inputField.value = '';
         }, 10);
       }
     }
@@ -336,9 +375,10 @@ document.addEventListener('DOMContentLoaded', function() {
       updateGrid();
       
       // Silme işleminden sonra tekrar klavyeye odaklan
-      if (isKeyboardOpen) {
+      if (gameState.mobileKeyboardActive) {
         setTimeout(() => {
           inputField.focus();
+          inputField.value = '';
         }, 10);
       }
     }
