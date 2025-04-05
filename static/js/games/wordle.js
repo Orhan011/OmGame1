@@ -99,6 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
         submitGuess();
       }
     });
+    
+    // Klavye kapandığında durumu güncelle
+    inputField.addEventListener('blur', function() {
+      // Klavyenin kapandığını belirt
+      isKeyboardOpen = false;
+    });
   }
 
   /**
@@ -197,39 +203,46 @@ document.addEventListener('DOMContentLoaded', function() {
         playSound('keypress');
       }
     }
+    
+    // Input alanına odağı sürdür ancak klavyeyi tekrar açmaya çalışma
+    // Bu, gereksiz odaklanma/odağı kaybetme döngüsünü önler
+    if (document.activeElement !== inputField && isKeyboardOpen) {
+      inputField.focus();
+    }
   }
   
   /**
    * Input field'a otomatik odaklanma
    */
+  // Klavye açılma durumunu izlemek için değişken
+  let isKeyboardOpen = false;
+
   function focusInputField() {
     if (inputField && !gameState.isGameOver) {
+      // Klavye zaten açıksa tekrar açmaya çalışma
+      if (isKeyboardOpen) {
+        return;
+      }
+      
       // Mobil cihazlarda klavyeyi açma yöntemini iyileştir
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         // Önce input field'ı kullanılabilir yap
         inputField.readOnly = false;
         
-        // Input'u kullanıcıya gösterme
+        // Input'u kullanıcıya gösterme ama erişilebilir tut
         inputField.style.position = "fixed";
-        inputField.style.top = "50%";
-        inputField.style.left = "50%";
-        inputField.style.transform = "translate(-50%, -50%)";
+        inputField.style.bottom = "0";
+        inputField.style.left = "0";
         inputField.style.opacity = "0";
-        inputField.style.pointerEvents = "auto"; // Dokunmaları algıla
         inputField.style.width = "1px";
         inputField.style.height = "1px";
         inputField.style.fontSize = "16px"; // iOS'un yakınlaştırmasını önler
         
-        // Önce blur sonra focus mobil klavyeyi daha iyi açar
-        inputField.blur();
-        setTimeout(() => {
-          inputField.focus();
-          // Mobil klavyeyi açtıktan kısa süre sonra görünmez yap
-          setTimeout(() => {
-            inputField.style.opacity = "0";
-            inputField.style.pointerEvents = "none";
-          }, 100);
-        }, 50);
+        // Klavye açılma durumunu belirle
+        isKeyboardOpen = true;
+        
+        // Sadece bir kez focus yaparak klavyeyi aç
+        inputField.focus();
       } else {
         // Masaüstü tarayıcılar için normal focus yeterli
         inputField.focus();
