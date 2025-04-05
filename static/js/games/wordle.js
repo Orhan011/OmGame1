@@ -51,8 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
       correct: new Set(),
       present: new Set(),
       absent: new Set()
-    },
-    mobileKeyboardActive: false
+    }
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
@@ -141,26 +140,18 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Wordle ızgarasını oluşturur
    */
-  // Mobil klavye yönetimi için geliştirilmiş değişkenler
+  // Mobil klavye yönetimi için değişken
+  let isKeyboardOpen = false;
   const inputField = document.createElement('input');
   inputField.type = 'text';
   inputField.className = 'wordle-input-field';
   inputField.maxLength = 1; // Tek harf için
   inputField.autocomplete = 'off';
   inputField.autocapitalize = 'characters';
-  inputField.inputMode = 'text'; // Mobil klavyeyi daha iyi destekler
-  inputField.autocorrect = 'off';
-  inputField.spellcheck = false;
   
   function createWordleGrid() {
     wordleGrid.innerHTML = '';
     document.body.appendChild(inputField);
-    
-    // Açıklama metni ekle
-    const instructionText = document.createElement('div');
-    instructionText.className = 'wordle-instruction';
-    instructionText.textContent = 'Satıra tıklayarak klavyeyi açabilirsiniz';
-    wordleGrid.parentNode.insertBefore(instructionText, wordleGrid);
     
     for (let row = 0; row < 6; row++) {
       const rowDiv = document.createElement('div');
@@ -173,221 +164,112 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         
+        // Hücreye tıklandığında klavyeyi açma
+        cell.addEventListener('click', function() {
+          if (gameState.isGameOver) return;
+          if (parseInt(cell.dataset.row) === gameState.currentRow) {
+            openMobileKeyboard();
+          }
+        });
+        
         rowDiv.appendChild(cell);
       }
-      
-      // Satırın tamamı tıklanabilir olsun
-      rowDiv.addEventListener('click', function() {
-        if (gameState.isGameOver) return;
-        if (parseInt(rowDiv.dataset.row) === gameState.currentRow) {
-          openMobileKeyboard();
-        }
-      });
       
       wordleGrid.appendChild(rowDiv);
     }
     
     // Klavye yönetimini ayarla
     setupKeyboardInput();
-    
-    // İlk satırı vurgula
-    highlightActiveRow();
   }
   
   /**
    * Mobil klavyeyi açar
    */
   function openMobileKeyboard() {
-    // İşlem durumlarını sıfırla
-    isProcessing = false;
-    if (typeof isComposing !== 'undefined') isComposing = false;
-    lastInputValue = '';
-    lastBackspaceTime = 0;
-    lastInputTime = 0;
-    
-    // Önce input değerini temizle
     inputField.value = '';
-    
-    // Sayfa konumunu hatırla ve klavye odaklandıktan sonra geri al
-    const scrollPos = window.scrollY;
-    
-    // Aktif satırı vurgula
-    highlightActiveRow();
-    
-    // Klavyeyi odakla (daha kısa sürede)
-    setTimeout(() => {
-      inputField.focus();
-      gameState.mobileKeyboardActive = true;
-      
-      // Sayfanın otomatik kaydırmasını önlemek için konum düzeltmesi
-      setTimeout(() => {
-        window.scrollTo(0, scrollPos);
-        
-        // İnput alanının görünür olmasını engelle
-        inputField.style.position = 'fixed';
-        inputField.style.top = '50%';
-        inputField.style.opacity = '0';
-      }, 20);
-      
-      // Mobil klavye açıldığında UI'ı düzenle
-      document.body.classList.add('keyboard-visible');
-    }, 20);
+    inputField.focus();
+    isKeyboardOpen = true;
   }
   
   /**
    * Klavye giriş olaylarını ayarlar
    */
   function setupKeyboardInput() {
-    // Input değişikliklerini engellemek için flag kullan
-    let isProcessing = false;
-    
-    // Input alanı için event listener kullan
-    inputField.addEventListener('beforeinput', function(e) {
-      // İşleme yapılıyorsa yeni girişleri engelle
-      if (isProcessing || gameState.isGameOver) {
-        e.preventDefault();
-        return false;
-      }
-    });
-    
-    // Kompozisyon olaylarını daha iyi şekilde izle (IME giriş sistemi için)
-    let isComposing = false;
-    
-    inputField.addEventListener('compositionstart', function() {
-      isComposing = true;
-      isProcessing = true;
-    });
-    
-    inputField.addEventListener('compositionend', function() {
-      isComposing = false;
-      
-      // Kompozisyon bittiğinde değeri hemen temizle
-      setTimeout(() => {
-        inputField.value = '';
-        isProcessing = false;
-      }, 10);
-    });
-    
-    // Odak değişikliklerini daha iyi yönet
-    inputField.addEventListener('focus', function() {
-      // Odaklandığında temiz başla
-      inputField.value = '';
-      isProcessing = false;
-      isComposing = false;
-    });
-    
-    // Harf girişi için input eventini daha güvenilir şekilde yönet
-    let lastInputValue = '';
-    let lastInputTime = 0;
-    
     inputField.addEventListener('input', function(e) {
-      if (isProcessing || gameState.isGameOver) return;
+      if (gameState.isGameOver) return;
       
-      // Çift girişleri önlemek için zaman kontrolü ekle
-      const now = Date.now();
-      if (now - lastInputTime < 150) {
-        e.preventDefault();
-        inputField.value = '';
-        return;
-      }
-      
-      // İşlem yapılıyor olarak işaretle
-      isProcessing = true;
-      lastInputTime = now;
-      
-      const input = e.target.value.trim().toUpperCase();
-      
-      // Sadece yeni karakter girildiğinde işlem yap
-      if (input && input !== lastInputValue && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
+      const input = e.target.value.toUpperCase();
+      if (input && /^[A-ZĞÜŞİÖÇ]$/.test(input)) {
         addLetter(input);
+        inputField.value = ''; // Değeri temizle
         playSound('keypress');
-        lastInputValue = input;
       }
-      
-      // Input alanını hemen temizle
-      setTimeout(() => {
-        inputField.value = '';
-        isProcessing = false;
-      }, 10);
     });
-    
-    // Silme ve enter tuşları için daha güvenilir event yönetimi
-    let lastBackspaceTime = 0;
     
     inputField.addEventListener('keydown', function(e) {
       if (gameState.isGameOver) return;
       
       if (e.key === 'Enter') {
-        e.preventDefault();
         submitGuess();
       } else if (e.key === 'Backspace') {
-        const now = Date.now();
-        
-        // Çift silmeyi önlemek için zaman kontrolü
-        if (now - lastBackspaceTime < 300) {
-          e.preventDefault();
-          return;
-        }
-        
-        lastBackspaceTime = now;
-        e.preventDefault();
-        
-        // Silme işlemini gerçekleştir
-        if (gameState.currentCol > 0) {
-          deleteLetter();
-          playSound('keypress');
-        }
+        deleteLetter();
+        playSound('keypress');
       }
     });
     
     // Klavye kapandığında durumu güncelle
     inputField.addEventListener('blur', function() {
       setTimeout(() => {
-        gameState.mobileKeyboardActive = false;
-        document.body.classList.remove('keyboard-visible');
-        isProcessing = false;
+        isKeyboardOpen = false;
       }, 100);
     });
-    
-    // Sayfa yüklendiğinde dokunma olayını dinle
-    document.addEventListener('touchstart', function() {
-      if (!gameState.isGameOver && !gameState.mobileKeyboardActive) {
-        setTimeout(() => {
-          openMobileKeyboard();
-        }, 300);
-      }
-    }, {once: true});
   }
 
   /**
-   * Klavyeyi oluşturur (Artık sadece mobil klavye için input alanı)
+   * Klavyeyi oluşturur
    */
   function createKeyboard() {
-    // Klavye container'ını gizle
-    const keyboardContainer = document.getElementById('keyboard');
-    keyboardContainer.style.display = 'none';
+    keyboardRow1.innerHTML = '';
+    keyboardRow2.innerHTML = '';
+    keyboardRow3.innerHTML = '';
     
-    // Giriş alanını odakla
-    setTimeout(() => {
-      openMobileKeyboard();
-    }, 300);
+    // Klavye düzenini oluştur
+    turkishKeyboard.forEach((row, rowIndex) => {
+      const rowContainer = document.getElementById(`keyboard-row-${rowIndex + 1}`);
+      
+      row.forEach(key => {
+        const keyButton = document.createElement('button');
+        keyButton.className = 'keyboard-key';
+        keyButton.textContent = key;
+        
+        if (key === 'SİL' || key === 'ENTER') {
+          keyButton.classList.add('wide');
+        }
+        
+        keyButton.addEventListener('click', () => {
+          handleKeyboardClick(key);
+        });
+        
+        rowContainer.appendChild(keyButton);
+      });
+    });
   }
-  
+
   /**
-   * Aktif satırı vurgula ve mobil klavyeyi açar
+   * Klavye tıklaması işleme
    */
-  function highlightActiveRow() {
-    // Tüm satırların vurgusunu kaldır
-    const allCells = document.querySelectorAll('.wordle-cell');
-    allCells.forEach(cell => {
-      cell.classList.remove('current-row');
-    });
+  function handleKeyboardClick(key) {
+    if (gameState.isGameOver) return;
     
-    // Sadece aktif satırı vurgula
-    const activeCells = document.querySelectorAll(`.wordle-cell[data-row="${gameState.currentRow}"]`);
-    activeCells.forEach(cell => {
-      cell.classList.add('current-row');
-    });
+    playSound('keypress');
+    
+    if (key === 'ENTER') {
+      submitGuess();
+    } else if (key === 'SİL') {
+      deleteLetter();
+    } else {
+      addLetter(key);
+    }
   }
 
   /**
@@ -425,10 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Harf ekledikten sonra tekrar klavyeye odaklan
-      if (gameState.mobileKeyboardActive) {
+      if (isKeyboardOpen) {
         setTimeout(() => {
           inputField.focus();
-          inputField.value = '';
         }, 10);
       }
     }
@@ -444,10 +325,9 @@ document.addEventListener('DOMContentLoaded', function() {
       updateGrid();
       
       // Silme işleminden sonra tekrar klavyeye odaklan
-      if (gameState.mobileKeyboardActive) {
+      if (isKeyboardOpen) {
         setTimeout(() => {
           inputField.focus();
-          inputField.value = '';
         }, 10);
       }
     }
@@ -500,10 +380,12 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         updateGrid();
         
-        // Her zaman otomatik klavye açma
-        setTimeout(() => {
-          openMobileKeyboard();
-        }, 300);
+        // Mobil cihazda otomatik klavye açma
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            openMobileKeyboard();
+          }, 300);
+        }
       }, 1600); // Animasyondan sonra
     }
     
@@ -620,19 +502,24 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           cell.classList.remove('filled');
         }
+        
+        // Aktif satır vurgusu
+        if (row === gameState.currentRow) {
+          cell.classList.add('current-row');
+        } else {
+          cell.classList.remove('current-row');
+        }
       }
     }
     
-    // Aktif satırı vurgula
-    highlightActiveRow();
-    
-    // Mobil klavye odaklanmasını yeniden sağla
+    // Aktif satıra tıklayınca otomatik klavye aç
     if (gameState.currentRow < 6 && !gameState.isGameOver) {
-      setTimeout(() => {
-        if (!gameState.mobileKeyboardActive) {
+      const currentRow = document.querySelector(`.wordle-row[data-row="${gameState.currentRow}"]`);
+      if (currentRow) {
+        currentRow.addEventListener('click', function() {
           openMobileKeyboard();
-        }
-      }, 300);
+        });
+      }
     }
   }
 
