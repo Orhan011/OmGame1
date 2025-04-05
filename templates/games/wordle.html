@@ -6,18 +6,6 @@
 <div class="container">
   <h1 class="game-title text-center">Wordle</h1>
 
-  <div class="controls-container">
-    <button id="theme-toggle" class="theme-toggle-btn">
-      <i class="fas fa-moon"></i>
-    </button>
-  </div>
-  
-  <div class="controls-container">
-    <button id="theme-toggle" class="theme-toggle-btn">
-      <i class="fas fa-moon"></i>
-    </button>
-  </div>
-
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
@@ -91,12 +79,15 @@
         <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Sanal giriş alanı - mobil klavye için -->
-        <div id="mobile-keyboard-container" class="mobile-keyboard-container">
-          <input type="text" id="mobile-input" class="mobile-input" autocomplete="off" autocapitalize="characters" autocorrect="off" maxlength="1">
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard-container">
+          <div class="keyboard-row" id="keyboard-row-1"></div>
+          <div class="keyboard-row" id="keyboard-row-2"></div>
+          <div class="keyboard-row" id="keyboard-row-3"></div>
         </div>
-      <!-- Game Over Container -->
       </div>
+
+      <!-- Game Over Container -->
       <div id="game-over-container" class="memory-results-container" style="display: none;">
         <div class="memory-results-card">
           <div class="memory-results-header">
@@ -257,54 +248,182 @@
   }
 
   /* Keyboard Styles */
-  /* Keyboard Styles */
-  .mobile-keyboard-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 0;
-    z-index: 10;
+  .keyboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .keyboard-row {
     display: flex;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.1);
+    gap: 6px;
   }
-  
-  .mobile-input {
-    position: absolute;
-    opacity: 0;
-    height: 1px;
+
+  .keyboard-key {
+    padding: 15px 12px;
+    min-width: 30px;
+    text-align: center;
+    background-color: rgba(60, 60, 80, 0.8);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex: 1;
+  }
+
+  .keyboard-key:hover {
+    background-color: rgba(80, 80, 100, 0.9);
+  }
+
+  .keyboard-key.correct {
+    background-color: rgba(46, 204, 113, 0.7);
+  }
+
+  .keyboard-key.present {
+    background-color: rgba(241, 196, 15, 0.7);
+  }
+
+  .keyboard-key.absent {
+    background-color: rgba(30, 30, 40, 0.9);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .keyboard-key.wide {
+    flex: 1.5;
+    font-size: 0.9rem;
+  }
+
+  /* Message Styles */
+  .message-container {
+    min-height: 40px;
+    text-align: center;
+  }
+
+  .game-message {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 0 auto;
+    animation: fadeInOut 2s;
+  }
+
+  .game-message.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+
+  .game-message.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+
+  .game-message.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+  }
+
+  .game-message.warning {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Mobil klavye input alanı */
+  .wordle-input-field {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
     width: 1px;
-    top: -100px;
-    left: 0;
+    height: 1px;
+    opacity: 0;
     z-index: -10;
     font-size: 16px; /* iOS'da yakınlaştırmayı önler */
+    caret-color: transparent; /* İmleç görünmez */
+    user-select: none; /* Seçimi devre dışı bırak */
+    -webkit-user-select: none;
+    pointer-events: auto; /* Kullanıcı girişini kabul et */
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    resize: none;
+    overflow: hidden;
   }
-  .wordle-row[data-row="3"] .wordle-cell,
-  .wordle-row[data-row="4"] .wordle-cell,
-  .wordle-row[data-row="5"] .wordle-cell {
+
+  /* Aktif satır vurgusu */
+  .wordle-row .wordle-cell {
     cursor: pointer;
   }
 
-  /* Aktif satırın hücrelerini vurgula */
-  .wordle-cell.current-row {
-    border-color: rgba(150, 150, 200, 0.8);
-    box-shadow: 0 0 5px rgba(150, 150, 200, 0.5);
+  /* Klavye talimatı */
+  .wordle-instruction {
+    text-align: center;
+    color: #a0a0c0;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    padding: 5px;
+    background-color: rgba(50, 50, 70, 0.3);
+    border-radius: 20px;
   }
 
+  /* Aktif satırın hücrelerini daha belirgin vurgula */
+  .wordle-cell.current-row {
+    border-color: rgba(120, 130, 255, 0.9);
+    box-shadow: 0 0 8px rgba(120, 130, 255, 0.7);
+    transform: translateY(-2px);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 8px rgba(120, 130, 255, 0.7); }
+    50% { box-shadow: 0 0 12px rgba(120, 130, 255, 0.9); }
+    100% { box-shadow: 0 0 8px rgba(120, 130, 255, 0.7); }
+  }
+
+  /* Aktif hücreleri daha da belirgin yap */
+  .wordle-row[data-row="0"] .wordle-cell,
+  .wordle-row[data-row="1"] .wordle-cell,
+  .wordle-row[data-row="2"] .wordle-cell,
+  .wordle-row[data-row="3"] .wordle-cell,
+  .wordle-row[data-row="4"] .wordle-cell,
+  .wordle-row[data-row="5"] .wordle-cell {
+    transition: all 0.3s ease;
+  }
+
+  /* Ekran kaydırma sorununu önlemek için sabit pozisyon ayarları */
+  .keyboard-visible .wordle-grid {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Ekran kaydırma sorununu engellemek için sabit oyun konteynırı */
+  #game-container {
+    position: relative;
+    z-index: 2;
+    touch-action: manipulation; /* Gereksiz kaydırma/zoom engelleme */
+  }
+  
+  /* Aktif satır için daha belirgin vurgu */
+  .wordle-cell.current-row.filled {
+    border-color: rgba(150, 150, 255, 1);
+    box-shadow: 0 0 10px rgba(150, 150, 255, 0.8);
+  }
+
+  /* Mobil için ek düzenlemeler */
   @media (max-width: 576px) {
-    /* Klavye sorununu gidermek için ekstra stiller */
-    .game-container {
-      overflow: auto;
-      padding-bottom: 60px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    html, body {
-      height: var(--vh, 100vh);
-      overflow-x: hidden;
-    }
-
     .wordle-cell {
       font-size: 1.3rem;
     }
@@ -315,12 +434,23 @@
     }
 
     .wordle-grid {
-      margin-bottom: 80px; /* Mobil klavye açıldığında ekstra alan */
+      margin-bottom: 20px; /* Daha az boşluk */
     }
-
-    /* Mobil klavye açıkken body stilini düzenle */
-    body.keyboard-visible {
-      padding-bottom: 150px;
+    
+    /* Oyun alanını her zaman ekranda tut */
+    #game-container {
+      position: relative;
+      z-index: 1;
+      padding-bottom: 20px;
+    }
+    
+    /* Daha görünür talimat */
+    .wordle-instruction {
+      background-color: rgba(50, 50, 70, 0.7);
+      color: white;
+      font-weight: bold;
+      padding: 8px;
+      margin: 10px 0;
     }
   }
 </style>
@@ -329,57 +459,3 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}
-  /* Tema değiştirici buton */
-  .controls-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-  }
-
-  .theme-toggle-btn {
-    background: none;
-    border: none;
-    color: #6a5ae0;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  .theme-toggle-btn:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    transform: scale(1.1);
-  }
-
-  /* Dark mode */
-  body.dark-mode {
-    background-color: #121212;
-    color: #f5f5f5;
-  }
-
-  body.dark-mode .game-container,
-  body.dark-mode .game-instructions,
-  body.dark-mode .game-over-content {
-    background-color: #1a1a2e;
-    color: #f5f5f5;
-  }
-
-  body.dark-mode .wordle-cell {
-    background-color: #2c2c44;
-    border-color: #3a3a5e;
-    color: #f5f5f5;
-  }
-
-  body.dark-mode .keyboard-key {
-    background-color: #2c2c44;
-    color: #f5f5f5;
-  }
