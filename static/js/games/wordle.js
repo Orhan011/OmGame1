@@ -104,15 +104,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Rastgele bir kelime seç
     const wordList = [
-      "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "yağmur",
-      "orman", "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı",
-      "perde", "lamba", "dolap", "duvar", "bahçe", "çatı", "havuz", "sahil", "tarla", "şehir",
-      "ülke", "dünya", "ateş", "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "büyük",
-      "küçük", "kısa", "uzun", "gece", "sabah", "öğlen", "akşam", "saat", "ayna", "ceviz",
-      "badem", "kiraz", "elma", "armut", "mango", "kavun", "karpuz", "biber", "salça", "ekmek",
-      "kuşak", "kaşık", "çatal", "bardak", "tabak", "sürahi", "kağıt", "kalem", "defter", "silgi",
-      "tahta", "ders", "okul", "sınıf", "öğrenci", "oyun", "spor", "koşu", "dans", "müzik",
-      "şarkı", "gitar", "piyano", "film", "tiyatro", "masal", "roman", "dergi", "gazete", "haber"
+      "kalem", "kitap", "araba", "çiçek", "deniz", "güneş", "balık", "bulut", "orman", "nehir", 
+      "cadde", "sokak", "banka", "kapak", "vapur", "gözlü", "saray", "yazlı", "kravat", "kilim",
+      "lamba", "dolap", "duvar", "bahçe", "havuz", "şehir", "meyve", "sebze", "ekmek", "tabak",
+      "sıcak", "soğuk", "büyük", "küçük", "uzman", "sabah", "öğlen", "akşam", "tahta", "salon",
+      "sınıf", "sayfa", "kitap", "divan", "kanal", "fidan", "köşek", "canlı", "bilet", "firma",
+      "daire", "fırın", "bulaş", "badem", "kiraz", "elmas", "yakut", "zümrüt", "firuze", "safir",
+      "damla", "rüzgar", "yağmur", "toprak", "atlas", "çelik", "bakır", "demir", "tahıl", "kömür"
     ];
     
     const randomIndex = Math.floor(Math.random() * wordList.length);
