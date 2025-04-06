@@ -76,14 +76,28 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Wordle Grid -->
+        <!-- Wordle Grid - Ana oyun alanı -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Keyboard -->
-        <div id="keyboard" class="keyboard-container">
-          <div class="keyboard-row" id="keyboard-row-1"></div>
-          <div class="keyboard-row" id="keyboard-row-2"></div>
-          <div class="keyboard-row" id="keyboard-row-3"></div>
+        <!-- Mobil klavye için gizli alan - Sayfanın kaymayı önlemek için pozisyon: fixed -->
+        <div class="keyboard-wrapper">
+          <input type="text" 
+                 id="hidden-input" 
+                 autocomplete="off" 
+                 autocorrect="off" 
+                 autocapitalize="off" 
+                 spellcheck="false"
+                 maxlength="1">
+        </div>
+
+        <!-- Game Action Buttons -->
+        <div class="game-action-buttons">
+          <button id="delete-letter-btn" class="btn btn-outline-secondary action-btn">
+            <i class="fas fa-backspace"></i> Sil
+          </button>
+          <button id="submit-guess-btn" class="btn btn-primary action-btn">
+            <i class="fas fa-check"></i> Tahmin Et
+          </button>
         </div>
       </div>
 
@@ -217,6 +231,49 @@
     color: rgba(255, 255, 255, 0.5);
   }
 
+  .game-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 15px auto 30px;
+    max-width: 350px;
+  }
+
+  .action-btn {
+    flex: 1;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 6px;
+  }
+
+  /* Mobil klavye için gizli input alanı */
+  .keyboard-wrapper {
+    position: fixed;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    bottom: 0;
+    right: 0;
+  }
+  
+  #hidden-input {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    opacity: 0.01;
+    font-size: 16px; /* Mobil Safari'de yakınlaştırmayı önlemek için */
+    border: none;
+    background: transparent;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    /* Ekranın kaymasını önlemek için sabit konumlandırma */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -10;
+  }
+
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -245,58 +302,6 @@
     0% { transform: rotateX(0); }
     50% { transform: rotateX(90deg); }
     100% { transform: rotateX(0); }
-  }
-
-  /* Keyboard Styles */
-  .keyboard-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .keyboard-row {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .keyboard-key {
-    padding: 15px 12px;
-    min-width: 30px;
-    text-align: center;
-    background-color: rgba(60, 60, 80, 0.8);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    flex: 1;
-  }
-
-  .keyboard-key:hover {
-    background-color: rgba(80, 80, 100, 0.9);
-  }
-
-  .keyboard-key.correct {
-    background-color: rgba(46, 204, 113, 0.7);
-  }
-
-  .keyboard-key.present {
-    background-color: rgba(241, 196, 15, 0.7);
-  }
-
-  .keyboard-key.absent {
-    background-color: rgba(30, 30, 40, 0.9);
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  .keyboard-key.wide {
-    flex: 1.5;
-    font-size: 0.9rem;
   }
 
   /* Message Styles */
@@ -341,116 +346,43 @@
     100% { opacity: 0; }
   }
 
-  /* Mobil klavye input alanı */
-  .wordle-input-field {
-    position: fixed;
-    top: -9999px;
-    left: -9999px;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    z-index: -10;
-    font-size: 16px; /* iOS'da yakınlaştırmayı önler */
-    caret-color: transparent; /* İmleç görünmez */
-    user-select: none; /* Seçimi devre dışı bırak */
-    -webkit-user-select: none;
-    pointer-events: auto; /* Kullanıcı girişini kabul et */
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    resize: none;
-    overflow: hidden;
-  }
-
   /* Aktif satır vurgusu */
-  .wordle-row .wordle-cell {
+  .wordle-cell.active {
+    border-color: rgba(52, 152, 219, 0.8);
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
     cursor: pointer;
+    transform: scale(1.05);
   }
 
-  /* Klavye talimatı */
-  .wordle-instruction {
-    text-align: center;
-    color: #a0a0c0;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-    padding: 5px;
-    background-color: rgba(50, 50, 70, 0.3);
-    border-radius: 20px;
-  }
-
-  /* Aktif satırın hücrelerini daha belirgin vurgula */
+  /* Aktif satırın hücrelerini vurgula */
   .wordle-cell.current-row {
-    border-color: rgba(120, 130, 255, 0.9);
-    box-shadow: 0 0 8px rgba(120, 130, 255, 0.7);
-    transform: translateY(-2px);
-    animation: pulse 2s infinite;
+    border-color: rgba(150, 150, 200, 0.8);
+    box-shadow: 0 0 5px rgba(150, 150, 200, 0.5);
   }
 
-  @keyframes pulse {
-    0% { box-shadow: 0 0 8px rgba(120, 130, 255, 0.7); }
-    50% { box-shadow: 0 0 12px rgba(120, 130, 255, 0.9); }
-    100% { box-shadow: 0 0 8px rgba(120, 130, 255, 0.7); }
-  }
-
-  /* Aktif hücreleri daha da belirgin yap */
-  .wordle-row[data-row="0"] .wordle-cell,
-  .wordle-row[data-row="1"] .wordle-cell,
-  .wordle-row[data-row="2"] .wordle-cell,
-  .wordle-row[data-row="3"] .wordle-cell,
-  .wordle-row[data-row="4"] .wordle-cell,
-  .wordle-row[data-row="5"] .wordle-cell {
-    transition: all 0.3s ease;
-  }
-
-  /* Ekran kaydırma sorununu önlemek için sabit pozisyon ayarları */
-  .keyboard-visible .wordle-grid {
+  /* Ekran kaymasını engellemek için ekstra stil */
+  .game-container {
     position: relative;
-    z-index: 1;
-  }
-  
-  /* Ekran kaydırma sorununu engellemek için sabit oyun konteynırı */
-  #game-container {
-    position: relative;
-    z-index: 2;
-    touch-action: manipulation; /* Gereksiz kaydırma/zoom engelleme */
-  }
-  
-  /* Aktif satır için daha belirgin vurgu */
-  .wordle-cell.current-row.filled {
-    border-color: rgba(150, 150, 255, 1);
-    box-shadow: 0 0 10px rgba(150, 150, 255, 0.8);
+    min-height: 620px; /* Mobil klavye açıldığında da aynı yüksekliği koruması için */
   }
 
-  /* Mobil için ek düzenlemeler */
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
     }
 
-    .keyboard-key {
-      padding: 10px 8px;
+    .wordle-grid {
+      margin-bottom: 20px; 
+    }
+    
+    .action-btn {
+      padding: 8px 10px;
       font-size: 0.9rem;
     }
-
-    .wordle-grid {
-      margin-bottom: 20px; /* Daha az boşluk */
-    }
     
-    /* Oyun alanını her zaman ekranda tut */
-    #game-container {
-      position: relative;
-      z-index: 1;
-      padding-bottom: 20px;
-    }
-    
-    /* Daha görünür talimat */
-    .wordle-instruction {
-      background-color: rgba(50, 50, 70, 0.7);
-      color: white;
-      font-weight: bold;
-      padding: 8px;
-      margin: 10px 0;
+    /* Mobil cihazlar için ekran kaymasını önleme */
+    .game-container {
+      min-height: 500px;
     }
   }
 </style>
@@ -459,3 +391,102 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}
+<!-- Script bloğunu düzeltmek için oyun sayfasına ekle -->
+<script>
+  // Bu script, mobil cihazlarda ekranın kaymasını engellemek için eklendi
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sayfa yüklendikten sonra ekranı sabitle
+    setTimeout(function() {
+      // Sayfayı başa getir
+      window.scrollTo(0, 0);
+      
+      // Mobil cihazlarda viewport yüksekliğini sabitle
+      function setViewportHeight() {
+        // Viewport yüksekliğini sabitlemek için CSS değişkeni kullan
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      
+      // İlk yükleme ve boyut değişimleri için
+      setViewportHeight();
+      window.addEventListener('resize', setViewportHeight);
+      
+      // Klavye olaylarını yakala ve varsayılan davranışı engelle
+      document.addEventListener('keydown', function(e) {
+        // Bazı özel tuşları engelle - örneğin enter, boşluk, yukarı/aşağı
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault();
+        }
+      });
+      
+      // Sayfanın kaymasını önlemek için dokunma olaylarını engelle
+      document.querySelectorAll('.wordle-cell, .action-btn').forEach(item => {
+        item.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+        }, { passive: false });
+        
+        item.addEventListener('touchmove', function(e) {
+          e.preventDefault();
+        }, { passive: false });
+      });
+    }, 100);
+  });
+</script>
+<style>
+  /* Ekran kaymayı engellemek için ek CSS özellikleri */
+  :root {
+    --vh: 1vh;
+  }
+  
+  body.game-active {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .game-container {
+    height: calc(var(--vh, 1vh) * 100);
+    touch-action: none; /* Dokunma kaydırmayı engelle */
+    overflow-y: hidden; /* Dikey kaydırmayı engelle */
+  }
+  
+  /* input alanı için ek stiller */
+  .keyboard-wrapper {
+    position: fixed;
+    left: -9999px;
+    width: 0;
+    height: 0;
+    z-index: -999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  /* iOS 100vh sorununu düzeltme */
+  @supports (-webkit-touch-callout: none) {
+    .game-container {
+      height: -webkit-fill-available;
+    }
+  }
+</style>
+
+<script>
+  // Oyun aktif olduğunda body'ye class ekleyerek kaymayı engelle
+  document.addEventListener('DOMContentLoaded', function() {
+    const startGameBtn = document.getElementById('start-game');
+    if (startGameBtn) {
+      startGameBtn.addEventListener('click', function() {
+        document.body.classList.add('game-active');
+      });
+    }
+    
+    // Butonlara dokunma olaylarını düzgün işle
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('touchstart', function(e) {
+        // Dokunma olayının yayılmasını engelle
+        e.stopPropagation();
+      }, {passive: true});
+    });
+  });
+</script>
