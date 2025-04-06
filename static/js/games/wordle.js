@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const soundToggle = document.getElementById('sound-toggle');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
-  const mobileInput = document.getElementById('mobile-input');
 
   // Ses efektleri
   const sounds = {
@@ -47,15 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
       correct: new Set(),
       present: new Set(),
       absent: new Set()
-    },
-    isMobile: false, // Mobil cihaz kontrolü için
-    inputMode: 'physical' // Kullanıcının giriş yöntemi (physical veya virtual)
+    }
   };
-
-  // Mobil cihaz kontrolü
-  function detectMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
 
   // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
@@ -87,36 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
 
-  // Fiziksel klavyeyi sadece masaüstünde kullan
-  if (!detectMobile()) {
-    document.addEventListener('keydown', handleKeyPress);
-    gameState.inputMode = 'physical';
-  } else {
-    gameState.isMobile = true;
-    gameState.inputMode = 'virtual';
-  }
-
-  // Mobil input için input olayı - inputMode'a göre kontrol et
-  mobileInput.addEventListener('input', function(e) {
-    if (gameState.isMobile && gameState.inputMode === 'virtual' && e.target.value) {
-      addLetter(e.target.value.toUpperCase());
-      e.target.value = ''; // Her harf girildiğinde inputu temizle
-    }
-  });
-
-  // Mobil input için olay dinleyiciler
-  mobileInput.addEventListener('keydown', function(e) {
-    if (gameState.isMobile && gameState.inputMode === 'virtual') {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        submitGuess();
-      } else if (e.key === 'Backspace') {
-        e.preventDefault();
-        deleteLetter();
-        playSound('keypress');
-      }
-    }
-  });
+  // Klavye tuşu basımı
+  document.addEventListener('keydown', handleKeyPress);
 
   /**
    * Oyunu başlatır
@@ -176,12 +140,34 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
+        cell.tabIndex = 0; // Odaklanabilir yap
         
-        // Hücreye tıklandığında mobil klavyeyi açma - sadece mobil cihazda
+        // Her hücre odaklandığında klavyeyi göstermesi için
         cell.addEventListener('click', function() {
-          if (!gameState.isGameOver && row === gameState.currentRow && gameState.isMobile) {
-            gameState.inputMode = 'virtual'; // Mobil klavye moduna geç
-            mobileInput.focus();
+          if (!gameState.isGameOver && row === gameState.currentRow) {
+            cell.focus(); // Hücreye odaklanarak mobil klavyenin açılmasını sağla
+          }
+        });
+
+        // Hücre içine harf girişi için
+        cell.addEventListener('input', function(e) {
+          const letter = e.data ? e.data.toUpperCase() : '';
+          if (/^[A-ZĞÜŞİÖÇ]$/.test(letter)) {
+            addLetter(letter);
+            playSound('keypress');
+          }
+        });
+        
+        // Klavye olayları için
+        cell.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            submitGuess();
+          } else if (e.key === 'Backspace') {
+            deleteLetter();
+            playSound('keypress');
+          } else if (/^[a-zğüşiöçA-ZĞÜŞİÖÇ]$/.test(e.key)) {
+            addLetter(e.key.toUpperCase());
+            playSound('keypress');
           }
         });
         
@@ -197,9 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function handleKeyPress(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
-    // Mobil input kullanılıyorsa burayı atla
-    if (gameState.isMobile && gameState.inputMode === 'virtual') return;
     
     const key = e.key.toUpperCase();
     
@@ -356,6 +339,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           cell.classList.remove('filled');
         }
+      }
+    }
+
+    // Aktif satırdaki bir sonraki boş hücreye odaklan
+    if (!gameState.isGameOver) {
+      const currentCell = document.querySelector(
+        `.wordle-cell[data-row="${gameState.currentRow}"][data-col="${
+          Math.min(gameState.currentCol, 4)
+        }"]`
+      );
+      if (currentCell) {
+        currentCell.focus();
       }
     }
   }
@@ -679,14 +674,5 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
       console.error('Skor kaydetme hatası:', error);
     });
-  }
-
-  // Sayfa yüklendiğinde klavye türünü kontrol et
-  if (detectMobile()) {
-    gameState.isMobile = true;
-    gameState.inputMode = 'virtual';
-  } else {
-    gameState.isMobile = false;
-    gameState.inputMode = 'physical';
   }
 });
