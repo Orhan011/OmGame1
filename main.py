@@ -521,11 +521,15 @@ def index():
 # Giriş Sayfası
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Redirect parametresini al (varsa)
+    redirect_url = request.args.get('redirect', '')
+    
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
         
-        user = User.query.filter_by(username=username).first()
+        # Email ile kullanıcıyı bul
+        user = User.query.filter_by(email=email).first()
         
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
@@ -534,9 +538,13 @@ def login():
             db.session.commit()
             
             flash('Giriş başarılı!', 'success')
+            
+            # Yönlendirilecek sayfa varsa oraya git
+            if redirect_url:
+                return redirect(redirect_url)
             return redirect(url_for('index'))
         else:
-            flash('Kullanıcı adı veya şifre hatalı!', 'danger')
+            flash('Email veya şifre hatalı!', 'danger')
     
     return render_template('login.html')
 
@@ -658,15 +666,35 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
+        password_confirm = request.form.get('password_confirm')  # register.html'deki alan adı ile eşleşecek şekilde
+        terms = request.form.get('terms')
         
         # Validasyon kontrolleri
         if not username or not email or not password:
             flash('Tüm alanlar doldurulmalıdır!', 'danger')
             return redirect(url_for('register'))
         
-        if password != confirm_password:
+        if password != password_confirm:
             flash('Şifreler eşleşmiyor!', 'danger')
+            return redirect(url_for('register'))
+            
+        if not terms:
+            flash('Kullanım koşullarını kabul etmelisiniz!', 'danger')
+            return redirect(url_for('register'))
+        
+        # Kullanıcı adı formatını kontrol et (sadece harf, rakam, tire ve alt çizgi)
+        if not re.match(r'^[a-zA-Z0-9_-]+$', username):
+            flash('Kullanıcı adı sadece harf, rakam, tire ve alt çizgi içerebilir!', 'danger')
+            return redirect(url_for('register'))
+            
+        # Kullanıcı adı en az 3 karakter olmalı
+        if len(username) < 3:
+            flash('Kullanıcı adı en az 3 karakter olmalıdır!', 'danger')
+            return redirect(url_for('register'))
+            
+        # Şifre en az 6 karakter olmalı
+        if len(password) < 6:
+            flash('Şifre en az 6 karakter olmalıdır!', 'danger')
             return redirect(url_for('register'))
         
         # E-posta formatını kontrol et
