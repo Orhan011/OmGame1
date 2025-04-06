@@ -1,65 +1,64 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Beyin Egzersizi - Satranç</title>
+  <link href="/static/css/games/chess.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+</head>
 
-{% block title %}Beyin Egzersizi - Satranç{% endblock %}
-
-{% block styles %}
-<link href="{{ url_for('static', filename='css/games/chess.css') }}" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
-{% endblock %}
-
-{% block content %}
-<div class="game-container">
-  <div class="header">
-    <h1>Beyin Egzersizi Oyunları</h1>
-    <h2></h2>
-  </div>
-
-  <div class="timer-container">
-    <div class="timer black-timer">
-      <div id="blackTimerDisplay" class="timer-display">5:00</div>
-      <div class="player-name">Siyah</div>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <h1>Beyin Egzersizi Oyunları</h1>
+      <h2></h2>
     </div>
-    <div class="timer white-timer">
-      <div id="whiteTimerDisplay" class="timer-display">5:00</div>
-      <div class="player-name">Beyaz</div>
-    </div>
-  </div>
 
-  <div class="game-area">
-    <div id="status" class="status">Zorluk seviyesini seçip "YENİ OYUN" butonuna tıklayın</div>
-    <div id="board" class="board"></div>
-  </div>
-
-  <div class="game-options">
-    <div class="difficulty-selection">
-      <h3>Zorluk Seviyesi</h3>
-      <div class="radio-container">
-        <input type="radio" id="easyLevel" name="difficulty" value="easy" checked>
-        <label for="easyLevel">Kolay</label>
-        <input type="radio" id="mediumLevel" name="difficulty" value="medium">
-        <label for="mediumLevel">Orta</label>
-        <input type="radio" id="hardLevel" name="difficulty" value="hard">
-        <label for="hardLevel">Zor</label>
+    <div class="timer-container">
+      <div class="timer black-timer">
+        <div id="blackTimerDisplay" class="timer-display">5:00</div>
+        <div class="player-name">Siyah</div>
+      </div>
+      <div class="timer white-timer">
+        <div id="whiteTimerDisplay" class="timer-display">5:00</div>
+        <div class="player-name">Beyaz</div>
       </div>
     </div>
+
+    <div class="game-area">
+      <div id="status" class="status">Zorluk seviyesini seçip "YENİ OYUN" butonuna tıklayın</div>
+      <div id="board" class="board"></div>
+    </div>
+
+    <div class="game-options">
+      <div class="difficulty-selection">
+        <h3>Zorluk Seviyesi</h3>
+        <div class="radio-container">
+          <input type="radio" id="easyLevel" name="difficulty" value="easy" checked>
+          <label for="easyLevel">Kolay</label>
+          <input type="radio" id="mediumLevel" name="difficulty" value="medium">
+          <label for="mediumLevel">Orta</label>
+          <input type="radio" id="hardLevel" name="difficulty" value="hard">
+          <label for="hardLevel">Zor</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn">YENİ OYUN</button>
+      <button id="undoBtn">GERİ AL</button>
+    </div>
+
+    <div class="hidden-info">
+      <div id="fen"></div>
+      <div id="pgn"></div>
+    </div>
   </div>
 
-  <div class="controls">
-    <button id="startBtn">YENİ OYUN</button>
-    <button id="undoBtn">GERİ AL</button>
-  </div>
-
-  <div class="hidden-info">
-    <div id="fen"></div>
-    <div id="pgn"></div>
-  </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<script src="{{ url_for('static', filename='js/games/chess.js') }}"></script>
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
-{% endblock %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="/static/js/games/chess.js"></script>
+</body>
+</html>
