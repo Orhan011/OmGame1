@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/games/wordle-fixes.css') }}">
 
 <!-- Sayfa Özel CSS Dosyaları -->
 <!--  Profil CSS dosyası kaldırıldı -->
@@ -80,6 +81,7 @@ function loadArticleContent() {
 <!-- Meta Tags-->
 <meta name="description" content="Zihinsel becerilerinizi geliştirmek için bilimsel olarak tasarlanmış bilişsel oyunlar. IQ, hafıza, konsantrasyon ve çözüm odaklı düşünmeyi geliştirin.">
 <meta name="keywords" content="OmGame, beyin geliştirme, iq oyunları, zihin oyunları, hafıza geliştirme, bilişsel beceriler">
+{% block custom_meta %}{% endblock %}
 </head>
 <body>
 <!-- Dinamik Arkaplan Efekti -->
