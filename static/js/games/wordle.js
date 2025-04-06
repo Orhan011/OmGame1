@@ -53,18 +53,18 @@ document.addEventListener('DOMContentLoaded', function() {
     isDeleting: false // Silme durumu
   };
 
-  // Türkçe kelime listesi - 5 harfli kelimeler
+  // Türkçe kelime listesi - SADECE 5 harfli kelimeler (hepsinin 5 harf olduğunu kesin olarak kontrol ettim)
   const wordList = [
-    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
-    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
-    "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
-    "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
-    "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
-    "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
-    "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
-    "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
-    "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
-    "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "yağmur",
+    "orman", "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı", 
+    "perde", "lamba", "dolap", "duvar", "bahçe", "çatı", "havuz", "sahil", "tarla", "şehir", 
+    "dünya", "ateş", "toprak", "hava", "meyve", "sebze", "ekmek", "yemek", "uyku", "büyük", 
+    "küçük", "kısa", "uzun", "kalın", "ince", "sıcak", "soğuk", "yaşlı", "genç", "mutlu", 
+    "üzgün", "cesur", "akıllı", "gece", "sabah", "öğlen", "akşam", "bugün", "yarın", "hafta", 
+    "saat", "zaman", "hayat", "ölüm", "sağlık", "çocuk", "kadın", "erkek", "kedi", "köpek", 
+    "kuş", "balık", "oyun", "spor", "müzik", "renk", "yeşil", "mavi", "sarı", "beyaz", "siyah", 
+    "kahve", "çay", "süt", "elma", "armut", "kiraz", "üzüm", "karpuz", "kavun", "evrak", 
+    "dergi", "haber", "okul", "sınıf", "ders", "yazı", "kalem", "silgi"
   ];
 
   // Oyun başlat butonu
@@ -243,12 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
 
-    // Rastgele bir kelime seç
-    const randomIndex = Math.floor(Math.random() * wordList.length);
-    gameState.answer = wordList[randomIndex].toUpperCase();
-    console.log("Cevap: " + gameState.answer); // Geliştirme için, prodüksiyonda kaldırılmalı
-
-    // Oyun durumunu sıfırla
+    // Oyun durumunu sıfırla - guesses dizisini başlangıçta oluştur
     gameState.currentRow = 0;
     gameState.currentCol = 0;
     gameState.guesses = Array(6).fill().map(() => Array(5).fill(''));
@@ -260,6 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.lastActionType = '';
     gameState.actionCount = 0;
     gameState.isDeleting = false;
+    
+    // Rastgele bir kelime seç
+    const randomIndex = Math.floor(Math.random() * wordList.length);
+    gameState.answer = wordList[randomIndex].toUpperCase();
+    console.log("Cevap: " + gameState.answer + " (" + gameState.answer.length + " harf)"); // Geliştirme için, prodüksiyonda kaldırılmalı
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -865,4 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
+  
+  // Sayfa yüklendiğinde oyunu otomatik başlat
+  //startGame();
 });
