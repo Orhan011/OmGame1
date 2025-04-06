@@ -59,32 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Mobil klavye girişi için gizli input oluştur
   let mobileInput = null;
   
-  // Ekranın kaymasını önlemek için CSS düzenlemesi
-  function addPageScrollFixStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-      html, body {
-        height: 100%;
-        overflow: hidden;
-        position: fixed;
-        width: 100%;
-        touch-action: none;
-      }
-      
-      .container {
-        overflow-y: auto;
-        height: 100vh;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 100px;
-      }
-      
-      .game-title {
-        margin-top: 60px;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
   function createMobileInput() {
     if (!mobileInput) {
       mobileInput = document.createElement('input');
@@ -95,9 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileInput.autocapitalize = 'off';
       mobileInput.spellcheck = false;
       
-      // Görünmez input
-      mobileInput.style.position = 'absolute';
-      mobileInput.style.top = '-100px';  // Tamamen görünmez yap
+      // Görünmez input - tek seferde tek harf girişi için maxLength=1
+      mobileInput.style.position = 'fixed';
+      mobileInput.style.top = '0';
+      mobileInput.style.left = '0';
       mobileInput.style.opacity = '0';
       mobileInput.style.pointerEvents = 'none';
       mobileInput.style.height = '1px';
@@ -152,7 +127,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function focusMobileInput() {
     if (mobileInput && !gameState.isGameOver) {
-      mobileInput.focus({preventScroll: true});  // preventScroll ekledik
+      setTimeout(() => {
+        mobileInput.focus();
+      }, 50);
     }
   }
 
@@ -224,9 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Ekrana tıklama olayı - mobil input için
   wordleGrid.addEventListener('click', focusMobileInput);
-
-  // Sayfanın kaydırma sorununu gidermek için stil ekle
-  addPageScrollFixStyles();
 
   /**
    * Oyunu başlatır
