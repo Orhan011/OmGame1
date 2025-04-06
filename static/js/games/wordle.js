@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const soundToggle = document.getElementById('sound-toggle');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
+  
+  // Klavye Modu Değiştirme Butonu
+  let keyboardModeToggle;
 
   // Ses efektleri
   const sounds = {
@@ -46,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     streak: 0,
     hintsLeft: 3,
     soundEnabled: true,
+    keyboardMode: 'custom', // 'custom' veya 'native'
     usedLetters: {
       correct: new Set(),
       present: new Set(),
@@ -61,16 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
   let lastTouch = 0;
   const minTouchInterval = 300; // ms
   
-  // Debounce fonksiyonu
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-  }
-
+  // Mobil klavye girişi için input
+  let mobileInput = null;
+  
   // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
     "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
@@ -91,6 +88,120 @@ document.addEventListener('DOMContentLoaded', function() {
     ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
     ["Z", "C", "V", "B", "N", "M", "Ö", "Ç"]
   ];
+
+  // Debounce fonksiyonu
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      const context = this;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+  
+  // Mobil input oluştur (native klavye için)
+  function createMobileInput() {
+    if (!mobileInput) {
+      mobileInput = document.createElement('input');
+      mobileInput.type = 'text';
+      mobileInput.inputMode = 'text';
+      mobileInput.autocomplete = 'off';
+      mobileInput.autocorrect = 'off';
+      mobileInput.autocapitalize = 'off';
+      mobileInput.spellcheck = false;
+      mobileInput.maxLength = 1;
+      
+      // Görünmez input
+      mobileInput.style.opacity = '0';
+      mobileInput.style.position = 'fixed';
+      mobileInput.style.left = '-9999px';
+      mobileInput.style.height = '1px';
+      mobileInput.id = 'mobile-input';
+      
+      document.body.appendChild(mobileInput);
+      
+      // Harf giriş işlemi
+      mobileInput.addEventListener('input', function(e) {
+        const char = e.target.value.toUpperCase();
+        
+        if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
+          addLetter(char);
+          playSound('keypress');
+        }
+        
+        // Inputu temizle
+        setTimeout(() => {
+          mobileInput.value = '';
+        }, 50);
+      });
+      
+      // Silme ve Enter işlemleri
+      mobileInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace') {
+          e.preventDefault();
+          deleteLetter();
+          playSound('keypress');
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          submitGuess();
+        }
+      });
+    }
+  }
+  
+  // Klavye modu değiştirme butonu oluştur
+  function createKeyboardToggle() {
+    if (!keyboardModeToggle) {
+      keyboardModeToggle = document.createElement('button');
+      keyboardModeToggle.id = 'keyboard-toggle';
+      keyboardModeToggle.className = 'keyboard-toggle-btn';
+      keyboardModeToggle.innerHTML = '<i class="fas fa-keyboard"></i>';
+      keyboardModeToggle.title = gameState.keyboardMode === 'custom' ? 
+                               'Mobil klavyeye geç' : 'Özel klavyeye geç';
+      
+      keyboardModeToggle.style.position = 'fixed';
+      keyboardModeToggle.style.top = '20px';
+      keyboardModeToggle.style.right = '20px';
+      keyboardModeToggle.style.zIndex = '1001';
+      keyboardModeToggle.style.padding = '8px 12px';
+      keyboardModeToggle.style.backgroundColor = 'rgba(40, 40, 70, 0.8)';
+      keyboardModeToggle.style.color = 'white';
+      keyboardModeToggle.style.border = 'none';
+      keyboardModeToggle.style.borderRadius = '50%';
+      keyboardModeToggle.style.width = '40px';
+      keyboardModeToggle.style.height = '40px';
+      keyboardModeToggle.style.display = 'flex';
+      keyboardModeToggle.style.alignItems = 'center';
+      keyboardModeToggle.style.justifyContent = 'center';
+      keyboardModeToggle.style.cursor = 'pointer';
+      keyboardModeToggle.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+      
+      keyboardModeToggle.addEventListener('click', function() {
+        toggleKeyboardMode();
+      });
+      
+      document.body.appendChild(keyboardModeToggle);
+    }
+  }
+  
+  // Klavye modunu değiştir
+  function toggleKeyboardMode() {
+    if (gameState.keyboardMode === 'custom') {
+      gameState.keyboardMode = 'native';
+      hideCustomKeyboard();
+      keyboardModeToggle.title = 'Özel klavyeye geç';
+      keyboardModeToggle.innerHTML = '<i class="fas fa-th-large"></i>';
+      createMobileInput();
+      showMessage('Mobil klavye moduna geçildi', 'info');
+    } else {
+      gameState.keyboardMode = 'custom';
+      if (mobileInput) mobileInput.blur();
+      showCustomKeyboard();
+      keyboardModeToggle.title = 'Mobil klavyeye geç';
+      keyboardModeToggle.innerHTML = '<i class="fas fa-keyboard"></i>';
+      showMessage('Özel klavye moduna geçildi', 'info');
+    }
+  }
 
   // Özel klavye oluştur
   function createCustomKeyboard() {
@@ -229,6 +340,11 @@ document.addEventListener('DOMContentLoaded', function() {
           padding: 10px 3px !important;
         }
       }
+      
+      /* Kareleri tıklanabilir yap */
+      .wordle-cell {
+        cursor: pointer;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -249,6 +365,15 @@ document.addEventListener('DOMContentLoaded', function() {
       customKeyboardVisible = false;
     }
   }
+  
+  // Mobil klavyeyi odakla
+  function focusMobileInput() {
+    if (mobileInput && gameState.keyboardMode === 'native' && !gameState.isGameOver) {
+      setTimeout(() => {
+        mobileInput.focus();
+      }, 50);
+    }
+  }
 
   // Oyun başlat butonu
   startBtn.addEventListener('click', startGame);
@@ -257,11 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
   playAgainBtn.addEventListener('click', startGame);
 
   // İpucu butonu
-  hintButton.addEventListener('click', function() {
-    if (customKeyboardVisible) {
-      getHint();
-    }
-  });
+  hintButton.addEventListener('click', getHint);
 
   // Ses butonu
   soundToggle.addEventListener('click', toggleSound);
@@ -290,14 +411,31 @@ document.addEventListener('DOMContentLoaded', function() {
   // Ekrana tıklama olayı - grid tıklandığında klavyeyi göster
   wordleGrid.addEventListener('click', function(e) {
     if (!gameState.isGameOver) {
-      showCustomKeyboard();
+      if (gameState.keyboardMode === 'custom') {
+        showCustomKeyboard();
+      } else {
+        focusMobileInput();
+      }
     }
   });
   
-  // Sayfa tıklama olayı - grid dışına tıklandığında klavyeyi gizle
+  // Wordle hücrelerine tıklama olayı - daha büyük tıklama alanı
+  document.addEventListener('click', function(e) {
+    const cell = e.target.closest('.wordle-cell');
+    if (cell) {
+      if (gameState.keyboardMode === 'custom') {
+        showCustomKeyboard();
+      } else {
+        focusMobileInput();
+      }
+    }
+  });
+  
+  // Sayfa tıklama olayı - grid dışına tıklandığında özel klavyeyi gizle
   document.addEventListener('click', function(e) {
     if (customKeyboardVisible && !wordleGrid.contains(e.target) && 
-        !customKeyboard.contains(e.target) && !hintButton.contains(e.target)) {
+        !customKeyboard.contains(e.target) && !hintButton.contains(e.target) &&
+        !e.target.closest('.keyboard-toggle-btn')) {
       hideCustomKeyboard();
     }
   });
@@ -343,8 +481,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Grid oluştur
     createWordleGrid();
     
-    // Özel klavyeyi oluştur
+    // Klavye bileşenlerini oluştur
     createCustomKeyboard();
+    createMobileInput();
+    createKeyboardToggle();
+    
+    // Klavye moduna göre UI düzenle
+    if (gameState.keyboardMode === 'custom') {
+      showCustomKeyboard();
+    } else {
+      focusMobileInput();
+    }
     
     // Ses efektlerini sıfırla
     resetSounds();
@@ -352,14 +499,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Oyun başlangıç sesi çal
     playSound('keypress');
     
-    // Klavyeyi otomatik olarak göstermek için kısa bir gecikme
+    // Sayfa aşağı kaydıysa grid'i görünür yap
     setTimeout(() => {
-      if (!gameState.isGameOver) {
-        showCustomKeyboard();
-        // Sayfa aşağı kaydıysa grid'i görünür yap
-        wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
-      }
-    }, 500);
+      wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 300);
     
     // Özel klavye tuşlarını güncelle (renkler)
     updateCustomKeyboard();
@@ -381,6 +524,14 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
+        // Her hücreye tıklama olayı ekle
+        cell.addEventListener('click', function() {
+          if (gameState.keyboardMode === 'custom') {
+            showCustomKeyboard();
+          } else {
+            focusMobileInput();
+          }
+        });
         rowDiv.appendChild(cell);
       }
       
@@ -727,8 +878,17 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWin) {
     gameState.isGameOver = true;
     
-    // Özel klavyeyi gizle
-    hideCustomKeyboard();
+    // Klavyeleri gizle
+    if (gameState.keyboardMode === 'custom') {
+      hideCustomKeyboard();
+    } else if (mobileInput) {
+      mobileInput.blur();
+    }
+    
+    // Klavye geçiş butonunu gizle
+    if (keyboardModeToggle) {
+      keyboardModeToggle.style.display = 'none';
+    }
     
     // Seri ve puan hesaplamaları
     if (isWin) {
@@ -938,6 +1098,15 @@ document.addEventListener('DOMContentLoaded', function() {
   style.textContent = `
     .game-container {
       margin-bottom: 60px;
+    }
+    
+    .keyboard-toggle-btn {
+      transition: all 0.3s;
+    }
+    
+    .keyboard-toggle-btn:hover {
+      transform: scale(1.1);
+      background-color: rgba(70, 70, 100, 0.9) !important;
     }
     
     @media (max-width: 768px) {
