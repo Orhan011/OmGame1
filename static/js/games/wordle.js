@@ -7,9 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const playAgainBtn = document.getElementById('play-again');
   const wordleGrid = document.getElementById('wordle-grid');
   const keyboard = document.getElementById('keyboard');
-  const keyboardRow1 = document.getElementById('keyboard-row-1');
-  const keyboardRow2 = document.getElementById('keyboard-row-2');
-  const keyboardRow3 = document.getElementById('keyboard-row-3');
   const messageContainer = document.getElementById('message-container');
   const scoreDisplay = document.getElementById('score-display');
   const guessesDisplay = document.getElementById('guesses-display');
@@ -51,87 +48,26 @@ document.addEventListener('DOMContentLoaded', function() {
       present: new Set(),
       absent: new Set()
     },
-    // Çift işlemi önlemek için
-    lastInputTime: 0,
-    debounceTime: 200 // ms
+    // İşlem kilidi
+    isProcessing: false
   };
-
-  // Mobil klavye girişi için gizli input oluştur
-  let mobileInput = null;
   
-  function createMobileInput() {
-    if (!mobileInput) {
-      mobileInput = document.createElement('input');
-      mobileInput.type = 'text';
-      mobileInput.inputMode = 'text';
-      mobileInput.autocomplete = 'off';
-      mobileInput.autocorrect = 'off';
-      mobileInput.autocapitalize = 'off';
-      mobileInput.spellcheck = false;
-      
-      // Görünmez input - tek seferde tek harf girişi için maxLength=1
-      mobileInput.style.position = 'fixed';
-      mobileInput.style.top = '0';
-      mobileInput.style.left = '0';
-      mobileInput.style.opacity = '0';
-      mobileInput.style.pointerEvents = 'none';
-      mobileInput.style.height = '1px';
-      mobileInput.style.width = '1px';
-      mobileInput.maxLength = 1;
-      
-      document.body.appendChild(mobileInput);
-      
-      // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
-      const debounce = (callback, delay) => {
-        let timerId;
-        return function(...args) {
-          clearTimeout(timerId);
-          timerId = setTimeout(() => {
-            callback.apply(this, args);
-          }, delay);
-        };
+  // Event kontrolü - olay yönetimi
+  let eventController = {
+    // Zamanla kilitleyen ve açan fonksiyon
+    throttle: function(callback, delay) {
+      return function() {
+        if (gameState.isProcessing) return; // İşlem devam ediyorsa dön
+        
+        gameState.isProcessing = true;
+        callback.apply(this, arguments);
+        
+        setTimeout(() => {
+          gameState.isProcessing = false;
+        }, delay);
       };
-      
-      // Harf giriş işlemi için debounce uygulanan fonksiyon
-      const handleInput = debounce((e) => {
-        const char = e.target.value.toUpperCase();
-        
-        if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
-          addLetter(char);
-          playSound('keypress');
-        }
-        
-        // İnputu temizle - bir sonraki harf girişi için hazırla
-        e.target.value = '';
-      }, 100);
-      
-      // Mobil input olayları - tek harf girişi
-      mobileInput.addEventListener('input', handleInput);
-      
-      // Silme ve Enter için debounce uygulanan fonksiyon
-      const handleKeydown = debounce((e) => {
-        if (e.key === 'Backspace') {
-          e.preventDefault();
-          deleteLetter();
-          playSound('keypress');
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          submitGuess();
-        }
-      }, 100);
-      
-      // Mobil input silme ve enter işlemleri
-      mobileInput.addEventListener('keydown', handleKeydown);
     }
-  }
-  
-  function focusMobileInput() {
-    if (mobileInput && !gameState.isGameOver) {
-      setTimeout(() => {
-        mobileInput.focus();
-      }, 50);
-    }
-  }
+  };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
@@ -147,40 +83,49 @@ document.addEventListener('DOMContentLoaded', function() {
     "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
   ];
 
-  // Türkçe klavye düzeni
-  const turkishKeyboard = [
-    ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
-    ["SİL", "Z", "C", "V", "B", "N", "M", "Ö", "Ç", "ENTER"]
-  ];
+  // Minimum hız kısıtlaması
+  const MIN_EVENT_INTERVAL = 100; // ms
 
-  // Oyun başlat butonu
-  startBtn.addEventListener('click', startGame);
+  // Eventlerin son çalışma zamanını takip etmek için
+  let lastEventTimes = {
+    keydown: 0,
+    keypress: 0,
+    input: 0
+  };
+
+  // Zaman tabanlı event koruma
+  function shouldHandleEvent(eventType) {
+    const now = Date.now();
+    const lastTime = lastEventTimes[eventType] || 0;
+    
+    if (now - lastTime < MIN_EVENT_INTERVAL) {
+      return false;
+    }
+    
+    lastEventTimes[eventType] = now;
+    return true;
+  }
+
+  // Oyun başlatma butonu
+  startBtn.addEventListener('click', eventController.throttle(startGame, 500));
 
   // Yeniden oyna butonu
-  playAgainBtn.addEventListener('click', startGame);
+  playAgainBtn.addEventListener('click', eventController.throttle(startGame, 500));
 
   // İpucu butonu
-  hintButton.addEventListener('click', getHint);
+  hintButton.addEventListener('click', eventController.throttle(getHint, 500));
 
   // Ses butonu
-  soundToggle.addEventListener('click', toggleSound);
+  soundToggle.addEventListener('click', eventController.throttle(toggleSound, 300));
 
   // Skoru paylaş/kopyala butonları
-  copyScoreBtn.addEventListener('click', copyScore);
-  shareScoreBtn.addEventListener('click', shareScore);
+  copyScoreBtn.addEventListener('click', eventController.throttle(copyScore, 300));
+  shareScoreBtn.addEventListener('click', eventController.throttle(shareScore, 300));
 
-  // Klavye tuşu basımı için debounce fonksiyonu
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
-  
-  // Klavye tuşuna debounce uygula
-  const debouncedKeypress = debounce(function(e) {
+  // Klavye olaylarını kontrol et
+  document.addEventListener('keydown', function(e) {
+    if (!shouldHandleEvent('keydown')) return;
+    
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
     
     const key = e.key.toUpperCase();
@@ -194,13 +139,144 @@ document.addEventListener('DOMContentLoaded', function() {
       addLetter(key);
       playSound('keypress');
     }
-  }, 100);
-
-  // Klavye tuşu basımı
-  document.addEventListener('keydown', debouncedKeypress);
+  });
   
-  // Ekrana tıklama olayı - mobil input için
-  wordleGrid.addEventListener('click', focusMobileInput);
+  // Ekrana tıklama olayı
+  wordleGrid.addEventListener('click', function() {
+    if (!shouldHandleEvent('input')) return;
+    createVirtualKeyboard();
+  });
+
+  /**
+   * Sanal klavye oluştur
+   */
+  function createVirtualKeyboard() {
+    // Eğer oyun bitmişse işlem yapma
+    if (gameState.isGameOver) return;
+    
+    // Eğer zaten sanal klavye açıksa tekrar oluşturma
+    if (document.getElementById('virtual-keyboard')) return;
+    
+    // Sanal klavye oluştur
+    const keyboardDiv = document.createElement('div');
+    keyboardDiv.id = 'virtual-keyboard';
+    keyboardDiv.style.position = 'fixed';
+    keyboardDiv.style.top = '50%';
+    keyboardDiv.style.left = '50%';
+    keyboardDiv.style.transform = 'translate(-50%, -50%)';
+    keyboardDiv.style.background = 'rgba(40, 40, 60, 0.95)';
+    keyboardDiv.style.padding = '15px';
+    keyboardDiv.style.borderRadius = '10px';
+    keyboardDiv.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
+    keyboardDiv.style.zIndex = '1000';
+    keyboardDiv.style.display = 'flex';
+    keyboardDiv.style.flexDirection = 'column';
+    keyboardDiv.style.gap = '8px';
+    keyboardDiv.style.width = '90%';
+    keyboardDiv.style.maxWidth = '500px';
+    
+    // Türkçe klavye düzeni
+    const turkishKeyboard = [
+      ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
+      ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
+      ["Z", "C", "V", "B", "N", "M", "Ö", "Ç"]
+    ];
+    
+    // Klavye satırlarını oluştur
+    turkishKeyboard.forEach(row => {
+      const rowDiv = document.createElement('div');
+      rowDiv.style.display = 'flex';
+      rowDiv.style.justifyContent = 'center';
+      rowDiv.style.gap = '5px';
+      
+      row.forEach(key => {
+        const keyButton = document.createElement('button');
+        keyButton.textContent = key;
+        keyButton.style.padding = '12px';
+        keyButton.style.minWidth = '30px';
+        keyButton.style.background = 'rgba(60, 60, 80, 0.8)';
+        keyButton.style.color = 'white';
+        keyButton.style.border = 'none';
+        keyButton.style.borderRadius = '5px';
+        keyButton.style.fontWeight = 'bold';
+        keyButton.style.cursor = 'pointer';
+        
+        // Tuşa tıklama olayı
+        keyButton.addEventListener('click', eventController.throttle(function() {
+          addLetter(key);
+          playSound('keypress');
+        }, MIN_EVENT_INTERVAL));
+        
+        rowDiv.appendChild(keyButton);
+      });
+      
+      keyboardDiv.appendChild(rowDiv);
+    });
+    
+    // Kontrol tuşlarını içeren son satır
+    const controlRow = document.createElement('div');
+    controlRow.style.display = 'flex';
+    controlRow.style.justifyContent = 'center';
+    controlRow.style.gap = '5px';
+    controlRow.style.marginTop = '5px';
+    
+    // Backspace tuşu
+    const backspaceBtn = document.createElement('button');
+    backspaceBtn.innerHTML = '<i class="fas fa-backspace"></i> SİL';
+    backspaceBtn.style.padding = '12px';
+    backspaceBtn.style.background = 'rgba(80, 40, 40, 0.8)';
+    backspaceBtn.style.color = 'white';
+    backspaceBtn.style.border = 'none';
+    backspaceBtn.style.borderRadius = '5px';
+    backspaceBtn.style.fontWeight = 'bold';
+    backspaceBtn.style.cursor = 'pointer';
+    backspaceBtn.style.flex = '1';
+    
+    backspaceBtn.addEventListener('click', eventController.throttle(function() {
+      deleteLetter();
+      playSound('keypress');
+    }, MIN_EVENT_INTERVAL));
+    
+    // Enter tuşu
+    const enterBtn = document.createElement('button');
+    enterBtn.innerHTML = '<i class="fas fa-level-down-alt fa-rotate-90"></i> ENTER';
+    enterBtn.style.padding = '12px';
+    enterBtn.style.background = 'rgba(40, 80, 40, 0.8)';
+    enterBtn.style.color = 'white';
+    enterBtn.style.border = 'none';
+    enterBtn.style.borderRadius = '5px';
+    enterBtn.style.fontWeight = 'bold';
+    enterBtn.style.cursor = 'pointer';
+    enterBtn.style.flex = '1';
+    
+    enterBtn.addEventListener('click', eventController.throttle(function() {
+      submitGuess();
+    }, MIN_EVENT_INTERVAL));
+    
+    // Kapat tuşu
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+    closeBtn.style.padding = '12px 15px';
+    closeBtn.style.background = 'rgba(60, 60, 60, 0.8)';
+    closeBtn.style.color = 'white';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '5px';
+    closeBtn.style.fontWeight = 'bold';
+    closeBtn.style.cursor = 'pointer';
+    
+    closeBtn.addEventListener('click', function() {
+      document.body.removeChild(keyboardDiv);
+    });
+    
+    controlRow.appendChild(backspaceBtn);
+    controlRow.appendChild(enterBtn);
+    controlRow.appendChild(closeBtn);
+    
+    keyboardDiv.appendChild(controlRow);
+    
+    // Sanal klavyeyi sayfaya ekle
+    document.body.appendChild(keyboardDiv);
+  }
 
   /**
    * Oyunu başlatır
@@ -232,7 +308,14 @@ document.addEventListener('DOMContentLoaded', function() {
       present: new Set(),
       absent: new Set()
     };
-    gameState.lastInputTime = 0;
+    gameState.isProcessing = false;
+    
+    // Event zamanlarını sıfırla
+    lastEventTimes = {
+      keydown: 0,
+      keypress: 0,
+      input: 0
+    };
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -240,12 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // İpucu sayacını güncelle
     hintCount.textContent = gameState.hintsLeft;
 
-    // Grid ve klavyeyi oluştur
+    // Izgarayı oluştur
     createWordleGrid();
-    
-    // Mobil klavye desteği ekle
-    createMobileInput();
-    focusMobileInput();
 
     // Ses efektlerini sıfırla
     resetSounds();
@@ -278,17 +357,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Harf ekleme - çift işlemi önleme kontrolü eklendi
+   * Harf ekleme
    */
   function addLetter(letter) {
     if (gameState.isGameOver) return;
-    
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
     
     if (gameState.currentCol < 5) {
       gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
@@ -298,17 +370,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Harf silme - çift işlemi önleme kontrolü eklendi
+   * Harf silme
    */
   function deleteLetter() {
     if (gameState.isGameOver) return;
-    
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
     
     if (gameState.currentCol > 0) {
       gameState.currentCol--;
@@ -321,12 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
    * Tahmini gönderme
    */
   function submitGuess() {
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
+    if (gameState.isGameOver) return;
     
     if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
@@ -335,9 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const guess = gameState.guesses[gameState.currentRow].join('');
-    
-    // Kelime kontrolü (gerçek uygulamada kelime listesinden kontrol edilir)
-    // Basitlik için şimdilik atlıyoruz, istenirse eklenir
     
     // Tahmin sonuçlarını kontrol et
     const result = checkGuess(guess);
@@ -555,9 +612,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWin) {
     gameState.isGameOver = true;
     
-    // Mobil inputu gizle
-    if (mobileInput) {
-      mobileInput.style.display = 'none';
+    // Sanal klavye varsa kapat
+    const virtualKeyboard = document.getElementById('virtual-keyboard');
+    if (virtualKeyboard) {
+      document.body.removeChild(virtualKeyboard);
     }
     
     // Seri ve puan hesaplamaları
@@ -762,4 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
+  
+  // Oyunu başlat
+  startGame();
 });
