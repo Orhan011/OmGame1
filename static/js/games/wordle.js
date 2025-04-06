@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const soundToggle = document.getElementById('sound-toggle');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
-  const mobileInput = document.getElementById('mobile-input');
   const submitGuessBtn = document.getElementById('submit-guess-btn');
+  const deleteLetterBtn = document.getElementById('delete-letter-btn');
 
   // Ses efektleri
   const sounds = {
@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
     score: 0,
     streak: 0,
     hintsLeft: 3,
-    soundEnabled: true
+    soundEnabled: true,
+    activeCellIndex: 0  // Aktif hücre indeksi
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
@@ -78,29 +79,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Tahmin gönder butonu
   submitGuessBtn.addEventListener('click', function() {
-    processGuessFromInput();
+    submitGuess();
   });
 
-  // Mobil girişi ayarla
-  mobileInput.addEventListener('input', function() {
-    // Tüm girişi büyük harfe çevir
-    this.value = this.value.toUpperCase();
+  // Harf sil butonu
+  deleteLetterBtn.addEventListener('click', function() {
+    deleteLetter();
   });
 
-  mobileInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      processGuessFromInput();
-    }
-  });
-
-  // Klavye tuşu basımı (yedek olarak kalacak)
+  // Klavye tuşu basımı
   document.addEventListener('keydown', function(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
     
-    // Sadece Enter/Backspace tuşlarına yanıt ver (geri kalan harfler, input alanından gelecek)
-    if (e.key === 'Enter' && !mobileInput.hasFocus) {
-      processGuessFromInput();
+    const key = e.key.toUpperCase();
+    
+    if (key === 'ENTER') {
+      submitGuess();
+    } else if (key === 'BACKSPACE') {
+      deleteLetter();
+      playSound('keypress');
+    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+      addLetter(key);
+      playSound('keypress');
     }
   });
 
@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.guesses = Array(6).fill().map(() => Array(5).fill(''));
     gameState.isGameOver = false;
     gameState.hintsLeft = 3;
+    gameState.activeCellIndex = 0;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -133,10 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Grid oluştur
     createWordleGrid();
-
-    // Mobil girdi alanını temizle ve odaklan
-    mobileInput.value = '';
-    mobileInput.focus();
 
     // Ses efektlerini sıfırla
     resetSounds();
@@ -162,11 +159,19 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         
-        // Hücreye tıklandığında mobil giriş alanına odaklan
+        // Hücreye tıklama olayı
         cell.addEventListener('click', function() {
           if (gameState.isGameOver) return;
-          if (parseInt(cell.dataset.row) === gameState.currentRow) {
-            mobileInput.focus();
+          
+          const clickedRow = parseInt(cell.dataset.row);
+          const clickedCol = parseInt(cell.dataset.col);
+          
+          // Sadece aktif satırdaki hücrelerin tıklanabilir olmasını sağla
+          if (clickedRow === gameState.currentRow) {
+            // Tıklanan hücreyi aktif olarak işaretle
+            gameState.activeCellIndex = clickedCol;
+            highlightActiveCell();
+            playSound('keypress');
           }
         });
         
@@ -175,32 +180,63 @@ document.addEventListener('DOMContentLoaded', function() {
       
       wordleGrid.appendChild(rowDiv);
     }
+    
+    // İlk satırı ve hücreyi aktif olarak işaretle
+    updateGrid();
+    highlightActiveCell();
   }
 
   /**
-   * Mobil giriş kutusundan tahmini işler
+   * Aktif hücreyi vurgular
    */
-  function processGuessFromInput() {
-    if (gameState.isGameOver) return;
+  function highlightActiveCell() {
+    // Önce tüm hücrelerden 'active' sınıfını kaldır
+    document.querySelectorAll('.wordle-cell').forEach(cell => {
+      cell.classList.remove('active');
+    });
     
-    let guess = mobileInput.value.trim().toUpperCase();
-    
-    // 5 harflik tam bir kelime ise
-    if (guess.length === 5) {
-      // Mevcut satıra tahmini yerleştir
-      for (let i = 0; i < 5; i++) {
-        gameState.guesses[gameState.currentRow][i] = guess[i];
+    // Sadece mevcut satırdaki aktif hücreyi vurgula
+    if (gameState.currentRow < 6) {
+      const activeCell = document.querySelector(`.wordle-cell[data-row="${gameState.currentRow}"][data-col="${gameState.activeCellIndex}"]`);
+      if (activeCell) {
+        activeCell.classList.add('active');
       }
+    }
+  }
+
+  /**
+   * Harf ekleme
+   */
+  function addLetter(letter) {
+    if (gameState.currentCol < 5) {
+      // Önce aktif hücreye harfi yerleştir
+      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = letter;
       
-      gameState.currentCol = 5; // Tüm sütunları doldur
+      // Bir sonraki hücreyi aktif yap
+      gameState.activeCellIndex = (gameState.activeCellIndex + 1) % 5;
+      gameState.currentCol = Math.max(gameState.currentCol, gameState.activeCellIndex);
+      
+      // Izgarayı güncelle
       updateGrid();
-      submitGuess();
+      highlightActiveCell();
+    }
+  }
+
+  /**
+   * Harf silme
+   */
+  function deleteLetter() {
+    if (gameState.currentCol > 0) {
+      // Aktif hücrenin bir öncekine git
+      gameState.activeCellIndex = (gameState.activeCellIndex - 1 + 5) % 5;
       
-      // Girdi alanını temizle
-      mobileInput.value = '';
-    } else {
-      showMessage('Lütfen 5 harfli bir kelime girin!', 'warning');
-      shakeRow(gameState.currentRow);
+      // O hücredeki harfi sil
+      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
+      gameState.currentCol--;
+      
+      // Izgarayı güncelle
+      updateGrid();
+      highlightActiveCell();
     }
   }
 
@@ -231,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bir sonraki satıra geç
     gameState.currentRow++;
     gameState.currentCol = 0;
+    gameState.activeCellIndex = 0;
     
     // Oyun durumunu kontrol et
     if (guess === gameState.answer) {
@@ -244,12 +281,10 @@ document.addEventListener('DOMContentLoaded', function() {
         endGame(false);
       }, 1500);
     } else {
-      // Sonraki satıra geçildiğinde ızgarayı güncelle ve otomatik klavye aç
+      // Sonraki satıra geçildiğinde ızgarayı güncelle
       setTimeout(() => {
         updateGrid();
-        
-        // Mobil cihazda giriş alanına odaklan
-        mobileInput.focus();
+        highlightActiveCell();
       }, 1600); // Animasyondan sonra
     }
     
@@ -336,16 +371,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           cell.classList.remove('current-row');
         }
-      }
-    }
-    
-    // Aktif satıra tıklayınca otomatik girdi alanına odaklan
-    if (gameState.currentRow < 6 && !gameState.isGameOver) {
-      const currentRow = document.querySelector(`.wordle-row[data-row="${gameState.currentRow}"]`);
-      if (currentRow) {
-        currentRow.addEventListener('click', function() {
-          mobileInput.focus();
-        });
       }
     }
   }
@@ -452,25 +477,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Izgarayı güncelle
     updateGrid();
     
-    // Mobil giriş alanına eklenen harfi de yansıt
-    updateMobileInputFromGrid();
+    // Aktif hücreyi güncelle
+    gameState.activeCellIndex = (randomEmptyIndex + 1) % 5;
+    gameState.currentCol = Math.max(gameState.currentCol, filledCount + 1);
+    highlightActiveCell();
     
     // İpucu sesi çal
     playSound('hint');
     
     // Başarı mesajı göster
     showMessage('İpucu eklendi!', 'success');
-  }
-
-  /**
-   * Izgara durumunu mobil giriş alanına güncelle
-   */
-  function updateMobileInputFromGrid() {
-    let currentGuess = '';
-    for (let i = 0; i < 5; i++) {
-      currentGuess += gameState.guesses[gameState.currentRow][i] || '';
-    }
-    mobileInput.value = currentGuess;
   }
 
   /**

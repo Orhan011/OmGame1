@@ -79,13 +79,14 @@
         <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Mobile Input -->
-        <div id="mobile-input-container" class="mobile-input-container mt-3">
-          <p class="text-center input-instruction mb-2">Tahmininizi yazın:</p>
-          <input type="text" id="mobile-input" class="mobile-text-input form-control" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="Harf girin (5 harf)">
-          <div class="d-flex justify-content-center mt-2">
-            <button id="submit-guess-btn" class="btn btn-primary">Tahmin Et</button>
-          </div>
+        <!-- Game Action Buttons -->
+        <div class="game-action-buttons">
+          <button id="delete-letter-btn" class="btn btn-outline-secondary action-btn">
+            <i class="fas fa-backspace"></i> Sil
+          </button>
+          <button id="submit-guess-btn" class="btn btn-primary action-btn">
+            <i class="fas fa-check"></i> Tahmin Et
+          </button>
         </div>
       </div>
 
@@ -219,6 +220,21 @@
     color: rgba(255, 255, 255, 0.5);
   }
 
+  .game-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 15px auto 30px;
+    max-width: 350px;
+  }
+
+  .action-btn {
+    flex: 1;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 6px;
+  }
+
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -291,47 +307,12 @@
     100% { opacity: 0; }
   }
 
-  /* Mobil Klavye input alanı */
-  .mobile-text-input {
-    width: 100%;
-    max-width: 300px;
-    padding: 12px;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-align: center;
-    margin: 0 auto;
-    display: block;
-    border: 2px solid rgba(100, 100, 150, 0.5);
-    background-color: rgba(40, 40, 60, 0.8);
-    color: white;
-    border-radius: 8px;
-  }
-
-  .mobile-text-input:focus {
-    border-color: rgba(52, 152, 219, 0.8);
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-    outline: none;
-  }
-
-  .mobile-input-container {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .input-instruction {
-    color: rgba(200, 200, 255, 0.8);
-    font-size: 0.9rem;
-  }
-
   /* Aktif satır vurgusu */
-  .wordle-row[data-row="0"] .wordle-cell,
-  .wordle-row[data-row="1"] .wordle-cell,
-  .wordle-row[data-row="2"] .wordle-cell,
-  .wordle-row[data-row="3"] .wordle-cell,
-  .wordle-row[data-row="4"] .wordle-cell,
-  .wordle-row[data-row="5"] .wordle-cell {
+  .wordle-cell.active {
+    border-color: rgba(52, 152, 219, 0.8);
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
     cursor: pointer;
+    transform: scale(1.05);
   }
 
   /* Aktif satırın hücrelerini vurgula */
@@ -348,10 +329,10 @@
     .wordle-grid {
       margin-bottom: 20px; 
     }
-
-    .mobile-text-input {
-      padding: 10px;
-      font-size: 1rem;
+    
+    .action-btn {
+      padding: 8px 10px;
+      font-size: 0.9rem;
     }
   }
 </style>
