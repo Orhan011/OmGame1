@@ -1,523 +1,3 @@
-{% extends "layout.html" %}
-
-{% block title %}Simon Says - ZekaPark{% endblock %}
-
-{% block content %}
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-12 text-center mb-4">
-      <h1 class="display-4 fw-bold">Simon Says</h1>
-      <p class="lead text-muted">Renkli düğmelerin yanma sırasını hatırlayarak hafızanızı güçlendirin.</p>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-lg-8 mx-auto">
-      <div class="card main-card mb-4">
-        <div class="card-body">
-          <div id="game-start-screen" class="text-center py-4">
-            <h2 class="mb-4">Simon Says'e Hoş Geldiniz</h2>
-            <p>Bilgisayar belli bir sırada renkli düğmeleri yakacak. Sırayı izleyin ve aynen tekrar edin.</p>
-            <p>Her turda dizi bir renk daha uzayacak ve zorlaşacak. Ne kadar ileri gidebileceksiniz?</p>
-            
-            <div class="d-flex justify-content-center gap-3 mt-4">
-              <button id="start-game-btn" class="btn btn-lg btn-primary">Oyuna Başla</button>
-              <button id="tutorial-btn" class="btn btn-lg btn-outline-secondary">Nasıl Oynanır?</button>
-            </div>
-          </div>
-          
-          <div id="game-tutorial" class="py-4 d-none">
-            <h3 class="mb-3">Nasıl Oynanır?</h3>
-            <ul class="list-group list-group-flush mb-4">
-              <li class="list-group-item">Oyun, bilgisayarın bir sıra halinde yaktığı renkli düğmeleri hatırlamanızı gerektirir.</li>
-              <li class="list-group-item">Her turda, bilgisayar önceki diziye bir renk daha ekler.</li>
-              <li class="list-group-item">Bilgisayar dizisini gösterdikten sonra, aynı sırayı takip ederek düğmelere tıklamalısınız.</li>
-              <li class="list-group-item">Yanlış bir düğmeye tıklarsanız, oyun sona erer.</li>
-              <li class="list-group-item">Amacınız mümkün olduğunca yüksek bir seviyeye ulaşmaktır.</li>
-            </ul>
-            
-            <div class="text-center">
-              <button id="back-to-main-btn" class="btn btn-secondary">Geri Dön</button>
-            </div>
-          </div>
-          
-          <div id="game-area" class="text-center py-4 d-none">
-            <div class="level-info mb-4">
-              <span class="badge rounded-pill bg-primary fs-5">Seviye: <span id="level-display">1</span></span>
-            </div>
-            
-            <div class="status-message mb-4">
-              <p id="status-text" class="lead">Renkli sırayı izleyin...</p>
-            </div>
-            
-            <div class="simon-container mx-auto mb-4">
-              <div class="simon-game">
-                <div class="simon-btn simon-red" id="red"></div>
-                <div class="simon-btn simon-green" id="green"></div>
-                <div class="simon-btn simon-blue" id="blue"></div>
-                <div class="simon-btn simon-yellow" id="yellow"></div>
-                <div class="simon-center">
-                  <span id="center-text">Simon</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="controls mb-4">
-              <button id="start-sequence-btn" class="btn btn-primary">Başlat</button>
-            </div>
-          </div>
-          
-          <div id="game-over-screen" class="text-center py-4 d-none">
-            <h2 class="mb-3">Oyun Bitti!</h2>
-            <p class="lead mb-4">Tebrikler! Ulaştığınız seviye: <span id="final-level" class="fw-bold">0</span></p>
-            
-            <div class="score-container mb-4">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">Puanınız</h5>
-                      <p id="final-score" class="display-6 text-primary">0</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">En Uzun Dizi</h5>
-                      <p id="longest-sequence" class="display-6 text-success">0</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="d-flex justify-content-center gap-3">
-              <button id="play-again-btn" class="btn btn-primary">Tekrar Oyna</button>
-              <a href="{{ url_for('all_games') }}" class="btn btn-outline-secondary">Tüm Oyunlar</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elementleri
-    const gameStartScreen = document.getElementById('game-start-screen');
-    const gameTutorial = document.getElementById('game-tutorial');
-    const gameArea = document.getElementById('game-area');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    
-    const startGameBtn = document.getElementById('start-game-btn');
-    const tutorialBtn = document.getElementById('tutorial-btn');
-    const backToMainBtn = document.getElementById('back-to-main-btn');
-    const startSequenceBtn = document.getElementById('start-sequence-btn');
-    const playAgainBtn = document.getElementById('play-again-btn');
-    
-    const levelDisplay = document.getElementById('level-display');
-    const statusText = document.getElementById('status-text');
-    const centerText = document.getElementById('center-text');
-    const finalLevel = document.getElementById('final-level');
-    const finalScore = document.getElementById('final-score');
-    const longestSequence = document.getElementById('longest-sequence');
-    
-    const redBtn = document.getElementById('red');
-    const greenBtn = document.getElementById('green');
-    const blueBtn = document.getElementById('blue');
-    const yellowBtn = document.getElementById('yellow');
-    
-    // Oyun Değişkenleri
-    let gamePattern = [];
-    let userPattern = [];
-    let level = 1;
-    let isPlaying = false;
-    let canClick = false;
-    
-    // Ses Efektleri
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    function createTone(frequency) {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.type = 'sine';
-      oscillator.frequency.value = frequency;
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      return { oscillator, gainNode };
-    }
-    
-    const sounds = {
-      red: 261.63,    // C4
-      green: 329.63,  // E4
-      blue: 392.00,   // G4
-      yellow: 523.25  // C5
-    };
-    
-    // Olay Dinleyicileri
-    startGameBtn.addEventListener('click', startGame);
-    tutorialBtn.addEventListener('click', showTutorial);
-    backToMainBtn.addEventListener('click', backToMain);
-    startSequenceBtn.addEventListener('click', startSequence);
-    playAgainBtn.addEventListener('click', resetGame);
-    
-    redBtn.addEventListener('click', function() {
-      if (canClick) {
-        animateButton('red');
-        checkAnswer('red');
-      }
-    });
-    
-    greenBtn.addEventListener('click', function() {
-      if (canClick) {
-        animateButton('green');
-        checkAnswer('green');
-      }
-    });
-    
-    blueBtn.addEventListener('click', function() {
-      if (canClick) {
-        animateButton('blue');
-        checkAnswer('blue');
-      }
-    });
-    
-    yellowBtn.addEventListener('click', function() {
-      if (canClick) {
-        animateButton('yellow');
-        checkAnswer('yellow');
-      }
-    });
-    
-    // İşlevler
-    function startGame() {
-      gameStartScreen.classList.add('d-none');
-      gameArea.classList.remove('d-none');
-      resetVariables();
-    }
-    
-    function showTutorial() {
-      gameStartScreen.classList.add('d-none');
-      gameTutorial.classList.remove('d-none');
-    }
-    
-    function backToMain() {
-      gameTutorial.classList.add('d-none');
-      gameStartScreen.classList.remove('d-none');
-    }
-    
-    function resetVariables() {
-      gamePattern = [];
-      userPattern = [];
-      level = 1;
-      isPlaying = false;
-      canClick = false;
-      levelDisplay.textContent = level;
-      statusText.textContent = 'Başlamak için "Başlat" düğmesine tıklayın';
-      centerText.textContent = 'Simon';
-      startSequenceBtn.disabled = false;
-      startSequenceBtn.textContent = 'Başlat';
-    }
-    
-    function startSequence() {
-      if (isPlaying) return;
-      
-      isPlaying = true;
-      userPattern = [];
-      canClick = false;
-      startSequenceBtn.disabled = true;
-      
-      statusText.textContent = 'Renkli sırayı izleyin...';
-      centerText.textContent = level;
-      
-      // Yeni bir renk ekle
-      const colors = ['red', 'green', 'blue', 'yellow'];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      gamePattern.push(randomColor);
-      
-      // Kısa bir gecikme sonrası sırayı göster
-      setTimeout(() => {
-        playSequence();
-      }, 1000);
-    }
-    
-    function playSequence() {
-      let i = 0;
-      
-      const interval = setInterval(() => {
-        animateButton(gamePattern[i]);
-        i++;
-        
-        if (i >= gamePattern.length) {
-          clearInterval(interval);
-          
-          setTimeout(() => {
-            statusText.textContent = 'Sırayı tekrar edin!';
-            canClick = true;
-          }, 1000);
-        }
-      }, 800);
-    }
-    
-    function animateButton(color) {
-      const button = document.getElementById(color);
-      button.classList.add('active');
-      
-      // Ses çal
-      const tone = createTone(sounds[color]);
-      tone.oscillator.start();
-      tone.gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-      tone.gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
-      setTimeout(() => {
-        button.classList.remove('active');
-        tone.oscillator.stop();
-      }, 500);
-    }
-    
-    function checkAnswer(color) {
-      userPattern.push(color);
-      const currentIndex = userPattern.length - 1;
-      
-      if (userPattern[currentIndex] === gamePattern[currentIndex]) {
-        if (userPattern.length === gamePattern.length) {
-          // Tur tamamlandı, bir sonraki seviyeye geç
-          level++;
-          levelDisplay.textContent = level;
-          canClick = false;
-          
-          setTimeout(() => {
-            statusText.textContent = 'Doğru! Bir sonraki seviye başlıyor...';
-            userPattern = [];
-            
-            setTimeout(() => {
-              startSequence();
-            }, 1000);
-          }, 1000);
-        }
-      } else {
-        // Yanlış cevap
-        gameOver();
-      }
-    }
-    
-    function gameOver() {
-      // Oyun bitti efekti
-      const buttons = document.querySelectorAll('.simon-btn');
-      buttons.forEach(btn => {
-        btn.classList.add('game-over');
-      });
-      
-      statusText.textContent = 'Oyun Bitti!';
-      centerText.textContent = '☹';
-      
-      // Hata sesi
-      const errorSound = createTone(100);
-      errorSound.oscillator.type = 'sawtooth';
-      errorSound.oscillator.start();
-      errorSound.gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      errorSound.gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-      
-      setTimeout(() => {
-        buttons.forEach(btn => {
-          btn.classList.remove('game-over');
-        });
-        errorSound.oscillator.stop();
-        
-        // Sonuç ekranını göster
-        gameArea.classList.add('d-none');
-        gameOverScreen.classList.remove('d-none');
-        
-        // Sonuçları güncelle
-        finalLevel.textContent = level;
-        finalScore.textContent = calculateScore();
-        longestSequence.textContent = gamePattern.length;
-        
-        // Skoru kaydet
-        saveScore(calculateScore());
-        
-        isPlaying = false;
-      }, 1500);
-    }
-    
-    function calculateScore() {
-      // Basit bir skor hesaplama: dizi uzunluğu * seviye * 10
-      return gamePattern.length * level * 10;
-    }
-    
-    function resetGame() {
-      gameOverScreen.classList.add('d-none');
-      gameArea.classList.remove('d-none');
-      resetVariables();
-    }
-    
-    function saveScore(score) {
-      // API'ye skor gönder
-      fetch('/api/save-score', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          game_type: 'simonSays',
-          score: score
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Score saved:', data);
-      })
-      .catch(error => {
-        console.error('Error saving score:', error);
-      });
-    }
-  });
-</script>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-  .main-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
-  }
-  
-  /* Simon oyun tasarımı */
-  .simon-container {
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  .simon-game {
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%; /* Kare oran */
-    background-color: #252525;
-    border-radius: 50%;
-    margin: 0 auto;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-  }
-  
-  .simon-btn {
-    position: absolute;
-    width: 46%;
-    height: 46%;
-    opacity: 0.8;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  .simon-btn:hover {
-    opacity: 1;
-  }
-  
-  .simon-btn.active {
-    opacity: 1;
-    filter: brightness(1.5);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-  
-  .simon-btn.game-over {
-    opacity: 0.3;
-    filter: grayscale(1);
-  }
-  
-  .simon-red {
-    top: 2%;
-    left: 2%;
-    background-color: #ff4136;
-    border-top-left-radius: 100%;
-  }
-  
-  .simon-green {
-    top: 2%;
-    right: 2%;
-    background-color: #2ecc40;
-    border-top-right-radius: 100%;
-  }
-  
-  .simon-blue {
-    bottom: 2%;
-    right: 2%;
-    background-color: #0074d9;
-    border-bottom-right-radius: 100%;
-  }
-  
-  .simon-yellow {
-    bottom: 2%;
-    left: 2%;
-    background-color: #ffdc00;
-    border-bottom-left-radius: 100%;
-  }
-  
-  .simon-center {
-    position: absolute;
-    width: 30%;
-    height: 30%;
-    background-color: #111;
-    border-radius: 50%;
-    top: 35%;
-    left: 35%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 1.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-    z-index: 10;
-  }
-  
-  .level-info .badge {
-    font-size: 1.2rem;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #6a5ae0, #8170ff);
-  }
-  
-  .controls {
-    margin-top: 20px;
-  }
-  
-  .btn-primary {
-    background: linear-gradient(to right, #6a5ae0, #8170ff);
-    border: none;
-    box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
-  }
-  
-  .btn-primary:hover {
-    background: linear-gradient(to right, #8170ff, #9a8eff);
-    box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  .btn-primary:disabled {
-    background: #6c757d;
-    opacity: 0.7;
-  }
-  
-  @media (max-width: 576px) {
-    .simon-container {
-      max-width: 280px;
-    }
-    
-    .simon-center {
-      font-size: 1.2rem;
-    }
-  }
-</style>
-{% endblock %}
 {% extends 'layout.html' %}
 
 {% block title %}Simon Says - ZekaPark{% endblock %}
@@ -568,14 +48,14 @@
         <h2><i class="fas fa-trophy me-2"></i>Oyun Bitti!</h2>
         <p>Tebrikler! İşte sonuçlarınız:</p>
       </div>
-      
+
       <div class="memory-results-stats">
         <div class="memory-stat-item">
           <div class="memory-stat-value" id="final-level">0</div>
           <div class="memory-stat-label">Ulaşılan Seviye</div>
         </div>
       </div>
-      
+
       <div class="memory-results-footer">
         <button id="play-again" class="btn btn-primary btn-lg">
           <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
@@ -593,7 +73,7 @@
     max-width: 600px;
     margin: 0 auto;
   }
-  
+
   .simon-board {
     width: 400px;
     height: 400px;
@@ -608,39 +88,39 @@
     background-color: #333;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
-  
+
   .simon-button {
     border-radius: 100%;
     cursor: pointer;
     opacity: 0.7;
     transition: opacity 0.3s;
   }
-  
+
   #green {
     background-color: green;
     border-top-left-radius: 100%;
   }
-  
+
   #red {
     background-color: red;
     border-top-right-radius: 100%;
   }
-  
+
   #yellow {
     background-color: yellow;
     border-bottom-left-radius: 100%;
   }
-  
+
   #blue {
     background-color: blue;
     border-bottom-right-radius: 100%;
   }
-  
+
   .simon-button.active {
     opacity: 1;
     box-shadow: 0 0 20px white;
   }
-  
+
   .simon-center {
     position: absolute;
     top: 50%;
@@ -657,13 +137,13 @@
     z-index: 2;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
   }
-  
+
   .simon-score {
     font-size: 1.2rem;
     color: white;
     margin-bottom: 10px;
   }
-  
+
   #start-button {
     padding: 8px 16px;
   }
@@ -678,37 +158,37 @@ document.addEventListener('DOMContentLoaded', function() {
   const finalLevelDisplay = document.getElementById('final-level');
   const gameOverModal = document.getElementById('game-over-modal');
   const playAgainButton = document.getElementById('play-again');
-  
+
   const colors = ['green', 'red', 'yellow', 'blue'];
   let gamePattern = [];
   let userPattern = [];
   let level = 0;
   let isGameStarted = false;
-  
+
   // Audio elements for different sounds
   const sounds = {};
-  
+
   colors.forEach(color => {
     sounds[color] = new Audio(`/static/sounds/note${colors.indexOf(color) + 1}.mp3`);
   });
-  
+
   const gameOverSound = new Audio('/static/sounds/game-over.mp3');
   const successSound = new Audio('/static/sounds/success.mp3');
-  
+
   function nextSequence() {
     userPattern = [];
     level++;
     levelDisplay.textContent = level;
-    
+
     const randomColor = colors[Math.floor(Math.random() * 4)];
     gamePattern.push(randomColor);
-    
+
     // Play the pattern after a short delay
     setTimeout(() => {
       playPattern(gamePattern);
     }, 500);
   }
-  
+
   function playPattern(pattern) {
     let i = 0;
     const interval = setInterval(() => {
@@ -716,22 +196,22 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInterval(interval);
         return;
       }
-      
+
       flashButton(pattern[i]);
       i++;
     }, 600);
   }
-  
+
   function flashButton(color) {
     const button = document.getElementById(color);
     button.classList.add('active');
     sounds[color].play();
-    
+
     setTimeout(() => {
       button.classList.remove('active');
     }, 400);
   }
-  
+
   function checkAnswer(currentLevel) {
     if (userPattern[currentLevel] === gamePattern[currentLevel]) {
       if (userPattern.length === gamePattern.length) {
@@ -744,14 +224,14 @@ document.addEventListener('DOMContentLoaded', function() {
       gameOver();
     }
   }
-  
+
   function gameOver() {
     gameOverSound.play();
     finalLevelDisplay.textContent = level;
     gameOverModal.style.display = 'block';
     isGameStarted = false;
   }
-  
+
   function resetGame() {
     gamePattern = [];
     userPattern = [];
@@ -759,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     isGameStarted = false;
     gameOverModal.style.display = 'none';
   }
-  
+
   // Event Listeners
   startButton.addEventListener('click', function() {
     if (!isGameStarted) {
@@ -768,23 +248,23 @@ document.addEventListener('DOMContentLoaded', function() {
       nextSequence();
     }
   });
-  
+
   buttons.forEach(button => {
     button.addEventListener('click', function() {
       if (isGameStarted) {
         const chosenColor = this.getAttribute('data-color');
         userPattern.push(chosenColor);
-        
+
         flashButton(chosenColor);
         checkAnswer(userPattern.length - 1);
       }
     });
   });
-  
+
   restartButton.addEventListener('click', function() {
     resetGame();
   });
-  
+
   playAgainButton.addEventListener('click', function() {
     resetGame();
     isGameStarted = true;
