@@ -88,14 +88,39 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteLetter();
   });
 
-  // Gizli input alanının işlenmesi
-  hiddenInput.addEventListener('input', function(e) {
-    if (e.target.value) {
-      // Tek bir karakter aldığımızdan emin olalım
-      const letter = e.target.value.toUpperCase();
+  // Gizli input alanının işlenmesi - keydown ile harfleri yakalama
+  let lastKeyTime = 0;
+  let lastKey = '';
+  
+  hiddenInput.addEventListener('keydown', function(e) {
+    const now = Date.now();
+    
+    // Çok hızlı ardışık tuşlamaları engellemek için
+    if (now - lastKeyTime < 150 && e.key === lastKey) {
+      e.preventDefault();
+      return false;
+    }
+    
+    if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
+      const letter = e.key.toUpperCase();
+      
+      // Harfi ekle
       addLetter(letter);
-      // Input alanını temizleyelim
-      e.target.value = '';
+      
+      // Zaman ve tuş bilgisini kaydet
+      lastKeyTime = now;
+      lastKey = e.key;
+      
+      // Input alanını hemen temizle
+      setTimeout(() => {
+        hiddenInput.value = '';
+      }, 10);
+      
+      // Ses çal
+      playSound('keypress');
+      
+      // Varsayılan işlemi engelle
+      e.preventDefault();
     }
   });
 
