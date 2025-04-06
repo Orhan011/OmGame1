@@ -1220,156 +1220,173 @@ def get_current_user_api():
 # Skor Listeleme API'si
 @app.route('/api/scores/<game_type>')
 def get_scores(game_type):
-    if not game_type:
-        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
+    try:
+        if not game_type:
+            return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
 
-    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
-    current_user_id = session.get('user_id')
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
     
-    # En yüksek skorları getir (her kullanıcı için en iyi skor)
-    subquery = db.session.query(
-        Score.user_id,
-        Score.game_type,
-        db.func.max(Score.score).label('max_score')
-    ).filter(
-        Score.game_type == game_type
-    ).group_by(
-        Score.user_id,
-        Score.game_type
-    ).subquery()
+        # En yüksek skorları getir (her kullanıcı için en iyi skor)
+        subquery = db.session.query(
+            Score.user_id,
+            Score.game_type,
+            db.func.max(Score.score).label('max_score')
+        ).filter(
+            Score.game_type == game_type
+        ).group_by(
+            Score.user_id,
+            Score.game_type
+        ).subquery()
     
-    scores = db.session.query(
-        Score,
-        User.username,
-        User.avatar_url,
-        User.rank
-    ).join(
-        subquery,
-        db.and_(
-            Score.user_id == subquery.c.user_id,
-            Score.game_type == subquery.c.game_type,
-            Score.score == subquery.c.max_score
-        )
-    ).join(
-        User,
-        User.id == Score.user_id
-    ).filter(
-        Score.game_type == game_type
-    ).order_by(
-        Score.score.desc()
-    ).limit(10).all()
+        scores = db.session.query(
+            Score,
+            User.username,
+            User.avatar_url,
+            User.rank
+        ).join(
+            subquery,
+            db.and_(
+                Score.user_id == subquery.c.user_id,
+                Score.game_type == subquery.c.game_type,
+                Score.score == subquery.c.max_score
+            )
+        ).join(
+            User,
+            User.id == Score.user_id
+        ).filter(
+            Score.game_type == game_type
+        ).order_by(
+            Score.score.desc()
+        ).limit(10).all()
     
-    result = []
-    for score, username, avatar_url, rank in scores:
-        result.append({
-            'user_id': score.user_id,
-            'username': username,
-            'score': score.score,
-            'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
-            'avatar_url': avatar_url,
-            'rank': rank,
-            'is_current_user': score.user_id == current_user_id
-        })
+        result = []
+        for score, username, avatar_url, rank in scores:
+            result.append({
+                'user_id': score.user_id,
+                'username': username,
+                'score': score.score,
+                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
+                'avatar_url': avatar_url,
+                'rank': rank,
+                'is_current_user': score.user_id == current_user_id
+            })
     
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Skor verileri getirilirken hata oluştu ({game_type}): {str(e)}")
+        return jsonify([]), 500
 
 # Alternatif Skor Listeleme (Performans sorunları için)
 @app.route('/api/scores/alt/<game_type>')
 def get_scores_alt(game_type):
-    if not game_type:
-        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
-
-    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
-    current_user_id = session.get('user_id')
+    try:
+        if not game_type:
+            return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
     
-    # SQL sorgusu ile skorları doğrudan getir
-    result = db.session.execute(f"""
-        SELECT s.user_id, u.username, s.score, s.timestamp, u.avatar_url, u.rank
-        FROM (
-            SELECT user_id, MAX(score) as max_score
-            FROM scores
-            WHERE game_type = '{game_type}'
-            GROUP BY user_id
-        ) max_scores
-        JOIN scores s ON s.user_id = max_scores.user_id AND s.score = max_scores.max_score AND s.game_type = '{game_type}'
-        JOIN users u ON u.id = s.user_id
-        ORDER BY s.score DESC
-        LIMIT 10
-    """)
-    
-    scores = []
-    for row in result:
-        scores.append({
-            'user_id': row.user_id,
-            'username': row.username,
-            'score': row.score,
-            'timestamp': row.timestamp.strftime('%Y-%m-%d %H:%M'),
-            'avatar_url': row.avatar_url,
-            'rank': row.rank,
-            'is_current_user': row.user_id == current_user_id
-        })
-    
-    return jsonify(scores)
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
+        
+        # SQL sorgusu ile skorları doğrudan getir
+        result = db.session.execute(f"""
+            SELECT s.user_id, u.username, s.score, s.timestamp, u.avatar_url, u.rank
+            FROM (
+                SELECT user_id, MAX(score) as max_score
+                FROM scores
+                WHERE game_type = '{game_type}'
+                GROUP BY user_id
+            ) max_scores
+            JOIN scores s ON s.user_id = max_scores.user_id AND s.score = max_scores.max_score AND s.game_type = '{game_type}'
+            JOIN users u ON u.id = s.user_id
+            ORDER BY s.score DESC
+            LIMIT 10
+        """)
+        
+        scores = []
+        for row in result:
+            scores.append({
+                'user_id': row.user_id,
+                'username': row.username,
+                'score': row.score,
+                'timestamp': row.timestamp.strftime('%Y-%m-%d %H:%M'),
+                'avatar_url': row.avatar_url,
+                'rank': row.rank,
+                'is_current_user': row.user_id == current_user_id
+            })
+        
+        return jsonify(scores)
+    except Exception as e:
+        logger.error(f"Alternatif skor verileri getirilirken hata oluştu ({game_type}): {str(e)}")
+        return jsonify([]), 500
 
 # Toplam Skor API'si
 @app.route('/api/scores/aggregated')
 def get_aggregated_scores():
     """Tüm oyunlardaki toplam skorları getiren API."""
-    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
-    current_user_id = session.get('user_id')
-    
-    # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
-    subquery = db.session.query(
-        Score.user_id,
-        Score.game_type,
-        db.func.max(Score.score).label('max_score')
-    ).group_by(
-        Score.user_id,
-        Score.game_type
-    ).subquery()
-    
-    # Alt sorgudan gelen sonuçları topla
-    aggregated = db.session.query(
-        subquery.c.user_id,
-        db.func.sum(subquery.c.max_score).label('total_score')
-    ).group_by(
-        subquery.c.user_id
-    ).subquery()
-    
-    # Kullanıcı bilgileriyle birleştir
-    result = db.session.query(
-        User.id,
-        User.username,
-        User.avatar_url,
-        User.rank,
-        aggregated.c.total_score
-    ).join(
-        aggregated,
-        User.id == aggregated.c.user_id
-    ).order_by(
-        aggregated.c.total_score.desc()
-    ).limit(10).all()
-    
-    scores = []
-    for user_id, username, avatar_url, rank, total_score in result:
-        scores.append({
-            'user_id': user_id,
-            'username': username,
-            'total_score': total_score,
-            'avatar_url': avatar_url,
-            'rank': rank,
-            'is_current_user': user_id == current_user_id
-        })
-    
-    return jsonify(scores)
+    try:
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
+        
+        # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
+        subquery = db.session.query(
+            Score.user_id,
+            Score.game_type,
+            db.func.max(Score.score).label('max_score')
+        ).group_by(
+            Score.user_id,
+            Score.game_type
+        ).subquery()
+        
+        # Alt sorgudan gelen sonuçları topla
+        aggregated = db.session.query(
+            subquery.c.user_id,
+            db.func.sum(subquery.c.max_score).label('total_score')
+        ).group_by(
+            subquery.c.user_id
+        ).subquery()
+        
+        # Kullanıcı bilgileriyle birleştir
+        result = db.session.query(
+            User.id,
+            User.username,
+            User.avatar_url,
+            User.rank,
+            aggregated.c.total_score
+        ).join(
+            aggregated,
+            User.id == aggregated.c.user_id
+        ).order_by(
+            aggregated.c.total_score.desc()
+        ).limit(10).all()
+        
+        scores = []
+        for user_id, username, avatar_url, rank, total_score in result:
+            scores.append({
+                'user_id': user_id,
+                'username': username,
+                'total_score': total_score,
+                'avatar_url': avatar_url,
+                'rank': rank,
+                'is_current_user': user_id == current_user_id
+            })
+        
+        return jsonify(scores)
+    except Exception as e:
+        logger.error(f"Skor verilerini getirirken hata oluştu: {str(e)}")
+        # Boş bir skor listesi döndür
+        return jsonify([]), 500
 
 # Skor Tablosu API'si
 @app.route('/api/leaderboard/<game_type>')
 def get_leaderboard(game_type):
-    if game_type == 'all':
-        return get_aggregated_scores()
-    else:
-        return get_scores(game_type)
+    try:
+        if game_type == 'all':
+            return get_aggregated_scores()
+        else:
+            return get_scores(game_type)
+    except Exception as e:
+        logger.error(f"Liderlik tablosu verileri getirilirken hata oluştu ({game_type}): {str(e)}")
+        return jsonify([]), 500
 
 # Skor Tablosu Verisi
 @app.route('/api/leaderboard-data/<game_type>')

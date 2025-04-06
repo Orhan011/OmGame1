@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Rastgele bir kelime seç
     const wordList = [
       "kalem", "kitap", "araba", "çiçek", "deniz", "güneş", "balık", "bulut", "orman", "nehir", 
-      "cadde", "sokak", "banka", "kapak", "vapur", "gözlü", "saray", "yazlı", "kravat", "kilim",
+      "cadde", "sokak", "banka", "kapak", "vapur", "gözlü", "saray", "yazlı", "kilim",
       "lamba", "dolap", "duvar", "bahçe", "havuz", "şehir", "meyve", "sebze", "ekmek", "tabak",
       "sıcak", "soğuk", "büyük", "küçük", "uzman", "sabah", "öğlen", "akşam", "tahta", "salon",
-      "sınıf", "sayfa", "kitap", "divan", "kanal", "fidan", "köşek", "canlı", "bilet", "firma",
-      "daire", "fırın", "bulaş", "badem", "kiraz", "elmas", "yakut", "zümrüt", "firuze", "safir",
-      "damla", "rüzgar", "yağmur", "toprak", "atlas", "çelik", "bakır", "demir", "tahıl", "kömür"
+      "sınıf", "sayfa", "kitap", "divan", "kanal", "fidan", "döşek", "canlı", "bilet", "firma",
+      "daire", "fırın", "telaş", "badem", "kiraz", "elmas", "yakut", "fidan", "dolap", "safir",
+      "damla", "emoji", "huzur", "jeton", "atlas", "çelik", "bakır", "demir", "tahıl", "kömür"
     ];
     
     const randomIndex = Math.floor(Math.random() * wordList.length);

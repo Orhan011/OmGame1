@@ -17,8 +17,18 @@ app.secret_key = os.environ.get("SESSION_SECRET", "braingames_secret_key")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///permanent/braintraining.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
+    "pool_recycle": 60,      # Daha sık bağlantı yenileme (60 sn)
+    "pool_pre_ping": True,   # Her sorguda bağlantı kontrolü
+    "pool_timeout": 30,      # Bağlantı zaman aşımı
+    "pool_size": 5,          # Bağlantı havuzu boyutu
+    "max_overflow": 10,      # Maksimum ek bağlantı
+    "connect_args": {
+        "connect_timeout": 10,
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 10,
+        "keepalives_count": 5
+    }
 }
 
 # Veritabanı dizinlerini oluştur
