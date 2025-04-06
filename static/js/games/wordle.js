@@ -46,7 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
     hintsLeft: 3,
     soundEnabled: true,
     activeCellIndex: 0,  // Aktif hücre indeksi
-    isProcessingKey: false // Tuş işleme durumu
+    isProcessingKey: false, // Tuş işleme durumu
+    lastKeyTime: 0, // Son tuş basma zamanı
+    lastActionType: '', // Son işlem türü (add, delete, vs.)
+    actionCount: 0, // İşlem sayacı
+    isDeleting: false // Silme durumu
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
@@ -80,13 +84,28 @@ document.addEventListener('DOMContentLoaded', function() {
   shareScoreBtn.addEventListener('click', shareScore);
 
   // Tahmin gönder butonu
-  submitGuessBtn.addEventListener('click', function() {
+  submitGuessBtn.addEventListener('click', function(e) {
+    e.preventDefault(); // Sayfa kaymayı önleme
     submitGuess();
   });
 
-  // Harf sil butonu
-  deleteLetterBtn.addEventListener('click', function() {
+  // Harf sil butonu - özel önlem
+  deleteLetterBtn.addEventListener('click', function(e) {
+    e.preventDefault(); // Sayfa kaymayı önleme
+    
+    // Silme işlemi devam ediyorsa, çift silme önleme
+    if (gameState.isDeleting) return;
+    
+    // Silme durumunu başlat
+    gameState.isDeleting = true;
+    
+    // Harfi sil
     deleteLetter();
+    
+    // Silme durumunu bir gecikmeyle kapat
+    setTimeout(() => {
+      gameState.isDeleting = false;
+    }, 100);
   });
 
   // Mobil kareye tıklandığında ve klavye açıldığında gizli inputu hazırla
@@ -95,63 +114,125 @@ document.addEventListener('DOMContentLoaded', function() {
     hiddenInput.value = '';
   });
   
-  // Tuş basma olaylarını dinle - özel metod ile harf girişini engelle
+  // Tuş basma olaylarını dinle - çift silme sorununu önleme
   hiddenInput.addEventListener('keydown', function(e) {
     if (gameState.isGameOver) return;
     
-    // Tuş basma olayını ele al
-    handleKeyDown(e);
+    // Birden fazla hızlı silme işlemini önle
+    if (e.key === 'Backspace') {
+      const now = Date.now();
+      
+      // Ardışık silme işlemleri arasında minimum süre
+      if (gameState.isDeleting || (now - gameState.lastKeyTime < 150 && gameState.lastActionType === 'delete')) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Silme durumunu başlat
+      gameState.isDeleting = true;
+      gameState.lastActionType = 'delete';
+      gameState.lastKeyTime = now;
+      
+      // Harfi sil
+      deleteLetter();
+      playSound('keypress');
+      
+      // Ardışık çok hızlı silme işlemlerini önle
+      setTimeout(() => {
+        gameState.isDeleting = false;
+      }, 100);
+      
+      e.preventDefault(); // Sayfa kaymayı önleme
+    } else if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
+      const now = Date.now();
+      
+      // Ardışık çok hızlı harf ekleme işlemlerini sınırla
+      if (gameState.isProcessingKey || (now - gameState.lastKeyTime < 100 && gameState.lastActionType === 'add')) {
+        e.preventDefault();
+        return;
+      }
+      
+      // İşleme durumunu başlat
+      gameState.isProcessingKey = true;
+      gameState.lastActionType = 'add';
+      gameState.lastKeyTime = now;
+      
+      // Harfi ekle
+      const letter = e.key.toUpperCase();
+      addLetter(letter);
+      playSound('keypress');
+      
+      // Ardışık çok hızlı tuş basımlarını önle
+      setTimeout(() => {
+        gameState.isProcessingKey = false;
+      }, 100);
+      
+      e.preventDefault(); // Sayfa kaymayı önleme
+    } else if (e.key === 'Enter') {
+      e.preventDefault(); // Sayfa kaymayı önleme
+      submitGuess();
+    }
   });
 
   // Klavye tuşu basımı (doküman genelinde)
   document.addEventListener('keydown', function(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
     
-    // Tuş basma olayını ele al
-    handleKeyDown(e);
-  });
-
-  /**
-   * Tuş basma olayını işler
-   */
-  function handleKeyDown(e) {
-    // Eğer işleme yapılıyorsa, birden çok tuş basımı engelle
-    if (gameState.isProcessingKey) {
+    // Enter, Backspace ve harf tuşlarını işle
+    if (e.key === 'Enter') {
       e.preventDefault();
-      return;
-    }
-    
-    const key = e.key.toUpperCase();
-    
-    if (key === 'ENTER') {
       submitGuess();
-    } else if (key === 'BACKSPACE') {
+    } else if (e.key === 'Backspace') {
+      const now = Date.now();
+      
+      // Ardışık silme işlemleri arasında minimum süre
+      if (gameState.isDeleting || (now - gameState.lastKeyTime < 150 && gameState.lastActionType === 'delete')) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Silme durumunu başlat
+      gameState.isDeleting = true;
+      gameState.lastActionType = 'delete';
+      gameState.lastKeyTime = now;
+      
+      // Harfi sil
       deleteLetter();
       playSound('keypress');
-    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key) && key.length === 1) {
-      // İşleme durumunu başlat
-      gameState.isProcessingKey = true;
       
-      // Harfi ekle
-      addLetter(key);
-      
-      // Ses çal
-      playSound('keypress');
-      
-      // Kısa bir süre sonra işlemeyi serbest bırak
+      // Ardışık çok hızlı silme işlemlerini önle
       setTimeout(() => {
-        gameState.isProcessingKey = false;
-        
-        // Girdi alanını temizle
-        if (hiddenInput) {
-          hiddenInput.value = '';
-        }
+        gameState.isDeleting = false;
       }, 100);
       
-      // Varsayılan davranışı engelle
+      e.preventDefault();
+    } else if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
+      const now = Date.now();
+      
+      // Ardışık çok hızlı harf ekleme işlemlerini sınırla
+      if (gameState.isProcessingKey || (now - gameState.lastKeyTime < 100 && gameState.lastActionType === 'add')) {
+        e.preventDefault();
+        return;
+      }
+      
+      // İşleme durumunu başlat
+      gameState.isProcessingKey = true;
+      gameState.lastActionType = 'add';
+      gameState.lastKeyTime = now;
+      
+      // Harfi ekle
+      const letter = e.key.toUpperCase();
+      addLetter(letter);
+      playSound('keypress');
+      
+      // Ardışık çok hızlı tuş basımlarını önle
+      setTimeout(() => {
+        gameState.isProcessingKey = false;
+      }, 100);
+      
       e.preventDefault();
     }
-  }
+  });
 
   /**
    * Oyunu başlatır
@@ -175,6 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.hintsLeft = 3;
     gameState.activeCellIndex = 0;
     gameState.isProcessingKey = false;
+    gameState.lastKeyTime = 0;
+    gameState.lastActionType = '';
+    gameState.actionCount = 0;
+    gameState.isDeleting = false;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -193,6 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Input alanını temizle
     hiddenInput.value = '';
+    
+    // Ekran pozisyonunu sabitle (kaymayı önlemek için)
+    window.scrollTo(0, 0);
   }
 
   /**
@@ -213,7 +301,9 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.col = col;
         
         // Hücreye tıklama olayı
-        cell.addEventListener('click', function() {
+        cell.addEventListener('click', function(e) {
+          e.preventDefault(); // Sayfa kaymayı önleme
+          
           if (gameState.isGameOver) return;
           
           const clickedRow = parseInt(cell.dataset.row);
@@ -322,25 +412,28 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Harf silme
+   * Harf silme - tekli silme sağlar
    */
   function deleteLetter() {
     if (gameState.isGameOver) return;
     
-    // Mevcut hücre boş ise ve en solda değilse, sola geç
-    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '' && gameState.activeCellIndex > 0) {
+    // Önce, mevcut hücre doluluğunu kontrol et
+    let activeCellHasLetter = gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '';
+    
+    // Eğer aktif hücre zaten boşsa, solundaki hücreye geç
+    if (!activeCellHasLetter && gameState.activeCellIndex > 0) {
       gameState.activeCellIndex--;
     }
     
-    // Aktif hücredeki harfi sil
-    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '') {
-      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
-      gameState.currentCol = countFilledCells();
-      
-      // Izgarayı güncelle
-      updateGrid();
-      highlightActiveCell();
-    }
+    // Aktif hücredeki harfi sil - sadece bir tanesini
+    gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
+    
+    // Dolu hücre sayısını güncelle
+    gameState.currentCol = countFilledCells();
+    
+    // Izgarayı güncelle
+    updateGrid();
+    highlightActiveCell();
   }
 
   /**
@@ -658,6 +751,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Yıldız derecelendirmesini ayarla
     updateStarRating();
+    
+    // Ekran pozisyonunu sabitle (kaymayı önlemek için)
+    window.scrollTo(0, 0);
   }
 
   /**

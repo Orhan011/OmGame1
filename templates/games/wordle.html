@@ -76,17 +76,19 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Wordle Grid -->
+        <!-- Wordle Grid - Ana oyun alanı -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Mobil Keyboard Hack - Gizli giriş alanı -->
-        <input type="text" 
-               id="hidden-input" 
-               autocomplete="off" 
-               autocorrect="off" 
-               autocapitalize="off" 
-               spellcheck="false"
-               maxlength="1">
+        <!-- Mobil klavye için gizli alan - Sayfanın kaymayı önlemek için pozisyon: fixed -->
+        <div class="keyboard-wrapper">
+          <input type="text" 
+                 id="hidden-input" 
+                 autocomplete="off" 
+                 autocorrect="off" 
+                 autocapitalize="off" 
+                 spellcheck="false"
+                 maxlength="1">
+        </div>
 
         <!-- Game Action Buttons -->
         <div class="game-action-buttons">
@@ -245,25 +247,30 @@
   }
 
   /* Mobil klavye için gizli input alanı */
-  #hidden-input {
+  .keyboard-wrapper {
     position: fixed;
-    bottom: -100px;
-    left: -100px;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    bottom: 0;
+    right: 0;
+  }
+  
+  #hidden-input {
+    position: absolute;
+    height: 1px;
+    width: 1px;
     opacity: 0.01;
-    height: 10px;
-    width: 10px;
-    pointer-events: none;
     font-size: 16px; /* Mobil Safari'de yakınlaştırmayı önlemek için */
-    caret-color: transparent;
-    background: transparent;
     border: none;
+    background: transparent;
     outline: none;
-    color: transparent;
     margin: 0;
     padding: 0;
-    /* Hizmet dışı bırakılmış görünür kılacak özellikler */
-    visibility: visible;
-    display: block;
+    /* Ekranın kaymasını önlemek için sabit konumlandırma */
+    position: fixed;
+    top: 0;
+    left: 0;
     z-index: -10;
   }
 
@@ -353,6 +360,12 @@
     box-shadow: 0 0 5px rgba(150, 150, 200, 0.5);
   }
 
+  /* Ekran kaymasını engellemek için ekstra stil */
+  .game-container {
+    position: relative;
+    min-height: 620px; /* Mobil klavye açıldığında da aynı yüksekliği koruması için */
+  }
+
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
@@ -366,6 +379,11 @@
       padding: 8px 10px;
       font-size: 0.9rem;
     }
+    
+    /* Mobil cihazlar için ekran kaymasını önleme */
+    .game-container {
+      min-height: 500px;
+    }
   }
 </style>
 {% endblock %}
@@ -373,3 +391,102 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}
+<!-- Script bloğunu düzeltmek için oyun sayfasına ekle -->
+<script>
+  // Bu script, mobil cihazlarda ekranın kaymasını engellemek için eklendi
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sayfa yüklendikten sonra ekranı sabitle
+    setTimeout(function() {
+      // Sayfayı başa getir
+      window.scrollTo(0, 0);
+      
+      // Mobil cihazlarda viewport yüksekliğini sabitle
+      function setViewportHeight() {
+        // Viewport yüksekliğini sabitlemek için CSS değişkeni kullan
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      
+      // İlk yükleme ve boyut değişimleri için
+      setViewportHeight();
+      window.addEventListener('resize', setViewportHeight);
+      
+      // Klavye olaylarını yakala ve varsayılan davranışı engelle
+      document.addEventListener('keydown', function(e) {
+        // Bazı özel tuşları engelle - örneğin enter, boşluk, yukarı/aşağı
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault();
+        }
+      });
+      
+      // Sayfanın kaymasını önlemek için dokunma olaylarını engelle
+      document.querySelectorAll('.wordle-cell, .action-btn').forEach(item => {
+        item.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+        }, { passive: false });
+        
+        item.addEventListener('touchmove', function(e) {
+          e.preventDefault();
+        }, { passive: false });
+      });
+    }, 100);
+  });
+</script>
+<style>
+  /* Ekran kaymayı engellemek için ek CSS özellikleri */
+  :root {
+    --vh: 1vh;
+  }
+  
+  body.game-active {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .game-container {
+    height: calc(var(--vh, 1vh) * 100);
+    touch-action: none; /* Dokunma kaydırmayı engelle */
+    overflow-y: hidden; /* Dikey kaydırmayı engelle */
+  }
+  
+  /* input alanı için ek stiller */
+  .keyboard-wrapper {
+    position: fixed;
+    left: -9999px;
+    width: 0;
+    height: 0;
+    z-index: -999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  /* iOS 100vh sorununu düzeltme */
+  @supports (-webkit-touch-callout: none) {
+    .game-container {
+      height: -webkit-fill-available;
+    }
+  }
+</style>
+
+<script>
+  // Oyun aktif olduğunda body'ye class ekleyerek kaymayı engelle
+  document.addEventListener('DOMContentLoaded', function() {
+    const startGameBtn = document.getElementById('start-game');
+    if (startGameBtn) {
+      startGameBtn.addEventListener('click', function() {
+        document.body.classList.add('game-active');
+      });
+    }
+    
+    // Butonlara dokunma olaylarını düzgün işle
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('touchstart', function(e) {
+        // Dokunma olayının yayılmasını engelle
+        e.stopPropagation();
+      }, {passive: true});
+    });
+  });
+</script>
