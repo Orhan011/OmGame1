@@ -1,9 +1,7 @@
+
 {% extends "layout.html" %}
 
 {% block title %}Wordle - Kelime Tahmin Oyunu{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="/static/css/games/wordle.css">
-{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -82,7 +80,12 @@
         <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Klavye kaldırıldı -->
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard-container">
+          <div class="keyboard-row" id="keyboard-row-1"></div>
+          <div class="keyboard-row" id="keyboard-row-2"></div>
+          <div class="keyboard-row" id="keyboard-row-3"></div>
+        </div>
       </div>
 
       <!-- Game Over Container -->
@@ -102,49 +105,60 @@
             <div class="results-stats">
               <div class="result-stat">
                 <i class="fas fa-trophy"></i>
-                <span>Puan</span>
-                <span id="final-score" class="result-value">0</span>
+                <div class="result-stat-value">
+                  <span id="final-score">0</span>
+                </div>
+                <div class="result-stat-label">Toplam Puan</div>
               </div>
+
               <div class="result-stat">
-                <i class="fas fa-history"></i>
-                <span>Tahminler</span>
-                <span id="attempts-count" class="result-value">0/6</span>
+                <i class="fas fa-check-double"></i>
+                <div class="result-stat-value">
+                  <span id="attempts-count">0/6</span>
+                </div>
+                <div class="result-stat-label">Tahminler</div>
               </div>
+
               <div class="result-stat">
-                <i class="fas fa-fire"></i>
-                <span>Seri</span>
-                <span id="final-streak" class="result-value">0</span>
+                <i class="fas fa-award"></i>
+                <div class="result-stat-value">
+                  <span id="final-streak">0</span>
+                </div>
+                <div class="result-stat-label">Seri</div>
               </div>
             </div>
 
-            <div class="rating-container">
+            <div class="results-rating">
               <div class="rating-stars">
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
                 <i class="far fa-star"></i>
                 <i class="far fa-star"></i>
               </div>
-              <p id="rating-text" class="rating-text">İyi deneme!</p>
-            </div>
-
-            <div class="share-container">
-              <button id="copy-score" class="btn btn-outline-primary">
-                <i class="fas fa-copy me-2"></i>Skoru Kopyala
-              </button>
-              <button id="share-score" class="btn btn-outline-success">
-                <i class="fas fa-share-alt me-2"></i>Skoru Paylaş
-              </button>
+              <div class="rating-text" id="rating-text">İyi!</div>
             </div>
           </div>
 
           <div class="memory-results-footer">
-            <button id="play-again" class="btn btn-primary">
+            <button id="play-again" class="btn btn-primary btn-lg">
               <i class="fas fa-redo me-2"></i>Tekrar Oyna
             </button>
-            <a href="/all-games" class="btn btn-outline-secondary">
-              <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-trophy me-2"></i>Skor Tablosu
             </a>
+          </div>
+        </div>
+
+        <div class="memory-share-section">
+          <p>Skorunuzu paylaşın:</p>
+          <div class="share-buttons">
+            <button class="share-btn" title="Kopyala" id="copy-score">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button class="share-btn" title="Paylaş" id="share-score">
+              <i class="fas fa-share-alt"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -152,5 +166,195 @@
   </div>
 </div>
 
-<script src="/static/js/games/wordle.js"></script>
+<style>
+  .wordle-grid {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 10px;
+    max-width: 350px;
+    margin: 0 auto 30px;
+  }
+
+  .wordle-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+  }
+
+  .wordle-cell {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(30, 30, 50, 0.7);
+    border: 2px solid rgba(100, 100, 150, 0.3);
+    border-radius: 8px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .wordle-cell.filled {
+    border-color: rgba(150, 150, 200, 0.5);
+    transform: scale(1.05);
+  }
+
+  .wordle-cell.correct {
+    background-color: rgba(46, 204, 113, 0.7);
+    border-color: rgba(46, 204, 113, 0.9);
+    transform: scale(1.05);
+  }
+
+  .wordle-cell.present {
+    background-color: rgba(241, 196, 15, 0.7);
+    border-color: rgba(241, 196, 15, 0.9);
+  }
+
+  .wordle-cell.absent {
+    background-color: rgba(30, 30, 40, 0.9);
+    border-color: rgba(100, 100, 150, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+
+  .shake {
+    animation: shake 0.5s;
+  }
+
+  .pop {
+    animation: pop 0.3s;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .flip {
+    animation: flip 0.5s ease forwards;
+  }
+
+  @keyframes flip {
+    0% { transform: rotateX(0); }
+    50% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0); }
+  }
+
+  /* Keyboard Styles */
+  .keyboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .keyboard-key {
+    padding: 15px 12px;
+    min-width: 30px;
+    text-align: center;
+    background-color: rgba(60, 60, 80, 0.8);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex: 1;
+  }
+
+  .keyboard-key:hover {
+    background-color: rgba(80, 80, 100, 0.9);
+  }
+
+  .keyboard-key.correct {
+    background-color: rgba(46, 204, 113, 0.7);
+  }
+
+  .keyboard-key.present {
+    background-color: rgba(241, 196, 15, 0.7);
+  }
+
+  .keyboard-key.absent {
+    background-color: rgba(30, 30, 40, 0.9);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .keyboard-key.wide {
+    flex: 1.5;
+    font-size: 0.9rem;
+  }
+
+  /* Message Styles */
+  .message-container {
+    min-height: 40px;
+    text-align: center;
+  }
+
+  .game-message {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 0 auto;
+    animation: fadeInOut 2s;
+  }
+
+  .game-message.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+
+  .game-message.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+
+  .game-message.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+  }
+
+  .game-message.warning {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 576px) {
+    .wordle-cell {
+      font-size: 1.3rem;
+    }
+    
+    .keyboard-key {
+      padding: 10px 8px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}
