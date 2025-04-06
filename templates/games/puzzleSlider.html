@@ -1,0 +1,664 @@
+{% extends 'layout.html' %}
+
+{% block title %}Puzzle Slider - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>Puzzle Slider <span class="badge">Görsel Bulmaca</span></h1>
+      <p class="game-description">Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu.</p>
+    </div>
+
+    <div class="puzzle-slider-container">
+      <div class="puzzle-header">
+        <div class="puzzle-stats">
+          <div class="stat-item">
+            <div class="stat-label">Hamleler</div>
+            <div class="stat-value" id="moves">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="timer">00:00</div>
+          </div>
+        </div>
+        
+        <div class="difficulty-selector">
+          <button class="difficulty-btn active" data-size="3">3×3</button>
+          <button class="difficulty-btn" data-size="4">4×4</button>
+          <button class="difficulty-btn" data-size="5">5×5</button>
+        </div>
+      </div>
+
+      <div class="puzzle-board-container">
+        <div id="puzzle-board" class="puzzle-board size-3"></div>
+      </div>
+
+      <div class="puzzle-controls">
+        <button id="shuffle-btn" class="btn btn-primary">
+          <i class="fas fa-random me-2"></i>Karıştır
+        </button>
+        <button id="restart-btn" class="btn btn-outline-warning">
+          <i class="fas fa-redo-alt me-2"></i>Yeniden Başlat
+        </button>
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-secondary">
+          <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+        </a>
+      </div>
+
+      <div class="game-instructions">
+        <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
+        <ul class="instruction-list">
+          <li>Kareleri doğru sırada yerleştirmeye çalışın.</li>
+          <li>Boş kareye komşu olan bir kareye tıklayarak hareket ettirebilirsiniz.</li>
+          <li>Tüm kareleri 1'den başlayarak sırayla dizin.</li>
+          <li>Son kare boş kalmalıdır.</li>
+          <li>Zorluk seviyesini değiştirerek oyunu daha zor hale getirebilirsiniz.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="success-modal" class="puzzle-success-modal">
+      <div class="success-content">
+        <h2><i class="fas fa-trophy me-2"></i>Tebrikler!</h2>
+        <p>Puzzle'ı başarıyla tamamladınız!</p>
+        
+        <div class="success-stats">
+          <div class="success-stat">
+            <div class="success-stat-value" id="final-moves">0</div>
+            <div class="success-stat-label">Toplam Hamle</div>
+          </div>
+          <div class="success-stat">
+            <div class="success-stat-value" id="final-time">00:00</div>
+            <div class="success-stat-label">Geçen Süre</div>
+          </div>
+        </div>
+        
+        <div class="success-actions">
+          <button id="play-again-btn" class="btn btn-primary btn-lg">
+            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .puzzle-slider-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 10px;
+  }
+
+  .puzzle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .puzzle-stats {
+    display: flex;
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .stat-item {
+    padding: 10px 20px;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .stat-item:last-child {
+    border-right: none;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .difficulty-selector {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .difficulty-btn {
+    padding: 10px 15px;
+    border: none;
+    background: rgba(30, 30, 60, 0.5);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .difficulty-btn.active {
+    background: var(--accent-color);
+  }
+
+  .puzzle-board-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .puzzle-board {
+    display: grid;
+    gap: 5px;
+    background: rgba(25, 25, 45, 0.7);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .size-3 {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  .size-4 {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+
+  .size-5 {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
+
+  .puzzle-tile {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #6a5ae0, #a890ff);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    user-select: none;
+  }
+
+  .puzzle-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .puzzle-tile.empty {
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .puzzle-tile.empty:hover {
+    transform: none;
+  }
+
+  .puzzle-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .game-instructions {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .instruction-title {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .instruction-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+  }
+
+  .instruction-list li {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+
+  .instruction-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Success Modal */
+  .puzzle-success-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .success-content {
+    background: rgba(25, 25, 45, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalFadeIn 0.5s;
+  }
+
+  .success-content h2 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-size: 2rem;
+  }
+
+  .success-content p {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+  }
+
+  .success-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+  }
+
+  .success-stat {
+    text-align: center;
+  }
+
+  .success-stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+  }
+
+  .success-stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+
+  .success-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .puzzle-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .puzzle-stats {
+      width: 100%;
+    }
+
+    .difficulty-selector {
+      width: 100%;
+    }
+
+    .difficulty-btn {
+      flex: 1;
+      text-align: center;
+    }
+
+    .puzzle-tile {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+
+    .puzzle-controls {
+      flex-wrap: wrap;
+    }
+
+    .success-content {
+      padding: 20px;
+    }
+
+    .success-stat-value {
+      font-size: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .puzzle-tile {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+    }
+
+    .size-5 .puzzle-tile {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elements
+  const puzzleBoard = document.getElementById('puzzle-board');
+  const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const shuffleBtn = document.getElementById('shuffle-btn');
+  const restartBtn = document.getElementById('restart-btn');
+  const movesDisplay = document.getElementById('moves');
+  const timerDisplay = document.getElementById('timer');
+  const successModal = document.getElementById('success-modal');
+  const finalMovesDisplay = document.getElementById('final-moves');
+  const finalTimeDisplay = document.getElementById('final-time');
+  const playAgainBtn = document.getElementById('play-again-btn');
+
+  // Game State
+  let boardSize = 3;
+  let tiles = [];
+  let emptyTileIndex = boardSize * boardSize - 1;
+  let moves = 0;
+  let timer = null;
+  let seconds = 0;
+  let gameStarted = false;
+  
+  // Initialize game
+  createBoard();
+  shuffleTiles();
+
+  // Event listeners for difficulty buttons
+  difficultyBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const newSize = parseInt(this.getAttribute('data-size'));
+      if (newSize !== boardSize) {
+        boardSize = newSize;
+        
+        // Update board class
+        puzzleBoard.className = `puzzle-board size-${boardSize}`;
+        
+        // Reset game
+        resetGame();
+        createBoard();
+        shuffleTiles();
+        
+        // Update active button
+        difficultyBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      }
+    });
+  });
+
+  // Shuffle button
+  shuffleBtn.addEventListener('click', function() {
+    resetGame();
+    shuffleTiles();
+  });
+  
+  // Restart button
+  restartBtn.addEventListener('click', resetGame);
+  
+  // Play again button
+  playAgainBtn.addEventListener('click', function() {
+    successModal.style.display = 'none';
+    resetGame();
+    shuffleTiles();
+  });
+
+  // Create the game board
+  function createBoard() {
+    // Clear the board
+    puzzleBoard.innerHTML = '';
+    tiles = [];
+    
+    // Create tiles
+    for (let i = 0; i < boardSize * boardSize; i++) {
+      const tile = document.createElement('div');
+      tile.className = i === boardSize * boardSize - 1 ? 'puzzle-tile empty' : 'puzzle-tile';
+      
+      if (i !== boardSize * boardSize - 1) {
+        tile.textContent = i + 1;
+        tile.addEventListener('click', () => moveTile(i));
+      }
+      
+      puzzleBoard.appendChild(tile);
+      tiles.push(tile);
+    }
+  }
+  
+  // Shuffle the tiles
+  function shuffleTiles() {
+    // Start with a solved board
+    tiles.forEach((tile, index) => {
+      if (index !== boardSize * boardSize - 1) {
+        tile.textContent = index + 1;
+      }
+    });
+    
+    emptyTileIndex = boardSize * boardSize - 1;
+    
+    // Make valid random moves to ensure solvability
+    const numMoves = boardSize * boardSize * 20; // Make many random moves
+    
+    for (let i = 0; i < numMoves; i++) {
+      const validMoves = getValidMoves();
+      const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+      swapTiles(randomMove, emptyTileIndex);
+      emptyTileIndex = randomMove;
+    }
+    
+    // Start the game
+    gameStarted = true;
+    
+    // Reset moves counter
+    moves = 0;
+    movesDisplay.textContent = moves;
+    
+    // Start timer
+    if (timer) clearInterval(timer);
+    seconds = 0;
+    updateTimer();
+    timer = setInterval(updateTimer, 1000);
+  }
+  
+  // Move a tile
+  function moveTile(index) {
+    if (!gameStarted) return;
+    
+    // Check if the move is valid
+    if (isValidMove(index)) {
+      // Increment moves counter
+      moves++;
+      movesDisplay.textContent = moves;
+      
+      // Swap tiles
+      swapTiles(index, emptyTileIndex);
+      
+      // Update empty tile index
+      emptyTileIndex = index;
+      
+      // Check if the puzzle is solved
+      if (isSolved()) {
+        gameComplete();
+      }
+    }
+  }
+  
+  // Swap two tiles
+  function swapTiles(index1, index2) {
+    const temp = tiles[index1].textContent;
+    tiles[index1].textContent = tiles[index2].textContent;
+    tiles[index2].textContent = temp;
+    
+    tiles[index1].classList.toggle('empty', !temp);
+    tiles[index2].classList.toggle('empty', temp === '');
+  }
+  
+  // Check if a move is valid
+  function isValidMove(index) {
+    const row1 = Math.floor(index / boardSize);
+    const col1 = index % boardSize;
+    const row2 = Math.floor(emptyTileIndex / boardSize);
+    const col2 = emptyTileIndex % boardSize;
+    
+    // A move is valid if the tile is adjacent to the empty tile
+    return (
+      (Math.abs(row1 - row2) === 1 && col1 === col2) ||
+      (Math.abs(col1 - col2) === 1 && row1 === row2)
+    );
+  }
+  
+  // Get valid moves for the empty tile
+  function getValidMoves() {
+    const validMoves = [];
+    const row = Math.floor(emptyTileIndex / boardSize);
+    const col = emptyTileIndex % boardSize;
+    
+    // Check all four directions
+    const directions = [
+      { row: -1, col: 0 }, // Up
+      { row: 1, col: 0 },  // Down
+      { row: 0, col: -1 }, // Left
+      { row: 0, col: 1 }   // Right
+    ];
+    
+    directions.forEach(dir => {
+      const newRow = row + dir.row;
+      const newCol = col + dir.col;
+      
+      // Check if the new position is within the board
+      if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
+        validMoves.push(newRow * boardSize + newCol);
+      }
+    });
+    
+    return validMoves;
+  }
+  
+  // Check if the puzzle is solved
+  function isSolved() {
+    for (let i = 0; i < boardSize * boardSize - 1; i++) {
+      if (parseInt(tiles[i].textContent) !== i + 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  // Update the timer display
+  function updateTimer() {
+    seconds++;
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  
+  // Reset the game
+  function resetGame() {
+    // Stop the timer
+    if (timer) clearInterval(timer);
+    
+    // Reset game state
+    gameStarted = false;
+    moves = 0;
+    seconds = 0;
+    
+    // Reset displays
+    movesDisplay.textContent = moves;
+    timerDisplay.textContent = '00:00';
+    
+    // Reset board to solved state
+    tiles.forEach((tile, index) => {
+      if (index !== boardSize * boardSize - 1) {
+        tile.textContent = index + 1;
+        tile.classList.remove('empty');
+      } else {
+        tile.textContent = '';
+        tile.classList.add('empty');
+      }
+    });
+    
+    emptyTileIndex = boardSize * boardSize - 1;
+  }
+  
+  // Game complete
+  function gameComplete() {
+    // Stop the timer
+    clearInterval(timer);
+    
+    // Show success message
+    finalMovesDisplay.textContent = moves;
+    finalTimeDisplay.textContent = timerDisplay.textContent;
+    
+    // Save score
+    saveScore(moves);
+    
+    // Show success modal
+    successModal.style.display = 'flex';
+  }
+  
+  // Function to save score to the server
+  function saveScore(score) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'puzzle_slider',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+});
+</script>
+{% endblock %}

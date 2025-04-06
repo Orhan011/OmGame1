@@ -1,0 +1,814 @@
+{% extends 'layout.html' %}
+
+{% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>Matematik Mücadelesi <span class="badge">Sayısal Beceri</span></h1>
+      <p class="game-description">Hızlı düşünme ve matematiksel becerilerinizi test edin.</p>
+    </div>
+
+    <div class="math-container">
+      <div id="start-screen" class="math-screen">
+        <h2>Matematik Mücadelesine Hoş Geldiniz!</h2>
+        <p>Verilen süre içinde matematik problemlerini çözmeye çalışın.</p>
+        
+        <div class="game-options">
+          <div class="option-section">
+            <h3>Zorluk Seviyesi</h3>
+            <div class="button-group">
+              <button class="option-button active" data-difficulty="easy">Kolay</button>
+              <button class="option-button" data-difficulty="medium">Orta</button>
+              <button class="option-button" data-difficulty="hard">Zor</button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3>Süre</h3>
+            <div class="button-group">
+              <button class="option-button" data-time="30">30 Saniye</button>
+              <button class="option-button active" data-time="60">60 Saniye</button>
+              <button class="option-button" data-time="120">2 Dakika</button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3>İşlem Türleri</h3>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" checked data-operation="addition"> Toplama
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked data-operation="subtraction"> Çıkarma
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" checked data-operation="multiplication"> Çarpma
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" data-operation="division"> Bölme
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button id="start-game" class="btn btn-primary btn-lg">
+          <i class="fas fa-play me-2"></i>Oyuna Başla
+        </button>
+      </div>
+
+      <div id="game-screen" class="math-screen" style="display: none;">
+        <div class="game-hud">
+          <div class="hud-item">
+            <span class="hud-label">Skor</span>
+            <span class="hud-value" id="score">0</span>
+          </div>
+          <div class="hud-item hud-timer">
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="timer-bar"></div>
+            </div>
+            <span class="hud-value" id="timer">60</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">Doğru</span>
+            <span class="hud-value" id="correct">0</span>
+          </div>
+        </div>
+
+        <div class="math-problem">
+          <div id="problem-text">5 + 3 = ?</div>
+        </div>
+
+        <div class="answer-input">
+          <input type="number" id="answer-input" placeholder="Cevabınız">
+          <button id="submit-answer" class="btn btn-primary">
+            <i class="fas fa-check me-2"></i>Kontrol Et
+          </button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+      </div>
+
+      <div id="result-screen" class="math-screen" style="display: none;">
+        <h2>Oyun Bitti!</h2>
+        <div class="result-stats">
+          <div class="result-stat">
+            <div class="result-value" id="final-score">0</div>
+            <div class="result-label">Toplam Puan</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-value" id="final-correct">0</div>
+            <div class="result-label">Doğru Cevap</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-value" id="final-incorrect">0</div>
+            <div class="result-label">Yanlış Cevap</div>
+          </div>
+        </div>
+        
+        <div class="result-details">
+          <div class="detail-item">
+            <span class="detail-label">Doğruluk Oranı:</span>
+            <span class="detail-value" id="accuracy">0%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Ortalama Yanıt Süresi:</span>
+            <span class="detail-value" id="avg-time">0 saniye</span>
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <button id="play-again" class="btn btn-primary btn-lg">
+            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .math-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 10px;
+  }
+
+  .math-screen {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .math-screen h2 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+  }
+
+  .math-screen p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 25px;
+    font-size: 1rem;
+  }
+
+  /* Game Options */
+  .game-options {
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: left;
+  }
+
+  .option-section {
+    margin-bottom: 15px;
+  }
+
+  .option-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .option-section h3 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .option-button {
+    padding: 8px 15px;
+    background: rgba(40, 40, 80, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .option-button:hover {
+    background: rgba(60, 60, 100, 0.5);
+  }
+
+  .option-button.active {
+    background: rgba(106, 90, 224, 0.6);
+    border-color: var(--accent-color);
+  }
+
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+  }
+
+  .checkbox-label input {
+    margin-right: 8px;
+  }
+
+  /* Game HUD */
+  .game-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .hud-item {
+    text-align: center;
+  }
+
+  .hud-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+  }
+
+  .hud-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-color);
+  }
+
+  .hud-timer {
+    flex: 1;
+    margin: 0 20px;
+  }
+
+  .progress-bar-container {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    width: 100%;
+    transition: width linear 1s;
+  }
+
+  /* Math Problem */
+  .math-problem {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+  }
+
+  #problem-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* Answer Input */
+  .answer-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  #answer-input {
+    flex: 1;
+    padding: 12px 15px;
+    background: rgba(30, 30, 60, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  #answer-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+  }
+
+  /* Feedback */
+  .feedback {
+    font-size: 1.2rem;
+    font-weight: 600;
+    height: 30px;
+    transition: all 0.3s ease;
+  }
+
+  .feedback.correct {
+    color: #4CAF50;
+  }
+
+  .feedback.incorrect {
+    color: #F44336;
+  }
+
+  /* Result Screen */
+  .result-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .result-stat {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    min-width: 150px;
+  }
+
+  .result-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+  }
+
+  .result-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .result-details {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 30px;
+  }
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .detail-value {
+    color: white;
+    font-weight: 600;
+  }
+
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .math-screen {
+      padding: 20px;
+    }
+
+    .game-options {
+      padding: 15px;
+    }
+
+    #problem-text {
+      font-size: 2rem;
+    }
+
+    .result-stats {
+      gap: 10px;
+    }
+
+    .result-stat {
+      padding: 15px;
+      min-width: 120px;
+    }
+
+    .result-value {
+      font-size: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .math-screen {
+      padding: 15px;
+    }
+
+    .option-section h3 {
+      font-size: 1rem;
+    }
+
+    .option-button {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+
+    .checkbox-group {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    #problem-text {
+      font-size: 1.8rem;
+    }
+
+    .answer-input {
+      flex-direction: column;
+    }
+
+    #answer-input {
+      padding: 10px;
+      font-size: 1.1rem;
+    }
+
+    .result-value {
+      font-size: 1.7rem;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elements
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  
+  const difficultyButtons = document.querySelectorAll('[data-difficulty]');
+  const timeButtons = document.querySelectorAll('[data-time]');
+  const operationCheckboxes = document.querySelectorAll('[data-operation]');
+  
+  const startGameBtn = document.getElementById('start-game');
+  const playAgainBtn = document.getElementById('play-again');
+  
+  const problemText = document.getElementById('problem-text');
+  const answerInput = document.getElementById('answer-input');
+  const submitAnswerBtn = document.getElementById('submit-answer');
+  const feedbackEl = document.getElementById('feedback');
+  
+  const scoreEl = document.getElementById('score');
+  const correctEl = document.getElementById('correct');
+  const timerEl = document.getElementById('timer');
+  const timerBar = document.getElementById('timer-bar');
+  
+  const finalScoreEl = document.getElementById('final-score');
+  const finalCorrectEl = document.getElementById('final-correct');
+  const finalIncorrectEl = document.getElementById('final-incorrect');
+  const accuracyEl = document.getElementById('accuracy');
+  const avgTimeEl = document.getElementById('avg-time');
+
+  // Game Configuration
+  let difficulty = 'easy';
+  let gameTime = 60; // seconds
+  let operations = ['addition', 'subtraction', 'multiplication'];
+  
+  // Game State
+  let score = 0;
+  let correctAnswers = 0;
+  let incorrectAnswers = 0;
+  let currentAnswer = 0;
+  let timer = null;
+  let timeRemaining = 0;
+  let startTimestamp = 0;
+  let totalResponseTime = 0;
+  let problemStartTime = 0;
+
+  // Sounds
+  const correctSound = new Audio('/static/sounds/correct.mp3');
+  const wrongSound = new Audio('/static/sounds/wrong.mp3');
+  const gameOverSound = new Audio('/static/sounds/game-over.mp3');
+
+  // Event Listeners for Configuration
+  difficultyButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Update difficulty
+      difficulty = this.getAttribute('data-difficulty');
+      
+      // Update UI
+      difficultyButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  timeButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Update game time
+      gameTime = parseInt(this.getAttribute('data-time'));
+      
+      // Update UI
+      timeButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Start Game Button
+  startGameBtn.addEventListener('click', function() {
+    // Get selected operations
+    operations = [];
+    operationCheckboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+        operations.push(checkbox.getAttribute('data-operation'));
+      }
+    });
+    
+    // Make sure at least one operation is selected
+    if (operations.length === 0) {
+      alert('Lütfen en az bir işlem türü seçin!');
+      return;
+    }
+    
+    // Start the game
+    startGame();
+  });
+
+  // Submit Answer Button
+  submitAnswerBtn.addEventListener('click', checkAnswer);
+
+  // Answer Input Enter Key
+  answerInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+
+  // Play Again Button
+  playAgainBtn.addEventListener('click', function() {
+    showScreen(startScreen);
+  });
+
+  // Functions
+  function startGame() {
+    // Reset game state
+    score = 0;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    totalResponseTime = 0;
+    
+    // Reset UI
+    scoreEl.textContent = score;
+    correctEl.textContent = correctAnswers;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    
+    // Set timer
+    timeRemaining = gameTime;
+    timerEl.textContent = timeRemaining;
+    timerBar.style.width = '100%';
+    
+    // Show game screen
+    showScreen(gameScreen);
+    
+    // Focus answer input
+    answerInput.value = '';
+    answerInput.focus();
+    
+    // Generate first problem
+    generateProblem();
+    
+    // Start timer
+    startTimestamp = Date.now();
+    problemStartTime = Date.now();
+    timer = setInterval(updateTimer, 1000);
+  }
+
+  function generateProblem() {
+    // Choose random operation from selected operations
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    
+    let num1, num2, problem, answer;
+    
+    // Generate numbers based on difficulty and operation
+    switch (operation) {
+      case 'addition':
+        if (difficulty === 'easy') {
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+        } else if (difficulty === 'medium') {
+          num1 = Math.floor(Math.random() * 50) + 1;
+          num2 = Math.floor(Math.random() * 50) + 1;
+        } else { // hard
+          num1 = Math.floor(Math.random() * 100) + 1;
+          num2 = Math.floor(Math.random() * 100) + 1;
+        }
+        problem = `${num1} + ${num2} = ?`;
+        answer = num1 + num2;
+        break;
+        
+      case 'subtraction':
+        if (difficulty === 'easy') {
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * num1) + 1;
+        } else if (difficulty === 'medium') {
+          num1 = Math.floor(Math.random() * 50) + 10;
+          num2 = Math.floor(Math.random() * num1) + 1;
+        } else { // hard
+          num1 = Math.floor(Math.random() * 100) + 20;
+          num2 = Math.floor(Math.random() * num1) + 1;
+        }
+        problem = `${num1} - ${num2} = ?`;
+        answer = num1 - num2;
+        break;
+        
+      case 'multiplication':
+        if (difficulty === 'easy') {
+          num1 = Math.floor(Math.random() * 5) + 1;
+          num2 = Math.floor(Math.random() * 5) + 1;
+        } else if (difficulty === 'medium') {
+          num1 = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+        } else { // hard
+          num1 = Math.floor(Math.random() * 12) + 1;
+          num2 = Math.floor(Math.random() * 12) + 1;
+        }
+        problem = `${num1} × ${num2} = ?`;
+        answer = num1 * num2;
+        break;
+        
+      case 'division':
+        // For division, first generate the answer, then multiply to get the dividend
+        if (difficulty === 'easy') {
+          answer = Math.floor(Math.random() * 5) + 1;
+          num2 = Math.floor(Math.random() * 5) + 1;
+        } else if (difficulty === 'medium') {
+          answer = Math.floor(Math.random() * 10) + 1;
+          num2 = Math.floor(Math.random() * 10) + 1;
+        } else { // hard
+          answer = Math.floor(Math.random() * 12) + 1;
+          num2 = Math.floor(Math.random() * 12) + 1;
+        }
+        num1 = answer * num2; // This ensures whole number answers
+        problem = `${num1} ÷ ${num2} = ?`;
+        break;
+    }
+    
+    // Update UI
+    problemText.textContent = problem;
+    currentAnswer = answer;
+    
+    // Reset input
+    answerInput.value = '';
+    answerInput.focus();
+    
+    // Reset feedback
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    
+    // Record problem start time
+    problemStartTime = Date.now();
+  }
+
+  function checkAnswer() {
+    // Get user's answer
+    const userAnswer = parseInt(answerInput.value);
+    
+    // If input is empty or not a number, do nothing
+    if (isNaN(userAnswer)) {
+      return;
+    }
+    
+    // Calculate response time
+    const responseTime = (Date.now() - problemStartTime) / 1000;
+    totalResponseTime += responseTime;
+    
+    // Check if answer is correct
+    if (userAnswer === currentAnswer) {
+      // Correct answer
+      feedbackEl.textContent = 'Doğru!';
+      feedbackEl.className = 'feedback correct';
+      
+      // Update score (faster answers get more points)
+      const timeBonus = Math.max(0, 10 - Math.floor(responseTime));
+      const difficultyMultiplier = difficulty === 'easy' ? 1 : (difficulty === 'medium' ? 2 : 3);
+      const pointsEarned = 10 + timeBonus * difficultyMultiplier;
+      
+      score += pointsEarned;
+      correctAnswers++;
+      
+      // Play sound
+      correctSound.play();
+    } else {
+      // Incorrect answer
+      feedbackEl.textContent = `Yanlış! Doğru cevap: ${currentAnswer}`;
+      feedbackEl.className = 'feedback incorrect';
+      
+      incorrectAnswers++;
+      
+      // Play sound
+      wrongSound.play();
+    }
+    
+    // Update UI
+    scoreEl.textContent = score;
+    correctEl.textContent = correctAnswers;
+    
+    // Generate new problem after a short delay
+    setTimeout(generateProblem, 1500);
+  }
+
+  function updateTimer() {
+    timeRemaining--;
+    
+    // Update UI
+    timerEl.textContent = timeRemaining;
+    const percentLeft = (timeRemaining / gameTime) * 100;
+    timerBar.style.width = `${percentLeft}%`;
+    
+    // Change color when time is running out
+    if (timeRemaining <= 10) {
+      timerBar.style.backgroundColor = '#F44336';
+    }
+    
+    // Check if time is up
+    if (timeRemaining <= 0) {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    // Stop timer
+    clearInterval(timer);
+    
+    // Play sound
+    gameOverSound.play();
+    
+    // Calculate statistics
+    const totalAnswers = correctAnswers + incorrectAnswers;
+    const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+    const avgTime = totalAnswers > 0 ? (totalResponseTime / totalAnswers).toFixed(1) : 0;
+    
+    // Update result screen
+    finalScoreEl.textContent = score;
+    finalCorrectEl.textContent = correctAnswers;
+    finalIncorrectEl.textContent = incorrectAnswers;
+    accuracyEl.textContent = `${accuracy}%`;
+    avgTimeEl.textContent = `${avgTime} saniye`;
+    
+    // Save score
+    saveScore(score);
+    
+    // Show result screen
+    showScreen(resultScreen);
+  }
+
+  function showScreen(screen) {
+    // Hide all screens
+    startScreen.style.display = 'none';
+    gameScreen.style.display = 'none';
+    resultScreen.style.display = 'none';
+    
+    // Show the specified screen
+    screen.style.display = 'block';
+  }
+  
+  // Function to save score to the server
+  function saveScore(score) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'math_challenge',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+});
+</script>
+{% endblock %}

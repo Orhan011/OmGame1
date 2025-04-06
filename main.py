@@ -664,6 +664,30 @@ def typing_speed():
     """Yazma Hızı: Klavye hızı testi
     Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
     return render_template('games/typingSpeed.html')
+    
+@app.route('/games/puzzle-slider')
+def puzzle_slider():
+    """Puzzle Slider: Görsel bulmaca
+    Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu."""
+    return render_template('games/puzzleSlider.html')
+
+@app.route('/games/memory-match')
+def memory_match_game():
+    """Hafıza Eşleştirme: Görsel hafıza oyunu
+    Eşleşen kartları bularak görsel hafıza ve odaklanma becerilerinizi geliştirin."""
+    return render_template('games/memoryMatch.html')
+
+@app.route('/games/math-challenge')
+def math_challenge():
+    """Matematik Mücadelesi: Sayısal beceri testi
+    Hızlı düşünme ve matematiksel becerilerinizi test edin."""
+    return render_template('games/mathChallenge.html')
+
+@app.route('/games/snake')
+def snake_game():
+    """Yılan Oyunu: Klasik arcade
+    Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
+    return render_template('games/snake.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
