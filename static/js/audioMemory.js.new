@@ -1,0 +1,566 @@
+// MelodiX - Sesli Hafıza Oyunu JavaScript
+
+// Ses öğelerini yükle
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const notes = {
+  do: 261.63, // C4
+  re: 293.66, // D4
+  mi: 329.63, // E4
+  fa: 349.23, // F4
+  sol: 392.00, // G4
+  la: 440.00, // A4
+  si: 493.88, // B4
+  do2: 523.25, // C5
+  re2: 587.33, // D5
+  mi2: 659.25, // E5
+  fa2: 698.46, // F5
+  sol2: 783.99, // G5
+  la2: 880.00, // A5
+  si2: 987.77, // B5
+  do3: 1046.50, // C6
+  re3: 1174.66  // D6
+};
+
+// DOM öğeleri
+const soundPads = document.querySelectorAll('.sound-pad');
+const startBtn = document.getElementById('start-btn');
+const resetBtn = document.getElementById('reset-btn');
+const levelCount = document.getElementById('level-count');
+const scoreCount = document.getElementById('score-count');
+const statusMessage = document.getElementById('status-message');
+const progressBar = document.getElementById('progress-bar');
+const levelUpModal = document.getElementById('level-up-modal');
+const newLevelSpan = document.getElementById('new-level');
+const continueBtn = document.getElementById('continue-btn');
+// Mode buttons removed
+
+// Oyun değişkenleri
+let gamePattern = [];
+let playerPattern = [];
+let level = 1;
+let score = 0;
+let gameStarted = false;
+let playerTurn = false;
+let currentMode = 'classic';
+let currentDifficulty = 'easy';
+let visiblePads = 4; // Başlangıçta görünür pad sayısı
+let complexityFactor = 1; // Melodilerin karmaşıklık faktörü
+
+// Renkleri ayarla
+soundPads.forEach(pad => {
+  pad.style.backgroundColor = pad.getAttribute('data-color');
+});
+
+// Zorluk butonlarını ayarla
+const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+difficultyBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Aktif sınıfı kaldır
+    difficultyBtns.forEach(b => b.classList.remove('active'));
+    
+    // Yeni seçilen zorluk düzeyini aktif yap
+    btn.classList.add('active');
+    
+    // Zorluk değişkenini ayarla
+    currentDifficulty = btn.getAttribute('data-difficulty');
+    
+    // Zorluk seviyesine göre görünür pad sayısını ayarla
+    switch (currentDifficulty) {
+      case 'easy':
+        visiblePads = 4;
+        complexityFactor = 1;
+        break;
+      case 'medium':
+        visiblePads = 6;
+        complexityFactor = 2;
+        break;
+      case 'hard':
+        visiblePads = 9;
+        complexityFactor = 3;
+        break;
+    }
+    
+    // Görünür padleri güncelle
+    updateVisiblePads();
+    
+    // Eğer oyun başlamışsa, yeni oyun başlat
+    if (gameStarted) {
+      resetGame();
+      startLevel();
+    }
+  });
+});
+
+// Başlangıçta padleri ayarla
+updateVisiblePads();
+
+// Olay dinleyicileri
+startBtn.addEventListener('click', () => {
+  if (!gameStarted) {
+    startGame();
+  }
+});
+
+resetBtn.addEventListener('click', () => {
+  resetGame();
+});
+
+continueBtn.addEventListener('click', () => {
+  levelUpModal.style.display = 'none';
+  setTimeout(() => {
+    startLevel();
+  }, 500);
+});
+
+soundPads.forEach((pad, index) => {
+  pad.addEventListener('click', () => {
+    if (playerTurn && pad.style.display !== 'none') {
+      const note = pad.getAttribute('data-note');
+      playSound(note);
+      animatePad(pad);
+      
+      // Parçacık efekti oluştur
+      createParticles(pad);
+      
+      checkAnswer(index);
+    }
+  });
+});
+
+// Ses çalma
+function playSound(note, duration = 0.5) {
+  // Ses kaynağı oluştur
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  // Sinüs dalgası
+  oscillator.type = 'sine';
+  oscillator.frequency.value = notes[note];
+  
+  // Fade in/out için
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.05);
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+  
+  // Bağlantıları yap
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  // Başlat ve durdur
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + duration);
+}
+
+// Yastık animasyonu
+function animatePad(pad) {
+  // Aktif sınıfını ekle
+  pad.classList.add('active');
+  
+  // Animasyon süresi sonunda kaldır
+  setTimeout(() => {
+    pad.classList.remove('active');
+  }, 300);
+  
+  // Titreşim efekti
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
+}
+
+// Parçacık efekti
+function createParticles(element) {
+  const rect = element.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  for (let i = 0; i < 10; i++) {
+    const particle = document.createElement('div');
+    const size = Math.random() * 8 + 5;
+    
+    particle.style.position = 'fixed';
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.backgroundColor = element.getAttribute('data-color');
+    particle.style.borderRadius = '50%';
+    particle.style.pointerEvents = 'none';
+    particle.style.left = `${centerX}px`;
+    particle.style.top = `${centerY}px`;
+    particle.style.opacity = '1';
+    particle.style.zIndex = '100';
+    
+    document.body.appendChild(particle);
+    
+    const angle = Math.random() * Math.PI * 2;
+    const velocity = Math.random() * 10 + 10;
+    const vx = Math.cos(angle) * velocity;
+    const vy = Math.sin(angle) * velocity;
+    
+    let posX = centerX;
+    let posY = centerY;
+    
+    const animate = () => {
+      posX += vx;
+      posY += vy;
+      
+      particle.style.left = `${posX}px`;
+      particle.style.top = `${posY}px`;
+      particle.style.opacity = parseFloat(particle.style.opacity) - 0.02;
+      
+      if (parseFloat(particle.style.opacity) > 0) {
+        requestAnimationFrame(animate);
+      } else {
+        particle.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }
+}
+
+// Oyunu başlat
+function startGame() {
+  gameStarted = true;
+  score = 0;
+  level = 1;
+  scoreCount.textContent = score;
+  levelCount.textContent = level;
+  startBtn.textContent = 'Oyun Başladı';
+  updateStatusMessage('Dikkatlice dinle ve sırayı hatırla!');
+  
+  // Padleri hazırla
+  updateVisiblePads();
+  
+  // İlk seviyeyi başlat
+  startLevel();
+}
+
+// Oyunu sıfırla
+function resetGame() {
+  gameStarted = false;
+  playerTurn = false;
+  gamePattern = [];
+  playerPattern = [];
+  score = 0;
+  level = 1;
+  scoreCount.textContent = score;
+  levelCount.textContent = level;
+  startBtn.textContent = 'Başla';
+  updateStatusMessage('Başlamak için "Başla" butonuna basın');
+}
+
+// Zorluk seviyesine göre görünür padleri güncelle
+function updateVisiblePads() {
+  soundPads.forEach((pad, index) => {
+    if (index < visiblePads) {
+      pad.style.display = 'block';
+    } else {
+      pad.style.display = 'none';
+    }
+  });
+}
+
+// Seviyeyi başlat
+function startLevel() {
+  playerTurn = false;
+  playerPattern = [];
+  updateStatusMessage(`Seviye ${level}: Sırayı dinle`);
+  
+  // Seviyeye göre zorluk artışı
+  if (level > 5 && currentDifficulty === 'easy') {
+    setDifficulty('medium');
+  } else if (level > 10 && currentDifficulty === 'medium') {
+    setDifficulty('hard');
+  }
+  
+  // Yeni desen oluştur
+  generateComplexPattern();
+  
+  // İlerleme çubuğunu göster
+  updateProgressBar(0);
+  
+  // Kısa bir gecikme sonra deseni çal
+  setTimeout(playGamePattern, 1000);
+}
+
+// Kompleks desen oluştur
+function generateComplexPattern() {
+  // Önceki desenin uzunluğunu koru
+  const patternLength = gamePattern.length;
+  
+  // Her seviyede bir not ekle
+  if (currentDifficulty === 'easy' || gamePattern.length === 0) {
+    // Kolay mod: her seviyede yalnızca bir yeni not ekle
+    const randomPadIndex = Math.floor(Math.random() * visiblePads);
+    gamePattern.push(randomPadIndex);
+  } else {
+    // Orta ve zor mod: daha karmaşık desenler oluştur
+    // Önceki deseni belli bir olasılıkla değiştir
+    if (Math.random() < 0.3 * complexityFactor && gamePattern.length > 2) {
+      // Önceki desende rastgele bir pozisyonu değiştir
+      const changeIndex = Math.floor(Math.random() * gamePattern.length);
+      gamePattern[changeIndex] = Math.floor(Math.random() * visiblePads);
+    }
+    
+    // Yeni bir not ekle
+    const randomPadIndex = Math.floor(Math.random() * visiblePads);
+    gamePattern.push(randomPadIndex);
+    
+    // Zor modda tekrarlanan veya ardışık notlar olabilir
+    if (currentDifficulty === 'hard' && Math.random() < 0.4) {
+      // Son notu tekrarla veya benzer bir not ekle
+      if (Math.random() < 0.5) {
+        gamePattern.push(randomPadIndex); // Aynı notu tekrarla
+      } else {
+        // Yakın bir not ekle (bir yukarı veya aşağı)
+        let adjacentNote = randomPadIndex + (Math.random() < 0.5 ? 1 : -1);
+        adjacentNote = Math.max(0, Math.min(adjacentNote, visiblePads - 1));
+        gamePattern.push(adjacentNote);
+      }
+    }
+  }
+  
+  console.log('Desen:', gamePattern);
+}
+
+// Oyun desenini çal
+function playGamePattern() {
+  let i = 0;
+  const playNext = () => {
+    if (i < gamePattern.length) {
+      const padIndex = gamePattern[i];
+      const pad = soundPads[padIndex];
+      const note = pad.getAttribute('data-note');
+      
+      // İlerleme çubuğunu güncelle
+      updateProgressBar((i + 1) / gamePattern.length * 100);
+      
+      // Sesi çal ve animasyonu göster
+      playSound(note);
+      animatePad(pad);
+      
+      i++;
+      
+      // Zorluk seviyesine göre hızı ayarla
+      let speed;
+      switch (currentDifficulty) {
+        case 'easy': speed = 1000; break;
+        case 'medium': speed = 800; break;
+        case 'hard': speed = 600; break;
+        default: speed = 1000;
+      }
+      
+      // Desen hızını seviyeye göre artır (belirli bir limite kadar)
+      const levelFactor = Math.max(0.6, 1 - (level * 0.02));
+      speed = Math.max(400, speed * levelFactor);
+      
+      setTimeout(playNext, speed);
+    } else {
+      // Desen tamamlanınca oyuncunun sırasını başlat
+      setTimeout(() => {
+        playerTurn = true;
+        updateStatusMessage('Şimdi senin sıran! Sırayı tekrarla.');
+      }, 500);
+    }
+  };
+  
+  playNext();
+}
+
+// Oyuncunun cevabını kontrol et
+function checkAnswer(index) {
+  playerPattern.push(index);
+  
+  // Şimdiye kadarki girdileri kontrol et
+  const currentStep = playerPattern.length - 1;
+  
+  if (playerPattern[currentStep] === gamePattern[currentStep]) {
+    // Doğru! Devam et.
+    
+    // İlerleme çubuğunu güncelle
+    updateProgressBar(playerPattern.length / gamePattern.length * 100);
+    
+    // Desen tamamlandı mı?
+    if (playerPattern.length === gamePattern.length) {
+      // Oyuncu başarılı!
+      playerTurn = false;
+      
+      // Skoru ve seviyeyi güncelle
+      score += level * 10 * complexityFactor;
+      scoreCount.textContent = score;
+      
+      // Seviye atladı
+      level++;
+      levelCount.textContent = level;
+      
+      // Seviye atlama animasyonu
+      setTimeout(() => {
+        levelUp();
+      }, 500);
+    }
+  } else {
+    // Yanlış! Oyun bitti.
+    gameOver();
+  }
+}
+
+// Oyun sonu
+function gameOver() {
+  playerTurn = false;
+  gameStarted = false;
+  updateStatusMessage('Oyun bitti! Tekrar denemek için "Başla" butonuna basın.');
+
+  // Patlama efekti
+  soundPads.forEach(pad => {
+    setTimeout(() => {
+      animatePad(pad);
+    }, Math.random() * 500);
+  });
+
+  // Skoru kaydet
+  saveScore();
+
+  startBtn.textContent = 'Tekrar Başla';
+}
+
+// Skoru sunucuya gönderme
+function saveScore() {
+  // Skor 0 ise kaydetmeye gerek yok
+  if (score <= 0) {
+    console.log('Kaydedilecek skor yok');
+    return;
+  }
+  
+  console.log(`Skor gönderiliyor: ${score}`);
+  
+  // Backend'e skoru gönder
+  fetch('/api/save-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      game_type: 'audio_memory',
+      score: score
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP hata! Durum: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Skor başarıyla kaydedildi:', data);
+    
+    if (data.success && data.achievement) {
+      // Başarı bildirimi göster
+      const notification = document.createElement('div');
+      notification.className = 'achievement-notification';
+      notification.textContent = `🏆 Başarı: ${data.achievement.title}`;
+      notification.style.position = 'fixed';
+      notification.style.top = '20px';
+      notification.style.right = '20px';
+      notification.style.padding = '15px';
+      notification.style.background = 'linear-gradient(135deg, rgba(106, 90, 224, 0.9), rgba(90, 55, 200, 0.9))';
+      notification.style.color = 'white';
+      notification.style.borderRadius = '10px';
+      notification.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+      notification.style.zIndex = '1000';
+      notification.style.transform = 'translateX(120%)';
+      notification.style.transition = 'transform 0.3s ease-in-out';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+        setTimeout(() => {
+          notification.style.transform = 'translateX(120%)';
+          setTimeout(() => {
+            notification.remove();
+          }, 500);
+        }, 3000);
+      }, 100);
+    }
+  })
+  .catch(error => {
+    console.error('Skor gönderme hatası:', error);
+  });
+}
+
+// Durum mesajını güncelle
+function updateStatusMessage(message) {
+  statusMessage.textContent = message;
+}
+
+// İlerleme çubuğunu güncelle
+function updateProgressBar(percent) {
+  progressBar.style.width = `${percent}%`;
+}
+
+// Seviye atladı
+function levelUp() {
+  // Seviye atlama modalını göster
+  newLevelSpan.textContent = level;
+  levelUpModal.style.display = 'flex';
+  
+  // Konfeti efekti
+  createConfetti();
+}
+
+// Konfeti efekti
+function createConfetti() {
+  const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+  
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    const size = Math.random() * 10 + 5;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    confetti.style.position = 'fixed';
+    confetti.style.width = `${size}px`;
+    confetti.style.height = `${size}px`;
+    confetti.style.backgroundColor = color;
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.left = `${Math.random() * 100}vw`;
+    confetti.style.top = '-10px';
+    confetti.style.opacity = '1';
+    confetti.style.zIndex = '90';
+    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+    
+    document.body.appendChild(confetti);
+    
+    const delay = Math.random() * 3;
+    const duration = Math.random() * 3 + 2;
+    
+    confetti.animate([
+      { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+      { transform: `translateY(${Math.random() * 70 + 30}vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+    ], {
+      duration: duration * 1000,
+      delay: delay * 1000,
+      fill: 'forwards'
+    });
+    
+    setTimeout(() => {
+      confetti.remove();
+    }, (delay + duration) * 1000);
+  }
+}
+
+// Zorluk seviyesini ayarla
+function setDifficulty(difficulty) {
+  // Aktif düğmeyi güncelle
+  difficultyBtns.forEach(btn => {
+    if (btn.getAttribute('data-difficulty') === difficulty) {
+      btn.click();
+    }
+  });
+}
+
+// Sayfa yüklendikten sonra başlangıç işlemleri
+document.addEventListener('DOMContentLoaded', () => {
+  updateStatusMessage('Başlamak için "Başla" butonuna basın');
+  updateProgressBar(0);
+  updateVisiblePads();
+});
