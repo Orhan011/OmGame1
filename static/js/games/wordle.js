@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
     streak: 0,
     hintsLeft: 3,
     soundEnabled: true,
-    activeCellIndex: 0  // Aktif hücre indeksi
+    activeCellIndex: 0,  // Aktif hücre indeksi
+    selectedCell: null   // Seçili hücre referansı
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
@@ -88,58 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteLetter();
   });
 
-  // Gizli input alanının işlenmesi - keydown ile harfleri yakalama
-  let lastKeyTime = 0;
-  let lastKey = '';
-  
-  hiddenInput.addEventListener('keydown', function(e) {
-    const now = Date.now();
-    
-    // Çok hızlı ardışık tuşlamaları engellemek için
-    if (now - lastKeyTime < 150 && e.key === lastKey) {
-      e.preventDefault();
-      return false;
-    }
-    
-    if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
-      const letter = e.key.toUpperCase();
-      
-      // Harfi ekle
-      addLetter(letter);
-      
-      // Zaman ve tuş bilgisini kaydet
-      lastKeyTime = now;
-      lastKey = e.key;
-      
-      // Input alanını hemen temizle
-      setTimeout(() => {
-        hiddenInput.value = '';
-      }, 10);
-      
-      // Ses çal
-      playSound('keypress');
-      
-      // Varsayılan işlemi engelle
-      e.preventDefault();
-    }
-  });
-
-  // Klavye tuşu basımı
-  document.addEventListener('keydown', function(e) {
-    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
-    const key = e.key.toUpperCase();
-    
-    if (key === 'ENTER') {
-      submitGuess();
-    } else if (key === 'BACKSPACE') {
-      deleteLetter();
-      playSound('keypress');
-    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
-      addLetter(key);
-      playSound('keypress');
-    }
-  });
+  // DOMda olmayan tuşa basma event'ini kaldırıldı, çünkü mobil cihazlarda sorun çıkartıyor
 
   /**
    * Oyunu başlatır
@@ -162,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.isGameOver = false;
     gameState.hintsLeft = 3;
     gameState.activeCellIndex = 0;
+    gameState.selectedCell = null;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -196,25 +147,8 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         
-        // Hücreye tıklama olayı
-        cell.addEventListener('click', function() {
-          if (gameState.isGameOver) return;
-          
-          const clickedRow = parseInt(cell.dataset.row);
-          const clickedCol = parseInt(cell.dataset.col);
-          
-          // Sadece aktif satırdaki hücrelerin tıklanabilir olmasını sağla
-          if (clickedRow === gameState.currentRow) {
-            // Tıklanan hücreyi aktif olarak işaretle
-            gameState.activeCellIndex = clickedCol;
-            highlightActiveCell();
-            
-            // Mobil klavyeyi aktifleştir
-            hiddenInput.focus();
-            
-            playSound('keypress');
-          }
-        });
+        // Hücreyi tıklanabilir yap
+        cell.addEventListener('click', handleCellClick);
         
         rowDiv.appendChild(cell);
       }
@@ -222,8 +156,83 @@ document.addEventListener('DOMContentLoaded', function() {
       wordleGrid.appendChild(rowDiv);
     }
     
-    // İlk satırı ve hücreyi aktif olarak işaretle
+    // İlk satır ve hücreyi aktif olarak işaretle
     updateGrid();
+    highlightActiveCell();
+  }
+
+  /**
+   * Hücre tıklama olayını işler
+   */
+  function handleCellClick(event) {
+    if (gameState.isGameOver) return;
+    
+    const cell = event.currentTarget;
+    const clickedRow = parseInt(cell.dataset.row);
+    const clickedCol = parseInt(cell.dataset.col);
+    
+    if (clickedRow === gameState.currentRow) {
+      // Daha önce seçili hücre varsa vurgusunu kaldır
+      if (gameState.selectedCell) {
+        gameState.selectedCell.classList.remove('active');
+      }
+      
+      // Tıklanan hücreyi aktif olarak işaretle
+      cell.classList.add('active');
+      gameState.selectedCell = cell;
+      gameState.activeCellIndex = clickedCol;
+      
+      // Mobil klavyeyi göster ve karakter alındığında işleme fonksiyonunu hazırla
+      showCharPrompt(cell);
+      
+      playSound('keypress');
+    }
+  }
+
+  /**
+   * Mobil cihazlarda karakter girişi için prompt gösterir
+   */
+  function showCharPrompt(cell) {
+    // Özel bir karakteri kullanıcıdan isteme
+    const char = prompt("Harf girin:", "");
+    
+    if (char !== null && char.length > 0) {
+      // Sadece ilk harfi al
+      const letter = char.substring(0, 1).toUpperCase();
+      
+      if (/^[A-ZĞÜŞİÖÇ]$/.test(letter)) {
+        // Harfi hücreye ekle
+        const row = gameState.currentRow;
+        const col = gameState.activeCellIndex;
+        
+        gameState.guesses[row][col] = letter;
+        
+        // Izgarayı güncelle
+        updateGrid();
+        
+        // Sonraki hücreye geç
+        moveToNextCell();
+        
+        playSound('keypress');
+      } else {
+        showMessage("Lütfen geçerli bir harf girin", "warning");
+      }
+    }
+    
+    // Seçili hücrenin vurgusunu kaldır
+    if (gameState.selectedCell) {
+      gameState.selectedCell.classList.remove('active');
+      gameState.selectedCell = null;
+    }
+  }
+
+  /**
+   * Bir sonraki hücreye geçer
+   */
+  function moveToNextCell() {
+    const nextCol = (gameState.activeCellIndex + 1) % 5;
+    gameState.activeCellIndex = nextCol;
+    gameState.currentCol = Math.max(gameState.currentCol, countFilledCells());
     highlightActiveCell();
   }
 
@@ -231,18 +240,15 @@ document.addEventListener('DOMContentLoaded', function() {
    * Aktif hücreyi vurgular
    */
   function highlightActiveCell() {
-    // Önce tüm hücrelerden 'active' sınıfını kaldır
+    // Önce tüm hücrelerden 'active' sınıfını kaldır (elle tıklama için kullanılır)
     document.querySelectorAll('.wordle-cell').forEach(cell => {
       cell.classList.remove('active');
     });
     
-    // Sadece mevcut satırdaki aktif hücreyi vurgula
-    if (gameState.currentRow < 6) {
-      const activeCell = document.querySelector(`.wordle-cell[data-row="${gameState.currentRow}"][data-col="${gameState.activeCellIndex}"]`);
-      if (activeCell) {
-        activeCell.classList.add('active');
-      }
-    }
+    // Aktif satırdaki hücreleri vurgula
+    document.querySelectorAll(`.wordle-cell[data-row="${gameState.currentRow}"]`).forEach(cell => {
+      cell.classList.add('current-row');
+    });
   }
 
   /**
@@ -251,17 +257,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function addLetter(letter) {
     if (gameState.isGameOver) return;
     
-    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '') {
-      // Aktif hücreye harfi yerleştir
-      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = letter;
-      
-      // Bir sonraki hücreyi aktif yap (sağdaki boş hücreye geçiş)
-      gameState.activeCellIndex = (gameState.activeCellIndex + 1) % 5;
+    // Aktif satır ve hücreye harfi ekle
+    const row = gameState.currentRow;
+    const col = gameState.activeCellIndex;
+    
+    if (gameState.guesses[row][col] === '') {
+      gameState.guesses[row][col] = letter;
       gameState.currentCol = Math.max(gameState.currentCol, countFilledCells());
-      
-      // Izgarayı güncelle
+      moveToNextCell();
       updateGrid();
-      highlightActiveCell();
     }
   }
 
@@ -284,20 +288,20 @@ document.addEventListener('DOMContentLoaded', function() {
   function deleteLetter() {
     if (gameState.isGameOver) return;
     
-    // Mevcut hücre boş ise ve sol tarafında dolu hücre varsa, ona geç
-    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '' && gameState.activeCellIndex > 0) {
+    const row = gameState.currentRow;
+    
+    // Aktif hücrede içerik varsa onu sil, yoksa sola geç
+    if (gameState.guesses[row][gameState.activeCellIndex] !== '') {
+      gameState.guesses[row][gameState.activeCellIndex] = '';
+    } else if (gameState.activeCellIndex > 0) {
       gameState.activeCellIndex--;
+      gameState.guesses[row][gameState.activeCellIndex] = '';
     }
     
-    // Aktif hücredeki harfi sil
-    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '') {
-      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
-      gameState.currentCol = countFilledCells();
-      
-      // Izgarayı güncelle
-      updateGrid();
-      highlightActiveCell();
-    }
+    gameState.currentCol = countFilledCells();
+    updateGrid();
+    highlightActiveCell();
+    playSound('keypress');
   }
 
   /**
