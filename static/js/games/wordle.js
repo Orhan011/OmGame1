@@ -58,24 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Mobil klavye girişi için gizli input oluştur
   let mobileInput = null;
-  let inputContainer = null;
   
   function createMobileInput() {
     if (!mobileInput) {
-      // Önce bir konteyner oluştur - sayfayı kaydırmaması için
-      inputContainer = document.createElement('div');
-      inputContainer.style.position = 'absolute';
-      inputContainer.style.bottom = '0';
-      inputContainer.style.left = '0';
-      inputContainer.style.width = '1px';
-      inputContainer.style.height = '1px';
-      inputContainer.style.opacity = '0.01';
-      inputContainer.style.overflow = 'hidden';
-      inputContainer.style.zIndex = '-1';
-      inputContainer.style.pointerEvents = 'none';
-      document.body.appendChild(inputContainer);
-      
-      // Input'u bu konteynerin içine ekle
       mobileInput = document.createElement('input');
       mobileInput.type = 'text';
       mobileInput.inputMode = 'text';
@@ -84,26 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileInput.autocapitalize = 'off';
       mobileInput.spellcheck = false;
       
-      // Input'u tamamen görünmez yap, scroll'u önle
+      // Görünmez input - tek seferde tek harf girişi için maxLength=1
+      mobileInput.style.position = 'fixed';
+      mobileInput.style.top = '0';
+      mobileInput.style.left = '0';
       mobileInput.style.opacity = '0';
-      mobileInput.style.position = 'absolute';
-      mobileInput.style.width = '1px';
-      mobileInput.style.height = '1px';
-      mobileInput.style.outline = 'none';
-      mobileInput.style.border = 'none';
-      mobileInput.style.padding = '0';
-      mobileInput.style.margin = '0';
       mobileInput.style.pointerEvents = 'none';
+      mobileInput.style.height = '1px';
+      mobileInput.style.width = '1px';
       mobileInput.maxLength = 1;
       
-      inputContainer.appendChild(mobileInput);
-      
-      // Prevent scrolling when focusing input
-      mobileInput.addEventListener('focus', function(e) {
-        e.preventDefault();
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-      });
+      document.body.appendChild(mobileInput);
       
       // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
       const debounce = (callback, delay) => {
@@ -151,28 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function focusMobileInput() {
     if (mobileInput && !gameState.isGameOver) {
-      // Sayfa kaymadan focus yapmak için ekstra önlemler
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-      
-      // Sayfanın aşağı kaydırılmasını engelle
-      document.body.style.overflow = 'hidden';
-      document.body.style.height = '100%';
-      
       setTimeout(() => {
-        try {
-          // Scroll pozisyonunu sabitledikten sonra focus yap
-          mobileInput.focus({preventScroll: true});
-        } catch (e) {
-          console.error("Focus error:", e);
-          mobileInput.focus();
-        }
-        
-        // Sayfanın scroll davranışını normale döndür
-        setTimeout(() => {
-          document.body.style.overflow = '';
-          document.body.style.height = '';
-        }, 50);
+        mobileInput.focus();
       }, 50);
     }
   }
@@ -198,32 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
     ["SİL", "Z", "C", "V", "B", "N", "M", "Ö", "Ç", "ENTER"]
   ];
 
-  // CSS ekleyerek overflow ve kaydırma davranışını düzenle
-  function addScrollFixStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-      body.game-active {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-      }
-      
-      .wordle-container {
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .wordle-grid:focus {
-        outline: none;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
-  // Sayfa yüklendiğinde stil ekle
-  addScrollFixStyles();
-
   // Oyun başlat butonu
   startBtn.addEventListener('click', startGame);
 
@@ -239,14 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru paylaş/kopyala butonları
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
-  
-  // Scroll'u sabitlemek için ekran boyut değişimini izle
-  window.addEventListener('resize', () => {
-    if (gameContainer.style.display !== 'none' && !gameState.isGameOver) {
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-    }
-  });
 
   // Klavye tuşu basımı için debounce fonksiyonu
   function debounce(func, wait) {
@@ -278,18 +200,12 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('keydown', debouncedKeypress);
   
   // Ekrana tıklama olayı - mobil input için
-  wordleGrid.addEventListener('click', function(e) {
-    e.preventDefault(); // Varsayılan kaydırma davranışını engelle
-    focusMobileInput();
-  });
+  wordleGrid.addEventListener('click', focusMobileInput);
 
   /**
    * Oyunu başlatır
    */
   function startGame() {
-    // Body'e game-active sınıfı ekle - scroll'ü sabitlemek için
-    document.body.classList.add('game-active');
-    
     // Arayüzü sıfırla
     startScreen.style.display = 'none';
     gameContainer.style.display = 'block';
@@ -327,15 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Grid ve klavyeyi oluştur
     createWordleGrid();
     
-    // Scroll'u en üste al
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-    
     // Mobil klavye desteği ekle
     createMobileInput();
-    
-    // Tabancanın atış öncesi biraz beklemesi gibi, DOM hazır olduktan sonra focus yap
-    setTimeout(focusMobileInput, 300);
+    focusMobileInput();
 
     // Ses efektlerini sıfırla
     resetSounds();
@@ -645,12 +555,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWin) {
     gameState.isGameOver = true;
     
-    // Game-active sınıfını kaldır
-    document.body.classList.remove('game-active');
-    
     // Mobil inputu gizle
-    if (inputContainer) {
-      inputContainer.style.display = 'none';
+    if (mobileInput) {
+      mobileInput.style.display = 'none';
     }
     
     // Seri ve puan hesaplamaları
