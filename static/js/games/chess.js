@@ -282,8 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
     isAiThinking = true;
     statusEl.textContent = 'Yapay Zeka düşünüyor...';
 
-    // AI düşünürken zamanlayıcıyı durdurmadan devam ettir
-    // Bu şekilde zamanlayıcı sorunsuz çalışacak
+    // Her durumda siyahın zamanlayıcısının çalışmaya devam etmesini sağla
+    // Önceki zamanlayıcıyı durdurma, sadece kontrol et ve gerekirse yeniden başlat
+    if (!timerInterval || activeTimer !== 'b') {
+      startTimer('b');
+    }
 
     // Use setTimeout to give a visual effect of "thinking"
     setTimeout(() => {
@@ -295,7 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Switch timer only after AI makes its move
       if (!game.game_over()) {
         // Sırası beyaza geçtiği için zamanlayıcıyı değiştir
-        startTimer('w'); // Beyaz zamanlayıcısını başlat
+        stopTimer(); // Önce durdur
+        startTimer('w'); // Sonra beyazınkini başlat
       } else {
         stopTimer(); // Stop timer if game is over
       }
@@ -540,222 +544,163 @@ document.addEventListener('DOMContentLoaded', () => {
       [-50,-30,-30,-30,-30,-30,-30,-50]
     ];
 
-    function reverseArray(array) {
-      return array.slice().reverse();
-    }
+    // Get board representation
+    const board = chess.board();
 
-    // Evaluation tables for black (reversed)
-    const pawnTableBlack = reverseArray(pawnTable);
-    const knightTableBlack = reverseArray(knightTable);
-    const bishopTableBlack = reverseArray(bishopTable);
-    const rookTableBlack = reverseArray(rookTable);
-    const queenTableBlack = reverseArray(queenTable);
-    const kingMiddleTableBlack = reverseArray(kingMiddleTable);
-    const kingEndTableBlack = reverseArray(kingEndTable);
-
-    // Determine if we're in endgame (total value of pieces < 3000)
-    let totalMaterial = 0;
-    const squares = chess.SQUARES;
-    for (let i = 0; i < 64; i++) {
-      const piece = chess.get(squares[i]);
-      if (piece) {
-        totalMaterial += pieceValues[piece.type];
-      }
-    }
-    const isEndgame = totalMaterial < 5000;
-
-    // Evaluate each piece
-    for (let i = 0; i < 64; i++) {
-      const square = squares[i];
-      const piece = chess.get(square);
-      if (!piece) continue;
-
-      const file = square.charCodeAt(0) - 97; // 'a' -> 0, 'b' -> 1, etc.
-      const rank = 8 - parseInt(square.charAt(1)); // '1' -> 7, '2' -> 6, etc.
-      
-      // Base value
-      let value = pieceValues[piece.type];
-
-      // Position value
-      let positionValue = 0;
-      if (piece.type === 'p') {
-        positionValue = piece.color === 'w' ? pawnTable[rank][file] : pawnTableBlack[rank][file];
-      } else if (piece.type === 'n') {
-        positionValue = piece.color === 'w' ? knightTable[rank][file] : knightTableBlack[rank][file];
-      } else if (piece.type === 'b') {
-        positionValue = piece.color === 'w' ? bishopTable[rank][file] : bishopTableBlack[rank][file];
-      } else if (piece.type === 'r') {
-        positionValue = piece.color === 'w' ? rookTable[rank][file] : rookTableBlack[rank][file];
-      } else if (piece.type === 'q') {
-        positionValue = piece.color === 'w' ? queenTable[rank][file] : queenTableBlack[rank][file];
-      } else if (piece.type === 'k') {
-        if (isEndgame) {
-          positionValue = piece.color === 'w' ? kingEndTable[rank][file] : kingEndTableBlack[rank][file];
-        } else {
-          positionValue = piece.color === 'w' ? kingMiddleTable[rank][file] : kingMiddleTableBlack[rank][file];
+    // Count material to determine game phase
+    let materialCount = 0;
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        const square = board[i][j];
+        if (square && square.type !== 'k' && square.type !== 'p') {
+          materialCount += pieceValues[square.type];
         }
       }
+    }
 
-      // Add or subtract based on color (white is max, black is min)
-      const pieceValue = value + positionValue * 0.1;
-      if (piece.color === userColor) {
-        totalEvaluation -= pieceValue;
-      } else {
-        totalEvaluation += pieceValue;
+    // Determine if we're in endgame (less than a queen and a rook worth of material)
+    const isEndgame = materialCount < 1500;
+
+    // Loop through all squares
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        const square = board[i][j];
+        if (square) {
+          const isPlayerPiece = square.color === userColor;
+          const pieceValue = pieceValues[square.type];
+
+          // Add or subtract base piece values
+          totalEvaluation += pieceValue * (isPlayerPiece ? -1 : 1);
+
+          // Add position-based evaluation based on piece type
+          let positionValue = 0;
+
+          switch (square.type) {
+            case 'p':
+              positionValue = pawnTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              break;
+            case 'n':
+              positionValue = knightTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              break;
+            case 'b':
+              positionValue = bishopTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              break;
+            case 'r':
+              positionValue = rookTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              break;
+            case 'q':
+              positionValue = queenTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              break;
+            case 'k':
+              if (isEndgame) {
+                positionValue = kingEndTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              } else {
+                positionValue = kingMiddleTable[isPlayerPiece ? i : 7 - i][isPlayerPiece ? j : 7 - j];
+              }
+              break;
+          }
+
+          totalEvaluation += positionValue * (isPlayerPiece ? -1 : 1);
+        }
       }
     }
 
-    // Mobility bonus (normalized)
-    const mobilityFactor = 0.1;
-    const possibleMovesCount = chess.moves().length;
-    const turn = chess.turn();
-    
-    if (turn === userColor) {
-      totalEvaluation -= possibleMovesCount * mobilityFactor;
-    } else {
-      totalEvaluation += possibleMovesCount * mobilityFactor;
+    // Mobility bonus (number of legal moves)
+    const turnColor = chess.turn();
+    const colorMultiplier = turnColor === userColor ? -1 : 1;
+
+    // Check and threatened pieces evaluation
+    if (chess.in_check()) {
+      totalEvaluation += 50 * colorMultiplier;
     }
 
     return totalEvaluation;
   }
 
-  // Update status message
+  // Update the game status
   function updateStatus() {
+    if (!gameStarted) {
+      statusEl.textContent = 'Zorluk seviyesini seçip "YENİ OYUN" butonuna tıklayın';
+      return;
+    }
+
     let status = '';
 
-    // Checkmate?
+    // Check for checkmate
     if (game.in_checkmate()) {
       const winner = game.turn() === 'w' ? 'Siyah' : 'Beyaz';
-      status = `Oyun bitti: ${winner} oyuncusu şah mat yaptı!`;
+      status = `ŞAH MAT! ${winner} oyuncusu kazandı!`;
+      stopTimer(); // Ensure timer stops at checkmate
       endGame();
     }
-    // Draw?
+    // Check for stalemate
+    else if (game.in_stalemate()) {
+      status = 'AÇMAZ (PAT)! Hamle yapamayan ' + (game.turn() === 'w' ? 'Beyaz' : 'Siyah') + ' oyuncu kaybetti.';
+      stopTimer();
+      endGame();
+    }
+    // Check for draw
     else if (game.in_draw()) {
-      status = 'Oyun berabere bitti';
+      status = 'Oyun berabere bitti! 50 hamle kuralı.';
+      stopTimer();
       endGame();
     }
-    // Game still on
+    // Check for threefold repetition
+    else if (game.in_threefold_repetition()) {
+      status = 'Üç kez tekrar! Oyun berabere bitti.';
+      stopTimer();
+      endGame();
+    }
+    // Check for insufficient material
+    else if (game.insufficient_material()) {
+      status = 'Yetersiz materyal! Oyun berabere bitti.';
+      stopTimer();
+      endGame();
+    }
+    // Game still in progress
     else {
-      status = game.turn() === 'w' ? 'Sıra: Beyaz' : 'Sıra: Siyah';
+      status = game.turn() === 'w' ? 'Sıra Beyazda' : 'Sıra Siyahta';
 
-      // Check?
+      // Check if in check
       if (game.in_check()) {
-        status += ', ŞAH ÇEKİLDİ!';
+        status += ' - ŞAH ÇEKİLDİ!';
       }
     }
 
+    // Update display elements
     statusEl.textContent = status;
-    if (fenEl) fenEl.textContent = game.fen();
-    if (pgnEl) pgnEl.textContent = game.pgn();
+    fenEl.textContent = `FEN: ${game.fen()}`;
+    pgnEl.textContent = `PGN: ${game.pgn()}`;
   }
 
-  // End game processing
-  function endGame() {
-    gameStarted = false;
-    disableBoardInteraction();
-    
-    // Enable difficulty selection again
-    document.querySelectorAll('input[name="difficulty"]').forEach(option => {
-      option.disabled = false;
-    });
-    
-    // Calculate score based on pieces left, time, etc.
-    const finalScore = calculateScore();
-    
-    // Save score to server
-    saveScore(finalScore);
-  }
+  // Initial status update
+  updateStatus();
 
-  // Enable interaction with the board
+  // Ensure responsive design
+  window.addEventListener('resize', board.resize);
+// Define these functions in global scope
   function enableBoardInteraction() {
     const squares = document.querySelectorAll('.square-55d63');
     squares.forEach(square => {
-      square.style.cursor = 'pointer';
+      square.style.pointerEvents = 'auto';
     });
   }
 
-  // Disable interaction with the board
   function disableBoardInteraction() {
     const squares = document.querySelectorAll('.square-55d63');
     squares.forEach(square => {
-      square.style.cursor = 'default';
+      square.style.pointerEvents = 'none';
     });
   }
 
-  // Calculate score based on game state
-  function calculateScore() {
-    let totalScore = 0;
-    
-    // Add points for each remaining piece on player's side
-    const pieceValues = {
-      'p': 10,
-      'n': 30,
-      'b': 30,
-      'r': 50,
-      'q': 90
-    };
-    
-    const board = game.board();
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        const piece = board[row][col];
-        if (piece && piece.color === userColor) {
-          totalScore += pieceValues[piece.type] || 0;
-        }
-      }
-    }
-    
-    // Add points for checkmate or remaining time
-    if (game.in_checkmate() && game.turn() !== userColor) {
-      totalScore += 200; // Bonus for checkmate
-    }
-    
-    // Add bonus for remaining time
-    if (userColor === 'w') {
-      totalScore += Math.floor(whiteTimeRemaining / 10);
-    } else {
-      totalScore += Math.floor(blackTimeRemaining / 10);
-    }
-    
-    // Add points for total number of moves (to encourage longer games)
-    totalScore += Math.min(game.history().length * 2, 40);
-    
-    return totalScore;
-  }
+  function endGame() {
+    gameStarted = false;
+    disableBoardInteraction();
+    stopTimer();
 
-  function saveScore(score) {
-    console.log(`Satranç oyunu skoru kaydediliyor: ${score}`);
-    
-    fetch('/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'chess',
-        score: score
-      })
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Skor kaydetme başarısız oldu');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Skor başarıyla kaydedildi:', data);
-    })
-    .catch(error => {
-      console.error('Skor kaydedilirken hata oluştu:', error);
+    // Re-enable difficulty selection for next game
+    document.querySelectorAll('input[name="difficulty"]').forEach(option => {
+      option.disabled = false;
     });
   }
-
-  // Add back button
-  document.getElementById('backBtn').addEventListener('click', () => {
-    window.location.href = '/all-games';
-  });
-
-  // Initialize
-  updateStatus();
-  updateTimerDisplay();
 });

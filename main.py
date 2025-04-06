@@ -1497,8 +1497,6 @@ def reset_password():
 
 # API routes for game scores
 @app.route('/api/save-score', methods=['POST'])
-@app.route('/save-score', methods=['POST'])
-@app.route('/save_score', methods=['POST'])
 def save_score():
     data = request.json
 

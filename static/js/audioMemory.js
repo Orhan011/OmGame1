@@ -130,266 +130,215 @@ function createParticles(element) {
       particle.style.left = `${centerX + Math.cos(angle) * velocity * 50}px`;
       particle.style.top = `${centerY + Math.sin(angle) * velocity * 50}px`;
       particle.style.opacity = '0';
-      particle.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
-    }, 10);
 
-    // Parçacığı kaldır
-    setTimeout(() => {
-      particle.remove();
-    }, lifetime);
+      // Kaldır
+      setTimeout(() => {
+        if (document.body.contains(particle)) {
+          document.body.removeChild(particle);
+        }
+      }, lifetime);
+    }, 10);
   }
 }
 
-// Yeni seviye başlat
+// Seviye başlat
 function startLevel() {
   playerPattern = [];
   playerTurn = false;
-  
-  // Zorluk seviyesine göre görünür pedleri ayarla
-  updateVisiblePads();
-  
-  // Yeni melodiyi oluştur
-  gamePattern = generateComplexPattern();
-  
-  // İlerleme çubuğunu sıfırla
-  updateProgressBar(0);
-  
-  // Melodiyi oynat
-  updateStatusMessage('Melodiyi dinleyin...');
-  
-  // Oyun moduna göre oynatma hızını ayarla
-  let speed = 700; // Default
-  if (currentMode === 'speed') {
-    speed = 700 - (level * 20); // Seviye arttıkça hızlanır
-  } else {
-    speed = 1000 - (level * 15);
-  }
-  
-  setTimeout(() => {
-    playGamePattern();
-  }, 1000);
+
+  updateStatusMessage('Dinle ve hatırla...');
+
+  // Zorluk seviyesine göre kompleks melodiler oluştur
+  generateComplexPattern();
+
+  // Sıra ile sesleri çal
+  playGamePattern();
 }
 
-// Görünür pedleri güncelle
-function updateVisiblePads() {
-  const maxPads = soundPads.length;
-  
-  // Zorluk seviyesine göre görünür pad sayısını ayarla
-  switch (currentDifficulty) {
-    case 'easy':
-      visiblePads = 4;
-      break;
-    case 'medium':
-      visiblePads = 9;
-      break;
-    case 'hard':
-      visiblePads = maxPads;
-      break;
-    default:
-      visiblePads = 4;
-  }
-  
-  // Tüm pedleri önce gizle
-  soundPads.forEach(pad => {
-    if (pad) pad.style.display = 'none';
-  });
-  
-  // Belirlenen sayıda pedi göster
-  for (let i = 0; i < visiblePads; i++) {
-    if (soundPads[i]) soundPads[i].style.display = 'flex';
-  }
-}
-
-// Daha karmaşık melodi oluştur
+// Karmaşık melodi üret
 function generateComplexPattern() {
-  const sequence = [];
-  const sequenceLength = Math.min(level + 2, 20); // Seviye + 2 (max 20)
-  
-  // Görünür pedlerden rastgele seç
-  const visiblePadsList = Array.from(soundPads)
-    .filter((pad, index) => index < visiblePads && pad);
-  
-  if (visiblePadsList.length === 0) return [];
-  
-  // Zorluk seviyesine göre karmaşıklığı belirle
-  let usePatterns = false;
-  let repeatChance = 0;
-  
-  switch (currentDifficulty) {
-    case 'easy':
-      usePatterns = false;
-      repeatChance = 0.2;
-      break;
-    case 'medium':
-      usePatterns = level > 3;
-      repeatChance = 0.3;
-      break;
-    case 'hard':
-      usePatterns = true;
-      repeatChance = 0.4;
-      break;
+  // Zorluk seviyesine göre başlangıç nota sayısını belirle
+  let initialNotes = 0;
+
+  if (gamePattern.length === 0) {
+    // Oyun ilk başladığında zorluk seviyesine göre başlangıç nota sayısı
+    if (currentDifficulty === 'easy') {
+      initialNotes = 2; // Kolay mod için 2 nota ile başla
+    } else if (currentDifficulty === 'medium') {
+      initialNotes = 3; // Orta mod için 3 nota ile başla
+    } else if (currentDifficulty === 'hard') {
+      initialNotes = 4; // Zor mod için 4 nota ile başla
+    }
   }
-  
-  // Basit rastgele dizi
-  if (!usePatterns) {
-    for (let i = 0; i < sequenceLength; i++) {
-      const randomPad = visiblePadsList[Math.floor(Math.random() * visiblePadsList.length)];
-      if (randomPad && randomPad.dataset && randomPad.dataset.note) {
-        sequence.push(randomPad.dataset.note);
+
+  // Seviyeye ve zorluğa göre eklenecek nota sayısı
+  // Kolay mod: Her seviyede 1 nota ekle
+  // Orta mod: Her seviyede 1 nota ekle, başlangıç 3
+  // Zor mod: Her seviyede 1 nota ekle, başlangıç 4
+  const notesToAdd = initialNotes + (gamePattern.length === 0 ? 0 : 1);
+
+  // Görünür pad'leri filtrele
+  const visiblePadsList = Array.from(soundPads).filter(pad => 
+    pad && pad.style && pad.style.display !== 'none');
+
+  if (visiblePadsList.length === 0) {
+    console.error("Görünür pad bulunamadı!");
+    return;
+  }
+
+  for (let i = 0; i < notesToAdd; i++) {
+    // Tamamen karmaşık seçim için her seferinde rastgele pad seç
+    let randomPadIndex = Math.floor(Math.random() * visiblePadsList.length);
+
+    // Null check to ensure pad at this index exists
+    if (!visiblePadsList[randomPadIndex]) {
+      console.error(`Invalid pad index: ${randomPadIndex} of ${visiblePadsList.length} pads`);
+      continue; // Skip this iteration
+    }
+
+    // Karmaşıklığı artırmak için bazen aynı notayı tekrarlama
+    if (gamePattern.length > 0 && Math.random() > 0.7) {
+      // %30 ihtimalle önceki notalardan birini seç
+      const randomPrevIndex = Math.floor(Math.random() * gamePattern.length);
+      const prevNote = gamePattern[randomPrevIndex];
+      
+      if (prevNote) {
+        const prevPadIndex = visiblePadsList.findIndex(pad => 
+          pad && pad.dataset && pad.dataset.note === prevNote);
+
+        if (prevPadIndex !== -1) {
+          randomPadIndex = prevPadIndex;
+        }
       }
     }
-    return sequence;
-  }
-  
-  // Karmaşık dizi oluştur (motifler, tekrarlar vs.)
-  const createSubsequence = (length) => {
-    const subseq = [];
-    for (let i = 0; i < length; i++) {
-      const randomPad = visiblePadsList[Math.floor(Math.random() * visiblePadsList.length)];
-      if (randomPad && randomPad.dataset && randomPad.dataset.note) {
-        subseq.push(randomPad.dataset.note);
+
+    // Make sure the pad and its dataset exist
+    const pad = visiblePadsList[randomPadIndex];
+    if (pad && pad.dataset && pad.dataset.note) {
+      const randomNote = pad.dataset.note;
+
+      // Modlara göre özel melodi oluşturma
+      if (currentMode === 'classic' || currentMode === 'timed') {
+        gamePattern.push(randomNote);
+      } else if (currentMode === 'reverse') {
+        // Ters çevirme modunda dizinin başına ekle
+        gamePattern.unshift(randomNote);
+      } else if (currentMode === 'memory' && gamePattern.length > 0) {
+        // Hafıza modunda tekrarlayan kalıplar ekle
+        const patternLength = gamePattern.length;
+        const patternChunk = Math.floor(Math.random() * patternLength);
+        gamePattern.push(gamePattern[patternChunk]);
+      } else if (currentMode === 'speed') {
+        // Hız modunda daha kısa aralıklarla nota ekle
+        gamePattern.push(randomNote);
+        if (Math.random() > 0.6) { // %40 ihtimalle arka arkaya aynı nota
+          gamePattern.push(randomNote);
+        }
+      } else {
+        gamePattern.push(randomNote);
       }
-    }
-    return subseq;
-  };
-  
-  let remainingLength = sequenceLength;
-  while (remainingLength > 0) {
-    // Belirli bir olasılıkla önceki diziden parça tekrarla
-    if (sequence.length >= 2 && Math.random() < repeatChance) {
-      const repeatLength = Math.min(Math.floor(Math.random() * 3) + 2, remainingLength);
-      const startPos = Math.floor(Math.random() * (sequence.length - repeatLength + 1));
-      const repeatSeq = sequence.slice(startPos, startPos + repeatLength);
-      sequence.push(...repeatSeq);
-      remainingLength -= repeatLength;
     } else {
-      // Yeni bir alt dizi oluştur
-      const subseqLength = Math.min(Math.floor(Math.random() * 3) + 1, remainingLength);
-      const subseq = createSubsequence(subseqLength);
-      sequence.push(...subseq);
-      remainingLength -= subseqLength;
+      console.error('Missing dataset or pad at index: ' + randomPadIndex);
     }
   }
-  
-  return sequence;
 }
 
-// Oyun desenini çalma
+// Oyun dizisini çal
 function playGamePattern() {
   let i = 0;
-  
-  const playNext = () => {
+
+  // İlerleme çubuğunu ayarla
+  progressBar.style.width = '0%';
+
+  // Mod ve zorluk seviyesine göre hız ayarla
+  let speed = 1000; // Varsayılan hız
+
+  if (currentMode === 'speed') {
+    speed = 700 - (level * 20); // Seviye arttıkça hızlanır
+    speed = Math.max(speed, 300); // Minimum 300ms
+  } else {
+    speed = 1000 - (level * 15);
+    speed = Math.max(speed, 500); // Minimum 500ms
+  }
+
+  const interval = setInterval(() => {
     if (i >= gamePattern.length) {
-      // Tüm desen oynatıldı, oyuncunun sırası
-      playerTurn = true;
-      updateStatusMessage('Sıra sizde! Melodiyi tekrarlayın.');
+      clearInterval(interval);
+      setTimeout(() => {
+        playerTurn = true;
+        updateStatusMessage('Şimdi senin sıran!');
+      }, 500);
       return;
     }
 
     const note = gamePattern[i];
-    i++;
+    if (!note) {
+      i++;
+      return;
+    }
     
-    // Notaya karşılık gelen pedi bul ve çal
-    const pad = Array.from(soundPads).find(p => p && p.dataset && p.dataset.note === note);
+    const pad = Array.from(soundPads).find(pad => 
+      pad && pad.dataset && pad.dataset.note === note);
+
     if (pad) {
-      playSound(note);
+      // Mod bazlı ses efektleri
+      if (currentMode === 'memory') {
+        // Hafıza modunda daha kısa ses
+        playSound(note, 0.4);
+      } else if (currentMode === 'reverse') {
+        // Ters modda farklı ses tonu
+        playSound(note, 0.6);
+      } else {
+        playSound(note);
+      }
+
       animatePad(pad);
     }
-    
+
     // İlerleme çubuğunu güncelle
-    updateProgressBar((i / gamePattern.length) * 100);
-    
-    // Oyun moduna ve seviyeye göre hızı ayarla
-    let speed = 700; // Default
-    if (currentMode === 'speed') {
-      speed = 700 - (level * 20);
-    } else {
-      speed = 1000 - (level * 15);
-    }
-    
-    setTimeout(playNext, speed);
-  };
-  
-  playNext();
+    const progress = ((i + 1) / gamePattern.length) * 100;
+    progressBar.style.width = `${progress}%`;
+
+    i++;
+  }, speed);
 }
 
-// Cevabı kontrol et
+// Oyuncu girişini kontrol et
 function checkAnswer(index) {
-  // Oyuncu sırası değilse veya oyun başlamadıysa işlem yapma
-  if (!playerTurn || !gameStarted) return;
-  
-  // Doğru cevap kontrolü
-  if (playerPattern[index] === gamePattern[index]) {
-    // İlerleme çubuğunu güncelle
-    updateProgressBar(((index + 1) / gamePattern.length) * 100);
-    
-    // Son nota mı?
-    if (index === gamePattern.length - 1) {
-      playerTurn = false;
-      
-      // Skoru artır
+  if (!playerTurn) return;
+
+  const currentNote = playerPattern[index];
+  const expectedNote = gamePattern[index];
+
+  if (currentNote === expectedNote) {
+    // Doğru cevap
+    if (playerPattern.length === gamePattern.length) {
+      // Seviye tamamlandı
       score += level * 10;
       scoreCount.textContent = score;
-      
-      // Level atla ve başarı sesi
+
+      playerTurn = false;
       setTimeout(() => {
-        const successSound = new Audio('/static/sounds/success.mp3');
-        successSound.play();
         levelUp();
-      }, 500);
-    }
-  } else {
-    // Yanlış cevap, oyun bitti
-    playerTurn = false;
-    
-    // Hata sesi
-    const failSound = new Audio('/static/sounds/wrong.mp3');
-    failSound.play();
-    
-    // Doğru notanın padding'ini vurgula
-    const correctNote = gamePattern[index];
-    const correctPad = Array.from(soundPads).find(p => p && p.dataset && p.dataset.note === correctNote);
-    if (correctPad) {
-      correctPad.classList.add('correct');
-      setTimeout(() => {
-        correctPad.classList.remove('correct');
       }, 1000);
     }
-    
-    // Oyunu bitir
-    setTimeout(() => {
-      gameOver();
-    }, 500);
+  } else {
+    // Yanlış cevap
+    gameOver();
   }
 }
 
-// Seviye atlamak
+// Seviye atla
 function levelUp() {
   level++;
   levelCount.textContent = level;
-  
-  // Level-up animasyonu
-  levelCount.classList.add('level-up-animation');
+
+  // Modal olmadan direkt olarak bir sonraki seviyeye geç
   setTimeout(() => {
-    levelCount.classList.remove('level-up-animation');
+    // Her seviye geçişinde gamePattern sıfırlanmamalı, kümülatif olmalı
+    // Yeni seviyede sadece notalar eklenecek
+    startLevel();
   }, 1000);
-  
-  // Level-up ses efekti
-  const levelUpSound = new Audio('/static/sounds/level-up.mp3');
-  levelUpSound.play();
-  
-  // Modal ve efekt
-  newLevelSpan.textContent = level;
-  levelUpModal.classList.add('active');
-  
-  setTimeout(() => {
-    levelUpModal.classList.remove('active');
-    
-    // Sonraki seviyeyi başlat
-    setTimeout(() => {
-      startLevel();
-    }, 1000);
-  }, 2000);
 }
 
 // Oyun sonu
@@ -407,53 +356,7 @@ function gameOver() {
     }
   });
 
-  // Oyun sonu sesi
-  const gameOverSound = new Audio('/static/sounds/game-over.mp3');
-  gameOverSound.play();
-
-  // Skoru kaydet
-  if (score > 0) {
-    saveScore();
-  }
-
-  // Başla butonunu güncelle
-  startBtn.textContent = 'Başla';
-
-  // Eski oyun değişkenlerini sıfırla
-  setTimeout(() => {
-    level = 1;
-    score = 0;
-    levelCount.textContent = level;
-    scoreCount.textContent = score;
-  }, 2000);
-}
-
-// Skor kaydetme fonksiyonu
-function saveScore() {
-  console.log(`Audio Memory skoru kaydediliyor: ${score}`);
-  
-  fetch('/save-score', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      game_type: 'audio_memory',
-      score: score
-    })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Skor kaydetme başarısız oldu');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Skor başarıyla kaydedildi:', data);
-  })
-  .catch(error => {
-    console.error('Skor kaydedilirken hata oluştu:', error);
-  });
+  startBtn.textContent = 'Tekrar Başla';
 }
 
 // Durum mesajını güncelle
@@ -469,30 +372,90 @@ function updateProgressBar(percent) {
 // Oyun modunu ayarla
 function setGameMode(mode) {
   currentMode = mode;
-  
-  // UI güncelleme (mod düğmeleri kaldırıldı)
+  // Mode buttons were removed, so we don't need to update UI
+
+  // Mod özellikleri
+  switch(mode) {
+    case 'classic':
+      // Standart mod
+      complexityFactor = 1;
+      break;
+    case 'timed':
+      // Zamanlı mod
+      complexityFactor = 1;
+      break;
+    case 'duet':
+      // Düet modu
+      complexityFactor = 1.2;
+      break;
+    case 'reverse':
+      // Ters mod - notalar ters sırayla çalar
+      complexityFactor = 1.3;
+      break;
+    case 'memory':
+      // Hafıza modu - tekrarlayan kalıplar
+      complexityFactor = 1.4;
+      break;
+    case 'speed':
+      // Hız modu - daha hızlı oynanır
+      complexityFactor = 1.5;
+      break;
+  }
 }
 
 // Zorluk seviyesini ayarla
 function setDifficulty(difficulty) {
   currentDifficulty = difficulty;
-  updateVisiblePads();
-  
-  // Görsel feedback
-  if (gameStarted) {
-    updateStatusMessage(`Zorluk seviyesi ${difficulty} olarak ayarlandı. Yeni seviye başladığında etkin olacak.`);
+  document.querySelector('.game-container').className = 'game-container difficulty-' + difficulty;
+
+  // Zorluk seviyesine göre görünür pad sayısını ayarla
+  switch(difficulty) {
+    case 'easy':
+      visiblePads = 4;
+      // 4 pad göster (2x2), diğerlerini gizle
+      soundPads.forEach((pad, index) => {
+        if (pad) {
+          pad.style.display = index < 4 ? 'block' : 'none';
+        }
+      });
+      break;
+    case 'medium':
+      visiblePads = 9;
+      // 9 pad göster (3x3), diğerlerini gizle
+      soundPads.forEach((pad, index) => {
+        if (pad) {
+          pad.style.display = index < 9 ? 'block' : 'none';
+        }
+      });
+      break;
+    case 'hard':
+      visiblePads = 16;
+      // 16 pad göster (4x4)
+      soundPads.forEach((pad, index) => {
+        if (pad) {
+          pad.style.display = index < 16 ? 'block' : 'none';
+        }
+      });
+      break;
   }
 }
 
-// Başlat ve Reset butonları için olay dinleyicileri
+// Olay dinleyicileri
 if (startBtn) {
   startBtn.addEventListener('click', () => {
     if (!gameStarted) {
+      // Ses bağlamını başlat (tarayıcı politikası gereği kullanıcı etkileşimi gerekir)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
       gameStarted = true;
       gamePattern = [];
       playerPattern = [];
-      
-      updateStatusMessage('Oyun başlıyor...');
+      level = 1;
+      score = 0;
+      levelCount.textContent = level;
+      scoreCount.textContent = score;
       startBtn.textContent = 'Devam Et';
 
       startLevel();
@@ -527,15 +490,10 @@ soundPads.forEach(pad => {
   }
 });
 
-// Seviye atlamayı devam ettirme düğmesi
-if (continueBtn) {
-  continueBtn.addEventListener('click', () => {
-    levelUpModal.classList.remove('active');
-    setTimeout(() => {
-      startLevel();
-    }, 500);
-  });
-}
+// Modal ile seviye atlamayı kaldırdığımız için bu event listener'a artık ihtiyaç yok
+// continueBtn.addEventListener('click', () => { ... });
+
+// Mode buttons removed
 
 // Zorluk seçicileri için olay dinleyicileri
 const difficultyBtns = document.querySelectorAll('.difficulty-btn');
@@ -597,9 +555,4 @@ function playRandomSequence() {
 function getCurrentSequenceLength() {
   // Level'e göre uzunluk belirle
   return Math.min(5 + Math.floor(level / 2), 20); // Örnek bir değer, gerçek uygulamanızda burayı değiştirmeniz gerekebilir.
-}
-
-// Swipe back navigation için gerekli fonksiyon
-function goBack() {
-  window.location.href = '/all-games';
 }
