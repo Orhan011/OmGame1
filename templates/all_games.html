@@ -1,358 +1,3664 @@
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
 {% extends "layout.html" %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
 {% block content %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
 <div class="container">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   <div class="page-title-section">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     <h1>Tüm Oyunlar</h1>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     <p>Beyin egzersizi ve zihinsel gelişim için tasarlanmış interaktif oyunlarımız</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   <div class="game-grid">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    {% if session.get('user_id') %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     <!-- Kelime Bulmaca -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="word_puzzle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-font"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Kelime Bulmaca</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'word_puzzle' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="word_puzzle" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Kelime Bulmaca" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-font"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="word_puzzle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Labirent -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="labyrinth">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-route"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Labirent</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Karmaşık labirentlerden çıkış yolunu bularak mekansal zekânızı geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'labyrinth' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="labyrinth" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Labirent" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-route"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="labyrinth">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Yapboz -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="puzzle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Yapboz</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Parçaları doğru yerleştirerek resimleri tamamlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'puzzle' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="puzzle" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Yapboz" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-puzzle-piece"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="puzzle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Sayı Dizisi -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="number_sequence">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Sayı Dizisi</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Sayı dizilerindeki mantıksal örüntüleri keşfedin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'number_sequence' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="number_sequence" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Sayı Dizisi" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-sort-numeric-up"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="number_sequence">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Sayı Zinciri -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="number_chain">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-link"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Sayı Zinciri</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Ekranda beliren sayıları doğru sırayla hatırlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'number_chain' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="number_chain" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Sayı Zinciri" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-link"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="number_chain">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Sesli Hafıza -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="audio_memory">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Sesli Hafıza</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>İşitsel hafızanızı geliştirin, ses dizilerini doğru sırayla tekrarlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'audio_memory' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="audio_memory" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Sesli Hafıza" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-volume-up"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="audio_memory">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- N-Back Test -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="n_back">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-brain"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>N-Back Test</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Belirli bir zaman önce gösterilen uyaranı hatırlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'n_back' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="n_back" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="N-Back Test" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-brain"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="n_back">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- 3D Döndürme -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="three_d_rotation">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-cube"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>3D Döndürme</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Uzamsal algı yeteneklerinizi geliştirmek için 3D şekilleri doğru açılarla döndürün.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
-    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'three_d_rotation' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="three_d_rotation" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="3D Döndürme" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-cube"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="three_d_rotation">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Sudoku -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="sudoku">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-th"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Sudoku</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Mantık becerinizi geliştirin, her satır, sütun ve 3x3 kutuya 1-9 arası sayıları yerleştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'sudoku' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="sudoku" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Sudoku" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-th"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="sudoku">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- 2048 -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="game_2048">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-cubes"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>2048</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('game_2048') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'game_2048' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="game_2048" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="2048" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-cubes"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="game_2048">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Satranç -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="chess">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-chess"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Satranç</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'chess' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="chess" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Satranç" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-chess"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="chess">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
     <!-- Wordle -->
-    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card" data-game-type="wordle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-icon"><i class="fas fa-keyboard"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <h3>Wordle</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <p>5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('wordle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <button class="favorite-toggle-btn {% if 'wordle' in favorite_game_types %}active{% endif %}" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-type="wordle" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-name="Wordle" 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-icon="fas fa-keyboard"
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              data-game-route="wordle">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <i class="fas fa-star"></i>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </button>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    {% else %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Kelime Bulmaca -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-font"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Kelime Bulmaca</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Labirent -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-route"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Labirent</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Karmaşık labirentlerden çıkış yolunu bularak mekansal zekânızı geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Yapboz -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Yapboz</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Parçaları doğru yerleştirerek resimleri tamamlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Sayı Dizisi -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Sayı Dizisi</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Sayı dizilerindeki mantıksal örüntüleri keşfedin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Sayı Zinciri -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-link"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Sayı Zinciri</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Ekranda beliren sayıları doğru sırayla hatırlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Sesli Hafıza -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-volume-up"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Sesli Hafıza</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>İşitsel hafızanızı geliştirin, ses dizilerini doğru sırayla tekrarlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- N-Back Test -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-brain"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>N-Back Test</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Belirli bir zaman önce gösterilen uyaranı hatırlayın.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- 3D Döndürme -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-cube"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>3D Döndürme</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Uzamsal algı yeteneklerinizi geliştirmek için 3D şekilleri doğru açılarla döndürün.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Sudoku -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-th"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Sudoku</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Mantık becerinizi geliştirin, her satır, sütun ve 3x3 kutuya 1-9 arası sayıları yerleştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- 2048 -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-cubes"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>2048</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('game_2048') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Satranç -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-chess"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Satranç</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <!-- Wordle -->
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    <div class="game-card">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-icon"><i class="fas fa-keyboard"></i></div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <div class="game-info">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <h3>Wordle</h3>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        <p>5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!</p>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      <a href="{{ url_for('wordle') }}" class="game-btn">Oyna</a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    {% endif %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   <div class="row mt-5 mb-5">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     <div class="col-12 text-center">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       <a href="{{ url_for('index') }}" class="home-button">
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
         <i class="fas fa-home"></i> Ana Sayfaya Dön
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       </a>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
 </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
 {% endblock %}
 
 {% block extra_css %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
 <style>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  /* Favori ekleme butonları için JavaScript */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  document.addEventListener('DOMContentLoaded', function() {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    // Tüm favorilere ekleme butonlarını seç
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    const favoriteButtons = document.querySelectorAll('.favorite-toggle-btn');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    // Her buton için olay dinleyicisi ekle
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    favoriteButtons.forEach(button => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      button.addEventListener('click', function(e) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        e.preventDefault();
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        e.stopPropagation();
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        // Oyun bilgilerini al
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        const gameType = this.getAttribute('data-game-type');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        const isActive = this.classList.contains('active');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        if (isActive) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          // Favoriyi kaldır
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          fetch('/remove-favorite-game', {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            method: 'POST',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            headers: { 'Content-Type': 'application/json' },
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            body: JSON.stringify({ game_type: gameType })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .then(response => response.json())
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .then(data => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            if (data.success) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              // Butonu güncelle
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              this.classList.remove('active');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              showToast('Favorilerden kaldırıldı', 'info');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            } else {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              showToast(data.error || 'Bir hata oluştu', 'error');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .catch(error => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            console.error('Error:', error);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            showToast('Bağlantı hatası', 'error');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        } else {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          // Favoriye ekle
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          fetch('/add-favorite-game', {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            method: 'POST',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            headers: { 'Content-Type': 'application/json' },
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            body: JSON.stringify({ game_type: gameType })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .then(response => response.json())
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .then(data => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            if (data.success) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              // Butonu güncelle
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              this.classList.add('active');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              showToast('Favorilere eklendi', 'success');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            } else {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              // Hata durumunda
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              if (data.error && data.error.includes('En fazla')) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+                showLimitWarning();
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              } else {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+                showToast(data.error || 'Bir hata oluştu', 'error');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+              }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          })
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          .catch(error => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            console.error('Error:', error);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+            showToast('Bağlantı hatası', 'error');
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    // Toast bildirim göster
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    function showToast(message, type) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      Swal.fire({
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        toast: true,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        position: 'top-end',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        icon: type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info'),
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        title: message,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        showConfirmButton: false,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        timer: 3000
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    // Limit uyarısı göster
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    function showLimitWarning() {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      Swal.fire({
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        title: 'Favori Sınırı',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        text: 'Ana sayfada en fazla 4 favori oyun gösterebilirsiniz. Başka bir oyunu kaldırmak ister misiniz?',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        icon: 'warning',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        showCancelButton: true,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        confirmButtonColor: '#3085d6',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        cancelButtonColor: '#d33',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        confirmButtonText: 'Evet, yönet',
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        cancelButtonText: 'Hayır'
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      }).then((result) => {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        if (result.isConfirmed) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          // Ana sayfaya yönlendir
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+          window.location.href = '/';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+        }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+      });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  });
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   /* Modern oyun kartları ve ızgara düzeni */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-grid {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     display: grid;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     gap: 25px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-bottom: 3rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   @media (max-width: 768px) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     .game-grid {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       grid-template-columns: repeat(2, 1fr);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   @media (max-width: 480px) {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     .game-grid {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
       grid-template-columns: 1fr;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Oyun kartı tasarımı */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-card {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     padding: 20px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 15px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transition: all 0.3s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     display: flex;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     flex-direction: column;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     overflow: hidden;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border: 1px solid rgba(255, 255, 255, 0.1);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card:hover {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: translateY(-10px);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card::before {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     content: '';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     top: -50%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     right: -50%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     width: 100%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     height: 100%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05), transparent);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: rotate(45deg);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transition: all 0.5s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card:hover::before {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     top: 150%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     right: 150%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* İkon stilleri */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-icon {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 3.5rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-align: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-bottom: 15px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #6a5ae0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transition: all 0.3s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card:hover .game-icon {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: scale(1.1);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #8170ff;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Oyun bilgileri */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-info {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     flex: 1;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-info h3 {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-top: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #fff;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 1.4rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-bottom: 10px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-weight: 600;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     padding-bottom: 8px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-info h3::after {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     content: '';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     bottom: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     left: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     width: 50px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     height: 3px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: #6a5ae0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 3px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-info p {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: rgba(255, 255, 255, 0.7);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     line-height: 1.5;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 0.95rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Oyun butonu */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-btn {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(to right, #6a5ae0, #8170ff);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: white;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     padding: 10px 24px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 30px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     cursor: pointer;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-decoration: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     display: inline-block;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-top: 15px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-weight: 600;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 1rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transition: all 0.3s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-align: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-btn:hover {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(to right, #8170ff, #9a8eff);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: translateY(-2px);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Onarımda olan oyunlar için stiller */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-card[style*="opacity: 0.8"] {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card[style*="opacity: 0.8"]::after {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     content: '';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     top: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     left: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     width: 100%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     height: 100%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: rgba(0, 0, 0, 0.5);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 15px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     z-index: 1;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card[style*="opacity: 0.8"] .game-icon,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-card[style*="opacity: 0.8"] .game-info,
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .game-card[style*="opacity: 0.8"] .game-btn {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     z-index: 2;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .game-card[style*="opacity: 0.8"] .game-icon {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #6c757d;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Sayfa başlığı */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .page-title-section {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-align: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-bottom: 3rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     padding-bottom: 2rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .page-title-section h1 {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 2.8rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #2c3e50;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-weight: 700;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-bottom: 0.8rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: relative;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     display: inline-block;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .page-title-section h1::after {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     content: '';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     bottom: -10px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     left: 50%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: translateX(-50%);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     width: 100px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     height: 4px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(to right, #6a5ae0, #8170ff);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 4px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .page-title-section p {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: #666;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-size: 1.2rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     max-width: 700px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin: 0 auto;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   /* Ana sayfa butonu */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   .home-button {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     display: inline-block;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(to right, #2c3e50, #3498db);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     color: white;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     padding: 12px 30px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     border-radius: 50px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     text-decoration: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     font-weight: 600;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transition: all 0.3s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .home-button:hover {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     transform: translateY(-3px);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     background: linear-gradient(to right, #34495e, #2980b9);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
 
   .home-button i {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
     margin-right: 8px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
   }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  /* Favori butonları */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-toggle-btn {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    top: 10px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    right: 10px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    width: 36px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    height: 36px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-radius: 50%;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    background: rgba(0, 0, 0, 0.3);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    color: rgba(255, 255, 255, 0.7);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    display: flex;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    align-items: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    justify-content: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    cursor: pointer;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    transition: all 0.3s ease;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    z-index: 10;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-toggle-btn:hover {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    background: rgba(0, 0, 0, 0.5);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    color: rgba(255, 255, 255, 0.9);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-toggle-btn.active {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    background: #6a5ae0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    color: white;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-toggle-btn.disabled {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    opacity: 0.5;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    cursor: not-allowed;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  /* Favori limit aşıldığında gösterilecek bilgi balonu */
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-tooltip {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    top: 50px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    right: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    background: rgba(0, 0, 0, 0.8);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    color: white;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    padding: 8px 12px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-radius: 5px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    font-size: 0.8rem;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    z-index: 10;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    display: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    white-space: nowrap;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-tooltip::before {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    content: '';
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    position: absolute;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    top: -5px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    right: 15px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    width: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    height: 0;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-left: 5px solid transparent;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-right: 5px solid transparent;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-bottom: 5px solid rgba(0, 0, 0, 0.8);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  }
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+  .favorite-limit-warning {
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    display: none;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    text-align: center;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    margin-bottom: 20px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    padding: 10px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    background: rgba(255, 193, 7, 0.1);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border: 1px solid rgba(255, 193, 7, 0.3);
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    border-radius: 5px;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+    color: #856404;
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
 </style>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
+{% endblock %}
+
+{% endblock %}</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/all-games.js') }}"></script>
 {% endblock %}

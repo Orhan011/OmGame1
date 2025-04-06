@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app import app, db
-from models import User, Score, Article
+from models import User, Score, Article, FavoriteGame
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -579,9 +579,104 @@ def init_db_route():
 @app.route('/')
 def index():
     user = None
+    favorite_games = []
+    
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user, current_user=user)
+        
+        # Kullanıcının favori oyunlarını al
+        favorite_game_records = FavoriteGame.query.filter_by(user_id=session['user_id']).order_by(FavoriteGame.display_order).limit(4).all()
+        
+        # Her oyun için bilgi oluştur
+        game_info = {
+            'word_puzzle': {
+                'name': 'Kelime Bulmaca',
+                'description': 'Kelimeleri bul, sözcük hazineni genişlet.',
+                'icon': 'fas fa-font',
+                'route': 'word_puzzle'
+            },
+            'memory_cards': {
+                'name': 'Hafıza Kartları',
+                'description': 'Eşleşen kartları bul ve hafızanı test et.',
+                'icon': 'fas fa-clone',
+                'route': 'memory_cards'
+            },
+            'labyrinth': {
+                'name': 'Labirent',
+                'description': 'Çıkış yolunu bul ve stratejik düşün.',
+                'icon': 'fas fa-route',
+                'route': 'labyrinth'
+            },
+            'puzzle': {
+                'name': 'Yapboz',
+                'description': 'Parçaları birleştir ve görsel zekânı geliştir.',
+                'icon': 'fas fa-puzzle-piece',
+                'route': 'puzzle'
+            },
+            'number_sequence': {
+                'name': 'Sayı Dizisi',
+                'description': 'Sayı örüntülerini keşfet ve analitik düşün.',
+                'icon': 'fas fa-sort-numeric-up',
+                'route': 'number_sequence'
+            },
+            'number_chain': {
+                'name': 'Sayı Zinciri',
+                'description': 'Gördüğün sayıları doğru sırayla hatırla.',
+                'icon': 'fas fa-link',
+                'route': 'number_chain'
+            },
+            'audio_memory': {
+                'name': 'Sesli Hafıza',
+                'description': 'Duyduğun ses sıralamasını doğru tekrarla.',
+                'icon': 'fas fa-volume-up',
+                'route': 'audio_memory'
+            },
+            'n_back': {
+                'name': 'N-Back Test',
+                'description': 'Çalışma belleğini ve odaklanma gücünü test et.',
+                'icon': 'fas fa-brain',
+                'route': 'n_back'
+            },
+            'chess': {
+                'name': 'Satranç',
+                'description': 'Stratejik düşünme ve planlama becerilerini geliştir.',
+                'icon': 'fas fa-chess',
+                'route': 'chess'
+            },
+            'sudoku': {
+                'name': 'Sudoku',
+                'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştir.',
+                'icon': 'fas fa-th',
+                'route': 'sudoku'
+            },
+            'game_2048': {
+                'name': '2048',
+                'description': 'Sayıları kaydırarak aynı değere sahip kareleri birleştir.',
+                'icon': 'fas fa-cubes',
+                'route': 'game_2048'
+            },
+            'wordle': {
+                'name': 'Wordle',
+                'description': '5 harfli gizli kelimeyi 6 denemede bulmaya çalış!',
+                'icon': 'fas fa-keyboard',
+                'route': 'wordle'
+            },
+            'three_d_rotation': {
+                'name': '3D Döndürme',
+                'description': 'Şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerini geliştir.',
+                'icon': 'fas fa-cube',
+                'route': 'three_d_rotation'
+            }
+        }
+        
+        # Favori oyunları doldur
+        for fav in favorite_game_records:
+            if fav.game_type in game_info:
+                game_data = game_info[fav.game_type].copy()
+                game_data['game_type'] = fav.game_type
+                favorite_games.append(game_data)
+    
+    return render_template('index.html', user=user, current_user=user, favorite_games=favorite_games)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -715,7 +810,15 @@ def chess():
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():
-    return render_template('all_games.html')
+    # Kullanıcının favorilere eklediği oyunları al
+    favorite_game_types = []
+    if 'user_id' in session:
+        # Kullanıcının favori oyunlarını al
+        favorite_games = FavoriteGame.query.filter_by(user_id=session['user_id']).all()
+        # Oyun türlerini listele
+        favorite_game_types = [fav.game_type for fav in favorite_games]
+    
+    return render_template('all_games.html', favorite_game_types=favorite_game_types)
 
 # Skor Tablosu
 @app.route('/leaderboard')
@@ -1436,6 +1539,83 @@ def reset_password():
     return render_template('reset_password.html', email=email, token=token)
 
 # API routes for game scores
+# Favorilere oyun ekleme API 
+@app.route('/add-favorite-game', methods=['POST'])
+def add_favorite_game():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Lütfen önce giriş yapın.'}), 401
+    
+    user_id = session['user_id']
+    data = request.json
+    
+    if not data or not data.get('game_type'):
+        return jsonify({'success': False, 'error': 'Geçersiz istek.'}), 400
+    
+    game_type = data.get('game_type')
+    
+    # Kullanıcının mevcut favori oyunlarını kontrol et
+    favorite_count = FavoriteGame.query.filter_by(user_id=user_id).count()
+    
+    # Maksimum 4 oyun eklenebilir
+    if favorite_count >= 4:
+        return jsonify({'success': False, 'error': 'En fazla 4 oyun favorilere eklenebilir.'}), 400
+    
+    # Bu oyun zaten favorilere eklenmiş mi?
+    existing_favorite = FavoriteGame.query.filter_by(user_id=user_id, game_type=game_type).first()
+    if existing_favorite:
+        return jsonify({'success': False, 'error': 'Bu oyun zaten favorilerinize eklenmiş.'}), 400
+    
+    # Yeni favori oyun ekle
+    new_favorite = FavoriteGame(
+        user_id=user_id,
+        game_type=game_type,
+        display_order=favorite_count
+    )
+    
+    try:
+        db.session.add(new_favorite)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Add favorite game error: {e}")
+        return jsonify({'success': False, 'error': 'Favori eklenirken bir hata oluştu.'}), 500
+
+# Favorilerden oyun çıkarma API
+@app.route('/remove-favorite-game', methods=['POST'])
+def remove_favorite_game():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Lütfen önce giriş yapın.'}), 401
+    
+    user_id = session['user_id']
+    data = request.json
+    
+    if not data or not data.get('game_type'):
+        return jsonify({'success': False, 'error': 'Geçersiz istek.'}), 400
+    
+    game_type = data.get('game_type')
+    
+    # Bu oyun favorilere eklenmiş mi?
+    favorite_game = FavoriteGame.query.filter_by(user_id=user_id, game_type=game_type).first()
+    if not favorite_game:
+        return jsonify({'success': False, 'error': 'Bu oyun favorilerinizde bulunamadı.'}), 404
+    
+    try:
+        # Favori oyunu kaldır
+        db.session.delete(favorite_game)
+        
+        # Sıralamayı güncelle
+        remaining_favorites = FavoriteGame.query.filter_by(user_id=user_id).order_by(FavoriteGame.display_order).all()
+        for i, fav in enumerate(remaining_favorites):
+            fav.display_order = i
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Remove favorite game error: {e}")
+        return jsonify({'success': False, 'error': 'Favori kaldırılırken bir hata oluştu.'}), 500
+
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
     data = request.json
