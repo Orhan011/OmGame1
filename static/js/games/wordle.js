@@ -56,8 +56,35 @@ document.addEventListener('DOMContentLoaded', function() {
     debounceTime: 200 // ms
   };
 
-  // Mobil klavye girişi için gizli input oluştur
+  // Giriş yöntemini saklama
+  let currentInputMethod = 'invisible';
+
+  // Mobil klavye girişi için input oluştur
   let mobileInput = null;
+  
+  // Kaydırma problemini çözmek için sayfa pozisyonunu kaydet
+  let savedScrollPos = 0;
+  
+  // Debounce fonksiyonu
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+  
+  // Sayfanın scroll pozisyonunu kaydet
+  function saveScrollPosition() {
+    savedScrollPos = window.scrollY;
+  }
+  
+  // Scroll pozisyonunu geri yükle
+  function restoreScrollPosition() {
+    setTimeout(() => {
+      window.scrollTo(0, savedScrollPos);
+    }, 50);
+  }
   
   function createMobileInput() {
     if (!mobileInput) {
@@ -69,40 +96,43 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileInput.autocapitalize = 'off';
       mobileInput.spellcheck = false;
       
-      // Görünmez input - tek seferde tek harf girişi için maxLength=1
-      mobileInput.style.position = 'fixed';
-      mobileInput.style.top = '0';
-      mobileInput.style.left = '0';
-      mobileInput.style.opacity = '0';
-      mobileInput.style.pointerEvents = 'none';
-      mobileInput.style.height = '1px';
-      mobileInput.style.width = '1px';
-      mobileInput.maxLength = 1;
+      if (currentInputMethod === 'invisible') {
+        // Görünmez input - tek seferde tek harf girişi için
+        mobileInput.style.position = 'fixed';
+        mobileInput.style.opacity = '0';
+        mobileInput.style.pointerEvents = 'none';
+        mobileInput.style.width = '1px';
+        mobileInput.style.height = '1px';
+        mobileInput.style.left = '-9999px';
+        mobileInput.style.top = '0';
+        mobileInput.maxLength = 1;
+      }
       
-      document.body.appendChild(mobileInput);
+      // Input elemanını div içine sar
+      const inputContainer = document.createElement('div');
+      inputContainer.style.position = 'fixed';
+      inputContainer.style.bottom = '0';
+      inputContainer.style.left = '0';
+      inputContainer.style.right = '0';
+      inputContainer.style.zIndex = '100';
+      inputContainer.id = 'mobile-input-container';
       
-      // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
-      const debounce = (callback, delay) => {
-        let timerId;
-        return function(...args) {
-          clearTimeout(timerId);
-          timerId = setTimeout(() => {
-            callback.apply(this, args);
-          }, delay);
-        };
-      };
+      inputContainer.appendChild(mobileInput);
+      document.body.appendChild(inputContainer);
       
       // Harf giriş işlemi için debounce uygulanan fonksiyon
       const handleInput = debounce((e) => {
-        const char = e.target.value.toUpperCase();
-        
-        if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
-          addLetter(char);
-          playSound('keypress');
+        if (currentInputMethod === 'invisible') {
+          const char = e.target.value.toUpperCase();
+          if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
+            saveScrollPosition();
+            addLetter(char);
+            playSound('keypress');
+            restoreScrollPosition();
+          }
+          // İnputu temizle - bir sonraki harf girişi için hazırla
+          e.target.value = '';
         }
-        
-        // İnputu temizle - bir sonraki harf girişi için hazırla
-        e.target.value = '';
       }, 100);
       
       // Mobil input olayları - tek harf girişi
@@ -112,23 +142,42 @@ document.addEventListener('DOMContentLoaded', function() {
       const handleKeydown = debounce((e) => {
         if (e.key === 'Backspace') {
           e.preventDefault();
+          saveScrollPosition();
           deleteLetter();
           playSound('keypress');
+          restoreScrollPosition();
         } else if (e.key === 'Enter') {
           e.preventDefault();
+          saveScrollPosition();
           submitGuess();
+          restoreScrollPosition();
+          e.target.value = '';
         }
       }, 100);
       
       // Mobil input silme ve enter işlemleri
       mobileInput.addEventListener('keydown', handleKeydown);
+      
+      // Mobil klavyenin açılması ve kapanması olaylarını dinle
+      window.visualViewport.addEventListener('resize', () => {
+        setTimeout(() => {
+          wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }, 100);
+      });
+      
+      // Sayfa scroll olayında scroll pozisyonunu kaydet
+      window.addEventListener('scroll', saveScrollPosition);
     }
   }
   
   function focusMobileInput() {
     if (mobileInput && !gameState.isGameOver) {
+      saveScrollPosition();
       setTimeout(() => {
-        mobileInput.focus();
+        mobileInput.focus({preventScroll: true});
+        setTimeout(() => {
+          restoreScrollPosition();
+        }, 50);
       }, 50);
     }
   }
@@ -169,15 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru paylaş/kopyala butonları
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
-
-  // Klavye tuşu basımı için debounce fonksiyonu
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
   
   // Klavye tuşuna debounce uygula
   const debouncedKeypress = debounce(function(e) {
@@ -186,13 +226,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const key = e.key.toUpperCase();
     
     if (key === 'ENTER') {
+      saveScrollPosition();
       submitGuess();
+      restoreScrollPosition();
     } else if (key === 'BACKSPACE') {
+      saveScrollPosition();
       deleteLetter();
       playSound('keypress');
+      restoreScrollPosition();
     } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+      saveScrollPosition();
       addLetter(key);
       playSound('keypress');
+      restoreScrollPosition();
     }
   }, 100);
 
@@ -200,7 +246,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('keydown', debouncedKeypress);
   
   // Ekrana tıklama olayı - mobil input için
-  wordleGrid.addEventListener('click', focusMobileInput);
+  wordleGrid.addEventListener('click', function() {
+    focusMobileInput();
+    
+    // Eğer klavye açıksa, wordle grid'in görünür olduğundan emin ol
+    setTimeout(() => {
+      wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 300);
+  });
 
   /**
    * Oyunu başlatır
@@ -245,6 +298,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mobil klavye desteği ekle
     createMobileInput();
+    
+    // Sayfa pozisyonunu kaydet
+    saveScrollPosition();
+    
+    // Klavyeyi odakla
     focusMobileInput();
 
     // Ses efektlerini sıfırla
@@ -252,6 +310,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Oyun başlangıç sesi çal
     playSound('keypress');
+    
+    // Wordle grid'in görünür olduğundan emin ol
+    setTimeout(() => {
+      wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }, 300);
   }
 
   /**
@@ -762,4 +825,56 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
+  
+  // Sayfa tam yüklendiğinde wordle grid'in ortada görünmesini sağla
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (wordleGrid) {
+        wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+      }
+    }, 500);
+  });
+  
+  // Viewport değişimlerinde scroll pozisyonunu düzeltme
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (wordleGrid) {
+        setTimeout(() => {
+          wordleGrid.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }, 100);
+      }
+    });
+  }
+  
+  // CSS stil ekle - mobil cihazlarda sayfa kaymayı düzeltmek için
+  const style = document.createElement('style');
+  style.textContent = `
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    .wordle-grid {
+      position: relative;
+      z-index: 2;
+    }
+    
+    #mobile-input-container {
+      position: fixed;
+      z-index: 100;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    @media (max-width: 768px) {
+      .game-container {
+        padding-bottom: 50px; /* Klavye için ek alan */
+      }
+    }
+  `;
+  document.head.appendChild(style);
 });
