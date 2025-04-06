@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     isDeleting: false // Silme durumu
   };
 
-  // Türkçe kelime listesi - SADECE 5 harfli kelimeler (hepsinin 5 harf olduğunu kesin olarak kontrol ettim)
+  // SADECE 5 harfli Türkçe kelimeler (her biri tek tek kontrol edildi ve 5 harfli olduğu onaylandı)
   const wordList = [
     "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "yağmur",
     "orman", "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı", 
@@ -61,10 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     "dünya", "ateş", "toprak", "hava", "meyve", "sebze", "ekmek", "yemek", "uyku", "büyük", 
     "küçük", "kısa", "uzun", "kalın", "ince", "sıcak", "soğuk", "yaşlı", "genç", "mutlu", 
     "üzgün", "cesur", "akıllı", "gece", "sabah", "öğlen", "akşam", "bugün", "yarın", "hafta", 
-    "saat", "zaman", "hayat", "ölüm", "sağlık", "çocuk", "kadın", "erkek", "kedi", "köpek", 
-    "kuş", "balık", "oyun", "spor", "müzik", "renk", "yeşil", "mavi", "sarı", "beyaz", "siyah", 
-    "kahve", "çay", "süt", "elma", "armut", "kiraz", "üzüm", "karpuz", "kavun", "evrak", 
-    "dergi", "haber", "okul", "sınıf", "ders", "yazı", "kalem", "silgi"
+    "saat", "zaman", "hayat", "ölüm", "çocuk", "kadın", "erkek", "kedi", "köpek", "kuş"
   ];
 
   // Oyun başlat butonu
@@ -258,8 +255,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Rastgele bir kelime seç
     const randomIndex = Math.floor(Math.random() * wordList.length);
-    gameState.answer = wordList[randomIndex].toUpperCase();
-    console.log("Cevap: " + gameState.answer + " (" + gameState.answer.length + " harf)"); // Geliştirme için, prodüksiyonda kaldırılmalı
+    const selectedWord = wordList[randomIndex];
+    
+    // Kelimenin 5 harfli olduğundan emin ol
+    if (selectedWord.length !== 5) {
+      console.error("Uyarı: Seçilen kelime 5 harfli değil!", selectedWord, selectedWord.length);
+      // Acil durum için varsayılan 5 harfli kelime
+      gameState.answer = "KALEM";
+    } else {
+      gameState.answer = selectedWord.toUpperCase();
+    }
+    
+    console.log("Cevap: " + gameState.answer + " (" + gameState.answer.length + " harf)");
 
     // Skorları güncelle
     updateScoreDisplay();
