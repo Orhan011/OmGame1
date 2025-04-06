@@ -46,21 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
     hintsLeft: 3,
     soundEnabled: true,
     activeCellIndex: 0,  // Aktif hücre indeksi
-    isProcessingKey: false // Tuş işleme durumu
+    isProcessingKey: false, // Tuş işleme durumu
+    lastKeyTime: 0 // Son tuş basma zamanı
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
-    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
-    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
-    "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
-    "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
-    "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
-    "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
-    "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
-    "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
-    "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
-    "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "kuşlar",
+    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", 
+    "bina", "tablo", "masa", "koltuk", "yatak", "yastık", "halı", "perde", 
+    "lamba", "dolap", "musluk", "duvar", "bahçe", "çatı", "ateş", "toprak", 
+    "hava", "meyve", "sebze", "ekmek", "yemek", "uyku", "uzak", "yakın", 
+    "büyük", "küçük", "kısa", "uzun", "kalın", "ince", "sıcak", "soğuk",
+    "yaşlı", "genç", "mutlu", "üzgün", "gece", "sabah", "öğlen", "akşam", 
+    "bugün", "yarın", "hafta", "saat", "hayat", "ölüm", "sağlık"
   ];
 
   // Oyun başlat butonu
@@ -80,13 +79,29 @@ document.addEventListener('DOMContentLoaded', function() {
   shareScoreBtn.addEventListener('click', shareScore);
 
   // Tahmin gönder butonu
-  submitGuessBtn.addEventListener('click', function() {
+  submitGuessBtn.addEventListener('click', function(e) {
+    e.preventDefault(); // Sayfa kaydırmasını engelle
     submitGuess();
   });
 
   // Harf sil butonu
-  deleteLetterBtn.addEventListener('click', function() {
+  deleteLetterBtn.addEventListener('click', function(e) {
+    e.preventDefault(); // Sayfa kaydırmasını engelle
     deleteLetter();
+  });
+
+  // Kaydırma olayını engelle
+  submitGuessBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+  });
+  
+  deleteLetterBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+  });
+
+  // Karelere tıklama olayını engelle
+  wordleGrid.addEventListener('touchstart', function(e) {
+    e.preventDefault();
   });
 
   // Mobil kareye tıklandığında ve klavye açıldığında gizli inputu hazırla
@@ -95,63 +110,67 @@ document.addEventListener('DOMContentLoaded', function() {
     hiddenInput.value = '';
   });
   
-  // Tuş basma olaylarını dinle - özel metod ile harf girişini engelle
-  hiddenInput.addEventListener('keydown', function(e) {
+  // Tuş basma olayını doğrudan dinle
+  hiddenInput.addEventListener('input', function(e) {
     if (gameState.isGameOver) return;
     
     // Tuş basma olayını ele al
-    handleKeyDown(e);
+    const now = Date.now();
+    
+    // Çok hızlı ardışık tuşlamaları engellemek için
+    if (now - gameState.lastKeyTime < 100) {
+      e.preventDefault();
+      hiddenInput.value = '';
+      return;
+    }
+    
+    // Tuş girişini işle
+    if (e.target.value) {
+      const letter = e.target.value.toUpperCase();
+      
+      // Sadece harfler
+      if (/^[A-ZĞÜŞİÖÇ]$/i.test(letter)) {
+        addLetter(letter);
+        playSound('keypress');
+        
+        // Zaman bilgisini güncelle
+        gameState.lastKeyTime = now;
+      }
+      
+      // Input alanını temizle
+      e.target.value = '';
+    }
   });
 
   // Klavye tuşu basımı (doküman genelinde)
   document.addEventListener('keydown', function(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
     
-    // Tuş basma olayını ele al
-    handleKeyDown(e);
-  });
-
-  /**
-   * Tuş basma olayını işler
-   */
-  function handleKeyDown(e) {
-    // Eğer işleme yapılıyorsa, birden çok tuş basımı engelle
-    if (gameState.isProcessingKey) {
-      e.preventDefault();
-      return;
-    }
-    
     const key = e.key.toUpperCase();
     
     if (key === 'ENTER') {
+      e.preventDefault();
       submitGuess();
     } else if (key === 'BACKSPACE') {
+      e.preventDefault();
       deleteLetter();
       playSound('keypress');
-    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key) && key.length === 1) {
-      // İşleme durumunu başlat
-      gameState.isProcessingKey = true;
+    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+      e.preventDefault();
       
-      // Harfi ekle
+      // Çok hızlı ardışık tuşlamaları engellemek için
+      const now = Date.now();
+      if (now - gameState.lastKeyTime < 100) {
+        return;
+      }
+      
       addLetter(key);
-      
-      // Ses çal
       playSound('keypress');
       
-      // Kısa bir süre sonra işlemeyi serbest bırak
-      setTimeout(() => {
-        gameState.isProcessingKey = false;
-        
-        // Girdi alanını temizle
-        if (hiddenInput) {
-          hiddenInput.value = '';
-        }
-      }, 100);
-      
-      // Varsayılan davranışı engelle
-      e.preventDefault();
+      // Zaman bilgisini güncelle
+      gameState.lastKeyTime = now;
     }
-  }
+  });
 
   /**
    * Oyunu başlatır
@@ -175,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.hintsLeft = 3;
     gameState.activeCellIndex = 0;
     gameState.isProcessingKey = false;
+    gameState.lastKeyTime = 0;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -213,7 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.col = col;
         
         // Hücreye tıklama olayı
-        cell.addEventListener('click', function() {
+        cell.addEventListener('click', function(e) {
+          e.preventDefault(); // Sayfa kaydırmasını engelle
+          
           if (gameState.isGameOver) return;
           
           const clickedRow = parseInt(cell.dataset.row);
@@ -268,44 +290,24 @@ document.addEventListener('DOMContentLoaded', function() {
   function addLetter(letter) {
     if (gameState.isGameOver) return;
     
-    // Aktif hücre boşsa ve satır dolmadıysa harfi ekle
-    if (gameState.currentCol < 5 && gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '') {
+    // Aktif hücre boşsa harfi ekle
+    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '') {
       // Aktif hücreye harfi yerleştir
       gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = letter;
       
       // Dolu hücre sayısını güncelle
-      gameState.currentCol = Math.max(gameState.currentCol, countFilledCells());
+      gameState.currentCol = countFilledCells();
       
       // Bir sonraki boş hücreye geç
-      advanceToNextEmptyCell();
+      if (gameState.currentCol < 5) {
+        // 5'den küçükse aktif hücreyi ilerlet
+        gameState.activeCellIndex = (gameState.activeCellIndex + 1) % 5;
+      }
       
       // Izgarayı güncelle
       updateGrid();
       highlightActiveCell();
     }
-  }
-  
-  /**
-   * Bir sonraki boş hücreye geçer
-   */
-  function advanceToNextEmptyCell() {
-    // Başlangıç hücresi olarak aktif indeksin bir sonraki hücresine bak
-    let nextIndex = (gameState.activeCellIndex + 1) % 5;
-    
-    // 5 hücreyi kontrol et (tüm satırı)
-    for (let i = 0; i < 5; i++) {
-      // Bu hücre boşsa, aktif hücre olarak ayarla
-      if (gameState.guesses[gameState.currentRow][nextIndex] === '') {
-        gameState.activeCellIndex = nextIndex;
-        return;
-      }
-      
-      // Sonraki hücreye geç (döngüsel olarak)
-      nextIndex = (nextIndex + 1) % 5;
-    }
-    
-    // Eğer tüm hücreler doluysa, son hücreyi aktif yap
-    gameState.activeCellIndex = 4;
   }
 
   /**
@@ -314,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function countFilledCells() {
     let count = 0;
     for (let i = 0; i < 5; i++) {
-      if (gameState.guesses[gameState.currentRow][i] !== '') {
+      if (gameState.guesses[gameState.currentRow] && gameState.guesses[gameState.currentRow][i]) {
         count++;
       }
     }
@@ -334,7 +336,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Aktif hücredeki harfi sil
     if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '') {
+      // Sadece bir harf sil
       gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
+      
+      // Dolu hücre sayısını güncelle
       gameState.currentCol = countFilledCells();
       
       // Izgarayı güncelle
@@ -463,12 +468,19 @@ document.addEventListener('DOMContentLoaded', function() {
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 5; col++) {
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
-        cell.textContent = gameState.guesses[row][col];
         
-        // Hücre dolu mu kontrol et
-        if (gameState.guesses[row][col]) {
-          cell.classList.add('filled');
+        // Hücre değerini güncelle (hata kontrolü ile)
+        if (gameState.guesses[row] && gameState.guesses[row][col] !== undefined) {
+          cell.textContent = gameState.guesses[row][col];
+          
+          // Hücre dolu mu kontrol et
+          if (gameState.guesses[row][col]) {
+            cell.classList.add('filled');
+          } else {
+            cell.classList.remove('filled');
+          }
         } else {
+          cell.textContent = '';
           cell.classList.remove('filled');
         }
         
@@ -560,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mevcut satırdaki dolu ve boş hücreleri bul
     for (let i = 0; i < 5; i++) {
-      if (gameState.guesses[gameState.currentRow][i]) {
+      if (gameState.guesses[gameState.currentRow] && gameState.guesses[gameState.currentRow][i]) {
         filledCount++;
       } else {
         emptyIndices.push(i);
@@ -584,8 +596,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Izgarayı güncelle
     updateGrid();
     
-    // Aktivasyon indeksini güncelle
-    advanceToNextEmptyCell();
+    // Dolu hücre sayısını güncelle
+    gameState.currentCol = countFilledCells();
+    
+    // Sonraki boş hücreye geç
+    if (gameState.currentCol < 5) {
+      for (let i = 0; i < 5; i++) {
+        if (!gameState.guesses[gameState.currentRow][i]) {
+          gameState.activeCellIndex = i;
+          break;
+        }
+      }
+    }
+    
+    // Aktif hücreyi vurgula
     highlightActiveCell();
     
     // İpucu sesi çal
