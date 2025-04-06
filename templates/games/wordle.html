@@ -2,25 +2,6 @@
 
 {% block title %}Wordle - Kelime Tahmin Oyunu{% endblock %}
 
-{% block extra_head %}
-<!-- Mobil cihazlarda düzgün çalışması için viewport ayarları -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<!-- Mobil cihazlarda input odaklandığında sayfanın büyütülmesini engelleme -->
-<style>
-  html, body {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    touch-action: manipulation;
-  }
-  
-  input, textarea {
-    font-size: 16px; /* 16px'den küçük olursa iOS otomatik zoom yapıyor */
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center">Wordle</h1>
