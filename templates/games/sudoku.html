@@ -1,14 +1,10 @@
+
 {% extends "layout.html" %}
 
 {% block title %}Sudoku{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sudoku.css') }}">
-<style>
-  .selector-label, .sudoku-title {
-    color: var(--accent-color, #6a5ae0);
-  }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -16,14 +12,13 @@
   <div class="row mb-4">
     <div class="col text-center">
       <h1 class="display-4 game-title">Sudoku</h1>
-      <p class="lead">Mantık becerinizi geliştirin, her satır, sütun ve 3x3 bölgede 1-9 arasındaki sayıları yerleştirin.</p>
+      <p class="lead">Her satır, sütun ve 3x3 bölgede 1-9 arasındaki sayıları yerleştirin.</p>
     </div>
   </div>
 
   <div class="row">
     <div class="col-lg-8 mx-auto">
       <div class="sudoku-container">
-        <!-- Zorluk seçim ve oyun kontrolları -->
         <div class="sudoku-controls">
           <div class="difficulty-selector">
             <button class="difficulty-btn active" data-difficulty="easy">Kolay</button>
@@ -31,12 +26,12 @@
             <button class="difficulty-btn" data-difficulty="hard">Zor</button>
           </div>
           <div class="game-actions">
-            <button class="action-btn new-game"><i class="fas fa-redo me-1"></i>Yeni Oyun</button>
-            <button class="action-btn hint"><i class="fas fa-lightbulb me-1"></i>İpucu</button>
+            <button class="action-btn new-game"><i class="fas fa-redo"></i> Yeni Oyun</button>
+            <button class="action-btn hint"><i class="fas fa-lightbulb"></i> İpucu</button>
+            <button class="action-btn pause"><i class="fas fa-pause"></i> Duraklat</button>
           </div>
         </div>
 
-        <!-- Oyun bilgileri -->
         <div class="game-info">
           <div class="info-item">
             <div class="info-label">Süre</div>
@@ -50,9 +45,12 @@
             <div class="info-label">Durum</div>
             <div class="info-value status">Devam Ediyor</div>
           </div>
+          <div class="info-item">
+            <div class="info-label">İpucu</div>
+            <div class="info-value hints">3</div>
+          </div>
         </div>
 
-        <!-- Sudoku tahtası -->
         <div class="sudoku-board" id="sudoku-board"></div>
 
         <div class="sudoku-numpad">
@@ -65,10 +63,10 @@
           <button class="numpad-btn" data-num="7">7</button>
           <button class="numpad-btn" data-num="8">8</button>
           <button class="numpad-btn" data-num="9">9</button>
-          <button id="notes-toggle" class="numpad-btn tool notes">
-            <i class="fas fa-pencil-alt"></i> Notlar (Kapalı)
+          <button class="numpad-btn tool notes" id="notes-toggle">
+            <i class="fas fa-pencil-alt"></i> Notlar
           </button>
-          <button id="erase" class="numpad-btn tool erase">
+          <button class="numpad-btn tool erase" id="erase">
             <i class="fas fa-eraser"></i> Sil
           </button>
         </div>
@@ -77,23 +75,26 @@
   </div>
 </div>
 
-<!-- Alert mesajları için konteyner -->
-<div class="sudoku-alert success" id="success-alert"></div>
-<div class="sudoku-alert error" id="error-alert"></div>
-<div class="sudoku-alert info" id="info-alert"></div>
-
-<!-- Pause Menu -->
-<div class="pause-menu-overlay" id="pause-menu" style="display: none;">
-  <div class="pause-menu-content">
-    <h2 class="pause-title">Oyun Duraklatıldı</h2>
-    <p class="pause-description">Oyuna devam etmek için aşağıdaki seçeneklerden birini seçin.</p>
-    <div class="pause-menu-buttons">
-      <button id="resume-game" class="btn btn-primary">Oyuna Devam Et</button>
-      <button id="restart-game" class="btn btn-warning">Yeni Oyun Başlat</button>
-      <button id="exit-game" class="btn btn-danger">Oyundan Çık</button>
+<div class="modal fade" id="pause-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Oyun Duraklatıldı</h5>
+      </div>
+      <div class="modal-body">
+        <div class="pause-menu-buttons">
+          <button class="btn btn-primary resume-game">Devam Et</button>
+          <button class="btn btn-warning new-game">Yeni Oyun</button>
+          <button class="btn btn-danger exit-game">Çıkış</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<div id="success-alert" class="game-alert success"></div>
+<div id="error-alert" class="game-alert error"></div>
+<div id="info-alert" class="game-alert info"></div>
 {% endblock %}
 
 {% block scripts %}
