@@ -619,3 +619,640 @@
   }
 </style>
 {% endblock %}
+{% extends 'layout.html' %}
+
+{% block title %}Yazma Hızı - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>Yazma Hızı <span class="badge">Klavye Hızı Testi</span></h1>
+      <p class="game-description">Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin.</p>
+    </div>
+
+    <div class="typing-game-container">
+      <div class="typing-stats">
+        <div class="stat-item">
+          <div class="stat-label">Süre</div>
+          <div class="stat-value" id="time">60</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">WPM</div>
+          <div class="stat-value" id="wpm">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Doğruluk</div>
+          <div class="stat-value" id="accuracy">100%</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Yazılanlar</div>
+          <div class="stat-value" id="typed-count">0</div>
+        </div>
+      </div>
+
+      <div class="typing-content">
+        <div class="typing-text" id="typing-text"></div>
+        <div class="typing-cursor" id="typing-cursor"></div>
+      </div>
+
+      <textarea id="typing-input" class="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
+      <div class="typing-controls">
+        <button id="start-test" class="btn btn-primary">
+          <i class="fas fa-play me-2"></i>Başlat
+        </button>
+        <button id="restart-test" class="btn btn-warning" disabled>
+          <i class="fas fa-redo-alt me-2"></i>Yeniden Başlat
+        </button>
+        <div class="typing-settings">
+          <label for="time-select">Süre:</label>
+          <select id="time-select" class="form-select">
+            <option value="30">30 saniye</option>
+            <option value="60" selected>1 dakika</option>
+            <option value="120">2 dakika</option>
+            <option value="300">5 dakika</option>
+          </select>
+          
+          <label for="text-type" class="ms-3">İçerik:</label>
+          <select id="text-type" class="form-select">
+            <option value="paragraphs" selected>Paragraflar</option>
+            <option value="quotes">Alıntılar</option>
+            <option value="code">Kod</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="game-instructions mt-4">
+        <h4 class="instruction-title"><i class="fas fa-info-circle"></i>Nasıl Oynanır?</h4>
+        <ul class="instruction-list">
+          <li>Başlat düğmesine basın ve ekranda görüntülenen metni doğru bir şekilde yazmaya başlayın.</li>
+          <li>Test süresince yazım hatalarınız kırmızı ile gösterilecek.</li>
+          <li>WPM (Dakikada Kelime) ve doğruluk oranınız gerçek zamanlı olarak hesaplanacak.</li>
+          <li>Süre dolduğunda, detaylı sonuçlarınızı göreceksiniz.</li>
+          <li>Farklı süre seçenekleri ve içerik türleri arasından seçim yapabilirsiniz.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="results-container" class="memory-results-container" style="display: none;">
+      <div class="memory-results-header">
+        <h2><i class="fas fa-trophy me-2"></i>Test Sonuçları</h2>
+        <p>Tebrikler! İşte performansınız:</p>
+      </div>
+      
+      <div class="memory-results-stats">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="memory-stat-item">
+              <div class="memory-stat-value" id="result-wpm">0</div>
+              <div class="memory-stat-label">WPM (Kelime/Dk)</div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="memory-stat-item">
+              <div class="memory-stat-value" id="result-accuracy">0%</div>
+              <div class="memory-stat-label">Doğruluk</div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="memory-stat-item">
+              <div class="memory-stat-value" id="result-characters">0</div>
+              <div class="memory-stat-label">Toplam Karakter</div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="memory-stat-item">
+              <div class="memory-stat-value" id="result-errors">0</div>
+              <div class="memory-stat-label">Hatalar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="memory-results-details">
+        <div class="details-row">
+          <div class="details-label">Doğru Kelimeler:</div>
+          <div class="details-value" id="result-correct-words">0</div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Yanlış Kelimeler:</div>
+          <div class="details-value" id="result-wrong-words">0</div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Doğru Karakterler:</div>
+          <div class="details-value" id="result-correct-chars">0</div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Test Süresi:</div>
+          <div class="details-value" id="result-time">60 saniye</div>
+        </div>
+      </div>
+      
+      <div class="memory-results-footer">
+        <button id="play-again" class="btn btn-primary btn-lg">
+          <i class="fas fa-redo-alt me-2"></i>Tekrar Dene
+        </button>
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
+          <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .typing-game-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .typing-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .stat-item {
+    background: rgba(40, 40, 80, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    width: 22%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+  }
+  
+  .typing-content {
+    background: rgba(30, 30, 60, 0.6);
+    border-radius: 10px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .typing-text {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.7);
+    user-select: none;
+  }
+  
+  .typing-text span {
+    position: relative;
+  }
+  
+  .typing-text span.correct {
+    color: #6a5ae0;
+  }
+  
+  .typing-text span.incorrect {
+    color: #ff4757;
+    text-decoration: underline;
+  }
+  
+  .typing-text span.active {
+    background-color: rgba(106, 90, 224, 0.3);
+    border-radius: 2px;
+  }
+  
+  .typing-cursor {
+    position: absolute;
+    background-color: #6a5ae0;
+    width: 2px;
+    height: 24px;
+    display: none;
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  .typing-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .typing-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .typing-settings {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+  
+  .typing-settings select {
+    width: auto;
+    margin-left: 8px;
+    background: rgba(40, 40, 80, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+  }
+  
+  .memory-results-details {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .details-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .details-row:last-child {
+    border-bottom: none;
+  }
+  
+  .details-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .details-value {
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  @media (max-width: 768px) {
+    .stat-item {
+      width: 48%;
+      margin-bottom: 10px;
+    }
+    
+    .typing-settings {
+      margin-left: 0;
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const typingText = document.getElementById('typing-text');
+  const typingInput = document.getElementById('typing-input');
+  const typingCursor = document.getElementById('typing-cursor');
+  const timeElement = document.getElementById('time');
+  const wpmElement = document.getElementById('wpm');
+  const accuracyElement = document.getElementById('accuracy');
+  const typedCountElement = document.getElementById('typed-count');
+  
+  const startTestBtn = document.getElementById('start-test');
+  const restartTestBtn = document.getElementById('restart-test');
+  const timeSelect = document.getElementById('time-select');
+  const textTypeSelect = document.getElementById('text-type');
+  
+  const resultsContainer = document.getElementById('results-container');
+  const resultWpm = document.getElementById('result-wpm');
+  const resultAccuracy = document.getElementById('result-accuracy');
+  const resultCharacters = document.getElementById('result-characters');
+  const resultErrors = document.getElementById('result-errors');
+  const resultCorrectWords = document.getElementById('result-correct-words');
+  const resultWrongWords = document.getElementById('result-wrong-words');
+  const resultCorrectChars = document.getElementById('result-correct-chars');
+  const resultTime = document.getElementById('result-time');
+  const playAgainBtn = document.getElementById('play-again');
+  
+  let time = parseInt(timeSelect.value);
+  let timer = null;
+  let timeLeft = time;
+  let charIndex = 0;
+  let mistakes = 0;
+  let isTyping = false;
+  
+  let correctWords = 0;
+  let wrongWords = 0;
+  let totalChars = 0;
+  let correctChars = 0;
+
+  // Sample paragraphs for typing test
+  const paragraphs = [
+    "Bilim insanları, beyin egzersizlerinin zihinsel sağlık üzerindeki olumlu etkilerini araştırırken, düzenli bilişsel aktivitenin yaşlanmayla ilişkili bilişsel gerilemeyi yavaşlatabileceğini keşfettiler. Bu bulgu, özellikle hafıza ve problem çözme becerilerinin korunması açısından önemlidir. Çalışmalar, günlük olarak yapılan beyin jimnastiği egzersizlerinin, yeni nöral bağlantıların oluşmasını teşvik ederek beyin plastisitesini artırdığını göstermektedir.",
+    "Yazma hızı testleri, sadece klavye becerinizi ölçmekle kalmaz, aynı zamanda odaklanma ve el-göz koordinasyonunuzu da geliştirir. Düzenli pratik yaparak, bilinçaltı seviyesinde parmak hareketlerinizi otomatikleştirirsiniz. Bu, bilgisayar başında çalışan herkes için değerli bir beceridir. Profesyonel yazarlar ve programcılar, verimliliklerini artırmak için sürekli olarak yazma hızlarını geliştirmeye çalışırlar.",
+    "İnsan beyni yaklaşık 86 milyar nörondan oluşur ve bu nöronlar arasında trilyonlarca bağlantı bulunur. Her yeni öğrenme deneyimi, yeni sinaptik bağlantıların oluşmasını sağlar. Beynimiz sürekli olarak kendini yeniden yapılandırabilme yeteneğine sahiptir, bu özelliğe nöroplastisite denir. Yaşımız ilerledikçe bile, düzenli zihinsel egzersizler yaparak bilişsel fonksiyonlarımızı koruyabilir ve geliştirebiliriz.",
+    "Modern teknoloji hayatımızı kolaylaştırırken, bazı bilişsel becerilerimizin zayıflamasına da neden olabilir. Örneğin, GPS kullanımı yön bulma becerimizi, hesap makineleri ise mental aritmetik yeteneğimizi etkileyebilir. Ancak bilinçli bir şekilde teknoloji kullanımını dengeleyerek ve düzenli zihinsel egzersizler yaparak, bu becerileri korumak mümkündür. ZekaPark gibi platformlar, tam da bu dengeyi sağlamak için tasarlanmıştır."
+  ];
+  
+  // Sample quotes for typing test
+  const quotes = [
+    "Hayatta en hakiki mürşit ilimdir, fendir. - Mustafa Kemal Atatürk",
+    "Bir kitap, uygarlığın değerli mirasıdır. - W. Somerset Maugham",
+    "Düşünmek zor iştir; bu sebeple pek çok kişi yargılamayı tercih eder. - Henry Ford",
+    "Zeki insanlar çözümleri, akıllı insanlar sorunları tartışır. - Elbert Hubbard",
+    "Bilgi güçtür. - Francis Bacon",
+    "İnsan aklındaki sınırlar, genellikle gerçek sınırlar değildir. - Og Mandino",
+    "Eğitim, zihninizdeki karanlığı aydınlığa çevirme sanatıdır. - Bill Beattie",
+    "Asla öğrenmeyi bırakmayan kişi asla yaşlanmaz. - Leonardo Da Vinci"
+  ];
+  
+  // Sample code snippets for typing test
+  const code = [
+    "function calculateFactorial(n) {\n  if (n === 0 || n === 1) {\n    return 1;\n  }\n  return n * calculateFactorial(n - 1);\n}",
+    "const isPalindrome = (str) => {\n  const cleanStr = str.toLowerCase().replace(/[^a-z0-9]/g, '');\n  return cleanStr === cleanStr.split('').reverse().join('');\n}",
+    "class Node {\n  constructor(value) {\n    this.value = value;\n    this.left = null;\n    this.right = null;\n  }\n}",
+    "function quickSort(arr) {\n  if (arr.length <= 1) return arr;\n  const pivot = arr[0];\n  const left = arr.slice(1).filter(x => x < pivot);\n  const right = arr.slice(1).filter(x => x >= pivot);\n  return [...quickSort(left), pivot, ...quickSort(right)];\n}"
+  ];
+  
+  // Function to get random text based on selected type
+  function getRandomText() {
+    const textType = textTypeSelect.value;
+    let texts;
+    
+    switch(textType) {
+      case 'quotes':
+        texts = quotes;
+        break;
+      case 'code':
+        texts = code;
+        break;
+      default:
+        texts = paragraphs;
+    }
+    
+    return texts[Math.floor(Math.random() * texts.length)];
+  }
+  
+  // Function to load a new text for typing
+  function loadText() {
+    const text = getRandomText();
+    typingText.innerHTML = '';
+    
+    // Split the text into characters and create spans for each
+    text.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      typingText.appendChild(span);
+    });
+    
+    // Set active class to the first character
+    typingText.querySelectorAll('span')[0].classList.add('active');
+    
+    // Set up event listeners
+    document.addEventListener('keydown', handleKeyPress);
+    typingText.addEventListener('click', () => typingInput.focus());
+    
+    // Set cursor
+    updateCursorPosition();
+    
+    // Reset stats
+    charIndex = 0;
+    mistakes = 0;
+    timeLeft = time;
+    isTyping = false;
+    
+    timeElement.textContent = timeLeft;
+    wpmElement.textContent = 0;
+    accuracyElement.textContent = '100%';
+    typedCountElement.textContent = 0;
+    
+    // Reset results
+    correctWords = 0;
+    wrongWords = 0;
+    totalChars = 0;
+    correctChars = 0;
+  }
+  
+  // Function to update cursor position
+  function updateCursorPosition() {
+    if (charIndex < typingText.children.length) {
+      const activeChar = typingText.children[charIndex];
+      const rect = activeChar.getBoundingClientRect();
+      const textRect = typingText.getBoundingClientRect();
+      
+      typingCursor.style.left = `${activeChar.offsetLeft}px`;
+      typingCursor.style.top = `${activeChar.offsetTop}px`;
+      typingCursor.style.display = 'block';
+      
+      // Scroll text if necessary
+      if (activeChar.offsetTop > 150) {
+        const scrollAmount = activeChar.offsetTop - 50;
+        typingText.style.transform = `translateY(-${scrollAmount}px)`;
+      }
+    } else {
+      typingCursor.style.display = 'none';
+    }
+  }
+  
+  // Function to handle key presses
+  function handleKeyPress(e) {
+    if (!isTyping && e.key !== 'Tab') {
+      isTyping = true;
+      timer = setInterval(initTimer, 1000);
+    }
+    
+    const characters = typingText.querySelectorAll('span');
+    
+    // Handle backspace
+    if (e.key === 'Backspace' && charIndex > 0) {
+      charIndex--;
+      
+      if (characters[charIndex].classList.contains('incorrect')) {
+        mistakes--;
+      }
+      
+      characters[charIndex].classList.remove('correct', 'incorrect');
+      characters.forEach(span => span.classList.remove('active'));
+      if (charIndex < characters.length) {
+        characters[charIndex].classList.add('active');
+      }
+      
+      updateCursorPosition();
+      updateStats();
+      return;
+    }
+    
+    // Only process if it's a printable character
+    if (e.key.length !== 1) return;
+    
+    // If we've reached the end of the text
+    if (charIndex >= characters.length) return;
+    
+    totalChars++;
+    
+    // Check if the key pressed matches the current character
+    if (e.key === characters[charIndex].innerText) {
+      characters[charIndex].classList.add('correct');
+      correctChars++;
+      
+      // Check if this completes a word
+      if (e.key === ' ' || charIndex === characters.length - 1 || 
+          (characters[charIndex + 1] && /\s/.test(characters[charIndex + 1].innerText))) {
+        // Check if the completed word has any mistakes
+        let wordHasMistake = false;
+        let wordStart = charIndex;
+        
+        // Find start of the word
+        while (wordStart > 0 && !/\s/.test(characters[wordStart - 1].innerText)) {
+          wordStart--;
+        }
+        
+        // Check for mistakes in the word
+        for (let i = wordStart; i <= charIndex; i++) {
+          if (characters[i].classList.contains('incorrect')) {
+            wordHasMistake = true;
+            break;
+          }
+        }
+        
+        if (wordHasMistake) {
+          wrongWords++;
+        } else {
+          correctWords++;
+        }
+      }
+    } else {
+      characters[charIndex].classList.add('incorrect');
+      mistakes++;
+    }
+    
+    // Move to the next character
+    characters.forEach(span => span.classList.remove('active'));
+    charIndex++;
+    if (charIndex < characters.length) {
+      characters[charIndex].classList.add('active');
+    }
+    
+    updateCursorPosition();
+    updateStats();
+  }
+  
+  // Function to update statistics
+  function updateStats() {
+    // Calculate WPM: (characters typed / 5) / minutes elapsed
+    const timeElapsed = (time - timeLeft) / 60; // convert to minutes
+    const wpm = timeElapsed > 0 
+      ? Math.round(((charIndex - mistakes) / 5) / timeElapsed) 
+      : 0;
+    
+    // Calculate accuracy
+    const accuracy = charIndex > 0 
+      ? Math.round(((charIndex - mistakes) / charIndex) * 100) 
+      : 100;
+    
+    // Update display
+    wpmElement.textContent = wpm;
+    accuracyElement.textContent = `${accuracy}%`;
+    typedCountElement.textContent = charIndex;
+  }
+  
+  // Function to initialize the timer
+  function initTimer() {
+    if (timeLeft > 0) {
+      timeLeft--;
+      timeElement.textContent = timeLeft;
+      
+      // Update WPM in real-time
+      updateStats();
+    } else {
+      clearInterval(timer);
+      endTest();
+    }
+  }
+  
+  // Function to end the test
+  function endTest() {
+    // Calculate final stats
+    const timeElapsed = time / 60; // convert to minutes
+    const wpm = Math.round(((charIndex - mistakes) / 5) / timeElapsed);
+    const accuracy = charIndex > 0 
+      ? Math.round(((charIndex - mistakes) / charIndex) * 100) 
+      : 100;
+    
+    // Update results
+    resultWpm.textContent = wpm;
+    resultAccuracy.textContent = `${accuracy}%`;
+    resultCharacters.textContent = charIndex;
+    resultErrors.textContent = mistakes;
+    resultCorrectWords.textContent = correctWords;
+    resultWrongWords.textContent = wrongWords;
+    resultCorrectChars.textContent = correctChars;
+    resultTime.textContent = `${time} saniye`;
+    
+    // Show results
+    document.querySelector('.typing-game-container').style.display = 'none';
+    resultsContainer.style.display = 'block';
+    
+    // Remove key event listener
+    document.removeEventListener('keydown', handleKeyPress);
+  }
+  
+  // Event Listeners
+  startTestBtn.addEventListener('click', function() {
+    loadText();
+    typingInput.focus();
+    startTestBtn.disabled = true;
+    restartTestBtn.disabled = false;
+    typingCursor.style.display = 'block';
+  });
+  
+  restartTestBtn.addEventListener('click', function() {
+    clearInterval(timer);
+    loadText();
+    typingInput.focus();
+  });
+  
+  timeSelect.addEventListener('change', function() {
+    time = parseInt(timeSelect.value);
+    timeLeft = time;
+    timeElement.textContent = time;
+  });
+  
+  textTypeSelect.addEventListener('change', function() {
+    if (isTyping) {
+      clearInterval(timer);
+      loadText();
+      isTyping = false;
+    }
+  });
+  
+  playAgainBtn.addEventListener('click', function() {
+    resultsContainer.style.display = 'none';
+    document.querySelector('.typing-game-container').style.display = 'block';
+    loadText();
+    startTestBtn.disabled = true;
+    restartTestBtn.disabled = false;
+    typingInput.focus();
+  });
+  
+  // Initialize the typing test
+  loadText();
+});
+</script>
+{% endblock %}

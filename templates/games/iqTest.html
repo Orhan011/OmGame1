@@ -458,3 +458,953 @@
   }
 </style>
 {% endblock %}
+{% extends 'layout.html' %}
+
+{% block title %}IQ Test - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>IQ Test <span class="badge">Zeka ve Mantık</span></h1>
+      <p class="game-description">Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin.</p>
+    </div>
+
+    <div class="iq-test-container">
+      <div id="test-intro" class="test-section">
+        <div class="intro-content">
+          <h2>IQ Test'e Hoş Geldiniz</h2>
+          <p>Bu test, mantıksal düşünme, görsel algı, sayısal akıl yürütme ve sözel anlama becerilerinizi ölçer.</p>
+          
+          <div class="test-info">
+            <div class="info-item">
+              <i class="fas fa-question-circle"></i>
+              <div class="info-text">
+                <h4>30 Soru</h4>
+                <p>4 farklı kategoriden toplam 30 soru</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <div class="info-text">
+                <h4>30 Dakika</h4>
+                <p>Test süresince 30 dakikanız var</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-brain"></i>
+              <div class="info-text">
+                <h4>IQ Skoru</h4>
+                <p>Test sonunda IQ skorunuzu göreceksiniz</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="test-categories">
+            <h3>Test Kategorileri</h3>
+            <div class="category-grid">
+              <div class="category-item">
+                <div class="category-icon">
+                  <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <h4>Mantıksal Düşünme</h4>
+                <p>Örüntü tanıma ve mantıksal akıl yürütme</p>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">
+                  <i class="fas fa-eye"></i>
+                </div>
+                <h4>Görsel-Uzamsal</h4>
+                <p>Görsel algı ve uzamsal düşünme</p>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">
+                  <i class="fas fa-calculator"></i>
+                </div>
+                <h4>Sayısal Akıl Yürütme</h4>
+                <p>Matematiksel ve sayısal ilişkiler</p>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">
+                  <i class="fas fa-book"></i>
+                </div>
+                <h4>Sözel Anlama</h4>
+                <p>Dil becerileri ve sözel mantık</p>
+              </div>
+            </div>
+          </div>
+          
+          <button id="start-test" class="btn btn-primary btn-lg">
+            <i class="fas fa-play me-2"></i>Teste Başla
+          </button>
+        </div>
+      </div>
+      
+      <div id="test-container" class="test-section" style="display: none;">
+        <div class="test-header">
+          <div class="progress-container">
+            <div class="progress-info">
+              <span class="question-count">Soru <span id="current-question">1</span>/<span id="total-questions">30</span></span>
+              <span class="timer" id="timer">30:00</span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar" id="progress-bar" style="width: 3%;"></div>
+            </div>
+          </div>
+          <div class="category-badge" id="question-category">Mantıksal Düşünme</div>
+        </div>
+        
+        <div class="question-container">
+          <div class="question-text" id="question-text">
+            <!-- Soru metni buraya gelecek -->
+          </div>
+          
+          <div class="question-image-container" id="question-image-container" style="display: none;">
+            <img id="question-image" src="" alt="IQ Test Sorusu">
+          </div>
+          
+          <div class="options-container" id="options-container">
+            <!-- Seçenekler buraya gelecek -->
+          </div>
+        </div>
+        
+        <div class="question-navigation">
+          <button id="prev-question" class="btn btn-outline-primary" disabled>
+            <i class="fas fa-arrow-left me-2"></i>Önceki Soru
+          </button>
+          <button id="next-question" class="btn btn-primary">
+            <i class="fas fa-arrow-right me-2"></i>Sonraki Soru
+          </button>
+        </div>
+      </div>
+      
+      <div id="test-results" class="test-section" style="display: none;">
+        <div class="results-header">
+          <h2><i class="fas fa-award me-2"></i>Test Sonuçları</h2>
+          <p>Tebrikler! IQ testini tamamladınız. İşte sonuçlarınız:</p>
+        </div>
+        
+        <div class="iq-score-container">
+          <div class="iq-score-display">
+            <div class="iq-score" id="iq-score">115</div>
+            <div class="iq-label">IQ Skoru</div>
+          </div>
+          
+          <div class="iq-description" id="iq-description">
+            <!-- IQ açıklaması buraya gelecek -->
+          </div>
+        </div>
+        
+        <div class="category-scores">
+          <h3>Kategori Performansı</h3>
+          <div class="category-scores-grid">
+            <!-- Kategori skorları buraya gelecek -->
+          </div>
+        </div>
+        
+        <div class="test-results-actions">
+          <button id="restart-test" class="btn btn-primary btn-lg">
+            <i class="fas fa-redo-alt me-2"></i>Testi Tekrarla
+          </button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .iq-test-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .test-section {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .intro-content {
+    text-align: center;
+  }
+  
+  .intro-content h2 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  
+  .intro-content p {
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 700px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .test-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    padding: 15px;
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    width: 250px;
+    transition: all 0.3s ease;
+  }
+  
+  .info-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .info-item i {
+    font-size: 2rem;
+    margin-right: 15px;
+    color: var(--accent-color);
+  }
+  
+  .info-text h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1rem;
+  }
+  
+  .info-text p {
+    margin: 5px 0 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+  
+  .test-categories {
+    margin-bottom: 40px;
+  }
+  
+  .test-categories h3 {
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 1.4rem;
+  }
+  
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .category-item {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .category-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .category-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(106, 90, 224, 0.2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 15px;
+  }
+  
+  .category-icon i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+  }
+  
+  .category-item h4 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: 1rem;
+  }
+  
+  .category-item p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+  }
+  
+  #start-test {
+    margin-top: 20px;
+    padding: 12px 30px;
+  }
+  
+  /* Test Container Styles */
+  .test-header {
+    margin-bottom: 30px;
+  }
+  
+  .progress-container {
+    margin-bottom: 15px;
+  }
+  
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .question-count {
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  .timer {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+  
+  .progress {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #6a5ae0, #a890ff);
+    transition: width 0.3s ease;
+  }
+  
+  .category-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    background: rgba(106, 90, 224, 0.3);
+    color: #ddd;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  .question-container {
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+  
+  .question-text {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .question-image-container {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  #question-image {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .options-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .option {
+    background: rgba(40, 40, 70, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(50, 50, 90, 0.8);
+  }
+  
+  .option.selected {
+    background: rgba(106, 90, 224, 0.4);
+    border-color: rgba(106, 90, 224, 0.8);
+  }
+  
+  .option-label {
+    display: flex;
+    align-items: center;
+  }
+  
+  .option-marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .option.selected .option-marker {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+  }
+  
+  .option-text {
+    color: #fff;
+    font-size: 1rem;
+  }
+  
+  .question-navigation {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Results Styles */
+  .results-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .results-header h2 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+  }
+  
+  .iq-score-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .iq-score-display {
+    text-align: center;
+  }
+  
+  .iq-score {
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-shadow: 0 0 20px rgba(106, 90, 224, 0.5);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  
+  .iq-label {
+    font-size: 1.2rem;
+    color: #fff;
+  }
+  
+  .iq-description {
+    flex: 1;
+    min-width: 300px;
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+  }
+  
+  .category-scores {
+    margin-bottom: 40px;
+  }
+  
+  .category-scores h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  
+  .category-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .category-score-item {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .category-score-name {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+  }
+  
+  .category-score-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+  }
+  
+  .category-score-percent {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .test-results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elements
+  const testIntro = document.getElementById('test-intro');
+  const testContainer = document.getElementById('test-container');
+  const testResults = document.getElementById('test-results');
+  
+  const startTestBtn = document.getElementById('start-test');
+  const questionCategory = document.getElementById('question-category');
+  const questionText = document.getElementById('question-text');
+  const questionImageContainer = document.getElementById('question-image-container');
+  const questionImage = document.getElementById('question-image');
+  const optionsContainer = document.getElementById('options-container');
+  const currentQuestionElem = document.getElementById('current-question');
+  const totalQuestionsElem = document.getElementById('total-questions');
+  const progressBar = document.getElementById('progress-bar');
+  const prevQuestionBtn = document.getElementById('prev-question');
+  const nextQuestionBtn = document.getElementById('next-question');
+  const timerElem = document.getElementById('timer');
+  
+  const iqScoreElem = document.getElementById('iq-score');
+  const iqDescriptionElem = document.getElementById('iq-description');
+  const categoryScoresGrid = document.querySelector('.category-scores-grid');
+  const restartTestBtn = document.getElementById('restart-test');
+  
+  // Test Configuration
+  const categories = [
+    { id: 'logical', name: 'Mantıksal Düşünme', icon: 'puzzle-piece' },
+    { id: 'visual', name: 'Görsel-Uzamsal', icon: 'eye' },
+    { id: 'numerical', name: 'Sayısal Akıl Yürütme', icon: 'calculator' },
+    { id: 'verbal', name: 'Sözel Anlama', icon: 'book' }
+  ];
+  
+  // Sample questions (in a real app, this would be loaded from a backend)
+  const questions = [
+    // Logical Questions
+    {
+      id: 1,
+      category: 'logical',
+      text: 'Aşağıdaki dizide sonraki sayı nedir: 2, 4, 8, 16, 32, ?',
+      options: [
+        { id: 'a', text: '36' },
+        { id: 'b', text: '48' },
+        { id: 'c', text: '64' },
+        { id: 'd', text: '128' }
+      ],
+      correctAnswer: 'c'
+    },
+    {
+      id: 2,
+      category: 'logical',
+      text: 'Bir ailenin 6 oğlu var ve her oğlun bir kız kardeşi var. Bu ailede toplam kaç çocuk vardır?',
+      options: [
+        { id: 'a', text: '6' },
+        { id: 'b', text: '7' },
+        { id: 'c', text: '12' },
+        { id: 'd', text: '13' }
+      ],
+      correctAnswer: 'b'
+    },
+    // Visual Questions
+    {
+      id: 3,
+      category: 'visual',
+      text: 'Zihinsel olarak bu şekli 90 derece saat yönünde döndürdüğünüzde nasıl görünür?',
+      imageUrl: 'https://i.imgur.com/example1.jpg',
+      options: [
+        { id: 'a', text: 'A', imageUrl: 'https://i.imgur.com/option1a.jpg' },
+        { id: 'b', text: 'B', imageUrl: 'https://i.imgur.com/option1b.jpg' },
+        { id: 'c', text: 'C', imageUrl: 'https://i.imgur.com/option1c.jpg' },
+        { id: 'd', text: 'D', imageUrl: 'https://i.imgur.com/option1d.jpg' }
+      ],
+      correctAnswer: 'c'
+    },
+    // Numerical Questions
+    {
+      id: 4,
+      category: 'numerical',
+      text: '6, 15, 35, 77, ? - Bu sayı dizisindeki sonraki sayı nedir?',
+      options: [
+        { id: 'a', text: '121' },
+        { id: 'b', text: '143' },
+        { id: 'c', text: '161' },
+        { id: 'd', text: '165' }
+      ],
+      correctAnswer: 'c'
+    },
+    // Verbal Questions
+    {
+      id: 5,
+      category: 'verbal',
+      text: '"Yağmur" ve "Kar" arasındaki ilişki neyse, "Sıcak" ve "____" arasındaki ilişki de odur.',
+      options: [
+        { id: 'a', text: 'Güneş' },
+        { id: 'b', text: 'Kış' },
+        { id: 'c', text: 'Soğuk' },
+        { id: 'd', text: 'Hava' }
+      ],
+      correctAnswer: 'c'
+    },
+    // Add at least 5 more placeholder questions
+    {
+      id: 6,
+      category: 'logical',
+      text: 'Eğer her A bir B ise ve her B bir C ise, aşağıdakilerden hangisi doğrudur?',
+      options: [
+        { id: 'a', text: 'Her C bir A'dır' },
+        { id: 'b', text: 'Her A bir C'dir' },
+        { id: 'c', text: 'Hiçbir C bir A değildir' },
+        { id: 'd', text: 'Bazı C'ler A değildir' }
+      ],
+      correctAnswer: 'b'
+    },
+    {
+      id: 7,
+      category: 'visual',
+      text: 'Hangi şekil deseni tamamlar?',
+      imageUrl: 'https://i.imgur.com/example2.jpg',
+      options: [
+        { id: 'a', text: 'A', imageUrl: 'https://i.imgur.com/option2a.jpg' },
+        { id: 'b', text: 'B', imageUrl: 'https://i.imgur.com/option2b.jpg' },
+        { id: 'c', text: 'C', imageUrl: 'https://i.imgur.com/option2c.jpg' },
+        { id: 'd', text: 'D', imageUrl: 'https://i.imgur.com/option2d.jpg' }
+      ],
+      correctAnswer: 'a'
+    },
+    {
+      id: 8,
+      category: 'numerical',
+      text: 'Bir sayının 15% i 45 ise, bu sayının 25% i nedir?',
+      options: [
+        { id: 'a', text: '55' },
+        { id: 'b', text: '65' },
+        { id: 'c', text: '75' },
+        { id: 'd', text: '85' }
+      ],
+      correctAnswer: 'c'
+    },
+    {
+      id: 9,
+      category: 'verbal',
+      text: '"Kitap, Sayfa" ile "Bina, ?" ile aynı ilişkidedir.',
+      options: [
+        { id: 'a', text: 'Tuğla' },
+        { id: 'b', text: 'Duvar' },
+        { id: 'c', text: 'Çatı' },
+        { id: 'd', text: 'Kat' }
+      ],
+      correctAnswer: 'a'
+    },
+    {
+      id: 10,
+      category: 'logical',
+      text: 'Bir grup içinde 5 kişi var. Herkes diğer herkesle el sıkışırsa, toplam kaç el sıkışması olur?',
+      options: [
+        { id: 'a', text: '5' },
+        { id: 'b', text: '10' },
+        { id: 'c', text: '15' },
+        { id: 'd', text: '20' }
+      ],
+      correctAnswer: 'b'
+    }
+  ];
+  
+  // Test State
+  let currentQuestionIndex = 0;
+  let userAnswers = {};
+  let testStartTime;
+  let timerInterval;
+  const testDuration = 30 * 60; // 30 minutes in seconds
+  let remainingTime = testDuration;
+  
+  // Start the test
+  startTestBtn.addEventListener('click', function() {
+    testIntro.style.display = 'none';
+    testContainer.style.display = 'block';
+    
+    // Initialize the test
+    initTest();
+  });
+  
+  // Initialize the test
+  function initTest() {
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    remainingTime = testDuration;
+    
+    // Set total questions
+    totalQuestionsElem.textContent = questions.length;
+    
+    // Start the timer
+    startTimer();
+    
+    // Load the first question
+    loadQuestion(currentQuestionIndex);
+  }
+  
+  // Load a question
+  function loadQuestion(index) {
+    const question = questions[index];
+    
+    // Update question counter and progress bar
+    currentQuestionElem.textContent = index + 1;
+    const progress = ((index + 1) / questions.length) * 100;
+    progressBar.style.width = `${progress}%`;
+    
+    // Update category
+    const category = categories.find(cat => cat.id === question.category);
+    questionCategory.textContent = category.name;
+    
+    // Set question text
+    questionText.textContent = question.text;
+    
+    // Handle question image if exists
+    if (question.imageUrl) {
+      questionImage.src = question.imageUrl;
+      questionImageContainer.style.display = 'block';
+    } else {
+      questionImageContainer.style.display = 'none';
+    }
+    
+    // Create options
+    optionsContainer.innerHTML = '';
+    question.options.forEach(option => {
+      const optionElem = document.createElement('div');
+      optionElem.className = 'option';
+      if (userAnswers[question.id] === option.id) {
+        optionElem.classList.add('selected');
+      }
+      
+      let optionContent = `
+        <div class="option-label">
+          <div class="option-marker">${option.id.toUpperCase()}</div>
+          <div class="option-text">${option.text}</div>
+        </div>
+      `;
+      
+      if (option.imageUrl) {
+        optionContent += `<div class="option-image-container">
+          <img src="${option.imageUrl}" alt="Option ${option.id}" class="option-image">
+        </div>`;
+      }
+      
+      optionElem.innerHTML = optionContent;
+      
+      optionElem.addEventListener('click', () => {
+        selectOption(question.id, option.id);
+      });
+      
+      optionsContainer.appendChild(optionElem);
+    });
+    
+    // Update navigation buttons
+    prevQuestionBtn.disabled = index === 0;
+    if (index === questions.length - 1) {
+      nextQuestionBtn.innerHTML = '<i class="fas fa-check me-2"></i>Testi Bitir';
+    } else {
+      nextQuestionBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Sonraki Soru';
+    }
+  }
+  
+  // Select an option
+  function selectOption(questionId, optionId) {
+    userAnswers[questionId] = optionId;
+    
+    // Update UI
+    const options = optionsContainer.querySelectorAll('.option');
+    options.forEach(option => {
+      option.classList.remove('selected');
+    });
+    
+    const selectedOption = Array.from(options).find(option => 
+      option.querySelector('.option-marker').textContent.toLowerCase() === optionId.toUpperCase()
+    );
+    
+    if (selectedOption) {
+      selectedOption.classList.add('selected');
+    }
+  }
+  
+  // Navigation event listeners
+  prevQuestionBtn.addEventListener('click', function() {
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      loadQuestion(currentQuestionIndex);
+    }
+  });
+  
+  nextQuestionBtn.addEventListener('click', function() {
+    if (currentQuestionIndex < questions.length - 1) {
+      currentQuestionIndex++;
+      loadQuestion(currentQuestionIndex);
+    } else {
+      // End the test
+      endTest();
+    }
+  });
+  
+  // Start the timer
+  function startTimer() {
+    testStartTime = Date.now();
+    
+    timerInterval = setInterval(function() {
+      const elapsedSeconds = Math.floor((Date.now() - testStartTime) / 1000);
+      remainingTime = Math.max(0, testDuration - elapsedSeconds);
+      
+      // Update timer display
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+      timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // End test if time is up
+      if (remainingTime === 0) {
+        endTest();
+      }
+    }, 1000);
+  }
+  
+  // End the test
+  function endTest() {
+    // Stop the timer
+    clearInterval(timerInterval);
+    
+    // Calculate scores
+    const results = calculateResults();
+    
+    // Display results
+    displayResults(results);
+    
+    // Hide test container, show results
+    testContainer.style.display = 'none';
+    testResults.style.display = 'block';
+  }
+  
+  // Calculate test results
+  function calculateResults() {
+    let correctAnswers = 0;
+    const categoryScores = {};
+    
+    // Initialize category scores
+    categories.forEach(category => {
+      categoryScores[category.id] = { correct: 0, total: 0 };
+    });
+    
+    // Calculate correct answers and category scores
+    questions.forEach(question => {
+      const userAnswer = userAnswers[question.id];
+      const category = question.category;
+      
+      categoryScores[category].total++;
+      
+      if (userAnswer === question.correctAnswer) {
+        correctAnswers++;
+        categoryScores[category].correct++;
+      }
+    });
+    
+    // Calculate percentage scores
+    const categoryPercentages = {};
+    Object.keys(categoryScores).forEach(category => {
+      const { correct, total } = categoryScores[category];
+      categoryPercentages[category] = total > 0 ? Math.round((correct / total) * 100) : 0;
+    });
+    
+    // Calculate IQ score (simplified formula, for demonstration)
+    const rawScore = (correctAnswers / questions.length) * 100;
+    const iqScore = Math.round(70 + rawScore/2);
+    
+    return {
+      correctAnswers,
+      totalQuestions: questions.length,
+      percentage: Math.round((correctAnswers / questions.length) * 100),
+      categoryScores: categoryPercentages,
+      iqScore
+    };
+  }
+  
+  // Display test results
+  function displayResults(results) {
+    // Set IQ score
+    iqScoreElem.textContent = results.iqScore;
+    
+    // Set IQ description
+    let iqDescription = '';
+    if (results.iqScore < 85) {
+      iqDescription = 'Bu puan ortalamanın altında bir bilişsel yetenek gösterir. Bazı alanlarda gelişmeye ihtiyacınız olabilir.';
+    } else if (results.iqScore < 100) {
+      iqDescription = 'Bu puan ortalama ila ortalamanın biraz altında bir bilişsel yetenek gösterir.';
+    } else if (results.iqScore < 115) {
+      iqDescription = 'Bu puan ortalama bilişsel yetenek gösterir. Genel nüfusun çoğu bu aralıktadır.';
+    } else if (results.iqScore < 130) {
+      iqDescription = 'Bu puan ortalamanın üzerinde bir bilişsel yetenek gösterir. Belirli alanlarda güçlü becerileriniz var.';
+    } else {
+      iqDescription = 'Bu puan üstün bir bilişsel yetenek gösterir. Birçok alanda mükemmel becerileriniz var.';
+    }
+    iqDescriptionElem.textContent = iqDescription;
+    
+    // Display category scores
+    categoryScoresGrid.innerHTML = '';
+    categories.forEach(category => {
+      const percentage = results.categoryScores[category.id];
+      
+      const categoryElem = document.createElement('div');
+      categoryElem.className = 'category-score-item';
+      categoryElem.innerHTML = `
+        <div class="category-score-icon">
+          <i class="fas fa-${category.icon}"></i>
+        </div>
+        <div class="category-score-name">${category.name}</div>
+        <div class="category-score-value">${percentage}%</div>
+        <div class="category-score-percent">${results.categoryScores[category.id] || 0}% doğru</div>
+      `;
+      
+      categoryScoresGrid.appendChild(categoryElem);
+    });
+  }
+  
+  // Restart test
+  restartTestBtn.addEventListener('click', function() {
+    testResults.style.display = 'none';
+    testIntro.style.display = 'block';
+  });
+});
+</script>
+{% endblock %}
