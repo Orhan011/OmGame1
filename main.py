@@ -1,110 +1,96 @@
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 import os
-import re
-import time
-import uuid
-import json
-import random
-import secrets
-import logging
-from datetime import datetime, timedelta
-
-from flask import Flask, request, session, redirect, url_for, render_template, make_response, jsonify, flash
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+import random
+import json
 from werkzeug.utils import secure_filename
+import logging
+import uuid
+import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email_validator import validate_email, EmailNotValidError
+import time
+from functools import wraps
 
-from app import app, db
-from models import User, Score, Article
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///beyin_egzersizi.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = os.environ.get("SESSION_SECRET", "beyin_egzersizi_gizli_anahtar")
 
-# Configure logging
+# Yükleme klasörü ayarları
+UPLOAD_FOLDER = 'static/uploads/avatars'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
+
+# Logging ayarları
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# İzin verilen dosya uzantıları - avatar yüklemeleri için
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# Veritabanı
+from models import db, User, Score, Article, Achievement, GameStat
+
+# Veritabanını uygulama ile ilişkilendir
+db.init_app(app)
+
+# Veritabanı tabloları oluştur
+with app.app_context():
+    db.create_all()
+    logger.info("Database tables created successfully")
 
 def allowed_file(filename):
     """Dosya uzantısının izin verilen uzantılardan olup olmadığını kontrol eder."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-logging.basicConfig(level=logging.DEBUG)
 
-# Email verification
 def send_verification_email(to_email, verification_code):
     """
     Sends a verification email with the provided code
 
     Uses the configured Gmail account (omgameee@gmail.com) to send verification emails
     """
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    import ssl
-
-    # Gmail hesap bilgileri (güvenlik için çevresel değişkenlerden alınmalı)
-    sender_email = "omgameee@gmail.com"
-    sender_password = os.environ.get("EMAIL_PASSWORD", "htvh fmfz eeic kkls")  # Daha güvenli bir yöntem kullanılmalı
-
-    if not sender_password:
-        logger.error("Gmail app password not found")
-        raise ValueError("Email sending failed: Missing Gmail password")
-
-    # SSL context oluştur
-    context = ssl.create_default_context()
-
-    # Email içeriği
-    subject = "ZekaPark Şifre Sıfırlama Kodu"
-    message = f"""
-    <html>
-    <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">ZekaPark Şifre Sıfırlama</h2>
-            <p>Merhaba,</p>
-            <p>Şifre sıfırlama talebiniz için doğrulama kodunuz aşağıdadır:</p>
-            <div style="background-color: #3498db; color: white; font-size: 24px; padding: 10px; text-align: center; border-radius: 5px; margin: 20px 0;">
-                <strong>{verification_code}</strong>
-            </div>
-            <p>Bu kodu şifre sıfırlama ekranına giriniz. Eğer şifre sıfırlama talebinde bulunmadıysanız, bu email'i görmezden gelebilirsiniz.</p>
-            <p style="margin-top: 30px; font-size: 12px; color: #7f8c8d;">Bu otomatik bir email'dir, lütfen cevaplamayınız.</p>
-        </div>
-    </body>
-    </html>
-    """
-
-    # Email oluştur
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = sender_email
-    msg['To'] = to_email
-
-    # HTML içeriğini ekle
-    msg.attach(MIMEText(message, 'html'))
-
     try:
-        logger.info(f"Attempting to send verification email to {to_email}")
-
-        # Gmail SMTP sunucusuna bağlan
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp_server:
-            # Giriş yap
-            smtp_server.login(sender_email, sender_password)
-            logger.info("Successfully logged in to SMTP server")
-
-            # Email'i gönder
-            smtp_server.sendmail(sender_email, to_email, msg.as_string())
-            logger.info(f"Verification email successfully sent to {to_email}")
-
-            return True
-
-    except smtplib.SMTPAuthenticationError as e:
-        logger.error(f"SMTP Authentication failed: {e}")
-        raise ValueError("Email gönderimi başarısız: Gmail kimlik doğrulama hatası")
-    except smtplib.SMTPException as e:
-        logger.error(f"SMTP error occurred: {e}")
-        raise ValueError(f"Email gönderimi başarısız: SMTP hatası - {str(e)}")
+        from_email = "omgameee@gmail.com"
+        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+        
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = "ZekaPark - E-posta Doğrulama Kodu"
+        
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h2 style="color: #4a67e8; text-align: center;">ZekaPark'a Hoş Geldiniz!</h2>
+                <p>Merhaba,</p>
+                <p>ZekaPark hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
+                <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
+                    <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
+                </div>
+                <p>Bu kod 30 dakika boyunca geçerlidir.</p>
+                <p>Eğer böyle bir talepte bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
+                <p>Teşekkürler,<br>ZekaPark Ekibi</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(body, 'html'))
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(from_email, password)
+        text = msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+        return True
     except Exception as e:
-        logger.error(f"Unexpected error in email sending: {e}")
-        raise ValueError(f"Email gönderimi başarısız: {str(e)}")
+        logger.error(f"E-posta gönderme hatası: {str(e)}")
+        return False
 
-# Template utility function for getting current user
-@app.template_filter('get_user_avatar')
 def get_user_avatar(user_id):
     """
     Kullanıcının profil fotoğrafının URL'sini döndürür.
@@ -114,633 +100,483 @@ def get_user_avatar(user_id):
     """
     user = User.query.get(user_id)
     if user and user.avatar_url:
-        # Avatar URL'si zaten statik klasöründe bir yolu işaret ediyorsa,
-        # doğrudan bu yolu dön (url_for ile sarmalamadan)
         return user.avatar_url
-    return 'images/default-avatar.png'  # Varsayılan avatar
+    else:
+        return "images/placeholder.jpg"  # Varsayılan profil fotoğrafı
 
 @app.context_processor
 def utility_processor():
     def get_current_user():
+        """Session'daki kullanıcı kimliğine göre mevcut kullanıcıyı döndürür"""
         if 'user_id' in session:
             return User.query.get(session['user_id'])
         return None
-
+    
     def get_user_data():
         """Session'daki kullanıcı bilgilerini döndürür"""
         if 'user_id' in session:
+            user = User.query.get(session['user_id'])
             return {
-                'user_id': session.get('user_id'),
-                'username': session.get('username'),
-                'avatar_url': session.get('avatar_url', 'images/default-avatar.png')
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'full_name': user.full_name,
+                'avatar_url': user.avatar_url,
+                'experience_points': user.experience_points,
+                'rank': user.rank,
+                'theme_preference': user.theme_preference
             }
         return None
-
+    
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
-        return session.get('avatar_url', 'images/default-avatar.png')
+        if 'user_id' in session:
+            return get_user_avatar(session['user_id'])
+        return None
     
     def get_user_scores():
         """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
-        if 'user_id' not in session:
-            return {}
-        
-        user_id = session['user_id']
-        
-        # Kullanıcının tüm oyun skorlarını al
-        scores = Score.query.filter_by(user_id=user_id).all()
-        
-        # Her oyun türü için en yüksek skoru bul
-        score_dict = {}
-        for score in scores:
-            game_type = score.game_type
-            if game_type not in score_dict or score.score > score_dict[game_type]:
-                score_dict[game_type] = score.score
-                # Son oyun tarihini de ekle
-                score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
-        
-        return score_dict
-
-    # Tüm yardımcı fonksiyonları şablonlarda kullanılabilir hale getir
+        if 'user_id' in session:
+            scores = Score.query.filter_by(user_id=session['user_id']).all()
+            result = {}
+            for score in scores:
+                if score.game_type not in result or score.score > result[score.game_type]:
+                    result[score.game_type] = score.score
+            return result
+        return {}
+    
     return dict(
         get_current_user=get_current_user,
         get_user_data=get_user_data,
         get_avatar_url=get_avatar_url,
-        get_user_scores=get_user_scores,
-        calculate_level=calculate_level,
-        xp_for_level=xp_for_level
+        get_user_scores=get_user_scores
     )
 
-# Database initialization function
 def initialize_database():
     """Initialize the database with sample data"""
-
-    # Create sample articles
-    if Article.query.count() == 0:
-        articles = [
-            Article(
-                title="ZekaPark'a Hoş Geldiniz",
-                content="""
-                <p>ZekaPark, beyninizi çalıştıracak ve bilişsel yeteneklerinizi geliştirecek bir platform olarak tasarlanmıştır.</p>
-                <p>Burada bulacağınız mini oyunlar ve bulmacalar; hafıza, mantık, dikkat ve problem çözme yeteneklerinizi geliştirmenize yardımcı olacaktır.</p>
-                <p>Yeni özellikler ve içerikler düzenli olarak eklenecektir, bizi takip etmeye devam edin!</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Beyin Egzersizlerinin Faydaları",
-                content="""
-                <p>Düzenli beyin egzersizleri yapmanın birçok faydası vardır:</p>
-                <ul>
-                    <li>Hafızanızı güçlendirir</li>
-                    <li>Odaklanma yeteneğinizi artırır</li>
-                    <li>Problem çözme becerilerinizi geliştirir</li>
-                    <li>Yaratıcılığınızı tetikler</li>
-                    <li>Yaşla birlikte oluşabilecek bilişsel gerilemeyi yavaşlatır</li>
-                </ul>
-                <p>ZekaPark'taki oyunları düzenli olarak oynayarak bu faydaları elde edebilirsiniz.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Nöroplastisite ve Beyin Gelişimi",
-                content="""
-                <h3>Beynin Kendini Yenileme Gücü</h3>
-                <p>Nöroplastisite, beynin yaşam boyu kendini yenileme ve yeniden yapılandırma yeteneğidir. Bu, yeni nöral bağlantılar oluşturarak ve mevcut olanları güçlendirerek gerçekleşir.</p>
-                <p>Temel nöroplastisite prensipleri:</p>
-                <ul>
-                    <li><strong>Kullan ya da Kaybet:</strong> Kullanılmayan beyin bölgeleri zayıflarken, aktif olarak kullanılanlar güçlenir.</li>
-                    <li><strong>Yoğunluk Önemlidir:</strong> Düzenli ve yoğun pratik, beyin bağlantılarını daha hızlı güçlendirir.</li>
-                    <li><strong>Zorluk Seviyesi:</strong> Mevcut beceri seviyenizin biraz üzerinde çalışmak, beyin gelişimini en üst düzeye çıkarır.</li>
-                    <li><strong>Çeşitlilik:</strong> Farklı beyin alanlarını çalıştıran çeşitli aktiviteler, genel bilişsel sağlık için önemlidir.</li>
-                </ul>
-                <p>ZekaPark'taki farklı oyun türleri, nöroplastisiteyi desteklemek ve beyninizin farklı bölgelerini aktif tutmak için özel olarak tasarlanmıştır.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Bilişsel Rezerv Nedir ve Nasıl Geliştirilir?",
-                content="""
-                <h3>Zihinsel Sağlığınız İçin Bilişsel Rezerv</h3>
-                <p>Bilişsel rezerv, beynin yaşlanma ve hastalık etkilerine karşı koruyucu bir tampon görevi gören zihinsel kapasitedir. Yaş ilerledikçe ve hatta Alzheimer gibi hastalıklar gelişse bile, daha yüksek bilişsel rezerve sahip kişiler daha iyi bilişsel işleyiş gösterebilir.</p>
-
-                <h4>Bilişsel rezervi geliştirmek için:</h4>
-                <ul>
-                    <li><strong>Sürekli Öğrenme:</strong> Yeni beceriler edinmek, dil öğrenmek veya bir enstrüman çalmak beyin bağlantılarını zenginleştirir.</li>
-                    <li><strong>Zihinsel Zorluklar:</strong> Bulmacalar, strateji oyunları ve diğer zihinsel meydan okumalar beyni aktif tutar.</li>
-                    <li><strong>Sosyal Etkileşim:</strong> Sosyal ilişkiler beyin sağlığını destekler ve yalnızlığın olumsuz etkilerini azaltır.</li>
-                    <li><strong>Fiziksel Egzersiz:</strong> Düzenli egzersiz, beyne kan akışını artırır ve hafıza ile öğrenmeyi geliştiren nörotrofinleri uyarır.</li>
-                    <li><strong>Kaliteli Uyku:</strong> Yeterli uyku, hafızanın pekiştirilmesi ve beyin toksinlerinin temizlenmesi için gereklidir.</li>
-                </ul>
-                <p>ZekaPark'ta düzenli bilişsel alıştırmalar yaparak bilişsel rezervinizi güçlendirebilirsiniz.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Beyin Gücünü En Üst Düzeye Çıkaran Beslenme Stratejileri",
-                content="""
-                <h3>Beyniniz İçin Süper Yakıtlar</h3>
-                <p>Beyin, vücudun en aktif organlarından biridir ve tüm enerjimizin yaklaşık %20'sini tüketir. Doğru beslenme, optimal beyin performansı için hayati öneme sahiptir.</p>
-
-                <h4>Beyin sağlığını destekleyen besinler:</h4>
-                <ul>
-                    <li><strong>Yağlı Balıklar:</strong> Somon, sardalya ve uskumru gibi balıklar, beyin hücresi zarlarının yapı taşı olan omega-3 yağ asitleri açısından zengindir.</li>
-                    <li><strong>Fındık ve Tohumlar:</strong> Ceviz, badem ve keten tohumu gibi besinler E vitamini, antioksidanlar ve sağlıklı yağlar içerir.</li>
-                    <li><strong>Koyu Yeşil Yapraklı Sebzeler:</strong> Ispanak ve lahana gibi sebzeler, beyin fonksiyonu için önemli olan folat, E vitamini ve K vitamini içerir.</li>
-                    <li><strong>Yaban Mersini ve Diğer Meyveler:</strong> Antioksidanlarla dolu olan bu meyveler, beyin hücrelerini oksidatif stresten korur.</li>
-                    <li><strong>Tam Tahıllar:</strong> Kompleks karbonhidratlar, beyninize sabit bir enerji kaynağı sağlar.</li>
-                    <li><strong>Zerdeçal ve Tarçın:</strong> Bu baharatlar güçlü anti-enflamatuar özelliklere sahiptir ve nöron sağlığını destekleyebilir.</li>
-                    <li><strong>Koyu Çikolata:</strong> Flavonoidler içeren koyu çikolata, beyin kan akışını artırabilir.</li>
-                </ul>
-                <p>Beyninizi beslemek için bu besinleri düzenli olarak tüketmeyi ve işlenmiş gıdaları, rafine şekerleri ve trans yağları sınırlandırmayı hedefleyin.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Stresin Beyin Üzerindeki Etkileri ve Yönetimi",
-                content="""
-                <h3>Stres ve Bilişsel Performans</h3>
-                <p>Kısa süreli stres, odaklanmayı ve performansı artırabilirken, kronik stres beyin yapısını ve işlevini olumsuz etkileyebilir.</p>
-
-                <h4>Kronik stresin beyin üzerindeki etkileri:</h4>
-                <ul>
-                    <li>Hipokampusta (hafıza merkezi) hacim kaybı</li>
-                    <li>Nöron bağlantılarının azalması</li>
-                    <li>Kortizon seviyelerinin yükselmesi ve hafıza üzerinde olumsuz etki</li>
-                    <li>Beyin kimyasalları dengesi üzerinde bozucu etki</li>
-                    <li>Prefrontal korteksin (karar verme merkezi) işlevinde azalma</li>
-                </ul>
-
-                <h4>Stres yönetimi teknikleri:</h4>
-                <ul>
-                    <li><strong>Derin Nefes Egzersizleri:</strong> Günde birkaç dakika derin nefes alıp vermek, sempatik sinir sistemini sakinleştirebilir.</li>
-                    <li><strong>Meditasyon ve Mindfulness:</strong> Bu pratikler, beynin stres tepkisini düzenleyen bölgelerini güçlendirir.</li>
-                    <li><strong>Düzenli Fiziksel Aktivite:</strong> Egzersiz, stresi azaltan endorfinlerin salınımını tetikler.</li>
-                    <li><strong>Yeterli Uyku:</strong> Kaliteli uyku, stres hormonlarını düzenler ve duygusal dengeyi destekler.</li>
-                    <li><strong>Sosyal Bağlantılar:</strong> Destekleyici ilişkiler, stres tepkilerini hafifletebilir.</li>
-                    <li><strong>Eğlenceli Aktiviteler:</strong> ZekaPark'taki beyin oyunları gibi eğlenceli aktiviteler, zihinsel molanın bir formudur ve stresi azaltabilir.</li>
-                </ul>
-                <p>Düzenli stres yönetimi, bilişsel sağlığınızı korumanın ve ZekaPark oyunlarında optimal performans göstermenin anahtarıdır.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Daha İyi Konsantrasyon İçin İpuçları",
-                content="""
-                <ol>
-                    <li><strong>Yeterli Uyku:</strong> Düzenli ve kaliteli uyku, beyin fonksiyonlarınız için kritik öneme sahiptir.</li>
-                    <li><strong>Beslenme:</strong> Omega-3, antioksidanlar ve kompleks karbonhidratlar beyin sağlığınız için önemlidir.</li>
-                    <li><strong>Meditasyon:</strong> Günlük kısa meditasyon seansları odaklanma yeteneğinizi artırabilir.</li>
-                    <li><strong>Egzersiz:</strong> Fiziksel aktivite, beyninize oksijen akışını artırır ve bilişsel işlevleri destekler.</li>
-                    <li><strong>Mola Verin:</strong> Uzun süre aynı göreve odaklanmak yerine düzenli molalar verin.</li>
-                </ol>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Bilişsel Becerileri Geliştirmenin Günlük Yaşama Etkileri",
-                content="""
-                <h3>Oyunlar Ötesinde Faydalar</h3>
-                <p>Beyin egzersizlerinin yararları sadece oyun performansınızla sınırlı değildir. Geliştirdiğiniz bilişsel beceriler, günlük yaşamın çeşitli alanlarında da size avantaj sağlar.</p>
-
-                <h4>Gelişmiş bilişsel becerilerin günlük yaşamdaki yansımaları:</h4>
-                <ul>
-                    <li><strong>İş ve Akademik Performans:</strong> Daha hızlı öğrenme, daha iyi problem çözme ve gelişmiş kritik düşünme becerileri.</li>
-                    <li><strong>Günlük Görevler:</strong> Alışveriş listesini hatırlama, randevulara zamanında gitme ve çoklu görevleri daha verimli yönetme.</li>
-                    <li><strong>İletişim:</strong> Daha iyi dinleme, daha keskin sözel beceriler ve daha iyi sosyal ipuçları algılama.</li>
-                    <li><strong>Yaratıcılık:</strong> Daha geniş düşünme, farklı bakış açıları geliştirme ve daha yenilikçi çözümler bulma.</li>
-                    <li><strong>Duygusal Zeka:</strong> Duyguları daha iyi tanıma, dürtüleri kontrol etme ve stresle başa çıkma yeteneği.</li>
-                    <li><strong>Yaşla İlgili Gerilemeye Karşı Koruma:</strong> Bilişsel rezerv oluşturarak yaşlanmanın etkilerine karşı direnç geliştirme.</li>
-                </ul>
-                <p>ZekaPark'ta düzenli olarak egzersiz yapmak, beyninizin "kas belleğini" geliştirerek bu becerileri günlük yaşamınıza daha kolay aktarmanızı sağlar.</p>
-                """,
-                category="article"
-            ),
-            Article(
-                title="Hafıza Geliştirme Teknikleri",
-                content="""
-                <h3>Hafızanızı geliştirmek için deneyebileceğiniz etkili teknikler:</h3>
-                <ul>
-                    <li><strong>Görselleştirme:</strong> Hatırlamak istediğiniz bilgiyi canlı görüntülerle ilişkilendirin.</li>
-                    <li><strong>Çağrışım:</strong> Yeni bilgileri, zaten bildiğiniz şeylerle ilişkilendirin.</li>
-                    <li><strong>Bölme:</strong> Uzun bilgi dizilerini daha küçük, yönetilebilir parçalara ayırın.</li>
-                    <li><strong>Tekrar:</strong> Aralıklı tekrar, bilgilerin uzun süreli hafızaya geçmesini sağlar.</li>
-                    <li><strong>Hikaye Tekniği:</strong> Hatırlanması gereken öğeleri bir hikaye içinde birleştirin.</li>
-                </ul>
-                <p>Bu teknikleri ZekaPark oyunlarında pratik ederek hafızanızı güçlendirebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Zihinsel Dayanıklılık Geliştirme",
-                content="""
-                <h3>Zorluklarla Başa Çıkma Kapasitesini Artırmak</h3>
-                <p>Zihinsel dayanıklılık, bilişsel zorluklarla karşılaştığınızda pes etmeden devam etme yeteneğidir. Bu özellik, tüm beyin egzersizlerinde ve gerçek yaşam zorluklarında başarı için kritiktir.</p>
-
-                <h4>Zihinsel dayanıklılığı geliştirme stratejileri:</h4>
-                <ul>
-                    <li><strong>Zorluk Seviyesini Kademeli Artırın:</strong> Kendinizi konfor alanınızın biraz dışına çıkaran, ama tamamen bunaltmayan zorluklarla düzenli olarak meydan okuyun.</li>
-                    <li><strong>Hatalardan Öğrenin:</strong> Her başarısızlığı öğrenme fırsatı olarak görün ve neyin işe yaramadığını analiz edin.</li>
-                    <li><strong>Olumlu İç Konuşma:</strong> Kendinizle konuşma şeklinize dikkat edin. "Yapamam" yerine "Henüz yapamıyorum, ama pratikle gelişeceğim" demeyi deneyin.</li>
-                    <li><strong>Mikro-Hedefler Belirleyin:</strong> Büyük zorlukları daha küçük, ulaşılabilir adımlara bölün.</li>
-                    <li><strong>Başarılarınızı Takdir Edin:</strong> Küçük ilerlemeleri bile kutlayın ve kendinizi düzenli olarak ödüllendirin.</li>
-                </ul>
-                <p>ZekaPark'taki oyunları oynarken, zor bölümlerde pes etmeyip stratejinizi ayarlayarak zihinsel dayanıklılığınızı geliştirebilirsiniz. Bu yetenek zamanla gelişir ve günlük yaşamınızdaki engelleri aşmanıza da yardımcı olur.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Bilişsel Egzersizlerde İlerleme İzleme",
-                content="""
-                <h3>Gelişiminizi Ölçme ve Optimize Etme</h3>
-                <p>Bilişsel egzersizlerden maksimum faydayı sağlamak için ilerlemenizi izlemek ve pratiklerinizi buna göre ayarlamak önemlidir.</p>
-
-                <h4>Etkili ilerleme izleme yöntemleri:</h4>
-                <ul>
-                    <li><strong>Tutarlı Ölçümler:</strong> ZekaPark'taki oyun skorlarınızı düzenli olarak takip edin. Puanlarınızdaki artış, bilişsel performansınızın geliştiğini gösterir.</li>
-                    <li><strong>Zorluk Seviyesini Ayarlama:</strong> Skorlarınız yükseldiğinde zorluk seviyesini artırın, ancak sürekli başarısızlık yaşıyorsanız geçici olarak daha basit seviyelere dönün.</li>
-                    <li><strong>Çeşitli Becerileri Dengeleme:</strong> Tüm bilişsel alanları geliştirmek için farklı oyun türlerinde pratik yapın ve hangilerinde daha çok gelişmeye ihtiyacınız olduğunu belirleyin.</li>
-                    <li><strong>Günlük Tutma:</strong> Her seanstan sonra nasıl hissettiğinizi, ne kadar süre oynadığınızı ve karşılaştığınız zorlukları not edin.</li>
-                    <li><strong>Platoları Tanıma:</strong> İlerlemeniz durduğunda, farklı stratejiler deneyin veya geçici olarak başka bir oyun türüne geçin.</li>
-                </ul>
-                <p>ZekaPark profilinizde görüntülenen istatistikler, gelişiminizi izlemeniz ve egzersiz rejiminizi optimize etmeniz için güçlü bir araçtır.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Kelime Bulmaca İpuçları",
-                content="""
-                <h3>Kelime Bulmaca oyununda başarılı olmak için ipuçları:</h3>
-                <ol>
-                    <li>İpucu metnini dikkatlice okuyun ve anahtar kelimelere odaklanın.</li>
-                    <li>Harflerin sayısını dikkate alın ve buna göre muhtemel cevapları düşünün.</li>
-                    <li>Bilemediğiniz sorularda "Pas Geç" seçeneğini kullanarak zaman kaybetmeyin.</li>
-                    <li>Türkçe'de en sık kullanılan harfleri (e, a, i, n, r, s, t) düşünerek tahminlerde bulunun.</li>
-                    <li>Zamanınızı akıllıca kullanın - hızlı ama dikkatlice düşünün.</li>
-                </ol>
-                <p>Düzenli pratik yaparak kelime haznenizi ve bulmaca çözme becerilerinizi geliştirebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Etkili Hafıza Eşleştirme Stratejileri",
-                content="""
-                <h3>Hafıza Eşleştirme oyununda daha iyi performans için:</h3>
-                <ul>
-                    <li>Oyun başladığında, tüm kartlara kısaca göz atın ve konumlarını hafızanıza almaya çalışın.</li>
-                    <li>Stratejik olarak ilerleyin - rastgele kart açmak yerine belirli bir düzen takip edin.</li>
-                    <li>Açtığınız her kartın konumunu hafızanızda tutmaya çalışın.</li>
-                    <li>İlk turdaki amacınız mümkün olduğunca çok kartı görüntülemek olmalıdır.</li>
-                    <li>Görsel çağrışımlar yaratarak kartların konumlarını daha kolay hatırlayabilirsiniz.</li>
-                </ul>
-                <p>Beyin, desenler ve bağlantılar üzerinden daha kolay öğrenir. Bu stratejileri kullanarak hafıza kapasitenizi artırabilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Bilişsel Esnekliği Geliştirme",
-                content="""
-                <h3>Zihinsel Çeviklik İçin Stratejiler</h3>
-                <p>Bilişsel esneklik, düşünce ve stratejilerinizi değişen durumlara uyarlama yeteneğidir. Bu beceri, problem çözme, yaratıcılık ve değişimle başa çıkma için kritik öneme sahiptir.</p>
-
-                <h4>Bilişsel esnekliği geliştirme yolları:</h4>
-                <ul>
-                    <li><strong>Farklı Stratejiler Deneyin:</strong> ZekaPark oyunlarında aynı seviyeyi tamamlamak için çeşitli yaklaşımlar kullanın.</li>
-                    <li><strong>Düzenli Olarak Yeni Şeyler Öğrenin:</strong> Beyninizi yeni bilgileri işlemeye ve entegre etmeye zorlayın.</li>
-                    <li><strong>Konfor Alanınızdan Çıkın:</strong> Alışık olmadığınız zorlukları kabul edin ve yeni yollar denemeye istekli olun.</li>
-                    <li><strong>Perspektif Değiştirin:</strong> Bir probleme farklı açılardan bakmayı alışkanlık haline getirin.</li>
-                    <li><strong>Rutinlerinizi Değiştirin:</strong> Günlük alışkanlıklarınızda küçük değişiklikler yaparak beyninizi uyanık tutun.</li>
-                </ul>
-                <p>ZekaPark'taki farklı oyun türleri arasında düzenli olarak geçiş yapmak, bilişsel esnekliğinizi güçlendirmenin etkili bir yoludur. Bu esneklik, günlük yaşamda daha iyi uyum sağlamanıza ve problem çözmede daha yaratıcı olmanıza yardımcı olur.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Labirent Oyununda Başarılı Olma Taktikleri",
-                content="""
-                <h3>Labirent oyununda zorlanıyor musunuz? Bu taktikleri deneyin:</h3>
-                <ol>
-                    <li><strong>Sağ El Kuralı:</strong> Labirentte ilerlerken sürekli sağ (veya sol) duvarı takip edin.</li>
-                    <li><strong>Zihinsel Harita:</strong> İlerledikçe labirentin zihinsel bir haritasını oluşturmaya çalışın.</li>
-                    <li><strong>Çıkmaz Sokakları İşaretleyin:</strong> Zihinsel olarak, daha önce denediğiniz ve çıkmaz olan yolları işaretleyin.</li>
-                    <li><strong>Sistematik Yaklaşın:</strong> Rastgele hareket etmek yerine, sistematik bir yaklaşım benimseyin.</li>
-                    <li><strong>Sabırlı Olun:</strong> Labirent çözmek hız değil, strateji gerektirir.</li>
-                </ol>
-                <p>Bu taktikleri uygulayarak labirentleri daha hızlı ve etkili bir şekilde çözebilirsiniz.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Beyin Egzersizlerinde Tutarlılığın Önemi",
-                content="""
-                <h3>Düzenli Pratik, Kalıcı Kazanımlar</h3>
-                <p>Beyni güçlendirmek vücut geliştirmeye benzer - tek bir yoğun egzersiz değil, düzenli ve tutarlı pratik en iyi sonuçları verir.</p>
-
-                <h4>Etkili bir bilişsel antrenman rutini oluşturmak için:</h4>
-                <ul>
-                    <li><strong>Günlük Alışkanlık Geliştirin:</strong> Her gün belirli bir zamanda kısa bile olsa beyin egzersizleri yapmak, uzun vadeli gelişim için kritiktir.</li>
-                    <li><strong>Süreyi Kademeli Olarak Artırın:</strong> Başlangıçta günde 5-10 dakika ile başlayın, zamanla bu süreyi artırın.</li>
-                    <li><strong>Denge Kurun:</strong> Hafıza, dikkat, problem çözme ve mantıksal düşünme dahil farklı bilişsel becerileri çalıştırın.</li>
-                    <li><strong>İlerlemenizi İzleyin:</strong> Düzenli olarak performansınızı kaydedin, böylece gelişiminizi görebilirsiniz.</li>
-                    <li><strong>"Hepsini Birden" Yaklaşımından Kaçının:</strong> Bir günde saatlerce pratik yapmak yerine, düzenli kısa seanslar tercih edin.</li>
-                </ul>
-                <p>ZekaPark'ta günlük oturum hedefleri belirlemek ve bunları takip etmek, bilişsel gelişiminizi hızlandırabilir ve beyin sağlığınıza uzun vadeli yatırım yapmanızı sağlar.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Puzzle Oyunu İçin Etkili Stratejiler",
-                content="""
-                <h3>Puzzle oyununda daha başarılı olmak için ipuçları:</h3>
-                <ul>
-                    <li>Önce kenar ve köşe parçalarını bularak çerçeveyi oluşturun.</li>
-                    <li>Parçaları renklere veya desenlere göre gruplandırın.</li>
-                    <li>Bir bölümü tamamladıktan sonra diğerine geçin.</li>
-                    <li>Zorlandığınız parçaları geçici olarak kenara ayırıp daha sonra tekrar deneyin.</li>
-                    <li>Düzenli molalar verin - bazen uzaklaşıp sonra geri dönmek yeni perspektifler kazandırabilir.</li>
-                </ul>
-                <p>Puzzle çözmek, görsel-uzamsal zeka ve problem çözme becerilerinizi geliştirir.</p>
-                """,
-                category="tip"
-            ),
-            Article(
-                title="Beyin Sisi ile Başa Çıkma Yöntemleri",
-                content="""
-                <h3>Zihinsel Netlik İçin Stratejiler</h3>
-                <p>Beyin sisi veya bilişsel bulanıklık, konsantre olma zorluğu, zihinsel yorgunluk ve düşünme hızında azalma ile kendini gösterir. Bu durum, stres, yetersiz uyku, beslenme eksiklikleri veya sağlık sorunları nedeniyle ortaya çıkabilir.</p>
-
-                <h4>Beyin sisini azaltmak için etkili yöntemler:</h4>
-                <ul>
-                    <li><strong>Hidrasyon:</strong> Hafif dehidratasyon bile bilişsel performansı etkileyebilir. Gün boyunca yeterli su için.</li>
-                    <li><strong>Düzenli Egzersiz:</strong> 20-30 dakikalık orta yoğunlukta aktivite, beyne kan akışını artırır ve netliği geliştirir.</li>
-                    <li><strong>Beyin Dinlenme Molaları:</strong> Pomodoro tekniği gibi yöntemlerle düzenli kısa molalar verin.</li>
-                    <li><strong>Çoklu Görev Yapmaktan Kaçının:</strong> Bir seferde bir işe odaklanın, sürekli görev değiştirmek zihinsel yorgunluğu artırır.</li>
-                    <li><strong>Uyku Hijyeni:</strong> Kaliteli ve yeterli uyku, bilişsel fonksiyonların yenilenmesi için şarttır.</li>
-                    <li><strong>Mindfulness:</strong> 5-10 dakikalık meditasyon, zihinsel netliği önemli ölçüde artırabilir.</li<li><strong>Beslenme Düzeni:</strong> Düzenli öğünler ve beyin sağlığını destekleyen besinleri tüketmek.</li>
-                </ul>
-                <p>ZekaPark oyunlarını oynamak için kendinizi en iyi hissettiğiniz zamanları seçin. Düzenli bilişsel egzersizler, beyin sisine karşı genel direncin artmasına yardımcı olabilir.</p>
-                """,
-                category="tip"
+    try:
+        # Eğer herhangi bir kullanıcı yoksa, örnek veri oluştur
+        if User.query.count() == 0:
+            # Örnek kullanıcılar
+            admin = User(
+                username="admin",
+                email="admin@example.com",
+                password_hash=generate_password_hash("password123"),
+                full_name="Admin User",
+                age=30,
+                bio="ZekaPark platformunun yöneticisiyim.",
+                location="İstanbul",
+                experience_points=5000,
+                rank="Uzman",
+                total_games_played=100,
+                highest_score=1000
             )
-        ]
+            
+            demo = User(
+                username="demo",
+                email="demo@example.com",
+                password_hash=generate_password_hash("demo123"),
+                full_name="Demo User",
+                age=25,
+                bio="ZekaPark'ta bilişsel becerilerimi geliştiriyorum.",
+                location="Ankara",
+                experience_points=1500,
+                rank="Orta Seviye",
+                total_games_played=50,
+                highest_score=750
+            )
+            
+            db.session.add(admin)
+            db.session.add(demo)
+            
+            # Örnek skorlar
+            admin_scores = [
+                Score(user_id=1, game_type="wordPuzzle", score=850),
+                Score(user_id=1, game_type="memoryMatch", score=920),
+                Score(user_id=1, game_type="numberSequence", score=780),
+                Score(user_id=1, game_type="3dRotation", score=700)
+            ]
+            
+            demo_scores = [
+                Score(user_id=2, game_type="wordPuzzle", score=650),
+                Score(user_id=2, game_type="memoryMatch", score=720),
+                Score(user_id=2, game_type="numberSequence", score=580),
+                Score(user_id=2, game_type="3dRotation", score=500)
+            ]
+            
+            for score in admin_scores + demo_scores:
+                db.session.add(score)
+            
+            # Örnek makaleler
+            articles = [
+                Article(
+                    title="Bilişsel Becerileri Geliştirmenin Önemi",
+                    content="""
+                    <h3>Neden Bilişsel Becerilerimizi Geliştirmeliyiz?</h3>
+                    <p>Bilişsel becerilerimiz, günlük yaşamda bilgiyi işleme, anlama ve kullanma yeteneğimiz için temel oluşturur. Bu becerileri düzenli olarak geliştirmek şunları sağlar:</p>
+                    <ul>
+                        <li>Daha iyi problem çözme yeteneği</li>
+                        <li>Gelişmiş hafıza ve konsantrasyon</li>
+                        <li>Daha hızlı bilgi işleme</li>
+                        <li>Yaşla ilgili bilişsel gerilemenin yavaşlatılması</li>
+                        <li>Genel zihinsel esnekliğin artması</li>
+                    </ul>
 
-        for article in articles:
-            db.session.add(article)
+                    <h4>Temel Bilişsel Beceriler</h4>
+                    <p>ZekaPark'taki oyunlarımız aşağıdaki temel bilişsel becerileri geliştirmeye odaklanır:</p>
+                    <ul>
+                        <li><strong>Dikkat ve Konsantrasyon:</strong> Odaklanma sürenizi ve dış uyarıcılara rağmen konsantrasyonunuzu koruma yeteneğinizi geliştirir.</li>
+                        <li><strong>İşleyen Bellek:</strong> Zihninizde bilgiyi kısa süre tutma ve manipüle etme becerinizi güçlendirir.</li>
+                        <li><strong>İşleme Hızı:</strong> Zihinsel görevleri hızlı ve verimli bir şekilde tamamlama becerinizi artırır.</li>
+                        <li><strong>Görsel-Uzamsal Düşünme:</strong> Zihinsel rotasyon ve uzamsal ilişkileri anlama yeteneğinizi geliştirir.</li>
+                        <li><strong>Mantıksal Akıl Yürütme:</strong> Problem çözme ve kritik düşünme becerinizi iyileştirir.</li>
+                    </ul>
 
-        db.session.commit()
-        logger.info("Sample articles created")
+                    <h4>Bilimsel Temeller</h4>
+                    <p>Beyin egzersizinin bilişsel sağlık üzerindeki olumlu etkileri, nöroplastisite kavramına dayanır - yani beynin yeni öğrenme deneyimlerine yanıt olarak kendini yeniden şekillendirme ve yeni nöral yollar oluşturma yeteneği.</p>
+                    <p>Düzenli beyin egzersizi, nöronlar arasındaki bağlantıları güçlendirir ve hatta yeni bağlantıların oluşmasını teşvik eder, bu da bilişsel rezervinizi artırır - beyninizin hasara veya yaşlanmaya karşı direncini artıran bir kaynak.</p>
 
-    # Create admin user if no users exist
-    if User.query.count() == 0:
-        # Admin kullanıcısı
-        admin = User(
-            username="admin",
-            email="admin@example.com",
-            password_hash=generate_password_hash("admin123"),
-            full_name="Admin User",
-            age=30,
-            bio="Sistem yöneticisi",
-            rank="Yönetici",
-            experience_points=5000
-        )
+                    <h4>ZekaPark Yaklaşımı</h4>
+                    <p>ZekaPark'ta, bilimsel olarak tasarlanmış oyunlar, eğlence ve bilişsel gelişimin mükemmel birleşimini sunuyoruz. Her oyun belirli bilişsel becerilere hitap eden zorluklar sunar, öğrenme eğrisini artırır ve düzenli olarak oynandığında uzun vadeli bilişsel faydalar sağlar.</p>
+                    <p>Temel prensiplerimiz şunlardır:</p>
+                    <ul>
+                        <li>Artan zorluk seviyesi - çünkü beyninizin gelişmesi için kendini zorlaması gerekir</li>
+                        <li>Çeşitlilik - farklı bilişsel becerilerin bütünsel gelişimi için</li>
+                        <li>Süreklilik - bilişsel gelişim, düzenli uygulama gerektirir</li>
+                        <li>Kişiselleştirme - özel zayıf yönleri ve güçlü yönleri hedeflemek için</li>
+                        <li>Eğlence - çünkü keyif aldığınız aktivitelere daha fazla odaklanır ve bağlı kalırsınız</li>
+                    </ul>
+                    <p>ZekaPark'ta düzenli oynayarak, günlük yaşamda fark edebileceğiniz uzun süreli bilişsel gelişim sağlayın.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Beyin Sağlığını Destekleyen Besinler",
+                    content="""
+                    <h3>Bilişsel Performansı Artırmak İçin Beslenme</h3>
+                    <p>Düzenli beyin egzersizlerinin yanı sıra, doğru beslenme de optimal beyin sağlığı ve bilişsel performans için kritik öneme sahiptir. Beyin, vücudumuzun enerji tüketiminin yaklaşık %20'sini gerçekleştirir, bu nedenle doğru yakıtla beslenmesi gerekir.</p>
 
-        # Ek test kullanıcıları
-        user1 = User(
-            username="mehmet",
-            email="mehmet@example.com",
-            password_hash=generate_password_hash("123456"),
-            full_name="Mehmet Yılmaz",
-            age=25,
-            bio="Bilgisayar mühendisi",
-            rank="İlerleyen",
-            experience_points=12500
-        )
+                    <h4>Beyin dostu besinler:</h4>
+                    <ul>
+                        <li><strong>Yağlı Balıklar:</strong> Somon, sardalye ve uskumru gibi balıklar, beyin sağlığı için önemli olan omega-3 yağ asitleri açısından zengindir.</li>
+                        <li><strong>Kuruyemişler ve Tohumlar:</strong> Ceviz, badem, keten tohumu ve chia, sağlıklı yağlar, antioksidanlar ve E vitamini içerir.</li>
+                        <li><strong>Yaban Mersini ve Diğer Meyveler:</strong> Antioksidanlarla dolu olan bu meyveler, beyin hücrelerini oksidatif stresten korur.</li>
+                        <li><strong>Tam Tahıllar:</strong> Kompleks karbonhidratlar, beyninize sabit bir enerji kaynağı sağlar.</li>
+                        <li><strong>Zerdeçal ve Tarçın:</strong> Bu baharatlar güçlü anti-enflamatuar özelliklere sahiptir ve nöron sağlığını destekleyebilir.</li>
+                        <li><strong>Koyu Çikolata:</strong> Flavonoidler içeren koyu çikolata, beyin kan akışını artırabilir.</li>
+                    </ul>
+                    <p>Beyninizi beslemek için bu besinleri düzenli olarak tüketmeyi ve işlenmiş gıdaları, rafine şekerleri ve trans yağları sınırlandırmayı hedefleyin.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Stresin Beyin Üzerindeki Etkileri ve Yönetimi",
+                    content="""
+                    <h3>Stres ve Bilişsel Performans</h3>
+                    <p>Kısa süreli stres, odaklanmayı ve performansı artırabilirken, kronik stres beyin yapısını ve işlevini olumsuz etkileyebilir.</p>
 
-        user2 = User(
-            username="ayse",
-            email="ayse@example.com",
-            password_hash=generate_password_hash("123456"),
-            full_name="Ayşe Demir",
-            age=29,
-            bio="Matematik öğretmeni",
-            rank="Usta",
-            experience_points=18700
-        )
+                    <h4>Kronik stresin beyin üzerindeki etkileri:</h4>
+                    <ul>
+                        <li>Hipokampusta (hafıza merkezi) hacim kaybı</li>
+                        <li>Nöron bağlantılarının azalması</li>
+                        <li>Kortizon seviyelerinin yükselmesi ve hafıza üzerinde olumsuz etki</li>
+                        <li>Beyin kimyasalları dengesi üzerinde bozucu etki</li>
+                        <li>Prefrontal korteksin (karar verme merkezi) işlevinde azalma</li>
+                    </ul>
 
-        user3 = User(
-            username="emin",
-            email="emin@example.com",
-            password_hash=generate_password_hash("123456"),
-            full_name="Emin Kaya",
-            age=22,
-            bio="Bilgisayar bilimi öğrencisi",
-            rank="Acemi",
-            experience_points=8200
-        )
+                    <h4>Stres yönetimi teknikleri:</h4>
+                    <ul>
+                        <li><strong>Derin Nefes Egzersizleri:</strong> Günde birkaç dakika derin nefes alıp vermek, sempatik sinir sistemini sakinleştirebilir.</li>
+                        <li><strong>Meditasyon ve Mindfulness:</strong> Bu pratikler, beynin stres tepkisini düzenleyen bölgelerini güçlendirir.</li>
+                        <li><strong>Düzenli Fiziksel Aktivite:</strong> Egzersiz, stresi azaltan endorfinlerin salınımını tetikler.</li>
+                        <li><strong>Yeterli Uyku:</strong> Kaliteli uyku, stres hormonlarını düzenler ve duygusal dengeyi destekler.</li>
+                        <li><strong>Sosyal Bağlantılar:</strong> Destekleyici ilişkiler, stres tepkilerini hafifletebilir.</li>
+                        <li><strong>Eğlenceli Aktiviteler:</strong> ZekaPark'taki beyin oyunları gibi eğlenceli aktiviteler, zihinsel molanın bir formudur ve stresi azaltabilir.</li>
+                    </ul>
+                    <p>Düzenli stres yönetimi, bilişsel sağlığınızı korumanın ve ZekaPark oyunlarında optimal performans göstermenin anahtarıdır.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Daha İyi Konsantrasyon İçin İpuçları",
+                    content="""
+                    <ol>
+                        <li><strong>Yeterli Uyku:</strong> Düzenli ve kaliteli uyku, beyin fonksiyonlarınız için kritik öneme sahiptir.</li>
+                        <li><strong>Beslenme:</strong> Omega-3, antioksidanlar ve kompleks karbonhidratlar beyin sağlığınız için önemlidir.</li>
+                        <li><strong>Meditasyon:</strong> Günlük kısa meditasyon seansları odaklanma yeteneğinizi artırabilir.</li>
+                        <li><strong>Egzersiz:</strong> Fiziksel aktivite, beyninize oksijen akışını artırır ve bilişsel işlevleri destekler.</li>
+                        <li><strong>Mola Verin:</strong> Uzun süre aynı göreve odaklanmak yerine düzenli molalar verin.</li>
+                    </ol>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Bilişsel Becerileri Geliştirmenin Günlük Yaşama Etkileri",
+                    content="""
+                    <h3>Oyunlar Ötesinde Faydalar</h3>
+                    <p>Beyin egzersizlerinin yararları sadece oyun performansınızla sınırlı değildir. Geliştirdiğiniz bilişsel beceriler, günlük yaşamın çeşitli alanlarında da size avantaj sağlar.</p>
 
-        db.session.add_all([admin, user1, user2, user3])
-        db.session.commit()
+                    <h4>Gelişmiş bilişsel becerilerin günlük yaşamdaki yansımaları:</h4>
+                    <ul>
+                        <li><strong>İş ve Akademik Performans:</strong> Daha hızlı öğrenme, daha iyi problem çözme ve gelişmiş kritik düşünme becerileri.</li>
+                        <li><strong>Günlük Görevler:</strong> Alışveriş listesini hatırlama, randevulara zamanında gitme ve çoklu görevleri daha verimli yönetme.</li>
+                        <li><strong>İletişim:</strong> Daha iyi dinleme, daha keskin sözel beceriler ve daha iyi sosyal ipuçları algılama.</li>
+                        <li><strong>Yaratıcılık:</strong> Daha geniş düşünme, farklı bakış açıları geliştirme ve daha yenilikçi çözümler bulma.</li>
+                        <li><strong>Duygusal Zeka:</strong> Duyguları daha iyi tanıma, dürtüleri kontrol etme ve stresle başa çıkma yeteneği.</li>
+                        <li><strong>Yaşla İlgili Gerilemeye Karşı Koruma:</strong> Bilişsel rezerv oluşturarak yaşlanmanın etkilerine karşı direnç geliştirme.</li>
+                    </ul>
+                    <p>ZekaPark'ta düzenli olarak egzersiz yapmak, beyninizin "kas belleğini" geliştirerek bu becerileri günlük yaşamınıza daha kolay aktarmanızı sağlar.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Hafıza Geliştirme Teknikleri",
+                    content="""
+                    <h3>Hafızanızı geliştirmek için deneyebileceğiniz etkili teknikler:</h3>
+                    <ul>
+                        <li><strong>Görselleştirme:</strong> Hatırlamak istediğiniz bilgiyi canlı görüntülerle ilişkilendirin.</li>
+                        <li><strong>Çağrışım:</strong> Yeni bilgileri, zaten bildiğiniz şeylerle ilişkilendirin.</li>
+                        <li><strong>Bölme:</strong> Uzun bilgi dizilerini daha küçük, yönetilebilir parçalara ayırın.</li>
+                        <li><strong>Tekrar:</strong> Aralıklı tekrar, bilgilerin uzun süreli hafızaya geçmesini sağlar.</li>
+                        <li><strong>Hikaye Tekniği:</strong> Hatırlanması gereken öğeleri bir hikaye içinde birleştirin.</li>
+                    </ul>
+                    <p>Bu teknikleri ZekaPark oyunlarında pratik ederek hafızanızı güçlendirebilirsiniz.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Zihinsel Dayanıklılık Geliştirme",
+                    content="""
+                    <h3>Zorluklarla Başa Çıkma Kapasitesini Artırmak</h3>
+                    <p>Zihinsel dayanıklılık, bilişsel zorluklarla karşılaştığınızda pes etmeden devam etme yeteneğidir. Bu özellik, tüm beyin egzersizlerinde ve gerçek yaşam zorluklarında başarı için kritiktir.</p>
 
-        # Test kullanıcıları için örnek skorlar ekle
-        scores = [
-            # Mehmet'in skorları
-            Score(user_id=2, game_type="wordPuzzle", score=1200),
-            Score(user_id=2, game_type="memoryMatch", score=1800),
-            Score(user_id=2, game_type="labyrinth", score=950),
-            Score(user_id=2, game_type="puzzle", score=2200),
+                    <h4>Zihinsel dayanıklılığı geliştirme stratejileri:</h4>
+                    <ul>
+                        <li><strong>Zorluk Seviyesini Kademeli Artırın:</strong> Kendinizi konfor alanınızın biraz dışına çıkaran, ama tamamen bunaltmayan zorluklarla düzenli olarak meydan okuyun.</li>
+                        <li><strong>Hatalardan Öğrenin:</strong> Her başarısızlığı öğrenme fırsatı olarak görün ve neyin işe yaramadığını analiz edin.</li>
+                        <li><strong>Olumlu İç Konuşma:</strong> Kendinizle konuşma şeklinize dikkat edin. "Yapamam" yerine "Henüz yapamıyorum, ama pratikle gelişeceğim" demeyi deneyin.</li>
+                        <li><strong>Mikro-Hedefler Belirleyin:</strong> Büyük zorlukları daha küçük, ulaşılabilir adımlara bölün.</li>
+                        <li><strong>Başarılarınızı Takdir Edin:</strong> Küçük ilerlemeleri bile kutlayın ve kendinizi düzenli olarak ödüllendirin.</li>
+                    </ul>
+                    <p>ZekaPark'taki oyunları oynarken, zor bölümlerde pes etmeyip stratejinizi ayarlayarak zihinsel dayanıklılığınızı geliştirebilirsiniz. Bu yetenek zamanla gelişir ve günlük yaşamınızdaki engelleri aşmanıza da yardımcı olur.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Oyun Oynarken Optimum Performans İçin Hazırlık",
+                    content="""
+                    <h3>Oyuna Başlamadan Önce En İyi Performans İçin İpuçları</h3>
+                    <ol>
+                        <li><strong>Hidrasyon:</strong> Oyuna başlamadan önce ve oyun sırasında su için. Hafif dehidrasyon bile bilişsel performansı düşürebilir.</li>
+                        <li><strong>Duruş Kontrolü:</strong> Omurganızı dik tutacak ergonomik bir oturma pozisyonu belirleyin. İyi duruş, oksijen akışını ve odaklanmayı destekler.</li>
+                        <li><strong>Göz Dinlendirme:</strong> Her 20 dakikada bir, 20 saniye boyunca 20 feet (yaklaşık 6 metre) uzağa bakarak gözlerinizi dinlendirin (20-20-20 kuralı).</li>
+                        <li><strong>Beyin Isınması:</strong> Tam konsantrasyona ihtiyaç duyan oyunlara başlamadan önce basit zihinsel egzersizlerle ısının.</li>
+                        <li><strong>Arka Plan Müziği:</strong> Dikkatinizi dağıtmayan, sabit tempolu enstrümantal müzik, bazı kişilerde konsantrasyonu artırabilir.</li>
+                        <li><strong>Dikkat Dağıtıcıları Kaldırın:</strong> Optimum performans için telefonunuzu sessize alın ve diğer dikkat dağıtıcıları minimize edin.</li>
+                    </ol>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Yaşlılıkta Bilişsel Canlılığı Koruma",
+                    content="""
+                    <h3>Her Yaşta Zihinsel Keskinliği Koruma</h3>
+                    <p>Yaşlanma bazı bilişsel değişikliklerle ilişkilendirilse de, düzenli zihinsel aktivite ve sağlıklı alışkanlıklar, bu değişiklikleri yavaşlatabilir veya bazı durumlarda tersine çevirebilir.</p>
 
-            # Ayşe'nin skorları
-            Score(user_id=3, game_type="wordPuzzle", score=1500),
-            Score(user_id=3, game_type="memoryMatch", score=2100),
-            Score(user_id=3, game_type="labyrinth", score=1100),
-            Score(user_id=3, game_type="puzzle", score=2500),
+                    <h4>Her yaşta bilişsel sağlığı desteklemek için:</h4>
+                    <ul>
+                        <li><strong>Sürekli Öğrenme:</strong> Yeni beceriler ve konular öğrenmek, yeni nöral yollar oluşturur.</li>
+                        <li><strong>Beyin Jimnastiği:</strong> ZekaPark oyunları gibi düzenli bilişsel aktiviteler, beyninizi aktif tutar.</li>
+                        <li><strong>Sosyalleşme:</strong> Sosyal etkileşim, bilişsel gerilemeye karşı koruma sağlar.</li>
+                        <li><strong>Fiziksel Aktivite:</strong> Düzenli egzersiz, beyin hücrelerini besleyen kan akışını artırır.</li>
+                        <li><strong>Dengeli Beslenme:</strong> Akdeniz diyeti gibi beyin dostu beslenme modelleri, bilişsel sağlığı destekler.</li>
+                        <li><strong>Kaliteli Uyku:</strong> Uyku sırasında, beyin toksinlerden arınır ve hafıza konsolidasyonu gerçekleşir.</li>
+                        <li><strong>Stres Yönetimi:</strong> Kronik stres, hipokampus dahil beynin önemli bölgelerine zarar verebilir.</li>
+                    </ul>
+                    <p>Yaşlanma sürecinde bilişsel işlevleri korumak için en etkili stratejilerden biri, çeşitli zorluklarla beyninizi düzenli olarak çalıştırmaktır. ZekaPark platformu, her yaştan kullanıcılar için bilişsel stimülasyon için eğlenceli bir yol sunar.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Çocuklarda Bilişsel Gelişimi Teşvik Etme",
+                    content="""
+                    <h3>Gençlerde Bilişsel Büyümeyi Destekleme</h3>
+                    <p>Çocukluk, beyin gelişiminde kritik bir dönemdir. Aşağıdaki stratejiler, çocuğunuzun bilişsel potansiyelini en üst düzeye çıkarmasına yardımcı olabilir:</p>
 
-            # Emin'in skorları
-            Score(user_id=4, game_type="wordPuzzle", score=900),
-            Score(user_id=4, game_type="memoryMatch", score=1300),
-            Score(user_id=4, game_type="labyrinth", score=700),
-            Score(user_id=4, game_type="puzzle", score=1800),
-        ]
+                    <h4>Çocuğunuzun beyin gelişimini desteklemek için:</h4>
+                    <ul>
+                        <li><strong>Etkileşimli Oyun:</strong> Yaş uygun beyin oyunları, bilmeceleri ve beyin egzersizleri, bilişsel becerileri güçlendirir.</li>
+                        <li><strong>Açık Uçlu Sorular:</strong> Çocuğunuza "neden" ve "nasıl" soruları sorarak kritik düşünme becerilerini geliştirin.</li>
+                        <li><strong>Okuma Alışkanlığı:</strong> Düzenli okuma, dil becerileri, hayal gücü ve odaklanmayı geliştirir.</li>
+                        <li><strong>Fiziksel Aktivite:</strong> Hareket, beyin gelişimi için önemlidir ve koordinasyon, denge ve uzamsal farkındalığı geliştirir.</li>
+                        <li><strong>Müzik ve Sanat:</strong> Müzik eğitimi ve yaratıcı sanat çalışmaları beynin her iki yarımküresini de çalıştırır.</li>
+                        <li><strong>Sınırlı Ekran Süresi:</strong> Ekran zamanını kısıtlamak ve anlamlı teknoloji etkileşimlerini teşvik etmek.</li>
+                        <li><strong>Sağlıklı Beslenme:</strong> DHA gibi beyin dostu besin maddeleri sağlayan dengeli beslenme.</li>
+                        <li><strong>Tutarlı Uyku Düzeni:</strong> Yeterli ve düzenli uyku, bilişsel gelişim için hayati önem taşır.</li>
+                    </ul>
+                    <p>ZekaPark gibi platform, çocuklar ve gençler için yaşa uygun zorluklar sunarak eğlenceli bir bilişsel gelişim yolu sağlar.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Oyunlarda En Yüksek Puanı Almak İçin Stratejiler",
+                    content="""
+                    <h3>Skorunuzu En Üst Düzeye Çıkarmak İçin İpuçları</h3>
+                    <ol>
+                        <li><strong>Konsantrasyonunuzu Maksimize Edin:</strong> Dikkat dağıtıcı olmayan bir ortamda oynayın.</li>
+                        <li><strong>Oyun Mekaniklerini Öğrenin:</strong> Her oyunun puanlama sistemini ve en iyi stratejileri öğrenin.</li>
+                        <li><strong>Düzenli Pratik Yapın:</strong> Beceriler zamanla gelişir, düzenli oynamak iyileşmeye yol açar.</li>
+                        <li><strong>Zamanlamanızı İyileştirin:</strong> Birçok oyunda hızlı ve doğru yanıtlar daha yüksek puanlar sağlar.</li>
+                        <li><strong>Kendi Rekorlarınızı Takip Edin:</strong> Gelişiminizi takip edin ve kendi skorlarınızı geçmeye çalışın.</li>
+                        <li><strong>Rakiplerinizi Gözlemleyin:</strong> Lider tablosundaki üst düzey oyuncuların stratejilerini anlamaya çalışın.</li>
+                        <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
+                        <li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
+                    </ol>
+                    <p>ZekaPark oyunlarında yüksek puan almak, sadece eğlenceli bir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Bilişsel Egzersizlere Yeni Başlayanlar İçin Rehber",
+                    content="""
+                    <h3>Beyin Egzersizi Yolculuğuna Başlamak</h3>
+                    <p>Beyin egzersizleri yapmak ilk başta korkutucu olabilir, ama doğru yaklaşımla herkes için erişilebilir ve eğlenceli olabilir.</p>
 
-        db.session.add_all(scores)
-        db.session.commit()
+                    <h4>Başlangıç seviyesi stratejileri:</h4>
+                    <ol>
+                        <li><strong>Basit Başlayın:</strong> Temel zorluk seviyelerinde kendinize güven kazanın ve aşırı zorlamadan ilerleme kaydedin.</li>
+                        <li><strong>Düzenli, Kısa Seanslar:</strong> Her gün 10-15 dakikalık oturumlar, uzun ama seyrek oturumlardan daha etkilidir.</li>
+                        <li><strong>Çeşitliliği Benimseyin:</strong> Farklı bilişsel becerileri hedefleyen çeşitli oyunlar deneyin.</li>
+                        <li><strong>Gelişimi Takip Edin:</strong> İlerlemenizi izleyin, ancak kendiniziyle rekabet edin, başkalarıyla değil.</li>
+                        <li><strong>Eğlenceyi Önceliklendirin:</strong> Keyif aldığınız zihinsel aktivitelerde daha iyi performans göstereceksiniz.</li>
+                        <li><strong>Sabırlı Olun:</strong> Bilişsel gelişim zaman alır, sürekli küçük gelişmeleri hedefleyin.</li>
+                        <li><strong>Gerçekçi Beklentiler Oluşturun:</strong> Herkes farklı başlangıç becerilerine ve ilerleme hızlarına sahiptir.</li>
+                    </ol>
+                    <p>Unutmayın, bilişsel egzersiz bir maraton, sprint değil. ZekaPark'ta, seviyeniz ne olursa olsun sizin için uygun zorluklar bulabilirsiniz.</p>
+                    """,
+                    category="tip"
+                )
+            ]
+            
+            for article in articles:
+                db.session.add(article)
+            
+            # Değişiklikleri kaydet
+            db.session.commit()
+            return "Başarıyla örnek veriler oluşturuldu!"
+        else:
+            return "Veritabanında zaten veri var, işlem iptal edildi."
+    except Exception as e:
+        logger.error(f"Veritabanı başlatma hatası: {str(e)}")
+        return f"Veritabanı başlatma hatası: {str(e)}"
 
-        logger.info("Admin ve test kullanıcıları oluşturuldu")
-
-# Init database route
 @app.route('/init-db')
 def init_db_route():
-    initialize_database()
-    return 'Database initialized'
+    result = initialize_database()
+    return result
 
-# Routes for main pages
 def get_most_played_games(limit=4):
     """En çok oynanan oyunları sayısına göre döndürür."""
-    from sqlalchemy import func, desc
-    try:
-        # Her oyun türünün oynama sayısını hesapla
-        most_played = db.session.query(
-            Score.game_type,
-            func.count(Score.id).label('play_count')
-        ).group_by(
-            Score.game_type
-        ).order_by(
-            desc('play_count')
-        ).limit(limit).all()
-        
-        # Oyun türü ve sayma sonuçlarını bir sözlüğe dönüştür
-        result = []
-        game_info = {
-            'wordPuzzle': {'name': 'Kelime Bulmaca', 'icon': 'fas fa-font', 'description': 'Kelimeleri bul, sözcük hazineni genişlet.', 'route': 'word_puzzle'},
-            'memoryMatch': {'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'description': 'Eşleşen kartları bul ve hafızanı test et.', 'route': 'memory_cards'},
-            'labyrinth': {'name': 'Labirent', 'icon': 'fas fa-route', 'description': 'Çıkış yolunu bul ve stratejik düşün.', 'route': 'labyrinth'},
-            'puzzle': {'name': 'Yapboz', 'icon': 'fas fa-puzzle-piece', 'description': 'Parçaları birleştir ve görsel zekânı geliştir.', 'route': 'puzzle'},
-            'numberSequence': {'name': 'Sayı Dizisi', 'icon': 'fas fa-sort-numeric-up', 'description': 'Sayı örüntülerini keşfet ve analitik düşün.', 'route': 'number_sequence'},
-            'numberChain': {'name': 'Sayı Zinciri', 'icon': 'fas fa-link', 'description': 'Gördüğün sayıları doğru sırayla hatırla.', 'route': 'number_chain'},
-            'audioMemory': {'name': 'Sesli Hafıza', 'icon': 'fas fa-volume-up', 'description': 'Duyduğun ses sıralamasını doğru tekrarla.', 'route': 'audio_memory'},
-            'nBack': {'name': 'N-Back Test', 'icon': 'fas fa-brain', 'description': 'Çalışma belleğini ve odaklanma gücünü test et.', 'route': 'n_back'},
-            'chess': {'name': 'Satranç', 'icon': 'fas fa-chess', 'description': 'Stratejik düşünme ve planlama becerilerinizi geliştirin.', 'route': 'chess'},
-            'sudoku': {'name': 'Sudoku', 'icon': 'fas fa-th', 'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.', 'route': 'sudoku'},
-            '3dRotation': {'name': '3D Döndürme', 'icon': 'fas fa-cube', 'description': '3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.', 'route': 'three_d_rotation'},
-            'wordle': {'name': 'Wordle', 'icon': 'fas fa-keyboard', 'description': '5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!', 'route': 'wordle'},
-            '2048': {'name': '2048', 'icon': 'fas fa-th-large', 'description': 'Sayıları birleştirerek 2048 değerine ulaşmaya çalışın.', 'route': 'game_2048'}
+    games = [
+        {
+            "name": "Kelime Bulmaca",
+            "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
+            "icon": "fas fa-font",
+            "route": "wordle"
+        },
+        {
+            "name": "Hafıza Kartları",
+            "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
+            "icon": "fas fa-clone",
+            "route": "memory_cards"
+        },
+        {
+            "name": "Sesli Hafıza",
+            "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
+            "icon": "fas fa-music",
+            "route": "audio_memory"
+        },
+        {
+            "name": "Sudoku",
+            "description": "Klasik mantık bulmacası ile analitik düşünme becerilerinizi geliştirin.",
+            "icon": "fas fa-th",
+            "route": "sudoku"
         }
-        
-        for game_type, count in most_played:
-            if game_type in game_info:
-                game_data = game_info[game_type].copy()
-                game_data['count'] = count
-                result.append(game_data)
-                
-        # Eğer yeterli veri yoksa varsayılan oyunları ekle
-        if len(result) < limit:
-            default_games = ['wordPuzzle', 'memoryMatch', 'sudoku', 'audioMemory']
-            for game in default_games:
-                if game not in [item['route'] for item in result] and len(result) < limit and game in game_info:
-                    game_data = game_info[game].copy()
-                    game_data['count'] = 0
-                    result.append(game_data)
-                    
-        return result
-    except Exception as e:
-        logger.error(f"Error getting most played games: {e}")
-        # Hata durumunda varsayılan oyunları döndür
-        return [
-            {'name': 'Kelime Bulmaca', 'icon': 'fas fa-font', 'description': 'Kelimeleri bul, sözcük hazineni genişlet.', 'route': 'word_puzzle', 'count': 0},
-            {'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'description': 'Eşleşen kartları bul ve hafızanı test et.', 'route': 'memory_cards', 'count': 0},
-            {'name': 'Sudoku', 'icon': 'fas fa-th', 'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.', 'route': 'sudoku', 'count': 0},
-            {'name': 'Sesli Hafıza', 'icon': 'fas fa-volume-up', 'description': 'Duyduğun ses sıralamasını doğru tekrarla.', 'route': 'audio_memory', 'count': 0}
-        ]
+    ]
+    return games[:limit]
 
+# Ana Sayfa
 @app.route('/')
 def index():
-    user = None
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-    
-    # En çok oynanan oyunları al
-    most_played_games = get_most_played_games(4)
-    
-    return render_template('index.html', user=user, current_user=user, most_played_games=most_played_games)
+    # En çok oynanan 4 oyunu çek
+    most_played_games = get_most_played_games(limit=4)
+    return render_template('index.html', most_played_games=most_played_games)
 
+# Giriş Sayfası
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Yönlendirme parametresini al (varsa)
-    redirect_to = request.args.get('redirect', '')
-    
     if request.method == 'POST':
-        email = request.form.get('email')
+        username = request.form.get('username')
         password = request.form.get('password')
-        # Form'dan yönlendirme bilgisini al
-        redirect_to = request.form.get('redirect', '')
-
-        if not email or not password:
-            flash('Lütfen email ve şifrenizi girin.', 'danger')
-            return redirect(url_for('login', redirect=redirect_to))
-
-        user = User.query.filter_by(email=email).first()
-
-        if not user or not check_password_hash(user.password_hash, password):
-            flash('Geçersiz email veya şifre.', 'danger')
-            return redirect(url_for('login', redirect=redirect_to))
-
-        # Kullanıcı oturum bilgilerini kaydet
-        session['user_id'] = user.id
-        session['username'] = user.username
-
-        # Avatar URL'sini session'a kaydet
-        if user.avatar_url:
-            session['avatar_url'] = user.avatar_url
-        else:
-            session['avatar_url'] = 'images/default-avatar.png'
-
-        flash('Başarıyla giriş yaptınız!', 'success')
         
-        # Eğer bir yönlendirme varsa, oraya git
-        if redirect_to:
-            if redirect_to.startswith('/'):
-                return redirect(redirect_to)
-            else:
-                return redirect('/' + redirect_to)
-        else:
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password_hash, password):
+            session['user_id'] = user.id
+            # Kullanıcının son aktif zamanını güncelle
+            user.last_active = datetime.utcnow()
+            db.session.commit()
+            
+            flash('Giriş başarılı!', 'success')
             return redirect(url_for('index'))
-
-    if session.get('user_id'):
-        # Kullanıcı zaten giriş yapmışsa
-        if redirect_to:
-            if redirect_to.startswith('/'):
-                return redirect(redirect_to)
-            else:
-                return redirect('/' + redirect_to)
         else:
-            return redirect(url_for('index'))
+            flash('Kullanıcı adı veya şifre hatalı!', 'danger')
+    
+    return render_template('login.html')
 
-    return render_template('login.html', redirect=redirect_to)
+# OYUNLAR
 
-# Profile routes have been removed from the application
-
-# Game routes
+# 3D Rotasyon Oyunu
 @app.route('/games/3d-rotation')
 def three_d_rotation():
     return render_template('games/3dRotation.html')
 
+# Kelime Bulmaca Oyunu
 @app.route('/games/word-puzzle')
 def word_puzzle():
     return render_template('games/wordPuzzle.html')
 
+# Hafıza Eşleştirme Oyunu
 @app.route('/games/memory-match')
 def memory_match():
-    # Eski Hafıza Kartları oyunu artık kullanılmıyor, yeni sürüme yönlendir
-    return redirect(url_for('memory_cards'))
+    return render_template('games/memoryMatch.html')
 
+# 3D Labirent Oyunu
 @app.route('/games/labyrinth')
 def labyrinth():
     return render_template('games/labyrinth.html')
 
+# Bulmaca Oyunu
 @app.route('/games/puzzle')
 def puzzle():
     return render_template('games/puzzle.html')
 
-# Removed Visual Attention game as requested
-# @app.route('/games/visual-attention')
-# def visual_attention():
-#     return render_template('games/visualAttention.html')
-
+# Sayı Dizisi Oyunu
 @app.route('/games/number-sequence')
 def number_sequence():
     return render_template('games/numberSequence.html')
 
-# Yeni Hafıza Güçlendirme Oyunları
-# Route for "Kim Nerede?" game has been removed
-
+# Hafıza Kartları Oyunu
 @app.route('/games/memory-cards')
 def memory_cards():
     return render_template('games/memoryCards.html')
 
+# Sayı Zinciri Oyunu
 @app.route('/games/number-chain')
 def number_chain():
     return render_template('games/numberChain.html')
 
+# Sesli Hafıza Oyunu
 @app.route('/games/audio-memory')
 def audio_memory():
     """Sesli Hafıza: Melodi oyunu
@@ -748,25 +584,40 @@ def audio_memory():
     Doğa sesleri, enstrümanlar veya diğer sesler ile hafıza egzersizi."""
     return render_template('games/audioMemory.html')
 
+# N-Back Oyunu
 @app.route('/games/n-back')
 def n_back():
     return render_template('games/nBack.html')
 
-# Yeni Mantık ve IQ Geliştirme Oyunları
-# Sudoku oyunu kaldırıldı
+# Sudoku Oyunu
 @app.route('/games/sudoku')
 def sudoku():
     return render_template('games/sudoku.html')
 
+# 2048 Oyunu
+@app.route('/2048')
+def game_2048_redirect():
+    return redirect(url_for('game_2048'))
+    
 @app.route('/games/2048')
 def game_2048():
     return render_template('games/2048.html')
 
+# Wordle Oyunu
+@app.route('/wordle')
+def wordle_redirect():
+    return redirect(url_for('wordle'))
+    
 @app.route('/games/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
     return render_template('games/wordle.html')
 
+# Satranç Oyunu
+@app.route('/chess')
+def chess_redirect():
+    return redirect(url_for('chess'))
+    
 @app.route('/games/chess')
 def chess():
     """Satranç oyunu"""
@@ -782,1161 +633,745 @@ def all_games():
 def leaderboard():
     return render_template('leaderboard.html')
 
-# Articles
+# Makaleler
 @app.route('/articles')
 def articles():
-    articles = Article.query.filter_by(category='article').all()
+    articles = Article.query.filter_by(category="article").all()
     return render_template('articles.html', articles=articles)
 
-# Tips
+# İpuçları
 @app.route('/tips')
 def tips():
-    tips = Article.query.filter_by(category='tip').all()
+    tips = Article.query.filter_by(category="tip").all()
     return render_template('tips.html', tips=tips)
 
-# User management routes
+# Kayıt Sayfası
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validasyon kontrolleri
         if not username or not email or not password:
-            flash('Tüm alanları doldurunuz.')
+            flash('Tüm alanlar doldurulmalıdır!', 'danger')
             return redirect(url_for('register'))
-
-        # Email validation
-        if not '@' in email or not '.' in email:
-            flash('Geçerli bir email adresi giriniz.')
+        
+        if password != confirm_password:
+            flash('Şifreler eşleşmiyor!', 'danger')
             return redirect(url_for('register'))
-
-        email_domain = email.split('@')[1]
-        valid_domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com']
-        if email_domain not in valid_domains:
-            flash('Lütfen geçerli bir email servis sağlayıcısı kullanın (Gmail, Hotmail, Yahoo, Outlook).')
+        
+        # E-posta formatını kontrol et
+        try:
+            valid = validate_email(email)
+            email = valid.email
+        except EmailNotValidError:
+            flash('Geçersiz e-posta formatı!', 'danger')
             return redirect(url_for('register'))
-
+        
+        # Kullanıcı veya e-posta zaten kayıtlı mı kontrol et
         if User.query.filter_by(username=username).first():
-            flash('Bu kullanıcı adı zaten kullanılıyor.')
+            flash('Bu kullanıcı adı zaten kullanılıyor!', 'danger')
             return redirect(url_for('register'))
-
+        
         if User.query.filter_by(email=email).first():
-            flash('Bu email adresi zaten kullanılıyor.')
+            flash('Bu e-posta adresi zaten kullanılıyor!', 'danger')
             return redirect(url_for('register'))
-
+        
+        # Yeni kullanıcı oluştur
+        hashed_password = generate_password_hash(password)
         new_user = User(
             username=username,
             email=email,
-            password_hash=generate_password_hash(password)
+            password_hash=hashed_password
         )
-
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-
-            session['user_id'] = new_user.id
-            session['username'] = new_user.username
-            session['avatar_url'] = 'images/default-avatar.png'  # Varsayılan avatar
-            flash('Kayıt başarılı! Hoş geldiniz!')
-            return redirect(url_for('index'))
-        except Exception as e:
-            db.session.rollback()
-            flash('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.')
-            return redirect(url_for('register'))
-
-    if session.get('user_id'):
+        
+        # Veritabanına kaydet
+        db.session.add(new_user)
+        db.session.commit()
+        
+        # Otomatik giriş yap
+        session['user_id'] = new_user.id
+        
+        flash('Kayıt başarılı! Hoş geldiniz!', 'success')
         return redirect(url_for('index'))
-
+    
     return render_template('register.html')
 
+# Çıkış
 @app.route('/logout')
 def logout():
-    # Tüm oturum verilerini temizle
-    session.clear()
-    flash('Başarıyla çıkış yaptınız.')
-    return redirect(url_for('login'))
+    session.pop('user_id', None)
+    flash('Başarıyla çıkış yaptınız!', 'success')
+    return redirect(url_for('index'))
 
-# Profile management routes
 def xp_for_level(level):
     """Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar."""
-    # Basit bir XP hesaplama formülü: 1000 * level * (level + 1) / 2
-    return int(1000 * level * (level + 1) / 2)
+    return int(100 * (level ** 1.5))
 
 def calculate_level(xp):
     """Toplam XP'ye göre kullanıcı seviyesini hesaplar."""
-    # Seviye 1 için gereken minimum XP: 0
-    if xp < 1000:
-        return 1
-    
-    # Quadratic formülü çözerek seviyeyi hesaplama
-    # n^2 + n - (2*xp/1000) = 0 formülünden n'yi çözümle
-    a = 1
-    b = 1
-    c = -2 * xp / 1000
-    
-    # Quadratic formülü kullanarak pozitif değeri bul: (-b + sqrt(b^2 - 4ac)) / 2a
-    import math
-    level = (-b + math.sqrt(b*b - 4*a*c)) / (2*a)
-    
-    # Tamsayıya yuvarla (aşağı)
-    return int(level)
+    level = 1
+    while xp >= xp_for_level(level + 1):
+        level += 1
+    return level
 
 def xp_for_level(level):
     """Belirli bir seviyeye ulaşmak için gereken XP miktarını hesaplar."""
-    # Seviye 1 için XP: 0
-    if level <= 1:
-        return 0
-    
-    # Formül: level * (level - 1) * 500
-    return int(level * (level - 1) * 500)
+    return int(100 * (level ** 1.5))
 
 def get_user_scores():
     """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
-    if 'user_id' not in session:
-        return {}
-    
-    user_id = session['user_id']
-    
-    # Kullanıcının tüm oyun skorlarını al
-    scores = Score.query.filter_by(user_id=user_id).all()
-    
-    # Her oyun türü için en yüksek skoru bul
-    score_dict = {}
-    for score in scores:
-        game_type = score.game_type
-        if game_type not in score_dict or score.score > score_dict[game_type]:
-            score_dict[game_type] = score.score
-            # Son oyun tarihini de ekle
-            score_dict[f"{game_type}_date"] = score.timestamp.strftime('%d/%m/%Y')
-    
-    return score_dict
+    if 'user_id' in session:
+        scores = Score.query.filter_by(user_id=session['user_id']).all()
+        result = {}
+        for score in scores:
+            if score.game_type not in result or score.score > result[score.game_type]:
+                result[score.game_type] = score.score
+        return result
+    return {}
 
+# Profil Sayfası
 @app.route('/profile')
 def profile():
     """Mevcut profil sayfası."""
-    # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
     if 'user_id' not in session:
+        flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
     
-    # Kullanıcı bilgilerini veritabanından al
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Kullanıcının oyun skorlarını al
-    scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
+    # Toplam oyun sayısı ve en yüksek skoru hesapla
+    scores = Score.query.filter_by(user_id=user.id).all()
     
-    # Oyun türlerine göre skorları grupla
-    game_scores = {}
+    user_scores = {}
     for score in scores:
-        if score.game_type not in game_scores:
-            game_scores[score.game_type] = []
-        game_scores[score.game_type].append(score)
+        if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
+            user_scores[score.game_type] = score.score
     
-    # Profil sayfasını render et
-    return render_template('profile_new.html', user=user, game_scores=game_scores)
-
-@app.route('/profile-v2')
-def profile_v2():
-    """Yeni tasarımlı profil sayfası."""
-    # Kullanıcı girişi yapılmamışsa login sayfasına yönlendir
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
+    # Kullanıcı seviyesini hesapla
+    user_level = calculate_level(user.experience_points)
     
-    # Kullanıcı bilgilerini veritabanından al
-    user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
+    # Bir sonraki seviyeye ne kadar XP kaldığını hesapla
+    next_level_xp = xp_for_level(user_level + 1)
+    current_level_xp = xp_for_level(user_level)
+    xp_progress = ((user.experience_points - current_level_xp) / (next_level_xp - current_level_xp)) * 100
     
-    # Kullanıcının oyun skorlarını al
-    scores = Score.query.filter_by(user_id=user.id).order_by(Score.timestamp.desc()).all()
-    
-    # Oyun türlerine göre skorları grupla
-    game_scores = {}
-    for score in scores:
-        if score.game_type not in game_scores:
-            game_scores[score.game_type] = []
-        game_scores[score.game_type].append(score)
-    
-    # Kullanıcının seviyesini ve gereken XP miktarlarını hesapla
-    # Seviye 1 için gereken minimum XP: 0
-    user_xp = user.experience_points or 0
-    if user_xp < 1000:
-        current_level = 1
-    else:
-        try:
-            # Quadratic formülü çözerek seviyeyi hesaplama
-            # n^2 + n - (2*xp/1000) = 0 formülünden n'yi çözümle
-            import math
-            a = 1
-            b = 1
-            c = -2 * user_xp / 1000
-            
-            # Quadratic formülü kullanarak pozitif değeri bul: (-b + sqrt(b^2 - 4ac)) / 2a
-            disc = b*b - 4*a*c
-            if disc >= 0:  # Discriminant pozitif olmalı
-                current_level = int((-b + math.sqrt(disc)) / (2*a))
-            else:
-                current_level = 1  # Hesaplama hatası durumunda varsayılan değer
-        except Exception as e:
-            # Herhangi bir hata durumunda varsayılan seviyeyi kullan
-            current_level = 1
-            print(f"Seviye hesaplama hatası: {e}")
-    
-    # Seviye en az 1 olmalıdır
-    current_level = max(1, current_level)
-    
-    xp_for_current = xp_for_level(current_level)
-    xp_for_next = xp_for_level(current_level + 1)
-    
-    # Yeni profil sayfasını render et
     return render_template(
-        'profile_v2.html',
-        user=user,
-        game_scores=game_scores,
-        calculate_level=calculate_level,
-        xp_for_level=xp_for_level,
-        current_level=current_level,
-        xp_for_current=xp_for_current,
-        xp_for_next=xp_for_next
+        'profile.html', 
+        user=user, 
+        scores=user_scores,
+        user_level=user_level,
+        xp_progress=xp_progress,
+        next_level_xp=next_level_xp,
+        current_xp=user.experience_points
     )
 
-@app.route('/update-profile', methods=['POST'])
+# Profil Sayfası (Yeni Tasarım)
+@app.route('/profile/v2')
+def profile_v2():
+    """Yeni tasarımlı profil sayfası."""
+    if 'user_id' not in session:
+        flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    # Kullanıcı istatistiklerini hesapla
+    scores = Score.query.filter_by(user_id=user.id).all()
+    
+    total_games = len(scores)
+    highest_score = 0
+    if scores:
+        highest_score = max(score.score for score in scores)
+    
+    # Oyun başına en yüksek skorlar
+    user_scores = {}
+    for score in scores:
+        if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
+            user_scores[score.game_type] = score.score
+    
+    # Kullanıcı seviyesini hesapla
+    user_level = calculate_level(user.experience_points)
+    
+    # Bir sonraki seviyeye ne kadar XP kaldığını hesapla
+    next_level_xp = xp_for_level(user_level + 1)
+    current_level_xp = xp_for_level(user_level)
+    xp_progress = ((user.experience_points - current_level_xp) / (next_level_xp - current_level_xp)) * 100
+    
+    return render_template(
+        'profile_v2.html', 
+        user=user, 
+        scores=user_scores,
+        total_games=total_games,
+        highest_score=highest_score,
+        user_level=user_level,
+        xp_progress=xp_progress,
+        next_level_xp=next_level_xp,
+        current_xp=user.experience_points,
+        xp_needed=next_level_xp - user.experience_points
+    )
+
+# Profil Güncelleme
+@app.route('/profile/update', methods=['POST'])
 def update_profile():
     """Profil bilgilerini güncelleme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Form verilerini al
-    username = request.form.get('username')
-    email = request.form.get('email')
-    full_name = request.form.get('full_name')
-    bio = request.form.get('bio')
+    # POST verilerini al
+    full_name = request.form.get('full_name', user.full_name)
+    bio = request.form.get('bio', user.bio)
+    age = request.form.get('age')
+    location = request.form.get('location', user.location)
     
-    # Kullanıcı adı kontrol - mevcut kullanıcı hariç
-    if username != user.username and User.query.filter_by(username=username).first():
-        flash('Bu kullanıcı adı zaten kullanılıyor.', 'danger')
-        return redirect(url_for('profile_v2'))
-    
-    # E-posta kontrol - mevcut kullanıcı hariç
-    if email != user.email and User.query.filter_by(email=email).first():
-        flash('Bu e-posta adresi zaten kullanılıyor.', 'danger')
-        return redirect(url_for('profile_v2'))
+    # Yaşı sayıya çevir veya None olarak bırak
+    try:
+        age = int(age) if age else None
+    except:
+        age = None
     
     # Kullanıcı bilgilerini güncelle
-    user.username = username
-    user.email = email
     user.full_name = full_name
     user.bio = bio
+    user.age = age
+    user.location = location
     
-    # Session'daki kullanıcı adını da güncelle
-    session['username'] = username
+    db.session.commit()
     
-    try:
-        db.session.commit()
-        flash('Profil bilgileriniz başarıyla güncellendi.', 'success')
-    except:
-        db.session.rollback()
-        flash('Profil güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-    
-    return redirect(url_for('profile_v2'))
+    return jsonify({'success': True, 'message': 'Profil bilgileri güncellendi!'})
 
-@app.route('/update-avatar', methods=['POST'])
+# Avatar Güncelleme
+@app.route('/profile/update/avatar', methods=['POST'])
 def update_avatar():
     """Profil fotoğrafını güncelleme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Avatar yüklendi mi kontrol et
+    # Dosyanın gelip gelmediğini kontrol et
     if 'avatar' not in request.files:
-        flash('Profil fotoğrafı yüklenirken bir hata oluştu.', 'danger')
-        return redirect(url_for('profile_v2'))
+        return jsonify({'success': False, 'message': 'Dosya seçilmedi!'})
     
-    file = request.files['avatar']
+    avatar = request.files['avatar']
     
-    # Dosya seçilmedi ise
-    if file.filename == '':
-        flash('Lütfen bir dosya seçin.', 'danger')
-        return redirect(url_for('profile_v2'))
+    # Dosya adı boş mu kontrol et
+    if avatar.filename == '':
+        return jsonify({'success': False, 'message': 'Dosya seçilmedi!'})
     
-    # Güvenli dosya ismi oluştur
-    if file and allowed_file(file.filename):
-        try:
-            filename = secure_filename(file.filename)
-            # Benzersiz isim üretmek için timestamp ekle
-            unique_filename = f"{user.id}_{int(time.time())}_{filename}"
-            filepath = os.path.join('static/uploads/avatars', unique_filename)
-            
-            # Dizin yoksa oluştur
-            os.makedirs('static/uploads/avatars', exist_ok=True)
-            
-            # Dosyayı kaydet
-            file.save(filepath)
-            
-            # Kullanıcının avatar_url'sini güncelle
-            user.avatar_url = f'uploads/avatars/{unique_filename}'
-            session['avatar_url'] = user.avatar_url
-            
-            db.session.commit()
-            flash('Profil fotoğrafınız başarıyla güncellendi.', 'success')
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Avatar upload error: {e}")
-            flash('Fotoğraf yüklenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-    else:
-        flash('İzin verilen dosya formatları: png, jpg, jpeg, gif', 'danger')
+    # Dosya uzantısı uygun mu kontrol et
+    if not allowed_file(avatar.filename):
+        return jsonify({'success': False, 'message': 'Geçersiz dosya formatı! Sadece PNG, JPG, JPEG ve GIF dosyaları kabul edilir.'})
     
-    return redirect(url_for('profile_v2'))
+    # Dosya ismini güvenli hale getir ve benzersiz yap
+    filename = secure_filename(avatar.filename)
+    unique_filename = f"{user.id}_{int(time.time())}_{filename}"
+    
+    # Yükleme klasörü yoksa oluştur
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
+    # Dosyayı kaydet
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+    avatar.save(filepath)
+    
+    # Veritabanını güncelle (static/ öneki olmadan kaydet)
+    user.avatar_url = os.path.join('uploads/avatars', unique_filename)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Profil fotoğrafı güncellendi!', 'avatar_url': user.avatar_url})
 
-@app.route('/change-password', methods=['POST'])
+# Şifre Değiştirme
+@app.route('/profile/change-password', methods=['POST'])
 def change_password():
     """Şifre değiştirme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Form verilerini al
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
     
-    # Mevcut şifreyi kontrol et
+    # Validasyon
+    if not current_password or not new_password or not confirm_password:
+        return jsonify({'success': False, 'message': 'Tüm alanları doldurun!'})
+    
     if not check_password_hash(user.password_hash, current_password):
-        flash('Mevcut şifreniz yanlış.', 'danger')
-        return redirect(url_for('profile_v2'))
+        return jsonify({'success': False, 'message': 'Mevcut şifre yanlış!'})
     
-    # Yeni şifre doğrulama
     if new_password != confirm_password:
-        flash('Yeni şifreler eşleşmiyor.', 'danger')
-        return redirect(url_for('profile_v2'))
+        return jsonify({'success': False, 'message': 'Yeni şifreler eşleşmiyor!'})
     
-    if len(new_password) < 6:
-        flash('Yeni şifre en az 6 karakter olmalıdır.', 'danger')
-        return redirect(url_for('profile_v2'))
+    if len(new_password) < 8:
+        return jsonify({'success': False, 'message': 'Şifre en az 8 karakter olmalıdır!'})
     
     # Şifreyi güncelle
     user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
     
-    try:
-        db.session.commit()
-        flash('Şifreniz başarıyla değiştirildi.', 'success')
-    except:
-        db.session.rollback()
-        flash('Şifre değiştirilirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-    
-    return redirect(url_for('profile_v2'))
+    return jsonify({'success': True, 'message': 'Şifre başarıyla değiştirildi!'})
 
-@app.route('/update-security-settings', methods=['POST'])
+# Güvenlik Ayarları
+@app.route('/profile/security', methods=['POST'])
 def update_security_settings():
     """Güvenlik ayarlarını güncelleme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Form verilerini al
-    current_password = request.form.get('current_password')
-    new_password = request.form.get('new_password')
-    confirm_password = request.form.get('confirm_password')
+    # Güvenlik ayarlarını al (örnek olarak 2FA)
+    two_factor = request.form.get('two_factor', 'off') == 'on'
     
-    # Mevcut şifreyi kontrol et
-    if not check_password_hash(user.password_hash, current_password):
-        flash('Mevcut şifreniz yanlış.', 'danger')
-        return redirect(url_for('profile_v2'))
+    # Burada gerçek 2FA implementasyonu yapılabilir
+    # Şimdilik sadece bir ayar olarak kaydediyoruz
     
-    # Yeni şifre doğrulama
-    if new_password != confirm_password:
-        flash('Yeni şifreler eşleşmiyor.', 'danger')
-        return redirect(url_for('profile_v2'))
-    
-    if len(new_password) < 6:
-        flash('Yeni şifre en az 6 karakter olmalıdır.', 'danger')
-        return redirect(url_for('profile_v2'))
-    
-    # Şifreyi güncelle
-    user.password_hash = generate_password_hash(new_password)
-    
-    try:
-        db.session.commit()
-        flash('Güvenlik ayarlarınız başarıyla güncellendi.', 'success')
-    except:
-        db.session.rollback()
-        flash('Güvenlik ayarları güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-    
-    return redirect(url_for('profile_v2'))
+    return jsonify({'success': True, 'message': 'Güvenlik ayarları güncellendi!'})
 
-@app.route('/update-notification-settings', methods=['POST'])
+# Bildirim Ayarları
+@app.route('/profile/notifications', methods=['POST'])
 def update_notification_settings():
     """Bildirim ayarlarını güncelleme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
     
-    # Form verilerini al
-    email_notifications = 'email_notifications' in request.form
-    achievement_notifications = 'achievement_notifications' in request.form
-    leaderboard_notifications = 'leaderboard_notifications' in request.form
+    # Bildirim ayarlarını al
+    email_notifications = request.form.get('email_notifications', 'off') == 'on'
+    achievement_notifications = request.form.get('achievement_notifications', 'off') == 'on'
+    leaderboard_notifications = request.form.get('leaderboard_notifications', 'off') == 'on'
     
-    # Kullanıcı modelinde bu alanlar yoksa eklemeli veya farklı bir yaklaşım kullanmalıyız
-    # Bu örnekte varsayalım ki User modelinde bu alanlar var:
-    try:
-        user.email_notifications = email_notifications
-        user.achievement_notifications = achievement_notifications
-        user.leaderboard_notifications = leaderboard_notifications
-        
-        db.session.commit()
-        flash('Bildirim ayarlarınız başarıyla güncellendi.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Notification settings update error: {e}")
-        flash('Bildirim ayarları güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    # Kullanıcı ayarlarını güncelle
+    user.email_notifications = email_notifications
+    user.achievement_notifications = achievement_notifications
+    user.leaderboard_notifications = leaderboard_notifications
     
-    return redirect(url_for('profile_v2'))
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Bildirim ayarları güncellendi!'})
 
-@app.route('/update-theme', methods=['POST'])
+# Tema Ayarları
+@app.route('/profile/theme', methods=['POST'])
 def update_theme():
     """Tema tercihini güncelleme."""
     if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Giriş yapmamış kullanıcı'})
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı'})
     
-    data = request.json
-    theme = data.get('theme', 'dark')
+    # Tema tercihini al
+    theme = request.form.get('theme', 'dark')
     
-    try:
-        user.theme_preference = theme
-        db.session.commit()
-        return jsonify({'success': True, 'theme': theme})
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Theme update error: {e}")
-        return jsonify({'success': False, 'message': str(e)})
+    # Tema tercihini doğrula
+    if theme not in ['light', 'dark', 'system']:
+        theme = 'dark'  # Varsayılan tema
+    
+    # Kullanıcı ayarını güncelle
+    user.theme_preference = theme
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Tema tercihi güncellendi!'})
 
-@app.route('/delete-account', methods=['POST'])
+# Hesap Silme
+@app.route('/profile/delete', methods=['POST'])
 def delete_account():
     """Hesabı silme."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
-    
-    # Şifre ve onay kontrolü
     password = request.form.get('password')
-    confirm_delete = request.form.get('confirm_delete') == 'on'
     
+    # Şifre doğrulama
     if not check_password_hash(user.password_hash, password):
-        flash('Şifreniz yanlış.', 'danger')
-        return redirect(url_for('profile_v2'))
+        return jsonify({'success': False, 'message': 'Şifre doğrulaması başarısız!'})
     
-    if not confirm_delete:
-        flash('Hesap silme işlemini onaylamanız gerekiyor.', 'danger')
-        return redirect(url_for('profile_v2'))
+    # Kullanıcının skorlarını sil
+    Score.query.filter_by(user_id=user.id).delete()
     
-    try:
-        # Kullanıcıya ait tüm skorları sil
-        Score.query.filter_by(user_id=user.id).delete()
-        
-        # Kullanıcıyı sil
-        db.session.delete(user)
-        db.session.commit()
-        
-        # Oturumu temizle
-        session.clear()
-        
-        flash('Hesabınız başarıyla silindi.', 'success')
-        return redirect(url_for('index'))
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Account deletion error: {e}")
-        flash('Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-        return redirect(url_for('profile_v2'))
+    # Kullanıcıyı sil
+    db.session.delete(user)
+    db.session.commit()
+    
+    # Oturumu sonlandır
+    session.pop('user_id', None)
+    
+    return jsonify({'success': True, 'message': 'Hesabınız başarıyla silindi!'})
 
-@app.route('/suspend-account', methods=['POST'])
+# Hesap Dondurma
+@app.route('/profile/suspend', methods=['POST'])
 def suspend_account():
     """Hesabı dondurma."""
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
     user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect(url_for('login'))
-    
-    # Şifre ve onay kontrolü
     password = request.form.get('password')
-    confirm_suspend = request.form.get('confirm_suspend') == 'on'
+    duration = request.form.get('duration', '30')  # Varsayılan 30 gün
     
+    # Şifre doğrulama
     if not check_password_hash(user.password_hash, password):
-        flash('Şifreniz yanlış.', 'danger')
-        return redirect(url_for('profile_v2'))
+        return jsonify({'success': False, 'message': 'Şifre doğrulaması başarısız!'})
     
-    if not confirm_suspend:
-        flash('Hesap dondurma işlemini onaylamanız gerekiyor.', 'danger')
-        return redirect(url_for('profile_v2'))
-    
+    # Süreyi doğrula ve ayarla
     try:
-        # Hesabı dondur - 30 gün sonrası için tarih hesapla
-        suspended_until = datetime.utcnow() + timedelta(days=30)
-        user.account_status = 'suspended'
-        user.suspended_until = suspended_until
-        
-        db.session.commit()
-        
-        # Oturumu temizle
-        session.clear()
-        
-        flash('Hesabınız 30 gün boyunca donduruldu. Bu süre sonunda tekrar giriş yapabilirsiniz.', 'info')
-        return redirect(url_for('index'))
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Account suspension error: {e}")
-        flash('Hesap dondurulurken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-        return redirect(url_for('profile_v2'))
+        duration = int(duration)
+        if duration not in [7, 30, 90]:
+            duration = 30
+    except:
+        duration = 30
+    
+    # Hesabı dondur
+    user.account_status = 'suspended'
+    user.suspended_until = datetime.utcnow() + timedelta(days=duration)
+    db.session.commit()
+    
+    # Oturumu sonlandır
+    session.pop('user_id', None)
+    
+    return jsonify({'success': True, 'message': f'Hesabınız {duration} gün boyunca donduruldu!'})
 
-# Password reset routes
+# Şifremi Unuttum
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email')
+        
+        # E-posta ile kullanıcıyı bul
         user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Rastgele 6 haneli kod oluştur
+            reset_code = str(random.randint(100000, 999999))
+            
+            # Token ve son kullanma tarihi kaydet
+            user.reset_token = reset_code
+            user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
+            db.session.commit()
+            
+            # E-posta gönder
+            if send_verification_email(email, reset_code):
+                flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+                return redirect(url_for('reset_code', email=email))
+            else:
+                flash('E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+        else:
+            # Güvenlik için kullanıcının bulunup bulunmadığını belirtme
+            flash('Şifre sıfırlama talimatları e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+    
+    return render_template('forgot_password.html')
 
-        if not user:
-            flash('Bu email adresi ile kayıtlı bir kullanıcı bulunamadı.', 'danger')
-            return redirect(url_for('forgot_password'))
-
-        # Generate a random 4-digit verification code
-        verification_code = ''.join(random.choices('0123456789', k=4))
-        token_expiry = datetime.utcnow() + timedelta(minutes=30)  # Token valid for 30 minutes
-
-        # Save the verification code and expiry in the user's record
-        user.reset_token = verification_code
-        user.reset_token_expiry = token_expiry
-        db.session.commit()
-
-        # Try to send the verification code via email
-        # For security purposes, we don't reveal if email exists or not
-        try:
-            # Even if we can't send email, show success message but log the code for testing
-            logger.info(f"Password reset code for {email}: {verification_code}")
-
-            # Try to send email
-            send_verification_email(email, verification_code)
-
-            # Always show success message to prevent email enumeration attacks
-            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-
-            # In development mode, also show the code on screen
-            if app.debug:
-                flash(f'TEST MODU - Doğrulama kodunuz: {verification_code}', 'info')
-        except Exception as e:
-            # Still log the error but don't tell the user
-            logger.error(f"Error sending email: {e}")
-
-            # Show success message anyway for security
-            flash('Doğrulama kodu email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-
-            # In development mode, show code and error
-            if app.debug:
-                flash(f'TEST MODU - Doğrulama kodunuz: {verification_code}', 'info')
-                flash(f'E-posta gönderme hatası (yalnızca geliştirme): {str(e)}', 'warning')
-
-        # Redirect to the verification code page
-        return redirect(url_for('reset_code', email=email))
-
-    email = request.args.get('email', '')
-    return render_template('forgot_password.html', email=email)
-
+# Şifre Sıfırlama Kodu
 @app.route('/reset-code', methods=['GET', 'POST'])
 def reset_code():
     email = request.args.get('email', '')
-    if not email and request.method == 'POST':
-        email = request.form.get('email', '')
-
-    if not email:
-        flash('Email adresi belirtilmedi.', 'danger')
-        return redirect(url_for('forgot_password'))
-
+    
     if request.method == 'POST':
-        # Debug: log form data
-        logger.debug(f"Reset code form data: {request.form}")
-
-        # İki farklı form parametresi kontrolü
-        verification_code = request.form.get('verification_code', '')
-
-        if not verification_code:
-            # Try to get individual digits and combine them
-            code_parts = []
-            for i in range(1, 5):
-                digit = request.form.get(f'code{i}', '')
-                if not digit:
-                    break
-                code_parts.append(digit)
-
-            if len(code_parts) == 4:
-                verification_code = ''.join(code_parts)
-
-        user = User.query.filter_by(email=email).first()
-
-        if not user:
-            flash('Geçersiz email adresi.', 'danger')
-            return redirect(url_for('forgot_password'))
-
-        # Debug: log verification details
-        logger.debug(f"Verification attempt: code={verification_code}, user_token={user.reset_token}")
-
-        if not user.reset_token or user.reset_token != verification_code:
-            flash('Geçersiz doğrulama kodu.', 'danger')
-            return render_template('reset_code.html', email=email)
-
-        if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
-            flash('Doğrulama kodunun süresi doldu. Lütfen yeni bir kod talep edin.', 'danger')
-            return redirect(url_for('forgot_password'))
-
-        try:
-            # Generate a secure token for the password reset page
-            reset_token = secrets.token_urlsafe(32)
-            user.reset_token = reset_token
-            user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=15)  # Token valid for 15 minutes
-            db.session.commit()
-
-            return redirect(url_for('reset_password', email=email, token=reset_token))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error generating reset token: {e}")
-            flash('İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-            return redirect(url_for('forgot_password'))
-
+        code = request.form.get('code')
+        email = request.form.get('email')
+        
+        # Kod ve e-posta ile kullanıcıyı bul
+        user = User.query.filter_by(email=email, reset_token=code).first()
+        
+        if user and user.reset_token_expiry > datetime.utcnow():
+            # Kodu doğrula ve şifre sıfırlama sayfasına yönlendir
+            return redirect(url_for('reset_password', email=email, token=code))
+        else:
+            flash('Geçersiz veya süresi dolmuş kod!', 'danger')
+    
     return render_template('reset_code.html', email=email)
 
+# Şifre Sıfırlama
 @app.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
     email = request.args.get('email', '')
     token = request.args.get('token', '')
-
-    if request.method == 'POST':
-        email = request.form.get('email', '')
-        token = request.form.get('token', '')
-
-        # Debug: Print form data
-        logger.debug(f"Reset password form data: {request.form}")
-
-    if not email or not token:
-        flash('Geçersiz istek. Email veya token eksik.', 'danger')
-        logger.error(f"Invalid reset request: email={email}, token={token}")
-        return redirect(url_for('login'))
-
+    
+    # Token ve e-posta ile kullanıcıyı bul
     user = User.query.filter_by(email=email, reset_token=token).first()
-
-    if not user:
-        flash('Geçersiz link. Lütfen şifre sıfırlama sürecini tekrar başlatın.', 'danger')
-        logger.error(f"User not found for reset: email={email}, token={token}")
+    
+    if not user or user.reset_token_expiry < datetime.utcnow():
+        flash('Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı!', 'danger')
         return redirect(url_for('forgot_password'))
-
-    if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
-        flash('Şifre sıfırlama linkinin süresi doldu. Lütfen tekrar deneyin.', 'danger')
-        logger.error(f"Token expired for user: {user.email}")
-        return redirect(url_for('forgot_password'))
-
+    
     if request.method == 'POST':
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-
-        if not password or len(password) < 6:
-            flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
-            return render_template('reset_password.html', email=email, token=token)
-
+        
         if password != confirm_password:
-            flash('Şifreler eşleşmiyor.', 'danger')
-            return render_template('reset_password.html', email=email, token=token)
-
-        try:
-            # Update password
+            flash('Şifreler eşleşmiyor!', 'danger')
+        elif len(password) < 8:
+            flash('Şifre en az 8 karakter olmalıdır!', 'danger')
+        else:
+            # Şifreyi güncelle ve token'ı temizle
             user.password_hash = generate_password_hash(password)
             user.reset_token = None
             user.reset_token_expiry = None
             db.session.commit()
-
-            flash('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.', 'success')
+            
+            flash('Şifreniz başarıyla sıfırlandı! Şimdi giriş yapabilirsiniz.', 'success')
             return redirect(url_for('login'))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error updating password: {e}")
-            flash('Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
-
+    
     return render_template('reset_password.html', email=email, token=token)
 
-# API routes for game scores
+# Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
-    data = request.json
-
-    # Use anonymous user or a session-based temporary user if not logged in
-    user_id = session.get('user_id')
-
-    # Kullanıcı giriş yapmamışsa
-    if not user_id:
-        # Şu anki sayfayı belirle (geri dönmek için)
-        current_page = request.headers.get('Referer', '')
-        
-        # URL'den domain kısmını çıkar, sadece path kısmını al
-        if current_page:
-            from urllib.parse import urlparse
-            parsed_url = urlparse(current_page)
-            current_path = parsed_url.path
-        else:
-            current_path = ''
-        
-        # Skorları kaydetmeyi devre dışı bırak ve kullanıcıya bildir
-        return jsonify({
-            'success': False, 
-            'message': 'Login required',
-            'score': data.get('score', 0),
-            'redirect_url': url_for('login', redirect=current_path)
-        })
-
-    # Kullanıcı bilgilerini getir
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found'})
-
-    # game_type parametresini kontrol et (hem game_type hem de gameType'ı destekle)
-    game_type = data.get('game_type', data.get('gameType', None))
-    if not game_type:
-        return jsonify({'success': False, 'message': 'Game type not provided'})
-
-    # XP ve seviye hesaplamaları için değerler
-    original_level = user.experience_points // 1000 + 1
-    xp_gain = min(data['score'] // 10, 100)  # Her 10 puan 1 XP, maksimum 100 XP
-
-    from sqlalchemy import func
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
     
-    is_high_score = False
-
-    # Her oyun için yeni bir skor kaydı oluştur
+    data = request.get_json()
+    
+    game_type = data.get('game_type')
+    score = data.get('score')
+    
+    if not game_type or not score:
+        return jsonify({'success': False, 'message': 'Eksik veri!'})
+    
+    try:
+        score = int(score)
+    except:
+        return jsonify({'success': False, 'message': 'Geçersiz skor!'})
+    
+    # Yeni skoru kaydet
     new_score = Score(
-        user_id=user_id,
+        user_id=session['user_id'],
         game_type=game_type,
-        score=data['score']
+        score=score
     )
-
+    
     db.session.add(new_score)
-
-    # Kullanıcının bu oyun için en yüksek skorunu bul
-    highest_game_score = db.session.query(func.max(Score.score)).filter_by(
-        user_id=user_id,
-        game_type=game_type
-    ).scalar() or 0
-
-    # Eğer yeni skor, bu oyun için en yüksek skorsa, bonus XP ekle
-    if data['score'] > highest_game_score:
-        xp_gain += 20
-        is_high_score = True
-
-    # Kullanıcının tüm zamanların en yüksek skorunu kontrol et ve güncelle
-    if data['score'] > user.highest_score:
-        user.highest_score = data['score']
-
-    # İlk kez oynama kontrolü
-    game_play_count = Score.query.filter_by(
-        user_id=user_id,
-        game_type=game_type
-    ).count()
-
-    # İlk defa oynamak için bonus XP (yeni kayıt eklenmeden önce sayıldığı için 0 ise ilk kez)
-    if game_play_count == 0:
-        xp_gain += 10
-
-    # XP ekle
+    
+    # Kullanıcının deneyim puanını artır (oyun skorunun %10'u kadar)
+    user = User.query.get(session['user_id'])
+    xp_gain = int(score * 0.1)
     user.experience_points += xp_gain
-
-    # Toplam oyun sayısını artır
+    
+    # Kullanıcının toplam oyun sayısını güncelle
     user.total_games_played += 1
-
-    # Seviye yükseldi mi kontrol et
-    new_level = user.experience_points // 1000 + 1
-
-    # Rank güncelleme
-    if new_level <= 5:
-        user.rank = 'Başlangıç'
-    elif new_level <= 10:
-        user.rank = 'Acemi'
-    elif new_level <= 15:
-        user.rank = 'İlerleyen'
-    elif new_level <= 20:
-        user.rank = 'Usta'
-    elif new_level <= 30:
-        user.rank = 'Uzman'
-    else:
-        user.rank = 'Efsane'
-
+    
+    # Kullanıcının en yüksek skorunu güncelle (gerekirse)
+    if score > user.highest_score:
+        user.highest_score = score
+    
     db.session.commit()
-
-    # Kullanıcıya dönecek bilgileri hazırla
-    response_data = {
-        'success': True,
-        'xp_gained': xp_gain,
-        'new_total_xp': user.experience_points,
-        'level': new_level,
-        'is_level_up': new_level > original_level,
-        'is_high_score': is_high_score,
-        'rank': user.rank
-    }
-
-    return jsonify(response_data)
-
-@app.route('/api/get-current-user')
-def get_current_user_api():
-    """Mevcut kullanıcı kimliğini döndür (API)"""
-    user_id = session.get('user_id')
+    
+    # Yeni seviyeyi hesapla
+    new_level = calculate_level(user.experience_points)
+    
     return jsonify({
-        'success': True if user_id else False,
-        'user_id': user_id
+        'success': True, 
+        'message': 'Skor kaydedildi!',
+        'xp_gain': xp_gain,
+        'total_xp': user.experience_points,
+        'level': new_level
     })
 
-@app.route('/api/get-scores/<game_type>')
+# Mevcut Kullanıcı API'si
+@app.route('/api/current-user')
+def get_current_user_api():
+    """Mevcut kullanıcı kimliğini döndür (API)"""
+    if 'user_id' in session:
+        return jsonify({'user_id': session['user_id']})
+    else:
+        return jsonify({'user_id': None})
+
+# Skor Listeleme API'si
+@app.route('/api/scores/<game_type>')
 def get_scores(game_type):
-    from sqlalchemy import func
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
 
-    try:
-        # "all" özelliği eklenmiş - tüm oyunların verilerini getir
-        if game_type == 'all':
-            # Tüm oyun türleri için en yüksek skorları getir
-            game_types = [
-                'wordPuzzle', 'memoryMatch', 'labyrinth', 'puzzle', 'visualAttention', 'numberSequence',
-                'memoryCards', 'numberChain', 'nBack', 'sudoku', '2048', 'chess', 
-                'logicPuzzles', 'tangram', 'rubikCube', 'audioMemory'
-            ]
-            all_scores = {}
+    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+    current_user_id = session.get('user_id')
+    
+    # En yüksek skorları getir (her kullanıcı için en iyi skor)
+    subquery = db.session.query(
+        Score.user_id,
+        Score.game_type,
+        db.func.max(Score.score).label('max_score')
+    ).filter(
+        Score.game_type == game_type
+    ).group_by(
+        Score.user_id,
+        Score.game_type
+    ).subquery()
+    
+    scores = db.session.query(
+        Score,
+        User.username,
+        User.avatar_url,
+        User.rank
+    ).join(
+        subquery,
+        db.and_(
+            Score.user_id == subquery.c.user_id,
+            Score.game_type == subquery.c.game_type,
+            Score.score == subquery.c.max_score
+        )
+    ).join(
+        User,
+        User.id == Score.user_id
+    ).filter(
+        Score.game_type == game_type
+    ).order_by(
+        Score.score.desc()
+    ).limit(10).all()
+    
+    result = []
+    for score, username, avatar_url, rank in scores:
+        result.append({
+            'user_id': score.user_id,
+            'username': username,
+            'score': score.score,
+            'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
+            'avatar_url': avatar_url,
+            'rank': rank,
+            'is_current_user': score.user_id == current_user_id
+        })
+    
+    return jsonify(result)
 
-            for internal_game_type in game_types:
-                try:
-                    # Her oyun türü için kullanıcı başına en yüksek puanları bul
-                    max_scores_subquery = db.session.query(
-                        Score.user_id, 
-                        func.max(Score.score).label('max_score')
-                    ).filter_by(
-                        game_type=internal_game_type
-                    ).group_by(
-                        Score.user_id
-                    ).subquery()
-
-                    # Tam skor kayıtlarını ve kullanıcı bilgilerini getir
-                    scores = db.session.query(Score, User).join(
-                        max_scores_subquery, 
-                        db.and_(
-                            Score.user_id == max_scores_subquery.c.user_id,
-                            Score.score == max_scores_subquery.c.max_score,
-                            Score.game_type == internal_game_type
-                        )
-                    ).join(
-                        User, 
-                        User.id == Score.user_id
-                    ).order_by(
-                        Score.score.desc()
-                    ).limit(10).all()
-
-                    # Skor listesini oyun türüne göre oluştur
-                    score_list = []
-                    for score, user in scores:
-                        score_list.append({
-                            'user_id': score.user_id,
-                            'username': user.username if user else 'Anonim',
-                            'score': score.score,
-                            'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                            'game_type': internal_game_type,
-                            'rank': user.rank if user else 'Başlangıç'
-                        })
-
-                    # Her oyun türü için skorları ekle
-                    all_scores[internal_game_type] = score_list
-                except Exception as e:
-                    logger.error(f"Error getting scores for {internal_game_type}: {e}")
-                    all_scores[internal_game_type] = []
-
-            return jsonify(all_scores)
-        else:
-            # Belirli bir oyun türü için skorları getir
-            game_type_map = {
-                'word-puzzle': 'wordPuzzle',
-                'memory-match': 'memoryMatch',
-                'labyrinth': 'labyrinth',
-                'puzzle': 'puzzle',
-                'visual-attention': 'visualAttention',
-                'number-sequence': 'numberSequence',
-                'memory-cards': 'memoryCards',
-                'number-chain': 'numberChain',
-                'audio-memory': 'audioMemory',
-                'n-back': 'nBack',
-                'sudoku': 'sudoku',
-                '2048': '2048',
-                'chess': 'chess',
-                'logic-puzzles': 'logicPuzzles',
-                'tangram': 'tangram',
-                'rubik-cube': 'rubikCube',
-                '3d-rotation': '3dRotation'
-            }
-
-            internal_game_type = game_type_map.get(game_type)
-            if not internal_game_type:
-                logger.warning(f"Invalid game type requested: {game_type}")
-                return jsonify([])  # Geçersiz oyun türü için boş liste döndür
-
-            try:
-                # Önce her kullanıcı için maksimum skoru bulalım
-                max_scores_subquery = db.session.query(
-                    Score.user_id, 
-                    func.max(Score.score).label('max_score')
-                ).filter_by(
-                    game_type=internal_game_type
-                ).group_by(
-                    Score.user_id
-                ).subquery()
-
-                # Sonra tam skor kayıtlarını ve kullanıcı bilgilerini alalım
-                scores = db.session.query(Score, User).join(
-                    max_scores_subquery, 
-                    db.and_(
-                        Score.user_id == max_scores_subquery.c.user_id,
-                        Score.score == max_scores_subquery.c.max_score,
-                        Score.game_type == internal_game_type
-                    )
-                ).join(
-                    User, 
-                    User.id == Score.user_id
-                ).order_by(
-                    Score.score.desc()
-                ).limit(10).all()
-
-                # Skor listesini hazırla
-                score_list = []
-                for score, user in scores:
-                    score_list.append({
-                        'user_id': score.user_id,
-                        'username': user.username if user else 'Anonim',
-                        'score': score.score,
-                        'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                        'game_type': internal_game_type,
-                        'rank': user.rank if user else 'Başlangıç',
-                        'avatar_url': user.avatar_url if user and user.avatar_url else 'images/default-avatar.png'
-                    })
-
-                return jsonify(score_list)
-            except Exception as e:
-                logger.error(f"Error querying scores for {internal_game_type}: {e}")
-                return jsonify([])  # Sorgu hatasında boş liste döndür
-    except Exception as e:
-        logger.error(f"Error in get_scores API: {e}")
-        return jsonify([])  # Genel hata durumunda boş liste döndür
-
-@app.route('/get_scores/<game_type>')  # Profil sayfası için eklenen alternatif endpoint
+# Alternatif Skor Listeleme (Performans sorunları için)
+@app.route('/api/scores/alt/<game_type>')
 def get_scores_alt(game_type):
-    return get_scores(game_type)
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
 
-@app.route('/api/aggregated_scores')
+    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+    current_user_id = session.get('user_id')
+    
+    # SQL sorgusu ile skorları doğrudan getir
+    result = db.session.execute(f"""
+        SELECT s.user_id, u.username, s.score, s.timestamp, u.avatar_url, u.rank
+        FROM (
+            SELECT user_id, MAX(score) as max_score
+            FROM scores
+            WHERE game_type = '{game_type}'
+            GROUP BY user_id
+        ) max_scores
+        JOIN scores s ON s.user_id = max_scores.user_id AND s.score = max_scores.max_score AND s.game_type = '{game_type}'
+        JOIN users u ON u.id = s.user_id
+        ORDER BY s.score DESC
+        LIMIT 10
+    """)
+    
+    scores = []
+    for row in result:
+        scores.append({
+            'user_id': row.user_id,
+            'username': row.username,
+            'score': row.score,
+            'timestamp': row.timestamp.strftime('%Y-%m-%d %H:%M'),
+            'avatar_url': row.avatar_url,
+            'rank': row.rank,
+            'is_current_user': row.user_id == current_user_id
+        })
+    
+    return jsonify(scores)
+
+# Toplam Skor API'si
+@app.route('/api/scores/aggregated')
 def get_aggregated_scores():
     """Tüm oyunlardaki toplam skorları getiren API."""
-    from sqlalchemy import func, desc
-    try:
-        # Her kullanıcının tüm oyunlardaki toplam puanını hesapla
-        aggregated_scores = db.session.query(
-            User.id.label('user_id'),
-            User.username,
-            User.rank,
-            User.avatar_url,
-            func.sum(Score.score).label('total_score')
-        ).join(
-            Score, User.id == Score.user_id
-        ).group_by(
-            User.id, User.username, User.rank, User.avatar_url
-        ).order_by(
-            desc('total_score')
-        ).all()
-        
-        # Sonuçları sözlük listesine dönüştür
-        result = [
-            {
-                'user_id': row.user_id,
-                'username': row.username,
-                'rank': row.rank,
-                'avatar_url': row.avatar_url if row.avatar_url else '/static/images/avatars/avatar1.svg',
-                'total_score': row.total_score
-            } for row in aggregated_scores
-        ]
-        
-        return jsonify(result)
-    except Exception as e:
-        logger.error(f"Error in get_aggregated_scores API: {e}")
-        return jsonify([])
+    # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+    current_user_id = session.get('user_id')
+    
+    # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
+    subquery = db.session.query(
+        Score.user_id,
+        Score.game_type,
+        db.func.max(Score.score).label('max_score')
+    ).group_by(
+        Score.user_id,
+        Score.game_type
+    ).subquery()
+    
+    # Alt sorgudan gelen sonuçları topla
+    aggregated = db.session.query(
+        subquery.c.user_id,
+        db.func.sum(subquery.c.max_score).label('total_score')
+    ).group_by(
+        subquery.c.user_id
+    ).subquery()
+    
+    # Kullanıcı bilgileriyle birleştir
+    result = db.session.query(
+        User.id,
+        User.username,
+        User.avatar_url,
+        User.rank,
+        aggregated.c.total_score
+    ).join(
+        aggregated,
+        User.id == aggregated.c.user_id
+    ).order_by(
+        aggregated.c.total_score.desc()
+    ).limit(10).all()
+    
+    scores = []
+    for user_id, username, avatar_url, rank, total_score in result:
+        scores.append({
+            'user_id': user_id,
+            'username': username,
+            'total_score': total_score,
+            'avatar_url': avatar_url,
+            'rank': rank,
+            'is_current_user': user_id == current_user_id
+        })
+    
+    return jsonify(scores)
 
+# Skor Tablosu API'si
 @app.route('/api/leaderboard/<game_type>')
 def get_leaderboard(game_type):
-    # Kabul edilen oyun türleri listesi - kategori ve id eşleştirmesi
-    game_types = {
-        'all': 'all',  # Özel durum - tüm oyunlar
-        'wordPuzzle': 'wordpuzzle',
-        'memoryMatch': 'memorymatch',
-        'numberSequence': 'numbersequence',
-        'labyrinth': 'labyrinth',
-        'puzzle': 'puzzle',
-        'memoryCards': 'memorycards',
-        'numberChain': 'numberchain',
-        'audioMemory': 'audiomemory',
-        'nBack': 'nback',
-        'sudoku': 'sudoku',
+    if game_type == 'all':
+        return get_aggregated_scores()
+    else:
+        return get_scores(game_type)
+
+# Skor Tablosu Verisi
+@app.route('/api/leaderboard-data/<game_type>')
+def get_leaderboard_data(game_type):
+    # Oyun türü çevirisi
+    game_names = {
+        'all': 'Tüm Oyunlar',
+        'wordPuzzle': 'Kelime Bulmaca',
+        'memoryMatch': 'Hafıza Eşleştirme',
+        '3dRotation': '3D Rotasyon',
+        'numberSequence': 'Sayı Dizisi',
+        'memoryCards': 'Hafıza Kartları',
+        'numberChain': 'Sayı Zinciri',
+        'labyrinth': '3D Labirent',
+        'puzzle': 'Bulmaca',
+        'audioMemory': 'Sesli Hafıza',
+        'nBack': 'N-Back',
+        'sudoku': 'Sudoku',
         '2048': '2048',
-        'chess': 'chess',
-        'logicPuzzles': 'logicpuzzles',
-        'tangram': 'tangram',
-        'rubikCube': 'rubikcube',
-        '3dRotation': '3drotation',
-        '3dLabyrinth': '3dlabyrinth'
+        'wordle': 'Wordle',
+        'chess': 'Satranç'
     }
     
-    # Oyun türü kontrolü
-    normalized_game_type = game_types.get(game_type)
-    if not normalized_game_type and game_type != 'all':
-        logger.warning(f"Invalid game type requested: {game_type}")
-        return jsonify([])
+    return jsonify({
+        'game_type': game_type,
+        'game_name': game_names.get(game_type, game_type),
+        'games': list(game_names.items())
+    })
 
-    from sqlalchemy import func
-    try:
-        if game_type == 'all':
-            # Tüm oyun türleri için lider tablosu verilerini getir
-            all_leaderboards = {}
-            for game_id, internal_id in game_types.items():
-                if game_id != 'all':  # 'all' türünü atla
-                    leaderboard_data = get_leaderboard_data(internal_id)
-                    all_leaderboards[game_id] = leaderboard_data
-            return jsonify(all_leaderboards)
-        else:
-            # Belirli bir oyun türü için lider tablosu verilerini getir
-            return jsonify(get_leaderboard_data(normalized_game_type))
-    except Exception as e:
-        logger.error(f"Error in get_leaderboard API: {e}")
-        return jsonify([])
-
-def get_leaderboard_data(game_type):
-    from sqlalchemy import func
-    try:
-        # Oyun türü adını düzgün formata dönüştür
-        internal_game_type = game_type.replace("-", "")
-        
-        # Oyun türü eşleştirme haritası - API isteklerinden veritabanı formatına dönüşüm
-        # Eğer veritabanındaki oyun tipleri büyük/küçük harf duyarlı ise
-        game_type_map = {
-            'wordpuzzle': 'wordPuzzle',
-            'memorymatch': 'memoryMatch',
-            'numbersequence': 'numberSequence',
-            'labyrinth': 'labyrinth',
-            'puzzle': 'puzzle',
-            'memorycards': 'memoryCards',
-            'numberchain': 'numberChain',
-            'audiomemory': 'audioMemory',
-            'nback': 'nBack',
-            'sudoku': 'sudoku',
-            '2048': '2048', 
-            'chess': 'chess',
-            'logicpuzzles': 'logicPuzzles',
-            'tangram': 'tangram',
-            'rubikcube': 'rubikCube',
-            '3drotation': '3dRotation',
-            '3dlabyrinth': '3dLabyrinth'
-        }
-        
-        # Veritabanında kullanılan oyun türünü bul
-        db_game_type = game_type_map.get(internal_game_type.lower(), internal_game_type)
-        
-        # Her oyun türü için en yüksek puanları bul
-        max_scores_subquery = db.session.query(
-            Score.user_id, 
-            func.max(Score.score).label('max_score')
-        ).filter_by(
-            game_type=db_game_type
-        ).group_by(
-            Score.user_id
-        ).subquery()
-
-        # Tam skor kayıtlarını ve kullanıcı bilgilerini getir (sıralamayı puanı yüksekten düşüğe doğru yap)
-        scores = db.session.query(Score, User).join(
-            max_scores_subquery, 
-            db.and_(
-                Score.user_id == max_scores_subquery.c.user_id,
-                Score.score == max_scores_subquery.c.max_score,
-                Score.game_type == db_game_type
-            )
-        ).join(
-            User, 
-            User.id == Score.user_id
-        ).order_by(
-            Score.score.desc()
-        ).limit(25).all()  # Daha fazla skoruyla göster
-
-        # Skor listesini oluştur ve zengin kullanıcı bilgileriyle doldur
-        score_list = []
-        for score, user in scores:
-            score_list.append({
-                'user_id': score.user_id,
-                'username': user.username if user else 'Anonim',
-                'full_name': user.full_name if user and user.full_name else None,
-                'score': score.score,
-                'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                'game_type': internal_game_type,
-                'rank': user.rank if user else 'Başlangıç',
-                'level': calculate_level(score.score),  # Puana göre seviye hesapla
-                'experience_points': user.experience_points if user else 0,
-                'total_games_played': user.total_games_played if user else 0,
-                'avatar_url': user.avatar_url if user and user.avatar_url else '/static/images/avatars/avatar1.svg'
-            })
-
-        return score_list
-    except Exception as e:
-        logger.error(f"Error querying leaderboard for {game_type}: {e}")
-        return []
-        
-# Puana göre seviye hesaplama fonksiyonu
+# Yardımcı fonksiyonlar
 def calculate_level(score):
-    if score < 100:
-        return "Başlangıç"
-    elif score < 300:
-        return "Acemi"
-    elif score < 600:
-        return "Orta"
-    elif score < 1000:
-        return "İleri"
-    elif score < 2000:
-        return "Uzman"
-    else:
-        return "Üstadı"
+    """
+    Skor değerine göre seviyeyi hesaplar
+    Basit bir algoritma: Her 100 puan için 1 seviye
+    """
+    return max(1, score // 100)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
