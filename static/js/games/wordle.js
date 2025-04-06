@@ -102,18 +102,18 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
 
-    // Rastgele bir kelime seç
+    // Sadece 5 harfli kelimeler
     const wordList = [
-      "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
-      "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
-      "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
-      "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
-      "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
-      "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
-      "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
-      "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
-      "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
-      "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+      "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "orman", 
+      "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı", "perde", 
+      "lamba", "dolap", "duvar", "bahçe", "çatı", "havuz", "sahil", "tarla", "şehir", "ülke", 
+      "ateş", "toprak", "hava", "meyve", "sebze", "ekmek", "uyku", "gece", "sabah", "öğlen", 
+      "akşam", "bugün", "yarın", "hafta", "hayat", "ölüm", "insan", "çocuk", "kadın", "erkek", 
+      "bebek", "anne", "baba", "dede", "nine", "sanat", "bilim", "spor", "oyun", "kapı", "köşe", 
+      "kenar", "renk", "siyah", "beyaz", "yeşil", "mavi", "sarı", "kırmızı", "çimen", "ağaç", 
+      "duman", "koku", "tatil", "okul", "sınıf", "film", "dizi", "kitap", "resim", "müzik", 
+      "şarkı", "dans", "tiyatro", "opera", "haber", "dergi", "gazete", "hava", "deniz", "nehir", 
+      "göl", "dağ", "tepe", "vadi"
     ];
     
     const randomIndex = Math.floor(Math.random() * wordList.length);
