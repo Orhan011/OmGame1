@@ -230,6 +230,30 @@ document.addEventListener('DOMContentLoaded', function() {
     finalLevelDisplay.textContent = level;
     gameOverModal.style.display = 'block';
     isGameStarted = false;
+    
+    // Save score to the server
+    saveScore(level);
+  }
+  
+  // Function to save score to the server
+  function saveScore(score) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'simon_says',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
   }
 
   function resetGame() {

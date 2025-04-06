@@ -617,71 +617,9 @@ document.addEventListener('DOMContentLoaded', function() {
       text: '"Yağmur" ve "Kar" arasındaki ilişki neyse, "Sıcak" ve "____" arasındaki ilişki de odur.',
       options: [
         { id: 'a', text: 'Güneş' },
-        { id: 'b', text: 'Kış' },
-        { id: 'c', text: 'Soğuk' },
-        { id: 'd', text: 'Hava' }
-      ],
-      correctAnswer: 'c'
-    },
-    // Add at least 5 more placeholder questions
-    {
-      id: 6,
-      category: 'logical',
-      text: 'Eğer her A bir B ise ve her B bir C ise, aşağıdakilerden hangisi doğrudur?',
-      options: [
-        { id: 'a', text: 'Her C bir A'dır' },
-        { id: 'b', text: 'Her A bir C'dir' },
-        { id: 'c', text: 'Hiçbir C bir A değildir' },
-        { id: 'd', text: 'Bazı C'ler A değildir' }
-      ],
-      correctAnswer: 'b'
-    },
-    {
-      id: 7,
-      category: 'visual',
-      text: 'Hangi şekil deseni tamamlar?',
-      imageUrl: 'https://i.imgur.com/example2.jpg',
-      options: [
-        { id: 'a', text: 'A', imageUrl: 'https://i.imgur.com/option2a.jpg' },
-        { id: 'b', text: 'B', imageUrl: 'https://i.imgur.com/option2b.jpg' },
-        { id: 'c', text: 'C', imageUrl: 'https://i.imgur.com/option2c.jpg' },
-        { id: 'd', text: 'D', imageUrl: 'https://i.imgur.com/option2d.jpg' }
-      ],
-      correctAnswer: 'a'
-    },
-    {
-      id: 8,
-      category: 'numerical',
-      text: 'Bir sayının 15% i 45 ise, bu sayının 25% i nedir?',
-      options: [
-        { id: 'a', text: '55' },
-        { id: 'b', text: '65' },
-        { id: 'c', text: '75' },
-        { id: 'd', text: '85' }
-      ],
-      correctAnswer: 'c'
-    },
-    {
-      id: 9,
-      category: 'verbal',
-      text: '"Kitap, Sayfa" ile "Bina, ?" ile aynı ilişkidedir.',
-      options: [
-        { id: 'a', text: 'Tuğla' },
-        { id: 'b', text: 'Duvar' },
-        { id: 'c', text: 'Çatı' },
-        { id: 'd', text: 'Kat' }
-      ],
-      correctAnswer: 'a'
-    },
-    {
-      id: 10,
-      category: 'logical',
-      text: 'Bir grup içinde 5 kişi var. Herkes diğer herkesle el sıkışırsa, toplam kaç el sıkışması olur?',
-      options: [
-        { id: 'a', text: '5' },
-        { id: 'b', text: '10' },
-        { id: 'c', text: '15' },
-        { id: 'd', text: '20' }
+        { id: 'b', text: 'Soğuk' },
+        { id: 'c', text: 'Hava' },
+        { id: 'd', text: 'Yaz' }
       ],
       correctAnswer: 'b'
     }
@@ -689,53 +627,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Test State
   let currentQuestionIndex = 0;
-  let userAnswers = {};
-  let testStartTime;
-  let timerInterval;
-  const testDuration = 30 * 60; // 30 minutes in seconds
-  let remainingTime = testDuration;
+  let remainingTime = 30 * 60; // 30 minutes in seconds
+  let timer = null;
+  let userAnswers = [];
+  let categoryScores = {};
 
-  // Start the test
-  startTestBtn.addEventListener('click', function() {
-    testIntro.style.display = 'none';
-    testContainer.style.display = 'block';
-
-    // Initialize the test
-    initTest();
-  });
-
-  // Initialize the test
+  // Initialize test
   function initTest() {
-    currentQuestionIndex = 0;
-    userAnswers = {};
-    remainingTime = testDuration;
-
+    // Initialize user answers
+    userAnswers = Array(questions.length).fill(null);
+    
+    // Initialize category scores
+    categories.forEach(category => {
+      categoryScores[category.id] = 0;
+    });
+    
     // Set total questions
     totalQuestionsElem.textContent = questions.length;
-
-    // Start the timer
+    
+    // Reset question index
+    currentQuestionIndex = 0;
+    
+    // Reset timer
+    remainingTime = 30 * 60;
+    updateTimer();
+    
+    // Load first question
+    loadQuestion();
+    
+    // Start timer
     startTimer();
-
-    // Load the first question
-    loadQuestion(currentQuestionIndex);
+    
+    // Show test container
+    testIntro.style.display = 'none';
+    testContainer.style.display = 'block';
+    testResults.style.display = 'none';
   }
 
-  // Load a question
-  function loadQuestion(index) {
-    const question = questions[index];
-
-    // Update question counter and progress bar
-    currentQuestionElem.textContent = index + 1;
-    const progress = ((index + 1) / questions.length) * 100;
+  // Load current question
+  function loadQuestion() {
+    const question = questions[currentQuestionIndex];
+    
+    // Update question counter
+    currentQuestionElem.textContent = currentQuestionIndex + 1;
+    
+    // Update progress bar
+    const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
     progressBar.style.width = `${progress}%`;
-
+    
     // Update category
     const category = categories.find(cat => cat.id === question.category);
     questionCategory.textContent = category.name;
-
-    // Set question text
+    
+    // Update question text
     questionText.textContent = question.text;
-
+    
     // Handle question image if exists
     if (question.imageUrl) {
       questionImage.src = question.imageUrl;
@@ -743,204 +689,223 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       questionImageContainer.style.display = 'none';
     }
-
-    // Create options
+    
+    // Clear previous options
     optionsContainer.innerHTML = '';
+    
+    // Add options
     question.options.forEach(option => {
       const optionElem = document.createElement('div');
       optionElem.className = 'option';
-      if (userAnswers[question.id] === option.id) {
+      if (userAnswers[currentQuestionIndex] === option.id) {
         optionElem.classList.add('selected');
       }
-
-      let optionContent = `
+      
+      const optionHTML = `
         <div class="option-label">
           <div class="option-marker">${option.id.toUpperCase()}</div>
           <div class="option-text">${option.text}</div>
         </div>
       `;
-
-      if (option.imageUrl) {
-        optionContent += `<div class="option-image-container">
-          <img src="${option.imageUrl}" alt="Option ${option.id}" class="option-image">
-        </div>`;
-      }
-
-      optionElem.innerHTML = optionContent;
-
+      
+      optionElem.innerHTML = optionHTML;
+      
       optionElem.addEventListener('click', () => {
-        selectOption(question.id, option.id);
+        selectOption(option.id);
       });
-
+      
       optionsContainer.appendChild(optionElem);
     });
-
+    
     // Update navigation buttons
-    prevQuestionBtn.disabled = index === 0;
-    if (index === questions.length - 1) {
-      nextQuestionBtn.innerHTML = '<i class="fas fa-check me-2"></i>Testi Bitir';
-    } else {
-      nextQuestionBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Sonraki Soru';
-    }
+    prevQuestionBtn.disabled = currentQuestionIndex === 0;
+    nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? 
+      'Testi Bitir' : 'Sonraki Soru';
+    nextQuestionBtn.innerHTML = currentQuestionIndex === questions.length - 1 ? 
+      '<i class="fas fa-check-circle me-2"></i>Testi Bitir' : 
+      '<i class="fas fa-arrow-right me-2"></i>Sonraki Soru';
   }
 
   // Select an option
-  function selectOption(questionId, optionId) {
-    userAnswers[questionId] = optionId;
-
-    // Update UI
+  function selectOption(optionId) {
+    userAnswers[currentQuestionIndex] = optionId;
+    
+    // Update selected option UI
     const options = optionsContainer.querySelectorAll('.option');
     options.forEach(option => {
-      option.classList.remove('selected');
-    });
-
-    const selectedOption = Array.from(options).find(option => 
-      option.querySelector('.option-marker').textContent.toLowerCase() === optionId.toUpperCase()
-    );
-
-    if (selectedOption) {
-      selectedOption.classList.add('selected');
-    }
-  }
-
-  // Navigation event listeners
-  prevQuestionBtn.addEventListener('click', function() {
-    if (currentQuestionIndex > 0) {
-      currentQuestionIndex--;
-      loadQuestion(currentQuestionIndex);
-    }
-  });
-
-  nextQuestionBtn.addEventListener('click', function() {
-    if (currentQuestionIndex < questions.length - 1) {
-      currentQuestionIndex++;
-      loadQuestion(currentQuestionIndex);
-    } else {
-      // End the test
-      endTest();
-    }
-  });
-
-  // Start the timer
-  function startTimer() {
-    testStartTime = Date.now();
-
-    timerInterval = setInterval(function() {
-      const elapsedSeconds = Math.floor((Date.now() - testStartTime) / 1000);
-      remainingTime = Math.max(0, testDuration - elapsedSeconds);
-
-      // Update timer display
-      const minutes = Math.floor(remainingTime / 60);
-      const seconds = remainingTime % 60;
-      timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-      // End test if time is up
-      if (remainingTime === 0) {
-        endTest();
+      const marker = option.querySelector('.option-marker');
+      if (marker.textContent.toLowerCase() === optionId) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
       }
-    }, 1000);
+    });
   }
 
-  // End the test
-  function endTest() {
-    // Stop the timer
-    clearInterval(timerInterval);
+  // Calculate IQ score
+  function calculateIQScore() {
+    let correctAnswers = 0;
+    let categoryCorrect = {};
+    let categoryTotal = {};
+    
+    // Initialize category counters
+    categories.forEach(category => {
+      categoryCorrect[category.id] = 0;
+      categoryTotal[category.id] = 0;
+    });
+    
+    // Count correct answers
+    questions.forEach((question, index) => {
+      categoryTotal[question.category]++;
+      
+      if (userAnswers[index] === question.correctAnswer) {
+        correctAnswers++;
+        categoryCorrect[question.category]++;
+      }
+    });
+    
+    // Calculate category scores (percentage)
+    categories.forEach(category => {
+      const correct = categoryCorrect[category.id];
+      const total = categoryTotal[category.id];
+      
+      if (total > 0) {
+        categoryScores[category.id] = Math.round((correct / total) * 100);
+      }
+    });
+    
+    // Calculate IQ (base 100 + correct answers * 2)
+    // This is a simplified formula just for this example
+    const iqScore = 100 + correctAnswers * 2;
+    
+    return {
+      iq: iqScore,
+      correctAnswers,
+      totalQuestions: questions.length,
+      categoryScores
+    };
+  }
 
-    // Calculate scores
-    const results = calculateResults();
-
-    // Display results
-    displayResults(results);
-
-    // Hide test container, show results
+  // Show test results
+  function showResults() {
+    clearInterval(timer);
+    
+    const results = calculateIQScore();
+    
+    // Update IQ score
+    iqScoreElem.textContent = results.iq;
+    
+    // Update IQ description
+    let description = '';
+    if (results.iq < 90) {
+      description = 'Bu skor, ortalama IQ değerinin altındadır. Bununla birlikte, IQ testleri bilişsel yeteneklerin yalnızca bir yönünü ölçer ve pratik zeka, yaratıcılık, sosyal beceriler gibi birçok önemli alanı kapsamaz.';
+    } else if (results.iq < 110) {
+      description = 'Bu skor, ortalama IQ aralığındadır. Ortalama bir IQ, günlük görevleri etkili bir şekilde yönetmek için yeterli bilişsel kapasiteye sahip olduğunuzu gösterir.';
+    } else if (results.iq < 130) {
+      description = 'Bu skor, ortalamanın üzerinde bir IQ değerini temsil eder. Bu, karmaşık kavramları anlamada ve soyut düşünmede güçlü olduğunuzu gösterir.';
+    } else {
+      description = 'Bu skor, üstün bir IQ değerini temsil eder. Bu, karmaşık problemleri çözmede, örüntüleri tanımada ve mantıksal düşünmede istisnai yeteneklere sahip olduğunuzu gösterir.';
+    }
+    
+    iqDescriptionElem.innerHTML = `
+      <p>${description}</p>
+      <p>Doğru cevaplanan sorular: <strong>${results.correctAnswers}/${results.totalQuestions}</strong> (${Math.round((results.correctAnswers / results.totalQuestions) * 100)}%)</p>
+    `;
+    
+    // Update category scores
+    categoryScoresGrid.innerHTML = '';
+    
+    categories.forEach(category => {
+      const score = categoryScores[category.id];
+      
+      const categoryScoreItem = document.createElement('div');
+      categoryScoreItem.className = 'category-score-item';
+      
+      categoryScoreItem.innerHTML = `
+        <div class="category-score-name">${category.name}</div>
+        <div class="category-score-value">${score}%</div>
+      `;
+      
+      categoryScoresGrid.appendChild(categoryScoreItem);
+    });
+    
+    // Save score to the server
+    saveScore(results.iq);
+    
+    // Show test results
     testContainer.style.display = 'none';
     testResults.style.display = 'block';
   }
 
-  // Calculate test results
-  function calculateResults() {
-    let correctAnswers = 0;
-    const categoryScores = {};
-
-    // Initialize category scores
-    categories.forEach(category => {
-      categoryScores[category.id] = { correct: 0, total: 0 };
-    });
-
-    // Calculate correct answers and category scores
-    questions.forEach(question => {
-      const userAnswer = userAnswers[question.id];
-      const category = question.category;
-
-      categoryScores[category].total++;
-
-      if (userAnswer === question.correctAnswer) {
-        correctAnswers++;
-        categoryScores[category].correct++;
-      }
-    });
-
-    // Calculate percentage scores
-    const categoryPercentages = {};
-    Object.keys(categoryScores).forEach(category => {
-      const { correct, total } = categoryScores[category];
-      categoryPercentages[category] = total > 0 ? Math.round((correct / total) * 100) : 0;
-    });
-
-    // Calculate IQ score (simplified formula, for demonstration)
-    const rawScore = (correctAnswers / questions.length) * 100;
-    const iqScore = Math.round(70 + rawScore/2);
-
-    return {
-      correctAnswers,
-      totalQuestions: questions.length,
-      percentage: Math.round((correctAnswers / questions.length) * 100),
-      categoryScores: categoryPercentages,
-      iqScore
-    };
-  }
-
-  // Display test results
-  function displayResults(results) {
-    // Set IQ score
-    iqScoreElem.textContent = results.iqScore;
-
-    // Set IQ description
-    let iqDescription = '';
-    if (results.iqScore < 85) {
-      iqDescription = 'Bu puan ortalamanın altında bir bilişsel yetenek gösterir. Bazı alanlarda gelişmeye ihtiyacınız olabilir.';
-    } else if (results.iqScore < 100) {
-      iqDescription = 'Bu puan ortalama ila ortalamanın biraz altında bir bilişsel yetenek gösterir.';
-    } else if (results.iqScore < 115) {
-      iqDescription = 'Bu puan ortalama bilişsel yetenek gösterir. Genel nüfusun çoğu bu aralıktadır.';
-    } else if (results.iqScore < 130) {
-      iqDescription = 'Bu puan ortalamanın üzerinde bir bilişsel yetenek gösterir. Belirli alanlarda güçlü becerileriniz var.';
-    } else {
-      iqDescription = 'Bu puan üstün bir bilişsel yetenek gösterir. Birçok alanda mükemmel becerileriniz var.';
+  // Update timer display
+  function updateTimer() {
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    
+    timerElem.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (remainingTime <= 300) { // Less than 5 minutes
+      timerElem.style.color = '#ff4757';
     }
-    iqDescriptionElem.textContent = iqDescription;
+  }
 
-    // Display category scores
-    categoryScoresGrid.innerHTML = '';
-    categories.forEach(category => {
-      const percentage = results.categoryScores[category.id];
+  // Start timer
+  function startTimer() {
+    timer = setInterval(() => {
+      remainingTime--;
+      
+      if (remainingTime <= 0) {
+        // Time's up
+        clearInterval(timer);
+        showResults();
+        return;
+      }
+      
+      updateTimer();
+    }, 1000);
+  }
 
-      const categoryElem = document.createElement('div');
-      categoryElem.className = 'category-score-item';
-      categoryElem.innerHTML = `
-        <div class="category-score-icon">
-          <i class="fas fa-${category.icon}"></i>
-        </div>
-        <div class="category-score-name">${category.name}</div>
-        <div class="category-score-value">${percentage}%</div>
-        <div class="category-score-percent">${results.categoryScores[category.id] || 0}% doğru</div>
-      `;
-
-      categoryScoresGrid.appendChild(categoryElem);
+  // Function to save score to the server
+  function saveScore(score) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'iq_test',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
     });
   }
 
-  // Restart test
+  // Event Listeners
+  startTestBtn.addEventListener('click', initTest);
+  
+  prevQuestionBtn.addEventListener('click', function() {
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      loadQuestion();
+    }
+  });
+  
+  nextQuestionBtn.addEventListener('click', function() {
+    if (currentQuestionIndex < questions.length - 1) {
+      currentQuestionIndex++;
+      loadQuestion();
+    } else {
+      // Last question, finish test
+      showResults();
+    }
+  });
+  
   restartTestBtn.addEventListener('click', function() {
     testResults.style.display = 'none';
     testIntro.style.display = 'block';
