@@ -637,6 +637,34 @@ def chess():
     """Satranç oyunu"""
     return render_template('games/chess.html')
 
+# IQ Test Oyunu
+@app.route('/games/iq-test')
+def iq_test():
+    """IQ Test: Zeka ve mantık oyunu
+    Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin."""
+    return render_template('games/iqTest.html')
+
+# Simon Says Oyunu
+@app.route('/games/simon-says')
+def simon_says():
+    """Simon Says: Hafıza oyunu
+    Renkli düğmelerin yanma sırasını hatırlayarak hafızanızı güçlendirin."""
+    return render_template('games/simonSays.html')
+
+# Tetris Oyunu
+@app.route('/games/tetris')
+def tetris():
+    """Tetris: Klasik blok puzzle oyunu
+    Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
+    return render_template('games/tetris.html')
+
+# Typing Speed Oyunu
+@app.route('/games/typing-speed')
+def typing_speed():
+    """Yazma Hızı: Klavye hızı testi
+    Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
+    return render_template('games/typingSpeed.html')
+
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():

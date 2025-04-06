@@ -1,0 +1,460 @@
+{% extends "layout.html" %}
+
+{% block title %}IQ Test - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12 text-center mb-4">
+      <h1 class="display-4 fw-bold">IQ Test</h1>
+      <p class="lead text-muted">Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card main-card mb-4">
+        <div class="card-body">
+          <div id="game-start-screen" class="text-center py-4">
+            <h2 class="mb-4">IQ Testine Hoş Geldiniz</h2>
+            <p>Bu test mantık, matematiksel yetenek, görsel-uzamsal algı ve sözel yetenek gibi farklı kategorilerde sorular içerir.</p>
+            <p>Sonuç ekranında yaklaşık IQ puanınız belirtilecektir. Test süresi 20 dakikadır.</p>
+            
+            <div class="d-flex justify-content-center gap-3 mt-4">
+              <button id="start-test-btn" class="btn btn-lg btn-primary">Teste Başla</button>
+              <button id="tutorial-btn" class="btn btn-lg btn-outline-secondary">Nasıl Oynanır?</button>
+            </div>
+          </div>
+          
+          <div id="game-tutorial" class="py-4 d-none">
+            <h3 class="mb-3">Nasıl Oynanır?</h3>
+            <ul class="list-group list-group-flush mb-4">
+              <li class="list-group-item">Çeşitli kategorilerde toplam 20 soru cevaplayacaksınız.</li>
+              <li class="list-group-item">Her sorunun bir doğru cevabı vardır.</li>
+              <li class="list-group-item">Test süresi 20 dakikadır. Kalan süre ekranda gösterilecektir.</li>
+              <li class="list-group-item">Soruları yanıtladıkça zorluk seviyesi artabilir.</li>
+              <li class="list-group-item">Tamamladığınızda, yaklaşık IQ puanınız hesaplanacaktır.</li>
+            </ul>
+            
+            <div class="text-center">
+              <button id="back-to-main-btn" class="btn btn-secondary">Geri Dön</button>
+            </div>
+          </div>
+          
+          <div id="game-area" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="progress" style="height: 10px; width: 70%;">
+                <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div id="timer" class="badge bg-primary fs-6">20:00</div>
+            </div>
+            
+            <div id="question-container" class="mb-4">
+              <h3 id="question-text" class="mb-3">Soru metni burada görünecek</h3>
+              <div id="question-image-container" class="text-center mb-3 d-none">
+                <img id="question-image" src="" alt="Soru görseli" class="img-fluid" style="max-height: 300px;">
+              </div>
+              
+              <div id="options-container" class="d-grid gap-2">
+                <!-- Seçenekler buraya dinamik olarak eklenecek -->
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <button id="prev-question-btn" class="btn btn-secondary" disabled>Önceki Soru</button>
+              <button id="next-question-btn" class="btn btn-primary">Sonraki Soru</button>
+            </div>
+          </div>
+          
+          <div id="results-screen" class="text-center py-4 d-none">
+            <h2 class="mb-3">Test Sonuçları</h2>
+            <div class="result-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
+              <span id="iq-score" class="display-3 fw-bold">0</span>
+            </div>
+            <p class="lead mb-4">Tahmini IQ puanınız: <span id="iq-result">0</span></p>
+            
+            <div class="row mb-4">
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Doğru Cevaplar</h5>
+                    <p id="correct-answers" class="display-6 text-success">0/20</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Tamamlama Süresi</h5>
+                    <p id="completion-time" class="display-6 text-primary">00:00</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <p class="text-muted mb-4">Bu sonuç sadece eğlence amaçlıdır ve profesyonel bir IQ testi değildir.</p>
+            
+            <div class="d-flex justify-content-center gap-3">
+              <button id="retry-btn" class="btn btn-primary">Yeniden Dene</button>
+              <a href="{{ url_for('all_games') }}" class="btn btn-outline-secondary">Tüm Oyunlar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM elementleri
+    const gameStartScreen = document.getElementById('game-start-screen');
+    const gameTutorial = document.getElementById('game-tutorial');
+    const gameArea = document.getElementById('game-area');
+    const resultsScreen = document.getElementById('results-screen');
+    
+    const startTestBtn = document.getElementById('start-test-btn');
+    const tutorialBtn = document.getElementById('tutorial-btn');
+    const backToMainBtn = document.getElementById('back-to-main-btn');
+    const prevQuestionBtn = document.getElementById('prev-question-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    
+    const progressBar = document.getElementById('progress-bar');
+    const timerElement = document.getElementById('timer');
+    const questionText = document.getElementById('question-text');
+    const questionImageContainer = document.getElementById('question-image-container');
+    const questionImage = document.getElementById('question-image');
+    const optionsContainer = document.getElementById('options-container');
+    
+    const iqScore = document.getElementById('iq-score');
+    const iqResult = document.getElementById('iq-result');
+    const correctAnswers = document.getElementById('correct-answers');
+    const completionTime = document.getElementById('completion-time');
+    
+    // Oyun değişkenleri
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 20 * 60; // 20 dakika
+    let userAnswers = [];
+    let startTime;
+    
+    // Örnek sorular (gerçek uygulamada daha fazla soru olacaktır)
+    const questions = [
+      {
+        text: "Aşağıdaki dizinin bir sonraki elemanı nedir? 2, 4, 8, 16, 32, ...",
+        options: ["48", "56", "64", "96"],
+        correctAnswer: 2, // 64
+        category: "matematik"
+      },
+      {
+        text: "Eğer KALEM kelimesinde K=1, A=2, L=3, E=4, M=5 ise, ELMA kelimesinin sayısal değeri nedir?",
+        options: ["10", "11", "12", "13"],
+        correctAnswer: 1, // 11 (E=4, L=3, M=5, A=2)
+        category: "sözel"
+      },
+      {
+        text: "Bir dikdörtgenin çevresi 26 cm, alanı 42 cm² ise, kısa kenar uzunluğu kaç cm'dir?",
+        options: ["4", "6", "7", "9"],
+        correctAnswer: 1, // 6 cm
+        category: "matematik"
+      },
+      {
+        text: "ARABA ile OTOBÜS arasındaki ilişki nedir?",
+        options: ["İkisi de canlıdır", "İkisi de taşıttır", "Biri diğerinden büyüktür", "Biri diğerinin parçasıdır"],
+        correctAnswer: 1, // İkisi de taşıttır
+        category: "sözel"
+      },
+      {
+        text: "Bir saat 12:45'i gösteriyorsa, ayna görüntüsünde saat kaçı gösterir?",
+        options: ["11:15", "12:15", "5:15", "11:45"],
+        correctAnswer: 0, // 11:15
+        category: "mantık"
+      },
+      {
+        text: "Hangi sayı sıradakinden farklıdır?",
+        options: ["10", "26", "34", "65"],
+        correctAnswer: 3, // 65 (diğerleri çift sayılar)
+        category: "matematik"
+      },
+      {
+        text: "Eğer 5 işçi bir işi 10 günde bitiriyorsa, aynı işi 2 işçi kaç günde bitirir?",
+        options: ["20", "25", "15", "30"],
+        correctAnswer: 1, // 25 gün
+        category: "mantık"
+      },
+      {
+        text: "DOKTOR : HASTANE ilişkisi aşağıdakilerden hangisine benzer?",
+        options: ["ÖĞRENCİ : OKUL", "KALEM : KAĞIT", "EKMEK : FIRINCI", "ARABA : YOL"],
+        correctAnswer: 0, // ÖĞRENCİ : OKUL
+        category: "sözel"
+      }
+    ];
+    
+    // Olay dinleyicileri
+    startTestBtn.addEventListener('click', startGame);
+    tutorialBtn.addEventListener('click', showTutorial);
+    backToMainBtn.addEventListener('click', backToMain);
+    prevQuestionBtn.addEventListener('click', goToPreviousQuestion);
+    nextQuestionBtn.addEventListener('click', goToNextQuestion);
+    retryBtn.addEventListener('click', resetGame);
+    
+    // İşlevler
+    function startGame() {
+      gameStartScreen.classList.add('d-none');
+      gameArea.classList.remove('d-none');
+      startTime = new Date();
+      startTimer();
+      showQuestion(currentQuestion);
+    }
+    
+    function showTutorial() {
+      gameStartScreen.classList.add('d-none');
+      gameTutorial.classList.remove('d-none');
+    }
+    
+    function backToMain() {
+      gameTutorial.classList.add('d-none');
+      gameStartScreen.classList.remove('d-none');
+    }
+    
+    function startTimer() {
+      updateTimerDisplay();
+      timer = setInterval(function() {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          endGame();
+        }
+      }, 1000);
+    }
+    
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    function showQuestion(index) {
+      const question = questions[index];
+      questionText.textContent = question.text;
+      
+      // Resim varsa göster
+      if (question.image) {
+        questionImage.src = question.image;
+        questionImageContainer.classList.remove('d-none');
+      } else {
+        questionImageContainer.classList.add('d-none');
+      }
+      
+      // Seçenekleri temizle ve yeniden oluştur
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, i) => {
+        const button = document.createElement('button');
+        button.className = 'btn btn-outline-primary option-btn';
+        button.textContent = option;
+        
+        // Eğer kullanıcı daha önce bu soruyu cevapladıysa, seçili seçeneği göster
+        if (userAnswers[index] !== undefined && userAnswers[index] === i) {
+          button.classList.remove('btn-outline-primary');
+          button.classList.add('btn-primary');
+        }
+        
+        button.addEventListener('click', function() {
+          selectOption(i);
+        });
+        
+        optionsContainer.appendChild(button);
+      });
+      
+      // İlerleme çubuğunu güncelle
+      const progress = ((index + 1) / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      progressBar.setAttribute('aria-valuenow', progress);
+      
+      // Önceki/Sonraki düğmelerini güncelle
+      prevQuestionBtn.disabled = index === 0;
+      nextQuestionBtn.textContent = index === questions.length - 1 ? "Testi Bitir" : "Sonraki Soru";
+    }
+    
+    function selectOption(optionIndex) {
+      // Önceki seçimleri temizle
+      const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+      optionButtons.forEach(button => {
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-outline-primary');
+      });
+      
+      // Seçilen seçeneği işaretle
+      optionButtons[optionIndex].classList.remove('btn-outline-primary');
+      optionButtons[optionIndex].classList.add('btn-primary');
+      
+      // Kullanıcı cevabını kaydet
+      userAnswers[currentQuestion] = optionIndex;
+    }
+    
+    function goToPreviousQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion(currentQuestion);
+      }
+    }
+    
+    function goToNextQuestion() {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion(currentQuestion);
+      } else {
+        endGame();
+      }
+    }
+    
+    function endGame() {
+      clearInterval(timer);
+      
+      // Skor hesaplama
+      score = 0;
+      userAnswers.forEach((answer, index) => {
+        if (answer === questions[index].correctAnswer) {
+          score++;
+        }
+      });
+      
+      // Tamamlama süresi
+      const endTime = new Date();
+      const timeTaken = Math.floor((endTime - startTime) / 1000); // saniye cinsinden
+      const minutesTaken = Math.floor(timeTaken / 60);
+      const secondsTaken = timeTaken % 60;
+      
+      // Tahmini IQ hesaplama (basitleştirilmiş)
+      const percentageCorrect = score / questions.length;
+      const estimatedIQ = Math.round(70 + (percentageCorrect * 60));
+      
+      // Sonuç ekranını güncelle
+      iqScore.textContent = estimatedIQ;
+      iqResult.textContent = estimatedIQ;
+      correctAnswers.textContent = `${score}/${questions.length}`;
+      completionTime.textContent = `${minutesTaken.toString().padStart(2, '0')}:${secondsTaken.toString().padStart(2, '0')}`;
+      
+      // Oyun alanını gizle, sonuç ekranını göster
+      gameArea.classList.add('d-none');
+      resultsScreen.classList.remove('d-none');
+      
+      // Skoru kaydet
+      saveScore(estimatedIQ);
+    }
+    
+    function resetGame() {
+      currentQuestion = 0;
+      score = 0;
+      timeLeft = 20 * 60;
+      userAnswers = [];
+      
+      resultsScreen.classList.add('d-none');
+      gameStartScreen.classList.remove('d-none');
+    }
+    
+    function saveScore(score) {
+      // API'ye skor gönder
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          game_type: 'iqTest',
+          score: score
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Score saved:', data);
+      })
+      .catch(error => {
+        console.error('Error saving score:', error);
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .main-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+  }
+  
+  .result-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6a5ae0, #8170ff);
+    color: white;
+    box-shadow: 0 8px 25px rgba(106, 90, 224, 0.4);
+  }
+  
+  .option-btn {
+    padding: 12px;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  
+  .option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .progress {
+    height: 10px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .progress-bar {
+    background: linear-gradient(to right, #6a5ae0, #8170ff);
+    border-radius: 20px;
+  }
+  
+  #timer {
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #6a5ae0, #8170ff);
+    padding: 8px 16px;
+    border-radius: 20px;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(to right, #6a5ae0, #8170ff);
+    border: none;
+    box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(to right, #8170ff, #9a8eff);
+    box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
+    transform: translateY(-2px);
+  }
+  
+  .btn-outline-primary {
+    border-color: #6a5ae0;
+    color: #6a5ae0;
+  }
+  
+  .btn-outline-primary:hover {
+    background: linear-gradient(to right, #6a5ae0, #8170ff);
+    border-color: transparent;
+  }
+</style>
+{% endblock %}
