@@ -76,6 +76,9 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
+        <!-- Gizli input alanı - Mobil klavye için -->
+        <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
         <!-- Wordle Grid -->
         <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
@@ -233,6 +236,17 @@
     font-weight: 500;
     padding: 10px 15px;
     border-radius: 6px;
+  }
+
+  /* Gizli input alanı - mobil klavye için */
+  #hidden-input {
+    position: fixed;
+    opacity: 0.01;
+    height: 0;
+    width: 0;
+    z-index: -1;
+    pointer-events: none;
+    font-size: 16px; /* Mobil Safari'de yakınlaştırmayı önlemek için */
   }
 
   @keyframes shake {

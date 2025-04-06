@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const shareScoreBtn = document.getElementById('share-score');
   const submitGuessBtn = document.getElementById('submit-guess-btn');
   const deleteLetterBtn = document.getElementById('delete-letter-btn');
+  const hiddenInput = document.getElementById('hidden-input');
 
   // Ses efektleri
   const sounds = {
@@ -44,8 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     streak: 0,
     hintsLeft: 3,
     soundEnabled: true,
-    activeCellIndex: 0,  // Aktif hücre indeksi
-    isTyping: false      // Klavye açık mı kontrol et
+    activeCellIndex: 0  // Aktif hücre indeksi
   };
 
   // Türkçe kelime listesi - 5 harfli kelimeler
@@ -88,18 +88,45 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteLetter();
   });
 
-  // Oyun alanına dokunma olayı - özel mobil klavye için
-  document.addEventListener('click', function(e) {
-    // Oyun aktif değilse işlem yapma
-    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
+  // Gizli input alanının işlenmesi - keydown ile harfleri yakalama
+  let lastKeyTime = 0;
+  let lastKey = '';
+  
+  hiddenInput.addEventListener('keydown', function(e) {
+    const now = Date.now();
     
-    // Klavyeden giriş izni
-    gameState.isTyping = true;
+    // Çok hızlı ardışık tuşlamaları engellemek için
+    if (now - lastKeyTime < 150 && e.key === lastKey) {
+      e.preventDefault();
+      return false;
+    }
+    
+    if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
+      const letter = e.key.toUpperCase();
+      
+      // Harfi ekle
+      addLetter(letter);
+      
+      // Zaman ve tuş bilgisini kaydet
+      lastKeyTime = now;
+      lastKey = e.key;
+      
+      // Input alanını hemen temizle
+      setTimeout(() => {
+        hiddenInput.value = '';
+      }, 10);
+      
+      // Ses çal
+      playSound('keypress');
+      
+      // Varsayılan işlemi engelle
+      e.preventDefault();
+    }
   });
 
   // Klavye tuşu basımı
   document.addEventListener('keydown', function(e) {
-    if (gameState.isGameOver || gameContainer.style.display === 'none' || !gameState.isTyping) return;
+    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
     
     const key = e.key.toUpperCase();
     
@@ -108,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (key === 'BACKSPACE') {
       deleteLetter();
       playSound('keypress');
-    } else if (key.length === 1 && /^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
       addLetter(key);
       playSound('keypress');
     }
@@ -135,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.isGameOver = false;
     gameState.hintsLeft = 3;
     gameState.activeCellIndex = 0;
-    gameState.isTyping = false;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -171,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.col = col;
         
         // Hücreye tıklama olayı
-        cell.addEventListener('click', function(e) {
+        cell.addEventListener('click', function() {
           if (gameState.isGameOver) return;
           
           const clickedRow = parseInt(cell.dataset.row);
@@ -183,13 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.activeCellIndex = clickedCol;
             highlightActiveCell();
             
-            // Klavye girişini aktifleştir
-            gameState.isTyping = true;
+            // Mobil klavyeyi aktifleştir
+            hiddenInput.focus();
             
             playSound('keypress');
-            
-            // Mobil klavyede açık prompt göster
-            showMobileKeyboardPrompt(cell);
           }
         });
         
@@ -202,27 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // İlk satırı ve hücreyi aktif olarak işaretle
     updateGrid();
     highlightActiveCell();
-  }
-  
-  /**
-   * Mobil klavyede harf girişi için bir prompt gösterir
-   */
-  function showMobileKeyboardPrompt(cell) {
-    // Mobil cihazda
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      // Kullanıcıdan bir harf isteyelim
-      const letter = prompt("Bir harf girin:");
-      
-      if (letter && letter.length > 0) {
-        // İlk karakteri al ve büyük harfe çevir
-        const singleChar = letter.charAt(0).toUpperCase();
-        
-        // Harf kontrolü
-        if (/^[A-ZĞÜŞİÖÇ]$/.test(singleChar)) {
-          addLetter(singleChar);
-        }
-      }
-    }
   }
 
   /**
