@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     answer: '',
     currentRow: 0,
     currentCol: 0,
-    guesses: [],
+    guesses: Array(6).fill().map(() => Array(5).fill('')),
     isGameOver: false,
     score: 0,
     streak: 0,
