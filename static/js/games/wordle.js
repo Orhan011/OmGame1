@@ -104,16 +104,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Rastgele bir kelime seç
     const wordList = [
-      "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
-      "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
-      "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
-      "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
-      "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
-      "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
-      "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
-      "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
-      "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
-      "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+      "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "yağmur",
+      "orman", "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı",
+      "perde", "lamba", "dolap", "duvar", "bahçe", "çatı", "havuz", "sahil", "tarla", "şehir",
+      "ülke", "dünya", "ateş", "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "büyük",
+      "küçük", "kısa", "uzun", "gece", "sabah", "öğlen", "akşam", "saat", "ayna", "ceviz",
+      "badem", "kiraz", "elma", "armut", "mango", "kavun", "karpuz", "biber", "salça", "ekmek",
+      "kuşak", "kaşık", "çatal", "bardak", "tabak", "sürahi", "kağıt", "kalem", "defter", "silgi",
+      "tahta", "ders", "okul", "sınıf", "öğrenci", "oyun", "spor", "koşu", "dans", "müzik",
+      "şarkı", "gitar", "piyano", "film", "tiyatro", "masal", "roman", "dergi", "gazete", "haber"
     ];
     
     const randomIndex = Math.floor(Math.random() * wordList.length);
