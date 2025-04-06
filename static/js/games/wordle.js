@@ -53,106 +53,64 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     // Çift işlemi önlemek için
     lastInputTime: 0,
-    debounceTime: 200 // ms
+    debounceTime: 200, // ms
+    processingKey: false
   };
 
-  // Mobil klavye girişi için gizli input oluştur
-  let mobileInput = null;
-  
-  function createMobileInput() {
-    if (!mobileInput) {
-      mobileInput = document.createElement('input');
-      mobileInput.type = 'text';
-      mobileInput.inputMode = 'text';
-      mobileInput.autocomplete = 'off';
-      mobileInput.autocorrect = 'off';
-      mobileInput.autocapitalize = 'off';
-      mobileInput.spellcheck = false;
-      
-      // Görünmez input - tek seferde tek harf girişi için maxLength=1
-      mobileInput.style.position = 'fixed';
-      mobileInput.style.top = '0';
-      mobileInput.style.left = '0';
-      mobileInput.style.opacity = '0';
-      mobileInput.style.pointerEvents = 'none';
-      mobileInput.style.height = '1px';
-      mobileInput.style.width = '1px';
-      mobileInput.maxLength = 1;
-      
-      document.body.appendChild(mobileInput);
-      
-      // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
-      const debounce = (callback, delay) => {
-        let timerId;
-        return function(...args) {
-          clearTimeout(timerId);
-          timerId = setTimeout(() => {
-            callback.apply(this, args);
-          }, delay);
-        };
-      };
-      
-      // Harf giriş işlemi için debounce uygulanan fonksiyon
-      const handleInput = debounce((e) => {
-        const char = e.target.value.toUpperCase();
-        
-        if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
-          addLetter(char);
-          playSound('keypress');
-        }
-        
-        // İnputu temizle - bir sonraki harf girişi için hazırla
-        e.target.value = '';
-      }, 100);
-      
-      // Mobil input olayları - tek harf girişi
-      mobileInput.addEventListener('input', handleInput);
-      
-      // Silme ve Enter için debounce uygulanan fonksiyon
-      const handleKeydown = debounce((e) => {
-        if (e.key === 'Backspace') {
-          e.preventDefault();
-          deleteLetter();
-          playSound('keypress');
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          submitGuess();
-        }
-      }, 100);
-      
-      // Mobil input silme ve enter işlemleri
-      mobileInput.addEventListener('keydown', handleKeydown);
+  // Mobil klavye girişi yerine direkt klavye tuşlarını kullanarak oyunu oynayalım
+  // Bu şekilde hem klavye kayma sorunu önlenecek hem de harfler doğrudan Wordle karelerine girilecek
+
+  /**
+   * Klavye tuşuna basıldığında çağrılacak fonksiyon
+   * Önemli: Çift işlem yapılmaması ve ekranın kaymaması için geliştirilmiş versiyonu
+   */
+  function handleKeyPress(e) {
+    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
+    
+    // Zaten bir tuş işlemi devam ediyorsa
+    if (gameState.processingKey) return;
+    
+    // Çift işlem kontrolü - zaman farkı
+    const now = Date.now();
+    if (now - gameState.lastInputTime < gameState.debounceTime) {
+      return;
     }
-  }
-  
-  function focusMobileInput() {
-    if (mobileInput && !gameState.isGameOver) {
+    
+    gameState.processingKey = true;
+    gameState.lastInputTime = now;
+    
+    const key = e.key.toUpperCase();
+    
+    try {
+      if (key === 'ENTER') {
+        submitGuess();
+      } else if (key === 'BACKSPACE') {
+        deleteLetter();
+        playSound('keypress');
+      } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+        addLetter(key);
+        playSound('keypress');
+      }
+    } finally {
+      // Her durumda işlemi tamamlandı olarak işaretleyelim
       setTimeout(() => {
-        mobileInput.focus();
-      }, 50);
+        gameState.processingKey = false;
+      }, gameState.debounceTime);
     }
   }
 
-  // Türkçe kelime listesi - 5 harfli kelimeler
-  const wordList = [
-    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
-    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
-    "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
-    "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
-    "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
-    "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
-    "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
-    "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
-    "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
-    "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
-  ];
-
-  // Türkçe klavye düzeni
-  const turkishKeyboard = [
-    ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
-    ["SİL", "Z", "C", "V", "B", "N", "M", "Ö", "Ç", "ENTER"]
-  ];
+  // Klavye tuşu basımı için olay dinleyicisi
+  document.addEventListener('keydown', handleKeyPress);
+  
+  // Wordle grid tıklama olayı için tıklanan hücreye odaklanma
+  wordleGrid.addEventListener('click', function(e) {
+    // Herhangi bir tıklama olayında, mevcut aktif satıra odaklanma sağlayalım
+    // Bu sayede kullanıcı daha kolay yazabilecek
+    if (!gameState.isGameOver) {
+      // Özel bir şey yapmaya gerek yok, direkt klavye girişi çalışacak
+      document.body.focus();
+    }
+  });
 
   // Oyun başlat butonu
   startBtn.addEventListener('click', startGame);
@@ -169,38 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru paylaş/kopyala butonları
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
-
-  // Klavye tuşu basımı için debounce fonksiyonu
-  function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
-  
-  // Klavye tuşuna debounce uygula
-  const debouncedKeypress = debounce(function(e) {
-    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
-    const key = e.key.toUpperCase();
-    
-    if (key === 'ENTER') {
-      submitGuess();
-    } else if (key === 'BACKSPACE') {
-      deleteLetter();
-      playSound('keypress');
-    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
-      addLetter(key);
-      playSound('keypress');
-    }
-  }, 100);
-
-  // Klavye tuşu basımı
-  document.addEventListener('keydown', debouncedKeypress);
-  
-  // Ekrana tıklama olayı - mobil input için
-  wordleGrid.addEventListener('click', focusMobileInput);
 
   /**
    * Oyunu başlatır
@@ -233,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
       absent: new Set()
     };
     gameState.lastInputTime = 0;
+    gameState.processingKey = false;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -242,16 +169,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Grid ve klavyeyi oluştur
     createWordleGrid();
-    
-    // Mobil klavye desteği ekle
-    createMobileInput();
-    focusMobileInput();
 
     // Ses efektlerini sıfırla
     resetSounds();
 
     // Oyun başlangıç sesi çal
     playSound('keypress');
+    
+    // Sayfa kaydırma davranışını engelle - mobil cihazlarda klavye açıldığında ekranı kaydırmaması için
+    preventScroll();
+  }
+  
+  // Sayfa kaydırmayı engelleme
+  function preventScroll() {
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.height = '100%';
+    document.documentElement.style.overflow = 'hidden';
+    
+    // Otomatik odaklanma ve kaydırmayı engelle
+    document.addEventListener('focus', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+    
+    // Dokunma olaylarında varsayılan davranışı engelle 
+    wordleGrid.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    
+    wordleGrid.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
   }
 
   /**
@@ -283,13 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function addLetter(letter) {
     if (gameState.isGameOver) return;
     
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
-    
     if (gameState.currentCol < 5) {
       gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
       updateGrid();
@@ -303,13 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function deleteLetter() {
     if (gameState.isGameOver) return;
     
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
-    
     if (gameState.currentCol > 0) {
       gameState.currentCol--;
       gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
@@ -321,13 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
    * Tahmini gönderme
    */
   function submitGuess() {
-    // Çift işlem kontrolü
-    const now = Date.now();
-    if (now - gameState.lastInputTime < gameState.debounceTime) {
-      return;
-    }
-    gameState.lastInputTime = now;
-    
     if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
@@ -555,10 +483,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWin) {
     gameState.isGameOver = true;
     
-    // Mobil inputu gizle
-    if (mobileInput) {
-      mobileInput.style.display = 'none';
-    }
+    // Kaydırma davranışını geri yükle
+    document.body.style.height = '';
+    document.body.style.overflow = '';
+    document.documentElement.style.height = '';
+    document.documentElement.style.overflow = '';
     
     // Seri ve puan hesaplamaları
     if (isWin) {
@@ -762,4 +691,18 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
+
+  // Türkçe kelime listesi - 5 harfli kelimeler
+  const wordList = [
+    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
+    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
+    "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
+    "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
+    "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
+    "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
+    "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
+    "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
+    "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
+    "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+  ];
 });
