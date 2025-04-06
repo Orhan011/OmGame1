@@ -727,6 +727,9 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Oyun sonu
    */
+  /**
+   * Oyun sonu
+   */
   function endGame(isWin) {
     gameState.isGameOver = true;
     
@@ -734,11 +737,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isWin) {
       resultMessage.textContent = `Tebrikler! ${gameState.currentRow} denemede buldunuz.`;
       gameState.streak++;
-      playSound('gameWin');
+      playSound("gameWin");
       
-      // Skoru kaydet
-      saveScore('wordle', gameState.score);
+      // Puan hesaplama - daha az denemede bulunması durumunda puan artar
+      const attemptBonus = Math.max(0, 6 - gameState.currentRow) * 20; // 0-5 arası deneme bonusu
+      const finalScore = gameState.score + attemptBonus;
+      
+      // Skoru kaydet - daha güvenilir bir şekilde
+      setTimeout(() => {
+        saveScore("wordle", finalScore);
+      }, 1000); // Kısa bir gecikme ile kaydetme işlemini yap
     } else {
+      resultMessage.textContent = "Üzgünüm, kelimeyi bulamadınız.";
+      gameState.streak = 0;
+      playSound("gameLose");
+    }
+    
+    // Cevabı göster
+    answerReveal.textContent = gameState.answer;
+    
+    // İstatistikleri güncelle
+    finalScore.textContent = gameState.score;
+    attemptsCount.textContent = `${gameState.currentRow}/6`;
+    finalStreak.textContent = gameState.streak;
+    
+    // Sonuç panelini göster
+    gameContainer.style.display = "none";
+    gameOverContainer.style.display = "block";
+    
+    // Yıldız derecelendirmesini ayarla
+    updateStarRating();
+    
+    // Ekran pozisyonunu sabitle (kaymayı önlemek için)
+    window.scrollTo(0, 0);
+  }
       resultMessage.textContent = 'Üzgünüm, kelimeyi bulamadınız.';
       gameState.streak = 0;
       playSound('gameLose');
@@ -803,7 +835,77 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Skoru kaydet
    */
+  /**
+   * Skoru kaydet
+   */
   function saveScore(gameType, score) {
+    // Kontrol: Skor 0 ya da negatif olmamalı
+    if (score <= 0) {
+      console.log("Geçersiz skor. Skor 0 veya negatif olamaz.");
+      return;
+    }
+    
+    // Kontrol: gameType boş olmamalı 
+    if (!gameType || gameType.trim() === "") {
+      console.log("Geçersiz oyun tipi");
+      return;
+    }
+
+    fetch("/save-score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        game_type: gameType,
+        score: score
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Sunucu yanıtı başarısız: " + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        console.log("Skor başarıyla kaydedildi!");
+        // Başarılı kayıt mesajı göster
+        showMessage("Skorunuz başarıyla kaydedildi!", "success");
+        
+        // İsteğe bağlı: Skor tablosunu güncelle
+        updateLeaderboardIfVisible();
+      } else {
+        console.error("Skor kaydedilirken hata oluştu:", data.error);
+        showMessage("Skor kaydedilemedi. Lütfen tekrar deneyin.", "error");
+      }
+    })
+    .catch(error => {
+      console.error("Skor kaydedilirken hata oluştu:", error);
+      showMessage("Skor kaydedilemedi. Lütfen tekrar deneyin.", "error");
+    });
+  }
+  
+  /**
+   * Eğer skor tablosu görünüyorsa günceller
+   */
+  function updateLeaderboardIfVisible() {
+    // Skor tablosu sayfadaysa güncelle
+    const leaderboardContainer = document.getElementById("leaderboardContainer");
+    if (leaderboardContainer) {
+      // Leaderboard.js deki yükleme fonksiyonunu çağır
+      if (typeof loadLeaderboard === "function") {
+        loadLeaderboard();
+      }
+    }
+  }
+    
+    // Kontrol: gameType boş olmamalı 
+    if (!gameType || gameType.trim() === '') {
+      console.log('Geçersiz oyun tipi');
+      return;
+    }
+
     fetch('/save-score', {
       method: 'POST',
       headers: {
@@ -814,17 +916,43 @@ document.addEventListener('DOMContentLoaded', function() {
         score: score
       })
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Sunucu yanıtı başarısız: ' + response.status);
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.success) {
         console.log('Skor başarıyla kaydedildi!');
+        // Başarılı kayıt mesajı göster
+        showMessage('Skorunuz başarıyla kaydedildi!', 'success');
+        
+        // İsteğe bağlı: Skor tablosunu güncelle
+        updateLeaderboardIfVisible();
       } else {
         console.error('Skor kaydedilirken hata oluştu:', data.error);
+        showMessage('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
       }
     })
     .catch(error => {
       console.error('Skor kaydedilirken hata oluştu:', error);
+      showMessage('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
     });
+  }
+  
+  /**
+   * Eğer skor tablosu görünüyorsa günceller
+   */
+  function updateLeaderboardIfVisible() {
+    // Skor tablosu sayfadaysa güncelle
+    const leaderboardContainer = document.getElementById('leaderboard-container');
+    if (leaderboardContainer) {
+      // Leaderboard.js'deki yükleme fonksiyonunu çağır
+      if (typeof loadLeaderboard === 'function') {
+        loadLeaderboard();
+      }
+    }
   }
 
   /**
