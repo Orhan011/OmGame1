@@ -61,25 +61,43 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function createMobileInput() {
     if (!mobileInput) {
+      // Ekranın aşağı kaymaması için önce bir container oluşturalım
+      const inputContainer = document.createElement('div');
+      inputContainer.style.position = 'fixed';
+      inputContainer.style.bottom = '0';
+      inputContainer.style.left = '0';
+      inputContainer.style.width = '100%';
+      inputContainer.style.height = '1px';
+      inputContainer.style.opacity = '0';
+      inputContainer.style.zIndex = '-1';
+      
+      // Input elementi oluştur
       mobileInput = document.createElement('input');
       mobileInput.type = 'text';
       mobileInput.inputMode = 'text';
       mobileInput.autocomplete = 'off';
       mobileInput.autocorrect = 'off';
-      mobileInput.autocapitalize = 'off';
+      mobileInput.autocapitalize = 'none';
       mobileInput.spellcheck = false;
       
-      // Görünmez input - tek seferde tek harf girişi için maxLength=1
-      mobileInput.style.position = 'fixed';
-      mobileInput.style.top = '0';
-      mobileInput.style.left = '0';
+      // Input elementini görünmez yap
+      mobileInput.style.position = 'absolute';
       mobileInput.style.opacity = '0';
-      mobileInput.style.pointerEvents = 'none';
       mobileInput.style.height = '1px';
       mobileInput.style.width = '1px';
-      mobileInput.maxLength = 1;
+      mobileInput.style.pointerEvents = 'none';
+      mobileInput.style.left = '0';
+      mobileInput.style.top = '0';
+      mobileInput.maxLength = 1; // Sadece bir karakter girilebilir
       
-      document.body.appendChild(mobileInput);
+      // Sayfanın kaymasını önlemek için
+      mobileInput.style.zIndex = '-1';
+      
+      // Input elementini container'a ekle
+      inputContainer.appendChild(mobileInput);
+      
+      // Container'ı sayfaya ekle
+      document.body.appendChild(inputContainer);
       
       // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
       const debounce = (callback, delay) => {
@@ -122,6 +140,19 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Mobil input silme ve enter işlemleri
       mobileInput.addEventListener('keydown', handleKeydown);
+      
+      // Taşınmayı ve kaydırmayı önlemek için
+      window.visualViewport.addEventListener('resize', () => {
+        if (window.visualViewport.height < window.innerHeight) {
+          // Klavye açıldı, gridimizin ortada kalmasını sağlayalım
+          wordleGrid.style.marginTop = '10px';
+          wordleGrid.style.marginBottom = '150px';
+        } else {
+          // Klavye kapandı, normal görünüme dönelim
+          wordleGrid.style.marginTop = '';
+          wordleGrid.style.marginBottom = '';
+        }
+      });
     }
   }
   
@@ -242,6 +273,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Grid ve klavyeyi oluştur
     createWordleGrid();
+    
+    // Grid'in ekranın alt tarafında olduğundan emin ol
+    wordleGrid.style.marginTop = '0';
     
     // Mobil klavye desteği ekle
     createMobileInput();
@@ -762,4 +796,32 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
+  
+  // Sayfa yüklendiğinde klavye için ana CSS stil ekleyelim
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    .wordle-grid {
+      margin-top: 20px;
+      margin-bottom: 100px !important;  /* Mobil klavye için ek boşluk bırak */
+    }
+    
+    /* Mobil için ek stil */
+    @media (max-width: 767px) {
+      .wordle-grid {
+        margin-top: 10px;
+        margin-bottom: 150px !important;  /* Mobil klavye için daha fazla boşluk */
+      }
+      
+      .wordle-cell {
+        font-size: 1.2rem !important;  /* Mobil için biraz daha küçük */
+      }
+    }
+    
+    /* Klavyenin sayfayı kaydırmaması için */
+    body.keyboard-open .wordle-grid {
+      transform: translateY(-80px);
+      transition: transform 0.3s ease;
+    }
+  `;
+  document.head.appendChild(styleElement);
 });
