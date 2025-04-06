@@ -76,17 +76,23 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Wordle Grid -->
-        <div id="wordle-grid" class="wordle-grid mb-4"></div>
+        <!-- Virtual Keyboard Wrapper-->
+        <div class="virtual-keyboard-wrapper">
+          <!-- Wordle Grid -->
+          <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
-        <!-- Mobil Keyboard Hack - Gizli giriş alanı -->
-        <input type="text" 
-               id="hidden-input" 
-               autocomplete="off" 
-               autocorrect="off" 
-               autocapitalize="off" 
-               spellcheck="false"
-               maxlength="1">
+          <!-- Invisible keyboard input - fixed positioning to avoid page scrolling -->
+          <div class="hidden-input-container">
+            <input type="text" 
+                  id="hidden-input" 
+                  autocomplete="off" 
+                  autocorrect="off" 
+                  autocapitalize="off" 
+                  spellcheck="false"
+                  inputmode="none"
+                  maxlength="1">
+          </div>
+        </div>
 
         <!-- Game Action Buttons -->
         <div class="game-action-buttons">
@@ -245,26 +251,44 @@
   }
 
   /* Mobil klavye için gizli input alanı */
-  #hidden-input {
-    position: fixed;
-    bottom: -100px;
-    left: -100px;
+  .virtual-keyboard-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+  }
+  
+  .hidden-input-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
     opacity: 0.01;
-    height: 10px;
-    width: 10px;
-    pointer-events: none;
-    font-size: 16px; /* Mobil Safari'de yakınlaştırmayı önlemek için */
-    caret-color: transparent;
-    background: transparent;
+    z-index: -1;
+  }
+  
+  #hidden-input {
+    width: 1px;
+    height: 1px;
+    opacity: 0.01;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border: none;
     outline: none;
+    background: transparent;
     color: transparent;
-    margin: 0;
+    caret-color: transparent;
     padding: 0;
-    /* Hizmet dışı bırakılmış görünür kılacak özellikler */
-    visibility: visible;
-    display: block;
-    z-index: -10;
+    margin: 0;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    pointer-events: none;
+    font-size: 16px; /* Prevent auto-zoom on iOS */
   }
 
   @keyframes shake {
