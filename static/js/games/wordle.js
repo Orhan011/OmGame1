@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const shareScoreBtn = document.getElementById('share-score');
   const submitGuessBtn = document.getElementById('submit-guess-btn');
   const deleteLetterBtn = document.getElementById('delete-letter-btn');
+  const hiddenInput = document.getElementById('hidden-input');
 
   // Ses efektleri
   const sounds = {
@@ -85,6 +86,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // Harf sil butonu
   deleteLetterBtn.addEventListener('click', function() {
     deleteLetter();
+  });
+
+  // Gizli input alanının işlenmesi
+  hiddenInput.addEventListener('input', function(e) {
+    if (e.target.value) {
+      // Tek bir karakter aldığımızdan emin olalım
+      const letter = e.target.value.toUpperCase();
+      addLetter(letter);
+      // Input alanını temizleyelim
+      e.target.value = '';
+    }
   });
 
   // Klavye tuşu basımı
@@ -171,6 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Tıklanan hücreyi aktif olarak işaretle
             gameState.activeCellIndex = clickedCol;
             highlightActiveCell();
+            
+            // Mobil klavyeyi aktifleştir
+            hiddenInput.focus();
+            
             playSound('keypress');
           }
         });
@@ -208,13 +224,15 @@ document.addEventListener('DOMContentLoaded', function() {
    * Harf ekleme
    */
   function addLetter(letter) {
-    if (gameState.currentCol < 5) {
-      // Önce aktif hücreye harfi yerleştir
+    if (gameState.isGameOver) return;
+    
+    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '') {
+      // Aktif hücreye harfi yerleştir
       gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = letter;
       
-      // Bir sonraki hücreyi aktif yap
+      // Bir sonraki hücreyi aktif yap (sağdaki boş hücreye geçiş)
       gameState.activeCellIndex = (gameState.activeCellIndex + 1) % 5;
-      gameState.currentCol = Math.max(gameState.currentCol, gameState.activeCellIndex);
+      gameState.currentCol = Math.max(gameState.currentCol, countFilledCells());
       
       // Izgarayı güncelle
       updateGrid();
@@ -223,16 +241,33 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
+   * Dolu hücre sayısını hesaplar
+   */
+  function countFilledCells() {
+    let count = 0;
+    for (let i = 0; i < 5; i++) {
+      if (gameState.guesses[gameState.currentRow][i] !== '') {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
    * Harf silme
    */
   function deleteLetter() {
-    if (gameState.currentCol > 0) {
-      // Aktif hücrenin bir öncekine git
-      gameState.activeCellIndex = (gameState.activeCellIndex - 1 + 5) % 5;
-      
-      // O hücredeki harfi sil
+    if (gameState.isGameOver) return;
+    
+    // Mevcut hücre boş ise ve sol tarafında dolu hücre varsa, ona geç
+    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '' && gameState.activeCellIndex > 0) {
+      gameState.activeCellIndex--;
+    }
+    
+    // Aktif hücredeki harfi sil
+    if (gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '') {
       gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
-      gameState.currentCol--;
+      gameState.currentCol = countFilledCells();
       
       // Izgarayı güncelle
       updateGrid();
@@ -244,7 +279,11 @@ document.addEventListener('DOMContentLoaded', function() {
    * Tahmini gönderme
    */
   function submitGuess() {
-    if (gameState.currentCol < 5) {
+    if (gameState.isGameOver) return;
+    
+    // Tüm satırın dolu olduğunu kontrol et
+    const filledCount = countFilledCells();
+    if (filledCount < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
       return;
