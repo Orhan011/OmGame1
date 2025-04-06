@@ -66,74 +66,42 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileInput.autocapitalize = 'off';
       mobileInput.spellcheck = false;
       
-      // Ekranı kaydırma sorununu düzeltmek için görünür hale getiriyoruz
-      // ve ekranın üstünde sabit pozisyonda tutuyoruz
+      // Görünmez input - tek seferde tek harf girişi için maxLength=1
       mobileInput.style.position = 'fixed';
       mobileInput.style.top = '0';
-      mobileInput.style.left = '50%';
-      mobileInput.style.transform = 'translateX(-50%)';
-      mobileInput.style.width = '80%'; 
-      mobileInput.style.padding = '10px';
-      mobileInput.style.backgroundColor = 'rgba(60, 60, 80, 0.9)';
-      mobileInput.style.color = 'white';
-      mobileInput.style.borderRadius = '0 0 8px 8px';
-      mobileInput.style.border = 'none';
-      mobileInput.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
-      mobileInput.style.zIndex = '1000';
-      mobileInput.style.textAlign = 'center';
-      mobileInput.style.fontSize = '16px';
-      mobileInput.style.fontWeight = 'bold';
-      mobileInput.placeholder = 'Kelimeyi tahmin et...';
-      
-      // maxLength'i 5'e çıkarıyoruz, böylece tüm kelimeyi yazabilirler
-      mobileInput.maxLength = 5;
+      mobileInput.style.left = '0';
+      mobileInput.style.opacity = '0';
+      mobileInput.style.pointerEvents = 'none';
+      mobileInput.style.height = '1px';
+      mobileInput.style.width = '1px';
+      mobileInput.maxLength = 1;
       
       document.body.appendChild(mobileInput);
       
-      // Mobil input olayları
-      let lastInputTime = 0;
-      
+      // Mobil input olayları - tek harf girişi
       mobileInput.addEventListener('input', (e) => {
-        const value = e.target.value.toUpperCase();
+        const char = e.target.value.toUpperCase();
         
-        // Mevcut satırı tamamen temizle 
-        clearCurrentRow();
-        
-        // Değerin her harfini tek tek ekle
-        for (let i = 0; i < value.length; i++) {
-          const char = value[i];
-          if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
-            gameState.guesses[gameState.currentRow][i] = char;
-          }
+        if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
+          addLetter(char);
+          playSound('keypress');
         }
         
-        // Sütun pozisyonunu değerin uzunluğuna ayarla
-        gameState.currentCol = value.length;
-        
-        // Izgarayı güncelle
-        updateGrid();
+        // İnputu temizle - bir sonraki harf girişi için hazırla
+        e.target.value = '';
       });
       
-      // Enter tuşuna basıldığında tahmini gönder
+      // Mobil input silme işlemi
       mobileInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Backspace') {
           e.preventDefault();
-          if (gameState.currentCol === 5) {
-            submitGuess();
-            // Tahminden sonra input'u temizle
-            mobileInput.value = '';
-          } else {
-            showMessage('5 harfli bir kelime girin', 'warning');
-          }
+          deleteLetter();
+          playSound('keypress');
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          submitGuess();
         }
       });
-    }
-  }
-  
-  // Mevcut satırı temizle
-  function clearCurrentRow() {
-    for (let i = 0; i < 5; i++) {
-      gameState.guesses[gameState.currentRow][i] = '';
     }
   }
   
@@ -348,11 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Tahmin sayısını güncelle
     guessesDisplay.textContent = `${gameState.currentRow}/6`;
-    
-    // Input'u temizle
-    if (mobileInput) {
-      mobileInput.value = '';
-    }
   }
 
   /**
@@ -533,15 +496,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Kullanıcıya bilgi mesajı göster
     showMessage('İpucu verildi!', 'info');
-    
-    // Mobil input'taki değeri güncelle
-    if (mobileInput) {
-      const currentValue = [];
-      for (let i = 0; i < 5; i++) {
-        currentValue.push(gameState.guesses[gameState.currentRow][i] || '');
-      }
-      mobileInput.value = currentValue.join('');
-    }
   }
 
   /**
