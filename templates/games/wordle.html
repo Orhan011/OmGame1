@@ -1,50 +1,183 @@
 {% extends "layout.html" %}
-{% block title %}Wordle - ZekaPark{% endblock %}
 
-{% block custom_meta %}
-<meta name="description" content="Kelime tahmin etme oyunu Wordle - Türkçe kelimeleri tahmin ederek zihinsel kelime dağarcığını geliştir." />
-<meta name="keywords" content="wordle, kelime oyunu, zihin egzersizi, türkçe kelime oyunu" />
-{% endblock %}
+{% block title %}Wordle - Kelime Tahmin Oyunu{% endblock %}
 
-{% block styles %}
+{% block content %}
+<div class="container">
+  <h1 class="game-title text-center">Wordle</h1>
+  
+  <div class="game-stats-container">
+    <div class="game-stat-item">
+      <i class="fas fa-trophy"></i>
+      <div class="game-stat-value" id="score-display">0</div>
+      <div class="game-stat-label">PUAN</div>
+    </div>
+
+    <div class="game-stat-item">
+      <i class="fas fa-keyboard"></i>
+      <div class="game-stat-value" id="guesses-display">0/6</div>
+      <div class="game-stat-label">TAHMİN</div>
+    </div>
+
+    <div class="game-stat-item">
+      <i class="fas fa-award"></i>
+      <div class="game-stat-value" id="streak-display">0</div>
+      <div class="game-stat-label">SERİ</div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Intro Section -->
+      <div class="game-instructions" id="start-screen">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h4 class="instruction-title"><i class="fas fa-info-circle me-2"></i>Nasıl Oynanır?</h4>
+            <p>Gizli beş harfli kelimeyi tahmin etmek için 6 hakkınız var. Her tahminden sonra, harflerin doğru olup olmadığına dair ipuçları alacaksınız.</p>
+            <div class="game-rules mt-3">
+              <div class="rule-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Yeşil: Harf doğru ve doğru yerde</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Sarı: Harf doğru ama yanlış yerde</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-times-circle"></i>
+                <span>Gri: Harf kelimede yok</span>
+              </div>
+              <div class="rule-item">
+                <i class="fas fa-lightbulb"></i>
+                <span>İpucu kullanarak yardım alabilirsiniz!</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+            <button id="start-game" class="btn btn-primary btn-lg pulse-animation">
+              <i class="fas fa-play me-2"></i>Oyunu Başlat
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Container -->
+      <div id="game-container" class="game-container" style="display: none;">
+        <!-- Game Controls -->
+        <div class="game-controls-top">
+          <button id="hint-button" class="game-control-btn" title="İpucu Al (3)">
+            <i class="fas fa-lightbulb"></i> <span id="hint-count">3</span>
+          </button>
+          <button id="sound-toggle" class="game-control-btn active" title="Sesi Aç/Kapat">
+            <i class="fas fa-volume-up"></i>
+          </button>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="message-container" class="message-container mb-3"></div>
+
+        <!-- Wordle Grid -->
+        <div id="wordle-grid" class="wordle-grid mb-4"></div>
+
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard-container">
+          <div class="keyboard-row" id="keyboard-row-1"></div>
+          <div class="keyboard-row" id="keyboard-row-2"></div>
+          <div class="keyboard-row" id="keyboard-row-3"></div>
+        </div>
+      </div>
+
+      <!-- Game Over Container -->
+      <div id="game-over-container" class="memory-results-container" style="display: none;">
+        <div class="memory-results-card">
+          <div class="memory-results-header">
+            <span class="result-badge">
+              <i class="fas fa-flag-checkered"></i>
+            </span>
+            <h2 class="mb-0">Oyun Tamamlandı!</h2>
+          </div>
+
+          <div class="memory-results-body">
+            <p id="game-result-message" class="text-center mb-3">Tebrikler! Kelimeyi buldunuz.</p>
+            <p class="text-center">Cevap: <span id="answer-reveal" class="fw-bold"></span></p>
+
+            <div class="results-stats">
+              <div class="result-stat">
+                <i class="fas fa-trophy"></i>
+                <div class="result-stat-value">
+                  <span id="final-score">0</span>
+                </div>
+                <div class="result-stat-label">Toplam Puan</div>
+              </div>
+
+              <div class="result-stat">
+                <i class="fas fa-check-double"></i>
+                <div class="result-stat-value">
+                  <span id="attempts-count">0/6</span>
+                </div>
+                <div class="result-stat-label">Tahminler</div>
+              </div>
+
+              <div class="result-stat">
+                <i class="fas fa-award"></i>
+                <div class="result-stat-value">
+                  <span id="final-streak">0</span>
+                </div>
+                <div class="result-stat-label">Seri</div>
+              </div>
+            </div>
+
+            <div class="results-rating">
+              <div class="rating-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <div class="rating-text" id="rating-text">İyi!</div>
+            </div>
+          </div>
+
+          <div class="memory-results-footer">
+            <button id="play-again" class="btn btn-primary btn-lg">
+              <i class="fas fa-redo me-2"></i>Tekrar Oyna
+            </button>
+            <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
+              <i class="fas fa-trophy me-2"></i>Skor Tablosu
+            </a>
+          </div>
+        </div>
+
+        <div class="memory-share-section">
+          <p>Skorunuzu paylaşın:</p>
+          <div class="share-buttons">
+            <button class="share-btn" title="Kopyala" id="copy-score">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button class="share-btn" title="Paylaş" id="share-score">
+              <i class="fas fa-share-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
-  /* Ana oyun düzeni için iyileştirilmiş CSS */
-  .container {
-    padding-bottom: 100px; /* Sayfanın en altında boşluk bırak */
-    position: relative;
-    min-height: 100vh; /* Sayfanın en az ekran yüksekliği kadar olmasını sağla */
-  }
-  
-  /* Sayfa kaymasını önlemek için oyun alanı konumlandırması */
-  .game-container {
-    position: relative;
-    padding-top: 20px;
-    padding-bottom: 100px;
-    overflow: visible;
-  }
-  
-  /* Wordle grid yapısı */
   .wordle-grid {
     display: grid;
     grid-template-rows: repeat(6, 1fr);
     gap: 10px;
     max-width: 350px;
-    margin: 20px auto 80px; /* Klavye için yeterli boşluk */
-    position: relative; /* Göreceli konumlandırma */
+    margin: 0 auto 30px;
   }
 
   .wordle-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 5px;
-    position: relative;
-    transition: transform 0.3s ease;
-    transform-origin: center;
-  }
-  
-  /* Aktif satır vurgulaması */
-  .wordle-row.current-row {
-    transform: scale(1.02);
   }
 
   .wordle-cell {
@@ -84,59 +217,6 @@
     color: rgba(255, 255, 255, 0.5);
   }
 
-  /* Mesaj gösterme alanı */
-  .message-container {
-    min-height: 40px;
-    text-align: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-  }
-
-  .game-message {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 500;
-    margin: 0 auto;
-    animation: fadeInOut 2s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  .game-message.error {
-    background-color: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
-  }
-
-  .game-message.success {
-    background-color: rgba(46, 204, 113, 0.2);
-    color: #2ecc71;
-  }
-
-  .game-message.info {
-    background-color: rgba(52, 152, 219, 0.2);
-    color: #3498db;
-  }
-
-  .game-message.warning {
-    background-color: rgba(241, 196, 15, 0.2);
-    color: #f1c40f;
-  }
-  
-  /* Gizli input için stil */
-  .hidden-input {
-    position: absolute !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    height: 1px !important;
-    width: 1px !important;
-    top: -1000px !important;
-    left: -1000px !important;
-  }
-
-  /* Animasyonlar */
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -167,169 +247,111 @@
     100% { transform: rotateX(0); }
   }
 
+  /* Keyboard Styles */
+  .keyboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .keyboard-key {
+    padding: 15px 12px;
+    min-width: 30px;
+    text-align: center;
+    background-color: rgba(60, 60, 80, 0.8);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex: 1;
+  }
+
+  .keyboard-key:hover {
+    background-color: rgba(80, 80, 100, 0.9);
+  }
+
+  .keyboard-key.correct {
+    background-color: rgba(46, 204, 113, 0.7);
+  }
+
+  .keyboard-key.present {
+    background-color: rgba(241, 196, 15, 0.7);
+  }
+
+  .keyboard-key.absent {
+    background-color: rgba(30, 30, 40, 0.9);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .keyboard-key.wide {
+    flex: 1.5;
+    font-size: 0.9rem;
+  }
+
+  /* Message Styles */
+  .message-container {
+    min-height: 40px;
+    text-align: center;
+  }
+
+  .game-message {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin: 0 auto;
+    animation: fadeInOut 2s;
+  }
+
+  .game-message.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+
+  .game-message.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+
+  .game-message.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+  }
+
+  .game-message.warning {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+  }
+
   @keyframes fadeInOut {
     0% { opacity: 0; }
     10% { opacity: 1; }
     90% { opacity: 1; }
     100% { opacity: 0; }
   }
-  
-  /* Klavye kontrolü (gizlenmiş) */
-  .keyboard-container {
-    display: none;
-  }
 
-  /* Mobil uyumluluk için stil düzenlemeleri */
   @media (max-width: 576px) {
     .wordle-cell {
       font-size: 1.3rem;
     }
     
-    .game-stats-container {
-      margin-bottom: 10px;
-    }
-    
-    .wordle-grid {
-      margin-top: 10px;
-      margin-bottom: 50px;
-    }
-    
-    .game-controls-top {
-      margin-bottom: 5px;
-    }
-    
-    /* Input için sabit bir alan belirle */
-    .game-container {
-      padding-bottom: 50px;
+    .keyboard-key {
+      padding: 10px 8px;
+      font-size: 0.9rem;
     }
   }
 </style>
-{% endblock %}
-
-{% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-10 mx-auto">
-      <h1 class="game-title text-center mb-3">Wordle <small>Kelime Tahmin Oyunu</small></h1>
-      
-      <!-- Başlangıç Ekranı -->
-      <div id="start-screen" class="text-center start-screen py-5">
-        <h2 class="start-header mb-4">Wordle'a Hoş Geldiniz!</h2>
-        <p class="start-description mb-5">Saklı 5 harfli Türkçe kelimeyi bulabilecek misiniz? Her tahmininizde doğru harf ve konumları öğrenip, 6 denemede kelimeyi tahmin edin!</p>
-        
-        <div class="rules mb-5">
-          <h3 class="mb-3">Nasıl Oynanır?</h3>
-          <ul class="text-start rules-list">
-            <li>5 harfli Türkçe bir kelime tahmin etmeye çalışın</li>
-            <li>Tahmin ettikten sonra, her harfin rengi ipucu verecektir:</li>
-            <li><span class="color-example correct">Yeşil</span>: Doğru harf, doğru yerde</li>
-            <li><span class="color-example present">Sarı</span>: Doğru harf, yanlış yerde</li>
-            <li><span class="color-example absent">Gri</span>: Bu harf kelimede yok</li>
-            <li>6 tahmin hakkınız vardır</li>
-          </ul>
-        </div>
-        <button id="start-game" class="btn btn-primary btn-lg start-btn">Oyuna Başla</button>
-      </div>
-      
-      <!-- Oyun Alanı -->
-      <div id="game-container" class="game-container text-center" style="display: none;">
-        <!-- Mesaj Alanı -->
-        <div id="message-container" class="message-container mb-2"></div>
-        
-        <!-- Üst Kontroller -->
-        <div class="game-controls-top d-flex justify-content-between align-items-center mb-3">
-          <div class="game-stats d-flex">
-            <div class="stat-box me-3">
-              <span class="stat-label">Puan:</span>
-              <span id="score-display" class="stat-value">0</span>
-            </div>
-            <div class="stat-box me-3">
-              <span class="stat-label">Tahmin:</span>
-              <span id="guesses-display" class="stat-value">0/6</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Seri:</span>
-              <span id="streak-display" class="stat-value">0</span>
-            </div>
-          </div>
-          
-          <div class="game-actions">
-            <button id="hint-button" class="btn btn-sm btn-outline-info hint-btn" title="İpucu Al">
-              <i class="fas fa-lightbulb"></i> İpucu
-              <span id="hint-count" class="hint-count badge bg-info text-white">3</span>
-            </button>
-            <button id="sound-toggle" class="btn btn-sm btn-outline-secondary ms-2 sound-btn active" title="Sesi Aç/Kapat">
-              <i class="fas fa-volume-up"></i>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Wordle Grid -->
-        <div id="wordle-grid" class="wordle-grid"></div>
-        
-        <!-- Klavye (Gizli) -->
-        <div id="keyboard" class="keyboard-container" style="display: none;">
-          <div id="keyboard-row-1" class="keyboard-row"></div>
-          <div id="keyboard-row-2" class="keyboard-row"></div>
-          <div id="keyboard-row-3" class="keyboard-row"></div>
-        </div>
-      </div>
-      
-      <!-- Oyun Sonu Ekranı -->
-      <div id="game-over-container" class="game-over-container text-center py-4" style="display: none;">
-        <h2 id="game-result-message" class="mb-4">Tebrikler! Kelimeyi buldunuz!</h2>
-        
-        <div class="answer-reveal-container mb-4">
-          <p class="answer-label">Kelime:</p>
-          <h3 id="answer-reveal" class="answer-word">ÖRNEK</h3>
-        </div>
-        
-        <div class="row score-display-container mb-4">
-          <div class="col-md-4">
-            <div class="score-box">
-              <h4>Toplam Puan</h4>
-              <div id="final-score" class="final-score">0</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="score-box">
-              <h4>Tahminler</h4>
-              <div id="attempts-count" class="attempts-count">0/6</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="score-box">
-              <h4>Seri</h4>
-              <div id="final-streak" class="final-streak">0</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="rating-container mb-4">
-          <div class="rating-stars mb-2">
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-          </div>
-          <div id="rating-text" class="rating-text">İyi!</div>
-        </div>
-        
-        <div class="share-container mb-4">
-          <button id="copy-score" class="btn btn-outline-primary me-2">
-            <i class="fas fa-copy"></i> Skoru Kopyala
-          </button>
-          <button id="share-score" class="btn btn-primary">
-            <i class="fas fa-share-alt"></i> Paylaş
-          </button>
-        </div>
-        
-        <button id="play-again" class="btn btn-lg btn-success play-again-btn">Yeniden Oyna</button>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
