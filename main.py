@@ -477,6 +477,11 @@ def init_db_route():
 
 def get_most_played_games(limit=4):
     """En çok oynanan oyunları sayısına göre döndürür."""
+    # Burada gerçek veritabanı verisi yerine sabit oyun listesi kullanılıyor
+    # İleriki aşamalarda, veritabanından en çok oynanan oyunları çeken 
+    # sorgu ile değiştirilebilir
+    
+    # Şu an için en popüler 4 oyun (sıralama önemli değil)
     games = [
         {
             "name": "Kelime Bulmaca",
@@ -503,6 +508,7 @@ def get_most_played_games(limit=4):
             "route": "sudoku"
         }
     ]
+    # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
     return games[:limit]
 
 # Ana Sayfa

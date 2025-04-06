@@ -17,7 +17,7 @@ function loadLeaderboard() {
   `;
 
   // Tüm skorları API'den al
-  fetch('/api/aggregated_scores')
+  fetch('/api/scores/aggregated')
     .then(response => response.json())
     .then(data => {
       console.log("Toplam skorlar:", data);
