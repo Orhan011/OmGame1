@@ -428,6 +428,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const gameStartOverlay = document.getElementById('game-start-overlay');
   const pauseOverlay = document.getElementById('pause-overlay');
   const gameOverOverlay = document.getElementById('game-over-overlay');
+
+  // Eğer gerekli DOM elementleri bulunamazsa, erken dön
+  if (!canvas || !nextPieceCanvas) {
+    console.error('Gerekli canvas elementleri bulunamadı!');
+    return;
+  }
   
   // Game Constants
   const ROWS = 20;
@@ -1029,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Play sound effect
       const audio = new Audio('/static/sounds/success.mp3');
-      audio.play();
+      audio.play().catch(err => console.log('Ses çalma hatası:', err));
     }
   }
   

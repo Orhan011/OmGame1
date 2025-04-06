@@ -294,18 +294,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function flashButton(color) {
     const button = document.getElementById(color);
-    button.classList.add('active');
-    sounds[color].play();
+    if (button) {
+      button.classList.add('active');
+      if (sounds[color]) {
+        sounds[color].play().catch(err => console.log('Ses çalma hatası:', err));
+      }
 
-    setTimeout(() => {
-      button.classList.remove('active');
-    }, 400);
+      setTimeout(() => {
+        button.classList.remove('active');
+      }, 400);
+    }
   }
 
   function checkAnswer(currentLevel) {
     if (userPattern[currentLevel] === gamePattern[currentLevel]) {
       if (userPattern.length === gamePattern.length) {
-        successSound.play();
+        successSound.play().catch(err => console.log('Ses çalma hatası:', err));
         setTimeout(() => {
           nextSequence();
         }, 1000);
@@ -316,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function gameOver() {
-    gameOverSound.play();
+    gameOverSound.play().catch(err => console.log('Ses çalma hatası:', err));
     finalLevelDisplay.textContent = level;
     gameOverModal.style.display = 'block';
     isGameStarted = false;
@@ -363,27 +367,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  buttons.forEach(button => {
-    button.addEventListener('click', function() {
-      if (isGameStarted) {
-        const chosenColor = this.getAttribute('data-color');
-        userPattern.push(chosenColor);
+  if (buttons) {
+    buttons.forEach(button => {
+      button.addEventListener('click', function() {
+        if (isGameStarted) {
+          const chosenColor = this.getAttribute('data-color');
+          userPattern.push(chosenColor);
 
-        flashButton(chosenColor);
-        checkAnswer(userPattern.length - 1);
-      }
+          flashButton(chosenColor);
+          checkAnswer(userPattern.length - 1);
+        }
+      });
     });
-  });
+  }
 
-  restartButton.addEventListener('click', function() {
-    resetGame();
-  });
+  if (restartButton) {
+    restartButton.addEventListener('click', function() {
+      resetGame();
+    });
+  }
 
-  playAgainButton.addEventListener('click', function() {
-    resetGame();
-    isGameStarted = true;
-    nextSequence();
-  });
+  if (playAgainButton) {
+    playAgainButton.addEventListener('click', function() {
+      resetGame();
+      isGameStarted = true;
+      nextSequence();
+    });
+  }
 });
 </script>
 {% endblock %}
