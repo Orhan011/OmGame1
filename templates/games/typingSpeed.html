@@ -1015,6 +1015,16 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
+  
+  // Focus input field when clicking the text area
+  typingText.addEventListener('click', function() {
+    inputField.focus();
+  });
+  
+  // Fix for mobile devices
+  if ('ontouchstart' in window) {
+    typingText.style.cursor = 'pointer';
+  }
 });
 </script>
 {% endblock %}

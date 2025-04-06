@@ -238,8 +238,8 @@
 
   .tetris-board-container {
     position: relative;
-    width: 300px;
-    height: 600px;
+    width: 250px;
+    height: 500px;
   }
 
   #tetris-canvas {
@@ -331,10 +331,10 @@
     }
     
     .tetris-board-container {
-      width: 90vw;
-      max-width: 350px;
-      height: 180vw;
-      max-height: 700px;
+      width: 80vw;
+      max-width: 250px;
+      height: 160vw;
+      max-height: 500px;
     }
     
     .tetris-score-panel, .tetris-next-piece, .tetris-controls, .tetris-help {
@@ -416,6 +416,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const levelElement = document.getElementById('level');
   const linesElement = document.getElementById('lines');
   const finalScoreElement = document.getElementById('final-score');
+  
+  // Canvas boyutlarını ayarla
+  if (canvas) {
+    canvas.width = 250;
+    canvas.height = 500;
+  }
   
   const startButton = document.getElementById('start-button');
   const startGameButton = document.getElementById('start-game');
