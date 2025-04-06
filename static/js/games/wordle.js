@@ -604,7 +604,12 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       gameState.streak = 0;
       playSound('gameLose');
+    // Skoru veritabanına kaydet
+    saveScore(gameState.score);
     }
+    
+    // Skoru veritabanına kaydet
+    saveScore(gameState.score);
     
     // Sonuç ekranını hazırla
     finalScore.textContent = gameState.score;
@@ -796,3 +801,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+  /**
+   * Skoru veritabanına kaydeder
+   */
+  function saveScore(score) {
+    fetch('/save_score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'wordle',
+        score: score
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Skor kaydedilemedi');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Skor başarıyla kaydedildi:', data);
+    })
+    .catch(error => {
+      console.error('Skor kaydetme hatası:', error);
+    });
+  }
