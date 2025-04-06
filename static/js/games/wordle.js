@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const startScreen = document.getElementById('start-screen');
@@ -6,6 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const startBtn = document.getElementById('start-game');
   const playAgainBtn = document.getElementById('play-again');
   const wordleGrid = document.getElementById('wordle-grid');
+  const keyboard = document.getElementById('keyboard');
+  const keyboardRow1 = document.getElementById('keyboard-row-1');
+  const keyboardRow2 = document.getElementById('keyboard-row-2');
+  const keyboardRow3 = document.getElementById('keyboard-row-3');
   const messageContainer = document.getElementById('message-container');
   const scoreDisplay = document.getElementById('score-display');
   const guessesDisplay = document.getElementById('guesses-display');
@@ -20,9 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const soundToggle = document.getElementById('sound-toggle');
   const copyScoreBtn = document.getElementById('copy-score');
   const shareScoreBtn = document.getElementById('share-score');
-  const submitGuessBtn = document.getElementById('submit-guess-btn');
-  const deleteLetterBtn = document.getElementById('delete-letter-btn');
-  const hiddenInput = document.getElementById('hidden-input');
 
   // Ses efektleri
   const sounds = {
@@ -45,23 +47,32 @@ document.addEventListener('DOMContentLoaded', function() {
     streak: 0,
     hintsLeft: 3,
     soundEnabled: true,
-    activeCellIndex: 0,  // Aktif hücre indeksi
-    isProcessingKey: false, // Tuş işleme durumu
-    lastKeyTime: 0, // Son tuş basma zamanı
-    lastActionType: '', // Son işlem türü (add, delete, vs.)
-    actionCount: 0, // İşlem sayacı
-    isDeleting: false // Silme durumu
+    usedLetters: {
+      correct: new Set(),
+      present: new Set(),
+      absent: new Set()
+    }
   };
 
-  // SADECE 5 harfli Türkçe kelimeler (her biri tek tek kontrol edildi ve 5 harfli olduğu onaylandı)
+  // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
-    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "balık", "bulut", "yağmur",
-    "orman", "nehir", "cadde", "sokak", "kapı", "bina", "tablo", "masa", "yatak", "halı", 
-    "perde", "lamba", "dolap", "duvar", "bahçe", "çatı", "havuz", "sahil", "tarla", "şehir", 
-    "dünya", "ateş", "toprak", "hava", "meyve", "sebze", "ekmek", "yemek", "uyku", "büyük", 
-    "küçük", "kısa", "uzun", "kalın", "ince", "sıcak", "soğuk", "yaşlı", "genç", "mutlu", 
-    "üzgün", "cesur", "akıllı", "gece", "sabah", "öğlen", "akşam", "bugün", "yarın", "hafta", 
-    "saat", "zaman", "hayat", "ölüm", "çocuk", "kadın", "erkek", "kedi", "köpek", "kuş"
+    "kalem", "kitap", "araba", "ağaç", "çiçek", "deniz", "güneş", "gökyüzü", "balık", "kuşlar",
+    "bulut", "yağmur", "orman", "dağlar", "nehir", "cadde", "sokak", "kapı", "bina", "tablo",
+    "masa", "koltuk", "sandalye", "yatak", "yastık", "battaniye", "halı", "perde", "lamba", "dolap",
+    "musluk", "duvar", "pencere", "bahçe", "çatı", "merdiven", "asansör", "havuz", "sahil", "kumsal",
+    "tarla", "çiftlik", "kasaba", "şehir", "ülke", "dünya", "gezegen", "ateş", "toprak", "hava",
+    "meyve", "sebze", "ekmek", "yemek", "içmek", "uyku", "koşmak", "yürüme", "konuşma", "dinle",
+    "uzak", "yakın", "büyük", "küçük", "kısa", "uzun", "yüksek", "alçak", "kalın", "ince",
+    "sıcak", "soğuk", "yaşlı", "genç", "mutlu", "üzgün", "korkak", "cesur", "akıllı", "deli",
+    "gece", "gündüz", "sabah", "öğlen", "akşam", "bugün", "dün", "yarın", "hafta", "aylar",
+    "yıllar", "saat", "dakika", "saniye", "zaman", "hayat", "ölüm", "sağlık", "hastalık", "iyilik"
+  ];
+
+  // Türkçe klavye düzeni
+  const turkishKeyboard = [
+    ["E", "R", "T", "Y", "U", "I", "O", "P", "Ğ", "Ü"],
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ş", "İ"],
+    ["SİL", "Z", "C", "V", "B", "N", "M", "Ö", "Ç", "ENTER"]
   ];
 
   // Oyun başlat butonu
@@ -80,156 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
 
-  // Tahmin gönder butonu
-  submitGuessBtn.addEventListener('click', function(e) {
-    e.preventDefault(); // Sayfa kaymayı önleme
-    submitGuess();
-  });
-
-  // Harf sil butonu - özel önlem
-  deleteLetterBtn.addEventListener('click', function(e) {
-    e.preventDefault(); // Sayfa kaymayı önleme
-    
-    // Silme işlemi devam ediyorsa, çift silme önleme
-    if (gameState.isDeleting) return;
-    
-    // Silme durumunu başlat
-    gameState.isDeleting = true;
-    
-    // Harfi sil
-    deleteLetter();
-    
-    // Silme durumunu bir gecikmeyle kapat
-    setTimeout(() => {
-      gameState.isDeleting = false;
-    }, 100);
-  });
-
-  // Mobil kareye tıklandığında ve klavye açıldığında gizli inputu hazırla
-  hiddenInput.addEventListener('focus', function() {
-    // Input değerini temizle
-    hiddenInput.value = '';
-  });
-  
-  // Tuş basma olaylarını dinle - çift silme sorununu önleme
-  hiddenInput.addEventListener('keydown', function(e) {
-    if (gameState.isGameOver) return;
-    
-    // Birden fazla hızlı silme işlemini önle
-    if (e.key === 'Backspace') {
-      const now = Date.now();
-      
-      // Ardışık silme işlemleri arasında minimum süre
-      if (gameState.isDeleting || (now - gameState.lastKeyTime < 150 && gameState.lastActionType === 'delete')) {
-        e.preventDefault();
-        return;
-      }
-      
-      // Silme durumunu başlat
-      gameState.isDeleting = true;
-      gameState.lastActionType = 'delete';
-      gameState.lastKeyTime = now;
-      
-      // Harfi sil
-      deleteLetter();
-      playSound('keypress');
-      
-      // Ardışık çok hızlı silme işlemlerini önle
-      setTimeout(() => {
-        gameState.isDeleting = false;
-      }, 100);
-      
-      e.preventDefault(); // Sayfa kaymayı önleme
-    } else if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
-      const now = Date.now();
-      
-      // Ardışık çok hızlı harf ekleme işlemlerini sınırla
-      if (gameState.isProcessingKey || (now - gameState.lastKeyTime < 100 && gameState.lastActionType === 'add')) {
-        e.preventDefault();
-        return;
-      }
-      
-      // İşleme durumunu başlat
-      gameState.isProcessingKey = true;
-      gameState.lastActionType = 'add';
-      gameState.lastKeyTime = now;
-      
-      // Harfi ekle
-      const letter = e.key.toUpperCase();
-      addLetter(letter);
-      playSound('keypress');
-      
-      // Ardışık çok hızlı tuş basımlarını önle
-      setTimeout(() => {
-        gameState.isProcessingKey = false;
-      }, 100);
-      
-      e.preventDefault(); // Sayfa kaymayı önleme
-    } else if (e.key === 'Enter') {
-      e.preventDefault(); // Sayfa kaymayı önleme
-      submitGuess();
-    }
-  });
-
-  // Klavye tuşu basımı (doküman genelinde)
-  document.addEventListener('keydown', function(e) {
-    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
-    // Enter, Backspace ve harf tuşlarını işle
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submitGuess();
-    } else if (e.key === 'Backspace') {
-      const now = Date.now();
-      
-      // Ardışık silme işlemleri arasında minimum süre
-      if (gameState.isDeleting || (now - gameState.lastKeyTime < 150 && gameState.lastActionType === 'delete')) {
-        e.preventDefault();
-        return;
-      }
-      
-      // Silme durumunu başlat
-      gameState.isDeleting = true;
-      gameState.lastActionType = 'delete';
-      gameState.lastKeyTime = now;
-      
-      // Harfi sil
-      deleteLetter();
-      playSound('keypress');
-      
-      // Ardışık çok hızlı silme işlemlerini önle
-      setTimeout(() => {
-        gameState.isDeleting = false;
-      }, 100);
-      
-      e.preventDefault();
-    } else if (e.key.length === 1 && /^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
-      const now = Date.now();
-      
-      // Ardışık çok hızlı harf ekleme işlemlerini sınırla
-      if (gameState.isProcessingKey || (now - gameState.lastKeyTime < 100 && gameState.lastActionType === 'add')) {
-        e.preventDefault();
-        return;
-      }
-      
-      // İşleme durumunu başlat
-      gameState.isProcessingKey = true;
-      gameState.lastActionType = 'add';
-      gameState.lastKeyTime = now;
-      
-      // Harfi ekle
-      const letter = e.key.toUpperCase();
-      addLetter(letter);
-      playSound('keypress');
-      
-      // Ardışık çok hızlı tuş basımlarını önle
-      setTimeout(() => {
-        gameState.isProcessingKey = false;
-      }, 100);
-      
-      e.preventDefault();
-    }
-  });
+  // Klavye tuşu basımı
+  document.addEventListener('keydown', handleKeyPress);
 
   /**
    * Oyunu başlatır
@@ -240,33 +103,22 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
 
-    // Oyun durumunu sıfırla - guesses dizisini başlangıçta oluştur
+    // Rastgele bir kelime seç
+    const randomIndex = Math.floor(Math.random() * wordList.length);
+    gameState.answer = wordList[randomIndex].toUpperCase();
+    console.log("Cevap: " + gameState.answer); // Geliştirme için, prodüksiyonda kaldırılmalı
+
+    // Oyun durumunu sıfırla
     gameState.currentRow = 0;
     gameState.currentCol = 0;
     gameState.guesses = Array(6).fill().map(() => Array(5).fill(''));
     gameState.isGameOver = false;
     gameState.hintsLeft = 3;
-    gameState.activeCellIndex = 0;
-    gameState.isProcessingKey = false;
-    gameState.lastKeyTime = 0;
-    gameState.lastActionType = '';
-    gameState.actionCount = 0;
-    gameState.isDeleting = false;
-    
-    // Rastgele bir kelime seç
-    const randomIndex = Math.floor(Math.random() * wordList.length);
-    const selectedWord = wordList[randomIndex];
-    
-    // Kelimenin 5 harfli olduğundan emin ol
-    if (selectedWord.length !== 5) {
-      console.error("Uyarı: Seçilen kelime 5 harfli değil!", selectedWord, selectedWord.length);
-      // Acil durum için varsayılan 5 harfli kelime
-      gameState.answer = "KALEM";
-    } else {
-      gameState.answer = selectedWord.toUpperCase();
-    }
-    
-    console.log("Cevap: " + gameState.answer + " (" + gameState.answer.length + " harf)");
+    gameState.usedLetters = {
+      correct: new Set(),
+      present: new Set(),
+      absent: new Set()
+    };
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -274,20 +126,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // İpucu sayacını güncelle
     hintCount.textContent = gameState.hintsLeft;
 
-    // Grid oluştur
+    // Grid ve klavyeyi oluştur
     createWordleGrid();
+    createKeyboard();
 
     // Ses efektlerini sıfırla
     resetSounds();
 
     // Oyun başlangıç sesi çal
     playSound('keypress');
-    
-    // Input alanını temizle
-    hiddenInput.value = '';
-    
-    // Ekran pozisyonunu sabitle (kaymayı önlemek için)
-    window.scrollTo(0, 0);
   }
 
   /**
@@ -306,56 +153,76 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
-        
-        // Hücreye tıklama olayı
-        cell.addEventListener('click', function(e) {
-          e.preventDefault(); // Sayfa kaymayı önleme
-          
-          if (gameState.isGameOver) return;
-          
-          const clickedRow = parseInt(cell.dataset.row);
-          const clickedCol = parseInt(cell.dataset.col);
-          
-          // Sadece aktif satırdaki hücrelerin tıklanabilir olmasını sağla
-          if (clickedRow === gameState.currentRow) {
-            // Tıklanan hücreyi aktif olarak işaretle
-            gameState.activeCellIndex = clickedCol;
-            highlightActiveCell();
-            
-            // Mobil klavyeyi aktifleştir
-            hiddenInput.value = '';
-            hiddenInput.focus();
-            
-            playSound('keypress');
-          }
-        });
-        
         rowDiv.appendChild(cell);
       }
       
       wordleGrid.appendChild(rowDiv);
     }
-    
-    // İlk satırı ve hücreyi aktif olarak işaretle
-    updateGrid();
-    highlightActiveCell();
   }
 
   /**
-   * Aktif hücreyi vurgular
+   * Klavyeyi oluşturur
    */
-  function highlightActiveCell() {
-    // Önce tüm hücrelerden 'active' sınıfını kaldır
-    document.querySelectorAll('.wordle-cell').forEach(cell => {
-      cell.classList.remove('active');
-    });
+  function createKeyboard() {
+    keyboardRow1.innerHTML = '';
+    keyboardRow2.innerHTML = '';
+    keyboardRow3.innerHTML = '';
     
-    // Sadece mevcut satırdaki aktif hücreyi vurgula
-    if (gameState.currentRow < 6) {
-      const activeCell = document.querySelector(`.wordle-cell[data-row="${gameState.currentRow}"][data-col="${gameState.activeCellIndex}"]`);
-      if (activeCell) {
-        activeCell.classList.add('active');
-      }
+    // Klavye düzenini oluştur
+    turkishKeyboard.forEach((row, rowIndex) => {
+      const rowContainer = document.getElementById(`keyboard-row-${rowIndex + 1}`);
+      
+      row.forEach(key => {
+        const keyButton = document.createElement('button');
+        keyButton.className = 'keyboard-key';
+        keyButton.textContent = key;
+        
+        if (key === 'SİL' || key === 'ENTER') {
+          keyButton.classList.add('wide');
+        }
+        
+        keyButton.addEventListener('click', () => {
+          handleKeyboardClick(key);
+        });
+        
+        rowContainer.appendChild(keyButton);
+      });
+    });
+  }
+
+  /**
+   * Klavye tıklaması işleme
+   */
+  function handleKeyboardClick(key) {
+    if (gameState.isGameOver) return;
+    
+    playSound('keypress');
+    
+    if (key === 'ENTER') {
+      submitGuess();
+    } else if (key === 'SİL') {
+      deleteLetter();
+    } else {
+      addLetter(key);
+    }
+  }
+
+  /**
+   * Klavye tuşu basımını işleme
+   */
+  function handleKeyPress(e) {
+    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
+    
+    const key = e.key.toUpperCase();
+    
+    if (key === 'ENTER') {
+      submitGuess();
+    } else if (key === 'BACKSPACE') {
+      deleteLetter();
+      playSound('keypress');
+    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+      addLetter(key);
+      playSound('keypress');
     }
   }
 
@@ -363,95 +230,29 @@ document.addEventListener('DOMContentLoaded', function() {
    * Harf ekleme
    */
   function addLetter(letter) {
-    if (gameState.isGameOver) return;
-    
-    // Aktif hücre boşsa ve satır dolmadıysa harfi ekle
-    if (gameState.currentCol < 5 && gameState.guesses[gameState.currentRow][gameState.activeCellIndex] === '') {
-      // Aktif hücreye harfi yerleştir
-      gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = letter;
-      
-      // Dolu hücre sayısını güncelle
-      gameState.currentCol = Math.max(gameState.currentCol, countFilledCells());
-      
-      // Bir sonraki boş hücreye geç
-      advanceToNextEmptyCell();
-      
-      // Izgarayı güncelle
+    if (gameState.currentCol < 5) {
+      gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
       updateGrid();
-      highlightActiveCell();
+      gameState.currentCol++;
     }
-  }
-  
-  /**
-   * Bir sonraki boş hücreye geçer
-   */
-  function advanceToNextEmptyCell() {
-    // Başlangıç hücresi olarak aktif indeksin bir sonraki hücresine bak
-    let nextIndex = (gameState.activeCellIndex + 1) % 5;
-    
-    // 5 hücreyi kontrol et (tüm satırı)
-    for (let i = 0; i < 5; i++) {
-      // Bu hücre boşsa, aktif hücre olarak ayarla
-      if (gameState.guesses[gameState.currentRow][nextIndex] === '') {
-        gameState.activeCellIndex = nextIndex;
-        return;
-      }
-      
-      // Sonraki hücreye geç (döngüsel olarak)
-      nextIndex = (nextIndex + 1) % 5;
-    }
-    
-    // Eğer tüm hücreler doluysa, son hücreyi aktif yap
-    gameState.activeCellIndex = 4;
   }
 
   /**
-   * Dolu hücre sayısını hesaplar
-   */
-  function countFilledCells() {
-    let count = 0;
-    for (let i = 0; i < 5; i++) {
-      if (gameState.guesses[gameState.currentRow][i] !== '') {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  /**
-   * Harf silme - tekli silme sağlar
+   * Harf silme
    */
   function deleteLetter() {
-    if (gameState.isGameOver) return;
-    
-    // Önce, mevcut hücre doluluğunu kontrol et
-    let activeCellHasLetter = gameState.guesses[gameState.currentRow][gameState.activeCellIndex] !== '';
-    
-    // Eğer aktif hücre zaten boşsa, solundaki hücreye geç
-    if (!activeCellHasLetter && gameState.activeCellIndex > 0) {
-      gameState.activeCellIndex--;
+    if (gameState.currentCol > 0) {
+      gameState.currentCol--;
+      gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
+      updateGrid();
     }
-    
-    // Aktif hücredeki harfi sil - sadece bir tanesini
-    gameState.guesses[gameState.currentRow][gameState.activeCellIndex] = '';
-    
-    // Dolu hücre sayısını güncelle
-    gameState.currentCol = countFilledCells();
-    
-    // Izgarayı güncelle
-    updateGrid();
-    highlightActiveCell();
   }
 
   /**
    * Tahmini gönderme
    */
   function submitGuess() {
-    if (gameState.isGameOver) return;
-    
-    // Tüm satırın dolu olduğunu kontrol et
-    const filledCount = countFilledCells();
-    if (filledCount < 5) {
+    if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
       return;
@@ -468,13 +269,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sonuçları görsel olarak göster
     animateResults(result);
     
+    // Klavyeyi güncelle
+    updateKeyboard(result);
+    
     // Skorları güncelle
     updateScore(result);
     
     // Bir sonraki satıra geç
     gameState.currentRow++;
     gameState.currentCol = 0;
-    gameState.activeCellIndex = 0;
     
     // Oyun durumunu kontrol et
     if (guess === gameState.answer) {
@@ -487,12 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         endGame(false);
       }, 1500);
-    } else {
-      // Sonraki satıra geçildiğinde ızgarayı güncelle
-      setTimeout(() => {
-        updateGrid();
-        highlightActiveCell();
-      }, 1600); // Animasyondan sonra
     }
     
     // Tahmin sayısını güncelle
@@ -512,6 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (guessLetters[i] === answerLetters[i]) {
         result[i] = 'correct';
         answerLetters[i] = null; // Tekrar kontrol edilmemesi için harfi işaretle
+        gameState.usedLetters.correct.add(guessLetters[i]);
       }
     }
     
@@ -522,6 +320,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (index !== -1) {
           result[i] = 'present';
           answerLetters[index] = null; // Tekrar kontrol edilmemesi için harfi işaretle
+          gameState.usedLetters.present.add(guessLetters[i]);
+        } else {
+          gameState.usedLetters.absent.add(guessLetters[i]);
         }
       }
     }
@@ -557,6 +358,39 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
+   * Klavyeyi günceller
+   */
+  function updateKeyboard(result) {
+    const guess = gameState.guesses[gameState.currentRow];
+    
+    for (let i = 0; i < 5; i++) {
+      const letter = guess[i];
+      const status = result[i];
+      
+      // Klavye tuşlarını bul
+      const keyButtons = document.querySelectorAll('.keyboard-key');
+      
+      keyButtons.forEach(button => {
+        if (button.textContent === letter) {
+          // Eğer tuş zaten doğru olarak işaretlenmişse, o durumu koru
+          if (button.classList.contains('correct')) {
+            return;
+          }
+          
+          // Eğer tuş zaten var ama yanlış yerde olarak işaretlenmişse ve şu an doğru değilse, o durumu koru
+          if (button.classList.contains('present') && status !== 'correct') {
+            return;
+          }
+          
+          // Tüm sınıfları temizle ve yeni durumu ekle
+          button.classList.remove('correct', 'present', 'absent');
+          button.classList.add(status);
+        }
+      });
+    }
+  }
+
+  /**
    * Izgarayı günceller
    */
   function updateGrid() {
@@ -565,18 +399,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
         cell.textContent = gameState.guesses[row][col];
         
-        // Hücre dolu mu kontrol et
         if (gameState.guesses[row][col]) {
           cell.classList.add('filled');
         } else {
           cell.classList.remove('filled');
-        }
-        
-        // Aktif satır vurgusu
-        if (row === gameState.currentRow) {
-          cell.classList.add('current-row');
-        } else {
-          cell.classList.remove('current-row');
         }
       }
     }
@@ -592,111 +418,164 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       rowElement.classList.remove('shake');
     }, 500);
-    
-    // Hata sesi çal
-    playSound('wrong');
   }
 
   /**
-   * Mesaj gösterme
-   */
-  function showMessage(text, type = 'info') {
-    messageContainer.innerHTML = '';
-    const messageElement = document.createElement('div');
-    messageElement.className = `game-message ${type}`;
-    messageElement.textContent = text;
-    messageContainer.appendChild(messageElement);
-    
-    // Mesajı otomatik olarak temizle
-    setTimeout(() => {
-      if (messageContainer.contains(messageElement)) {
-        messageContainer.removeChild(messageElement);
-      }
-    }, 3000);
-  }
-
-  /**
-   * Skoru güncelleme
+   * Puanı günceller
    */
   function updateScore(result) {
-    // Doğru harfler için puan ekle
-    let roundScore = 0;
-    result.forEach(r => {
-      if (r === 'correct') roundScore += 10;
-      else if (r === 'present') roundScore += 3;
-    });
+    // Doğru ve var olan harf sayısını hesapla
+    const correctCount = result.filter(r => r === 'correct').length;
+    const presentCount = result.filter(r => r === 'present').length;
     
-    // Erken tahmin bonusu - daha az denemede bulursan daha çok puan
-    const attemptMultiplier = Math.max(1, 1.5 - (gameState.currentRow * 0.1));
-    roundScore = Math.round(roundScore * attemptMultiplier);
+    // Tahminin başarı puanını hesapla
+    const rowBonus = (6 - gameState.currentRow) * 10; // Erken tahmin için bonus
+    const letterScore = (correctCount * 20) + (presentCount * 5);
     
-    gameState.score += roundScore;
-    scoreDisplay.textContent = gameState.score;
+    const guessScore = letterScore + rowBonus;
+    gameState.score += guessScore;
+    
+    // Ekranı güncelle
+    updateScoreDisplay();
   }
 
   /**
-   * Skor/göstergeleri güncelle
+   * Puan göstergesini günceller
    */
   function updateScoreDisplay() {
     scoreDisplay.textContent = gameState.score;
-    guessesDisplay.textContent = `${gameState.currentRow}/6`;
     streakDisplay.textContent = gameState.streak;
+    guessesDisplay.textContent = `${gameState.currentRow}/6`;
   }
 
   /**
-   * İpucu alma
+   * İpucu verir
    */
   function getHint() {
     if (gameState.hintsLeft <= 0) {
-      showMessage('İpucu hakkınız kalmadı!', 'warning');
+      showMessage('İpucu hakkınız kalmadı!', 'error');
       return;
     }
     
-    if (gameState.isGameOver) return;
-    
-    // Doğru harf sayısını kontrol et
-    let filledCount = 0;
-    let emptyIndices = [];
-    
-    // Mevcut satırdaki dolu ve boş hücreleri bul
-    for (let i = 0; i < 5; i++) {
-      if (gameState.guesses[gameState.currentRow][i]) {
-        filledCount++;
-      } else {
-        emptyIndices.push(i);
-      }
-    }
-    
-    // Tüm satır doldurulmuşsa ipucu verme
-    if (filledCount === 5) {
-      showMessage('Bu satır zaten dolu!', 'warning');
+    if (gameState.isGameOver) {
       return;
     }
     
-    // Rastgele boş bir hücre için doğru harfi göster
-    const randomEmptyIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-    gameState.guesses[gameState.currentRow][randomEmptyIndex] = gameState.answer[randomEmptyIndex];
-    
-    // İpucu sayısını azalt
+    // İpucu hakkını azalt
     gameState.hintsLeft--;
     hintCount.textContent = gameState.hintsLeft;
     
-    // Izgarayı güncelle
-    updateGrid();
+    // Rastgele bir konumda henüz doğru tahmin edilmemiş bir harf ver
+    const currentGuess = gameState.guesses[gameState.currentRow];
+    const correctPositions = [];
     
-    // Aktivasyon indeksini güncelle
-    advanceToNextEmptyCell();
-    highlightActiveCell();
+    // Mevcut satırdaki doğru harfleri bul
+    for (let i = 0; i < 5; i++) {
+      const cells = document.querySelectorAll(`.wordle-cell[data-col="${i}"]`);
+      let isCorrect = false;
+      
+      cells.forEach(cell => {
+        if (cell.classList.contains('correct')) {
+          isCorrect = true;
+        }
+      });
+      
+      if (!isCorrect) {
+        correctPositions.push(i);
+      }
+    }
     
-    // İpucu sesi çal
-    playSound('hint');
-    
-    // Başarı mesajı göster
-    showMessage('İpucu eklendi!', 'success');
+    // Henüz doğru tahmin edilmemiş pozisyonlardan birini seç
+    if (correctPositions.length > 0) {
+      const randomIndex = Math.floor(Math.random() * correctPositions.length);
+      const hintPosition = correctPositions[randomIndex];
+      const hintLetter = gameState.answer[hintPosition];
+      
+      showMessage(`İpucu: ${hintPosition + 1}. harf "${hintLetter}"`, 'info');
+      playSound('hint');
+    } else {
+      showMessage('Tüm harfler zaten doğru tahmin edilmiş!', 'info');
+      // İpucu hakkını geri ver
+      gameState.hintsLeft++;
+      hintCount.textContent = gameState.hintsLeft;
+    }
   }
 
   /**
-   * Ses açıp kapatma
+   * Oyunu bitirir
+   */
+  function endGame(isWin) {
+    gameState.isGameOver = true;
+    
+    if (isWin) {
+      gameState.streak++;
+      resultMessage.textContent = 'Tebrikler! Kelimeyi buldunuz.';
+      playSound('gameWin');
+    } else {
+      gameState.streak = 0;
+      resultMessage.textContent = 'Üzgünüm, kelimeyi bulamadınız.';
+      playSound('gameLose');
+    }
+    
+    // Doğru cevabı göster
+    answerReveal.textContent = gameState.answer;
+    
+    // Son skorları güncelle
+    finalScore.textContent = gameState.score;
+    attemptsCount.textContent = `${gameState.currentRow}/6`;
+    finalStreak.textContent = gameState.streak;
+    
+    // Derecelendirmeyi güncelle
+    updateRating(isWin);
+    
+    // Oyun sonu ekranını göster
+    setTimeout(() => {
+      gameContainer.style.display = 'none';
+      gameOverContainer.style.display = 'block';
+    }, 1000);
+    
+    // Skoru kaydet
+    saveScore();
+  }
+
+  /**
+   * Derecelendirmeyi günceller
+   */
+  function updateRating(isWin) {
+    const ratingStars = document.querySelectorAll('.rating-stars i');
+    const ratingText = document.getElementById('rating-text');
+    
+    let rating = 0;
+    
+    if (isWin) {
+      // Erken tahmin için daha yüksek derecelendirme
+      if (gameState.currentRow <= 2) rating = 5;
+      else if (gameState.currentRow === 3) rating = 4;
+      else if (gameState.currentRow === 4) rating = 3;
+      else rating = 2;
+    } else {
+      rating = 1;
+    }
+    
+    // Yıldızları güncelle
+    ratingStars.forEach((star, index) => {
+      if (index < rating) {
+        star.className = 'fas fa-star';
+      } else {
+        star.className = 'far fa-star';
+      }
+    });
+    
+    // Derecelendirme metnini güncelle
+    if (rating === 5) ratingText.textContent = 'Mükemmel!';
+    else if (rating === 4) ratingText.textContent = 'Çok İyi!';
+    else if (rating === 3) ratingText.textContent = 'İyi';
+    else if (rating === 2) ratingText.textContent = 'İdare Eder';
+    else ratingText.textContent = 'Daha İyisini Yapabilirsin';
+  }
+
+  /**
+   * Ses ayarını açar/kapatır
    */
   function toggleSound() {
     gameState.soundEnabled = !gameState.soundEnabled;
@@ -711,168 +590,103 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Sesleri çalma
+   * Belirtilen ses efektini çalar
    */
-  function playSound(soundName) {
+  function playSound(sound) {
+    if (!gameState.soundEnabled) return;
+    
     try {
-      if (gameState.soundEnabled && sounds[soundName]) {
-        sounds[soundName].currentTime = 0;
-        sounds[soundName].play();
-      }
+      sounds[sound].currentTime = 0;
+      sounds[sound].play().catch(err => console.log("Ses çalma hatası:", err));
     } catch (error) {
       console.log("Ses çalma hatası:", error);
     }
   }
 
   /**
-   * Oyun sonu
+   * Ses efektlerini sıfırlar
    */
-  function endGame(isWin) {
-    gameState.isGameOver = true;
+  function resetSounds() {
+    Object.values(sounds).forEach(sound => {
+      sound.pause();
+      sound.currentTime = 0;
+    });
+  }
+
+  /**
+   * Mesaj gösterir
+   */
+  function showMessage(text, type = 'info') {
+    const message = document.createElement('div');
+    message.className = `game-message ${type}`;
+    message.textContent = text;
     
-    // Sonuç mesajı
-    if (isWin) {
-      resultMessage.textContent = `Tebrikler! ${gameState.currentRow} denemede buldunuz.`;
-      gameState.streak++;
-      playSound('gameWin');
-      
-      // Skoru kaydet
-      saveScore('wordle', gameState.score);
+    messageContainer.innerHTML = '';
+    messageContainer.appendChild(message);
+    
+    setTimeout(() => {
+      message.style.opacity = '0';
+      setTimeout(() => {
+        if (messageContainer.contains(message)) {
+          messageContainer.removeChild(message);
+        }
+      }, 500);
+    }, 2000);
+  }
+
+  /**
+   * Skoru kopyalar
+   */
+  function copyScore() {
+    const scoreText = `Wordle oyununda ${gameState.score} puan kazandım! ${gameState.currentRow}/6 tahminde kelimeyi buldum!`;
+    
+    navigator.clipboard.writeText(scoreText)
+      .then(() => {
+        showMessage('Skor kopyalandı!', 'success');
+      })
+      .catch(err => {
+        console.error('Kopyalama başarısız: ', err);
+        showMessage('Kopyalama başarısız', 'error');
+      });
+  }
+
+  /**
+   * Skoru paylaşır
+   */
+  function shareScore() {
+    const scoreText = `Wordle oyununda ${gameState.score} puan kazandım! ${gameState.currentRow}/6 tahminde kelimeyi buldum!`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Beyin Egzersizi - Wordle Skorumu',
+        text: scoreText,
+      })
+      .catch(error => console.log('Paylaşım başarısız:', error));
     } else {
-      resultMessage.textContent = 'Üzgünüm, kelimeyi bulamadınız.';
-      gameState.streak = 0;
-      playSound('gameLose');
+      copyScore();
     }
-    
-    // Cevabı göster
-    answerReveal.textContent = gameState.answer;
-    
-    // İstatistikleri güncelle
-    finalScore.textContent = gameState.score;
-    attemptsCount.textContent = `${gameState.currentRow}/6`;
-    finalStreak.textContent = gameState.streak;
-    
-    // Sonuç panelini göster
-    gameContainer.style.display = 'none';
-    gameOverContainer.style.display = 'block';
-    
-    // Yıldız derecelendirmesini ayarla
-    updateStarRating();
-    
-    // Ekran pozisyonunu sabitle (kaymayı önlemek için)
-    window.scrollTo(0, 0);
   }
 
   /**
-   * Yıldız derecelendirmesini günceller
+   * Skoru sunucuya gönderir
    */
-  function updateStarRating() {
-    const ratingStars = document.querySelector('.rating-stars');
-    const ratingText = document.getElementById('rating-text');
-    
-    // Skor ve deneme sayısına göre yıldız sayısını belirle
-    let stars = 0;
-    
-    if (gameState.isGameOver) {
-      if (gameState.currentRow <= 2) {
-        stars = 5; // Mükemmel - 1-2 denemede
-      } else if (gameState.currentRow <= 3) {
-        stars = 4; // Çok İyi - 3 denemede
-      } else if (gameState.currentRow <= 4) {
-        stars = 3; // İyi - 4 denemede
-      } else if (gameState.currentRow <= 5) {
-        stars = 2; // Orta - 5 denemede
-      } else if (gameState.currentRow <= 6) {
-        stars = 1; // Zayıf - 6 denemede (son deneme)
-      }
-    }
-    
-    // Yıldızları güncelle
-    ratingStars.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
-      const star = document.createElement('i');
-      star.className = i < stars ? 'fas fa-star' : 'far fa-star';
-      ratingStars.appendChild(star);
-    }
-    
-    // Derecelendirme metnini ayarla
-    const ratingTexts = ['Zayıf', 'Orta', 'İyi', 'Çok İyi', 'Mükemmel!'];
-    ratingText.textContent = stars > 0 ? ratingTexts[stars - 1] : 'Üzgünüm!';
-  }
-
-  /**
-   * Skoru kaydet
-   */
-  function saveScore(gameType, score) {
-    fetch('/save-score', {
+  function saveScore() {
+    fetch('/save_score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        game_type: gameType,
-        score: score
+        game_type: 'wordle',
+        score: gameState.score
       })
     })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
-        console.log('Skor başarıyla kaydedildi!');
-      } else {
-        console.error('Skor kaydedilirken hata oluştu:', data.error);
-      }
+      console.log('Skor kaydedildi:', data);
     })
     .catch(error => {
       console.error('Skor kaydedilirken hata oluştu:', error);
     });
   }
-
-  /**
-   * Skoru paylaşma panolarına kopyalama
-   */
-  function copyScore() {
-    const shareText = `🎮 Wordle Oyunu: ${gameState.score} puan kazandım! ${gameState.currentRow}/6 denemede "${gameState.answer}" kelimesini buldum. #ZekaPark #Wordle`;
-    
-    navigator.clipboard.writeText(shareText)
-      .then(() => {
-        showMessage('Skor panoya kopyalandı!', 'success');
-      })
-      .catch(err => {
-        showMessage('Kopyalama başarısız: ' + err, 'error');
-      });
-  }
-
-  /**
-   * Sosyal medyada paylaşma
-   */
-  function shareScore() {
-    const shareText = encodeURIComponent(`🎮 Wordle Oyunu: ${gameState.score} puan kazandım! ${gameState.currentRow}/6 denemede "${gameState.answer}" kelimesini buldum. #ZekaPark #Wordle`);
-    
-    // Web Share API varsa kullan
-    if (navigator.share) {
-      navigator.share({
-        title: 'Wordle Skorum',
-        text: decodeURIComponent(shareText)
-      })
-      .catch(error => console.log('Paylaşma hatası:', error));
-    } else {
-      // Twitter paylaşımı
-      window.open(`https://twitter.com/intent/tweet?text=${shareText}`, '_blank');
-    }
-  }
-
-  /**
-   * Sesleri yeniden başlat
-   */
-  function resetSounds() {
-    for (const sound in sounds) {
-      if (sounds.hasOwnProperty(sound)) {
-        sounds[sound].pause();
-        sounds[sound].currentTime = 0;
-      }
-    }
-  }
-  
-  // Sayfa yüklendiğinde oyunu otomatik başlat
-  //startGame();
 });

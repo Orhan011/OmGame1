@@ -31,8 +31,6 @@ class User(db.Model):
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
     scores = db.relationship('Score', backref='user', lazy=True)
-    # Favorite games
-    favorite_games = db.relationship('FavoriteGame', backref='user', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -90,16 +88,3 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
-    
-    
-class FavoriteGame(db.Model):
-    """Ana sayfada gösterilecek favorilere eklenmiş oyunları takip eden model."""
-    __tablename__ = 'favorite_games'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    game_type = db.Column(db.String(50), nullable=False)  # Oyun türü (ör: wordle, sudoku, audio_memory)
-    display_order = db.Column(db.Integer, default=0)  # Görüntüleme sırası
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<FavoriteGame {self.game_type} (User: {self.user_id})>'
