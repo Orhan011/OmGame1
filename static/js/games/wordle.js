@@ -192,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
       keyboardModeToggle.title = 'Özel klavyeye geç';
       keyboardModeToggle.innerHTML = '<i class="fas fa-th-large"></i>';
       createMobileInput();
+      focusMobileInput(); // Otomatik olarak mobil klavyeyi aç
       showMessage('Mobil klavye moduna geçildi', 'info');
     } else {
       gameState.keyboardMode = 'custom';
@@ -370,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function focusMobileInput() {
     if (mobileInput && gameState.keyboardMode === 'native' && !gameState.isGameOver) {
       setTimeout(() => {
-        mobileInput.focus();
+        mobileInput.focus({preventScroll: true});
       }, 50);
     }
   }
@@ -408,8 +409,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Ekrana tıklama olayı - grid tıklandığında klavyeyi göster
-  wordleGrid.addEventListener('click', function(e) {
+  // Wordle kareleri tıklandığında klavye göster
+  function handleCellClick() {
     if (!gameState.isGameOver) {
       if (gameState.keyboardMode === 'custom') {
         showCustomKeyboard();
@@ -417,19 +418,10 @@ document.addEventListener('DOMContentLoaded', function() {
         focusMobileInput();
       }
     }
-  });
+  }
   
-  // Wordle hücrelerine tıklama olayı - daha büyük tıklama alanı
-  document.addEventListener('click', function(e) {
-    const cell = e.target.closest('.wordle-cell');
-    if (cell) {
-      if (gameState.keyboardMode === 'custom') {
-        showCustomKeyboard();
-      } else {
-        focusMobileInput();
-      }
-    }
-  });
+  // Ekrana tıklama olayı - grid tıklandığında klavyeyi göster
+  wordleGrid.addEventListener('click', handleCellClick);
   
   // Sayfa tıklama olayı - grid dışına tıklandığında özel klavyeyi gizle
   document.addEventListener('click', function(e) {
@@ -525,13 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         // Her hücreye tıklama olayı ekle
-        cell.addEventListener('click', function() {
-          if (gameState.keyboardMode === 'custom') {
-            showCustomKeyboard();
-          } else {
-            focusMobileInput();
-          }
-        });
+        cell.addEventListener('click', handleCellClick);
         rowDiv.appendChild(cell);
       }
       
@@ -690,6 +676,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Tahmin sayısını güncelle
     guessesDisplay.textContent = `${gameState.currentRow}/6`;
+    
+    // Tahmin sonrası klavyeyi yeniden aç (mobil klavye için)
+    if (gameState.keyboardMode === 'native' && !gameState.isGameOver) {
+      setTimeout(() => {
+        focusMobileInput();
+      }, 1600); // Animasyonlardan sonra
+    }
   }
 
   /**
@@ -1133,10 +1126,32 @@ document.addEventListener('DOMContentLoaded', function() {
         margin-top: 20px;
         margin-bottom: 70px;
       }
+      
+      /* Wordle hücreleri için stil düzenlemesi */
+      .wordle-cell {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        cursor: pointer !important;
+        transition: transform 0.1s;
+      }
+      
+      .wordle-cell:active {
+        transform: scale(0.95);
+      }
     }
   `;
   document.head.appendChild(style);
   
   // Sayfa yüklendiğinde oyunu başlat
   startGame();
+  
+  // Sayfa başlangıçta aktif klavye moduna göre mobil klavye veya özel klavye göster
+  if (gameState.keyboardMode === 'native') {
+    // Mobil klavye modunda ise bir miktar gecikme ile mobil klavyeyi aç
+    setTimeout(() => {
+      focusMobileInput();
+    }, 1000);
+  }
 });
