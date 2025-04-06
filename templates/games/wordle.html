@@ -76,23 +76,11 @@
         <!-- Alert Container -->
         <div id="message-container" class="message-container mb-3"></div>
 
-        <!-- Virtual Keyboard Wrapper-->
-        <div class="virtual-keyboard-wrapper">
-          <!-- Wordle Grid -->
-          <div id="wordle-grid" class="wordle-grid mb-4"></div>
+        <!-- Gizli input alanı - Mobil klavye için -->
+        <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
-          <!-- Invisible keyboard input - fixed positioning to avoid page scrolling -->
-          <div class="hidden-input-container">
-            <input type="text" 
-                  id="hidden-input" 
-                  autocomplete="off" 
-                  autocorrect="off" 
-                  autocapitalize="off" 
-                  spellcheck="false"
-                  inputmode="none"
-                  maxlength="1">
-          </div>
-        </div>
+        <!-- Wordle Grid -->
+        <div id="wordle-grid" class="wordle-grid mb-4"></div>
 
         <!-- Game Action Buttons -->
         <div class="game-action-buttons">
@@ -250,45 +238,15 @@
     border-radius: 6px;
   }
 
-  /* Mobil klavye için gizli input alanı */
-  .virtual-keyboard-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 350px;
-    margin: 0 auto;
-  }
-  
-  .hidden-input-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    opacity: 0.01;
-    z-index: -1;
-  }
-  
+  /* Gizli input alanı - mobil klavye için */
   #hidden-input {
-    width: 1px;
-    height: 1px;
-    opacity: 0.01;
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: none;
-    outline: none;
-    background: transparent;
-    color: transparent;
-    caret-color: transparent;
-    padding: 0;
-    margin: 0;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    opacity: 0.01;
+    height: 0;
+    width: 0;
+    z-index: -1;
     pointer-events: none;
-    font-size: 16px; /* Prevent auto-zoom on iOS */
+    font-size: 16px; /* Mobil Safari'de yakınlaştırmayı önlemek için */
   }
 
   @keyframes shake {
