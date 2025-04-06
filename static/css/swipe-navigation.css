@@ -1,27 +1,98 @@
-/* Swipe (kaydırma) navigasyon stilleri */
+/**
+ * iOS Tarzı Swipe Navigasyon - CSS
+ * Tam iOS benzeri animasyonlarla
+ */
 
-.swipe-animation {
-    position: fixed;
-    top: 0;
-    height: 100vh;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
-    z-index: 9999;
-    opacity: 0;
-    transform: translateX(-100%);
-    pointer-events: none;
+/* Body stili */
+body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  touch-action: pan-y;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
 }
 
-.swipe-animation.right {
-    transform: translateX(-100%);
+/* Gölge overlay - iOS kenar gölgesi */
+.shadow-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: none;
+  transition: opacity 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
 }
 
-.swipe-animation.left {
-    transform: translateX(100%);
+/* Ana sayfa container'ı */
+.page-container {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-.swipe-animation.animate {
-    transition: all 0.3s ease;
-    opacity: 0.2;
-    transform: translateX(0);
+/* IOS Benzeri Sayfa Geçişleri */
+.page-transition-enter {
+  transform: translateX(100%);
+}
+
+.page-transition-enter-active {
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
+}
+
+.page-transition-exit {
+  transform: translateX(0);
+}
+
+.page-transition-exit-active {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
+}
+
+/* Geri buton stili */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  color: #007aff; /* iOS mavi rengi */
+  cursor: pointer;
+  user-select: none;
+  font-weight: 400;
+  padding: 8px 10px;
+}
+
+.back-button:before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(-45deg);
+  margin-right: 6px;
+  position: relative;
+  top: 1px;
+}
+
+/* iOS stili yükleme göstergesi */
+.ios-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0,122,255,0.2);
+  border-top-color: rgba(0,122,255,1);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
