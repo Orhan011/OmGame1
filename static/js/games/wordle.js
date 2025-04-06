@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const startScreen = document.getElementById('start-screen');
@@ -48,8 +47,15 @@ document.addEventListener('DOMContentLoaded', function() {
       correct: new Set(),
       present: new Set(),
       absent: new Set()
-    }
+    },
+    isMobile: false, // Mobil cihaz kontrolü için
+    inputMode: 'physical' // Kullanıcının giriş yöntemi (physical veya virtual)
   };
+
+  // Mobil cihaz kontrolü
+  function detectMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
 
   // Türkçe kelime listesi - 5 harfli kelimeler
   const wordList = [
@@ -81,14 +87,34 @@ document.addEventListener('DOMContentLoaded', function() {
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
 
-  // Klavye tuşu basımı
-  document.addEventListener('keydown', handleKeyPress);
+  // Fiziksel klavyeyi sadece masaüstünde kullan
+  if (!detectMobile()) {
+    document.addEventListener('keydown', handleKeyPress);
+    gameState.inputMode = 'physical';
+  } else {
+    gameState.isMobile = true;
+    gameState.inputMode = 'virtual';
+  }
 
-  // Mobil input için focus olayı
+  // Mobil input için input olayı - inputMode'a göre kontrol et
   mobileInput.addEventListener('input', function(e) {
-    if (e.target.value) {
+    if (gameState.isMobile && gameState.inputMode === 'virtual' && e.target.value) {
       addLetter(e.target.value.toUpperCase());
       e.target.value = ''; // Her harf girildiğinde inputu temizle
+    }
+  });
+
+  // Mobil input için olay dinleyiciler
+  mobileInput.addEventListener('keydown', function(e) {
+    if (gameState.isMobile && gameState.inputMode === 'virtual') {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitGuess();
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        deleteLetter();
+        playSound('keypress');
+      }
     }
   });
 
@@ -151,9 +177,10 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.dataset.row = row;
         cell.dataset.col = col;
         
-        // Hücreye tıklandığında mobil klavyeyi açma
+        // Hücreye tıklandığında mobil klavyeyi açma - sadece mobil cihazda
         cell.addEventListener('click', function() {
-          if (!gameState.isGameOver && row === gameState.currentRow) {
+          if (!gameState.isGameOver && row === gameState.currentRow && gameState.isMobile) {
+            gameState.inputMode = 'virtual'; // Mobil klavye moduna geç
             mobileInput.focus();
           }
         });
@@ -170,6 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function handleKeyPress(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
+    
+    // Mobil input kullanılıyorsa burayı atla
+    if (gameState.isMobile && gameState.inputMode === 'virtual') return;
     
     const key = e.key.toUpperCase();
     
@@ -649,5 +679,14 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
       console.error('Skor kaydetme hatası:', error);
     });
+  }
+
+  // Sayfa yüklendiğinde klavye türünü kontrol et
+  if (detectMobile()) {
+    gameState.isMobile = true;
+    gameState.inputMode = 'virtual';
+  } else {
+    gameState.isMobile = false;
+    gameState.inputMode = 'physical';
   }
 });
