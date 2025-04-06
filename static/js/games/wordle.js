@@ -50,7 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
       correct: new Set(),
       present: new Set(),
       absent: new Set()
-    }
+    },
+    // Çift işlemi önlemek için
+    lastInputTime: 0,
+    debounceTime: 200 // ms
   };
 
   // Mobil klavye girişi için gizli input oluştur
@@ -78,8 +81,19 @@ document.addEventListener('DOMContentLoaded', function() {
       
       document.body.appendChild(mobileInput);
       
-      // Mobil input olayları - tek harf girişi
-      mobileInput.addEventListener('input', (e) => {
+      // Debounce (sıçrama engelleme) fonksiyonu tanımlanıyor
+      const debounce = (callback, delay) => {
+        let timerId;
+        return function(...args) {
+          clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            callback.apply(this, args);
+          }, delay);
+        };
+      };
+      
+      // Harf giriş işlemi için debounce uygulanan fonksiyon
+      const handleInput = debounce((e) => {
         const char = e.target.value.toUpperCase();
         
         if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
@@ -89,10 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // İnputu temizle - bir sonraki harf girişi için hazırla
         e.target.value = '';
-      });
+      }, 100);
       
-      // Mobil input silme işlemi
-      mobileInput.addEventListener('keydown', (e) => {
+      // Mobil input olayları - tek harf girişi
+      mobileInput.addEventListener('input', handleInput);
+      
+      // Silme ve Enter için debounce uygulanan fonksiyon
+      const handleKeydown = debounce((e) => {
         if (e.key === 'Backspace') {
           e.preventDefault();
           deleteLetter();
@@ -101,7 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
           e.preventDefault();
           submitGuess();
         }
-      });
+      }, 100);
+      
+      // Mobil input silme ve enter işlemleri
+      mobileInput.addEventListener('keydown', handleKeydown);
     }
   }
   
@@ -150,8 +170,34 @@ document.addEventListener('DOMContentLoaded', function() {
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
 
+  // Klavye tuşu basımı için debounce fonksiyonu
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+  
+  // Klavye tuşuna debounce uygula
+  const debouncedKeypress = debounce(function(e) {
+    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
+    
+    const key = e.key.toUpperCase();
+    
+    if (key === 'ENTER') {
+      submitGuess();
+    } else if (key === 'BACKSPACE') {
+      deleteLetter();
+      playSound('keypress');
+    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
+      addLetter(key);
+      playSound('keypress');
+    }
+  }, 100);
+
   // Klavye tuşu basımı
-  document.addEventListener('keydown', handleKeyPress);
+  document.addEventListener('keydown', debouncedKeypress);
   
   // Ekrana tıklama olayı - mobil input için
   wordleGrid.addEventListener('click', focusMobileInput);
@@ -186,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
       present: new Set(),
       absent: new Set()
     };
+    gameState.lastInputTime = 0;
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -231,29 +278,18 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Klavye tuşu basımını işleme
-   */
-  function handleKeyPress(e) {
-    if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
-    const key = e.key.toUpperCase();
-    
-    if (key === 'ENTER') {
-      submitGuess();
-    } else if (key === 'BACKSPACE') {
-      deleteLetter();
-      playSound('keypress');
-    } else if (/^[A-ZĞÜŞİÖÇ]$/.test(key)) {
-      addLetter(key);
-      playSound('keypress');
-    }
-  }
-
-  /**
-   * Harf ekleme
+   * Harf ekleme - çift işlemi önleme kontrolü eklendi
    */
   function addLetter(letter) {
     if (gameState.isGameOver) return;
+    
+    // Çift işlem kontrolü
+    const now = Date.now();
+    if (now - gameState.lastInputTime < gameState.debounceTime) {
+      return;
+    }
+    gameState.lastInputTime = now;
+    
     if (gameState.currentCol < 5) {
       gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
       updateGrid();
@@ -262,10 +298,18 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Harf silme
+   * Harf silme - çift işlemi önleme kontrolü eklendi
    */
   function deleteLetter() {
     if (gameState.isGameOver) return;
+    
+    // Çift işlem kontrolü
+    const now = Date.now();
+    if (now - gameState.lastInputTime < gameState.debounceTime) {
+      return;
+    }
+    gameState.lastInputTime = now;
+    
     if (gameState.currentCol > 0) {
       gameState.currentCol--;
       gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
@@ -277,6 +321,13 @@ document.addEventListener('DOMContentLoaded', function() {
    * Tahmini gönderme
    */
   function submitGuess() {
+    // Çift işlem kontrolü
+    const now = Date.now();
+    if (now - gameState.lastInputTime < gameState.debounceTime) {
+      return;
+    }
+    gameState.lastInputTime = now;
+    
     if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
