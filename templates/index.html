@@ -44,142 +44,18 @@
 </section>
 
 <section class="mt-4">
-<h2 class="text-center mb-3">Beyin Egzersizi Oyunları</h2>
+<h2 class="text-center mb-3">En Çok Oynanan Oyunlar</h2>
 <div class="game-grid">
-  <!-- Kelime Bulmaca -->
+  {% for game in most_played_games %}
   <div class="game-card">
-    <div class="game-icon"><i class="fas fa-font"></i></div>
+    <div class="game-icon"><i class="{{ game.icon }}"></i></div>
     <div class="game-info">
-      <h3>Kelime Bulmaca</h3>
-      <p>Kelimeleri bul, sözcük hazineni genişlet.</p>
+      <h3>{{ game.name }}</h3>
+      <p>{{ game.description }}</p>
     </div>
-    <a href="{{ url_for('word_puzzle') }}" class="game-btn">Oyna</a>
+    <a href="{{ url_for(game.route) }}" class="game-btn">Oyna</a>
   </div>
-
-  <!-- Hafıza Kartları -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-clone"></i></div>
-    <div class="game-info">
-      <h3>Hafıza Kartları</h3>
-      <p>Eşleşen kartları bul ve hafızanı test et.</p>
-    </div>
-    <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Labirent -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-route"></i></div>
-    <div class="game-info">
-      <h3>Labirent</h3>
-      <p>Çıkış yolunu bul ve stratejik düşün.</p>
-    </div>
-    <a href="{{ url_for('labyrinth') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Yapboz -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
-    <div class="game-info">
-      <h3>Yapboz</h3>
-      <p>Parçaları birleştir ve görsel zekânı geliştir.</p>
-    </div>
-    <a href="{{ url_for('puzzle') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Görsel Dikkat oyunu kaldırıldı
-  <div class="game-card" style="display: none;">
-    <div class="game-icon"><i class="fas fa-eye"></i></div>
-    <div class="game-info">
-      <h3>Görsel Dikkat</h3>
-      <p>Örüntüleri bul ve dikkatini test et.</p>
-    </div>
-    <a href="#" class="game-btn">Oyna</a>
-  </div>
-  -->
-
-  <!-- Sayı Dizisi -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-sort-numeric-up"></i></div>
-    <div class="game-info">
-      <h3>Sayı Dizisi</h3>
-      <p>Sayı örüntülerini keşfet ve analitik düşün.</p>
-    </div>
-    <a href="{{ url_for('number_sequence') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Kim Nerede? oyunu kaldırıldı -->
-
-  <!-- Kart Eşleme oyunu kaldırıldı -->
-  <!--
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-th"></i></div>
-    <div class="game-info">
-      <h3>Kart Eşleme</h3>
-      <p>İkonları eşleştir ve görsel hafızanı geliştir.</p>
-    </div>
-    <a href="{{ url_for('memory_cards') }}" class="game-btn">Oyna</a>
-  </div>
-  -->
-
-  <!-- Sayı Zinciri -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-link"></i></div>
-    <div class="game-info">
-      <h3>Sayı Zinciri</h3>
-      <p>Gördüğün sayıları doğru sırayla hatırla.</p>
-    </div>
-    <a href="{{ url_for('number_chain') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Sesli Hafıza -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-volume-up"></i></div>
-    <div class="game-info">
-      <h3>Sesli Hafıza</h3>
-      <p>Duyduğun ses sıralamasını doğru tekrarla.</p>
-    </div>
-    <a href="{{ url_for('audio_memory') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- N-Back Test -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-brain"></i></div>
-    <div class="game-info">
-      <h3>N-Back Test</h3>
-      <p>Çalışma belleğini ve odaklanma gücünü test et.</p>
-    </div>
-    <a href="{{ url_for('n_back') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- Satranç -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-chess"></i></div>
-    <div class="game-info">
-      <h3>Satranç</h3>
-      <p>Stratejik düşünme ve planlama becerilerinizi geliştirin.</p>
-    </div>
-    <a href="{{ url_for('chess') }}" class="game-btn">Oyna</a>
-  </div>
-  
-  <!-- Sudoku -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-th"></i></div>
-    <div class="game-info">
-      <h3>Sudoku</h3>
-      <p>Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.</p>
-    </div>
-    <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
-  </div>
-
-  <!-- 3D Döndürme -->
-  <div class="game-card">
-    <div class="game-icon"><i class="fas fa-cube"></i></div>
-    <div class="game-info">
-      <h3>3D Döndürme</h3>
-      <p>3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.</p>
-    </div>
-    <a href="{{ url_for('three_d_rotation') }}" class="game-btn">Oyna</a>
-  </div>
+  {% endfor %}
 </div>
 </section>
 

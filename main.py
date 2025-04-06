@@ -574,12 +574,74 @@ def init_db_route():
     return 'Database initialized'
 
 # Routes for main pages
+def get_most_played_games(limit=4):
+    """En çok oynanan oyunları sayısına göre döndürür."""
+    from sqlalchemy import func, desc
+    try:
+        # Her oyun türünün oynama sayısını hesapla
+        most_played = db.session.query(
+            Score.game_type,
+            func.count(Score.id).label('play_count')
+        ).group_by(
+            Score.game_type
+        ).order_by(
+            desc('play_count')
+        ).limit(limit).all()
+        
+        # Oyun türü ve sayma sonuçlarını bir sözlüğe dönüştür
+        result = []
+        game_info = {
+            'wordPuzzle': {'name': 'Kelime Bulmaca', 'icon': 'fas fa-font', 'description': 'Kelimeleri bul, sözcük hazineni genişlet.', 'route': 'word_puzzle'},
+            'memoryMatch': {'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'description': 'Eşleşen kartları bul ve hafızanı test et.', 'route': 'memory_cards'},
+            'labyrinth': {'name': 'Labirent', 'icon': 'fas fa-route', 'description': 'Çıkış yolunu bul ve stratejik düşün.', 'route': 'labyrinth'},
+            'puzzle': {'name': 'Yapboz', 'icon': 'fas fa-puzzle-piece', 'description': 'Parçaları birleştir ve görsel zekânı geliştir.', 'route': 'puzzle'},
+            'numberSequence': {'name': 'Sayı Dizisi', 'icon': 'fas fa-sort-numeric-up', 'description': 'Sayı örüntülerini keşfet ve analitik düşün.', 'route': 'number_sequence'},
+            'numberChain': {'name': 'Sayı Zinciri', 'icon': 'fas fa-link', 'description': 'Gördüğün sayıları doğru sırayla hatırla.', 'route': 'number_chain'},
+            'audioMemory': {'name': 'Sesli Hafıza', 'icon': 'fas fa-volume-up', 'description': 'Duyduğun ses sıralamasını doğru tekrarla.', 'route': 'audio_memory'},
+            'nBack': {'name': 'N-Back Test', 'icon': 'fas fa-brain', 'description': 'Çalışma belleğini ve odaklanma gücünü test et.', 'route': 'n_back'},
+            'chess': {'name': 'Satranç', 'icon': 'fas fa-chess', 'description': 'Stratejik düşünme ve planlama becerilerinizi geliştirin.', 'route': 'chess'},
+            'sudoku': {'name': 'Sudoku', 'icon': 'fas fa-th', 'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.', 'route': 'sudoku'},
+            '3dRotation': {'name': '3D Döndürme', 'icon': 'fas fa-cube', 'description': '3D şekilleri doğru açılarla döndürerek uzamsal algı yeteneklerinizi geliştirin.', 'route': 'three_d_rotation'},
+            'wordle': {'name': 'Wordle', 'icon': 'fas fa-keyboard', 'description': '5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!', 'route': 'wordle'},
+            '2048': {'name': '2048', 'icon': 'fas fa-th-large', 'description': 'Sayıları birleştirerek 2048 değerine ulaşmaya çalışın.', 'route': 'game_2048'}
+        }
+        
+        for game_type, count in most_played:
+            if game_type in game_info:
+                game_data = game_info[game_type].copy()
+                game_data['count'] = count
+                result.append(game_data)
+                
+        # Eğer yeterli veri yoksa varsayılan oyunları ekle
+        if len(result) < limit:
+            default_games = ['wordPuzzle', 'memoryMatch', 'sudoku', 'audioMemory']
+            for game in default_games:
+                if game not in [item['route'] for item in result] and len(result) < limit and game in game_info:
+                    game_data = game_info[game].copy()
+                    game_data['count'] = 0
+                    result.append(game_data)
+                    
+        return result
+    except Exception as e:
+        logger.error(f"Error getting most played games: {e}")
+        # Hata durumunda varsayılan oyunları döndür
+        return [
+            {'name': 'Kelime Bulmaca', 'icon': 'fas fa-font', 'description': 'Kelimeleri bul, sözcük hazineni genişlet.', 'route': 'word_puzzle', 'count': 0},
+            {'name': 'Hafıza Kartları', 'icon': 'fas fa-clone', 'description': 'Eşleşen kartları bul ve hafızanı test et.', 'route': 'memory_cards', 'count': 0},
+            {'name': 'Sudoku', 'icon': 'fas fa-th', 'description': 'Her satır, sütun ve bölgede 1-9 arası rakamları yerleştirerek mantık gücünüzü geliştirin.', 'route': 'sudoku', 'count': 0},
+            {'name': 'Sesli Hafıza', 'icon': 'fas fa-volume-up', 'description': 'Duyduğun ses sıralamasını doğru tekrarla.', 'route': 'audio_memory', 'count': 0}
+        ]
+
 @app.route('/')
 def index():
     user = None
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user, current_user=user)
+    
+    # En çok oynanan oyunları al
+    most_played_games = get_most_played_games(4)
+    
+    return render_template('index.html', user=user, current_user=user, most_played_games=most_played_games)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
