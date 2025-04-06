@@ -173,14 +173,15 @@
 
 <style>
   .typing-container {
-    max-width: 900px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 0 10px;
   }
 
   .typing-test-wrapper {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 30px;
+    padding: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -190,9 +191,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
   }
 
   .typing-stats {
@@ -200,12 +201,17 @@
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
     overflow: hidden;
+    flex-wrap: wrap;
+    width: 100%;
   }
 
   .stat-item {
-    padding: 15px 20px;
+    padding: 10px 15px;
     text-align: center;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 70px;
   }
 
   .stat-item:last-child {
@@ -215,11 +221,11 @@
   .stat-label {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: #fff;
   }
@@ -236,15 +242,19 @@
     display: flex;
     overflow: hidden;
     border-radius: 10px;
+    width: 100%;
+    margin-top: 10px;
   }
 
   .mode-button {
-    padding: 10px 15px;
+    padding: 8px 12px;
     background: rgba(30, 30, 60, 0.5);
     border: none;
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex-grow: 1;
+    text-align: center;
   }
 
   .mode-button.active {
@@ -263,13 +273,13 @@
 
   .typing-content {
     position: relative;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .test-intro {
     display: none;
     text-align: center;
-    padding: 20px;
+    padding: 15px;
   }
 
   .test-intro.active {
@@ -278,24 +288,26 @@
 
   .test-intro h3 {
     color: var(--accent-color);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     font-weight: 600;
+    font-size: 1.4rem;
   }
 
   .test-intro p {
     color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
   }
 
   .test-options {
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 25px;
+    padding: 15px;
+    margin-bottom: 20px;
   }
 
   .option-section {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
   }
 
   .option-section:last-child {
@@ -305,23 +317,24 @@
   .option-section h4 {
     font-size: 0.9rem;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .button-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
   .option-button, .difficulty-button {
-    padding: 8px 15px;
+    padding: 6px 12px;
     background: rgba(40, 40, 80, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
   }
 
   .option-button:hover, .difficulty-button:hover {
@@ -336,7 +349,7 @@
   .radio-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .radio-option {
@@ -346,46 +359,49 @@
   }
 
   .radio-option input[type="radio"] {
-    margin-right: 10px;
+    margin-right: 8px;
   }
 
   .radio-option label {
     color: #fff;
     cursor: pointer;
+    font-size: 0.9rem;
   }
 
   .help-text {
-    margin-left: 10px;
-    font-size: 0.8rem;
+    margin-left: 8px;
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.6);
+    display: inline-block;
   }
 
   .typing-text-area {
     display: none;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
 
   .typing-text {
     background: rgba(30, 30, 60, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    padding: 20px;
-    font-size: 1.2rem;
-    line-height: 1.7;
-    min-height: 150px;
-    margin-bottom: 15px;
+    padding: 15px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    min-height: 120px;
+    margin-bottom: 12px;
     color: rgba(255, 255, 255, 0.7);
     user-select: none;
+    overflow-wrap: break-word;
   }
 
   .input-field {
     width: 100%;
-    padding: 15px;
+    padding: 12px;
     background: rgba(40, 40, 80, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: border-color 0.3s ease;
   }
 
@@ -397,7 +413,7 @@
   .typing-controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
   }
 
   /* Text Character Styling */
@@ -424,7 +440,7 @@
   .typing-results {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 30px;
+    padding: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -433,50 +449,55 @@
 
   .typing-results h2 {
     color: var(--accent-color);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
   }
 
   .results-summary {
     display: flex;
     justify-content: center;
-    gap: 40px;
-    margin-bottom: 30px;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .result-main {
     background: rgba(30, 30, 60, 0.5);
     border-radius: 15px;
-    padding: 30px;
-    min-width: 200px;
+    padding: 15px;
+    min-width: 150px;
+    flex-grow: 1;
   }
 
   .result-main .result-value {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 
   .result-main .result-label {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .results-details {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-bottom: 40px;
+    gap: 15px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
   }
 
   .results-column {
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
-    padding: 20px;
-    min-width: 200px;
+    padding: 15px;
+    flex-grow: 1;
+    max-width: 220px;
+    min-width: 150px;
   }
 
   .results-item {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 
   .results-column .results-item:last-child {
@@ -484,13 +505,13 @@
   }
 
   .results-item .result-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   .results-item .result-value {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: #fff;
   }
@@ -498,7 +519,93 @@
   .results-actions {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  /* Mobil Optimizasyonlar */
+  @media (max-width: 768px) {
+    .game-container {
+      padding: 10px;
+    }
+    
+    .typing-test-wrapper, .typing-results {
+      padding: 15px;
+    }
+    
+    .typing-header {
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .stat-item {
+      padding: 8px;
+    }
+    
+    .stat-label {
+      font-size: 0.7rem;
+    }
+    
+    .stat-value {
+      font-size: 1rem;
+    }
+    
+    .test-intro h3 {
+      font-size: 1.2rem;
+    }
+    
+    .test-intro p {
+      font-size: 0.85rem;
+    }
+    
+    .test-options {
+      padding: 12px;
+    }
+    
+    .option-section h4 {
+      font-size: 0.8rem;
+    }
+    
+    .option-button, .difficulty-button {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+    
+    .radio-option label {
+      font-size: 0.8rem;
+    }
+    
+    .help-text {
+      font-size: 0.7rem;
+    }
+    
+    .typing-text {
+      font-size: 1rem;
+      padding: 12px;
+      min-height: 100px;
+    }
+    
+    .input-field {
+      padding: 10px;
+    }
+    
+    .results-summary {
+      gap: 10px;
+    }
+    
+    .result-main {
+      padding: 12px;
+      min-width: 120px;
+    }
+    
+    .result-main .result-value {
+      font-size: 2rem;
+    }
+    
+    .results-column {
+      padding: 12px;
+      min-width: 120px;
+    }
   }
 </style>
 

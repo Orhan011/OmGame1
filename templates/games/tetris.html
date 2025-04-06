@@ -119,13 +119,14 @@
 
 <style>
   .tetris-container {
-    max-width: 900px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 0 10px;
   }
 
   .tetris-layout {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -134,16 +135,16 @@
     width: 250px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
   }
 
   .tetris-score-panel {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
 
@@ -154,12 +155,12 @@
   }
 
   .tetris-score-label {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: rgba(255, 255, 255, 0.8);
   }
 
   .tetris-score-value {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--accent-color);
   }
@@ -167,14 +168,14 @@
   .tetris-next-piece {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
 
   .tetris-next-label {
     text-align: center;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+    margin-bottom: 8px;
+    font-size: 1rem;
     color: rgba(255, 255, 255, 0.8);
   }
 
@@ -187,22 +188,22 @@
   .tetris-controls {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
 
   .tetris-help {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
 
   .tetris-help-title {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.9);
     text-align: center;
@@ -211,27 +212,27 @@
   .tetris-help-items {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .tetris-help-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .tetris-key {
     background: rgba(106, 90, 224, 0.3);
-    padding: 5px 10px;
+    padding: 4px 8px;
     border-radius: 5px;
     font-size: 0.8rem;
-    min-width: 30px;
+    min-width: 25px;
     text-align: center;
     color: var(--accent-color);
   }
 
   .tetris-help-item span {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.7);
   }
 
@@ -245,6 +246,8 @@
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: 100%;
   }
 
   .tetris-overlay {
@@ -263,53 +266,143 @@
 
   .tetris-overlay-content {
     text-align: center;
-    padding: 30px;
+    padding: 20px;
     max-width: 90%;
   }
 
   .tetris-overlay-content h2 {
     color: var(--accent-color);
-    margin-bottom: 20px;
-    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
   }
 
   .tetris-overlay-content p {
     color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 10px;
-    font-size: 1rem;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
   }
 
   .tetris-final-score {
     background: rgba(40, 40, 80, 0.5);
     border-radius: 15px;
-    padding: 20px;
-    margin: 20px 0 30px;
+    padding: 15px;
+    margin: 15px 0 20px;
   }
 
   .tetris-final-score-label {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .tetris-final-score-value {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: var(--accent-color);
   }
 
   /* Mobile Responsive */
   @media (max-width: 768px) {
+    .game-container {
+      padding: 10px;
+    }
+    
+    .game-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .game-header .badge {
+      font-size: 0.8rem;
+    }
+    
+    .game-description {
+      font-size: 0.9rem;
+    }
+    
     .tetris-layout {
       flex-direction: column-reverse;
+      align-items: center;
+      gap: 15px;
     }
     
     .tetris-info-panel {
       width: 100%;
+      max-width: 350px;
+    }
+    
+    .tetris-board-container {
+      width: 90vw;
+      max-width: 350px;
+      height: 180vw;
+      max-height: 700px;
+    }
+    
+    .tetris-score-panel, .tetris-next-piece, .tetris-controls, .tetris-help {
+      padding: 12px;
+    }
+    
+    .tetris-score-label {
+      font-size: 0.9rem;
+    }
+    
+    .tetris-score-value {
+      font-size: 1.2rem;
+    }
+    
+    .tetris-next-label {
+      font-size: 0.9rem;
+    }
+    
+    .tetris-help-title {
+      font-size: 0.9rem;
     }
     
     .tetris-help-items {
       grid-template-columns: 1fr 1fr 1fr;
+    }
+    
+    .tetris-help-item span {
+      font-size: 0.8rem;
+    }
+    
+    .tetris-key {
+      font-size: 0.75rem;
+      padding: 3px 6px;
+    }
+    
+    .tetris-overlay-content h2 {
+      font-size: 1.4rem;
+    }
+    
+    .tetris-overlay-content p {
+      font-size: 0.85rem;
+    }
+    
+    .tetris-final-score-value {
+      font-size: 2rem;
+    }
+  }
+  
+  /* Handle Landscape Mobile */
+  @media (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
+    .tetris-layout {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    
+    .tetris-info-panel {
+      width: 40%;
+      min-width: 200px;
+    }
+    
+    .tetris-board-container {
+      width: 50vh;
+      height: 90vh;
+      max-height: 450px;
+    }
+    
+    .tetris-help-items {
+      grid-template-columns: 1fr 1fr;
     }
   }
 </style>
@@ -405,6 +498,31 @@ document.addEventListener('DOMContentLoaded', function() {
       color: '#f00000' // Red
     }
   ];
+  
+  // Resize canvas based on container size
+  function resizeCanvas() {
+    const container = document.querySelector('.tetris-board-container');
+    if (!container) return;
+    
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // Calculate block size based on container dimensions
+    const blockSizeW = containerWidth / COLS;
+    const blockSizeH = containerHeight / ROWS;
+    
+    // Set canvas dimensions
+    canvas.width = containerWidth;
+    canvas.height = containerHeight;
+    
+    // Update drawing scale
+    ctx.scale(blockSizeW / BLOCK_SIZE, blockSizeH / BLOCK_SIZE);
+    
+    // Redraw if game is in progress
+    if (!gameOver && !paused) {
+      drawBoard();
+    }
+  }
   
   // Game variables
   const ctx = canvas.getContext('2d');
@@ -528,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Draw board background
     ctx.fillStyle = 'rgba(20, 20, 40, 0.5)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, COLS * BLOCK_SIZE, ROWS * BLOCK_SIZE);
     
     // Draw grid lines
     ctx.strokeStyle = 'rgba(50, 50, 80, 0.5)';
@@ -638,9 +756,14 @@ document.addEventListener('DOMContentLoaded', function() {
     nextCtx.fillRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
     
     // Calculate offset to center the piece
+    const blockSizeNext = Math.min(
+      nextPieceCanvas.width / (nextPiece.matrix[0].length + 2),
+      nextPieceCanvas.height / (nextPiece.matrix.length + 2)
+    );
+    
     const offset = {
-      x: (nextPieceCanvas.width / BLOCK_SIZE - nextPiece.matrix[0].length) / 2,
-      y: (nextPieceCanvas.height / BLOCK_SIZE - nextPiece.matrix.length) / 2
+      x: (nextPieceCanvas.width - nextPiece.matrix[0].length * blockSizeNext) / 2 / blockSizeNext,
+      y: (nextPieceCanvas.height - nextPiece.matrix.length * blockSizeNext) / 2 / blockSizeNext
     };
     
     // Draw next piece
@@ -649,19 +772,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (value !== 0) {
           // Draw block
           nextCtx.fillStyle = nextPiece.color;
-          nextCtx.fillRect((x + offset.x) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+          nextCtx.fillRect(
+            (x + offset.x) * blockSizeNext, 
+            (y + offset.y) * blockSizeNext, 
+            blockSizeNext, 
+            blockSizeNext
+          );
           
           // Draw block border
           nextCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
           nextCtx.lineWidth = 2;
-          nextCtx.strokeRect((x + offset.x) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+          nextCtx.strokeRect(
+            (x + offset.x) * blockSizeNext, 
+            (y + offset.y) * blockSizeNext, 
+            blockSizeNext, 
+            blockSizeNext
+          );
           
           // Draw block highlight
           nextCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
           nextCtx.beginPath();
-          nextCtx.moveTo((x + offset.x) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE);
-          nextCtx.lineTo((x + offset.x + 1) * BLOCK_SIZE, (y + offset.y) * BLOCK_SIZE);
-          nextCtx.lineTo((x + offset.x) * BLOCK_SIZE, (y + offset.y + 1) * BLOCK_SIZE);
+          nextCtx.moveTo((x + offset.x) * blockSizeNext, (y + offset.y) * blockSizeNext);
+          nextCtx.lineTo((x + offset.x + 1) * blockSizeNext, (y + offset.y) * blockSizeNext);
+          nextCtx.lineTo((x + offset.x) * blockSizeNext, (y + offset.y + 1) * blockSizeNext);
           nextCtx.fill();
         }
       });
@@ -933,6 +1066,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // Touch controls for mobile
+  let touchStartX = null;
+  let touchStartY = null;
+  
+  canvas.addEventListener('touchstart', function(e) {
+    if (gameOver || paused) return;
+    
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    e.preventDefault();
+  }, { passive: false });
+  
+  canvas.addEventListener('touchmove', function(e) {
+    if (gameOver || paused || touchStartX === null) return;
+    
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    
+    const diffX = touchX - touchStartX;
+    const diffY = touchY - touchStartY;
+    
+    // Require minimum movement to trigger action
+    const minSwipe = 20;
+    
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipe) {
+      // Horizontal swipe
+      if (diffX > 0) {
+        move(1); // Right
+      } else {
+        move(-1); // Left
+      }
+      touchStartX = touchX;
+      touchStartY = touchY;
+    } else if (Math.abs(diffY) > Math.abs(diffX) && diffY > minSwipe) {
+      // Downward swipe
+      drop();
+      touchStartX = touchX;
+      touchStartY = touchY;
+    }
+    
+    e.preventDefault();
+  }, { passive: false });
+  
+  canvas.addEventListener('touchend', function(e) {
+    touchStartX = null;
+    touchStartY = null;
+  });
+  
+  // Double tap to rotate
+  let lastTap = 0;
+  canvas.addEventListener('touchend', function(e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      // Double tap detected
+      rotate();
+      e.preventDefault();
+    }
+    
+    lastTap = currentTime;
+  });
+  
   // Button event listeners
   startButton.addEventListener('click', startGame);
   startGameButton.addEventListener('click', startGame);
@@ -944,8 +1140,12 @@ document.addEventListener('DOMContentLoaded', function() {
     startGame();
   });
   
+  // Window resize event
+  window.addEventListener('resize', resizeCanvas);
+  
   // Initialize game
   init();
+  resizeCanvas();
 });
 </script>
 {% endblock %}

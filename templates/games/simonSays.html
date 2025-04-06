@@ -70,15 +70,18 @@
 
 <style>
   .simon-game-container {
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 0 15px;
   }
 
   .simon-board {
-    width: 400px;
-    height: 400px;
+    width: 90vw;
+    max-width: 400px;
+    height: 90vw;
+    max-height: 400px;
     border-radius: 50%;
-    margin: 30px auto;
+    margin: 20px auto;
     position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -126,8 +129,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 150px;
-    height: 150px;
+    width: 35%;
+    height: 35%;
     background-color: #111;
     border-radius: 50%;
     display: flex;
@@ -146,6 +149,93 @@
 
   #start-button {
     padding: 8px 16px;
+  }
+  
+  .game-instructions {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .instruction-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .instruction-list {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 10px;
+    padding: 15px 15px 15px 35px;
+    margin: 0;
+  }
+  
+  .instruction-list li {
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+  }
+  
+  .instruction-list li:last-child {
+    margin-bottom: 0;
+  }
+  
+  .game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  /* Mobil Optimizasyonlar */
+  @media (max-width: 768px) {
+    .game-container {
+      padding: 15px 10px;
+    }
+    
+    .game-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .game-header .badge {
+      font-size: 0.8rem;
+    }
+    
+    .game-description {
+      font-size: 0.9rem;
+    }
+    
+    .simon-board {
+      width: 85vw;
+      height: 85vw;
+      gap: 10px;
+      padding: 10px;
+    }
+    
+    .simon-center {
+      width: 40%;
+      height: 40%;
+    }
+    
+    .simon-score {
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+    
+    #start-button {
+      padding: 5px 10px;
+      font-size: 0.9rem;
+    }
+    
+    .instruction-title {
+      font-size: 1.1rem;
+    }
+    
+    .instruction-list li {
+      font-size: 0.85rem;
+    }
   }
 </style>
 
