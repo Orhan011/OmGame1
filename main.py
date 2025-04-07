@@ -58,21 +58,21 @@ def send_verification_email(to_email, verification_code):
         msg = MIMEMultipart()
         msg['From'] = from_email
         msg['To'] = to_email
-        msg['Subject'] = "ZekaPark - E-posta Doğrulama Kodu"
+        msg['Subject'] = "OmGame - E-posta Doğrulama Kodu"
         
         body = f"""
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #4a67e8; text-align: center;">ZekaPark'a Hoş Geldiniz!</h2>
+                <h2 style="color: #4a67e8; text-align: center;">OmGame'e Hoş Geldiniz!</h2>
                 <p>Merhaba,</p>
-                <p>ZekaPark hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
+                <p>OmGame hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
                 <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
                     <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
                 </div>
                 <p>Bu kod 30 dakika boyunca geçerlidir.</p>
                 <p>Eğer böyle bir talepte bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
-                <p>Teşekkürler,<br>ZekaPark Ekibi</p>
+                <p>Teşekkürler,<br>OmGame Ekibi</p>
             </div>
         </body>
         </html>

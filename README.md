@@ -1,6 +1,6 @@
-# ZekaPark
+# OmGame
 
-ZekaPark, çeşitli interaktif oyunlar içeren bir eğitim platformudur. Beyin egzersizleri, hafıza geliştirme, ve eğlenceli aktiviteler sunarak kullanıcıların zihinsel becerilerini geliştirmeyi amaçlamaktadır.
+OmGame, çeşitli interaktif oyunlar içeren bir eğitim platformudur. Beyin egzersizleri, hafıza geliştirme, ve eğlenceli aktiviteler sunarak kullanıcıların zihinsel becerilerini geliştirmeyi amaçlamaktadır.
 
 ## Özellikler
 
