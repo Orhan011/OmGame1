@@ -342,6 +342,7 @@
   }
 
   .option-button.active, .difficulty-button.active {
+    animation: pulse 2s infinite;
     background: rgba(106, 90, 224, 0.6);
     border-color: var(--accent-color);
   }
@@ -523,8 +524,127 @@
     flex-wrap: wrap;
   }
   
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideInUp {
+    from { 
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes highlightChar {
+    0% { background-color: rgba(106, 90, 224, 0.3); }
+    100% { background-color: transparent; }
+  }
+  
+  /* Visual feedback for correct/incorrect typing */
+  .char.correct {
+    color: #6ab04c;
+    animation: highlightChar 0.3s ease-out;
+  }
+  
+  .char.incorrect {
+    color: #ff4757;
+    text-decoration: underline;
+    animation: shake 0.3s ease-in-out;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+  
+  .char.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    animation: pulse 1s infinite;
+  }
+  
+  /* Results animations */
+  .typing-results {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .results-summary, .results-details, .results-actions {
+    animation: slideInUp 0.5s ease-out;
+    animation-fill-mode: both;
+  }
+  
+  .results-details {
+    animation-delay: 0.1s;
+  }
+  
+  .results-actions {
+    animation-delay: 0.2s;
+  }
+  
+  /* Improved button styles */
+  .btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+  
+  .btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    20% {
+      transform: scale(25, 25);
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(40, 40);
+    }
+  }
+  
   /* Mobil Optimizasyonlar */
   @media (max-width: 768px) {
+    /* Improve touch experience */
+    .option-button, .difficulty-button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    
+    .input-field {
+      font-size: 16px; /* Prevent auto-zoom on iOS */
+    }
     .game-container {
       padding: 10px;
     }
@@ -605,6 +725,16 @@
     .results-column {
       padding: 12px;
       min-width: 120px;
+    }
+    
+    /* Improve touch experience */
+    .option-button, .difficulty-button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    
+    .input-field {
+      font-size: 16px; /* Prevent auto-zoom on iOS */
     }
   }
 </style>
@@ -710,11 +840,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('mode-words').addEventListener('click', function() {
     wordsMode.checked = true;
     wordsMode.dispatchEvent(new Event('change'));
+    playSound("click");
   });
 
   document.getElementById('mode-time').addEventListener('click', function() {
     timeMode.checked = true;
     timeMode.dispatchEvent(new Event('change'));
+    playSound("click");
   });
 
   wordButtons.forEach(button => {
@@ -722,6 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
       wordButtons.forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
       wordCount = parseInt(this.getAttribute('data-words'));
+      playSound("click");
     });
   });
 
@@ -741,18 +874,79 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Sound functions
+  function playSound(soundType) {
+    try {
+      let sound;
+      switch(soundType) {
+        case 'start':
+          sound = new Audio('/static/sounds/success.mp3');
+          break;
+        case 'key':
+          sound = new Audio('/static/sounds/click.mp3');
+          sound.volume = 0.2;
+          break;
+        case 'error':
+          sound = new Audio('/static/sounds/wrong.mp3');
+          sound.volume = 0.3;
+          break;
+        case 'complete':
+          sound = new Audio('/static/sounds/game-complete.mp3');
+          break;
+        default:
+          return;
+      }
+      sound.play().catch(e => console.log('Sound playback prevented', e));
+    } catch (e) {
+      console.log('Sound error:', e);
+    }
+  }
+
+  // Sound functions
+  function playSound(soundType) {
+    try {
+      let sound;
+      switch(soundType) {
+        case 'start':
+          sound = new Audio('/static/sounds/success.mp3');
+          break;
+        case 'key':
+          sound = new Audio('/static/sounds/click.mp3');
+          sound.volume = 0.2;
+          break;
+        case 'error':
+          sound = new Audio('/static/sounds/wrong.mp3');
+          sound.volume = 0.3;
+          break;
+        case 'complete':
+          sound = new Audio('/static/sounds/game-complete.mp3');
+          break;
+        default:
+          return;
+      }
+      sound.play().catch(e => console.log('Sound playback prevented', e));
+    } catch (e) {
+      console.log('Sound error:', e);
+    }
+  }
   // Start test
   startTestBtn.addEventListener('click', function() {
+    playSound('start');
+    playSound('start');
     initTest();
   });
 
   // Restart test
   restartTestBtn.addEventListener('click', function() {
+    playSound('start');
+    playSound('start');
     initTest();
   });
 
   // Retry test
   retryTestBtn.addEventListener('click', function() {
+    playSound('start');
+    playSound('start');
     testIntro.classList.add('active');
     resultsScreen.style.display = 'none';
   });
@@ -843,6 +1037,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Process typing input
   inputField.addEventListener('input', function(e) {
+    // Play keypress sound
+    playSound("key");
     // Start timer on first input
     if (!isTyping) {
       isTyping = true;
@@ -865,6 +1061,29 @@ document.addEventListener('DOMContentLoaded', function() {
         // In word mode, end the test when all text is typed
         clearInterval(timer);
         endTest();
+    // Update result section with animated counters
+    let wpmCounter = 0;
+    let accuracyCounter = 0;
+    
+    // Animate WPM counter
+    const wpmInterval = setInterval(() => {
+      wpmCounter += Math.ceil(wpm / 50);
+      if (wpmCounter >= wpm) {
+        wpmCounter = wpm;
+        clearInterval(wpmInterval);
+      }
+      resultWpm.textContent = wpmCounter;
+    }, 20);
+    
+    // Animate accuracy counter
+    const accuracyInterval = setInterval(() => {
+      accuracyCounter += Math.ceil(accuracy / 50);
+      if (accuracyCounter >= accuracy) {
+        accuracyCounter = accuracy;
+        clearInterval(accuracyInterval);
+      }
+      resultAccuracy.textContent = `${accuracyCounter}%`;
+    }, 20);
       }
       return;
     }
@@ -946,6 +1165,29 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       clearInterval(timer);
       endTest();
+    // Update result section with animated counters
+    let wpmCounter = 0;
+    let accuracyCounter = 0;
+    
+    // Animate WPM counter
+    const wpmInterval = setInterval(() => {
+      wpmCounter += Math.ceil(wpm / 50);
+      if (wpmCounter >= wpm) {
+        wpmCounter = wpm;
+        clearInterval(wpmInterval);
+      }
+      resultWpm.textContent = wpmCounter;
+    }, 20);
+    
+    // Animate accuracy counter
+    const accuracyInterval = setInterval(() => {
+      accuracyCounter += Math.ceil(accuracy / 50);
+      if (accuracyCounter >= accuracy) {
+        accuracyCounter = accuracy;
+        clearInterval(accuracyInterval);
+      }
+      resultAccuracy.textContent = `${accuracyCounter}%`;
+    }, 20);
     }
   }
 
@@ -960,6 +1202,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to end the test
   function endTest() {
+    // Play completion sound
+    playSound('complete');
+  
+    // Calculate final stats
+    // Play completion sound
+    playSound('complete');
+  
     // Calculate final stats
     const timeElapsed = time / 60; // convert to minutes
     const wpm = Math.round(((charIndex - mistakes) / 5) / timeElapsed);
@@ -967,9 +1216,35 @@ document.addEventListener('DOMContentLoaded', function() {
       ? Math.round(((charIndex - mistakes) / charIndex) * 100) 
       : 100;
 
-    // Update results
-    resultWpm.textContent = wpm;
-    resultAccuracy.textContent = `${accuracy}%`;
+    // Update results with animations
+    resultWpm.textContent = '0';
+    resultAccuracy.textContent = '0%';
+    
+    // Create counters for animated number display
+    let wpmCounter = 0;
+    let accuracyCounter = 0;
+    
+    // Animate WPM counter
+    const wpmInterval = setInterval(() => {
+      wpmCounter += Math.ceil(wpm / 50);
+      if (wpmCounter >= wpm) {
+        wpmCounter = wpm;
+        clearInterval(wpmInterval);
+      }
+      resultWpm.textContent = wpmCounter;
+    }, 20);
+    
+    // Animate accuracy counter
+    const accuracyInterval = setInterval(() => {
+      accuracyCounter += Math.ceil(accuracy / 50);
+      if (accuracyCounter >= accuracy) {
+        accuracyCounter = accuracy;
+        clearInterval(accuracyInterval);
+      }
+      resultAccuracy.textContent = `${accuracyCounter}%`;
+    }, 20);
+    
+    // Update other results
     resultCharacters.textContent = charIndex;
     resultErrors.textContent = mistakes;
     resultCorrectWords.textContent = correctWords;
@@ -1028,3 +1303,115 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
+<style>
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideInUp {
+    from { 
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes highlightChar {
+    0% { background-color: rgba(106, 90, 224, 0.3); }
+    100% { background-color: transparent; }
+  }
+  
+  /* Visual feedback for correct/incorrect typing */
+  .char.correct {
+    color: #6ab04c;
+    animation: highlightChar 0.3s ease-out;
+  }
+  
+  .char.incorrect {
+    color: #ff4757;
+    text-decoration: underline;
+    animation: shake 0.3s ease-in-out;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+  
+  .char.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    animation: pulse 1s infinite;
+  }
+  
+  /* Results animations */
+  .typing-results {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .results-summary, .results-details, .results-actions {
+    animation: slideInUp 0.5s ease-out;
+    animation-fill-mode: both;
+  }
+  
+  .results-details {
+    animation-delay: 0.1s;
+  }
+  
+  .results-actions {
+    animation-delay: 0.2s;
+  }
+  
+  /* Improved button styles */
+  .btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+  
+  .btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    20% {
+      transform: scale(25, 25);
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(40, 40);
+    }
+  }
+</style>
