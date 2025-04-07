@@ -16,6 +16,14 @@ from models import db, User, Score, Game, AdminUser, SiteSettings, Page, BlogPos
 
 # Logger ayarı
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Konsol handler ekle
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # Admin blueprint tanımı
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -70,7 +78,7 @@ def create_admin_log(action, entity_type=None, entity_id=None, details=None):
             entity_id=entity_id,
             details=details,
             ip_address=request.remote_addr,
-            user_agent=request.user_agent.string
+            user_agent=request.headers.get('User-Agent', 'unknown')
         )
         db.session.add(log)
         db.session.commit()
@@ -993,11 +1001,26 @@ def game_designer_edit(game_id):
 @admin_required
 def game_designer_update(game_id):
     """Oyun tasarım ayarlarını güncelle"""
+    logger.debug(f"Tasarım güncelleme isteği alındı, game_id: {game_id}")
+    
+    # İstek bilgilerini logla
+    logger.debug(f"İstek içeriği: {request.get_data(as_text=True)}")
+    logger.debug(f"İstek başlıkları: {dict(request.headers)}")
+    
     game = Game.query.get_or_404(game_id)
+    logger.debug(f"Oyun bulundu: {game.name}")
     
     try:
         # JSON verisini al
         design_data = request.json
+        if not design_data:
+            logger.error("Geçersiz JSON verisi alındı veya veri boş")
+            return jsonify({
+                'success': False,
+                'message': 'Geçersiz veri formatı. Lütfen geçerli bir JSON verisi gönderin.'
+            }), 400
+        
+        logger.debug(f"Alınan tasarım verisi: {design_data}")
         
         # Oyun ayarlarını güncelle
         if not game.settings:
@@ -1008,14 +1031,19 @@ def game_designer_update(game_id):
         
         # Veritabanını güncelle
         db.session.commit()
+        logger.debug("Veritabanı güncellendi")
         
         # İşlem kaydı oluştur
-        create_admin_log(
-            action='update',
-            entity_type='game_design',
-            entity_id=game.id,
-            details=f"'{game.name}' oyunu tasarımı güncellendi"
-        )
+        try:
+            create_admin_log(
+                action='update',
+                entity_type='game_design',
+                entity_id=game.id,
+                details=f"'{game.name}' oyunu tasarımı güncellendi"
+            )
+            logger.debug("İşlem kaydı oluşturuldu")
+        except Exception as log_err:
+            logger.warning(f"Log oluşturma hatası (kritik değil): {str(log_err)}")
         
         return jsonify({
             'success': True,
@@ -1024,10 +1052,13 @@ def game_designer_update(game_id):
     
     except Exception as e:
         db.session.rollback()
-        logger.error(f"Oyun tasarımı güncellenirken hata: {str(e)}")
+        error_details = str(e)
+        logger.error(f"Oyun tasarımı güncellenirken hata: {error_details}")
+        logger.exception("Hata detayları:")
+        
         return jsonify({
             'success': False,
-            'message': f"Bir hata oluştu: {str(e)}"
+            'message': f"Bir hata oluştu: {error_details}"
         }), 500
 
 @admin_bp.route('/game-designer/templates')

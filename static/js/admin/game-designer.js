@@ -581,13 +581,13 @@ function updateDesignData() {
                     height: element.css('height')
                 },
                 style: {
-                    color: content.css('color'),
-                    backgroundColor: content.css('background-color'),
-                    fontSize: content.css('font-size'),
-                    borderColor: content.css('border-color'),
-                    borderWidth: content.css('border-width'),
-                    borderRadius: content.css('border-radius'),
-                    padding: content.css('padding')
+                    color: content.css("color") || "#000000",
+                    backgroundColor: content.css("background-color") || "transparent",
+                    fontSize: content.css("font-size") || "16px",
+                    borderColor: content.css("border-color") || "transparent",
+                    borderWidth: content.css("border-width") || "0px",
+                    borderRadius: content.css("border-radius") || "0px",
+                    padding: content.css("padding") || "0px"
                 },
                 content: ''
             };
@@ -862,21 +862,38 @@ function saveDesign(gameId) {
     // Mevcut tasarım verilerini güncelle
     updateDesignData();
     
-    // Tasarım verilerini sunucuya gönder
-    $.ajax({
-        url: `/admin/game-designer/${gameId}/update`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(currentDesignData),
-        success: function(response) {
-            if (response.success) {
-                alert('Tasarım başarıyla kaydedildi.');
-            } else {
-                alert('Hata: ' + response.message);
+    try {
+        // Tasarım verilerini JSON olarak hazırla
+        const designData = JSON.stringify(currentDesignData);
+        console.log("Gönderilecek veri:", designData);
+        
+        // Tasarım verilerini sunucuya gönder
+        $.ajax({
+            url: `/admin/game-designer/${gameId}/update`,
+            type: "POST",
+            contentType: "application/json",
+            data: designData,
+            beforeSend: function() {
+                console.log("Tasarım verileri gönderiliyor...");
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert("Tasarım başarıyla kaydedildi.");
+                    console.log("Başarılı cevap:", response);
+                } else {
+                    alert("Hata: " + response.message);
+                    console.error("Sunucu hatası:", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("İşlem sırasında bir hata oluştu: " + error);
+                console.error("Ajax hatası:", status, error);
+                console.error("XHR detayları:", xhr.status, xhr.responseText);
             }
-        },
-        error: function(xhr) {
-            alert('Sunucu hatası: ' + xhr.statusText);
-        }
+        });
+    } catch (e) {
+        console.error("Tasarım kaydetme hatası:", e);
+        alert("Tasarım kaydedilirken bir hata oluştu: " + e.message);
+    }
     });
 }

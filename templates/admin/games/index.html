@@ -70,13 +70,13 @@
                                     </td>
                                     <td>
                                         <div class="table-actions">
-                                            <a href="{{ url_for('admin_game_view', id=game.id) }}" class="btn btn-action btn-view" title="Görüntüle">
+                                            <a href="{{ url_for('admin.game_view', id=game.id) }}" class="btn btn-action btn-view" title="Görüntüle">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ url_for('admin_game_edit', id=game.id) }}" class="btn btn-action btn-edit" title="Düzenle">
+                                            <a href="{{ url_for('admin.game_edit', id=game.id) }}" class="btn btn-action btn-edit" title="Düzenle">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ url_for('admin_game_delete', id=game.id) }}" class="btn btn-action btn-delete" title="Sil" data-confirm="Bu oyunu silmek istediğinizden emin misiniz?">
+                                            <a href="{{ url_for('admin.game_delete', id=game.id) }}" class="btn btn-action btn-delete" title="Sil" data-confirm="Bu oyunu silmek istediğinizden emin misiniz?">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
