@@ -652,22 +652,11 @@ def simon_says():
     return render_template('games/simonSays.html')
 
 # Tetris Oyunu
-# Tetris yönlendirme
-@app.route('/tetris')
-def tetris_redirect():
-    return redirect(url_for('tetris_new'))
-
 @app.route('/games/tetris')
 def tetris():
     """Tetris: Klasik blok puzzle oyunu
     Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
     return render_template('games/tetris.html')
-
-@app.route('/games/tetris-new')
-def tetris_new():
-    """Tetris Yeni: Modern tasarımlı blok puzzle oyunu
-    Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
-    return render_template('games/tetris_new.html')
 
 # Typing Speed Oyunu
 @app.route('/games/typing-speed')
