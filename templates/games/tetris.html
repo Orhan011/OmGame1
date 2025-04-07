@@ -111,6 +111,25 @@
               </a>
             </div>
           </div>
+          
+          <!-- Mobile touch controls -->
+          <div class="touch-controls" id="touch-controls" style="display: none;">
+            <button class="touch-control-btn" id="touch-left">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="touch-control-btn" id="touch-rotate">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button class="touch-control-btn" id="touch-right">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="touch-control-btn" id="touch-down">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+            <button class="touch-control-btn" id="touch-drop">
+              <i class="fas fa-angle-double-down"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -301,6 +320,91 @@
     color: var(--accent-color);
   }
 
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleUp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes levelUpAnimation {
+    0% { transform: translateY(20px); opacity: 0; }
+    20% { transform: translateY(-10px); opacity: 1; }
+    80% { transform: translateY(-10px); opacity: 1; }
+    100% { transform: translateY(-30px); opacity: 0; }
+  }
+  
+  /* Level up animation */
+  .level-up-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(100, 50, 255, 0.8);
+    z-index: 100;
+    animation: levelUpAnimation 2s forwards;
+    pointer-events: none;
+  }
+
+  /* Animate overlay */
+  .tetris-overlay-content {
+    animation: scaleUp 0.3s ease-out;
+  }
+  
+  /* Score value animation */
+  .score-update {
+    animation: pulse 0.3s ease-out;
+  }
+  
+  /* Tetris grid lines */
+  .grid-line {
+    position: absolute;
+    background-color: rgba(200, 200, 255, 0.05);
+    z-index: 1;
+  }
+  
+  .grid-horizontal {
+    height: 1px;
+    width: 100%;
+  }
+  
+  .grid-vertical {
+    width: 1px;
+    height: 100%;
+  }
+  
+  /* Controls enhancement */
+  .tetris-key {
+    background: rgba(106, 90, 224, 0.3);
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    min-width: 25px;
+    text-align: center;
+    color: var(--accent-color);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(106, 90, 224, 0.3);
+  }
+  
+  .tetris-key:hover {
+    background: rgba(106, 90, 224, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .game-container {
@@ -380,6 +484,33 @@
     
     .tetris-final-score-value {
       font-size: 2rem;
+    }
+    
+    /* Add touchscreen controls for mobile */
+    .touch-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 15px;
+    }
+    
+    .touch-control-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(106, 90, 224, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.9);
+      border: none;
+      touch-action: manipulation;
+    }
+    
+    .touch-control-btn:active {
+      background: rgba(106, 90, 224, 0.6);
+      transform: scale(0.95);
     }
   }
   
@@ -604,6 +735,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Start the game
   function startGame() {
+    // Play start sound
+    const startSound = new Audio('/static/sounds/success.mp3');
+    startSound.play().catch(e => console.log('Start sound playback prevented', e));
+    
     // Hide overlays
     tetrisOverlay.style.display = 'none';
     
@@ -839,15 +974,20 @@ document.addEventListener('DOMContentLoaded', function() {
     gameOver = true;
     cancelAnimationFrame(animationId);
 
+    // Play game over sound
+    const gameOverSound = new Audio('/static/sounds/game-over.mp3');
+    gameOverSound.play().catch(e => console.log('Game over sound playback prevented', e));
+
     // Update final results
     finalScoreElement.textContent = score;
     
     // Save score to the server
     saveScore(score);
     
-    // Show game over overlay
+    // Show game over overlay with animation
     tetrisOverlay.style.display = 'flex';
     gameOverOverlay.style.display = 'block';
+    gameOverOverlay.classList.add('animate-in');
     
     // Update button states
     pauseGameButton.disabled = true;
@@ -1035,6 +1175,21 @@ document.addEventListener('DOMContentLoaded', function() {
         level = Math.floor(lines / 10) + 1;
         levelElement.textContent = level;
         
+        // Level up animation and sound
+        const levelUpAnim = document.createElement('div');
+        levelUpAnim.className = 'level-up-animation';
+        levelUpAnim.textContent = 'LEVEL UP!';
+        document.querySelector('.tetris-board-container').appendChild(levelUpAnim);
+        
+        // Play level up sound
+        const levelUpSound = new Audio('/static/sounds/level-up.mp3');
+        levelUpSound.play().catch(e => console.log('Level up sound playback prevented', e));
+        
+        // Remove animation after delay
+        setTimeout(() => {
+          levelUpAnim.remove();
+        }, 2000);
+        
         // Increase speed
         dropInterval = Math.max(100, 1000 - (level - 1) * 100);
       }
@@ -1140,6 +1295,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     lastTap = currentTime;
   });
+  
+  // Touch controls for mobile
+  const touchControls = document.getElementById('touch-controls');
+  const touchLeft = document.getElementById('touch-left');
+  const touchRight = document.getElementById('touch-right');
+  const touchRotate = document.getElementById('touch-rotate');
+  const touchDown = document.getElementById('touch-down');
+  const touchDrop = document.getElementById('touch-drop');
+  
+  // Show touch controls on mobile devices
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    touchControls.style.display = 'flex';
+  }
+  
+  // Touch control event listeners
+  if (touchLeft) {
+    touchLeft.addEventListener('click', () => move(-1));
+    touchRight.addEventListener('click', () => move(1));
+    touchRotate.addEventListener('click', rotate);
+    touchDown.addEventListener('click', () => drop());
+    touchDrop.addEventListener('click', () => {
+      while(!collide(board, player)) {
+        player.pos.y++;
+      }
+      player.pos.y--;
+      merge(board, player);
+      resetPlayer();
+      clearLines();
+    });
+  }
   
   // Button event listeners
   startButton.addEventListener('click', startGame);

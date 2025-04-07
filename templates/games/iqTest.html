@@ -562,6 +562,7 @@
     
     .category-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
     
     .category-icon {
@@ -589,6 +590,18 @@
       grid-template-columns: 1fr;
     }
     
+    .option {
+      padding: 12px;
+      margin-bottom: 8px;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      touch-action: manipulation;
+    }
+    
+    .option:active {
+      transform: scale(0.98);
+      background: rgba(60, 60, 100, 0.8);
+    }
+    
     .iq-score {
       font-size: 3.5rem;
     }
@@ -599,6 +612,51 @@
     
     .category-scores-grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .test-results-actions {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .test-results-actions .btn {
+      width: 100%;
+    }
+    
+    .question-navigation {
+      position: sticky;
+      bottom: 0;
+      background: rgba(25, 25, 45, 0.95);
+      padding: 10px;
+      margin: 10px -15px -15px;
+      border-radius: 0 0 15px 15px;
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+  }
+  
+  /* Küçük ekranlar için ek optimizasyonlar */
+  @media (max-width: 480px) {
+    .test-info {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .info-item {
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .category-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .category-scores-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .iq-score-container {
+      flex-direction: column;
     }
   }
 </style>
@@ -791,6 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
       optionElem.innerHTML = optionHTML;
       
       optionElem.addEventListener('click', () => {
+        playSound('select');
         selectOption(option.id);
       });
       
@@ -945,6 +1004,46 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
   }
 
+  // Play sound effects
+  function playSound(soundType) {
+    // Basit hata yönetimi ile ses çalma
+    try {
+      const sound = new Audio();
+      
+      switch(soundType) {
+        case 'start':
+          sound.src = "/static/sounds/click.mp3";
+          break;
+        case 'select':
+          sound.src = "/static/sounds/click.mp3";
+          break;
+        case 'correct':
+          sound.src = "/static/sounds/correct.mp3";
+          break;
+        case 'complete':
+          sound.src = "/static/sounds/game-complete.mp3";
+          break;
+        default:
+          sound.src = "/static/sounds/click.mp3";
+      }
+      
+      sound.volume = 0.6;
+      
+      // Ses çalma hatalarını yakalayın
+      sound.addEventListener('error', (e) => {
+        console.log('Ses çalma hatası:', e);
+      });
+      
+      // Ses çalma vaadini geri döndür
+      return sound.play().catch(err => {
+        // Kullanıcı etkileşimi olmadan otomatik ses çalma genellikle engellenir
+        console.log('Ses çalma engellenmiş olabilir:', err);
+      });
+    } catch (err) {
+      console.log('Ses çalma hatası:', err);
+    }
+  }
+  
   // Function to save score to the server
   function saveScore(score) {
     fetch('/api/save-score', {
@@ -960,6 +1059,8 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
+      // Skor kaydedildikten sonra ses çal
+      playSound('complete');
     })
     .catch(error => {
       console.error('Error saving score:', error);
@@ -967,7 +1068,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Event Listeners
-  startTestBtn.addEventListener('click', initTest);
+  startTestBtn.addEventListener('click', function() {
+    playSound('start');
+    initTest();
+  });
   
   prevQuestionBtn.addEventListener('click', function() {
     if (currentQuestionIndex > 0) {
@@ -987,6 +1091,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   restartTestBtn.addEventListener('click', function() {
+    playSound('start');
     testResults.style.display = 'none';
     testIntro.style.display = 'block';
   });
