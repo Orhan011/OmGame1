@@ -1,0 +1,67 @@
+<!-- Başarılar Sekmesi -->
+<div class="tab-content" id="achievements-tab">
+  <h3 class="tab-title">Başarılar</h3>
+  
+  <div class="achievements-container">
+    <div class="achievement-stats">
+      <div class="achievement-stat-item">
+        <div class="stat-value">{{ completed_achievements_count }}</div>
+        <div class="stat-label">Tamamlanan</div>
+      </div>
+      <div class="achievement-stat-item">
+        <div class="stat-value">{{ total_achievements_count }}</div>
+        <div class="stat-label">Toplam</div>
+      </div>
+      <div class="achievement-stat-item">
+        <div class="stat-value">{{ total_achievement_points }}</div>
+        <div class="stat-label">Puan</div>
+      </div>
+      <div class="achievement-stat-item">
+        <div class="stat-value">{{ completion_percentage }}%</div>
+        <div class="stat-label">Tamamlama</div>
+      </div>
+    </div>
+    
+    <div class="achievement-list">
+      {% for user_achievement in user.achievements %}
+        <div class="achievement-item {% if user_achievement.progress >= 100 %}completed{% endif %}">
+          <div class="achievement-icon">
+            {% if user_achievement.progress >= 100 %}
+              <img src="{{ user_achievement.achievement.image_url }}" alt="{{ user_achievement.achievement.name }}">
+            {% else %}
+              <div class="achievement-lock">
+                <i class="fas fa-lock"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">{{ user_achievement.achievement.name }}</h4>
+            <p class="achievement-description">{{ user_achievement.achievement.description }}</p>
+            {% if user_achievement.progress < 100 %}
+              <div class="achievement-progress">
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar" style="width: {{ user_achievement.progress }}%"></div>
+                </div>
+                <span class="progress-text">{{ user_achievement.progress }}%</span>
+              </div>
+            {% else %}
+              <div class="achievement-completed">
+                <i class="fas fa-check-circle me-1"></i>
+                <span>{{ user_achievement.unlocked_at.strftime('%d.%m.%Y') }} tarihinde kazanıldı</span>
+              </div>
+            {% endif %}
+          </div>
+          <div class="achievement-reward">
+            <span class="points-badge">{{ user_achievement.achievement.points }} Puan</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon"><i class="fas fa-trophy"></i></div>
+          <h3>Henüz Başarı Yok</h3>
+          <p>Oyunları oynayarak çeşitli başarılar kazanın!</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

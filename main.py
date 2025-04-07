@@ -47,6 +47,10 @@ from admin import admin_bp
 # Admin blueprint'ini kaydet
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
+# Avatar ve başarım route'larını kaydet
+from routes import register_routes
+register_routes(app)
+
 # Veritabanı tabloları oluştur
 with app.app_context():
     db.create_all()
@@ -987,17 +991,33 @@ def profile_v2():
     xp_for_next = xp_for_level(current_level + 1)
     xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
     
+    # Başarımları getir - gerçek başarımlara göre güncellenecek
+    user_achievements = UserAchievement.query.filter_by(user_id=user.id).all()
+    all_achievements = Achievement.query.all()
+    
+    # Tamamlanan başarım sayısı
+    completed_achievements = [ua for ua in user_achievements if ua.progress >= 100]
+    completed_achievements_count = len(completed_achievements)
+    total_achievements_count = len(all_achievements)
+    total_achievement_points = sum([a.points for a in Achievement.query.join(UserAchievement).filter(
+        UserAchievement.user_id == user.id, 
+        UserAchievement.progress >= 100
+    ).all()])
+    
     return render_template(
         'profile_v2.html', 
         user=user, 
         scores=user_scores,
         total_games=total_games,
         highest_score=highest_score,
-        user_level=user_level,
+        current_level=current_level,
         xp_progress=xp_progress,
-        next_level_xp=next_level_xp,
-        current_xp=user.experience_points,
-        xp_needed=next_level_xp - user.experience_points
+        xp_for_current=xp_for_current,
+        xp_for_next=xp_for_next,
+        user_achievements=user_achievements,
+        completed_achievements_count=completed_achievements_count,
+        total_achievements_count=total_achievements_count,
+        total_achievement_points=total_achievement_points
     )
 
 # Profil Güncelleme

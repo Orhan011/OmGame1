@@ -144,6 +144,8 @@ function loadArticleContent() {
         </a>
         <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="userDropdown">
           <li><a class="dropdown-item" href="{{ url_for('profile_v2') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('avatars.avatar_list') }}"><i class="fas fa-user-circle me-2"></i>Avatarlar</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('achievements.achievement_list') }}"><i class="fas fa-trophy me-2"></i>Başarımlar</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap</a></li>
         </ul>
