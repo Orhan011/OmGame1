@@ -31,8 +31,6 @@ class User(db.Model):
     achievement_notifications = db.Column(db.Boolean, default=True)
     leaderboard_notifications = db.Column(db.Boolean, default=True)
     scores = db.relationship('Score', backref='user', lazy=True)
-    avatars = db.relationship('UserAvatar', backref='user', lazy=True)
-    achievements = db.relationship('UserAchievement', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -232,45 +230,6 @@ class MediaFile(db.Model):
     
     def __repr__(self):
         return f'<MediaFile {self.filename}>'
-
-class Avatar(db.Model):
-    __tablename__ = 'avatars'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    image_url = db.Column(db.String(2000), nullable=False)
-    description = db.Column(db.Text)
-    category = db.Column(db.String(50))  # Örn: basic, premium, achievement
-    required_achievement_id = db.Column(db.Integer, db.ForeignKey('achievements.id'), nullable=True)
-    required_level = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Avatar kullanımları
-    user_avatars = db.relationship('UserAvatar', backref='avatar', lazy=True)
-    
-    def __repr__(self):
-        return f'<Avatar {self.name}>'
-
-class UserAvatar(db.Model):
-    __tablename__ = 'user_avatars'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    avatar_id = db.Column(db.Integer, db.ForeignKey('avatars.id'), nullable=False)
-    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_selected = db.Column(db.Boolean, default=False)
-    
-    def __repr__(self):
-        return f'<UserAvatar {self.user_id}:{self.avatar_id}>'
-
-class UserAchievement(db.Model):
-    __tablename__ = 'user_achievements'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    achievement_id = db.Column(db.Integer, db.ForeignKey('achievements.id'), nullable=False)
-    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow)
-    progress = db.Column(db.Integer, default=0)  # İlerleme (100 = tamamlandı)
-    
-    def __repr__(self):
-        return f'<UserAchievement {self.user_id}:{self.achievement_id}>'
 
 class AdminLog(db.Model):
     __tablename__ = 'admin_logs'
