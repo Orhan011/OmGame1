@@ -238,7 +238,7 @@
     border: 2px solid #4CAF50;
   }
   
-   highlight-pulse {
+  @keyframes highlight-pulse {
     0% {
       box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
     }
@@ -475,6 +475,7 @@
       height: 40px;
       font-size: 1rem;
     }
+  }
   /* Board shuffle animation */
   @keyframes board-shuffle {
     0% { transform: rotate(0deg); }
@@ -627,7 +628,6 @@
       justify-content: center;
     }
   }
-  }
 </style>
 
 <script>
@@ -676,6 +676,29 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update active button
         difficultyBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
+    });
+  });
+
+  // Event listeners for theme buttons
+  const themeBtns = document.querySelectorAll(".theme-btn");
+  themeBtns.forEach(btn => {
+    btn.addEventListener("click", function() {
+      const theme = this.getAttribute("data-theme");
+      
+      // Remove previous theme classes from tiles
+      document.querySelectorAll(".puzzle-tile").forEach(tile => {
+        tile.classList.remove("theme-default", "theme-gradient", "theme-neon", "theme-dark");
+        
+        if(!tile.classList.contains("empty")) {
+          tile.classList.add(`theme-${theme}`);
+        }
+      });
+      
+      // Update active button
+      themeBtns.forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+  });
+    
       }
     });
   });
@@ -942,26 +965,6 @@ document.addEventListener('DOMContentLoaded', function() {
         particle.remove();
       }, 4000);
     }
-  function createCompletionEffect() {
-    // Create confetti or particles
-    for (let i = 0; i < 100; i++) {
-      const particle = document.createElement("div");
-      particle.className = "confetti";
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      particle.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
-      particle.style.animationDelay = `${Math.random() * 2}s`;
-      document.querySelector(".puzzle-board-container").appendChild(particle);
-      
-      // Remove confetti after animation
-      setTimeout(() => {
-        particle.remove();
-      }, 3000);
-    }
-  }
-      // Check if the new position is within the board
-      if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
-        validMoves.push(newRow * boardSize + newCol);
       }
     });
     
