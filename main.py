@@ -671,11 +671,11 @@ def puzzle_slider():
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu."""
     return render_template('games/puzzleSlider.html')
 
-@app.route('/games/memory-match')
-def memory_match_game():
-    """Hafıza Eşleştirme: Görsel hafıza oyunu
-    Eşleşen kartları bularak görsel hafıza ve odaklanma becerilerinizi geliştirin."""
-    return render_template('games/memoryMatch.html')
+@app.route('/games/color-match')
+def color_match_game():
+    """Renk Eşleştirme: Odaklanma oyunu
+    Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin."""
+    return render_template('games/colorMatch.html')
 
 @app.route('/games/math-challenge')
 def math_challenge():
