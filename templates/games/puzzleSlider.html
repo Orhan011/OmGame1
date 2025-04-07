@@ -1007,27 +1007,156 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add celebration animation to tiles
     tiles.forEach((tile, index) => {
       setTimeout(() => {
-        if (!tile.classList.contains('empty')) {
-          tile.style.animation = 'tileSuccess 0.5s forwards';
+        if (!tile.classList.contains("empty")) {
+          tile.style.animation = "tileSuccess 0.5s forwards";
         }
       }, index * 50);
     });
+    
+    // Calculate score based on moves, time and difficulty
+    // Better score for fewer moves and less time
+    const timeInSeconds = seconds;
+    let difficultyMultiplier = 1;
+    if (boardSize === 4) difficultyMultiplier = 2;
+    if (boardSize === 5) difficultyMultiplier = 3;
+    
+    // Base score for completion
+    let calculatedScore = 1000;
+    
+    // Subtract points for each move (more impact on higher difficulties)
+    calculatedScore -= moves * (5 / difficultyMultiplier);
+    
+    // Subtract points for time (less impact on higher difficulties)
+    calculatedScore -= timeInSeconds * (3 / difficultyMultiplier);
+    
+    // Ensure minimum score of 100
+    calculatedScore = Math.max(100, Math.round(calculatedScore));
     
     // Show success message
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = timerDisplay.textContent;
     
     // Save score
-    saveScore(moves);
+    saveScore(calculatedScore);
+    
+    // Update success modal to show points earned
+    const pointsEarned = document.createElement("div");
+    pointsEarned.className = "points-earned";
+    pointsEarned.innerHTML = `
+      <div class="points-label">Kazanılan Puan</div>
+      <div class="points-value">${calculatedScore}</div>
+    `;
+    pointsEarned.style.marginBottom = "20px";
+    pointsEarned.style.textAlign = "center";
+    pointsEarned.style.animation = "fadeInUp 0.5s 0.5s forwards";
+    pointsEarned.style.opacity = "0";
+    
+    // Style for points display
+    const pointsValue = pointsEarned.querySelector(".points-value");
+    pointsValue.style.fontSize = "3rem";
+    pointsValue.style.fontWeight = "800";
+    pointsValue.style.color = "#4CAF50";
+    pointsValue.style.textShadow = "0 2px 10px rgba(76, 175, 80, 0.3)";
+    pointsValue.style.marginTop = "5px";
+    
+    const pointsLabel = pointsEarned.querySelector(".points-label");
+    pointsLabel.style.fontSize = "1rem";
+    pointsLabel.style.color = "rgba(255, 255, 255, 0.7)";
+    pointsLabel.style.textTransform = "uppercase";
+    pointsLabel.style.letterSpacing = "1px";
+    
+    // Get existing content and insert points earned before success-actions
+    const successContent = document.querySelector(".success-content");
+    const successActions = document.querySelector(".success-actions");
+    successContent.insertBefore(pointsEarned, successActions);
+    
+    // Show leaderboard button
+    const leaderboardBtn = document.createElement("a");
+    leaderboardBtn.href = "/leaderboard";
+    leaderboardBtn.className = "btn btn-outline-secondary btn-lg";
+    leaderboardBtn.innerHTML = "<i class="fas fa-trophy me-2"></i>Puan Tablosu";
+    leaderboardBtn.style.marginTop = "10px";
+    
+    // Add to success actions
+    successActions.appendChild(leaderboardBtn);
     
     // Show success modal after a delay for animations
     setTimeout(() => {
-      successModal.style.display = 'flex';
+      successModal.style.display = "flex";
     }, 1000);
   }
   
   // Function to save score to the server
   function saveScore(score) {
+    fetch("/api/save-score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        game_type: "puzzle_slider",
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Score saved:", data);
+      
+      if (data.success) {
+        // Show notification of score saved
+        showScoreNotification(score);
+      }
+    })
+    .catch(error => {
+      console.error("Error saving score:", error);
+    });
+  }
+  
+  // Function to show a floating notification when score is saved
+  function showScoreNotification(score) {
+    const notification = document.createElement("div");
+    notification.className = "score-notification";
+    notification.innerHTML = `
+      <i class="fas fa-check-circle"></i>
+      <span>${score} puan kaydedildi!</span>
+    `;
+    
+    // Style the notification
+    notification.style.position = "fixed";
+    notification.style.bottom = "20px";
+    notification.style.right = "20px";
+    notification.style.backgroundColor = "rgba(76, 175, 80, 0.9)";
+    notification.style.color = "white";
+    notification.style.padding = "12px 20px";
+    notification.style.borderRadius = "8px";
+    notification.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
+    notification.style.display = "flex";
+    notification.style.alignItems = "center";
+    notification.style.gap = "10px";
+    notification.style.zIndex = "9999";
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(20px)";
+    notification.style.transition = "all 0.3s ease";
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Show with animation
+    setTimeout(() => {
+      notification.style.opacity = "1";
+      notification.style.transform = "translateY(0)";
+    }, 100);
+    
+    // Remove after a few seconds
+    setTimeout(() => {
+      notification.style.opacity = "0";
+      notification.style.transform = "translateY(20px)";
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 5000);
+  }
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
@@ -1041,10 +1170,61 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
+      
+      if (data.success) {
+        // Show notification of score saved
+        showScoreNotification(score);
+      }
     })
     .catch(error => {
       console.error('Error saving score:', error);
     });
+  }
+  
+  // Function to show a floating notification when score is saved
+  function showScoreNotification(score) {
+    const notification = document.createElement('div');
+    notification.className = 'score-notification';
+    notification.innerHTML = `
+      <i class="fas fa-check-circle"></i>
+      <span>${score} puan kaydedildi!</span>
+    `;
+    
+    // Style the notification
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
+    notification.style.color = 'white';
+    notification.style.padding = '12px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+    notification.style.display = 'flex';
+    notification.style.alignItems = 'center';
+    notification.style.gap = '10px';
+    notification.style.zIndex = '9999';
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateY(20px)';
+    notification.style.transition = 'all 0.3s ease';
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Show with animation
+    setTimeout(() => {
+      notification.style.opacity = '1';
+      notification.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // Remove after a few seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 5000);
   }
 });
 
