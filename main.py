@@ -669,7 +669,7 @@ def typing_speed():
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu."""
-    return render_template('games/puzzleSlider_enhanced.html')
+    return render_template('games/puzzleSlider_new.html')
 
 @app.route('/games/color-match')
 def color_match_game():
