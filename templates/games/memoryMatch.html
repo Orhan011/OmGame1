@@ -44,24 +44,13 @@
           <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
         </a>
       </div>
-
-      <div class="game-instructions">
-        <h4 class="instruction-title"><i class="fas fa-info-circle"></i>Nasıl Oynanır?</h4>
-        <ul class="instruction-list">
-          <li>Yüzü kapalı kartları çevirerek eşleşen çiftleri bulmaya çalışın.</li>
-          <li>Her seferde sadece iki kart açabilirsiniz.</li>
-          <li>Kartlar eşleştiğinde açık kalırlar, eşleşmezlerse tekrar kapanırlar.</li>
-          <li>Tüm çiftleri en az hamle ile bulmaya çalışın.</li>
-          <li>Farklı zorluk seviyeleri için daha fazla kart çifti ile oynayabilirsiniz.</li>
-        </ul>
-      </div>
     </div>
 
     <div id="success-modal" class="memory-success-modal">
       <div class="success-content">
         <h2><i class="fas fa-trophy me-2"></i>Tebrikler!</h2>
         <p>Tüm kartları başarıyla eşleştirdiniz!</p>
-
+        
         <div class="success-stats">
           <div class="success-stat">
             <div class="success-stat-value" id="final-moves">0</div>
@@ -72,7 +61,7 @@
             <div class="success-stat-label">Geçen Süre</div>
           </div>
         </div>
-
+        
         <div class="success-actions">
           <button id="play-again-btn" class="btn btn-primary btn-lg">
             <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
@@ -90,67 +79,23 @@
   .memory-match-container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 25px;
-    background: rgba(20, 20, 35, 0.4);
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .memory-match-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: linear-gradient(to right, #7a6aff, #a890ff, #7a6aff);
-    z-index: 1;
+    padding: 0 10px;
   }
 
   .memory-stats {
     display: flex;
     justify-content: space-between;
-    background: rgba(35, 35, 70, 0.6);
-    border-radius: 15px;
-    margin-bottom: 20px;
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 10px;
+    margin-bottom: 15px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(106, 90, 224, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .memory-stats:hover {
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.3);
-    transform: translateY(-2px);
   }
 
   .memory-stat {
     flex: 1;
     text-align: center;
-    padding: 15px;
+    padding: 12px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .memory-stat::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, transparent, rgba(106, 90, 224, 0.5), transparent);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-
-  .memory-stat:hover::after {
-    transform: scaleX(1);
   }
 
   .memory-stat:last-child {
@@ -161,571 +106,48 @@
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 5px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
   }
 
   .memory-stat-value {
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     color: var(--accent-color);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-  }
-
-  .memory-stat:hover .memory-stat-value {
-    transform: scale(1.1);
   }
 
   .difficulty-selector {
     display: flex;
-    margin-bottom: 20px;
-    border-radius: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 
   .difficulty-btn {
     flex: 1;
-    padding: 12px;
+    padding: 10px;
     border: none;
-    background: rgba(35, 35, 70, 0.6);
+    background: rgba(25, 25, 45, 0.7);
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: 600;
-    position: relative;
-    overflow: hidden;
-    letter-spacing: 0.5px;
-  }
-
-  .difficulty-btn::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.4s ease;
-  }
-
-  .difficulty-btn:hover::before {
-    opacity: 1;
-    transform: scale(1);
   }
 
   .difficulty-btn.active {
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  .difficulty-btn:not(.active):hover {
-    background: rgba(50, 50, 90, 0.8);
+    background: var(--accent-color);
   }
 
   .memory-board-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
-    perspective: 1000px;
-    position: relative;
+    margin-bottom: 20px;
   }
 
-  .memory-board-container::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: radial-gradient(circle at center, transparent 60%, rgba(20, 20, 35, 0.4) 100%);
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  #memory-board {
+  .memory-board {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 550px;
-    margin: 20px auto;
-    gap: 15px;
-    justify-content: center;
-    background: rgba(30, 30, 55, 0.8);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(106, 90, 224, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  @media (max-width: 576px) {
-    #memory-board {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-  }
-
-  .memory-card {
-    width: 100px;
-    height: 100px;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
-    cursor: pointer;
-    perspective: 600px;
-    margin: 0 auto;
-  }
-
-  .memory-card.flip {
-    transform: rotateY(180deg);
-  }
-
-  .memory-card-front, .memory-card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    border-radius: 12px;
-    backface-visibility: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    transform-style: preserve-3d;
-  }
-
-  .memory-card-front {
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    transform: rotateY(180deg);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .memory-card-front::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
-    opacity: 0.5;
-  }
-
-  .memory-card-back {
-    background: url('/static/images/card-pattern.svg'), linear-gradient(135deg, #2c3e50, #1a1a2e);
-    background-size: cover;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    transform: rotateY(0deg);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .memory-card-back::after {
-    content: '?';
-    position: absolute;
-    font-size: 2rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.3);
-    opacity: 0.5;
-  }
-
-  .memory-card:hover .memory-card-back {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    transform: rotateY(0deg) translateY(-5px);
-  }
-
-  .memory-card-front i {
-    font-size: 2.2rem;
-    color: white;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    z-index: 1;
-    opacity: 0;
-    animation: iconAppear 0.3s forwards;
-    animation-delay: 0.2s;
-  }
-
-  @keyframes iconAppear {
-    from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
-    to { opacity: 1; transform: scale(1) rotate(0deg); }
-  }
-
-  .game-controls {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-
-  .game-controls .btn {
-    padding: 12px 25px;
-    font-weight: 600;
-    border-radius: 50px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    letter-spacing: 0.5px;
-  }
-
-  .game-controls .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  }
-
-  .game-controls .btn:active {
-    transform: translateY(1px);
-  }
-
-  .game-controls .btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1) translate(-50%, -50%);
-    transform-origin: 50% 50%;
-  }
-
-  .game-controls .btn:active::after {
-    opacity: 1;
-    animation: ripple 0.6s linear;
-  }
-
-  @keyframes ripple {
-    0% {
-      opacity: 1;
-      transform: scale(0) translate(-50%, -50%);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(20) translate(-50%, -50%);
-    }
-  }
-
-  .game-instructions {
-    background: rgba(35, 35, 70, 0.6);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(106, 90, 224, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .game-instructions:hover {
-    box-shadow: 0 12px 30px rgba(106, 90, 224, 0.3);
-    transform: translateY(-3px);
-  }
-
-  .game-instructions::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom, #6a5ae0, transparent);
-  }
-
-  .instruction-title {
-    color: var(--accent-color);
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  .instruction-title i {
-    margin-right: 10px;
-    background: rgba(106, 90, 224, 0.2);
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-  }
-
-  .instruction-list {
-    list-style-type: none;
-    padding-left: 15px;
-    margin: 0;
-  }
-
-  .instruction-list li {
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 12px;
-    font-size: 1rem;
-    position: relative;
-    padding-left: 25px;
-    transition: all 0.3s ease;
-  }
-
-  .instruction-list li:hover {
-    color: white;
-    transform: translateX(5px);
-  }
-
-  .instruction-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent-color);
-    transition: all 0.3s ease;
-  }
-
-  .instruction-list li:hover::before {
-    transform: translateX(3px);
-  }
-
-  .instruction-list li:last-child {
-    margin-bottom: 0;
-  }
-
-  /* Success Modal */
-  .memory-success-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 15, 25, 0.95);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(8px);
-  }
-
-  .success-content {
-    background: rgba(30, 30, 55, 0.95);
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    max-width: 90%;
-    width: 450px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(106, 90, 224, 0.3);
-    animation: modalFadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .success-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at top right, rgba(106, 90, 224, 0.3), transparent 70%);
-    pointer-events: none;
-  }
-
-  .success-content h2 {
-    color: var(--accent-color);
-    margin-bottom: 15px;
-    font-size: 2.2rem;
-    font-weight: 800;
-    text-shadow: 0 2px 10px rgba(106, 90, 224, 0.5);
-    letter-spacing: 1px;
-  }
-
-  .success-content h2 i {
-    display: inline-block;
-    animation: trophyBounce 1s infinite alternate;
-    transform-origin: bottom center;
-  }
-
-  @keyframes trophyBounce {
-    from { transform: scale(1) rotate(-5deg); }
-    to { transform: scale(1.2) rotate(5deg); }
-  }
-
-  .success-content p {
-    color: white;
-    margin-bottom: 30px;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-
-  .success-stats {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 40px;
-  }
-
-  .success-stat {
-    text-align: center;
-    background: rgba(40, 40, 80, 0.6);
-    padding: 15px 25px;
-    border-radius: 15px;
-    min-width: 120px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(106, 90, 224, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .success-stat:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(106, 90, 224, 0.3);
-  }
-
-  .success-stat-value {
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: var(--accent-color);
-    margin-bottom: 5px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(to right, #6a5ae0, #a890ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .success-stat-label {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .success-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .success-actions .btn {
-    padding: 15px 30px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    border-radius: 50px;
-    letter-spacing: 0.5px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .success-actions .btn-primary {
-    background: linear-gradient(to right, #6a5ae0, #a890ff);
-    border: none;
-  }
-
-  .success-actions .btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(106, 90, 224, 0.5);
-  }
-
-  .success-actions .btn-outline-light {
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: transparent;
-  }
-
-  .success-actions .btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-3px);
-  }
-
-  .success-actions .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: all 0.6s ease;
-  }
-
-  .success-actions .btn:hover::before {
-    left: 100%;
-  }
-
-  @keyframes modalFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-30px) scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* Confetti effect for matched cards */
-  .confetti {
-    position: absolute;
-    width: 5px;
-    height: 10px;
-    background-color: #f00;
-    opacity: 0;
-    animation: confetti-fall 2s ease forwards;
-    z-index: -1;
-  }
-
-  @keyframes confetti-fall {
-    0% {
-      transform: translateY(-10px) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100px) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .memory-card {
-      width: 85px;
-      height: 85px;
-    }
-
-    .memory-card-front i {
-      font-size: 1.8rem;
-    }
-
-    .success-stat {
-      width: 80%;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .memory-card {
-      width: 75px;
-      height: 75px;
-    }
-
-    .memory-card-front i {
-      font-size: 1.5rem;
-    }
-
-    #memory-board {
-      max-width: 280px;
-    }
-  }
-
-  @media (max-width: 350px) {
-    .memory-card {
-      width: 65px;
-      height: 65px;
-    }
+    gap: 10px;
+    background: rgba(25, 25, 45, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
 
   .memory-board.easy {
@@ -741,6 +163,177 @@
   .memory-board.hard {
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: repeat(5, 1fr);
+  }
+
+  .memory-card {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: scale(1);
+    transition: transform 0.5s;
+    cursor: pointer;
+  }
+
+  .memory-card:active {
+    transform: scale(0.95);
+  }
+
+  .memory-card.flip {
+    transform: rotateY(180deg);
+  }
+
+  .memory-card-front, .memory-card-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 10px;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .memory-card-front {
+    background: linear-gradient(135deg, #6a5ae0, #a890ff);
+    transform: rotateY(180deg);
+  }
+
+  .memory-card-back {
+    background: url('/static/images/card-pattern.svg'), linear-gradient(135deg, #2c3e50, #1a1a2e);
+    background-size: cover;
+  }
+
+  .memory-card-front i {
+    font-size: 2rem;
+    color: white;
+  }
+
+  .game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  /* Success Modal */
+  .memory-success-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .success-content {
+    background: rgba(25, 25, 45, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalFadeIn 0.5s;
+  }
+
+  .success-content h2 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-size: 2rem;
+  }
+
+  .success-content p {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+  }
+
+  .success-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+  }
+
+  .success-stat {
+    text-align: center;
+  }
+
+  .success-stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+  }
+
+  .success-stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+
+  .success-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .memory-card {
+      width: 70px;
+      height: 70px;
+    }
+
+    .memory-board.medium .memory-card,
+    .memory-board.hard .memory-card {
+      width: 60px;
+      height: 60px;
+    }
+
+    .memory-card-front i {
+      font-size: 1.7rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .memory-card {
+      width: 60px;
+      height: 60px;
+    }
+
+    .memory-board.medium .memory-card {
+      width: 50px;
+      height: 50px;
+    }
+
+    .memory-board.hard .memory-card {
+      width: 40px;
+      height: 40px;
+    }
+
+    .memory-card-front i {
+      font-size: 1.5rem;
+    }
+
+    .memory-board.hard .memory-card-front i {
+      font-size: 1.2rem;
+    }
   }
 </style>
 
@@ -771,21 +364,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let difficulty = 'easy';
   let totalPairs = 6; // For easy difficulty
 
-  // Icons for cards with categories
-  const cardIcons = {
-    nature: ['fa-leaf', 'fa-tree', 'fa-cloud', 'fa-sun', 'fa-moon', 'fa-snowflake', 'fa-mountain', 'fa-fire'],
-    animals: ['fa-dog', 'fa-cat', 'fa-horse', 'fa-fish', 'fa-dragon', 'fa-spider', 'fa-hippo', 'fa-crow'],
-    objects: ['fa-key', 'fa-car', 'fa-gift', 'fa-bell', 'fa-book', 'fa-coffee', 'fa-camera', 'fa-pen'],
-    symbols: ['fa-heart', 'fa-star', 'fa-crown', 'fa-gem', 'fa-bolt', 'fa-music', 'fa-rocket', 'fa-anchor']
-  };
-
-  // Colors for card categories
-  const categoryColors = {
-    nature: ['#4CAF50', '#8BC34A'],
-    animals: ['#FF9800', '#FFC107'],
-    objects: ['#2196F3', '#03A9F4'],
-    symbols: ['#9C27B0', '#E040FB']
-  };
+  // Icons for cards
+  const cardIcons = [
+    'fa-heart', 'fa-star', 'fa-smile', 'fa-bolt', 'fa-bell', 'fa-moon',
+    'fa-sun', 'fa-cloud', 'fa-tree', 'fa-apple-alt', 'fa-car', 'fa-home',
+    'fa-gift', 'fa-plane', 'fa-rocket', 'fa-anchor', 'fa-coffee', 'fa-key',
+    'fa-music', 'fa-camera', 'fa-football-ball', 'fa-basketball-ball', 'fa-book', 'fa-pen',
+    'fa-globe', 'fa-flag', 'fa-crown', 'fa-gem', 'fa-leaf', 'fa-fire'
+  ];
 
   // Audio
   const flipSound = new Audio('/static/sounds/card-flip.mp3');
@@ -808,19 +394,19 @@ document.addEventListener('DOMContentLoaded', function() {
       const newDifficulty = this.getAttribute('data-difficulty');
       if (newDifficulty !== difficulty) {
         difficulty = newDifficulty;
-
+        
         // Update total pairs based on difficulty
         if (difficulty === 'easy') totalPairs = 6;
         else if (difficulty === 'medium') totalPairs = 10;
         else if (difficulty === 'hard') totalPairs = 15;
-
+        
         // Update board class
         memoryBoard.className = `memory-board ${difficulty}`;
-
+        
         // Update active button
         difficultyBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-
+        
         // Restart game with new difficulty
         restartGame();
       }
@@ -831,89 +417,53 @@ document.addEventListener('DOMContentLoaded', function() {
   function initializeGame() {
     // Create cards
     createCards();
-
+    
     // Reset game state
     resetGameState();
-
+    
     // Shuffle cards
     shuffleCards();
-
-    // Add intro animation
-    animateCards();
   }
 
   function createCards() {
     // Clear the board
     memoryBoard.innerHTML = '';
     cards = [];
-
-    // Get all categories for the icons
-    const categories = Object.keys(cardIcons);
-
-    // Create pairs of cards
-    let pairsCreated = 0;
-    let categoryIndex = 0;
-
-    while (pairsCreated < totalPairs) {
-      const category = categories[categoryIndex % categories.length];
-      const availableIcons = [...cardIcons[category]]; // Create a copy
-
-      // Determine how many pairs to create from this category
-      const pairsFromCategory = Math.min(availableIcons.length, totalPairs - pairsCreated);
-
-      // Shuffle the icons within this category
-      shuffleArray(availableIcons);
-
-      // Create pairs from this category
-      for (let i = 0; i < pairsFromCategory; i++) {
-        if (pairsCreated >= totalPairs) break;
-
-        const icon = availableIcons[i];
-        const categoryColor = categoryColors[category];
-
-        // Create two cards with the same icon
-        for (let j = 0; j < 2; j++) {
-          const card = createCard(icon, category, categoryColor);
-          memoryBoard.appendChild(card);
-          cards.push(card);
-        }
-
-        pairsCreated++;
+    
+    // Generate pairs of cards
+    for (let i = 0; i < totalPairs; i++) {
+      const icon = cardIcons[i];
+      
+      // Create two cards with the same icon
+      for (let j = 0; j < 2; j++) {
+        const card = createCard(icon);
+        memoryBoard.appendChild(card);
+        cards.push(card);
       }
-
-      categoryIndex++;
     }
-
-    // Final shuffle of all cards in the DOM
-    cards.forEach(card => {
-      const randomPos = Math.floor(Math.random() * cards.length);
-      card.style.order = randomPos;
-    });
   }
 
-  function createCard(icon, category, categoryColor) {
+  function createCard(icon) {
     const card = document.createElement('div');
     card.className = 'memory-card';
     card.dataset.icon = icon;
-    card.dataset.category = category;
-
+    
     // Create front of card (icon)
     const front = document.createElement('div');
     front.className = 'memory-card-front';
     front.innerHTML = `<i class="fas ${icon}"></i>`;
-    front.style.background = `linear-gradient(135deg, ${categoryColor[0]}, ${categoryColor[1]})`;
-
+    
     // Create back of card (pattern)
     const back = document.createElement('div');
     back.className = 'memory-card-back';
-
+    
     // Add to card
     card.appendChild(front);
     card.appendChild(back);
-
+    
     // Add click event
     card.addEventListener('click', flipCard);
-
+    
     return card;
   }
 
@@ -924,12 +474,12 @@ document.addEventListener('DOMContentLoaded', function() {
     matches = 0;
     seconds = 0;
     gameStarted = false;
-
+    
     // Reset displays
     movesDisplay.textContent = moves;
     matchesDisplay.textContent = matches;
     timerDisplay.textContent = '00:00';
-
+    
     // Clear timer
     if (timer) clearInterval(timer);
   }
@@ -941,18 +491,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  function animateCards() {
-    // Add staggered intro animation to each card
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.style.animation = 'cardIntro 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
-      }, index * 50);
-    });
-  }
-
   function startTimer() {
     if (timer) clearInterval(timer);
-
+    
     timer = setInterval(() => {
       seconds++;
       const minutes = Math.floor(seconds / 60);
@@ -967,33 +508,31 @@ document.addEventListener('DOMContentLoaded', function() {
       gameStarted = true;
       startTimer();
     }
-
+    
     // If board is locked or this card is already flipped, exit
     if (lockBoard) return;
     if (this === firstCard) return;
-    if (this.classList.contains('matched')) return;
-
-    // Flip the card with a slight delay for animation
+    
+    // Flip the card
     this.classList.add('flip');
-
+    
     // Play flip sound
-    flipSound.currentTime = 0;
     flipSound.play();
-
+    
     if (!hasFlippedCard) {
       // First card flipped
       hasFlippedCard = true;
       firstCard = this;
       return;
     }
-
+    
     // Second card flipped
     secondCard = this;
-
+    
     // Increment moves
     moves++;
     movesDisplay.textContent = moves;
-
+    
     // Check for match
     checkForMatch();
   }
@@ -1001,32 +540,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function checkForMatch() {
     // Lock the board while checking
     lockBoard = true;
-
+    
     // Check if the cards match
     const isMatch = firstCard.dataset.icon === secondCard.dataset.icon;
-
+    
     if (isMatch) {
       // Cards match
       disableCards();
       matches++;
       matchesDisplay.textContent = matches;
-
-      // Add matched class for styling
-      firstCard.classList.add('matched');
-      secondCard.classList.add('matched');
-
-      // Add pulsing animation to matched cards
-      firstCard.style.animation = 'cardMatch 0.5s ease forwards';
-      secondCard.style.animation = 'cardMatch 0.5s ease forwards';
-
-      // Create confetti effect around matched cards
-      createConfetti(firstCard);
-      createConfetti(secondCard);
-
+      
       // Play match sound
-      matchSound.currentTime = 0;
       matchSound.play();
-
+      
       // Check if all pairs are found
       if (matches === totalPairs) {
         gameComplete();
@@ -1037,54 +563,13 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // Cards don't match
       // Play no match sound
-      noMatchSound.currentTime = 0;
       noMatchSound.play();
-
-      // Add slight shake animation
-      firstCard.style.animation = 'cardNoMatch 0.5s ease';
-      secondCard.style.animation = 'cardNoMatch 0.5s ease';
-
+      
       // Flip cards back after a delay
       setTimeout(() => {
-        firstCard.classList.remove('flip');
-        secondCard.classList.remove('flip');
-
-        // Reset animations
-        firstCard.style.animation = '';
-        secondCard.style.animation = '';
-
+        unflipCards();
         lockBoard = false;
-
-        // Reset board state
-        resetBoard();
       }, 1000);
-    }
-  }
-
-  function createConfetti(card) {
-    // Get card position
-    const rect = card.getBoundingClientRect();
-    const boardRect = memoryBoard.getBoundingClientRect();
-
-    // Create confetti pieces
-    const colors = ['#6a5ae0', '#a890ff', '#ff4081', '#ffc107', '#4caf50', '#2196f3'];
-
-    for (let i = 0; i < 20; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      confetti.style.left = rect.left - boardRect.left + Math.random() * rect.width + 'px';
-      confetti.style.top = rect.top - boardRect.top + Math.random() * rect.height + 'px';
-      confetti.style.width = Math.random() * 7 + 3 + 'px';
-      confetti.style.height = Math.random() * 10 + 5 + 'px';
-      confetti.style.animationDuration = Math.random() * 2 + 1 + 's';
-
-      memoryBoard.appendChild(confetti);
-
-      // Remove confetti after animation
-      setTimeout(() => {
-        confetti.remove();
-      }, 2000);
     }
   }
 
@@ -1092,7 +577,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove event listeners to prevent further flipping
     firstCard.removeEventListener('click', flipCard);
     secondCard.removeEventListener('click', flipCard);
+    
+    // Reset board state
+    resetBoard();
+  }
 
+  function unflipCards() {
+    // Flip the cards back
+    firstCard.classList.remove('flip');
+    secondCard.classList.remove('flip');
+    
     // Reset board state
     resetBoard();
   }
@@ -1104,72 +598,46 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function restartGame() {
-    // Lock board to prevent clicks during restart
-    lockBoard = true;
-
-    // Add card exit animation
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.style.animation = 'cardExit 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
-      }, index * 30);
+    // First unflip all cards
+    cards.forEach(card => {
+      card.classList.remove('flip');
     });
-
+    
     // Wait for animation to complete
     setTimeout(() => {
       // Reset game state
       resetGameState();
-
-      // Create new cards
-      createCards();
-
+      
       // Shuffle cards
       shuffleCards();
-
-      // Add new intro animation
-      animateCards();
-
-      // Unlock board
-      lockBoard = false;
-    }, cards.length * 30 + 500);
+      
+      // Re-add event listeners
+      cards.forEach(card => {
+        card.addEventListener('click', flipCard);
+      });
+    }, 500);
   }
 
   function gameComplete() {
     // Stop the timer
     clearInterval(timer);
-
+    
     // Play complete sound
-    gameCompleteSound.currentTime = 0;
     gameCompleteSound.play();
-
-    // Add celebration animation to all cards
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.style.animation = 'cardCelebration 0.8s ease infinite alternate';
-      }, index * 50);
-    });
-
+    
     // Show success message
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = timerDisplay.textContent;
-
+    
     // Save score
     saveScore(moves);
-
+    
     // Show success modal after a short delay
     setTimeout(() => {
       successModal.style.display = 'flex';
-    }, 1500);
+    }, 1000);
   }
-
-  // Function to shuffle array (Fisher-Yates algorithm)
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
-
+  
   // Function to save score to the server
   function saveScore(score) {
     fetch('/api/save-score', {
@@ -1190,39 +658,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
-
-  // Add animation keyframes dynamically
-  const styleSheet = document.createElement('style');
-  styleSheet.type = 'text/css';
-  styleSheet.innerText = `
-    @keyframes cardIntro {
-      0% { opacity: 0; transform: scale(0.8) translateY(20px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    @keyframes cardExit {
-      0% { opacity: 1; transform: scale(1) rotateY(0deg); }
-      100% { opacity: 0; transform: scale(0.8) rotateY(90deg); }
-    }
-
-    @keyframes cardMatch {
-      0% { transform: rotateY(180deg) scale(1); }
-      50% { transform: rotateY(180deg) scale(1.1); box-shadow: 0 0 20px rgba(106, 90, 224, 0.8); }
-      100% { transform: rotateY(180deg) scale(1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
-    }
-
-    @keyframes cardNoMatch {
-      0%, 100% { transform: rotateY(180deg) translateX(0); }
-      20%, 60% { transform: rotateY(180deg) translateX(-5px); }
-      40%, 80% { transform: rotateY(180deg) translateX(5px); }
-    }
-
-    @keyframes cardCelebration {
-      0% { transform: rotateY(180deg) scale(1) translateY(0); }
-      100% { transform: rotateY(180deg) scale(1.05) translateY(-5px); }
-    }
-  `;
-  document.head.appendChild(styleSheet);
 });
 </script>
 {% endblock %}
