@@ -21,6 +21,10 @@
             <div class="stat-label">Süre</div>
             <div class="stat-value" id="timer">00:00</div>
           </div>
+          <div class="stat-item">
+            <div class="stat-label">Seviye</div>
+            <div class="stat-value" id="level">1</div>
+          </div>
         </div>
         
         <div class="difficulty-selector">
@@ -69,6 +73,7 @@
           <li>Zorluk seviyesini değiştirerek oyunu daha zor hale getirebilirsiniz.</li>
           <li>İpucu butonu ile bir sonraki hamlenin önerisini alabilirsiniz.</li>
           <li>Farklı temalar ile görsel deneyiminizi değiştirebilirsiniz.</li>
+          <li>Her seviyeyi bitirdiğinizde bir sonraki seviyeye geçersiniz.</li>
         </ul>
       </div>
     </div>
@@ -87,9 +92,20 @@
             <div class="success-stat-value" id="final-time">00:00</div>
             <div class="success-stat-label">Geçen Süre</div>
           </div>
+          <div class="success-stat">
+            <div class="success-stat-value" id="final-level">1</div>
+            <div class="success-stat-label">Seviye</div>
+          </div>
+        </div>
+        
+        <div id="level-up-message" class="level-up-message" style="display: none;">
+          <i class="fas fa-arrow-up me-2"></i>Bir sonraki seviyeye geçtiniz!
         </div>
         
         <div class="success-actions">
+          <button id="next-level-btn" class="btn btn-success btn-lg">
+            <i class="fas fa-level-up-alt me-2"></i>Sonraki Seviye
+          </button>
           <button id="play-again-btn" class="btn btn-primary btn-lg">
             <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
           </button>
@@ -97,6 +113,13 @@
             <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
           </a>
         </div>
+      </div>
+    </div>
+    
+    <div id="notification" class="game-notification">
+      <div class="notification-content">
+        <p id="notification-message"></p>
+        <button id="close-notification" class="btn-close"></button>
       </div>
     </div>
   </div>
@@ -238,7 +261,7 @@
     border: 2px solid #4CAF50;
   }
   
-   highlight-pulse {
+  @keyframes highlight-pulse {
     0% {
       box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
     }
@@ -314,6 +337,7 @@
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .game-instructions {
@@ -388,7 +412,7 @@
   .success-stats {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   .success-stat {
@@ -406,11 +430,68 @@
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
   }
+  
+  .level-up-message {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   .success-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  
+  .game-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(25, 25, 45, 0.9);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-width: 300px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .game-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .notification-content p {
+    margin: 0;
+    color: white;
+    font-size: 0.9rem;
+  }
+  
+  .btn-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    margin-left: 10px;
   }
 
   @keyframes modalFadeIn {
@@ -483,14 +564,23 @@ document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const puzzleBoard = document.getElementById('puzzle-board');
   const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const themeBtns = document.querySelectorAll('.theme-btn');
   const shuffleBtn = document.getElementById('shuffle-btn');
   const restartBtn = document.getElementById('restart-btn');
+  const hintBtn = document.getElementById('hint-btn');
   const movesDisplay = document.getElementById('moves');
   const timerDisplay = document.getElementById('timer');
+  const levelDisplay = document.getElementById('level');
   const successModal = document.getElementById('success-modal');
   const finalMovesDisplay = document.getElementById('final-moves');
   const finalTimeDisplay = document.getElementById('final-time');
+  const finalLevelDisplay = document.getElementById('final-level');
+  const levelUpMessage = document.getElementById('level-up-message');
   const playAgainBtn = document.getElementById('play-again-btn');
+  const nextLevelBtn = document.getElementById('next-level-btn');
+  const notification = document.getElementById('notification');
+  const notificationMessage = document.getElementById('notification-message');
+  const closeNotification = document.getElementById('close-notification');
 
   // Game State
   let boardSize = 3;
@@ -500,6 +590,15 @@ document.addEventListener('DOMContentLoaded', function() {
   let timer = null;
   let seconds = 0;
   let gameStarted = false;
+  let currentLevel = 1;
+  let currentTheme = 'default';
+  let hintTimeout = null;
+  
+  // Sound Effects
+  const moveSound = new Audio('/static/sounds/click.mp3');
+  const successSound = new Audio('/static/sounds/success.mp3');
+  const hintSound = new Audio('/static/sounds/hint.mp3');
+  const levelUpSound = new Audio('/static/sounds/level-up.mp3');
   
   // Initialize game
   createBoard();
@@ -526,6 +625,23 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+  
+  // Event listeners for theme buttons
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const newTheme = this.getAttribute('data-theme');
+      if (newTheme !== currentTheme) {
+        currentTheme = newTheme;
+        
+        // Update themes
+        updateTileThemes();
+        
+        // Update active button
+        themeBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      }
+    });
+  });
 
   // Shuffle button
   shuffleBtn.addEventListener('click', function() {
@@ -536,11 +652,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // Restart button
   restartBtn.addEventListener('click', resetGame);
   
+  // Hint button
+  hintBtn.addEventListener('click', showHint);
+  
   // Play again button
   playAgainBtn.addEventListener('click', function() {
     successModal.style.display = 'none';
     resetGame();
     shuffleTiles();
+  });
+  
+  // Next level button
+  nextLevelBtn.addEventListener('click', function() {
+    successModal.style.display = 'none';
+    goToNextLevel();
+  });
+  
+  // Close notification
+  closeNotification.addEventListener('click', function() {
+    notification.classList.remove('show');
   });
 
   // Create the game board
@@ -557,11 +687,29 @@ document.addEventListener('DOMContentLoaded', function() {
       if (i !== boardSize * boardSize - 1) {
         tile.textContent = i + 1;
         tile.addEventListener('click', () => moveTile(i));
+        
+        // Apply current theme
+        if (currentTheme !== 'default') {
+          tile.classList.add(`theme-${currentTheme}`);
+        }
       }
       
       puzzleBoard.appendChild(tile);
       tiles.push(tile);
     }
+  }
+  
+  // Update tile themes
+  function updateTileThemes() {
+    tiles.forEach(tile => {
+      // Remove all theme classes
+      tile.classList.remove('theme-gradient', 'theme-neon', 'theme-dark');
+      
+      // Add current theme class if not default
+      if (currentTheme !== 'default' && !tile.classList.contains('empty')) {
+        tile.classList.add(`theme-${currentTheme}`);
+      }
+    });
   }
   
   // Shuffle the tiles
@@ -597,6 +745,12 @@ document.addEventListener('DOMContentLoaded', function() {
     seconds = 0;
     updateTimer();
     timer = setInterval(updateTimer, 1000);
+    
+    // Update level display
+    levelDisplay.textContent = currentLevel;
+    
+    // Check for correct positions
+    updateCorrectPositions();
   }
   
   // Move a tile
@@ -605,6 +759,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check if the move is valid
     if (isValidMove(index)) {
+      // Play move sound
+      moveSound.play();
+      
       // Increment moves counter
       moves++;
       movesDisplay.textContent = moves;
@@ -614,6 +771,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Update empty tile index
       emptyTileIndex = index;
+      
+      // Update correct positions
+      updateCorrectPositions();
       
       // Check if the puzzle is solved
       if (isSolved()) {
@@ -626,10 +786,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function swapTiles(index1, index2) {
     const temp = tiles[index1].textContent;
     tiles[index1].textContent = tiles[index2].textContent;
-    tiles[index2].textContent = temp;
-    
     tiles[index1].classList.toggle('empty', !temp);
     tiles[index2].classList.toggle('empty', temp === '');
+    
+    // Transfer theme class if needed
+    if (currentTheme !== 'default') {
+      if (temp) { // If tile1 has content and is moving to tile2
+        tiles[index1].classList.remove(`theme-${currentTheme}`);
+        tiles[index2].classList.add(`theme-${currentTheme}`);
+      } else { // If tile2 has content and is moving to tile1
+        tiles[index2].classList.remove(`theme-${currentTheme}`);
+        tiles[index1].classList.add(`theme-${currentTheme}`);
+      }
+    }
   }
   
   // Check if a move is valid
@@ -683,6 +852,70 @@ document.addEventListener('DOMContentLoaded', function() {
     return true;
   }
   
+  // Update tiles with correct position indicators
+  function updateCorrectPositions() {
+    for (let i = 0; i < boardSize * boardSize - 1; i++) {
+      const correctPosition = parseInt(tiles[i].textContent) === i + 1;
+      tiles[i].classList.toggle('correct-position', correctPosition && !tiles[i].classList.contains('empty'));
+    }
+  }
+  
+  // Show hint for next move
+  function showHint() {
+    if (!gameStarted || gameRunning === false) return;
+    
+    // Play hint sound
+    hintSound.play();
+    
+    // Find a tile that can be moved to improve the puzzle
+    const validMoves = getValidMoves();
+    let bestMove = null;
+    let bestImprovement = -1;
+    
+    validMoves.forEach(moveIndex => {
+      const tileValue = parseInt(tiles[moveIndex].textContent);
+      const currentPosition = moveIndex;
+      const targetPosition = tileValue - 1;
+      
+      // Calculate Manhattan distance from current to target position
+      const currentRow = Math.floor(currentPosition / boardSize);
+      const currentCol = currentPosition % boardSize;
+      const targetRow = Math.floor(targetPosition / boardSize);
+      const targetCol = targetPosition % boardSize;
+      
+      const currentDistance = Math.abs(currentRow - targetRow) + Math.abs(currentCol - targetCol);
+      
+      // Calculate Manhattan distance if we move this tile to empty position
+      const newPosition = emptyTileIndex;
+      const newRow = Math.floor(newPosition / boardSize);
+      const newCol = newPosition % boardSize;
+      const newDistance = Math.abs(newRow - targetRow) + Math.abs(newCol - targetCol);
+      
+      // If this move improves the puzzle (reduces distance to target)
+      const improvement = currentDistance - newDistance;
+      if (improvement > bestImprovement) {
+        bestImprovement = improvement;
+        bestMove = moveIndex;
+      }
+    });
+    
+    // If no improving move found, just pick the first valid move
+    if (bestMove === null && validMoves.length > 0) {
+      bestMove = validMoves[0];
+    }
+    
+    // Highlight the suggested move
+    if (bestMove !== null) {
+      tiles[bestMove].classList.add('highlight');
+      
+      // Remove highlight after a delay
+      if (hintTimeout) clearTimeout(hintTimeout);
+      hintTimeout = setTimeout(() => {
+        tiles[bestMove].classList.remove('highlight');
+      }, 3000);
+    }
+  }
+  
   // Update the timer display
   function updateTimer() {
     seconds++;
@@ -709,14 +942,52 @@ document.addEventListener('DOMContentLoaded', function() {
     tiles.forEach((tile, index) => {
       if (index !== boardSize * boardSize - 1) {
         tile.textContent = index + 1;
-        tile.classList.remove('empty');
+        tile.classList.remove('empty', 'highlight', 'correct-position');
+        
+        // Apply theme
+        if (currentTheme !== 'default') {
+          tile.classList.add(`theme-${currentTheme}`);
+        }
       } else {
         tile.textContent = '';
         tile.classList.add('empty');
+        tile.classList.remove('theme-gradient', 'theme-neon', 'theme-dark', 'highlight', 'correct-position');
       }
     });
     
     emptyTileIndex = boardSize * boardSize - 1;
+  }
+  
+  // Go to next level
+  function goToNextLevel() {
+    // Increase level and difficulty if needed
+    currentLevel++;
+    
+    // Every 3 levels, increase board size if possible
+    if (currentLevel % 3 === 0 && boardSize < 5) {
+      boardSize++;
+      
+      // Update board class
+      puzzleBoard.className = `puzzle-board size-${boardSize}`;
+      
+      // Update difficulty buttons
+      difficultyBtns.forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.getAttribute('data-size')) === boardSize) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Create new board
+      createBoard();
+    }
+    
+    // Start new game
+    resetGame();
+    shuffleTiles();
+    
+    // Show notification
+    showNotification(`Seviye ${currentLevel}'e hoş geldiniz!`);
   }
   
   // Game complete
@@ -724,18 +995,62 @@ document.addEventListener('DOMContentLoaded', function() {
     // Stop the timer
     clearInterval(timer);
     
+    // Play success sound
+    successSound.play();
+    
     // Show success message
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = timerDisplay.textContent;
+    finalLevelDisplay.textContent = currentLevel;
+    
+    // Determine if level up
+    const levelUp = moves <= (boardSize * boardSize * 2);
+    levelUpMessage.style.display = levelUp ? 'block' : 'none';
+    nextLevelBtn.style.display = levelUp ? 'block' : 'none';
+    
+    // If player completed the level efficiently, play level up sound
+    if (levelUp) {
+      levelUpSound.play();
+    }
     
     // Save score
-    saveScore(moves);
+    saveScore(calculateScore());
     
     // Show success modal
     successModal.style.display = 'flex';
   }
   
-  // Function to save score to the server
+  // Calculate score based on moves, time and board size
+  function calculateScore() {
+    // Base score depends on board size
+    const baseScore = boardSize * boardSize * 10;
+    
+    // Penalty for moves and time
+    const idealMoves = boardSize * boardSize * 2;
+    const movePenalty = Math.max(0, moves - idealMoves) * 2;
+    
+    // Time penalty (less significant)
+    const timePenalty = Math.floor(seconds / 10);
+    
+    // Level bonus
+    const levelBonus = currentLevel * 20;
+    
+    // Calculate final score
+    return Math.max(baseScore - movePenalty - timePenalty + levelBonus, 10);
+  }
+  
+  // Show notification
+  function showNotification(message) {
+    notificationMessage.textContent = message;
+    notification.classList.add('show');
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+  
+  // Save score
   function saveScore(score) {
     fetch('/api/save-score', {
       method: 'POST',
@@ -750,6 +1065,9 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
+      if (!data.success && data.message === 'Oturum açık değil!') {
+        showNotification('Skorunuzu kaydetmek için giriş yapmalısınız!');
+      }
     })
     .catch(error => {
       console.error('Error saving score:', error);

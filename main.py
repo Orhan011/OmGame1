@@ -669,25 +669,25 @@ def typing_speed():
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu."""
-    return render_template('games/puzzleSlider.html')
+    return render_template('games/puzzleSlider_enhanced.html')
 
 @app.route('/games/color-match')
 def color_match_game():
     """Renk Eşleştirme: Odaklanma oyunu
     Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin."""
-    return render_template('games/colorMatch.html')
+    return render_template('games/colorMatch_enhanced.html')
 
 @app.route('/games/math-challenge')
 def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
-    return render_template('games/mathChallenge.html')
+    return render_template('games/mathChallenge_enhanced.html')
 
 @app.route('/games/snake')
 def snake_game():
     """Yılan Oyunu: Klasik arcade
     Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
-    return render_template('games/snake.html')
+    return render_template('games/snake_enhanced.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
