@@ -804,10 +804,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Icons for cards with categories
   const cardIcons = {
-    nature: ['fa-leaf', 'fa-tree', 'fa-cloud', 'fa-sun', 'fa-moon', 'fa-snowflake', 'fa-mountain', 'fa-fire'],
-    animals: ['fa-dog', 'fa-cat', 'fa-horse', 'fa-fish', 'fa-dragon', 'fa-spider', 'fa-hippo', 'fa-crow'],
-    objects: ['fa-key', 'fa-car', 'fa-gift', 'fa-bell', 'fa-book', 'fa-coffee', 'fa-camera', 'fa-pen'],
-    symbols: ['fa-heart', 'fa-star', 'fa-crown', 'fa-gem', 'fa-bolt', 'fa-music', 'fa-rocket', 'fa-anchor']
+    nature: ['fas fa-leaf', 'fas fa-tree', 'fas fa-cloud', 'fas fa-sun', 'fas fa-moon', 'fas fa-snowflake', 'fas fa-mountain', 'fas fa-fire'],
+    animals: ['fas fa-dog', 'fas fa-cat', 'fas fa-horse', 'fas fa-fish', 'fas fa-dragon', 'fas fa-spider', 'fas fa-hippo', 'fas fa-crow'],
+    objects: ['fas fa-key', 'fas fa-car', 'fas fa-gift', 'fas fa-bell', 'fas fa-book', 'fas fa-coffee', 'fas fa-camera', 'fas fa-pen'],
+    symbols: ['fas fa-heart', 'fas fa-star', 'fas fa-crown', 'fas fa-gem', 'fas fa-bolt', 'fas fa-music', 'fas fa-rocket', 'fas fa-anchor']
   };
 
   // Colors for card categories
@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create front of card (icon)
     const front = document.createElement('div');
     front.className = 'memory-card-front';
-    front.innerHTML = `<i class="fas ${icon}"></i>`;
+    front.innerHTML = `<i class="${icon}"></i>`;
     front.style.background = `linear-gradient(135deg, ${categoryColor[0]}, ${categoryColor[1]})`;
     
     // Create back of card (pattern)
