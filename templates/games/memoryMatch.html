@@ -32,6 +32,12 @@
         <button class="difficulty-btn" data-difficulty="hard">Zor</button>
       </div>
 
+      <div class="theme-selector">
+        <button class="theme-btn active" data-theme="animals">Hayvanlar</button>
+        <button class="theme-btn" data-theme="emojis">Emojiler</button>
+        <button class="theme-btn" data-theme="nature">Doğa</button>
+      </div>
+
       <div class="memory-board-container">
         <div id="memory-board" class="memory-board easy"></div>
       </div>
@@ -52,7 +58,7 @@
           <li>Her seferde sadece iki kart açabilirsiniz.</li>
           <li>Kartlar eşleştiğinde açık kalırlar, eşleşmezlerse tekrar kapanırlar.</li>
           <li>Tüm çiftleri en az hamle ile bulmaya çalışın.</li>
-          <li>Farklı zorluk seviyeleri için daha fazla kart çifti ile oynayabilirsiniz.</li>
+          <li>Farklı zorluk seviyeleri ve temalar için üstteki butonları kullanabilirsiniz.</li>
         </ul>
       </div>
     </div>
@@ -178,15 +184,15 @@
     transform: scale(1.1);
   }
 
-  .difficulty-selector {
+  .difficulty-selector, .theme-selector {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 
-  .difficulty-btn {
+  .difficulty-btn, .theme-btn {
     flex: 1;
     padding: 12px;
     border: none;
@@ -200,7 +206,7 @@
     letter-spacing: 0.5px;
   }
   
-  .difficulty-btn::before {
+  .difficulty-btn::before, .theme-btn::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -213,17 +219,17 @@
     transition: all 0.4s ease;
   }
   
-  .difficulty-btn:hover::before {
+  .difficulty-btn:hover::before, .theme-btn:hover::before {
     opacity: 1;
     transform: scale(1);
   }
 
-  .difficulty-btn.active {
+  .difficulty-btn.active, .theme-btn.active {
     background: linear-gradient(135deg, #6a5ae0, #a890ff);
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
   }
   
-  .difficulty-btn:not(.active):hover {
+  .difficulty-btn:not(.active):hover, .theme-btn:not(.active):hover {
     background: rgba(50, 50, 90, 0.8);
   }
 
@@ -264,13 +270,13 @@
   }
 
   .memory-board.medium {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-template-rows: repeat(4, 1fr);
   }
 
   .memory-board.hard {
     grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
   }
 
   .memory-card {
@@ -290,6 +296,10 @@
   .memory-card.flip {
     transform: rotateY(180deg);
   }
+  
+  .memory-card.matched {
+    cursor: default;
+  }
 
   .memory-card-front, .memory-card-back {
     width: 100%;
@@ -306,7 +316,6 @@
   }
 
   .memory-card-front {
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
     transform: rotateY(180deg);
     border: 2px solid rgba(255, 255, 255, 0.2);
     position: relative;
@@ -355,6 +364,10 @@
     opacity: 0;
     animation: iconAppear 0.3s forwards;
     animation-delay: 0.2s;
+  }
+  
+  .memory-card.matched .memory-card-front {
+    box-shadow: 0 0 20px 5px rgba(106, 90, 224, 0.5);
   }
   
   @keyframes iconAppear {
@@ -784,6 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const timerDisplay = document.getElementById('timer');
   const restartBtn = document.getElementById('restart-btn');
   const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const themeBtns = document.querySelectorAll('.theme-btn');
   const successModal = document.getElementById('success-modal');
   const finalMovesDisplay = document.getElementById('final-moves');
   const finalTimeDisplay = document.getElementById('final-time');
@@ -801,28 +815,70 @@ document.addEventListener('DOMContentLoaded', function() {
   let gameStarted = false;
   let difficulty = 'easy';
   let totalPairs = 6; // For easy difficulty
+  let currentTheme = 'animals';
 
-  // Icons for cards with categories
-  const cardIcons = {
-    nature: ['fa-leaf', 'fa-tree', 'fa-cloud', 'fa-sun', 'fa-moon', 'fa-snowflake', 'fa-mountain', 'fa-fire'],
-    animals: ['fa-dog', 'fa-cat', 'fa-horse', 'fa-fish', 'fa-dragon', 'fa-spider', 'fa-hippo', 'fa-crow'],
-    objects: ['fa-key', 'fa-car', 'fa-gift', 'fa-bell', 'fa-book', 'fa-coffee', 'fa-camera', 'fa-pen'],
-    symbols: ['fa-heart', 'fa-star', 'fa-crown', 'fa-gem', 'fa-bolt', 'fa-music', 'fa-rocket', 'fa-anchor']
+  // Card themes
+  const cardThemes = {
+    animals: {
+      icons: [
+        'fa-dog', 'fa-cat', 'fa-horse', 'fa-fish', 'fa-frog', 'fa-spider', 
+        'fa-hippo', 'fa-crow', 'fa-dragon', 'fa-kiwi-bird', 'fa-otter', 'fa-dove',
+        'fa-cow', 'fa-horse-head', 'fa-paw', 'fa-spider', 'fa-feather', 'fa-bug'
+      ],
+      colors: [
+        ['#FF9800', '#FFC107'], // Orange
+        ['#4CAF50', '#8BC34A'], // Green
+        ['#2196F3', '#03A9F4'], // Blue
+        ['#9C27B0', '#E040FB'], // Purple
+        ['#F44336', '#FF5722'], // Red
+        ['#795548', '#A1887F']  // Brown
+      ]
+    },
+    emojis: {
+      icons: [
+        'fa-smile', 'fa-laugh', 'fa-grin', 'fa-meh', 'fa-frown', 'fa-angry',
+        'fa-surprise', 'fa-kiss', 'fa-dizzy', 'fa-tired', 'fa-grimace', 'fa-grin-stars',
+        'fa-grin-hearts', 'fa-grin-beam-sweat', 'fa-sad-cry', 'fa-laugh-squint', 'fa-laugh-beam', 'fa-surprise'
+      ],
+      colors: [
+        ['#FFD54F', '#FFEB3B'], // Yellow
+        ['#FF4081', '#E91E63'], // Pink
+        ['#4CAF50', '#8BC34A'], // Green
+        ['#2196F3', '#03A9F4'], // Blue
+        ['#9C27B0', '#E040FB'], // Purple
+        ['#FF5722', '#FF9800']  // Orange
+      ]
+    },
+    nature: {
+      icons: [
+        'fa-leaf', 'fa-tree', 'fa-water', 'fa-cloud', 'fa-sun', 'fa-moon',
+        'fa-mountain', 'fa-snowflake', 'fa-bolt', 'fa-fire', 'fa-wind', 'fa-rainbow',
+        'fa-umbrella-beach', 'fa-seedling', 'fa-feather', 'fa-fan', 'fa-meteor', 'fa-campground'
+      ],
+      colors: [
+        ['#4CAF50', '#8BC34A'], // Green
+        ['#2196F3', '#03A9F4'], // Blue
+        ['#795548', '#A1887F'], // Brown
+        ['#607D8B', '#90A4AE'], // Blue Gray
+        ['#FF9800', '#FFC107'], // Orange
+        ['#9E9E9E', '#BDBDBD']  // Gray
+      ]
+    }
   };
 
-  // Colors for card categories
-  const categoryColors = {
-    nature: ['#4CAF50', '#8BC34A'],
-    animals: ['#FF9800', '#FFC107'],
-    objects: ['#2196F3', '#03A9F4'],
-    symbols: ['#9C27B0', '#E040FB']
-  };
-
-  // Audio
+  // Preload Audio
   const flipSound = new Audio('/static/sounds/card-flip.mp3');
   const matchSound = new Audio('/static/sounds/match.mp3');
   const noMatchSound = new Audio('/static/sounds/no-match.mp3');
   const gameCompleteSound = new Audio('/static/sounds/game-complete.mp3');
+
+  // Helper function to handle sound errors
+  function playSoundSafely(sound) {
+    sound.play().catch(e => {
+      console.log("Sound play ignored:", e);
+      // Silent fail - some browsers require user interaction first
+    });
+  }
 
   // Initialize game
   initializeGame();
@@ -842,8 +898,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update total pairs based on difficulty
         if (difficulty === 'easy') totalPairs = 6;
-        else if (difficulty === 'medium') totalPairs = 10;
-        else if (difficulty === 'hard') totalPairs = 15;
+        else if (difficulty === 'medium') totalPairs = 12;
+        else if (difficulty === 'hard') totalPairs = 18;
         
         // Update board class
         memoryBoard.className = `memory-board ${difficulty}`;
@@ -853,6 +909,22 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.add('active');
         
         // Restart game with new difficulty
+        restartGame();
+      }
+    });
+  });
+  
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const newTheme = this.getAttribute('data-theme');
+      if (newTheme !== currentTheme) {
+        currentTheme = newTheme;
+        
+        // Update active button
+        themeBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Restart game with new theme
         restartGame();
       }
     });
@@ -878,61 +950,35 @@ document.addEventListener('DOMContentLoaded', function() {
     memoryBoard.innerHTML = '';
     cards = [];
     
-    // Get all categories for the icons
-    const categories = Object.keys(cardIcons);
+    // Get theme data
+    const themeData = cardThemes[currentTheme];
+    const icons = themeData.icons;
+    const colors = themeData.colors;
     
     // Create pairs of cards
-    let pairsCreated = 0;
-    let categoryIndex = 0;
-    
-    while (pairsCreated < totalPairs) {
-      const category = categories[categoryIndex % categories.length];
-      const availableIcons = [...cardIcons[category]]; // Create a copy
+    for (let i = 0; i < totalPairs; i++) {
+      const icon = icons[i % icons.length]; // Use modulo to handle more pairs than icons
+      const colorPair = colors[i % colors.length]; // Use modulo to handle more pairs than colors
       
-      // Determine how many pairs to create from this category
-      const pairsFromCategory = Math.min(availableIcons.length, totalPairs - pairsCreated);
-      
-      // Shuffle the icons within this category
-      shuffleArray(availableIcons);
-      
-      // Create pairs from this category
-      for (let i = 0; i < pairsFromCategory; i++) {
-        if (pairsCreated >= totalPairs) break;
-        
-        const icon = availableIcons[i];
-        const categoryColor = categoryColors[category];
-        
-        // Create two cards with the same icon
-        for (let j = 0; j < 2; j++) {
-          const card = createCard(icon, category, categoryColor);
-          memoryBoard.appendChild(card);
-          cards.push(card);
-        }
-        
-        pairsCreated++;
+      // Create two cards with the same icon
+      for (let j = 0; j < 2; j++) {
+        const card = createCard(icon, colorPair);
+        memoryBoard.appendChild(card);
+        cards.push(card);
       }
-      
-      categoryIndex++;
     }
-    
-    // Final shuffle of all cards in the DOM
-    cards.forEach(card => {
-      const randomPos = Math.floor(Math.random() * cards.length);
-      card.style.order = randomPos;
-    });
   }
 
-  function createCard(icon, category, categoryColor) {
+  function createCard(icon, colorPair) {
     const card = document.createElement('div');
     card.className = 'memory-card';
     card.dataset.icon = icon;
-    card.dataset.category = category;
     
     // Create front of card (icon)
     const front = document.createElement('div');
     front.className = 'memory-card-front';
     front.innerHTML = `<i class="fas ${icon}"></i>`;
-    front.style.background = `linear-gradient(135deg, ${categoryColor[0]}, ${categoryColor[1]})`;
+    front.style.background = `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`;
     
     // Create back of card (pattern)
     const back = document.createElement('div');
@@ -1008,8 +1054,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.classList.add('flip');
     
     // Play flip sound
-    flipSound.currentTime = 0;
-    flipSound.play();
+    playSoundSafely(flipSound);
     
     if (!hasFlippedCard) {
       // First card flipped
@@ -1055,8 +1100,7 @@ document.addEventListener('DOMContentLoaded', function() {
       createConfetti(secondCard);
       
       // Play match sound
-      matchSound.currentTime = 0;
-      matchSound.play();
+      playSoundSafely(matchSound);
       
       // Check if all pairs are found
       if (matches === totalPairs) {
@@ -1068,8 +1112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // Cards don't match
       // Play no match sound
-      noMatchSound.currentTime = 0;
-      noMatchSound.play();
+      playSoundSafely(noMatchSound);
       
       // Add slight shake animation
       firstCard.style.animation = 'cardNoMatch 0.5s ease';
@@ -1114,7 +1157,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Remove confetti after animation
       setTimeout(() => {
-        confetti.remove();
+        if (confetti.parentNode) {
+          confetti.remove();
+        }
       }, 2000);
     }
   }
@@ -1169,8 +1214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clearInterval(timer);
     
     // Play complete sound
-    gameCompleteSound.currentTime = 0;
-    gameCompleteSound.play();
+    playSoundSafely(gameCompleteSound);
     
     // Add celebration animation to all cards
     cards.forEach((card, index) => {
@@ -1190,15 +1234,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       successModal.style.display = 'flex';
     }, 1500);
-  }
-  
-  // Function to shuffle array (Fisher-Yates algorithm)
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
   }
   
   // Function to save score to the server
