@@ -12,8 +12,8 @@
 
     <div class="math-container">
       <div id="start-screen" class="math-screen">
-        <h2>Matematik Mücadelesine Hoş Geldiniz!</h2>
-        <p>Verilen süre içinde matematik problemlerini çözmeye çalışın.</p>
+        <h2><i class="fas fa-calculator"></i> Matematik Mücadelesine Hoş Geldiniz!</h2>
+        <p>Verilen süre içinde matematik problemlerini çözmeye çalışın ve en yüksek puanı almak için hızlı olun.</p>
         
         <div class="game-options">
           <div class="option-section">
@@ -38,16 +38,24 @@
             <h3>İşlem Türleri</h3>
             <div class="checkbox-group">
               <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="addition"> Toplama
+                <input type="checkbox" checked data-operation="addition"> 
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">Toplama</span>
               </label>
               <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="subtraction"> Çıkarma
+                <input type="checkbox" checked data-operation="subtraction"> 
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">Çıkarma</span>
               </label>
               <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="multiplication"> Çarpma
+                <input type="checkbox" checked data-operation="multiplication"> 
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">Çarpma</span>
               </label>
               <label class="checkbox-label">
-                <input type="checkbox" data-operation="division"> Bölme
+                <input type="checkbox" data-operation="division"> 
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">Bölme</span>
               </label>
             </div>
           </div>
@@ -76,7 +84,7 @@
           </div>
         </div>
 
-        <div class="math-problem">
+        <div class="math-problem" id="problem-container">
           <div id="problem-text">5 + 3 = ?</div>
         </div>
 
@@ -91,7 +99,7 @@
       </div>
 
       <div id="result-screen" class="math-screen" style="display: none;">
-        <h2>Oyun Bitti!</h2>
+        <h2><i class="fas fa-trophy me-2"></i> Oyun Bitti!</h2>
         <div class="result-stats">
           <div class="result-stat">
             <div class="result-value" id="final-score">0</div>
@@ -135,43 +143,93 @@
   .math-container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 10px;
+    position: relative;
   }
 
   .math-screen {
     background: rgba(25, 25, 45, 0.7);
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
     text-align: center;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .math-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, #6a5ae0, #a890ff, #6a5ae0);
+    z-index: 1;
   }
 
   .math-screen h2 {
     color: var(--accent-color);
     margin-bottom: 20px;
-    font-size: 1.8rem;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .math-screen h2 i {
+    margin-right: 10px;
+    background: rgba(106, 90, 224, 0.2);
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
   }
 
   .math-screen p {
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 25px;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* Game Options */
   .game-options {
     background: rgba(30, 30, 60, 0.5);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 25px;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
     text-align: left;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .game-options:hover {
+    box-shadow: 0 15px 35px rgba(106, 90, 224, 0.3);
+    transform: translateY(-5px);
   }
 
   .option-section {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    position: relative;
   }
 
   .option-section:last-child {
@@ -180,8 +238,22 @@
 
   .option-section h3 {
     color: white;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .option-section h3::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background: var(--accent-color);
+    margin-right: 10px;
+    border-radius: 3px;
   }
 
   .button-group {
@@ -191,28 +263,51 @@
   }
 
   .option-button {
-    padding: 8px 15px;
+    padding: 10px 20px;
     background: rgba(40, 40, 80, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
   }
 
   .option-button:hover {
-    background: rgba(60, 60, 100, 0.5);
+    background: rgba(60, 60, 100, 0.6);
+    transform: translateY(-2px);
+  }
+  
+  .option-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.4s ease;
+  }
+  
+  .option-button:hover::before {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .option-button.active {
-    background: rgba(106, 90, 224, 0.6);
-    border-color: var(--accent-color);
+    background: linear-gradient(135deg, #6a5ae0, #a890ff);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
   }
 
   .checkbox-group {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
+    gap: 15px;
   }
 
   .checkbox-label {
@@ -220,10 +315,103 @@
     align-items: center;
     color: white;
     cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .checkbox-label:hover {
+    transform: translateX(5px);
   }
 
   .checkbox-label input {
-    margin-right: 8px;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+    background: rgba(40, 40, 80, 0.5);
+  }
+  
+  .checkbox-label:hover .checkbox-custom {
+    border-color: var(--accent-color);
+  }
+  
+  .checkbox-label input:checked ~ .checkbox-custom {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+  
+  .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .checkbox-label input:checked ~ .checkbox-custom::after {
+    display: block;
+  }
+  
+  .checkbox-text {
+    transition: all 0.3s ease;
+  }
+  
+  .checkbox-label input:checked ~ .checkbox-text {
+    color: var(--accent-color);
+  }
+
+  /* Start Game Button */
+  #start-game {
+    background: linear-gradient(135deg, #6a5ae0, #a890ff);
+    border: none;
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(106, 90, 224, 0.4);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+  }
+  
+  #start-game:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(106, 90, 224, 0.5);
+  }
+  
+  #start-game:active {
+    transform: translateY(1px) scale(0.98);
+  }
+  
+  #start-game::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+  }
+  
+  #start-game:hover::before {
+    left: 100%;
   }
 
   /* Game HUD */
@@ -232,10 +420,32 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    background: rgba(35, 35, 70, 0.6);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
   }
 
   .hud-item {
     text-align: center;
+    padding: 0 20px;
+    position: relative;
+  }
+  
+  .hud-item::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .hud-item:last-child::after {
+    display: none;
   }
 
   .hud-label {
@@ -243,12 +453,16 @@
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
   .hud-value {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--accent-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .hud-timer {
@@ -257,71 +471,168 @@
   }
 
   .progress-bar-container {
-    height: 10px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
 
   .progress-bar {
     height: 100%;
-    background: var(--accent-color);
+    background: linear-gradient(to right, #6a5ae0, #a890ff);
     width: 100%;
     transition: width linear 1s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: progressBarShimmer 2s infinite;
+  }
+  
+  @keyframes progressBarShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 
   /* Math Problem */
   .math-problem {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 10px;
-    padding: 30px;
+    background: rgba(40, 40, 80, 0.6);
+    border-radius: 15px;
+    padding: 40px;
     margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .math-problem::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(106, 90, 224, 0.1), transparent 70%);
+    pointer-events: none;
   }
 
   #problem-text {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
     color: white;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: problemAppear 0.5s forwards;
+  }
+  
+  @keyframes problemAppear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Answer Input */
   .answer-input {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 15px;
+    margin-bottom: 25px;
   }
 
   #answer-input {
     flex: 1;
-    padding: 12px 15px;
-    background: rgba(30, 30, 60, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
+    padding: 15px 20px;
+    background: rgba(35, 35, 70, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 
   #answer-input:focus {
     outline: none;
     border-color: var(--accent-color);
+    box-shadow: 0 5px 20px rgba(106, 90, 224, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  #answer-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  #submit-answer {
+    padding: 0 25px;
+    background: linear-gradient(135deg, #6a5ae0, #a890ff);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+  }
+  
+  #submit-answer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
+  }
+  
+  #submit-answer:active {
+    transform: translateY(1px);
   }
 
   /* Feedback */
   .feedback {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
-    height: 30px;
+    height: 40px;
     transition: all 0.3s ease;
+    padding: 5px 20px;
+    border-radius: 50px;
+    display: inline-block;
+    min-width: 200px;
   }
 
   .feedback.correct {
     color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    animation: feedbackPulse 1s ease;
   }
 
   .feedback.incorrect {
     color: #F44336;
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    animation: feedbackShake 0.5s ease;
+  }
+  
+  @keyframes feedbackPulse {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes feedbackShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
   }
 
   /* Result Screen */
@@ -330,39 +641,76 @@
     justify-content: space-around;
     margin-bottom: 30px;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 20px;
   }
 
   .result-stat {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 10px;
-    padding: 20px;
+    background: rgba(40, 40, 80, 0.6);
+    border-radius: 15px;
+    padding: 25px;
     min-width: 150px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    transition: all 0.3s ease;
+    animation: statAppear 0.5s forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .result-stat:nth-child(1) { animation-delay: 0.1s; }
+  .result-stat:nth-child(2) { animation-delay: 0.3s; }
+  .result-stat:nth-child(3) { animation-delay: 0.5s; }
+  
+  .result-stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(106, 90, 224, 0.3);
+  }
+  
+  @keyframes statAppear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .result-value {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--accent-color);
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to right, #6a5ae0, #a890ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .result-label {
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .result-details {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 10px;
-    padding: 15px;
+    background: rgba(40, 40, 80, 0.6);
+    border-radius: 15px;
+    padding: 20px;
     margin-bottom: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    animation: fadeIn 0.5s forwards;
+    animation-delay: 0.7s;
+    opacity: 0;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .detail-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 12px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -371,7 +719,8 @@
   }
 
   .detail-label {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
   }
 
   .detail-value {
@@ -382,9 +731,79 @@
   .result-actions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-width: 300px;
+    gap: 15px;
+    max-width: 400px;
     margin: 0 auto;
+    animation: fadeIn 0.5s forwards;
+    animation-delay: 0.9s;
+    opacity: 0;
+  }
+  
+  .result-actions .btn {
+    padding: 15px 30px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .result-actions .btn-primary {
+    background: linear-gradient(to right, #6a5ae0, #a890ff);
+    border: none;
+  }
+  
+  .result-actions .btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(106, 90, 224, 0.5);
+  }
+  
+  .result-actions .btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+  }
+  
+  .result-actions .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+  }
+  
+  .result-actions .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+  }
+  
+  .result-actions .btn:hover::before {
+    left: 100%;
+  }
+
+  /* Problem animations */
+  .problem-enter {
+    animation: problemEnter 0.5s forwards;
+  }
+  
+  .problem-exit {
+    animation: problemExit 0.5s forwards;
+  }
+  
+  @keyframes problemEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes problemExit {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
   }
 
   /* Responsive Design */
@@ -396,22 +815,47 @@
     .game-options {
       padding: 15px;
     }
-
+    
     #problem-text {
-      font-size: 2rem;
+      font-size: 2.5rem;
     }
 
     .result-stats {
-      gap: 10px;
+      gap: 15px;
     }
-
+    
     .result-stat {
       padding: 15px;
       min-width: 120px;
+      flex: 1;
     }
-
+    
     .result-value {
       font-size: 2rem;
+    }
+    
+    .option-section h3 {
+      font-size: 1.1rem;
+    }
+    
+    .option-button {
+      padding: 8px 15px;
+    }
+    
+    .checkbox-group {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .game-hud {
+      padding: 10px;
+    }
+    
+    .hud-item {
+      padding: 0 10px;
+    }
+    
+    .hud-value {
+      font-size: 1.5rem;
     }
   }
 
@@ -430,20 +874,29 @@
     }
 
     .checkbox-group {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
     #problem-text {
-      font-size: 1.8rem;
+      font-size: 2rem;
     }
 
     .answer-input {
       flex-direction: column;
     }
 
+    #answer-input, #submit-answer {
+      width: 100%;
+    }
+    
     #answer-input {
-      padding: 10px;
+      padding: 12px 15px;
       font-size: 1.1rem;
+    }
+    
+    #submit-answer {
+      padding: 12px 0;
     }
 
     .result-value {
@@ -452,6 +905,34 @@
 
     .result-label {
       font-size: 0.9rem;
+    }
+    
+    .result-stats {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .result-stat {
+      width: 100%;
+    }
+    
+    .game-hud {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .hud-item {
+      width: 100%;
+      padding: 5px 0;
+    }
+    
+    .hud-item::after {
+      display: none;
+    }
+    
+    .result-actions .btn {
+      padding: 12px 20px;
+      font-size: 1rem;
     }
   }
 </style>
@@ -470,6 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const startGameBtn = document.getElementById('start-game');
   const playAgainBtn = document.getElementById('play-again');
   
+  const problemContainer = document.getElementById('problem-container');
   const problemText = document.getElementById('problem-text');
   const answerInput = document.getElementById('answer-input');
   const submitAnswerBtn = document.getElementById('submit-answer');
@@ -501,11 +983,17 @@ document.addEventListener('DOMContentLoaded', function() {
   let startTimestamp = 0;
   let totalResponseTime = 0;
   let problemStartTime = 0;
+  let streakCount = 0; // Consecutive correct answers
+  let comboPulse = false; // For combo animation
+  
+  // Game particles
+  const particles = [];
 
   // Sounds
   const correctSound = new Audio('/static/sounds/correct.mp3');
   const wrongSound = new Audio('/static/sounds/wrong.mp3');
   const gameOverSound = new Audio('/static/sounds/game-over.mp3');
+  const bonusSound = new Audio('/static/sounds/hint.mp3');
 
   // Event Listeners for Configuration
   difficultyButtons.forEach(btn => {
@@ -516,6 +1004,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update UI
       difficultyButtons.forEach(b => b.classList.remove('active'));
       this.classList.add('active');
+      
+      // Add click effect
+      addClickEffect(this);
     });
   });
 
@@ -527,8 +1018,49 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update UI
       timeButtons.forEach(b => b.classList.remove('active'));
       this.classList.add('active');
+      
+      // Add click effect
+      addClickEffect(this);
     });
   });
+  
+  // Click effect for buttons
+  function addClickEffect(element) {
+    const circle = document.createElement('span');
+    circle.classList.add('click-effect');
+    circle.style.position = 'absolute';
+    circle.style.width = '50px';
+    circle.style.height = '50px';
+    circle.style.borderRadius = '50%';
+    circle.style.background = 'rgba(255, 255, 255, 0.4)';
+    circle.style.transform = 'translate(-50%, -50%) scale(0)';
+    circle.style.animation = 'clickEffect 0.6s forwards';
+    circle.style.pointerEvents = 'none';
+    
+    // Position the circle at the click point
+    const rect = element.getBoundingClientRect();
+    circle.style.left = (rect.width / 2) + 'px';
+    circle.style.top = (rect.height / 2) + 'px';
+    
+    element.style.position = 'relative';
+    element.style.overflow = 'hidden';
+    element.appendChild(circle);
+    
+    // Remove the circle after animation
+    setTimeout(() => {
+      circle.remove();
+    }, 600);
+  }
+  
+  // Add keyframes for click effect
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    @keyframes clickEffect {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(styleEl);
 
   // Start Game Button
   startGameBtn.addEventListener('click', function() {
@@ -546,8 +1078,34 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    // Start the game
-    startGame();
+    // Start the game with transition
+    startScreen.style.animation = 'slideOut 0.5s forwards';
+    
+    setTimeout(() => {
+      startScreen.style.display = 'none';
+      gameScreen.style.display = 'block';
+      gameScreen.style.animation = 'slideIn 0.5s forwards';
+      
+      // Start the game after animation
+      setTimeout(() => {
+        startGame();
+      }, 300);
+    }, 500);
+    
+    // Add slide animations
+    const slideStyles = document.createElement('style');
+    slideStyles.textContent = `
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(-20px); opacity: 0; }
+      }
+      
+      @keyframes slideIn {
+        from { transform: translateX(20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(slideStyles);
   });
 
   // Submit Answer Button
@@ -562,7 +1120,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Play Again Button
   playAgainBtn.addEventListener('click', function() {
-    showScreen(startScreen);
+    // Transition back to start screen
+    resultScreen.style.animation = 'slideOut 0.5s forwards';
+    
+    setTimeout(() => {
+      resultScreen.style.display = 'none';
+      startScreen.style.display = 'block';
+      startScreen.style.animation = 'slideIn 0.5s forwards';
+    }, 500);
   });
 
   // Functions
@@ -572,6 +1137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     correctAnswers = 0;
     incorrectAnswers = 0;
     totalResponseTime = 0;
+    streakCount = 0;
     
     // Reset UI
     scoreEl.textContent = score;
@@ -583,9 +1149,6 @@ document.addEventListener('DOMContentLoaded', function() {
     timeRemaining = gameTime;
     timerEl.textContent = timeRemaining;
     timerBar.style.width = '100%';
-    
-    // Show game screen
-    showScreen(gameScreen);
     
     // Focus answer input
     answerInput.value = '';
@@ -601,89 +1164,125 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function generateProblem() {
-    // Choose random operation from selected operations
-    const operation = operations[Math.floor(Math.random() * operations.length)];
+    // Prepare for transition
+    problemContainer.classList.add('problem-exit');
     
-    let num1, num2, problem, answer;
-    
-    // Generate numbers based on difficulty and operation
-    switch (operation) {
-      case 'addition':
-        if (difficulty === 'easy') {
-          num1 = Math.floor(Math.random() * 10) + 1;
-          num2 = Math.floor(Math.random() * 10) + 1;
-        } else if (difficulty === 'medium') {
-          num1 = Math.floor(Math.random() * 50) + 1;
-          num2 = Math.floor(Math.random() * 50) + 1;
-        } else { // hard
-          num1 = Math.floor(Math.random() * 100) + 1;
-          num2 = Math.floor(Math.random() * 100) + 1;
-        }
-        problem = `${num1} + ${num2} = ?`;
-        answer = num1 + num2;
-        break;
-        
-      case 'subtraction':
-        if (difficulty === 'easy') {
-          num1 = Math.floor(Math.random() * 10) + 1;
-          num2 = Math.floor(Math.random() * num1) + 1;
-        } else if (difficulty === 'medium') {
-          num1 = Math.floor(Math.random() * 50) + 10;
-          num2 = Math.floor(Math.random() * num1) + 1;
-        } else { // hard
-          num1 = Math.floor(Math.random() * 100) + 20;
-          num2 = Math.floor(Math.random() * num1) + 1;
-        }
-        problem = `${num1} - ${num2} = ?`;
-        answer = num1 - num2;
-        break;
-        
-      case 'multiplication':
-        if (difficulty === 'easy') {
-          num1 = Math.floor(Math.random() * 5) + 1;
-          num2 = Math.floor(Math.random() * 5) + 1;
-        } else if (difficulty === 'medium') {
-          num1 = Math.floor(Math.random() * 10) + 1;
-          num2 = Math.floor(Math.random() * 10) + 1;
-        } else { // hard
-          num1 = Math.floor(Math.random() * 12) + 1;
-          num2 = Math.floor(Math.random() * 12) + 1;
-        }
-        problem = `${num1} × ${num2} = ?`;
-        answer = num1 * num2;
-        break;
-        
-      case 'division':
-        // For division, first generate the answer, then multiply to get the dividend
-        if (difficulty === 'easy') {
-          answer = Math.floor(Math.random() * 5) + 1;
-          num2 = Math.floor(Math.random() * 5) + 1;
-        } else if (difficulty === 'medium') {
-          answer = Math.floor(Math.random() * 10) + 1;
-          num2 = Math.floor(Math.random() * 10) + 1;
-        } else { // hard
-          answer = Math.floor(Math.random() * 12) + 1;
-          num2 = Math.floor(Math.random() * 12) + 1;
-        }
-        num1 = answer * num2; // This ensures whole number answers
-        problem = `${num1} ÷ ${num2} = ?`;
-        break;
-    }
-    
-    // Update UI
-    problemText.textContent = problem;
-    currentAnswer = answer;
-    
-    // Reset input
-    answerInput.value = '';
-    answerInput.focus();
-    
-    // Reset feedback
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'feedback';
-    
-    // Record problem start time
-    problemStartTime = Date.now();
+    setTimeout(() => {
+      // Choose random operation from selected operations
+      const operation = operations[Math.floor(Math.random() * operations.length)];
+      
+      let num1, num2, problem, answer;
+      let operatorSymbol = '';
+      
+      // Generate numbers based on difficulty and operation
+      switch (operation) {
+        case 'addition':
+          operatorSymbol = '+';
+          if (difficulty === 'easy') {
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+          } else if (difficulty === 'medium') {
+            num1 = Math.floor(Math.random() * 50) + 1;
+            num2 = Math.floor(Math.random() * 50) + 1;
+          } else { // hard
+            num1 = Math.floor(Math.random() * 100) + 1;
+            num2 = Math.floor(Math.random() * 100) + 1;
+          }
+          problem = `${num1} ${operatorSymbol} ${num2} = ?`;
+          answer = num1 + num2;
+          break;
+          
+        case 'subtraction':
+          operatorSymbol = '-';
+          if (difficulty === 'easy') {
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * num1) + 1;
+          } else if (difficulty === 'medium') {
+            num1 = Math.floor(Math.random() * 50) + 10;
+            num2 = Math.floor(Math.random() * num1) + 1;
+          } else { // hard
+            num1 = Math.floor(Math.random() * 100) + 20;
+            num2 = Math.floor(Math.random() * num1) + 1;
+          }
+          problem = `${num1} ${operatorSymbol} ${num2} = ?`;
+          answer = num1 - num2;
+          break;
+          
+        case 'multiplication':
+          operatorSymbol = '×';
+          if (difficulty === 'easy') {
+            num1 = Math.floor(Math.random() * 5) + 1;
+            num2 = Math.floor(Math.random() * 5) + 1;
+          } else if (difficulty === 'medium') {
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+          } else { // hard
+            num1 = Math.floor(Math.random() * 12) + 1;
+            num2 = Math.floor(Math.random() * 12) + 1;
+          }
+          problem = `${num1} ${operatorSymbol} ${num2} = ?`;
+          answer = num1 * num2;
+          break;
+          
+        case 'division':
+          operatorSymbol = '÷';
+          // For division, first generate the answer, then multiply to get the dividend
+          if (difficulty === 'easy') {
+            answer = Math.floor(Math.random() * 5) + 1;
+            num2 = Math.floor(Math.random() * 5) + 1;
+          } else if (difficulty === 'medium') {
+            answer = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+          } else { // hard
+            answer = Math.floor(Math.random() * 12) + 1;
+            num2 = Math.floor(Math.random() * 12) + 1;
+          }
+          num1 = answer * num2; // This ensures whole number answers
+          problem = `${num1} ${operatorSymbol} ${num2} = ?`;
+          break;
+      }
+      
+      // Set operator color based on operation
+      let operatorColor;
+      switch (operation) {
+        case 'addition':
+          operatorColor = '#4CAF50'; // Green
+          break;
+        case 'subtraction':
+          operatorColor = '#2196F3'; // Blue
+          break;
+        case 'multiplication':
+          operatorColor = '#FF9800'; // Orange
+          break;
+        case 'division':
+          operatorColor = '#9C27B0'; // Purple
+          break;
+      }
+      
+      // Update UI with colored operator
+      const formattedProblem = problem.replace(
+        operatorSymbol,
+        `<span style="color: ${operatorColor}; font-weight: 800;">${operatorSymbol}</span>`
+      );
+      
+      problemText.innerHTML = formattedProblem;
+      currentAnswer = answer;
+      
+      // Show problem with animation
+      problemContainer.classList.remove('problem-exit');
+      problemContainer.classList.add('problem-enter');
+      
+      // Reset input
+      answerInput.value = '';
+      answerInput.focus();
+      
+      // Reset feedback
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
+      
+      // Record problem start time
+      problemStartTime = Date.now();
+    }, 300); // Wait for exit animation
   }
 
   function checkAnswer() {
@@ -692,6 +1291,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // If input is empty or not a number, do nothing
     if (isNaN(userAnswer)) {
+      answerInput.classList.add('invalid');
+      setTimeout(() => {
+        answerInput.classList.remove('invalid');
+      }, 300);
       return;
     }
     
@@ -705,25 +1308,101 @@ document.addEventListener('DOMContentLoaded', function() {
       feedbackEl.textContent = 'Doğru!';
       feedbackEl.className = 'feedback correct';
       
+      // Increment streak
+      streakCount++;
+      
+      // Check for streak bonus
+      let streakBonus = 0;
+      if (streakCount >= 3) {
+        streakBonus = Math.floor(streakCount / 3) * 5;
+        
+        // Play bonus sound
+        if (streakBonus > 0) {
+          bonusSound.currentTime = 0;
+          bonusSound.play();
+          
+          // Show streak indicator
+          const streakIndicator = document.createElement('div');
+          streakIndicator.textContent = `Seri Bonus: +${streakBonus}`;
+          streakIndicator.style.position = 'absolute';
+          streakIndicator.style.top = '50%';
+          streakIndicator.style.left = '50%';
+          streakIndicator.style.transform = 'translate(-50%, -50%)';
+          streakIndicator.style.color = '#FFD700';
+          streakIndicator.style.fontWeight = '700';
+          streakIndicator.style.fontSize = '1.5rem';
+          streakIndicator.style.textShadow = '0 2px 5px rgba(0,0,0,0.3)';
+          streakIndicator.style.zIndex = '10';
+          streakIndicator.style.animation = 'streakAppear 1.5s forwards';
+          
+          problemContainer.appendChild(streakIndicator);
+          
+          setTimeout(() => {
+            streakIndicator.remove();
+          }, 1500);
+        }
+      }
+      
       // Update score (faster answers get more points)
       const timeBonus = Math.max(0, 10 - Math.floor(responseTime));
       const difficultyMultiplier = difficulty === 'easy' ? 1 : (difficulty === 'medium' ? 2 : 3);
-      const pointsEarned = 10 + timeBonus * difficultyMultiplier;
+      const pointsEarned = 10 + timeBonus * difficultyMultiplier + streakBonus;
       
       score += pointsEarned;
       correctAnswers++;
       
+      // Create particles for correct answer
+      createParticles(true);
+      
+      // Update combo animation
+      if (streakCount > 1) {
+        const combo = document.createElement('div');
+        combo.textContent = `${streakCount} Combo!`;
+        combo.style.position = 'absolute';
+        combo.style.top = '-40px';
+        combo.style.right = '20px';
+        combo.style.color = '#FFD700';
+        combo.style.fontWeight = '700';
+        combo.style.fontSize = '1.2rem';
+        combo.style.animation = 'comboFade 1.5s forwards';
+        
+        problemContainer.style.position = 'relative';
+        problemContainer.appendChild(combo);
+        
+        setTimeout(() => {
+          combo.remove();
+        }, 1500);
+      }
+      
       // Play sound
+      correctSound.currentTime = 0;
       correctSound.play();
+      
+      // Flash score element
+      scoreEl.style.animation = 'scorePulse 0.5s';
+      setTimeout(() => {
+        scoreEl.style.animation = '';
+      }, 500);
     } else {
       // Incorrect answer
       feedbackEl.textContent = `Yanlış! Doğru cevap: ${currentAnswer}`;
       feedbackEl.className = 'feedback incorrect';
       
       incorrectAnswers++;
+      streakCount = 0; // Reset streak
+      
+      // Create particles for incorrect answer
+      createParticles(false);
       
       // Play sound
+      wrongSound.currentTime = 0;
       wrongSound.play();
+      
+      // Shake the problem container
+      problemContainer.style.animation = 'containerShake 0.5s';
+      setTimeout(() => {
+        problemContainer.style.animation = '';
+      }, 500);
     }
     
     // Update UI
@@ -732,6 +1411,89 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate new problem after a short delay
     setTimeout(generateProblem, 1500);
+  }
+  
+  function createParticles(isCorrect) {
+    const color = isCorrect ? '#4CAF50' : '#F44336';
+    const particleCount = isCorrect ? 30 : 15;
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'math-particle';
+      particle.style.position = 'absolute';
+      particle.style.width = `${Math.random() * 8 + 4}px`;
+      particle.style.height = particle.style.width;
+      particle.style.background = color;
+      particle.style.borderRadius = '50%';
+      particle.style.opacity = Math.random() * 0.5 + 0.5;
+      
+      // Position particles around the problem text
+      const rect = problemText.getBoundingClientRect();
+      const containerRect = problemContainer.getBoundingClientRect();
+      
+      particle.style.left = `${rect.left - containerRect.left + rect.width/2 + (Math.random() - 0.5) * rect.width}px`;
+      particle.style.top = `${rect.top - containerRect.top + rect.height/2 + (Math.random() - 0.5) * rect.height}px`;
+      
+      // Random velocity
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 100 + 50;
+      particle.vx = Math.cos(angle) * speed;
+      particle.vy = Math.sin(angle) * speed;
+      
+      // Add to container
+      problemContainer.appendChild(particle);
+      particles.push({
+        element: particle,
+        x: parseFloat(particle.style.left),
+        y: parseFloat(particle.style.top),
+        vx: particle.vx,
+        vy: particle.vy,
+        opacity: 1,
+        life: Math.random() * 1 + 0.5
+      });
+    }
+    
+    // Start animation if not already running
+    if (!particleAnimation) {
+      particleAnimation = requestAnimationFrame(updateParticles);
+    }
+  }
+  
+  let particleAnimation = null;
+  let lastTime = 0;
+  
+  function updateParticles(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const delta = (timestamp - lastTime) / 1000;
+    lastTime = timestamp;
+    
+    let hasParticles = false;
+    
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * delta;
+      p.y += p.vy * delta;
+      p.opacity -= delta / p.life;
+      
+      p.element.style.left = `${p.x}px`;
+      p.element.style.top = `${p.y}px`;
+      p.element.style.opacity = Math.max(0, p.opacity);
+      
+      // Remove dead particles
+      if (p.opacity <= 0) {
+        p.element.remove();
+        particles.splice(i, 1);
+      } else {
+        hasParticles = true;
+      }
+    }
+    
+    if (hasParticles) {
+      particleAnimation = requestAnimationFrame(updateParticles);
+    } else {
+      particleAnimation = null;
+      lastTime = 0;
+    }
   }
 
   function updateTimer() {
@@ -744,7 +1506,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Change color when time is running out
     if (timeRemaining <= 10) {
-      timerBar.style.backgroundColor = '#F44336';
+      timerBar.style.background = 'linear-gradient(to right, #F44336, #FF9800)';
+      
+      // Add pulse animation to timer
+      if (timeRemaining <= 5) {
+        timerEl.style.animation = 'timerPulse 0.5s infinite alternate';
+      }
     }
     
     // Check if time is up
@@ -752,12 +1519,59 @@ document.addEventListener('DOMContentLoaded', function() {
       endGame();
     }
   }
+  
+  // Add keyframes for animations
+  const keyframes = document.createElement('style');
+  keyframes.textContent = `
+    @keyframes scorePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); color: #4CAF50; }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes containerShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes timerPulse {
+      from { transform: scale(1); color: #F44336; }
+      to { transform: scale(1.1); color: #FF9800; }
+    }
+    
+    @keyframes comboFade {
+      0% { opacity: 0; transform: translateY(-10px) scale(0.8); }
+      20% { opacity: 1; transform: translateY(0) scale(1.1); }
+      80% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(10px); }
+    }
+    
+    @keyframes streakAppear {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -150%); }
+    }
+    
+    .invalid {
+      animation: invalidShake 0.3s;
+    }
+    
+    @keyframes invalidShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  `;
+  document.head.appendChild(keyframes);
 
   function endGame() {
     // Stop timer
     clearInterval(timer);
     
     // Play sound
+    gameOverSound.currentTime = 0;
     gameOverSound.play();
     
     // Calculate statistics
@@ -775,18 +1589,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save score
     saveScore(score);
     
-    // Show result screen
-    showScreen(resultScreen);
-  }
-
-  function showScreen(screen) {
-    // Hide all screens
-    startScreen.style.display = 'none';
-    gameScreen.style.display = 'none';
-    resultScreen.style.display = 'none';
+    // Transition to result screen
+    gameScreen.style.animation = 'slideOut 0.5s forwards';
     
-    // Show the specified screen
-    screen.style.display = 'block';
+    setTimeout(() => {
+      gameScreen.style.display = 'none';
+      resultScreen.style.display = 'block';
+      resultScreen.style.animation = 'slideIn 0.5s forwards';
+    }, 500);
   }
   
   // Function to save score to the server
