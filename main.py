@@ -980,12 +980,12 @@ def profile_v2():
             user_scores[score.game_type] = score.score
     
     # Kullanıcı seviyesini hesapla
-    user_level = calculate_level(user.experience_points)
+    current_level = calculate_level(user.experience_points)
     
-    # Bir sonraki seviyeye ne kadar XP kaldığını hesapla
-    next_level_xp = xp_for_level(user_level + 1)
-    current_level_xp = xp_for_level(user_level)
-    xp_progress = ((user.experience_points - current_level_xp) / (next_level_xp - current_level_xp)) * 100
+    # XP hesaplamaları
+    xp_for_current = xp_for_level(current_level)
+    xp_for_next = xp_for_level(current_level + 1)
+    xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
     
     return render_template(
         'profile_v2.html', 
