@@ -1,0 +1,92 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Oyun Tasarımcısı{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Oyun Tasarımcısı</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Oyun Tasarımcısı</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Giriş Bilgilendirme Kartı -->
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Oyun Tasarımcısı Aracı</h3>
+            </div>
+            <div class="card-body">
+                <p>Oyun başlangıç ekranlarını, kartlarını ve diğer arayüz öğelerini düzenlemek için bu aracı kullanabilirsiniz. 
+                Sürükle-bırak özelliği ile kolayca oyun arayüzünüzü özelleştirebilirsiniz.</p>
+                <p><strong>Yapabilecekleriniz:</strong></p>
+                <ul>
+                    <li>Oyun kartları tasarlama</li>
+                    <li>Başlangıç ekranı düzenleme</li>
+                    <li>Buton yerlerini değiştirme/kaldırma</li>
+                    <li>Yeni metin ekleyebilme</li>
+                    <li>Renkler ve tema değiştirebilme</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Oyunlar Listesi -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Tasarlanacak Oyunu Seçin</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>Oyun Adı</th>
+                            <th>Son Düzenleme</th>
+                            <th style="width: 120px">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in games %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ game.name }}</td>
+                                <td>{{ game.updated_at.strftime('%d.%m.%Y %H:%M') if game.updated_at else 'Düzenlenmemiş' }}</td>
+                                <td>
+                                    <a href="{{ url_for('admin.game_designer_edit', game_id=game.id) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-paint-brush"></i> Tasarla
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">Kayıtlı oyun bulunamadı.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

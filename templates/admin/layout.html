@@ -202,9 +202,21 @@
             <div class="px-3 py-2">
                 <small class="text-white-50">İÇERİK YÖNETİMİ</small>
             </div>
+                <small class="text-white-50">İÇERİK YÖNETİMİ</small>
+            </div>
             
-            <a href="{{ url_for('admin.games') }}" class="menu-item {% if request.endpoint.startswith('admin.game') %}active{% endif %}">
+            <a href="{{ url_for('admin.games') }}" class="menu-item {% if request.endpoint.startswith('admin.game') and not request.endpoint.startswith('admin.game_designer') %}active{% endif %}">
                 <i class="fas fa-gamepad"></i> Oyunlar
+            </a>
+            
+                <i class="fas fa-paint-brush"></i> Oyun Tasarımcısı
+            </a>
+            
+            <a href="{{ url_for('admin.users') }}" class="menu-item {% if request.endpoint.startswith('admin.user') %}active{% endif %}">
+                <i class="fas fa-users"></i> Kullanıcılar
+            </a>
+
+                <i class="fas fa-paint-brush"></i> Oyun Tasarımcısı
             </a>
             
             <a href="{{ url_for('admin.users') }}" class="menu-item {% if request.endpoint.startswith('admin.user') %}active{% endif %}">

@@ -960,3 +960,149 @@ def admin_profile_update():
         flash(f"Profil güncellenirken bir hata oluştu: {str(e)}", 'danger')
     
     return redirect(url_for('admin.admin_profile'))
+
+# OYUN TASARIMCISI
+@admin_bp.route('/game-designer')
+@admin_required
+def game_designer():
+    """Oyun tasarımcısı ana sayfası"""
+    games = Game.query.order_by(Game.name).all()
+    return render_template(
+        'admin/game_designer/index.html',
+        games=games,
+        current_admin=get_current_admin()
+    )
+
+@admin_bp.route('/game-designer/<int:game_id>')
+@admin_required
+def game_designer_edit(game_id):
+    """Oyun tasarımcısı düzenleme sayfası"""
+    game = Game.query.get_or_404(game_id)
+    
+    # Oyun ayarlarından tasarım bilgilerini al veya varsayılan oluştur
+    design_settings = game.settings.get('design', {}) if game.settings else {}
+    
+    return render_template(
+        'admin/game_designer/edit.html',
+        game=game,
+        design_settings=design_settings,
+        current_admin=get_current_admin()
+    )
+
+@admin_bp.route('/game-designer/<int:game_id>/update', methods=['POST'])
+@admin_required
+def game_designer_update(game_id):
+    """Oyun tasarım ayarlarını güncelle"""
+    game = Game.query.get_or_404(game_id)
+    
+    try:
+        # JSON verisini al
+        design_data = request.json
+        
+        # Oyun ayarlarını güncelle
+        if not game.settings:
+            game.settings = {}
+        
+        # 'design' anahtarını ekleyelim
+        game.settings['design'] = design_data
+        
+        # Veritabanını güncelle
+        db.session.commit()
+        
+        # İşlem kaydı oluştur
+        create_admin_log(
+            action='update',
+            entity_type='game_design',
+            entity_id=game.id,
+            details=f"'{game.name}' oyunu tasarımı güncellendi"
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Oyun tasarımı başarıyla güncellendi'
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Oyun tasarımı güncellenirken hata: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Bir hata oluştu: {str(e)}"
+        }), 500
+
+@admin_bp.route('/game-designer/templates')
+@admin_required
+def game_designer_templates():
+    """Tasarım şablonlarını listele"""
+    # Şablon kategorilerini al
+    template_categories = [
+        {
+            'id': 'cards',
+            'name': 'Oyun Kartları',
+            'templates': [
+                {'id': 'card_simple', 'name': 'Basit Kart', 'thumbnail': '/static/images/admin/templates/card_simple.jpg'},
+                {'id': 'card_image', 'name': 'Resimli Kart', 'thumbnail': '/static/images/admin/templates/card_image.jpg'},
+                {'id': 'card_hover', 'name': 'Hover Efektli Kart', 'thumbnail': '/static/images/admin/templates/card_hover.jpg'}
+            ]
+        },
+        {
+            'id': 'buttons',
+            'name': 'Butonlar',
+            'templates': [
+                {'id': 'btn_simple', 'name': 'Basit Buton', 'thumbnail': '/static/images/admin/templates/btn_simple.jpg'},
+                {'id': 'btn_animated', 'name': 'Animasyonlu Buton', 'thumbnail': '/static/images/admin/templates/btn_animated.jpg'},
+                {'id': 'btn_icon', 'name': 'İkonlu Buton', 'thumbnail': '/static/images/admin/templates/btn_icon.jpg'}
+            ]
+        },
+        {
+            'id': 'layouts',
+            'name': 'Düzenler',
+            'templates': [
+                {'id': 'layout_grid', 'name': 'Grid Düzen', 'thumbnail': '/static/images/admin/templates/layout_grid.jpg'},
+                {'id': 'layout_flex', 'name': 'Flex Düzen', 'thumbnail': '/static/images/admin/templates/layout_flex.jpg'},
+                {'id': 'layout_sidebar', 'name': 'Sidebar Düzen', 'thumbnail': '/static/images/admin/templates/layout_sidebar.jpg'}
+            ]
+        }
+    ]
+    
+    return jsonify(template_categories)
+
+@admin_bp.route('/game-designer/template/<template_id>')
+@admin_required
+def game_designer_template_details(template_id):
+    """Şablon detaylarını getir"""
+    # Örnek şablon verisi
+    templates = {
+        'card_simple': {
+            'name': 'Basit Kart',
+            'html': '<div class="game-card simple-card"><h3>{{title}}</h3><p>{{description}}</p></div>',
+            'css': '.game-card.simple-card{border:1px solid #ddd;border-radius:8px;padding:15px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,0.1)}.game-card.simple-card h3{margin-top:0;color:#333}.game-card.simple-card p{color:#666}',
+            'defaults': {
+                'title': 'Kart Başlığı',
+                'description': 'Kart açıklaması buraya gelecek.'
+            }
+        },
+        'btn_simple': {
+            'name': 'Basit Buton',
+            'html': '<button class="game-btn simple-btn">{{text}}</button>',
+            'css': '.game-btn.simple-btn{background:#3498db;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:bold}.game-btn.simple-btn:hover{background:#2980b9}',
+            'defaults': {
+                'text': 'Butona Tıkla'
+            }
+        },
+        'layout_grid': {
+            'name': 'Grid Düzen',
+            'html': '<div class="game-grid">{{#each items}}<div class="grid-item">{{this}}</div>{{/each}}</div>',
+            'css': '.game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.game-grid .grid-item{background:#f9f9f9;padding:20px;border-radius:5px;text-align:center}',
+            'defaults': {
+                'items': ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6']
+            }
+        }
+    }
+    
+    template = templates.get(template_id)
+    
+    if not template:
+        return jsonify({'error': 'Şablon bulunamadı'}), 404
+    
+    return jsonify(template)

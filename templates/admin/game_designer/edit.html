@@ -1,0 +1,358 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}{{ game.name }} - Oyun Tasarımcısı{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/css/admin/game-designer.css">
+<style>
+    .designer-container {
+        min-height: 500px;
+        border: 2px dashed #ccc;
+        padding: 20px;
+        background: #f8f9fa;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .component-palette {
+        border: 1px solid #ddd;
+        padding: 15px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .palette-item {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #eee;
+        background: #f9f9f9;
+        cursor: grab;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .palette-item:hover {
+        background: #e9ecef;
+        border-color: #ddd;
+    }
+    .palette-item i {
+        margin-right: 5px;
+    }
+    .design-element {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        background: white;
+        position: absolute;
+        cursor: move;
+        min-width: 100px;
+        min-height: 30px;
+        border-radius: 4px;
+        user-select: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .design-element.ui-selected {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+    .design-element .element-actions {
+        display: none;
+        position: absolute;
+        top: -15px;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .design-element:hover .element-actions {
+        display: block;
+    }
+    .design-element .element-actions button {
+        border: none;
+        background: none;
+        font-size: 12px;
+        padding: 2px 5px;
+        cursor: pointer;
+        color: #555;
+    }
+    .design-element .element-actions button:hover {
+        color: #000;
+    }
+    .design-element .element-actions button.delete-element {
+        color: #dc3545;
+    }
+    .design-element .element-actions button.delete-element:hover {
+        color: #bd2130;
+    }
+    .toolbox {
+        position: sticky;
+        top: 20px;
+    }
+    .preview-container {
+        border: 1px solid #ddd;
+        padding: 15px;
+        background: #fff;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .game-template-preview {
+        width: 100%;
+        height: 300px;
+        border: 1px solid #eee;
+        background: #fafafa;
+        margin-bottom: 15px;
+    }
+    .designer-tabs {
+        margin-bottom: 15px;
+    }
+    .element-props-panel {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        background: #f8f9fa;
+        margin-top: 15px;
+    }
+    .resizable-handle {
+        width: 10px;
+        height: 10px;
+        background-color: #fff;
+        border: 1px solid #999;
+        position: absolute;
+    }
+    .resizable-handle.resizable-se {
+        bottom: -5px;
+        right: -5px;
+        cursor: se-resize;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">{{ game.name }} - Tasarımcı</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.game_designer') }}">Oyun Tasarımcısı</a></li>
+                    <li class="breadcrumb-item active">{{ game.name }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="toolbox">
+                    <!-- Bileşen Paleti -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Bileşen Paleti</h3>
+                        </div>
+                        <div class="card-body component-palette">
+                            <h5>Temel Öğeler</h5>
+                            <div class="palette-item" data-type="text">
+                                <i class="fas fa-font"></i> Metin
+                            </div>
+                            <div class="palette-item" data-type="button">
+                                <i class="fas fa-square"></i> Buton
+                            </div>
+                            <div class="palette-item" data-type="image">
+                                <i class="fas fa-image"></i> Resim
+                            </div>
+                            <div class="palette-item" data-type="card">
+                                <i class="fas fa-credit-card"></i> Kart
+                            </div>
+
+                            <h5 class="mt-4">Oyun Kartları</h5>
+                            <div class="palette-item" data-type="game_card">
+                                <i class="fas fa-gamepad"></i> Oyun Kartı
+                            </div>
+                            <div class="palette-item" data-type="score_card">
+                                <i class="fas fa-trophy"></i> Skor Kartı
+                            </div>
+                            
+                            <h5 class="mt-4">Düzen</h5>
+                            <div class="palette-item" data-type="container">
+                                <i class="fas fa-box"></i> Konteyner
+                            </div>
+                            <div class="palette-item" data-type="row">
+                                <i class="fas fa-grip-lines"></i> Satır
+                            </div>
+                            <div class="palette-item" data-type="column">
+                                <i class="fas fa-grip-lines-vertical"></i> Sütun
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Şablonlar -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3 class="card-title">Hazır Şablonlar</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="template-list">
+                                <div class="template-item" data-template="default_game_screen">
+                                    <img src="/static/images/admin/templates/default_game.jpg" alt="Varsayılan Oyun Ekranı" class="img-fluid mb-2">
+                                    <div>Varsayılan Oyun Ekranı</div>
+                                </div>
+                                <div class="template-item mt-3" data-template="card_layout">
+                                    <img src="/static/images/admin/templates/card_layout.jpg" alt="Kart Düzeni" class="img-fluid mb-2">
+                                    <div>Kart Düzeni</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Tasarım Alanı</h3>
+                        <div class="card-tools">
+                            <button type="button" id="saveDesign" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Tasarımı Kaydet
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs designer-tabs" id="designerTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-screen-tab" data-toggle="tab" href="#home-screen" role="tab">
+                                    Başlangıç Ekranı
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="game-cards-tab" data-toggle="tab" href="#game-cards" role="tab">
+                                    Oyun Kartları
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="game-screen-tab" data-toggle="tab" href="#game-screen" role="tab">
+                                    Oyun Ekranı
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="designerTabContent">
+                            <!-- Ana Ekran Tasarımı -->
+                            <div class="tab-pane fade show active" id="home-screen" role="tabpanel">
+                                <div class="designer-container" id="homeScreenDesigner">
+                                    <!-- Tasarım öğeleri buraya eklenecek -->
+                                </div>
+                            </div>
+                            
+                            <!-- Oyun Kartları Tasarımı -->
+                            <div class="tab-pane fade" id="game-cards" role="tabpanel">
+                                <div class="designer-container" id="gameCardsDesigner">
+                                    <!-- Oyun kartları buraya eklenecek -->
+                                </div>
+                            </div>
+                            
+                            <!-- Oyun Ekranı Tasarımı -->
+                            <div class="tab-pane fade" id="game-screen" role="tabpanel">
+                                <div class="designer-container" id="gameScreenDesigner">
+                                    <!-- Oyun ekranı öğeleri buraya eklenecek -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Öğe özellikleri paneli -->
+                        <div class="element-props-panel" id="elementProperties">
+                            <h4>Öğe Özellikleri</h4>
+                            <p class="text-muted">Bir öğe seçin veya oluşturun.</p>
+                            <div id="propertiesForm" style="display:none;">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="elementText">Metin</label>
+                                        <input type="text" class="form-control" id="elementText" placeholder="Metin">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="elementColor">Metin Rengi</label>
+                                        <input type="color" class="form-control" id="elementColor" value="#000000">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="elementBgColor">Arkaplan Rengi</label>
+                                        <input type="color" class="form-control" id="elementBgColor" value="#ffffff">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="elementFontSize">Yazı Boyutu</label>
+                                        <input type="range" class="form-control" id="elementFontSize" min="8" max="72" value="16">
+                                        <span id="fontSizeValue">16px</span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="elementBorderColor">Kenarlık Rengi</label>
+                                        <input type="color" class="form-control" id="elementBorderColor" value="#dddddd">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="elementBorderWidth">Kenarlık Kalınlığı</label>
+                                        <input type="range" class="form-control" id="elementBorderWidth" min="0" max="10" value="1">
+                                        <span id="borderWidthValue">1px</span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="elementPadding">İç Boşluk</label>
+                                        <input type="range" class="form-control" id="elementPadding" min="0" max="50" value="10">
+                                        <span id="paddingValue">10px</span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="elementBorderRadius">Köşe Yuvarlaklığı</label>
+                                        <input type="range" class="form-control" id="elementBorderRadius" min="0" max="50" value="4">
+                                        <span id="borderRadiusValue">4px</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-container mt-4">
+                            <h4>Önizleme</h4>
+                            <div class="game-template-preview" id="previewArea">
+                                <!-- Önizleme burada gösterilecek -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.17/interact.min.js"></script>
+<script src="/static/js/admin/game-designer.js"></script>
+<script>
+    $(document).ready(function() {
+        // Tasarım verilerini yükleme
+        var designSettings = {{ design_settings|tojson }};
+        var gameId = {{ game.id }};
+        
+        // Tasarımcıyı başlat
+        initDesigner(gameId, designSettings);
+        
+        // Şablon yükleme
+        $('.template-item').click(function() {
+            var templateId = $(this).data('template');
+            loadTemplate(templateId);
+        });
+        
+        // Tasarımı kaydetme
+        $('#saveDesign').click(function() {
+            saveDesign(gameId);
+        });
+    });
+</script>
+{% endblock %}
