@@ -475,6 +475,158 @@
       height: 40px;
       font-size: 1rem;
     }
+  /* Board shuffle animation */
+  @keyframes board-shuffle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-2deg); }
+    75% { transform: rotate(2deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  .board-shuffle {
+    animation: board-shuffle 0.3s ease;
+  }
+  /* Tile movement animation */
+  @keyframes tile-move {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  
+  .tile-move {
+    animation: tile-move 0.2s ease;
+  }
+  /* Victory animation for tiles */
+  @keyframes tile-victory {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .tile-victory {
+    animation: tile-victory 0.6s ease infinite;
+    background-color: var(--accent-color);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Success modal animation */
+  @keyframes modal-appear {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  
+  .modal-appear {
+    animation: modal-appear 0.5s ease forwards;
+  }
+  
+  
+  
+  /* Tile animation and effects */
+  /* Confetti animation */
+  @keyframes confetti-fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: confetti-fall 3s ease-in-out forwards;
+    z-index: 10;
+  }
+  
+  @keyframes tile-move {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  
+  .tile-move {
+    animation: tile-move 0.3s ease;
+  }
+  
+  .tile-touch {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    transform: scale(0.95);
+  }
+  
+  /* Confetti animation for game completion */
+  @keyframes confetti-fall {
+    0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+  }
+  
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    animation: confetti-fall 3s ease-in-out forwards;
+    z-index: 100;
+    border-radius: 50%;
+  }
+  
+  /* Modal animation */
+  @keyframes modal-show {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  
+  .modal-show {
+    animation: modal-show 0.5s ease forwards;
+  }
+  /* Hint animation and tooltip styles */
+  @keyframes pulse-hint {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .pulse-hint {
+    animation: pulse-hint 1s infinite;
+    z-index: 10;
+  }
+  
+  .hint-tooltip {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  
+  /* Responsive design improvements */
+  @media (max-width: 576px) {
+    .puzzle-board {
+      width: 90vw;
+      height: 90vw;
+      max-width: 90vw;
+      max-height: 90vw;
+    }
+    
+    .puzzle-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .puzzle-controls button, .puzzle-controls a {
+      flex: 0 0 calc(50% - 8px);
+      margin: 0;
+    }
+    
+    .difficulty-selector {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
   }
 </style>
 
@@ -485,6 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const difficultyBtns = document.querySelectorAll('.difficulty-btn');
   const shuffleBtn = document.getElementById('shuffle-btn');
   const restartBtn = document.getElementById('restart-btn');
+  const hintBtn = document.getElementById('hint-btn');
   const movesDisplay = document.getElementById('moves');
   const timerDisplay = document.getElementById('timer');
   const successModal = document.getElementById('success-modal');
@@ -536,6 +689,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Restart button
   restartBtn.addEventListener('click', resetGame);
   
+  // Hint button event listener
+  hintBtn.addEventListener("click", function() {
+    if (gameStarted) {
+      showHint();
+    }
+  });
+  
   // Play again button
   playAgainBtn.addEventListener('click', function() {
     successModal.style.display = 'none';
@@ -546,17 +706,36 @@ document.addEventListener('DOMContentLoaded', function() {
   // Create the game board
   function createBoard() {
     // Clear the board
-    puzzleBoard.innerHTML = '';
+    puzzleBoard.innerHTML = "";
     tiles = [];
     
     // Create tiles
     for (let i = 0; i < boardSize * boardSize; i++) {
-      const tile = document.createElement('div');
-      tile.className = i === boardSize * boardSize - 1 ? 'puzzle-tile empty' : 'puzzle-tile';
+      const tile = document.createElement("div");
+      tile.className = i === boardSize * boardSize - 1 ? "puzzle-tile empty" : "puzzle-tile";
       
       if (i !== boardSize * boardSize - 1) {
         tile.textContent = i + 1;
-        tile.addEventListener('click', () => moveTile(i));
+        
+        // Add click event for desktop
+        tile.addEventListener("click", () => moveTile(i));
+        
+        // Add touch events for mobile
+        tile.addEventListener("touchstart", (e) => {
+          e.preventDefault(); // Prevent scrolling
+          tile.classList.add("tile-touch");
+        });
+        
+        tile.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          tile.classList.remove("tile-touch");
+          moveTile(i);
+        });
+        
+        // Cancel touch if moved out
+        tile.addEventListener("touchcancel", (e) => {
+          tile.classList.remove("tile-touch");
+        });
       }
       
       puzzleBoard.appendChild(tile);
@@ -566,6 +745,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Shuffle the tiles
   function shuffleTiles() {
+    // Play shuffle sound
+    const shuffleSound = new Audio("/static/sounds/card-flip.mp3");
+    shuffleSound.play();
+    
+    // Add shuffling visual effect to board
+    puzzleBoard.classList.add("board-shuffle");
+    
     // Start with a solved board
     tiles.forEach((tile, index) => {
       if (index !== boardSize * boardSize - 1) {
@@ -575,6 +761,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     emptyTileIndex = boardSize * boardSize - 1;
     
+    // Visual delay before shuffling
+    setTimeout(() => {
+      puzzleBoard.classList.remove("board-shuffle");
     // Make valid random moves to ensure solvability
     const numMoves = boardSize * boardSize * 20; // Make many random moves
     
@@ -597,6 +786,8 @@ document.addEventListener('DOMContentLoaded', function() {
     seconds = 0;
     updateTimer();
     timer = setInterval(updateTimer, 1000);
+    }, 300);
+  }
   }
   
   // Move a tile
@@ -605,15 +796,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check if the move is valid
     if (isValidMove(index)) {
+      // Play move sound
+      const moveSound = new Audio("/static/sounds/click.mp3");
+      moveSound.volume = 0.5;
+      moveSound.play();
+      
       // Increment moves counter
       moves++;
       movesDisplay.textContent = moves;
+      
+      // Add animation class
+      tiles[index].classList.add("tile-move");
       
       // Swap tiles
       swapTiles(index, emptyTileIndex);
       
       // Update empty tile index
       emptyTileIndex = index;
+      
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        tiles.forEach(tile => tile.classList.remove("tile-move"));
+      }, 300);
       
       // Check if the puzzle is solved
       if (isSolved()) {
@@ -624,12 +828,27 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Swap two tiles
   function swapTiles(index1, index2) {
+    // Only play sound during actual gameplay (not during shuffling)
+    if (gameStarted) {
+      const moveSound = new Audio("/static/sounds/click.mp3");
+      moveSound.volume = 0.3;
+      moveSound.play();
+    }
+    
+    // Add animation class
+    tiles[index1].classList.add("tile-move");
+    
     const temp = tiles[index1].textContent;
     tiles[index1].textContent = tiles[index2].textContent;
     tiles[index2].textContent = temp;
     
-    tiles[index1].classList.toggle('empty', !temp);
-    tiles[index2].classList.toggle('empty', temp === '');
+    tiles[index1].classList.toggle("empty", !temp);
+    tiles[index2].classList.toggle("empty", temp === "");
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      tiles[index1].classList.remove("tile-move");
+    }, 200);
   }
   
   // Check if a move is valid
@@ -650,20 +869,96 @@ document.addEventListener('DOMContentLoaded', function() {
   function getValidMoves() {
     const validMoves = [];
     const row = Math.floor(emptyTileIndex / boardSize);
-    const col = emptyTileIndex % boardSize;
+  function gameComplete() {
+    // Stop the timer
+    clearInterval(timer);
+    gameStarted = false;
     
-    // Check all four directions
-    const directions = [
-      { row: -1, col: 0 }, // Up
-      { row: 1, col: 0 },  // Down
-      { row: 0, col: -1 }, // Left
-      { row: 0, col: 1 }   // Right
-    ];
+    // Play completion sound
+    const completeSound = new Audio("/static/sounds/game-complete.mp3");
+    completeSound.volume = 0.7;
+    completeSound.play();
     
-    directions.forEach(dir => {
-      const newRow = row + dir.row;
-      const newCol = col + dir.col;
+    // Create celebration effect with confetti
+    createCompletionEffect();
+    
+    // Add victory animation to all tiles
+    tiles.forEach(tile => {
+      if (tile.textContent) { // Skip empty tile
+        tile.classList.add("tile-victory");
+      }
+    });
+    
+    // Show success message after a short delay
+    setTimeout(() => {
+      finalMovesDisplay.textContent = moves;
+      finalTimeDisplay.textContent = timerDisplay.textContent;
       
+      // Save score
+      saveScore(moves);
+  function createCompletionEffect() {
+    // Create confetti particles with different shapes
+    const shapes = ["circle", "square", "triangle"];
+    const colors = ["#FF5252", "#FFD740", "#64FFDA", "#448AFF", "#E040FB"];
+    const container = document.querySelector(".puzzle-container");
+    
+    for (let i = 0; i < 150; i++) {
+      const particle = document.createElement("div");
+      particle.className = "confetti";
+      
+      // Random position
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 30}%`;
+      
+      // Random color from our palette
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Random size
+      const size = 5 + Math.random() * 10;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // Random shape
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      if (shape === "square") {
+        particle.style.borderRadius = "0";
+      } else if (shape === "triangle") {
+        particle.style.width = "0";
+        particle.style.height = "0";
+        particle.style.backgroundColor = "transparent";
+        particle.style.borderLeft = `${size/2}px solid transparent`;
+        particle.style.borderRight = `${size/2}px solid transparent`;
+        particle.style.borderBottom = `${size}px solid ${colors[Math.floor(Math.random() * colors.length)]}`;
+      }
+      
+      // Random animation duration and delay
+      particle.style.animationDuration = `${2 + Math.random() * 2}s`;
+      particle.style.animationDelay = `${Math.random() * 0.5}s`;
+      
+      container.appendChild(particle);
+      
+      // Remove particles after animation
+      setTimeout(() => {
+        particle.remove();
+      }, 4000);
+    }
+  function createCompletionEffect() {
+    // Create confetti or particles
+    for (let i = 0; i < 100; i++) {
+      const particle = document.createElement("div");
+      particle.className = "confetti";
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      particle.style.animationDelay = `${Math.random() * 2}s`;
+      document.querySelector(".puzzle-board-container").appendChild(particle);
+      
+      // Remove confetti after animation
+      setTimeout(() => {
+        particle.remove();
+      }, 3000);
+    }
+  }
       // Check if the new position is within the board
       if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
         validMoves.push(newRow * boardSize + newCol);
@@ -684,6 +979,64 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Update the timer display
+  // Show a hint by highlighting a tile that should be moved
+  function showHint() {
+    // Play hint sound
+    const hintSound = new Audio("/static/sounds/hint.mp3");
+    hintSound.play();
+    
+    // Find a tile that is not in its correct position
+    let incorrectTiles = [];
+    tiles.forEach((tile, index) => {
+      if (tile.textContent && parseInt(tile.textContent) !== index + 1) {
+        incorrectTiles.push(tile);
+      }
+    });
+    
+    if (incorrectTiles.length === 0) {
+      return; // All tiles are in correct position
+    }
+    
+    // Select a random incorrect tile
+    const randomTile = incorrectTiles[Math.floor(Math.random() * incorrectTiles.length)];
+    
+    // Highlight the tile
+    const originalBackground = randomTile.style.background;
+    randomTile.style.background = "#ffe066";
+    randomTile.style.boxShadow = "0 0 10px rgba(255, 224, 102, 0.8)";
+    
+    // Add pulsing animation class
+    randomTile.classList.add("pulse-hint");
+    
+    // Show a tooltip with the correct position
+    const tileValue = parseInt(randomTile.textContent);
+    const correctRow = Math.floor((tileValue - 1) / boardSize);
+    const correctCol = (tileValue - 1) % boardSize;
+    
+    // Create tooltip element
+    const tooltip = document.createElement("div");
+    tooltip.className = "hint-tooltip";
+    tooltip.textContent = `Correct position: Row ${correctRow + 1}, Column ${correctCol + 1}`;
+    document.body.appendChild(tooltip);
+    
+    // Position tooltip
+    const tileRect = randomTile.getBoundingClientRect();
+    tooltip.style.top = `${tileRect.top - tooltip.offsetHeight - 10}px`;
+    tooltip.style.left = `${tileRect.left + (tileRect.width - tooltip.offsetWidth) / 2}px`;
+    
+    // Remove hint after 3 seconds
+    setTimeout(() => {
+      randomTile.style.background = originalBackground;
+      randomTile.style.boxShadow = "";
+      randomTile.classList.remove("pulse-hint");
+      tooltip.remove();
+    }, 3000);
+    
+    // Increase move count as penalty
+    moves += 2;
+    movesDisplay.textContent = moves;
+  }
+
   function updateTimer() {
     seconds++;
     const minutes = Math.floor(seconds / 60);
@@ -720,20 +1073,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Game complete
-  function gameComplete() {
-    // Stop the timer
-    clearInterval(timer);
-    
-    // Show success message
-    finalMovesDisplay.textContent = moves;
-    finalTimeDisplay.textContent = timerDisplay.textContent;
-    
-    // Save score
-    saveScore(moves);
-    
-    // Show success modal
-    successModal.style.display = 'flex';
-  }
   
   // Function to save score to the server
   function saveScore(score) {
