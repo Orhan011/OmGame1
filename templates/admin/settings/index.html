@@ -1,0 +1,365 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Site Ayarları{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Site Ayarları</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Site Ayarları</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Ayar Kategorileri -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kategoriler</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="nav nav-pills flex-column">
+                            <li class="nav-item">
+                                <a href="#general" class="nav-link active" data-toggle="tab">
+                                    <i class="fas fa-cog"></i> Genel Ayarlar
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#appearance" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-palette"></i> Görünüm
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#seo" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-search"></i> SEO
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#social" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-share-alt"></i> Sosyal Medya
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#contact" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-envelope"></i> İletişim
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#security" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-shield-alt"></i> Güvenlik
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#advanced" class="nav-link" data-toggle="tab">
+                                    <i class="fas fa-code"></i> Gelişmiş
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Yeni Ayar Ekleme -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Yeni Ayar Ekle</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('admin.settings_create') }}">
+                            <div class="form-group">
+                                <label for="setting_key">Ayar Anahtarı</label>
+                                <input type="text" class="form-control" id="setting_key" name="setting_key" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting_value">Değer</label>
+                                <textarea class="form-control" id="setting_value" name="setting_value" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting_type">Tip</label>
+                                <select class="form-control" id="setting_type" name="setting_type">
+                                    <option value="text">Metin</option>
+                                    <option value="number">Sayı</option>
+                                    <option value="boolean">Boolean</option>
+                                    <option value="json">JSON</option>
+                                    <option value="color">Renk</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Kategori</label>
+                                <select class="form-control" id="category" name="category">
+                                    <option value="general">Genel</option>
+                                    <option value="appearance">Görünüm</option>
+                                    <option value="seo">SEO</option>
+                                    <option value="social">Sosyal Medya</option>
+                                    <option value="contact">İletişim</option>
+                                    <option value="security">Güvenlik</option>
+                                    <option value="advanced">Gelişmiş</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Ekle</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Genel Ayarlar -->
+                    <div class="tab-pane active" id="general">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Genel Ayarlar</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'general' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                {% if setting.setting_type == 'text' %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'number' %}
+                                                    <input type="number" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'boolean' %}
+                                                    <select class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]">
+                                                        <option value="true" {% if setting.setting_value == 'true' %}selected{% endif %}>Evet</option>
+                                                        <option value="false" {% if setting.setting_value == 'false' %}selected{% endif %}>Hayır</option>
+                                                    </select>
+                                                {% elif setting.setting_type == 'json' %}
+                                                    <textarea class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" rows="5">{{ setting.setting_value }}</textarea>
+                                                {% elif setting.setting_type == 'color' %}
+                                                    <input type="color" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% else %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Görünüm Ayarları -->
+                    <div class="tab-pane" id="appearance">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Görünüm Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'appearance' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                {% if setting.setting_type == 'text' %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'number' %}
+                                                    <input type="number" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'boolean' %}
+                                                    <select class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]">
+                                                        <option value="true" {% if setting.setting_value == 'true' %}selected{% endif %}>Evet</option>
+                                                        <option value="false" {% if setting.setting_value == 'false' %}selected{% endif %}>Hayır</option>
+                                                    </select>
+                                                {% elif setting.setting_type == 'json' %}
+                                                    <textarea class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" rows="5">{{ setting.setting_value }}</textarea>
+                                                {% elif setting.setting_type == 'color' %}
+                                                    <input type="color" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% else %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Ayarları -->
+                    <div class="tab-pane" id="seo">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">SEO Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'seo' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                {% if setting.setting_type == 'text' %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'number' %}
+                                                    <input type="number" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% elif setting.setting_type == 'boolean' %}
+                                                    <select class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]">
+                                                        <option value="true" {% if setting.setting_value == 'true' %}selected{% endif %}>Evet</option>
+                                                        <option value="false" {% if setting.setting_value == 'false' %}selected{% endif %}>Hayır</option>
+                                                    </select>
+                                                {% elif setting.setting_type == 'json' %}
+                                                    <textarea class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" rows="5">{{ setting.setting_value }}</textarea>
+                                                {% elif setting.setting_type == 'color' %}
+                                                    <input type="color" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% else %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diğer kategoriler için benzer yapılar... -->
+                    
+                    <!-- Sosyal Medya Ayarları -->
+                    <div class="tab-pane" id="social">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Sosyal Medya Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'social' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- İletişim Ayarları -->
+                    <div class="tab-pane" id="contact">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">İletişim Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'contact' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Güvenlik Ayarları -->
+                    <div class="tab-pane" id="security">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Güvenlik Ayarları</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'security' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                {% if setting.setting_type == 'boolean' %}
+                                                    <select class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]">
+                                                        <option value="true" {% if setting.setting_value == 'true' %}selected{% endif %}>Evet</option>
+                                                        <option value="false" {% if setting.setting_value == 'false' %}selected{% endif %}>Hayır</option>
+                                                    </select>
+                                                {% else %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gelişmiş Ayarlar -->
+                    <div class="tab-pane" id="advanced">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Gelişmiş Ayarlar</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('admin.settings_update') }}">
+                                    {% for setting in settings %}
+                                        {% if setting.category == 'advanced' %}
+                                            <div class="form-group">
+                                                <label for="{{ setting.setting_key }}">{{ setting.setting_key|title|replace('_', ' ') }}</label>
+                                                {% if setting.setting_type == 'json' %}
+                                                    <textarea class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" rows="5">{{ setting.setting_value }}</textarea>
+                                                {% else %}
+                                                    <input type="text" class="form-control" id="{{ setting.setting_key }}" name="settings[{{ setting.id }}]" value="{{ setting.setting_value }}">
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.settings_delete', id=setting.id) }}" class="text-danger float-right" onclick="return confirm('Bu ayarı silmek istediğinize emin misiniz?');">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
