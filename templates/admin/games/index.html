@@ -1,0 +1,114 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Oyunlar{% endblock %}
+
+{% block page_title %}Oyunlar{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ url_for('admin_game_create') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Yeni Oyun Ekle
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Oyun</th>
+                            <th>Kategori</th>
+                            <th>Oynanma</th>
+                            <th>Puanlama</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if games %}
+                            {% for game in games %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if game.cover_image %}
+                                                <img src="{{ game.cover_image }}" alt="{{ game.name }}" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                            {% else %}
+                                                <div class="me-2" style="width: 40px; height: 40px; background-color: #f8f9fc; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-gamepad text-secondary"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ game.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ game.categories }}</td>
+                                    <td>{{ game.play_count }}</td>
+                                    <td>
+                                        {% if game.avg_rating > 0 %}
+                                            <div class="rating">
+                                                {% for i in range(5) %}
+                                                    {% if i < game.avg_rating|int %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% elif i < game.avg_rating|round(0, 'ceil')|int and (game.avg_rating - game.avg_rating|int) >= 0.5 %}
+                                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <span class="ms-1">{{ game.avg_rating|round(1) }}</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">Henüz değerlendirme yok</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if game.published %}
+                                            <span class="badge bg-success">Yayında</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Taslak</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="{{ url_for('admin_game_view', id=game.id) }}" class="btn btn-action btn-view" title="Görüntüle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_game_edit', id=game.id) }}" class="btn btn-action btn-edit" title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_game_delete', id=game.id) }}" class="btn btn-action btn-delete" title="Sil" data-confirm="Bu oyunu silmek istediğinizden emin misiniz?">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">Henüz oyun yok.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.datatable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json'
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extra_css %}
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}

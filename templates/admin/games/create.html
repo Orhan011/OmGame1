@@ -1,0 +1,247 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Yeni Oyun Ekle{% endblock %}
+
+{% block page_title %}Yeni Oyun Ekle{% endblock %}
+
+{% block header_actions %}
+    <a href="{{ url_for('admin_games') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Oyunlara Dön
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_game_store') }}" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Sol Kolon -->
+                    <div class="col-lg-8">
+                        <div class="mb-4">
+                            <label for="name" class="form-label">Oyun Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">/games/</span>
+                                <input type="text" class="form-control" id="slug" name="slug" required>
+                            </div>
+                            <small class="form-text text-muted">URL'de görünecek kısım. Boşluk yerine tire (-) kullanın.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="short_description" class="form-label">Kısa Açıklama</label>
+                            <input type="text" class="form-control" id="short_description" name="short_description" maxlength="200">
+                            <small class="form-text text-muted">Oyun listelerinde görünecek kısa açıklama (en fazla 200 karakter).</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Detaylı Açıklama</label>
+                            <textarea class="form-control tinymce" id="description" name="description" rows="8"></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="template_path" class="form-label">Şablon Yolu <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="template_path" name="template_path" placeholder="games/oyun_adi.html" required>
+                            <small class="form-text text-muted">Oyun şablonunun yolu. Örn: games/tetris.html</small>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="difficulty" class="form-label">Zorluk Seviyesi</label>
+                                <select class="form-select" id="difficulty" name="difficulty">
+                                    <option value="">Seçiniz</option>
+                                    <option value="easy">Kolay</option>
+                                    <option value="medium">Orta</option>
+                                    <option value="hard">Zor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="categories" class="form-label">Kategoriler</label>
+                                <select class="form-select select2" id="categories" name="categories[]" multiple>
+                                    <option value="hafıza">Hafıza</option>
+                                    <option value="bulmaca">Bulmaca</option>
+                                    <option value="strateji">Strateji</option>
+                                    <option value="dikkat">Dikkat</option>
+                                    <option value="matematik">Matematik</option>
+                                    <option value="hız">Hız</option>
+                                    <option value="kelime">Kelime</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="tags" class="form-label">Etiketler</label>
+                            <input type="text" class="form-control" id="tags" name="tags" placeholder="Virgülle ayırarak yazın">
+                            <small class="form-text text-muted">Etiketleri virgülle ayırarak yazın.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Sağ Kolon -->
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Yayın Bilgileri</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="published" name="published" checked>
+                                        <label class="form-check-label" for="published">Yayınla</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="featured" name="featured">
+                                        <label class="form-check-label" for="featured">Öne Çıkar</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Kapak Görseli</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="cover-preview mb-3">
+                                        <img id="coverPreview" src="{{ url_for('static', filename='images/placeholder.jpg') }}" alt="Kapak Görseli" class="img-fluid">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cover_image" class="form-label">Görsel Seç</label>
+                                        <input class="form-control" type="file" id="cover_image" name="cover_image" accept="image/*" data-preview="coverPreview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>SEO Bilgileri</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="meta_title" class="form-label">Meta Başlık</label>
+                                    <input type="text" class="form-control" id="meta_title" name="meta_title">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="meta_description" class="form-label">Meta Açıklama</label>
+                                    <textarea class="form-control" id="meta_description" name="meta_description" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="meta_keywords" class="form-label">Meta Anahtar Kelimeler</label>
+                                    <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" placeholder="Virgülle ayırarak yazın">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Kaydet
+                    </button>
+                    <a href="{{ url_for('admin_games') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> İptal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        $(document).ready(function() {
+            // Select2 initialize
+            $('.select2').select2({
+                tags: true,
+                tokenSeparators: [',']
+            });
+            
+            // TinyMCE initialize
+            tinymce.init({
+                selector: '.tinymce',
+                height: 400,
+                menubar: false,
+                plugins: [
+                    'advlist autolink lists link image charmap print preview anchor',
+                    'searchreplace visualblocks code fullscreen',
+                    'insertdatetime media table paste code help wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | ' +
+                    'bold italic backcolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help'
+            });
+            
+            // Slug oluşturucu
+            $('#name').on('input', function() {
+                let slug = $(this).val()
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-')
+                    .replace(/^-+/, '')
+                    .replace(/-+$/, '');
+                
+                $('#slug').val(slug);
+            });
+            
+            // Görsel önizleme
+            $('#cover_image').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#coverPreview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .cover-preview {
+            width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #e3e6f0;
+        }
+        
+        .cover-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .form-actions {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e3e6f0;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .select2-container--default .select2-selection--multiple {
+            border-color: #d1d3e2;
+        }
+        
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #bac8f3;
+        }
+    </style>
+{% endblock %}

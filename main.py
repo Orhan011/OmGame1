@@ -15,9 +15,15 @@ from email_validator import validate_email, EmailNotValidError
 import time
 from functools import wraps
 
+# Logger yapılandırması
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///beyin_egzersizi.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'static/uploads/'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
 app.secret_key = os.environ.get("SESSION_SECRET", "beyin_egzersizi_gizli_anahtar")
 
 # Yükleme klasörü ayarları
@@ -31,10 +37,15 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Veritabanı
-from models import db, User, Score, Article, Achievement, GameStat
+from models import db, User, Score, Article, Achievement, GameStat, AdminUser, Game, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog
 
 # Veritabanını uygulama ile ilişkilendir
 db.init_app(app)
+
+# Admin panel blueprint'ini içe aktar
+from admin import admin_bp
+# Admin blueprint'ini kaydet
+app.register_blueprint(admin_bp, url_prefix='/admin')
 
 # Veritabanı tabloları oluştur
 with app.app_context():
@@ -188,6 +199,90 @@ def initialize_database():
             
             db.session.add(admin)
             db.session.add(demo)
+            
+            # Admin paneli için admin kullanıcısı
+            admin_user = AdminUser(
+                username="admin",
+                email="admin@omgame.com",
+                password_hash=generate_password_hash("admin123"),
+                role="admin",
+                is_active=True,
+                created_at=datetime.utcnow()
+            )
+            
+            db.session.add(admin_user)
+            
+            # Örnek site ayarları ekle
+            site_settings = [
+                SiteSettings(setting_key="site_name", setting_value="OmGame", setting_type="text", category="general"),
+                SiteSettings(setting_key="site_description", setting_value="Bilişsel Becerileri Geliştiren Eğitici Oyunlar", setting_type="text", category="general"),
+                SiteSettings(setting_key="primary_color", setting_value="#4e73df", setting_type="color", category="theme"),
+                SiteSettings(setting_key="secondary_color", setting_value="#1cc88a", setting_type="color", category="theme"),
+                SiteSettings(setting_key="show_leaderboard", setting_value="true", setting_type="boolean", category="game"),
+                SiteSettings(setting_key="show_achievements", setting_value="true", setting_type="boolean", category="game")
+            ]
+            
+            for setting in site_settings:
+                db.session.add(setting)
+            
+            # Örnek oyunlar
+            games = [
+                Game(
+                    name="Tetris",
+                    slug="tetris",
+                    short_description="Klasik blok puzzle oyunu",
+                    description="""<p>Tetris, klasik bir blok düzenleme oyunudur. Düşen blokları doğru yerleştirerek çizgileri tamamlayın ve puanları toplayın.</p>
+                    <p>Oyun, hızlı düşünme, mekansal zeka ve planlama becerilerinizi geliştirmeye yardımcı olur.</p>""",
+                    template_path="games/tetris.html",
+                    categories="bulmaca,strateji",
+                    difficulty="medium",
+                    published=True,
+                    featured=True,
+                    created_by=1
+                ),
+                Game(
+                    name="Yazma Hızı",
+                    slug="typing-speed",
+                    short_description="Klavye hızı ve doğruluk testi",
+                    description="""<p>Yazma Hızı oyunu, klavye becerinizi test eder ve geliştirir. Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin.</p>
+                    <p>Bu oyun, parmak koordinasyonu, dikkat ve hızlı düşünme yeteneklerinizi artırır.</p>""",
+                    template_path="games/typingSpeed.html",
+                    categories="hız,konsantrasyon",
+                    difficulty="easy",
+                    published=True,
+                    featured=False,
+                    created_by=1
+                ),
+                Game(
+                    name="Puzzle Slider",
+                    slug="puzzle-slider",
+                    short_description="Görsel bulmaca",
+                    description="""<p>Puzzle Slider, parçalara ayrılmış bir görseli doğru şekilde birleştirmeniz gereken bir bulmaca oyunudur.</p>
+                    <p>Bu oyun, görsel-uzamsal düşünme, dikkat ve problem çözme becerilerinizi geliştirir.</p>""",
+                    template_path="games/puzzleSlider.html",
+                    categories="bulmaca,dikkat",
+                    difficulty="medium",
+                    published=True,
+                    featured=True,
+                    created_by=1
+                ),
+                Game(
+                    name="Renk Eşleştirme",
+                    slug="color-match",
+                    short_description="Odaklanma ve tepki oyunu",
+                    description="""<p>Renk Eşleştirme oyununda, kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki vermeniz gerekir.</p>
+                    <p>Bu oyun, dikkat, hızlı tepki ve bilişsel esneklik becerilerinizi geliştirir.</p>""",
+                    template_path="games/colorMatch.html",
+                    categories="dikkat,hız",
+                    difficulty="medium",
+                    published=True,
+                    featured=False,
+                    created_by=1
+                )
+            ]
+            
+            for game in games:
+                db.session.add(game)
             
             # Örnek skorlar
             admin_scores = [
@@ -472,8 +567,13 @@ def initialize_database():
 
 @app.route('/init-db')
 def init_db_route():
-    result = initialize_database()
-    return result
+    try:
+        db.drop_all()
+        db.create_all()
+        initialize_database()
+        return "Veritabanı başarıyla sıfırlandı ve örnek veriler eklendi!"
+    except Exception as e:
+        return f"Veritabanı sıfırlama hatası: {str(e)}"
 
 def get_most_played_games(limit=4):
     """En çok oynanan oyunları sayısına göre döndürür."""

@@ -88,3 +88,162 @@ class GameStat(db.Model):
     date = db.Column(db.Date, nullable=False)
     achievements_earned = db.Column(db.JSON, default=lambda: [])
     detailed_stats = db.Column(db.JSON, default=lambda: {})
+
+# Admin panel modelleri
+class AdminUser(db.Model):
+    __tablename__ = 'admin_users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256))
+    role = db.Column(db.String(20), default='editor')  # admin, editor, viewer
+    is_active = db.Column(db.Boolean, default=True)
+    last_login = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<AdminUser {self.username}>'
+
+class Game(db.Model):
+    __tablename__ = 'games'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    short_description = db.Column(db.String(200))
+    cover_image = db.Column(db.String(2000))
+    template_path = db.Column(db.String(200))  # games/gameName.html
+    categories = db.Column(db.String(200))  # Virgülle ayrılmış kategoriler
+    tags = db.Column(db.String(200))  # Virgülle ayrılmış etiketler
+    difficulty = db.Column(db.String(20))  # easy, medium, hard
+    published = db.Column(db.Boolean, default=True)
+    featured = db.Column(db.Boolean, default=False)
+    play_count = db.Column(db.Integer, default=0)
+    avg_rating = db.Column(db.Float, default=0)
+    avg_playtime = db.Column(db.Integer, default=0)  # Saniye cinsinden
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    
+    # SEO alanları
+    meta_title = db.Column(db.String(100))
+    meta_description = db.Column(db.String(200))
+    meta_keywords = db.Column(db.String(200))
+    
+    # Oyun özel ayarları
+    settings = db.Column(db.JSON, default=lambda: {})
+    
+    def __repr__(self):
+        return f'<Game {self.name}>'
+
+class GameScreenshot(db.Model):
+    __tablename__ = 'game_screenshots'
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey('games.id'), nullable=False)
+    image_url = db.Column(db.String(2000), nullable=False)
+    caption = db.Column(db.String(200))
+    order = db.Column(db.Integer, default=0)
+    
+    game = db.relationship('Game', backref=db.backref('screenshots', lazy=True))
+    
+    def __repr__(self):
+        return f'<GameScreenshot {self.id} for Game {self.game_id}>'
+
+class SiteSettings(db.Model):
+    __tablename__ = 'site_settings'
+    id = db.Column(db.Integer, primary_key=True)
+    setting_key = db.Column(db.String(100), unique=True, nullable=False)
+    setting_value = db.Column(db.Text)
+    setting_type = db.Column(db.String(20))  # text, number, boolean, json, color
+    category = db.Column(db.String(50))  # general, theme, seo, etc.
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    
+    def __repr__(self):
+        return f'<SiteSettings {self.setting_key}>'
+
+class Page(db.Model):
+    __tablename__ = 'pages'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
+    content = db.Column(db.Text)
+    published = db.Column(db.Boolean, default=True)
+    show_in_menu = db.Column(db.Boolean, default=False)
+    menu_order = db.Column(db.Integer, default=0)
+    meta_title = db.Column(db.String(100))
+    meta_description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    
+    def __repr__(self):
+        return f'<Page {self.title}>'
+
+class BlogPost(db.Model):
+    __tablename__ = 'blog_posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False)
+    content = db.Column(db.Text)
+    excerpt = db.Column(db.String(300))
+    featured_image = db.Column(db.String(2000))
+    published = db.Column(db.Boolean, default=True)
+    featured = db.Column(db.Boolean, default=False)
+    tags = db.Column(db.String(200))  # Virgülle ayrılmış etiketler
+    meta_title = db.Column(db.String(100))
+    meta_description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    
+    def __repr__(self):
+        return f'<BlogPost {self.title}>'
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(200))
+    icon = db.Column(db.String(50))  # Font Awesome icon ismi
+    parent_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    
+    children = db.relationship('Category', backref=db.backref('parent', remote_side=[id]))
+    
+    def __repr__(self):
+        return f'<Category {self.name}>'
+
+class MediaFile(db.Model):
+    __tablename__ = 'media_files'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    file_path = db.Column(db.String(2000), nullable=False)
+    file_type = db.Column(db.String(50))  # image, video, audio, document
+    file_size = db.Column(db.Integer)  # Byte cinsinden
+    width = db.Column(db.Integer)  # Resimler için
+    height = db.Column(db.Integer)  # Resimler için
+    title = db.Column(db.String(100))
+    alt_text = db.Column(db.String(200))
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    
+    def __repr__(self):
+        return f'<MediaFile {self.filename}>'
+
+class AdminLog(db.Model):
+    __tablename__ = 'admin_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin_users.id'))
+    action = db.Column(db.String(50), nullable=False)  # create, update, delete, login, etc.
+    entity_type = db.Column(db.String(50))  # user, game, page, etc.
+    entity_id = db.Column(db.Integer)
+    details = db.Column(db.Text)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    admin = db.relationship('AdminUser', backref=db.backref('logs', lazy=True))
+    
+    def __repr__(self):
+        return f'<AdminLog {self.action} by {self.admin_id}>'
