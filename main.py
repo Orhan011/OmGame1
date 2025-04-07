@@ -993,11 +993,12 @@ def profile_v2():
         scores=user_scores,
         total_games=total_games,
         highest_score=highest_score,
-        user_level=user_level,
+        current_level=current_level,
         xp_progress=xp_progress,
-        next_level_xp=next_level_xp,
+        xp_for_current=xp_for_current,
+        xp_for_next=xp_for_next,
         current_xp=user.experience_points,
-        xp_needed=next_level_xp - user.experience_points
+        xp_needed=xp_for_next - user.experience_points
     )
 
 # Profil Güncelleme
