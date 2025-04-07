@@ -656,7 +656,7 @@ def simon_says():
 def tetris():
     """Tetris: Klasik blok puzzle oyunu
     Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
-    return render_template('games/tetris_modern.html')
+    return render_template('games/tetris.html')
 
 # Typing Speed Oyunu
 @app.route('/games/typing-speed')
