@@ -1,16 +1,21 @@
 # admin.py
 # Admin paneli için controller fonksiyonları
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, abort
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify, abort, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import os
 import uuid
 import json
+import logging
 from functools import wraps
 
+from app import app
 from models import db, User, Score, Game, AdminUser, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog
+
+# Logger ayarı
+logger = logging.getLogger(__name__)
 
 # Admin blueprint tanımı
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -572,24 +577,88 @@ def user_delete(id):
 @admin_bp.route('/settings')
 @admin_required
 def settings():
-    # Kategori bazlı ayarları getir
-    general_settings = SiteSettings.query.filter_by(category='general').all()
-    theme_settings = SiteSettings.query.filter_by(category='theme').all()
-    game_settings = SiteSettings.query.filter_by(category='game').all()
-    seo_settings = SiteSettings.query.filter_by(category='seo').all()
-    other_settings = SiteSettings.query.filter(
-        ~SiteSettings.category.in_(['general', 'theme', 'game', 'seo'])
-    ).all()
-    
-    return render_template(
-        'admin/settings/index.html',
-        general_settings=general_settings,
-        theme_settings=theme_settings,
-        game_settings=game_settings,
-        seo_settings=seo_settings,
-        other_settings=other_settings,
-        current_admin=get_current_admin()
-    )
+    try:
+        # Tüm ayarları getir, şablonda kategoriye göre filtreleme yapılacak
+        settings = SiteSettings.query.all()
+        
+        # Eğer hiç ayar yoksa default ayarları ekle
+        if not settings:
+            default_settings = [
+                SiteSettings(
+                    setting_key='site_name',
+                    setting_value='Brain Training Games',
+                    setting_type='text',
+                    category='general'
+                ),
+                SiteSettings(
+                    setting_key='site_description',
+                    setting_value='Beyin egzersizleri ve eğitici oyunlar',
+                    setting_type='text',
+                    category='general'
+                ),
+                SiteSettings(
+                    setting_key='primary_color',
+                    setting_value='#3498db',
+                    setting_type='color',
+                    category='appearance'
+                ),
+                SiteSettings(
+                    setting_key='secondary_color',
+                    setting_value='#2ecc71',
+                    setting_type='color',
+                    category='appearance'
+                ),
+                SiteSettings(
+                    setting_key='footer_text',
+                    setting_value='© ' + str(datetime.now().year) + ' Brain Games. Tüm hakları saklıdır.',
+                    setting_type='text',
+                    category='general'
+                ),
+                SiteSettings(
+                    setting_key='contact_email',
+                    setting_value='info@example.com',
+                    setting_type='text',
+                    category='contact'
+                ),
+                SiteSettings(
+                    setting_key='facebook_url',
+                    setting_value='https://facebook.com',
+                    setting_type='text',
+                    category='social'
+                ),
+                SiteSettings(
+                    setting_key='twitter_url',
+                    setting_value='https://twitter.com',
+                    setting_type='text',
+                    category='social'
+                ),
+                SiteSettings(
+                    setting_key='instagram_url',
+                    setting_value='https://instagram.com',
+                    setting_type='text',
+                    category='social'
+                ),
+                SiteSettings(
+                    setting_key='meta_keywords',
+                    setting_value='beyin egzersizi, hafıza oyunları, zeka oyunları, eğitici oyunlar',
+                    setting_type='text',
+                    category='seo'
+                )
+            ]
+            
+            db.session.add_all(default_settings)
+            db.session.commit()
+            settings = default_settings
+        
+        return render_template(
+            'admin/settings/index.html',
+            settings=settings,
+            current_admin=get_current_admin()
+        )
+    except Exception as e:
+        logger.error(f"Ayarlar sayfası yüklenirken hata: {str(e)}")
+        flash(f"Ayarlar yüklenirken bir hata oluştu: {str(e)}", 'danger')
+        return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/settings/update', methods=['POST'])
 @admin_required

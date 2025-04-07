@@ -1,0 +1,152 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}İşlem Kayıtları{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">İşlem Kayıtları</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">İşlem Kayıtları</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">İşlem Kayıtları</h3>
+                <div class="card-tools">
+                    <form class="form-inline">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <select name="action" class="form-control">
+                                <option value="" {% if not request.args.get('action') %}selected{% endif %}>Tüm İşlemler</option>
+                                <option value="login" {% if request.args.get('action') == 'login' %}selected{% endif %}>Giriş</option>
+                                <option value="create" {% if request.args.get('action') == 'create' %}selected{% endif %}>Oluşturma</option>
+                                <option value="update" {% if request.args.get('action') == 'update' %}selected{% endif %}>Güncelleme</option>
+                                <option value="delete" {% if request.args.get('action') == 'delete' %}selected{% endif %}>Silme</option>
+                            </select>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Admin</th>
+                            <th>İşlem</th>
+                            <th>Tür</th>
+                            <th>Detaylar</th>
+                            <th>IP Adresi</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.admin.username if log.admin else 'Sistem' }}</td>
+                                <td>
+                                    {% if log.action == 'login' %}
+                                        <span class="badge bg-primary">Giriş</span>
+                                    {% elif log.action == 'logout' %}
+                                        <span class="badge bg-secondary">Çıkış</span>
+                                    {% elif log.action == 'create' %}
+                                        <span class="badge bg-success">Oluşturma</span>
+                                    {% elif log.action == 'update' %}
+                                        <span class="badge bg-info">Güncelleme</span>
+                                    {% elif log.action == 'delete' %}
+                                        <span class="badge bg-danger">Silme</span>
+                                    {% else %}
+                                        <span class="badge bg-dark">{{ log.action }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.entity_type == 'user' %}
+                                        <span class="badge bg-primary">Kullanıcı</span>
+                                    {% elif log.entity_type == 'game' %}
+                                        <span class="badge bg-success">Oyun</span>
+                                    {% elif log.entity_type == 'admin' %}
+                                        <span class="badge bg-warning">Admin</span>
+                                    {% elif log.entity_type == 'setting' %}
+                                        <span class="badge bg-info">Ayar</span>
+                                    {% elif log.entity_type %}
+                                        <span class="badge bg-secondary">{{ log.entity_type }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.details or '-' }}</td>
+                                <td>{{ log.ip_address or '-' }}</td>
+                                <td>{{ log.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center">Kayıt bulunamadı.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination and pagination.pages > 1 %}
+                <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        {% if pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.logs', page=pagination.prev_num, **request.args) }}">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page in pagination.iter_pages() %}
+                            {% if page %}
+                                {% if page != pagination.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.logs', page=page, **request.args) }}">{{ page }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">...</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.logs', page=pagination.next_num, **request.args) }}">&raquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

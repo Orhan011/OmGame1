@@ -17,13 +17,13 @@ app.secret_key = os.environ.get("SESSION_SECRET", "braingames_secret_key")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///permanent/braintraining.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 60,      # Daha sık bağlantı yenileme (60 sn)
+    "pool_recycle": 30,      # Daha sık bağlantı yenileme (30 sn)
     "pool_pre_ping": True,   # Her sorguda bağlantı kontrolü
-    "pool_timeout": 30,      # Bağlantı zaman aşımı
-    "pool_size": 5,          # Bağlantı havuzu boyutu
-    "max_overflow": 10,      # Maksimum ek bağlantı
+    "pool_timeout": 10,      # Daha kısa bağlantı zaman aşımı
+    "pool_size": 10,         # Daha büyük bağlantı havuzu
+    "max_overflow": 20,      # Daha fazla ek bağlantı
     "connect_args": {
-        "connect_timeout": 10,
+        "connect_timeout": 5,
         "keepalives": 1,
         "keepalives_idle": 30,
         "keepalives_interval": 10,

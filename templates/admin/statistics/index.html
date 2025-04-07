@@ -1,0 +1,295 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}İstatistikler ve Raporlar{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">İstatistikler ve Raporlar</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">İstatistikler</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Genel İstatistik Kartları -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ stats.total_users }}</h3>
+                        <p>Toplam Kullanıcı</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a href="{{ url_for('admin.users') }}" class="small-box-footer">
+                        Detaylar <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ stats.total_games }}</h3>
+                        <p>Toplam Oyun</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <a href="{{ url_for('admin.games') }}" class="small-box-footer">
+                        Detaylar <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ stats.active_users }}</h3>
+                        <p>Aktif Kullanıcı</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <a href="{{ url_for('admin.users') }}" class="small-box-footer">
+                        Detaylar <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ stats.total_scores|default(0) }}</h3>
+                        <p>Toplam Skor Kaydı</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        Detaylar <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Günlük Kullanıcı Kaydı Grafiği -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Son 7 Gün Kullanıcı Kayıtları</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="userRegistrationsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- En Popüler Oyunlar Grafiği -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">En Çok Oynanan Oyunlar</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="popularGamesChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Veri Dışa Aktarma -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Veri Dışa Aktarma</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group mb-3">
+                            <a href="{{ url_for('admin.statistics_export', type='users') }}" class="btn btn-primary">
+                                <i class="fas fa-users"></i> Kullanıcı Verilerini Dışa Aktar
+                            </a>
+                        </div>
+                        <div class="btn-group mb-3">
+                            <a href="{{ url_for('admin.statistics_export', type='games') }}" class="btn btn-success">
+                                <i class="fas fa-gamepad"></i> Oyun Verilerini Dışa Aktar
+                            </a>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{{ url_for('admin.statistics_export', type='scores') }}" class="btn btn-info">
+                                <i class="fas fa-chart-bar"></i> Skor Verilerini Dışa Aktar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- En Popüler Oyunlar Tablosu -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Oyun İstatistikleri (Son 30 Gün)</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Oyun</th>
+                                    <th>Oynama Sayısı</th>
+                                    <th style="width: 40px">Oran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set max_plays = game_stats[0].play_count if game_stats|length > 0 else 0 %}
+                                {% for game in game_stats %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ game.name }}</td>
+                                        <td>{{ game.play_count }}</td>
+                                        <td>
+                                            {% set percentage = (game.play_count / max_plays * 100) if max_plays > 0 else 0 %}
+                                            <div class="progress progress-xs">
+                                                <div class="progress-bar progress-bar-danger" style="width: {{ percentage }}%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">Veri bulunamadı.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(function() {
+        // Kullanıcı kayıtları grafiği
+        var userCtx = document.getElementById('userRegistrationsChart').getContext('2d');
+        var userRegistrationsData = {
+            labels: [
+                {% for reg in daily_registrations %}
+                    '{{ reg.date }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Kullanıcı Kayıtları',
+                backgroundColor: 'rgba(60,141,188,0.9)',
+                borderColor: 'rgba(60,141,188,0.8)',
+                pointRadius: 3,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: [
+                    {% for reg in daily_registrations %}
+                        {{ reg.count }},
+                    {% endfor %}
+                ]
+            }]
+        };
+        
+        var userOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        };
+        
+        new Chart(userCtx, {
+            type: 'line',
+            data: userRegistrationsData,
+            options: userOptions
+        });
+        
+        // En popüler oyunlar grafiği
+        var gamesCtx = document.getElementById('popularGamesChart').getContext('2d');
+        var popularGamesData = {
+            labels: [
+                {% for game in popular_games %}
+                    '{{ game.name }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Oynama Sayısı',
+                backgroundColor: [
+                    'rgba(52, 152, 219, 0.8)',
+                    'rgba(46, 204, 113, 0.8)',
+                    'rgba(155, 89, 182, 0.8)',
+                    'rgba(231, 76, 60, 0.8)',
+                    'rgba(241, 196, 15, 0.8)',
+                    'rgba(26, 188, 156, 0.8)',
+                    'rgba(211, 84, 0, 0.8)',
+                    'rgba(52, 73, 94, 0.8)',
+                    'rgba(22, 160, 133, 0.8)',
+                    'rgba(127, 140, 141, 0.8)'
+                ],
+                data: [
+                    {% for game in popular_games %}
+                        {{ game.play_count }},
+                    {% endfor %}
+                ]
+            }]
+        };
+        
+        var gamesOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        };
+        
+        new Chart(gamesCtx, {
+            type: 'pie',
+            data: popularGamesData,
+            options: gamesOptions
+        });
+    });
+</script>
+{% endblock %}
