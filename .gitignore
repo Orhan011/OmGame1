@@ -1,0 +1,52 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Flask session files
+flask_session/
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Local configuration
+instance/
+
+# Replit specific
+.replit
+replit.nix
+.breakpoints
+.upm/
+uv.lock
+.config/
+.cache/
+
+# Media uploads (keeping directory structure)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Packages
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
