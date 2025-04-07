@@ -697,9 +697,6 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update active button
       themeBtns.forEach(b => b.classList.remove("active"));
       this.classList.add("active");
-  });
-    
-      }
     });
   });
 
@@ -770,7 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function shuffleTiles() {
     // Play shuffle sound
     const shuffleSound = new Audio("/static/sounds/card-flip.mp3");
-    shuffleSound.play();
+    shuffleSound.volume = 0.4;
+    shuffleSound.play().catch(e => console.log('Sound playback prevented:', e));
     
     // Add shuffling visual effect to board
     puzzleBoard.classList.add("board-shuffle");
@@ -855,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (gameStarted) {
       const moveSound = new Audio("/static/sounds/click.mp3");
       moveSound.volume = 0.3;
-      moveSound.play();
+      moveSound.play().catch(e => console.log('Sound playback prevented:', e));
     }
     
     // Add animation class
@@ -892,6 +890,31 @@ document.addEventListener('DOMContentLoaded', function() {
   function getValidMoves() {
     const validMoves = [];
     const row = Math.floor(emptyTileIndex / boardSize);
+    const col = emptyTileIndex % boardSize;
+    
+    // Yukarı
+    if (row > 0) {
+      validMoves.push((row - 1) * boardSize + col);
+    }
+    
+    // Aşağı
+    if (row < boardSize - 1) {
+      validMoves.push((row + 1) * boardSize + col);
+    }
+    
+    // Sol
+    if (col > 0) {
+      validMoves.push(row * boardSize + (col - 1));
+    }
+    
+    // Sağ
+    if (col < boardSize - 1) {
+      validMoves.push(row * boardSize + (col + 1));
+    }
+    
+    return validMoves;
+  }
+  
   function gameComplete() {
     // Stop the timer
     clearInterval(timer);
@@ -900,7 +923,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play completion sound
     const completeSound = new Audio("/static/sounds/game-complete.mp3");
     completeSound.volume = 0.7;
-    completeSound.play();
+    completeSound.play().catch(e => console.log('Sound playback prevented:', e));
     
     // Create celebration effect with confetti
     createCompletionEffect();
@@ -916,6 +939,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       finalMovesDisplay.textContent = moves;
       finalTimeDisplay.textContent = timerDisplay.textContent;
+      
+      // Show success modal
+      successModal.style.display = 'flex';
       
       // Save score
       saveScore(moves);
@@ -966,9 +992,54 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 4000);
     }
       }
-    });
+    }, 1000);
+  }
+  
+  function createCompletionEffect() {
+    // Create confetti particles with different shapes
+    const shapes = ["circle", "square", "triangle"];
+    const colors = ["#FF5252", "#FFD740", "#64FFDA", "#448AFF", "#E040FB"];
     
-    return validMoves;
+    for (let i = 0; i < 150; i++) {
+      const particle = document.createElement("div");
+      particle.className = "confetti";
+      
+      // Random position
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 30}%`;
+      
+      // Random color from our palette
+      particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Random size
+      const size = 5 + Math.random() * 10;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // Random shape
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      if (shape === "square") {
+        particle.style.borderRadius = "0";
+      } else if (shape === "triangle") {
+        particle.style.width = "0";
+        particle.style.height = "0";
+        particle.style.backgroundColor = "transparent";
+        particle.style.borderLeft = `${size/2}px solid transparent`;
+        particle.style.borderRight = `${size/2}px solid transparent`;
+        particle.style.borderBottom = `${size}px solid ${colors[Math.floor(Math.random() * colors.length)]}`;
+      }
+      
+      // Random animation duration and delay
+      particle.style.animationDuration = `${2 + Math.random() * 2}s`;
+      particle.style.animationDelay = `${Math.random() * 0.5}s`;
+      
+      document.body.appendChild(particle);
+      
+      // Remove particles after animation
+      setTimeout(() => {
+        particle.remove();
+      }, 4000);
+    }
   }
   
   // Check if the puzzle is solved
@@ -986,7 +1057,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function showHint() {
     // Play hint sound
     const hintSound = new Audio("/static/sounds/hint.mp3");
-    hintSound.play();
+    hintSound.volume = 0.5;
+    hintSound.play().catch(e => console.log('Sound playback prevented:', e));
     
     // Find a tile that is not in its correct position
     let incorrectTiles = [];
