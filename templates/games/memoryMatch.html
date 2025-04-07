@@ -804,10 +804,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Icons for cards with categories
   const cardIcons = {
-    nature: ['fas fa-leaf', 'fas fa-tree', 'fas fa-cloud', 'fas fa-sun', 'fas fa-moon', 'fas fa-snowflake', 'fas fa-mountain', 'fas fa-fire'],
-    animals: ['fas fa-dog', 'fas fa-cat', 'fas fa-horse', 'fas fa-fish', 'fas fa-dragon', 'fas fa-spider', 'fas fa-hippo', 'fas fa-crow'],
-    objects: ['fas fa-key', 'fas fa-car', 'fas fa-gift', 'fas fa-bell', 'fas fa-book', 'fas fa-coffee', 'fas fa-camera', 'fas fa-pen'],
-    symbols: ['fas fa-heart', 'fas fa-star', 'fas fa-crown', 'fas fa-gem', 'fas fa-bolt', 'fas fa-music', 'fas fa-rocket', 'fas fa-anchor']
+    nature: ['fa-leaf', 'fa-tree', 'fa-cloud', 'fa-sun', 'fa-moon', 'fa-snowflake', 'fa-mountain', 'fa-fire'],
+    animals: ['fa-dog', 'fa-cat', 'fa-horse', 'fa-fish', 'fa-dragon', 'fa-spider', 'fa-hippo', 'fa-crow'],
+    objects: ['fa-key', 'fa-car', 'fa-gift', 'fa-bell', 'fa-book', 'fa-coffee', 'fa-camera', 'fa-pen'],
+    symbols: ['fa-heart', 'fa-star', 'fa-crown', 'fa-gem', 'fa-bolt', 'fa-music', 'fa-rocket', 'fa-anchor']
   };
 
   // Colors for card categories
@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create front of card (icon)
     const front = document.createElement('div');
     front.className = 'memory-card-front';
-    front.innerHTML = `<i class="${icon}"></i>`;
+    front.innerHTML = `<i class="fas ${icon}"></i>`;
     front.style.background = `linear-gradient(135deg, ${categoryColor[0]}, ${categoryColor[1]})`;
     
     // Create back of card (pattern)
@@ -1175,263 +1175,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add celebration animation to all cards
     cards.forEach((card, index) => {
       setTimeout(() => {
-        card.style.animation = "cardCelebration 0.8s ease infinite alternate";
+        card.style.animation = 'cardCelebration 0.8s ease infinite alternate';
       }, index * 50);
     });
-    
-    // Calculate score based on moves, time and difficulty
-    const timeInSeconds = seconds;
-    let difficultyMultiplier = 1;
-    if (difficulty === "medium") difficultyMultiplier = 2;
-    if (difficulty === "hard") difficultyMultiplier = 3;
-    
-    // Base score is higher for more difficult modes
-    let calculatedScore = 1000 * difficultyMultiplier;
-    
-    // Subtract points for each move (less impact on higher difficulties)
-    calculatedScore -= moves * (10 / difficultyMultiplier);
-    
-    // Subtract points for time (less impact on higher difficulties)
-    calculatedScore -= timeInSeconds * (5 / difficultyMultiplier);
-    
-    // Ensure minimum score of 100
-    calculatedScore = Math.max(100, Math.round(calculatedScore));
     
     // Show success message
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = timerDisplay.textContent;
     
     // Save score
-    saveScore(calculatedScore);
+    saveScore(moves);
     
-    // Update success modal to show points earned
-    const pointsEarned = document.createElement("div");
-    pointsEarned.className = "points-earned";
-    pointsEarned.innerHTML = `
-      <div class="points-label">Kazanılan Puan</div>
-      <div class="points-value">${calculatedScore}</div>
-    `;
-    pointsEarned.style.marginBottom = "20px";
-    pointsEarned.style.textAlign = "center";
-    pointsEarned.style.animation = "fadeInUp 0.5s 0.5s forwards";
-    pointsEarned.style.opacity = "0";
-    
-    // Style for points display
-    const pointsValue = pointsEarned.querySelector(".points-value");
-    pointsValue.style.fontSize = "3rem";
-    pointsValue.style.fontWeight = "800";
-    pointsValue.style.background = "linear-gradient(to right, #6a5ae0, #a890ff)";
-    pointsValue.style.WebkitBackgroundClip = "text";
-    pointsValue.style.WebkitTextFillColor = "transparent";
-    pointsValue.style.textShadow = "0 2px 10px rgba(106, 90, 224, 0.3)";
-    pointsValue.style.marginTop = "5px";
-    
-    const pointsLabel = pointsEarned.querySelector(".points-label");
-    pointsLabel.style.fontSize = "1rem";
-    pointsLabel.style.color = "rgba(255, 255, 255, 0.7)";
-    pointsLabel.style.textTransform = "uppercase";
-    pointsLabel.style.letterSpacing = "1px";
-    
-    // Get existing content and insert points earned before success-actions
-    const successContent = document.querySelector(".success-content");
-    const successActions = document.querySelector(".success-actions");
-    successContent.insertBefore(pointsEarned, successActions);
-    
-    // Show leaderboard button
-    const leaderboardBtn = document.createElement("a");
-    leaderboardBtn.href = "/leaderboard";
-    leaderboardBtn.className = "btn btn-outline-secondary btn-lg";
-    leaderboardBtn.innerHTML = "<i class="fas fa-trophy me-2"></i>Puan Tablosu";
-    leaderboardBtn.style.marginTop = "10px";
-    
-    // Add to success actions
-    successActions.appendChild(leaderboardBtn);
-    
-    // Create fireworks effect
-    createFireworks();
-    
-    // Show success modal after a delay
+    // Show success modal after a short delay
     setTimeout(() => {
-      successModal.style.display = "flex";
+      successModal.style.display = 'flex';
     }, 1500);
   }
   
-  // Function to create fireworks effect
-  function createFireworks() {
-    const fireworksContainer = document.createElement("div");
-    fireworksContainer.className = "fireworks-container";
-    fireworksContainer.style.position = "fixed";
-    fireworksContainer.style.top = "0";
-    fireworksContainer.style.left = "0";
-    fireworksContainer.style.width = "100%";
-    fireworksContainer.style.height = "100%";
-    fireworksContainer.style.pointerEvents = "none";
-    fireworksContainer.style.zIndex = "999";
-    document.body.appendChild(fireworksContainer);
-    
-    // Create 10 fireworks with random positions and colors
-    const colors = ["#6a5ae0", "#4CAF50", "#FF9800", "#F44336", "#a890ff", "#2196F3"];
-    
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => {
-        const firework = document.createElement("div");
-        firework.className = "firework";
-        
-        // Random position
-        const x = Math.random() * 100;
-        const y = Math.random() * 60 + 20;
-        firework.style.left = `${x}%`;
-        firework.style.top = `${y}%`;
-        
-        // Random color
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        firework.style.position = "absolute";
-        firework.style.width = "5px";
-        firework.style.height = "5px";
-        firework.style.borderRadius = "50%";
-        firework.style.background = color;
-        firework.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
-        firework.style.animation = "fireworkExplode 0.8s forwards";
-        
-        fireworksContainer.appendChild(firework);
-        
-        // Create particles for this firework
-        for (let j = 0; j < 30; j++) {
-          const particle = document.createElement("div");
-          particle.className = "firework-particle";
-          particle.style.position = "absolute";
-          particle.style.left = "50%";
-          particle.style.top = "50%";
-          particle.style.width = "3px";
-          particle.style.height = "3px";
-          particle.style.borderRadius = "50%";
-          particle.style.background = color;
-          particle.style.boxShadow = `0 0 6px ${color}`;
-          
-          // Random angle and speed
-          const angle = Math.random() * Math.PI * 2;
-          const speed = Math.random() * 50 + 30;
-          particle.style.transform = `translate(-50%, -50%)`;
-          particle.style.animation = "fireworkParticle 1s forwards";
-          
-          // Set animation delay for staggered effect
-          particle.style.animationDelay = "0.1s";
-          
-          // Apply custom transform to each particle
-          const moveX = Math.cos(angle) * speed;
-          const moveY = Math.sin(angle) * speed;
-          particle.style.setProperty("--moveX", `${moveX}px`);
-          particle.style.setProperty("--moveY", `${moveY}px`);
-          
-          firework.appendChild(particle);
-        }
-        
-        // Remove firework after animation completes
-        setTimeout(() => {
-          firework.remove();
-        }, 2000);
-      }, i * 300);
+  // Function to shuffle array (Fisher-Yates algorithm)
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-    
-    // Remove container after all animations complete
-    setTimeout(() => {
-      fireworksContainer.remove();
-    }, 5000);
-    
-    // Add keyframes for fireworks
-    const fireworkStyles = document.createElement("style");
-    fireworkStyles.textContent = `
-      @keyframes fireworkExplode {
-        0% { transform: scale(1); opacity: 1; }
-        20% { transform: scale(1.5); opacity: 1; }
-        100% { transform: scale(0.1); opacity: 0; }
-      }
-      
-      @keyframes fireworkParticle {
-        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        100% { transform: translate(calc(-50% + var(--moveX)), calc(-50% + var(--moveY))) scale(0); opacity: 0; }
-      }
-      
-      @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `;
-    document.head.appendChild(fireworkStyles);
+    return array;
   }
   
   // Function to save score to the server
   function saveScore(score) {
-    fetch("/api/save-score", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        game_type: "memory_match",
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Score saved:", data);
-      
-      if (data.success) {
-        // Show notification of score saved
-        showScoreNotification(score);
-      }
-    })
-    .catch(error => {
-      console.error("Error saving score:", error);
-    });
-  }
-  
-  // Function to show a floating notification when score is saved
-  function showScoreNotification(score) {
-    const notification = document.createElement("div");
-    notification.className = "score-notification";
-    notification.innerHTML = `
-      <i class="fas fa-check-circle"></i>
-      <span>${score} puan kaydedildi!</span>
-    `;
-    
-    // Style the notification
-    notification.style.position = "fixed";
-    notification.style.bottom = "20px";
-    notification.style.right = "20px";
-    notification.style.backgroundColor = "rgba(106, 90, 224, 0.9)";
-    notification.style.color = "white";
-    notification.style.padding = "12px 20px";
-    notification.style.borderRadius = "8px";
-    notification.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-    notification.style.display = "flex";
-    notification.style.alignItems = "center";
-    notification.style.gap = "10px";
-    notification.style.zIndex = "9999";
-    notification.style.opacity = "0";
-    notification.style.transform = "translateY(20px)";
-    notification.style.transition = "all 0.3s ease";
-    notification.style.fontWeight = "600";
-    
-    // Add to document
-    document.body.appendChild(notification);
-    
-    // Show with animation
-    setTimeout(() => {
-      notification.style.opacity = "1";
-      notification.style.transform = "translateY(0)";
-    }, 100);
-    
-    // Remove after a few seconds
-    setTimeout(() => {
-      notification.style.opacity = "0";
-      notification.style.transform = "translateY(20px)";
-      
-      setTimeout(() => {
-        notification.remove();
-      }, 300);
-    }, 5000);
-  }
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
