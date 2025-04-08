@@ -129,6 +129,7 @@
   max-width: 1200px;
   margin: 0 auto;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .tetris-modern-sidebar {
@@ -274,16 +275,20 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
+  margin-right: 80px;
 }
 
 .tetris-control-buttons {
   position: absolute;
-  right: -60px;
+  right: -70px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
+  background: rgba(30, 30, 60, 0.4);
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .control-button {
@@ -801,23 +806,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('left-button').addEventListener('click', () => playerMove(-1));
   document.getElementById('right-button').addEventListener('click', () => playerMove(1));
   document.getElementById('down-button').addEventListener('click', () => playerDrop());
-  
+
   // Touch events for swipe controls
   let touchStartX = 0;
   let touchStartY = 0;
-  
+
   canvas.addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
   });
-  
+
   canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
     const touchEndX = e.touches[0].clientX;
     const touchEndY = e.touches[0].clientY;
     const diffX = touchEndX - touchStartX;
     const diffY = touchEndY - touchStartY;
-    
+
     if (Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX > 0) {
         playerMove(1);
@@ -829,7 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerDrop();
       }
     }
-    
+
     touchStartX = touchEndX;
     touchStartY = touchEndY;
   });
