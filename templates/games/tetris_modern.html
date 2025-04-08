@@ -1,4 +1,3 @@
-
 {% extends 'layout.html' %}
 
 {% block title %}Marathon Tetris - ZekaPark{% endblock %}
@@ -28,7 +27,7 @@
       <span>NEXT</span>
       <canvas id="next-piece"></canvas>
     </div>
-    
+
     <div class="game-area">
       <canvas id="tetris-canvas"></canvas>
       <div id="level-up" class="level-up-animation" style="display: none;">Level Up!</div>
@@ -36,21 +35,21 @@
     </div>
 
     <div class="control-buttons">
-      <button id="rotate-btn" class="control-btn">
+      <button id="rotate-btn" class="control-btn" data-action="rotate">
         <i class="fas fa-redo"></i>
       </button>
       <div class="direction-buttons">
-        <button id="left-btn" class="control-btn">
+        <button id="left-btn" class="control-btn" data-action="left">
           <i class="fas fa-arrow-left"></i>
         </button>
-        <button id="down-btn" class="control-btn">
+        <button id="down-btn" class="control-btn" data-action="down">
           <i class="fas fa-arrow-down"></i>
         </button>
-        <button id="right-btn" class="control-btn">
+        <button id="right-btn" class="control-btn" data-action="right">
           <i class="fas fa-arrow-right"></i>
         </button>
       </div>
-      <button id="hard-drop-btn" class="control-btn">
+      <button id="hard-drop-btn" class="control-btn" data-action="drop">
         <i class="fas fa-angle-double-down"></i>
       </button>
     </div>
@@ -452,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function arenaSweep() {
     let rowCount = 1;
     let clearedRows = 0;
-    
+
     outer: for (let y = arena.length - 1; y > 0; --y) {
       for (let x = 0; x < arena[y].length; ++x) {
         if (arena[y][x] === 0) {
@@ -464,18 +463,18 @@ document.addEventListener('DOMContentLoaded', () => {
       arena.unshift(row);
       ++y;
       clearedRows++;
-      
+
       // Calculate score for this row
       const rowPoints = rowCount * 100;
       score += rowPoints;
-      
+
       // Show score popup
       const canvasRect = canvas.getBoundingClientRect();
       showScorePopup(rowPoints, 
         canvasRect.left + canvas.width / 2,
         canvasRect.top + (y * BLOCK_SIZE)
       );
-      
+
       rowCount *= 2;
       linesCleared++;
     }
@@ -500,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       (y + offset.y) * BLOCK_SIZE,
                       BLOCK_SIZE - 1,
                       BLOCK_SIZE - 1);
-          
+
           // Add gradient effect
           ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
           ctx.fillRect((x + offset.x) * BLOCK_SIZE,
@@ -515,12 +514,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function drawNextPiece() {
     nextCtx.fillStyle = '#000033';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-    
+
     if (nextPiece) {
       const scale = 20;
       const offsetX = (nextCanvas.width - nextPiece[0].length * scale) / 2;
       const offsetY = (nextCanvas.height - nextPiece.length * scale) / 2;
-      
+
       nextPiece.forEach((row, y) => {
         row.forEach((value, x) => {
           if (value !== 0) {
@@ -531,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
               scale - 1,
               scale - 1
             );
-            
+
             // Add gradient effect
             nextCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
             nextCtx.fillRect(
@@ -591,11 +590,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Touch controls
-  document.getElementById('rotate-btn').addEventListener('click', () => playerRotate(1));
-  document.getElementById('left-btn').addEventListener('click', () => playerMove(-1));
-  document.getElementById('right-btn').addEventListener('click', () => playerMove(1));
-  document.getElementById('down-btn').addEventListener('click', () => playerDrop());
-  document.getElementById('hard-drop-btn').addEventListener('click', () => playerHardDrop());
+  document.querySelectorAll('.control-btn').forEach(btn => {
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const action = e.target.closest('.control-btn').dataset.action;
+      switch(action) {
+        case 'left': playerMove(-1); break;
+        case 'right': playerMove(1); break;
+        case 'down': playerDrop(); break;
+        case 'rotate': playerRotate(1); break;
+        case 'drop': playerHardDrop(); break;
+      }
+    });
+  });
+
 
   // Keyboard controls
   document.addEventListener('keydown', event => {
