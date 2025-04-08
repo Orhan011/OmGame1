@@ -62,7 +62,9 @@
   background: #1a1a4a;
   min-height: 100vh;
   padding: 20px;
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .game-header {
@@ -136,6 +138,9 @@
 .game-area {
   position: relative;
   margin: 0 auto;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #tetris-canvas {
@@ -212,6 +217,7 @@
   .game-layout {
     flex-direction: column;
     align-items: center;
+    padding-bottom: 120px;
   }
 
   .next-piece-display {
@@ -223,12 +229,26 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border-radius: 15px;
+    z-index: 1000;
   }
 
   .control-btn {
     width: 50px;
     height: 50px;
     font-size: 20px;
+    background: rgba(255,255,255,0.2);
+  }
+
+  .control-btn:active {
+    background: rgba(255,255,255,0.3);
+  }
+
+  body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 </style>
