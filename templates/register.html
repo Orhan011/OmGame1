@@ -56,9 +56,6 @@
           <input type="password" name="password" id="password" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password">Şifreniz</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
-            <i class="fas fa-eye" id="password-toggle-icon"></i>
-          </button>
         </div>
         <div class="form-text form-hint mt-1">Şifreniz en az 6 karakter uzunluğunda olmalıdır</div>
       </div>
@@ -69,9 +66,6 @@
           <input type="password" name="password_confirm" id="password_confirm" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password_confirm">Şifrenizi Tekrar Girin</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password_confirm')">
-            <i class="fas fa-eye" id="password-confirm-toggle-icon"></i>
-          </button>
         </div>
         <div class="password-match-indicator mt-1" id="password-match-indicator"></div>
       </div>
@@ -99,22 +93,6 @@
 
 {% block scripts %}
 <script>
-  
-  function togglePasswordVisibility(inputId) {
-    const passwordInput = document.getElementById(inputId);
-    const toggleIcon = passwordInput.nextElementSibling.querySelector('i');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      toggleIcon.classList.remove('fa-eye');
-      toggleIcon.classList.add('fa-eye-slash');
-    } else {
-      passwordInput.type = 'password';
-      toggleIcon.classList.remove('fa-eye-slash');
-      toggleIcon.classList.add('fa-eye');
-    }
-  }
-  
   document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password_confirm');
@@ -122,7 +100,6 @@
     const registerBtn = document.getElementById('register-btn');
     
     function checkPasswordMatch() {
-</old_str>
       if (confirmPassword.value === '') {
         indicator.textContent = '';
         indicator.className = 'password-match-indicator mt-1';
