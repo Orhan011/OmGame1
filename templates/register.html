@@ -9,20 +9,17 @@
 {% block content %}
 <div class="auth-container">
   <div class="auth-card glass-card">
-    <div class="auth-logo-wrapper">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small pulse-animation">
-    </div>
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
     
     <div class="auth-header">
-      <h2><i class="fas fa-user-plus"></i>Kayıt Ol</h2>
-      <p class="auth-subtitle">OmGame dünyasına katılın</p>
+      <h2>Kayıt Ol</h2>
+      <p class="auth-subtitle">Beyin Egzersizleri dünyasına katılın</p>
     </div>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
           <div class="alert alert-{{ category if category != '_' else 'info' }} alert-dismissible fade show">
-            <i class="fas {% if category == 'danger' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} me-2"></i>
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
           </div>
@@ -39,7 +36,6 @@
                  title="Sadece harf, rakam, tire ve alt çizgi kullanabilirsiniz"
                  autocomplete="username">
           <label for="username">Kullanıcı Adı</label>
-          <div class="input-focus-bg"></div>
         </div>
         <div class="form-text form-hint mt-1">Sadece harf, rakam, tire ve alt çizgi kullanabilirsiniz (en az 3 karakter)</div>
       </div>
@@ -50,7 +46,6 @@
           <input type="email" name="email" id="email" class="form-control" placeholder=" " required
                  autocomplete="email">
           <label for="email">Email Adresiniz</label>
-          <div class="input-focus-bg"></div>
         </div>
         <div class="form-text form-hint mt-1">Gmail, Hotmail, Yahoo veya Outlook hesabınızı kullanabilirsiniz</div>
       </div>
@@ -61,16 +56,8 @@
           <input type="password" name="password" id="password" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password">Şifreniz</label>
-          <button type="button" class="password-toggle" id="password-toggle">
-            <i class="fas fa-eye-slash"></i>
-          </button>
-          <div class="input-focus-bg"></div>
         </div>
         <div class="form-text form-hint mt-1">Şifreniz en az 6 karakter uzunluğunda olmalıdır</div>
-        <div class="password-strength-meter" id="password-strength-meter">
-          <div class="strength-bar"></div>
-        </div>
-        <div class="password-strength-text mt-1" id="password-strength-text"></div>
       </div>
       
       <div class="form-group floating-label">
@@ -79,10 +66,6 @@
           <input type="password" name="password_confirm" id="password_confirm" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password_confirm">Şifrenizi Tekrar Girin</label>
-          <button type="button" class="password-toggle" id="confirm-password-toggle">
-            <i class="fas fa-eye-slash"></i>
-          </button>
-          <div class="input-focus-bg"></div>
         </div>
         <div class="password-match-indicator mt-1" id="password-match-indicator"></div>
       </div>
@@ -96,21 +79,9 @@
         </div>
       </div>
       
-      <button type="submit" class="btn btn-primary btn-block btn-animated" id="register-btn">
-        <span class="btn-text">HESAP OLUŞTUR</span>
-        <i class="fas fa-arrow-right btn-icon"></i>
+      <button type="submit" class="btn btn-primary btn-block" id="register-btn">
+        HESAP OLUŞTUR
       </button>
-      
-      <div class="auth-separator">
-        <span>veya</span>
-      </div>
-      
-      <div class="social-login">
-        <button type="button" class="social-btn google-btn">
-          <i class="fab fa-google"></i>
-          <span>Google ile kaydol</span>
-        </button>
-      </div>
     </form>
     
     <div class="auth-links">
@@ -125,122 +96,26 @@
   document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password_confirm');
-    const passwordIndicator = document.getElementById('password-match-indicator');
+    const indicator = document.getElementById('password-match-indicator');
     const registerBtn = document.getElementById('register-btn');
-    const passwordToggle = document.getElementById('password-toggle');
-    const confirmPasswordToggle = document.getElementById('confirm-password-toggle');
-    const strengthMeter = document.getElementById('password-strength-meter');
-    const strengthBar = strengthMeter.querySelector('.strength-bar');
-    const strengthText = document.getElementById('password-strength-text');
     
-    // Şifre göster/gizle işlevi
-    function setupPasswordToggle(toggleBtn, passwordInput) {
-      toggleBtn.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        
-        // Göz simgesini değiştir
-        const eyeIcon = this.querySelector('i');
-        if (type === 'password') {
-          eyeIcon.classList.remove('fa-eye');
-          eyeIcon.classList.add('fa-eye-slash');
-        } else {
-          eyeIcon.classList.remove('fa-eye-slash');
-          eyeIcon.classList.add('fa-eye');
-        }
-      });
-    }
-    
-    setupPasswordToggle(passwordToggle, password);
-    setupPasswordToggle(confirmPasswordToggle, confirmPassword);
-    
-    // Şifre eşleşme kontrolü
     function checkPasswordMatch() {
       if (confirmPassword.value === '') {
-        passwordIndicator.textContent = '';
-        passwordIndicator.className = 'password-match-indicator mt-1';
+        indicator.textContent = '';
+        indicator.className = 'password-match-indicator mt-1';
         return;
       }
       
       if (password.value === confirmPassword.value) {
-        passwordIndicator.textContent = 'Şifreler eşleşiyor';
-        passwordIndicator.className = 'password-match-indicator mt-1 text-success';
-        confirmPassword.setCustomValidity('');
+        indicator.textContent = 'Şifreler eşleşiyor';
+        indicator.className = 'password-match-indicator mt-1 text-success';
       } else {
-        passwordIndicator.textContent = 'Şifreler eşleşmiyor';
-        passwordIndicator.className = 'password-match-indicator mt-1 text-danger';
-        confirmPassword.setCustomValidity('Şifreler eşleşmiyor');
+        indicator.textContent = 'Şifreler eşleşmiyor';
+        indicator.className = 'password-match-indicator mt-1 text-danger';
       }
     }
     
-    // Şifre güçlülük kontrolü
-    function checkPasswordStrength(password) {
-      let strength = 0;
-      
-      // En az 6 karakter
-      if (password.length >= 6) strength += 1;
-      
-      // En az 8 karakter
-      if (password.length >= 8) strength += 1;
-      
-      // Büyük ve küçük harf karışık
-      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
-      
-      // Sayılar
-      if (password.match(/\d/)) strength += 1;
-      
-      // Özel karakterler
-      if (password.match(/[^a-zA-Z\d]/)) strength += 1;
-      
-      return strength;
-    }
-    
-    function updatePasswordStrength() {
-      const value = password.value;
-      const strength = checkPasswordStrength(value);
-      
-      // Şifre boşsa, gösterge gizle
-      if (value === '') {
-        strengthMeter.style.display = 'none';
-        strengthText.textContent = '';
-        return;
-      }
-      
-      // Göstergeyi göster
-      strengthMeter.style.display = 'block';
-      
-      // Gösterge çubuğunu güncelle
-      const percentage = (strength / 5) * 100;
-      strengthBar.style.width = `${percentage}%`;
-      
-      // Renk ve metin güncelleme
-      if (strength <= 1) {
-        strengthBar.style.backgroundColor = '#f44336'; // Zayıf - Kırmızı
-        strengthText.textContent = 'Çok zayıf şifre';
-        strengthText.className = 'password-strength-text mt-1 text-danger';
-      } else if (strength === 2) {
-        strengthBar.style.backgroundColor = '#ff9800'; // Orta - Turuncu
-        strengthText.textContent = 'Zayıf şifre';
-        strengthText.className = 'password-strength-text mt-1 text-warning';
-      } else if (strength === 3) {
-        strengthBar.style.backgroundColor = '#ffeb3b'; // İyi - Sarı
-        strengthText.textContent = 'Orta düzeyde şifre';
-        strengthText.className = 'password-strength-text mt-1 text-warning';
-      } else if (strength === 4) {
-        strengthBar.style.backgroundColor = '#8bc34a'; // Güçlü - Açık Yeşil
-        strengthText.textContent = 'İyi şifre';
-        strengthText.className = 'password-strength-text mt-1 text-success';
-      } else if (strength === 5) {
-        strengthBar.style.backgroundColor = '#4caf50'; // Çok Güçlü - Koyu Yeşil
-        strengthText.textContent = 'Güçlü şifre';
-        strengthText.className = 'password-strength-text mt-1 text-success';
-      }
-    }
-    
-    password.addEventListener('input', function() {
-      updatePasswordStrength();
-      checkPasswordMatch();
-    });
+    password.addEventListener('input', checkPasswordMatch);
     confirmPassword.addEventListener('input', checkPasswordMatch);
     
     // Form validation
@@ -259,21 +134,6 @@
       
       form.classList.add('was-validated');
     });
-    
-    // Input animasyonları
-    const inputs = document.querySelectorAll('.form-control');
-    inputs.forEach(input => {
-      input.addEventListener('focus', function() {
-        this.parentElement.classList.add('input-focused');
-      });
-      
-      input.addEventListener('blur', function() {
-        this.parentElement.classList.remove('input-focused');
-      });
-    });
-    
-    // İlk yükleme için şifre gücü göstergesini gizle
-    strengthMeter.style.display = 'none';
   });
 </script>
 {% endblock %}
