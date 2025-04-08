@@ -181,7 +181,55 @@
   font-weight: 500;
 }
 
-/* Şifre gösterme butonu kaldırıldı */
+/* Animasyonlu Şifre Gösterme Butonu */
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  transform: translateY(-50%);
+  background: rgba(106, 90, 224, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+}
+
+.password-toggle:hover {
+  background: rgba(106, 90, 224, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.3);
+}
+
+.password-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle i {
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.password-toggle.showing i {
+  animation: spin 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.password-toggle.hiding i {
+  animation: spin 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) reverse;
+}
 
 /* Enhanced Button */
 .btn-primary {
