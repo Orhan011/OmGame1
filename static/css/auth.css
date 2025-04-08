@@ -181,18 +181,7 @@
   font-weight: 500;
 }
 
-.password-toggle {
-  position: absolute;
-  top: 50%;
-  right: 0.8rem;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  padding: 4px;
-  transition: all 0.3s ease;
-}
+/* Şifre gösterme butonu kaldırıldı */
 
 /* Enhanced Button */
 .btn-primary {
