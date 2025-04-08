@@ -143,8 +143,8 @@
 }
 
 .floating-label input {
-  width: 100%;
-  padding: 1rem 2.5rem 1rem 2.5rem;
+  width: calc(100% - 40px); /* Adjust width to accommodate the button */
+  padding: 1rem 1rem 1rem 2.5rem; /* Reduce right padding */
   background: transparent;
   border: none;
   color: #fff;
@@ -156,6 +156,18 @@
 .floating-label input:focus {
   outline: none;
 }
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+</old_str>
 
 .floating-label input::placeholder {
   color: rgba(255, 255, 255, 0.3);
