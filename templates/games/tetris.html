@@ -103,6 +103,19 @@
                 <div class="tetris-final-score-label">Final Skoru</div>
                 <div class="tetris-final-score-value" id="final-score">0</div>
               </div>
+              
+              <!-- XP ve Seviye Bilgisi -->
+              <div class="tetris-xp-info" style="display: none;">
+                <div class="tetris-xp-gain">
+                  <div class="tetris-xp-gain-label"><i class="fas fa-star me-2"></i>Kazanılan XP</div>
+                  <div class="tetris-xp-gain-value" id="xp-gain">0</div>
+                </div>
+                <div class="tetris-level-info">
+                  <div class="tetris-level-label">Seviye</div>
+                  <div class="tetris-level-value" id="current-level">1</div>
+                </div>
+              </div>
+              
               <button id="play-again" class="btn btn-primary btn-lg">
                 <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
               </button>
@@ -318,6 +331,41 @@
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--accent-color);
+  }
+  
+  /* XP Info styling */
+  .tetris-xp-info {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 0 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  
+  .tetris-xp-gain, .tetris-level-info {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .tetris-xp-gain-label, .tetris-level-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 5px;
+  }
+  
+  .tetris-xp-gain-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffc107; /* Gold color for XP */
+  }
+  
+  .tetris-level-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #8BC34A; /* Green color for level */
   }
 
   /* Animations */
@@ -1008,6 +1056,34 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
+      
+      // XP ve Seviye Bilgilerini Görüntüle
+      if (data.success) {
+        const xpGainElement = document.getElementById('xp-gain');
+        const currentLevelElement = document.getElementById('current-level');
+        const xpInfoElement = document.querySelector('.tetris-xp-info');
+        
+        if (xpGainElement && currentLevelElement && xpInfoElement) {
+          // XP verilerini güncelle
+          xpGainElement.textContent = data.xp_gain;
+          currentLevelElement.textContent = data.level;
+          
+          // XP bilgilerini göster
+          xpInfoElement.style.display = 'block';
+          
+          // XP kazanımı animasyonu
+          xpGainElement.classList.add('score-update');
+          setTimeout(() => {
+            xpGainElement.classList.remove('score-update');
+          }, 300);
+          
+          // Seviye animasyonu
+          currentLevelElement.classList.add('score-update');
+          setTimeout(() => {
+            currentLevelElement.classList.remove('score-update');
+          }, 300);
+        }
+      }
     })
     .catch(error => {
       console.error('Error saving score:', error);
