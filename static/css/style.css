@@ -7884,15 +7884,21 @@ main {
   top: 50%;
   right: 1rem;
   transform: translateY(-50%);
-  background: none;
-  border: none;
+  background: none !important;
+  border: none !important;
   color: var(--secondary-text);
   cursor: pointer;
-  padding: 5px;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  height: auto !important;
   transition: all 0.3s ease;
   /* Explicitly remove tooltips/bubbles */
   -webkit-appearance: none;
   appearance: none;
+  box-shadow: none !important;
+  outline: none !important;
+  z-index: 5;
 }
 
 .password-toggle:hover {
@@ -7903,6 +7909,24 @@ main {
 .password-toggle::before,
 .password-toggle::after {
   display: none !important;
+  content: none !important;
+}
+
+/* Hide any bootstrap tooltips on these elements */
+.password-toggle[data-toggle],
+.password-toggle[data-bs-toggle] {
+  pointer-events: auto;
+}
+.password-toggle[data-toggle]::after,
+.password-toggle[data-bs-toggle]::after {
+  display: none !important;
+}
+
+/* Ensure eye icon has proper spacing */
+.password-toggle i {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
 }
 
 .form-options {
