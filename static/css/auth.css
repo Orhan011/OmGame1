@@ -186,12 +186,11 @@
   top: 50%;
   right: 0.5rem;
   transform: translateY(-50%);
-  background: none;
   border: none;
+  background: none;
   color: var(--secondary-text);
   cursor: pointer;
-  padding: 5px;
-  transition: all 0.3s ease;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
