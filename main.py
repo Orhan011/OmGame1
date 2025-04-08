@@ -722,6 +722,13 @@ def game_2048():
 def wordle_redirect():
     return redirect(url_for('wordle'))
     
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Handle registration logic here
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
 @app.route('/games/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
