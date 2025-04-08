@@ -56,9 +56,6 @@
           <input type="password" name="password" id="password" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password">Şifreniz</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')" tabindex="-1">
-            <i class="fas fa-eye" id="password-toggle-icon"></i>
-          </button>
         </div>
         <div class="form-text form-hint mt-1">Şifreniz en az 6 karakter uzunluğunda olmalıdır</div>
       </div>
@@ -69,9 +66,6 @@
           <input type="password" name="password_confirm" id="password_confirm" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password_confirm">Şifrenizi Tekrar Girin</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password_confirm')" tabindex="-1">
-            <i class="fas fa-eye" id="password_confirm-toggle-icon"></i>
-          </button>
         </div>
         <div class="password-match-indicator mt-1" id="password-match-indicator"></div>
       </div>
@@ -99,19 +93,6 @@
 
 {% block scripts %}
 <script>
-  function togglePasswordVisibility(inputId) {
-    const passwordInput = document.getElementById(inputId);
-    const toggleIcon = document.getElementById(inputId + '-toggle-icon');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-      passwordInput.type = 'password';
-      toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password_confirm');

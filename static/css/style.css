@@ -7882,56 +7882,18 @@ main {
 .password-toggle {
   position: absolute;
   top: 50%;
-  right: 0;
+  right: 1rem;
   transform: translateY(-50%);
-  background: none !important;
-  border: none !important;
+  background: none;
+  border: none;
   color: var(--secondary-text);
   cursor: pointer;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 40px !important;
-  height: 100% !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 5px;
   transition: all 0.3s ease;
-  /* Explicitly remove tooltips/bubbles */
-  -webkit-appearance: none;
-  appearance: none;
-  box-shadow: none !important;
-  outline: none !important;
-  z-index: 5;
 }
 
 .password-toggle:hover {
   color: var(--accent-color);
-}
-
-/* Remove any tooltips for the password toggle */
-.password-toggle::before,
-.password-toggle::after {
-  display: none !important;
-  content: none !important;
-}
-
-/* Hide any bootstrap tooltips on these elements */
-.password-toggle[data-toggle],
-.password-toggle[data-bs-toggle] {
-  pointer-events: auto;
-}
-.password-toggle[data-toggle]::after,
-.password-toggle[data-bs-toggle]::after {
-  display: none !important;
-}
-
-/* Ensure eye icon has proper spacing and size */
-.password-toggle i {
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-  font-size: 1.2rem;
-  color: #6a5acd;
 }
 
 .form-options {
@@ -8272,14 +8234,9 @@ main {
   width: auto;
 }
 
-/* Fix for input text color and padding */
+/* Fix for input text color */
 .form-control {
   color: var(--primary-text) !important;
-}
-
-/* Input with password toggle gets additional right padding */
-input[type="password"] {
-  padding-right: 40px !important;
 }
 /* Animated Menu Button Styles */
 .animated-menu {
