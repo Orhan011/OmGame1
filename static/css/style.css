@@ -7890,10 +7890,19 @@ main {
   cursor: pointer;
   padding: 5px;
   transition: all 0.3s ease;
+  /* Explicitly remove tooltips/bubbles */
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .password-toggle:hover {
   color: var(--accent-color);
+}
+
+/* Remove any tooltips for the password toggle */
+.password-toggle::before,
+.password-toggle::after {
+  display: none !important;
 }
 
 .form-options {
