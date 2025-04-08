@@ -35,17 +35,17 @@
     </div>
 
     <div class="control-buttons">
-      <button id="left-btn" class="control-btn" data-action="left">
-        <i class="fas fa-chevron-left"></i>
-      </button>
       <button id="rotate-btn" class="control-btn" data-action="rotate">
-        <i class="fas fa-redo"></i>
-      </button>
-      <button id="down-btn" class="control-btn" data-action="down">
-        <i class="fas fa-chevron-down"></i>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIgMmgyMHYyMEgyeiIvPjxwYXRoIGQ9Ik0yIDEyaDIwIi8+PHBhdGggZD0iTTEyIDJ2MjAiLz48L3N2Zz4=" alt="Rotate" class="control-icon">
       </button>
       <button id="right-btn" class="control-btn" data-action="right">
-        <i class="fas fa-chevron-right"></i>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTUgMTJoMTQiLz48cGF0aCBkPSJNMTIgNWw3IDctNyA3Ii8+PC9zdmc+" alt="Right" class="control-icon">
+      </button>
+      <button id="down-btn" class="control-btn" data-action="down">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDV2MTQiLz48cGF0aCBkPSJNNSAxMmw3IDcgNy03Ii8+PC9zdmc+" alt="Down" class="control-icon">
+      </button>
+      <button id="left-btn" class="control-btn" data-action="left">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE5IDEySDUiLz48cGF0aCBkPSJNMTIgMTlsLTctNyA3LTciLz48L3N2Zz4=" alt="Left" class="control-icon">
       </button>
     </div>
   </div>
@@ -166,13 +166,12 @@
 }
 
 .control-btn {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: rgba(106,90,224,0.3);
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  border: none;
+  background: #1a237e;
   color: white;
-  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -180,6 +179,12 @@
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+.control-icon {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1);
 }
 
 .control-btn:active {
