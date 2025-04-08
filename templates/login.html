@@ -74,7 +74,8 @@
 <script>
     function togglePasswordVisibility(inputId) {
         const passwordInput = document.getElementById(inputId);
-        const toggleIcon = passwordInput.nextElementSibling.nextElementSibling.querySelector('i');
+        const toggleButton = passwordInput.parentElement.querySelector('.password-toggle');
+        const toggleIcon = toggleButton.querySelector('i');
         
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
