@@ -339,6 +339,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let linesCleared = 0;
   let level = 1;
   let nextPiece = null;
+  let combo = 0;
+  let lastClearTime = 0;
+  const comboTimeout = 2000; // 2 seconds to maintain combo
 
   const player = {
     pos: {x: 0, y: 0},
@@ -447,6 +450,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function createParticles(x, y, color) {
+    const particles = [];
+    for (let i = 0; i < 10; i++) {
+      const particle = {
+        x: x,
+        y: y,
+        color: color,
+        velocity: {
+          x: (Math.random() - 0.5) * 8,
+          y: (Math.random() - 4) * 8
+        },
+        alpha: 1
+      };
+      particles.push(particle);
+    }
+    return particles;
+  }
+
+  function updateParticles(particles) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const particle = particles[i];
+      particle.x += particle.velocity.x;
+      particle.y += particle.velocity.y;
+      particle.velocity.y += 0.3;
+      particle.alpha -= 0.02;
+
+      if (particle.alpha <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+  }
+
+  function drawParticles(particles) {
+    particles.forEach(particle => {
+      ctx.save();
+      ctx.globalAlpha = particle.alpha;
+      ctx.fillStyle = particle.color;
+      ctx.fillRect(particle.x, particle.y, 4, 4);
+      ctx.restore();
+    });
+  }
+
+  let particles = [];
+
   function playerReset() {
     if (!nextPiece) {
       nextPiece = createPiece(PIECES[PIECES.length * Math.random() | 0]);
@@ -504,13 +551,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Show score popup
       const canvasRect = canvas.getBoundingClientRect();
-      showScorePopup(rowPoints, 
+      showScorePopup(rowPoints,
         canvasRect.left + canvas.width / 2,
         canvasRect.top + (y * BLOCK_SIZE)
       );
 
+
+      // Add particle effect on line clear
+      for (let x = 0; x < COLS; x++) {
+        const particleColor = COLORS[arena[y][x]];
+        particles.push(...createParticles(x * BLOCK_SIZE, y * BLOCK_SIZE, particleColor));
+      }
+
+
       rowCount *= 2;
       linesCleared++;
+
+      const currentTime = Date.now();
+      if (currentTime - lastClearTime <= comboTimeout) {
+        combo++;
+        score += combo * 50; // Bonus score for combo
+      } else {
+        combo = 1;
+      }
+      lastClearTime = currentTime;
+
     }
 
     // Level up check
@@ -600,6 +665,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     drawMatrix(arena, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
+    drawParticles(particles);
+    updateParticles(particles);
   }
 
   function updateScore() {
@@ -678,15 +745,15 @@ document.addEventListener('DOMContentLoaded', () => {
       button.style.transform = 'scale(0.9)';
 
       switch(action) {
-        case 'left': 
+        case 'left':
           playerMove(-1);
           touchTimer = setInterval(() => playerMove(-1), 150);
           break;
-        case 'right': 
+        case 'right':
           playerMove(1);
           touchTimer = setInterval(() => playerMove(1), 150);
           break;
-        case 'down': 
+        case 'down':
           playerDrop();
           touchTimer = setInterval(() => playerDrop(), 100);
           break;
