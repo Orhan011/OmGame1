@@ -35,22 +35,17 @@
     </div>
 
     <div class="control-buttons">
+      <button id="left-btn" class="control-btn" data-action="left">
+        <i class="fas fa-chevron-left"></i>
+      </button>
       <button id="rotate-btn" class="control-btn" data-action="rotate">
         <i class="fas fa-redo"></i>
       </button>
-      <div class="direction-buttons">
-        <button id="left-btn" class="control-btn" data-action="left">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <button id="down-btn" class="control-btn" data-action="down">
-          <i class="fas fa-arrow-down"></i>
-        </button>
-        <button id="right-btn" class="control-btn" data-action="right">
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-      <button id="hard-drop-btn" class="control-btn" data-action="drop">
-        <i class="fas fa-angle-double-down"></i>
+      <button id="down-btn" class="control-btn" data-action="down">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <button id="right-btn" class="control-btn" data-action="right">
+        <i class="fas fa-chevron-right"></i>
       </button>
     </div>
   </div>
@@ -149,12 +144,11 @@
 }
 
 .control-buttons {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 15px;
-  align-items: center;
   position: fixed;
-  bottom: 10px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.7);
