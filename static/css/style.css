@@ -7882,7 +7882,7 @@ main {
 .password-toggle {
   position: absolute;
   top: 50%;
-  right: 1rem;
+  right: 0.75rem;
   transform: translateY(-50%);
   background: none !important;
   border: none !important;
@@ -7922,11 +7922,13 @@ main {
   display: none !important;
 }
 
-/* Ensure eye icon has proper spacing */
+/* Ensure eye icon has proper spacing and size */
 .password-toggle i {
   margin: 0;
   padding: 0;
   line-height: 1;
+  font-size: 1.2rem;
+  color: #6a5acd;
 }
 
 .form-options {
