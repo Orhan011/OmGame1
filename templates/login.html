@@ -44,7 +44,7 @@
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" name="password" id="password" class="form-control" placeholder=" " required>
                     <label for="password">Şifreniz</label>
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password', 'password-toggle-icon')">
                         <i class="fas fa-eye" id="password-toggle-icon"></i>
                     </button>
                 </div>
@@ -72,9 +72,9 @@
 
 {% block scripts %}
 <script>
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const passwordToggleIcon = document.getElementById('password-toggle-icon');
+    function togglePasswordVisibility(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const passwordToggleIcon = document.getElementById(iconId);
         const toggleButton = passwordToggleIcon.parentElement;
         
         if (passwordInput.type === 'password') {
