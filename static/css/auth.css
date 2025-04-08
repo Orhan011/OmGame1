@@ -184,7 +184,7 @@
 .password-toggle {
   position: absolute;
   top: 50%;
-  right: 1rem;
+  right: 0.5rem;
   transform: translateY(-50%);
   background: none;
   border: none;
@@ -195,14 +195,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
 }
 
 .password-toggle:hover {
   color: var(--accent-color);
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .password-toggle i {
