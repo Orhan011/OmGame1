@@ -181,7 +181,6 @@
   font-weight: 500;
 }
 
-/* Şifre gösterme butonu kaldırıldı */
 
 /* Enhanced Button */
 .btn-primary {
@@ -262,30 +261,6 @@
 .forgot-password:hover {
   color: #6A5AE0;
   text-decoration: underline;
-}
-
-/* Terms Agreement */
-.terms-agreement {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.terms-agreement input[type="checkbox"] {
-  accent-color: #6A5AE0;
-}
-
-.terms-link {
-  color: #8C66FF;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.terms-link:hover {
-  text-decoration: underline;
-  color: #6A5AE0;
 }
 
 /* Password Match Indicator */
