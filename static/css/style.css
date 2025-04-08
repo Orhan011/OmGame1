@@ -7882,7 +7882,7 @@ main {
 .password-toggle {
   position: absolute;
   top: 50%;
-  right: 0.75rem;
+  right: 0;
   transform: translateY(-50%);
   background: none !important;
   border: none !important;
@@ -7890,8 +7890,11 @@ main {
   cursor: pointer;
   padding: 0 !important;
   margin: 0 !important;
-  width: auto !important;
-  height: auto !important;
+  width: 40px !important;
+  height: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
   /* Explicitly remove tooltips/bubbles */
   -webkit-appearance: none;
@@ -8269,9 +8272,14 @@ main {
   width: auto;
 }
 
-/* Fix for input text color */
+/* Fix for input text color and padding */
 .form-control {
   color: var(--primary-text) !important;
+}
+
+/* Input with password toggle gets additional right padding */
+input[type="password"] {
+  padding-right: 40px !important;
 }
 /* Animated Menu Button Styles */
 .animated-menu {
