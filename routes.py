@@ -1,5 +1,8 @@
 from flask import url_for, render_template, login_required
 from app import app # Assuming app is defined elsewhere
+from flask_mail import Message # Assuming flask_mail is installed and configured
+from app import mail # Assuming mail is configured in app.py
+
 
 # Wordle rota tanımını ekleyin
 @app.route('/games/wordle')
@@ -11,6 +14,12 @@ def game_wordle():
 @login_required
 def game_wordPuzzle():
     return render_template('games/wordPuzzle.html')
+
+def send_welcome_email(email, username):
+    msg = Message('OmGame Dünyasına Hoş Geldiniz!', sender='noreply@omgame.com', recipients=[email]) # Replace with your actual sender address
+    msg.body = f"Merhaba {username},\nOmGame dünyasına hoş geldin!  Keyifli oyunlar dileriz."
+    mail.send(msg)
+
 
 # routes.py
 # Bu dosya artık kullanılmıyor, yönlendirmeler main.py içerisinde.

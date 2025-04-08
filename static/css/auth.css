@@ -355,6 +355,7 @@
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.6);
   z-index: 1;
+  pointer-events: none;
 }
 
 .floating-label input {
@@ -474,7 +475,12 @@
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   padding: 0;
-  z-index: 1;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .password-toggle:hover {

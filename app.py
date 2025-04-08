@@ -4,7 +4,10 @@ import shutil
 from datetime import datetime
 
 from flask import Flask
-from models import db
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_migrate import Migrate
+from flask_mail import Mail, Message
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -31,6 +34,15 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     }
 }
 
+# E-posta yapılandırması
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your-email@gmail.com'  # Gerçek e-posta adresinizi buraya ekleyin
+app.config['MAIL_PASSWORD'] = 'your-password'  # Gerçek şifrenizi buraya ekleyin
+app.config['MAIL_DEFAULT_SENDER'] = ('OmGame', 'your-email@gmail.com')
+
+
 # Veritabanı dizinlerini oluştur
 os.makedirs('permanent', exist_ok=True)
 os.makedirs('backups', exist_ok=True)
@@ -45,7 +57,11 @@ def backup_database():
         app.logger.info(f"Database backed up to {backup_path}")
 
 # Initialize the app with SQLAlchemy
-db.init_app(app)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+mail = Mail(app)
 
 # Initialize database
 with app.app_context():
