@@ -1,0 +1,144 @@
+
+{% extends 'admin/layout.html' %}
+
+{% block title %}{{ game.name }} - Düzenle{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Oyun Düzenle: {{ game.name }}</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.games') }}">Oyunlar</a></li>
+                    <li class="breadcrumb-item active">Düzenle</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ url_for('admin.game_update', id=game.id) }}" method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="name">Oyun Adı</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ game.name }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="slug">Slug</label>
+                                <input type="text" class="form-control" id="slug" name="slug" value="{{ game.slug }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="short_description">Kısa Açıklama</label>
+                                <textarea class="form-control" id="short_description" name="short_description" rows="2">{{ game.short_description }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Detaylı Açıklama</label>
+                                <textarea class="form-control" id="description" name="description" rows="5">{{ game.description }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="template_path">Şablon Yolu</label>
+                                <input type="text" class="form-control" id="template_path" name="template_path" value="{{ game.template_path }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="categories">Kategoriler</label>
+                                <input type="text" class="form-control" id="categories" name="categories" value="{{ game.categories }}">
+                                <small class="form-text text-muted">Kategorileri virgülle ayırarak yazın</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tags">Etiketler</label>
+                                <input type="text" class="form-control" id="tags" name="tags" value="{{ game.tags }}">
+                                <small class="form-text text-muted">Etiketleri virgülle ayırarak yazın</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="difficulty">Zorluk Seviyesi</label>
+                                <select class="form-control" id="difficulty" name="difficulty">
+                                    <option value="easy" {% if game.difficulty == 'easy' %}selected{% endif %}>Kolay</option>
+                                    <option value="medium" {% if game.difficulty == 'medium' %}selected{% endif %}>Orta</option>
+                                    <option value="hard" {% if game.difficulty == 'hard' %}selected{% endif %}>Zor</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="published" name="published" {% if game.published %}checked{% endif %}>
+                                    <label class="custom-control-label" for="published">Yayında</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="featured" name="featured" {% if game.featured %}checked{% endif %}>
+                                    <label class="custom-control-label" for="featured">Öne Çıkan</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cover_image">Kapak Görseli</label>
+                                {% if game.cover_image %}
+                                    <img src="{{ game.cover_image }}" class="img-fluid mb-2" alt="Kapak Görseli">
+                                {% endif %}
+                                <input type="file" class="form-control-file" id="cover_image" name="cover_image">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meta_title">Meta Başlık</label>
+                                <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ game.meta_title }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meta_description">Meta Açıklama</label>
+                                <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ game.meta_description }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meta_keywords">Meta Anahtar Kelimeler</label>
+                                <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" value="{{ game.meta_keywords }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <a href="{{ url_for('admin.games') }}" class="btn btn-secondary">İptal</a>
+                            <button type="submit" class="btn btn-primary float-right">Kaydet</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Slug otomatik oluşturma
+    $('#name').on('input', function() {
+        var slug = $(this).val()
+            .toLowerCase()
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-');
+        $('#slug').val(slug);
+    });
+});
+</script>
+{% endblock %}
