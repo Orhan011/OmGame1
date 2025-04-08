@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 
 {% block title %}Marathon Tetris - ZekaPark{% endblock %}
@@ -27,7 +28,7 @@
       <span>NEXT</span>
       <canvas id="next-piece"></canvas>
     </div>
-
+    
     <div class="game-area">
       <canvas id="tetris-canvas"></canvas>
       <div id="level-up" class="level-up-animation" style="display: none;">Level Up!</div>
@@ -54,13 +55,6 @@
       </button>
     </div>
   </div>
-  <div class="mobile-controls">
-    <button class="control-icon" id="mobile-left"><i class="fas fa-arrow-left"></i></button>
-    <button class="control-icon" id="mobile-rotate"><i class="fas fa-redo"></i></button>
-    <button class="control-icon" id="mobile-right"><i class="fas fa-arrow-right"></i></button>
-    <button class="control-icon" id="mobile-down"><i class="fas fa-arrow-down"></i></button>
-    <button class="control-icon" id="mobile-drop"><i class="fas fa-angle-double-down"></i></button>
-  </div>
 </div>
 
 <style>
@@ -68,7 +62,7 @@
   background: #1a1a4a;
   min-height: 100vh;
   padding: 20px;
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -232,39 +226,24 @@
   }
 
   .control-buttons {
-    display: none; /* Hide desktop buttons on mobile */
-  }
-
-  .mobile-controls {
     position: fixed;
     bottom: 20px;
-    left: 0;
-    right: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    right: 20px;
+    background: rgba(0,0,0,0.5);
     padding: 15px;
-    background: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
     z-index: 1000;
   }
 
-  .control-icon {
+  .control-btn {
     width: 50px;
     height: 50px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    border: none;
-    color: white;
-    font-size: 24px;
+    font-size: 20px;
+    background: rgba(255,255,255,0.2);
   }
 
-  .control-icon:active {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(0.95);
+  .control-btn:active {
+    background: rgba(255,255,255,0.3);
   }
 
   body {
@@ -473,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function arenaSweep() {
     let rowCount = 1;
     let clearedRows = 0;
-
+    
     outer: for (let y = arena.length - 1; y > 0; --y) {
       for (let x = 0; x < arena[y].length; ++x) {
         if (arena[y][x] === 0) {
@@ -485,18 +464,18 @@ document.addEventListener('DOMContentLoaded', () => {
       arena.unshift(row);
       ++y;
       clearedRows++;
-
+      
       // Calculate score for this row
       const rowPoints = rowCount * 100;
       score += rowPoints;
-
+      
       // Show score popup
       const canvasRect = canvas.getBoundingClientRect();
       showScorePopup(rowPoints, 
         canvasRect.left + canvas.width / 2,
         canvasRect.top + (y * BLOCK_SIZE)
       );
-
+      
       rowCount *= 2;
       linesCleared++;
     }
@@ -521,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       (y + offset.y) * BLOCK_SIZE,
                       BLOCK_SIZE - 1,
                       BLOCK_SIZE - 1);
-
+          
           // Add gradient effect
           ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
           ctx.fillRect((x + offset.x) * BLOCK_SIZE,
@@ -536,12 +515,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function drawNextPiece() {
     nextCtx.fillStyle = '#000033';
     nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-
+    
     if (nextPiece) {
       const scale = 20;
       const offsetX = (nextCanvas.width - nextPiece[0].length * scale) / 2;
       const offsetY = (nextCanvas.height - nextPiece.length * scale) / 2;
-
+      
       nextPiece.forEach((row, y) => {
         row.forEach((value, x) => {
           if (value !== 0) {
@@ -552,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
               scale - 1,
               scale - 1
             );
-
+            
             // Add gradient effect
             nextCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
             nextCtx.fillRect(
@@ -617,14 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('right-btn').addEventListener('click', () => playerMove(1));
   document.getElementById('down-btn').addEventListener('click', () => playerDrop());
   document.getElementById('hard-drop-btn').addEventListener('click', () => playerHardDrop());
-
-    // Mobile touch controls
-  document.getElementById('mobile-left').addEventListener('touchstart', () => playerMove(-1));
-  document.getElementById('mobile-right').addEventListener('touchstart', () => playerMove(1));
-  document.getElementById('mobile-down').addEventListener('touchstart', () => playerDrop());
-  document.getElementById('mobile-rotate').addEventListener('touchstart', () => playerRotate(1));
-  document.getElementById('mobile-drop').addEventListener('touchstart', () => playerHardDrop());
-
 
   // Keyboard controls
   document.addEventListener('keydown', event => {
