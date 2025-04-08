@@ -10,10 +10,9 @@
 <div class="auth-container">
     <div class="auth-card glass-card">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
-
         <div class="auth-header">
             <h2>Giriş Yap</h2>
-            <p class="auth-subtitle">OmGame'e hoş geldiniz</p>
+            <p class="auth-subtitle">Beyin Egzersizleri'ne hoş geldiniz</p>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -30,7 +29,6 @@
 
         <form method="POST" action="{{ url_for('login', redirect=request.args.get('redirect', '')) }}" class="auth-form">
             <input type="hidden" name="redirect" value="{{ request.args.get('redirect', '') }}">
-
             <div class="form-group floating-label">
                 <div class="input-icon-wrapper">
                     <i class="fas fa-envelope input-icon"></i>
@@ -44,8 +42,8 @@
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" name="password" id="password" class="form-control" placeholder=" " required>
                     <label for="password">Şifreniz</label>
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
-                        <i class="fas fa-eye"></i>
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye" id="password-toggle-icon"></i>
                     </button>
                 </div>
             </div>
@@ -58,8 +56,9 @@
                 <a href="{{ url_for('forgot_password') }}" class="forgot-password">Şifremi Unuttum</a>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">
-                GİRİŞ YAP
+            <button type="submit" class="btn btn-primary btn-block btn-animated">
+                <span class="btn-text">Giriş Yap</span>
+                <i class="fas fa-arrow-right btn-icon"></i>
             </button>
         </form>
 
@@ -72,17 +71,16 @@
 
 {% block scripts %}
 <script>
-    function togglePasswordVisibility(inputId) {
-        const passwordInput = document.getElementById(inputId);
-        const toggleButton = passwordInput.parentElement.querySelector('.password-toggle');
-        const toggleIcon = toggleButton.querySelector('i');
-        
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            passwordToggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
         } else {
             passwordInput.type = 'password';
-            toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            passwordToggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     }
 </script>

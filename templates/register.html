@@ -1,16 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}OmGame - Kayıt Ol{% endblock %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-{% endblock %}
-
 {% block content %}
 <div class="auth-container">
   <div class="auth-card glass-card">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
-    
+    <div class="auth-logo-corner">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
+    </div>
     <div class="auth-header">
       <h2>Kayıt Ol</h2>
       <p class="auth-subtitle">Beyin Egzersizleri dünyasına katılın</p>
@@ -56,8 +51,8 @@
           <input type="password" name="password" id="password" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password">Şifreniz</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
-            <i class="fas fa-eye"></i>
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password', 'password-toggle-icon')">
+            <i class="fas fa-eye" id="password-toggle-icon"></i>
           </button>
         </div>
         <div class="form-text form-hint mt-1">Şifreniz en az 6 karakter uzunluğunda olmalıdır</div>
@@ -69,8 +64,8 @@
           <input type="password" name="password_confirm" id="password_confirm" class="form-control" placeholder=" " 
                  required minlength="6" autocomplete="new-password">
           <label for="password_confirm">Şifrenizi Tekrar Girin</label>
-          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password_confirm')">
-            <i class="fas fa-eye"></i>
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password_confirm', 'password-confirm-toggle-icon')">
+            <i class="fas fa-eye" id="password-confirm-toggle-icon"></i>
           </button>
         </div>
         <div class="password-match-indicator mt-1" id="password-match-indicator"></div>
@@ -85,20 +80,34 @@
         </div>
       </div>
       
-      <button type="submit" class="btn btn-primary btn-block" id="register-btn">
-        HESAP OLUŞTUR
+      <button type="submit" class="btn btn-primary btn-block btn-animated" id="register-btn">
+        <span class="btn-text">Hesap Oluştur</span>
+        <i class="fas fa-arrow-right btn-icon"></i>
       </button>
     </form>
+    
+    <!-- Social login removed -->
     
     <div class="auth-links">
       <p>Zaten hesabınız var mı? <a href="{{ url_for('login') }}">Giriş Yap</a></p>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
+  function togglePasswordVisibility(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const passwordToggleIcon = document.getElementById(iconId);
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      passwordToggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      passwordToggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+  
   document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('password_confirm');
@@ -141,19 +150,5 @@
       form.classList.add('was-validated');
     });
   });
-  
-  function togglePasswordVisibility(inputId) {
-    const passwordInput = document.getElementById(inputId);
-    const toggleButton = passwordInput.parentElement.querySelector('.password-toggle');
-    const toggleIcon = toggleButton.querySelector('i');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-      passwordInput.type = 'password';
-      toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-  }
 </script>
 {% endblock %}
