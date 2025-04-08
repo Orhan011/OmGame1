@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a237e, #0a1128);
+  background: var(--primary-bg, #0a0a18);
   position: relative;
   overflow: hidden;
 }
@@ -17,7 +17,7 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00b4db, #0083b0);
+  background: linear-gradient(135deg, #6A5AE0, #8C66FF);
   filter: blur(50px);
   animation: float 20s infinite ease-in-out;
   opacity: 0.05;
@@ -43,11 +43,11 @@
 .auth-card {
   width: 100%;
   max-width: 420px;
-  padding: 2.8rem;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
+  padding: 2.5rem;
+  background: rgba(25, 25, 50, 0.3);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 1;
@@ -65,9 +65,9 @@
 
 /* Logo Animation */
 .auth-logo-small {
-  width: 85px;
+  width: 80px;
   height: auto;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
   display: block;
   animation: pulse 2.5s infinite;
 }
@@ -81,38 +81,35 @@
 /* Modern Header */
 .auth-header {
   text-align: center;
-  margin-bottom: 2.8rem;
+  margin-bottom: 2rem;
 }
 
 .auth-header h2 {
-  font-size: 2.4rem;
-  color: #fff;
-  margin-bottom: 0.8rem;
+  font-size: 2.2rem;
+  color: #8075FF;
+  margin-bottom: 0.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #00b4db, #0083b0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   letter-spacing: -0.5px;
 }
 
 .auth-subtitle {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.05rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 /* Modern Input Fields */
 .floating-label {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-icon-wrapper {
   position: relative;
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
   overflow: hidden;
 }
 
@@ -127,8 +124,8 @@
   bottom: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #00b4db, #0083b0);
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: linear-gradient(90deg, #6A5AE0, #8C66FF);
+  transition: width 0.3s ease;
 }
 
 .input-icon-wrapper:focus-within::before {
@@ -141,7 +138,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
 }
 
@@ -170,9 +167,9 @@
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
   pointer-events: none;
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .floating-label input:focus ~ label,
@@ -180,7 +177,7 @@
   top: 0.7rem;
   left: 1rem;
   font-size: 0.8rem;
-  color: #00b4db;
+  color: #8C66FF;
   font-weight: 500;
 }
 
@@ -200,18 +197,19 @@
 /* Enhanced Button */
 .btn-primary {
   width: 100%;
-  padding: 1.2rem;
-  background: linear-gradient(135deg, #00b4db, #0083b0);
+  padding: 1rem;
+  background: linear-gradient(135deg, #6A5AE0, #8C66FF);
   border: none;
-  border-radius: 16px;
+  border-radius: 50px;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
 .btn-primary::before {
@@ -232,7 +230,15 @@
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 180, 219, 0.4);
+  box-shadow: 0 8px 25px rgba(106, 90, 224, 0.4);
+}
+
+/* Form Hints */
+.form-hint {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 /* Modern Form Options */
@@ -240,7 +246,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1.8rem 0;
+  margin: 1.5rem 0;
 }
 
 .remember-me {
@@ -251,33 +257,71 @@
 }
 
 .remember-me input[type="checkbox"] {
-  accent-color: #00b4db;
-  width: 1.1rem;
-  height: 1.1rem;
+  accent-color: #6A5AE0;
+  width: 1rem;
+  height: 1rem;
 }
 
 .forgot-password {
-  color: #00b4db;
+  color: #8C66FF;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #0083b0;
+  color: #6A5AE0;
   text-decoration: underline;
+}
+
+/* Terms Agreement */
+.terms-agreement {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.terms-agreement input[type="checkbox"] {
+  accent-color: #6A5AE0;
+}
+
+.terms-link {
+  color: #8C66FF;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+  color: #6A5AE0;
+}
+
+/* Password Match Indicator */
+.password-match-indicator {
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+.text-success {
+  color: #4CAF50 !important;
+}
+
+.text-danger {
+  color: #f44336 !important;
 }
 
 /* Modern Alert Styles */
 .alert {
-  padding: 1.2rem 1.4rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
@@ -285,7 +329,7 @@
 }
 
 .alert i {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 @keyframes slideDown {
@@ -302,13 +346,13 @@
 /* Modern Auth Links */
 .auth-links {
   text-align: center;
-  margin-top: 2.2rem;
+  margin-top: 1.8rem;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .auth-links a {
-  color: #00b4db;
+  color: #8C66FF;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -316,6 +360,6 @@
 }
 
 .auth-links a:hover {
-  color: #0083b0;
+  color: #6A5AE0;
   text-decoration: underline;
 }

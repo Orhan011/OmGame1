@@ -10,6 +10,7 @@
 <div class="auth-container">
     <div class="auth-card glass-card">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
+        
         <div class="auth-header">
             <h2>Giriş Yap</h2>
             <p class="auth-subtitle">Beyin Egzersizleri'ne hoş geldiniz</p>
@@ -29,6 +30,7 @@
 
         <form method="POST" action="{{ url_for('login', redirect=request.args.get('redirect', '')) }}" class="auth-form">
             <input type="hidden" name="redirect" value="{{ request.args.get('redirect', '') }}">
+            
             <div class="form-group floating-label">
                 <div class="input-icon-wrapper">
                     <i class="fas fa-envelope input-icon"></i>
@@ -56,9 +58,8 @@
                 <a href="{{ url_for('forgot_password') }}" class="forgot-password">Şifremi Unuttum</a>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block btn-animated">
-                <span class="btn-text">Giriş Yap</span>
-                <i class="fas fa-arrow-right btn-icon"></i>
+            <button type="submit" class="btn btn-primary btn-block">
+                GİRİŞ YAP
             </button>
         </form>
 

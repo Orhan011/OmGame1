@@ -1,11 +1,16 @@
 {% extends "layout.html" %}
 
+{% block title %}OmGame - Kayıt Ol{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="auth-container">
   <div class="auth-card glass-card">
-    <div class="auth-logo-corner">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
-    </div>
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="auth-logo-small">
+    
     <div class="auth-header">
       <h2>Kayıt Ol</h2>
       <p class="auth-subtitle">Beyin Egzersizleri dünyasına katılın</p>
@@ -80,20 +85,19 @@
         </div>
       </div>
       
-      <button type="submit" class="btn btn-primary btn-block btn-animated" id="register-btn">
-        <span class="btn-text">Hesap Oluştur</span>
-        <i class="fas fa-arrow-right btn-icon"></i>
+      <button type="submit" class="btn btn-primary btn-block" id="register-btn">
+        HESAP OLUŞTUR
       </button>
     </form>
-    
-    <!-- Social login removed -->
     
     <div class="auth-links">
       <p>Zaten hesabınız var mı? <a href="{{ url_for('login') }}">Giriş Yap</a></p>
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
   function togglePasswordVisibility(inputId, iconId) {
     const passwordInput = document.getElementById(inputId);
