@@ -65,12 +65,12 @@ def send_verification_email(to_email, verification_code):
     try:
         from_email = "omgameee@gmail.com"
         password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-        
+
         msg = MIMEMultipart()
         msg['From'] = from_email
         msg['To'] = to_email
         msg['Subject'] = "OmGame - E-posta Doğrulama Kodu"
-        
+
         body = f"""
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -88,9 +88,9 @@ def send_verification_email(to_email, verification_code):
         </body>
         </html>
         """
-        
+
         msg.attach(MIMEText(body, 'html'))
-        
+
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(from_email, password)
@@ -122,7 +122,7 @@ def utility_processor():
         if 'user_id' in session:
             return User.query.get(session['user_id'])
         return None
-    
+
     def get_user_data():
         """Session'daki kullanıcı bilgilerini döndürür"""
         if 'user_id' in session:
@@ -138,13 +138,13 @@ def utility_processor():
                 'theme_preference': user.theme_preference
             }
         return None
-    
+
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
         if 'user_id' in session:
             return get_user_avatar(session['user_id'])
         return None
-    
+
     def get_user_scores():
         """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
         if 'user_id' in session:
@@ -155,7 +155,7 @@ def utility_processor():
                     result[score.game_type] = score.score
             return result
         return {}
-    
+
     return dict(
         get_current_user=get_current_user,
         get_user_data=get_user_data,
@@ -182,7 +182,7 @@ def initialize_database():
                 total_games_played=100,
                 highest_score=1000
             )
-            
+
             demo = User(
                 username="demo",
                 email="demo@example.com",
@@ -196,10 +196,10 @@ def initialize_database():
                 total_games_played=50,
                 highest_score=750
             )
-            
+
             db.session.add(admin)
             db.session.add(demo)
-            
+
             # Admin paneli için admin kullanıcısı
             admin_user = AdminUser(
                 username="admin",
@@ -209,9 +209,9 @@ def initialize_database():
                 is_active=True,
                 created_at=datetime.utcnow()
             )
-            
+
             db.session.add(admin_user)
-            
+
             # Örnek site ayarları ekle
             site_settings = [
                 SiteSettings(setting_key="site_name", setting_value="OmGame", setting_type="text", category="general"),
@@ -221,10 +221,10 @@ def initialize_database():
                 SiteSettings(setting_key="show_leaderboard", setting_value="true", setting_type="boolean", category="game"),
                 SiteSettings(setting_key="show_achievements", setting_value="true", setting_type="boolean", category="game")
             ]
-            
+
             for setting in site_settings:
                 db.session.add(setting)
-            
+
             # Örnek oyunlar
             games = [
                 Game(
@@ -280,10 +280,10 @@ def initialize_database():
                     created_by=1
                 )
             ]
-            
+
             for game in games:
                 db.session.add(game)
-            
+
             # Örnek skorlar
             admin_scores = [
                 Score(user_id=1, game_type="wordPuzzle", score=850),
@@ -291,17 +291,17 @@ def initialize_database():
                 Score(user_id=1, game_type="numberSequence", score=780),
                 Score(user_id=1, game_type="3dRotation", score=700)
             ]
-            
+
             demo_scores = [
                 Score(user_id=2, game_type="wordPuzzle", score=650),
                 Score(user_id=2, game_type="memoryMatch", score=720),
                 Score(user_id=2, game_type="numberSequence", score=580),
                 Score(user_id=2, game_type="3dRotation", score=500)
             ]
-            
+
             for score in admin_scores + demo_scores:
                 db.session.add(score)
-            
+
             # Örnek makaleler
             articles = [
                 Article(
@@ -496,7 +496,7 @@ def initialize_database():
                     title="Çocuklarda Bilişsel Gelişimi Teşvik Etme",
                     content="""
                     <h3>Gençlerde Bilişsel Büyümeyi Destekleme</h3>
-                    <p>Çocukluk, beyin gelişiminde kritik bir dönemdir. Aşağıdaki stratejiler, çocuğunuzun bilişsel potansiyelini en üst düzeye çıkarmasına yardımcı olabilir:</p>
+                    <p>Çocukluk, beyin gelişiminde kritik bir dönemdir. Aşağıdaki stratejiler, çocuğunuzun bilişsel potansiyelini en üst düzeye çıkarmasına yardımcı olabilir.</p>
 
                     <h4>Çocuğunuzun beyin gelişimini desteklemek için:</h4>
                     <ul>
@@ -519,7 +519,7 @@ def initialize_database():
                     <h3>Skorunuzu En Üst Düzeye Çıkarmak İçin İpuçları</h3>
                     <ol>
                         <li><strong>Konsantrasyonunuzu Maksimize Edin:</strong> Dikkat dağıtıcı olmayan bir ortamda oynayın.</li>
-                        <li><strong>Oyun Mekaniklerini Öğrenin:</strong> Her oyunun puanlama sistemini ve en iyi stratejileri öğrenin.</li>
+                        <li><strong>Oyun Mekaniklerini Öğrenin:</strong> Her oyunun puanlama sistemini ve en iyi stratejilerini öğrenin.</li>
                         <li><strong>Düzenli Pratik Yapın:</strong> Beceriler zamanla gelişir, düzenli oynamak iyileşmeye yol açar.</li>
                         <li><strong>Zamanlamanızı İyileştirin:</strong> Birçok oyunda hızlı ve doğru yanıtlar daha yüksek puanlar sağlar.</li>
                         <li><strong>Kendi Rekorlarınızı Takip Edin:</strong> Gelişiminizi takip edin ve kendi skorlarınızı geçmeye çalışın.</li>
@@ -527,7 +527,7 @@ def initialize_database():
                         <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
                         <li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
                     </ol>
-                    <p>ZekaPark oyunlarında yüksek puan almak, sadece eğlenceli bir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
+<p>ZekaPark oyunlarında yüksek puan almak, sadece eğlenceli bir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
                     category="tip"
                 ),
@@ -552,10 +552,10 @@ def initialize_database():
                     category="tip"
                 )
             ]
-            
+
             for article in articles:
                 db.session.add(article)
-            
+
             # Değişiklikleri kaydet
             db.session.commit()
             return "Başarıyla örnek veriler oluşturuldu!"
@@ -580,7 +580,7 @@ def get_most_played_games(limit=4):
     # Burada gerçek veritabanı verisi yerine sabit oyun listesi kullanılıyor
     # İleriki aşamalarda, veritabanından en çok oynanan oyunları çeken 
     # sorgu ile değiştirilebilir
-    
+
     # Şu an için en popüler 4 oyun (sıralama önemli değil)
     games = [
         {
@@ -629,29 +629,29 @@ def index():
 def login():
     # Redirect parametresini al (varsa)
     redirect_url = request.args.get('redirect', '')
-    
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        
+
         # Email ile kullanıcıyı bul
         user = User.query.filter_by(email=email).first()
-        
+
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
             # Kullanıcının son aktif zamanını güncelle
             user.last_active = datetime.utcnow()
             db.session.commit()
-            
+
             flash('Giriş başarılı!', 'success')
-            
+
             # Yönlendirilecek sayfa varsa oraya git
             if redirect_url:
                 return redirect(redirect_url)
             return redirect(url_for('index'))
         else:
             flash('Email veya şifre hatalı!', 'danger')
-    
+
     return render_template('login.html')
 
 # OYUNLAR
@@ -715,7 +715,7 @@ def n_back():
 @app.route('/2048')
 def game_2048_redirect():
     return redirect(url_for('game_2048'))
-    
+
 @app.route('/games/2048')
 def game_2048():
     return render_template('games/2048.html')
@@ -724,7 +724,7 @@ def game_2048():
 @app.route('/wordle')
 def wordle_redirect():
     return redirect(url_for('wordle'))
-    
+
 @app.route('/games/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
@@ -734,7 +734,7 @@ def wordle():
 @app.route('/chess')
 def chess_redirect():
     return redirect(url_for('chess'))
-    
+
 @app.route('/games/chess')
 def chess():
     """Satranç oyunu"""
@@ -745,7 +745,7 @@ def chess():
 def iq_test():
     """IQ Test: Zeka ve mantık oyunu
     Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin."""
-    return render_template('games/iqTest_simplified.html')
+    return render_template('games/iqTest_enhanced.html')
 
 # Simon Says Oyunu
 @app.route('/games/simon-says')
@@ -772,7 +772,7 @@ def typing_speed():
     """Yazma Hızı: Klavye hızı testi
     Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
     return render_template('games/typingSpeed_simplified.html')
-    
+
 @app.route('/games/puzzle-slider')
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
@@ -789,13 +789,15 @@ def color_match_game():
 def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
-    return render_template('games/mathChallenge_simplified.html')
+    return render_template('games/mathChallenge_enhanced.html')
 
-@app.route('/games/snake')
-def snake_game():
-    """Yılan Oyunu: Klasik arcade
-    Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
-    return render_template('games/snake_simplified.html')
+@app.route('/snake')
+def snake():
+    return render_template('games/snake.html')
+
+@app.route('/pattern-flow')
+def pattern_flow():
+    return render_template('games/patternFlow.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
@@ -828,35 +830,35 @@ def register():
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')  # register.html'deki alan adı ile eşleşecek şekilde
         terms = request.form.get('terms')
-        
+
         # Validasyon kontrolleri
         if not username or not email or not password:
             flash('Tüm alanlar doldurulmalıdır!', 'danger')
             return redirect(url_for('register'))
-        
+
         if password != password_confirm:
             flash('Şifreler eşleşmiyor!', 'danger')
             return redirect(url_for('register'))
-            
+
         if not terms:
             flash('Kullanım koşullarını kabul etmelisiniz!', 'danger')
             return redirect(url_for('register'))
-        
+
         # Kullanıcı adı formatını kontrol et (sadece harf, rakam, tire ve alt çizgi)
         if not re.match(r'^[a-zA-Z0-9_-]+$', username):
             flash('Kullanıcı adı sadece harf, rakam, tire ve alt çizgi içerebilir!', 'danger')
             return redirect(url_for('register'))
-            
+
         # Kullanıcı adı en az 3 karakter olmalı
         if len(username) < 3:
             flash('Kullanıcı adı en az 3 karakter olmalıdır!', 'danger')
             return redirect(url_for('register'))
-            
+
         # Şifre en az 6 karakter olmalı
         if len(password) < 6:
             flash('Şifre en az 6 karakter olmalıdır!', 'danger')
             return redirect(url_for('register'))
-        
+
         # E-posta formatını kontrol et
         try:
             valid = validate_email(email)
@@ -864,16 +866,16 @@ def register():
         except EmailNotValidError:
             flash('Geçersiz e-posta formatı!', 'danger')
             return redirect(url_for('register'))
-        
+
         # Kullanıcı veya e-posta zaten kayıtlı mı kontrol et
         if User.query.filter_by(username=username).first():
             flash('Bu kullanıcı adı zaten kullanılıyor!', 'danger')
             return redirect(url_for('register'))
-        
+
         if User.query.filter_by(email=email).first():
             flash('Bu e-posta adresi zaten kullanılıyor!', 'danger')
             return redirect(url_for('register'))
-        
+
         # Yeni kullanıcı oluştur
         hashed_password = generate_password_hash(password)
         new_user = User(
@@ -881,17 +883,17 @@ def register():
             email=email,
             password_hash=hashed_password
         )
-        
+
         # Veritabanına kaydet
         db.session.add(new_user)
         db.session.commit()
-        
+
         # Otomatik giriş yap
         session['user_id'] = new_user.id
-        
+
         flash('Kayıt başarılı! Hoş geldiniz!', 'success')
         return redirect(url_for('index'))
-    
+
     return render_template('register.html')
 
 # Çıkış
@@ -930,25 +932,25 @@ def profile():
     if 'user_id' not in session:
         flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Toplam oyun sayısı ve en yüksek skoru hesapla
     scores = Score.query.filter_by(user_id=user.id).all()
-    
+
     user_scores = {}
     for score in scores:
         if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
             user_scores[score.game_type] = score.score
-    
+
     # Kullanıcı seviyesini hesapla
     user_level = calculate_level(user.experience_points)
-    
+
     # Bir sonraki seviyeye ne kadar XP kaldığını hesapla
     next_level_xp = xp_for_level(user_level + 1)
     current_level_xp = xp_for_level(user_level)
     xp_progress = ((user.experience_points - current_level_xp) / (next_level_xp - current_level_xp)) * 100
-    
+
     return render_template(
         'profile.html', 
         user=user, 
@@ -966,31 +968,31 @@ def profile_v2():
     if 'user_id' not in session:
         flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Kullanıcı istatistiklerini hesapla
     scores = Score.query.filter_by(user_id=user.id).all()
-    
+
     total_games = len(scores)
     highest_score = 0
     if scores:
         highest_score = max(score.score for score in scores)
-    
+
     # Oyun başına en yüksek skorlar
     user_scores = {}
     for score in scores:
         if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
             user_scores[score.game_type] = score.score
-    
+
     # Kullanıcı seviyesini hesapla
     current_level = calculate_level(user.experience_points)
-    
+
     # XP hesaplamaları
     xp_for_current = xp_for_level(current_level)
     xp_for_next = xp_for_level(current_level + 1)
     xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
-    
+
     return render_template(
         'profile_v2.html', 
         user=user, 
@@ -1011,29 +1013,29 @@ def update_profile():
     """Profil bilgilerini güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # POST verilerini al
     full_name = request.form.get('full_name', user.full_name)
     bio = request.form.get('bio', user.bio)
     age = request.form.get('age')
     location = request.form.get('location', user.location)
-    
+
     # Yaşı sayıya çevir veya None olarak bırak
     try:
         age = int(age) if age else None
     except:
         age = None
-    
+
     # Kullanıcı bilgilerini güncelle
     user.full_name = full_name
     user.bio = bio
     user.age = age
     user.location = location
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Profil bilgileri güncellendi!'})
 
 # Avatar Güncelleme
@@ -1042,38 +1044,38 @@ def update_avatar():
     """Profil fotoğrafını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Dosyanın gelip gelmediğini kontrol et
     if 'avatar' not in request.files:
         return jsonify({'success': False, 'message': 'Dosya seçilmedi!'})
-    
+
     avatar = request.files['avatar']
-    
+
     # Dosya adı boş mu kontrol et
     if avatar.filename == '':
         return jsonify({'success': False, 'message': 'Dosya seçilmedi!'})
-    
+
     # Dosya uzantısı uygun mu kontrol et
     if not allowed_file(avatar.filename):
         return jsonify({'success': False, 'message': 'Geçersiz dosya formatı! Sadece PNG, JPG, JPEG ve GIF dosyaları kabul edilir.'})
-    
+
     # Dosya ismini güvenli hale getir ve benzersiz yap
     filename = secure_filename(avatar.filename)
     unique_filename = f"{user.id}_{int(time.time())}_{filename}"
-    
+
     # Yükleme klasörü yoksa oluştur
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
+
     # Dosyayı kaydet
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
     avatar.save(filepath)
-    
+
     # Veritabanını güncelle (static/ öneki olmadan kaydet)
     user.avatar_url = os.path.join('uploads/avatars', unique_filename)
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Profil fotoğrafı güncellendi!', 'avatar_url': user.avatar_url})
 
 # Şifre Değiştirme
@@ -1082,30 +1084,30 @@ def change_password():
     """Şifre değiştirme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
-    
+
     # Validasyon
     if not current_password or not new_password or not confirm_password:
         return jsonify({'success': False, 'message': 'Tüm alanları doldurun!'})
-    
+
     if not check_password_hash(user.password_hash, current_password):
         return jsonify({'success': False, 'message': 'Mevcut şifre yanlış!'})
-    
+
     if new_password != confirm_password:
         return jsonify({'success': False, 'message': 'Yeni şifreler eşleşmiyor!'})
-    
+
     if len(new_password) < 8:
         return jsonify({'success': False, 'message': 'Şifre en az 8 karakter olmalıdır!'})
-    
+
     # Şifreyi güncelle
     user.password_hash = generate_password_hash(new_password)
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Şifre başarıyla değiştirildi!'})
 
 # Güvenlik Ayarları
@@ -1114,15 +1116,15 @@ def update_security_settings():
     """Güvenlik ayarlarını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Güvenlik ayarlarını al (örnek olarak 2FA)
     two_factor = request.form.get('two_factor', 'off') == 'on'
-    
+
     # Burada gerçek 2FA implementasyonu yapılabilir
     # Şimdilik sadece bir ayar olarak kaydediyoruz
-    
+
     return jsonify({'success': True, 'message': 'Güvenlik ayarları güncellendi!'})
 
 # Bildirim Ayarları
@@ -1131,21 +1133,21 @@ def update_notification_settings():
     """Bildirim ayarlarını güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Bildirim ayarlarını al
     email_notifications = request.form.get('email_notifications', 'off') == 'on'
     achievement_notifications = request.form.get('achievement_notifications', 'off') == 'on'
     leaderboard_notifications = request.form.get('leaderboard_notifications', 'off') == 'on'
-    
+
     # Kullanıcı ayarlarını güncelle
     user.email_notifications = email_notifications
     user.achievement_notifications = achievement_notifications
     user.leaderboard_notifications = leaderboard_notifications
-    
+
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Bildirim ayarları güncellendi!'})
 
 # Tema Ayarları
@@ -1154,20 +1156,20 @@ def update_theme():
     """Tema tercihini güncelleme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
-    
+
     # Tema tercihini al
     theme = request.form.get('theme', 'dark')
-    
+
     # Tema tercihini doğrula
     if theme not in ['light', 'dark', 'system']:
         theme = 'dark'  # Varsayılan tema
-    
+
     # Kullanıcı ayarını güncelle
     user.theme_preference = theme
     db.session.commit()
-    
+
     return jsonify({'success': True, 'message': 'Tema tercihi güncellendi!'})
 
 # Hesap Silme
@@ -1176,24 +1178,24 @@ def delete_account():
     """Hesabı silme."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
     password = request.form.get('password')
-    
+
     # Şifre doğrulama
     if not check_password_hash(user.password_hash, password):
         return jsonify({'success': False, 'message': 'Şifre doğrulaması başarısız!'})
-    
+
     # Kullanıcının skorlarını sil
     Score.query.filter_by(user_id=user.id).delete()
-    
+
     # Kullanıcıyı sil
     db.session.delete(user)
     db.session.commit()
-    
+
     # Oturumu sonlandır
     session.pop('user_id', None)
-    
+
     return jsonify({'success': True, 'message': 'Hesabınız başarıyla silindi!'})
 
 # Hesap Dondurma
@@ -1202,15 +1204,15 @@ def suspend_account():
     """Hesabı dondurma."""
     if 'user_id' not in session:
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
+
     user = User.query.get(session['user_id'])
     password = request.form.get('password')
     duration = request.form.get('duration', '30')  # Varsayılan 30 gün
-    
+
     # Şifre doğrulama
     if not check_password_hash(user.password_hash, password):
         return jsonify({'success': False, 'message': 'Şifre doğrulaması başarısız!'})
-    
+
     # Süreyi doğrula ve ayarla
     try:
         duration = int(duration)
@@ -1218,15 +1220,15 @@ def suspend_account():
             duration = 30
     except:
         duration = 30
-    
+
     # Hesabı dondur
     user.account_status = 'suspended'
     user.suspended_until = datetime.utcnow() + timedelta(days=duration)
     db.session.commit()
-    
+
     # Oturumu sonlandır
     session.pop('user_id', None)
-    
+
     return jsonify({'success': True, 'message': f'Hesabınız {duration} gün boyunca donduruldu!'})
 
 # Şifremi Unuttum
@@ -1234,19 +1236,19 @@ def suspend_account():
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email')
-        
+
         # E-posta ile kullanıcıyı bul
         user = User.query.filter_by(email=email).first()
-        
+
         if user:
             # Rastgele 6 haneli kod oluştur
             reset_code = str(random.randint(100000, 999999))
-            
+
             # Token ve son kullanma tarihi kaydet
             user.reset_token = reset_code
             user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
             db.session.commit()
-            
+
             # E-posta gönder
             if send_verification_email(email, reset_code):
                 flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
@@ -1256,27 +1258,27 @@ def forgot_password():
         else:
             # Güvenlik için kullanıcının bulunup bulunmadığını belirtme
             flash('Şifre sıfırlama talimatları e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-    
+
     return render_template('forgot_password.html')
 
 # Şifre Sıfırlama Kodu
 @app.route('/reset-code', methods=['GET', 'POST'])
 def reset_code():
     email = request.args.get('email', '')
-    
+
     if request.method == 'POST':
         code = request.form.get('code')
         email = request.form.get('email')
-        
+
         # Kod ve e-posta ile kullanıcıyı bul
         user = User.query.filter_by(email=email, reset_token=code).first()
-        
+
         if user and user.reset_token_expiry > datetime.utcnow():
             # Kodu doğrula ve şifre sıfırlama sayfasına yönlendir
             return redirect(url_for('reset_password', email=email, token=code))
         else:
             flash('Geçersiz veya süresi dolmuş kod!', 'danger')
-    
+
     return render_template('reset_code.html', email=email)
 
 # Şifre Sıfırlama
@@ -1284,18 +1286,18 @@ def reset_code():
 def reset_password():
     email = request.args.get('email', '')
     token = request.args.get('token', '')
-    
+
     # Token ve e-posta ile kullanıcıyı bul
     user = User.query.filter_by(email=email, reset_token=token).first()
-    
+
     if not user or user.reset_token_expiry < datetime.utcnow():
         flash('Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı!', 'danger')
         return redirect(url_for('forgot_password'))
-    
+
     if request.method == 'POST':
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        
+
         if password != confirm_password:
             flash('Şifreler eşleşmiyor!', 'danger')
         elif len(password) < 8:
@@ -1306,22 +1308,22 @@ def reset_password():
             user.reset_token = None
             user.reset_token_expiry = None
             db.session.commit()
-            
+
             flash('Şifreniz başarıyla sıfırlandı! Şimdi giriş yapabilirsiniz.', 'success')
             return redirect(url_for('login'))
-    
+
     return render_template('reset_password.html', email=email, token=token)
 
 # Oyun zorluğuna göre puan ve XP çarpanı hesaplama fonksiyonu
 def calculate_multipliers(game_type, difficulty=None, game_stats=None):
     """
     Oyun türüne, zorluğuna ve oyun istatistiklerine göre puan ve XP çarpanlarını hesaplar
-    
+
     Args:
         game_type (str): Oyun türü
         difficulty (str, optional): Zorluk seviyesi (easy, medium, hard)
         game_stats (dict, optional): Oyun istatistikleri (süre, hamle sayısı, ipucu sayısı, vb.)
-        
+
     Returns:
         dict: Puan ve XP çarpanları
     """
@@ -1334,7 +1336,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'difficulty_multiplier': 1.0,  # Zorluk çarpanı
         'final_score': None  # Hesaplanacak nihai skor
     }
-    
+
     # Oyun türüne göre özel çarpanlar
     game_multipliers = {
         'memoryCards': {'point_base': 70, 'score_multiplier': 0.6},
@@ -1355,13 +1357,14 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
+        'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
+        'pattern_flow': {'point_base': 90, 'score_multiplier': 0.45} # Pattern Flow için çarpanlar
     }
-    
+
     # Oyun türüne göre çarpanları güncelle
     if game_type in game_multipliers:
         multipliers.update(game_multipliers[game_type])
-    
+
     # Zorluk seviyesine göre çarpanı ayarla
     if difficulty:
         if difficulty == 'easy':
@@ -1372,16 +1375,16 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
             multipliers['difficulty_multiplier'] = 1.5
         elif difficulty == 'expert':
             multipliers['difficulty_multiplier'] = 2.0
-    
+
     # Eğer oyun istatistikleri verildiyse, daha gerçekçi bir puan hesapla
     if game_stats:
         # Başlangıç puanı
         base_score = 50
-        
+
         # Oyun süresini puan hesaplamasına kat
         duration_seconds = game_stats.get('duration_seconds', 0)
         duration_minutes = duration_seconds / 60.0
-        
+
         # Süreye bağlı puanlama (oyuna göre değişebilir)
         duration_score = 0
         if game_type in ['tetris', 'snake_game']:
@@ -1406,14 +1409,15 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'iq_test': 10.0,  # 10 dakika
                 'numberChain': 2.5,  # 2.5 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
-                'puzzle_slider': 2.0  # 2 dakika
+                'puzzle_slider': 2.0,  # 2 dakika
+                'pattern_flow': 4.0  # Pattern Flow için optimal süre
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
                 duration_score = int(30 * (optimal_duration - duration_minutes) / optimal_duration)
             else:
                 duration_score = max(0, int(30 * (1 - (duration_minutes - optimal_duration) / (optimal_duration * 2))))
-        
+
         # Hamle sayısına bağlı puanlama
         move_count = game_stats.get('move_count', 0)
         move_score = 0
@@ -1440,80 +1444,81 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'iq_test': 20,
                 'numberChain': 40,
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
-                'snake_game': 100  # Yılan uzadıkça daha fazla hamle
+                'snake_game': 100,  # Yılan uzadıkça daha fazla hamle
+                'pattern_flow': 35  # Pattern Flow için optimal hamle sayısı
             }.get(game_type, 50)
-            
+
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
             if move_count <= optimal_moves:
                 move_score = 20
             else:
                 move_score = max(0, int(20 * (1 - (move_count - optimal_moves) / optimal_moves)))
-        
+
         # İpucu kullanımına bağlı puanlama
         hint_count = game_stats.get('hint_count', 0)
         hint_penalty = min(20, hint_count * 5)  # Her ipucu 5 puan düşürür, max 20 puan
-        
+
         # Doğruluk oranına bağlı puanlama
         accuracy = game_stats.get('accuracy', 0)  # 0-100 arası
         accuracy_score = int(accuracy * 0.2)  # Max 20 puan
-        
+
         # Brüt puanı hesapla
         raw_score = base_score + duration_score + move_score + accuracy_score - hint_penalty
-        
+
         # Zorluk seviyesi katsayısını uygula
         adjusted_score = raw_score * multipliers['difficulty_multiplier']
-        
+
         # Sınırları uygula (10-100 arası)
         final_score = max(10, min(100, int(adjusted_score)))
-        
+
         # Nihai puanı ayarla
         multipliers['final_score'] = final_score
-    
+
     return multipliers
 
 # Günlük bonus kontrolü
 def check_daily_bonus(user_id):
     """
     Kullanıcının günlük bonus hakkı olup olmadığını kontrol eder
-    
+
     Args:
         user_id (int): Kullanıcı ID
-    
+
     Returns:
         bool: Günlük bonus hakkı varsa True, yoksa False
     """
     user = User.query.get(user_id)
     now = datetime.utcnow()
-    
+
     # Eğer kullanıcı daha önce hiç oynamamışsa veya son aktif olduğu gün bugün değilse
     if not user.last_active or user.last_active.date() < now.date():
         return True
-    
+
     return False
 
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
     data = request.get_json()
-    
+
     game_type = data.get('game_type')
     score = data.get('score')
     playtime = data.get('playtime', 60)  # Varsayılan oyun süresi 60 saniye
     difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk medium
     game_stats = data.get('game_stats', {})  # Oyun istatistikleri
-    
+
     if not game_type or not score:
         return jsonify({'success': False, 'message': 'Eksik veri!'})
-    
+
     try:
         score = int(score)
         playtime = int(playtime)
     except:
         return jsonify({'success': False, 'message': 'Geçersiz skor veya süre!'})
-    
+
     # Çarpanları hesapla 
     multipliers = calculate_multipliers(game_type, difficulty, game_stats)
-    
+
     # Artık sadece yeni puanlama sistemini kullanıyoruz
     # Performansa dayalı puanlama
     if multipliers.get('final_score'):
@@ -1522,56 +1527,56 @@ def save_score():
         base_points = final_score * 0.5
         score_points = final_score * 0.5
         total_points = final_score
-        
+
         # Puan bilgisini multipliers'a ekle
         multipliers['total_score'] = int(total_points)
     else:
         # Eğer yeni sistem için gerekli veriler yoksa, basit bir hesaplama yap
         # Ama rastgele değil, daha belirleyici bir formül kullan
-        
+
         # Zorluk seviyesine dayalı taban puan
         base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
-        
+
         # Oyun skoruna dayalı ek puan (bu gerçek oyun performansını yansıtır)
         score_points = score * multipliers['score_multiplier']
-        
+
         # Oyun süresine dayalı ek puan
         playtime_minutes = playtime / 60.0
         duration_points = min(20, int(playtime_minutes * 2))  # En fazla 20 puan
-        
+
         # Toplam puanı hesapla
         total_points = base_points + score_points + duration_points
-        
+
         # Sınırları uygula (10-100 arası)
         total_points = max(10, min(100, int(total_points)))
-        
+
         multipliers['total_score'] = int(total_points)
-    
+
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:
         user_id = session['user_id']
         user = User.query.get(user_id)
         now = datetime.utcnow()
-        
+
         # Günlük bonus kontrolü
         daily_bonus = 0
         streak_bonus = 0
-        
+
         if check_daily_bonus(user_id):
             daily_bonus = 20  # Günlük ilk oyun bonusu
-            
+
             # Ardışık günlerde oynama bonusu (streak bonus)
             last_play_date = user.last_active
             if last_play_date and (now.date() - last_play_date.date()).days == 1:
                 # Kullanıcının streak_count'u yoksa 0 kabul eder
                 streak_count = getattr(user, 'streak_count', 0) + 1
-                
+
                 # streak_count değeri yoksa ekle
                 if not hasattr(user, 'streak_count'):
                     user.streak_count = streak_count
                 else:
                     user.streak_count = streak_count
-                    
+
                 # Streak bonusu hesapla (her ardışık gün için artan bonus)
                 streak_bonus = min(streak_count * 5, 50)  # Maximum 50 bonus
             else:
@@ -1580,44 +1585,44 @@ def save_score():
                     user.streak_count = 1
                 else:
                     user.streak_count = 1
-        
+
         # Toplam puanı hesapla
         total_points = base_points + score_points + daily_bonus + streak_bonus
-        
+
         # XP hesaplama
         xp_base = multipliers['xp_base']
         xp_from_score = score * multipliers['xp_score_multiplier']
         xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
-        
+
         xp_gain = int(xp_base + xp_from_score + xp_from_time)
-        
+
         # Yeni skoru kaydet
         new_score = Score(
             user_id=user_id,
             game_type=game_type,
             score=score
         )
-        
+
         db.session.add(new_score)
-        
+
         # Kullanıcı bilgilerini güncelle
         user.experience_points += xp_gain
         user.total_games_played += 1
         user.last_active = now
-        
+
         # Kullanıcının en yüksek skorunu güncelle (gerekirse)
         if score > user.highest_score:
             user.highest_score = score
-        
+
         db.session.commit()
-        
+
         # Yeni seviyeyi hesapla
         new_level = calculate_level(user.experience_points)
         next_level_xp = xp_for_level(new_level + 1)
         current_level_xp = xp_for_level(new_level)
         xp_progress = user.experience_points - current_level_xp
         xp_needed = next_level_xp - current_level_xp
-        
+
         # Ödül detayları
         rewards = {
             'base_points': int(base_points),
@@ -1626,7 +1631,7 @@ def save_score():
             'streak_bonus': streak_bonus,
             'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
-        
+
         return jsonify({
             'success': True, 
             'message': 'Skor kaydedildi!',
@@ -1658,18 +1663,18 @@ def save_score():
             'streak_bonus': 0,
             'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
-        
+
         # Varsayılan XP bilgileri (gösterge amaçlı)
         xp_base = multipliers['xp_base']
         xp_from_score = score * multipliers['xp_score_multiplier']
         xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
-        
+
         xp_gain = int(xp_base + xp_from_score + xp_from_time)
         total_points = base_points + score_points
-        
+
         # Misafir kullanıcılara bilgi mesajı
         guest_message = "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun."
-        
+
         return jsonify({
             'success': False, 
             'message': guest_message,
@@ -1709,7 +1714,7 @@ def get_scores(game_type):
 
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-    
+
         # En yüksek skorları getir (her kullanıcı için en iyi skor)
         subquery = db.session.query(
             Score.user_id,
@@ -1721,7 +1726,7 @@ def get_scores(game_type):
             Score.user_id,
             Score.game_type
         ).subquery()
-    
+
         scores = db.session.query(
             Score,
             User.username,
@@ -1742,7 +1747,7 @@ def get_scores(game_type):
         ).order_by(
             Score.score.desc()
         ).all()  # Tüm kullanıcıları getirmek için limit kaldırıldı
-    
+
         result = []
         for score, username, avatar_url, rank in scores:
             # Profil resminin URL'sini düzelt (static/ öneki kaldırılır)
@@ -1756,7 +1761,7 @@ def get_scores(game_type):
                     fixed_avatar_url = 'static/' + avatar_url
                 else:
                     fixed_avatar_url = avatar_url
-            
+
             result.append({
                 'user_id': score.user_id,
                 'username': username,
@@ -1766,7 +1771,7 @@ def get_scores(game_type):
                 'rank': rank,
                 'is_current_user': score.user_id == current_user_id
             })
-    
+
         return jsonify(result)
     except Exception as e:
         logger.error(f"Skor verileri getirilirken hata oluştu ({game_type}): {str(e)}")
@@ -1778,10 +1783,10 @@ def get_scores_alt(game_type):
     try:
         if not game_type:
             return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
-    
+
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-        
+
         # SQL sorgusu ile skorları doğrudan getir
         result = db.session.execute(f"""
             SELECT s.user_id, u.username, s.score, s.timestamp, u.avatar_url, u.rank
@@ -1795,7 +1800,7 @@ def get_scores_alt(game_type):
             JOIN users u ON u.id = s.user_id
             ORDER BY s.score DESC
         """)
-        
+
         scores = []
         for row in result:
             # Profil resminin URL'sini düzelt
@@ -1809,7 +1814,7 @@ def get_scores_alt(game_type):
                     fixed_avatar_url = 'static/' + row.avatar_url
                 else:
                     fixed_avatar_url = row.avatar_url
-            
+
             scores.append({
                 'user_id': row.user_id,
                 'username': row.username,
@@ -1819,7 +1824,7 @@ def get_scores_alt(game_type):
                 'rank': row.rank,
                 'is_current_user': row.user_id == current_user_id
             })
-        
+
         return jsonify(scores)
     except Exception as e:
         logger.error(f"Alternatif skor verileri getirilirken hata oluştu ({game_type}): {str(e)}")
@@ -1832,7 +1837,7 @@ def get_aggregated_scores():
     try:
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-        
+
         # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
         subquery = db.session.query(
             Score.user_id,
@@ -1842,7 +1847,7 @@ def get_aggregated_scores():
             Score.user_id,
             Score.game_type
         ).subquery()
-        
+
         # Alt sorgudan gelen sonuçları topla
         aggregated = db.session.query(
             subquery.c.user_id,
@@ -1850,7 +1855,7 @@ def get_aggregated_scores():
         ).group_by(
             subquery.c.user_id
         ).subquery()
-        
+
         # Kullanıcı bilgileriyle birleştir
         result = db.session.query(
             User.id,
@@ -1864,7 +1869,7 @@ def get_aggregated_scores():
         ).order_by(
             aggregated.c.total_score.desc()
         ).all()  # Tüm kullanıcıları göstermek için limit kaldırıldı
-        
+
         scores = []
         for user_id, username, avatar_url, rank, total_score in result:
             # Profil resminin URL'sini düzelt
@@ -1878,7 +1883,7 @@ def get_aggregated_scores():
                     fixed_avatar_url = 'static/' + avatar_url
                 else:
                     fixed_avatar_url = avatar_url
-            
+
             scores.append({
                 'user_id': user_id,
                 'username': username,
@@ -1887,7 +1892,7 @@ def get_aggregated_scores():
                 'rank': rank,
                 'is_current_user': user_id == current_user_id
             })
-        
+
         return jsonify(scores)
     except Exception as e:
         logger.error(f"Skor verilerini getirirken hata oluştu: {str(e)}")
@@ -1925,9 +1930,10 @@ def get_leaderboard_data(game_type):
         'wordle': 'Wordle',
         'chess': 'Satranç',
         'puzzle_slider': 'Resim Bulmaca',
-        'snake_game': 'Yılan Oyunu'
+        'snake_game': 'Yılan Oyunu',
+        'pattern_flow': 'Pattern Flow' # Pattern Flow eklendi
     }
-    
+
     return jsonify({
         'game_type': game_type,
         'game_name': game_names.get(game_type, game_type),
