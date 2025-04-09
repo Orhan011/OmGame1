@@ -1,6 +1,7 @@
+
 {% extends 'layout.html' %}
 
-{% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
+{% block title %}Matematik Mücadelesi - OmGame{% endblock %}
 
 {% block content %}
 <div class="page-container">
@@ -81,7 +82,7 @@
         </div>
 
         <div class="answer-input">
-          <input type="number" id="answer-input" placeholder="Cevabınız">
+          <input type="number" id="answer-input" placeholder="Cevabınız" inputmode="numeric" pattern="[0-9]*">
           <button id="submit-answer" class="btn btn-primary">
             <i class="fas fa-check me-2"></i>Kontrol Et
           </button>
@@ -502,11 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let totalResponseTime = 0;
   let problemStartTime = 0;
 
-  // Sounds
-  const correctSound = new Audio('/static/sounds/correct.mp3');
-  const wrongSound = new Audio('/static/sounds/wrong.mp3');
-  const gameOverSound = new Audio('/static/sounds/game-over.mp3');
-
   // Event Listeners for Configuration
   difficultyButtons.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -712,18 +708,12 @@ document.addEventListener('DOMContentLoaded', function() {
       
       score += pointsEarned;
       correctAnswers++;
-      
-      // Play sound
-      correctSound.play();
     } else {
       // Incorrect answer
       feedbackEl.textContent = `Yanlış! Doğru cevap: ${currentAnswer}`;
       feedbackEl.className = 'feedback incorrect';
       
       incorrectAnswers++;
-      
-      // Play sound
-      wrongSound.play();
     }
     
     // Update UI
@@ -756,9 +746,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame() {
     // Stop timer
     clearInterval(timer);
-    
-    // Play sound
-    gameOverSound.play();
     
     // Calculate statistics
     const totalAnswers = correctAnswers + incorrectAnswers;
