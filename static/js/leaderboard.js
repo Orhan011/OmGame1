@@ -73,7 +73,7 @@ function loadLeaderboard(gameType = 'all') {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="/${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }

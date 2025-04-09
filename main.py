@@ -1689,12 +1689,24 @@ def get_scores(game_type):
     
         result = []
         for score, username, avatar_url, rank in scores:
+            # Profil resminin URL'sini düzelt (static/ öneki kaldırılır)
+            fixed_avatar_url = avatar_url
+            if avatar_url and not avatar_url.startswith(('http://', 'https://')):
+                # Resim yolu göreceli ise düzelt
+                if avatar_url.startswith('static/'):
+                    fixed_avatar_url = avatar_url
+                # uploads/ ile başlıyorsa bunu da düzelt
+                elif avatar_url.startswith('uploads/'):
+                    fixed_avatar_url = 'static/' + avatar_url
+                else:
+                    fixed_avatar_url = avatar_url
+            
             result.append({
                 'user_id': score.user_id,
                 'username': username,
                 'score': score.score,
                 'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
-                'avatar_url': avatar_url,
+                'avatar_url': fixed_avatar_url,
                 'rank': rank,
                 'is_current_user': score.user_id == current_user_id
             })
@@ -1730,12 +1742,24 @@ def get_scores_alt(game_type):
         
         scores = []
         for row in result:
+            # Profil resminin URL'sini düzelt
+            fixed_avatar_url = row.avatar_url
+            if row.avatar_url and not row.avatar_url.startswith(('http://', 'https://')):
+                # Resim yolu göreceli ise düzelt
+                if row.avatar_url.startswith('static/'):
+                    fixed_avatar_url = row.avatar_url
+                # uploads/ ile başlıyorsa bunu da düzelt
+                elif row.avatar_url.startswith('uploads/'):
+                    fixed_avatar_url = 'static/' + row.avatar_url
+                else:
+                    fixed_avatar_url = row.avatar_url
+            
             scores.append({
                 'user_id': row.user_id,
                 'username': row.username,
                 'score': row.score,
                 'timestamp': row.timestamp.strftime('%Y-%m-%d %H:%M'),
-                'avatar_url': row.avatar_url,
+                'avatar_url': fixed_avatar_url,
                 'rank': row.rank,
                 'is_current_user': row.user_id == current_user_id
             })
@@ -1787,11 +1811,23 @@ def get_aggregated_scores():
         
         scores = []
         for user_id, username, avatar_url, rank, total_score in result:
+            # Profil resminin URL'sini düzelt
+            fixed_avatar_url = avatar_url
+            if avatar_url and not avatar_url.startswith(('http://', 'https://')):
+                # Resim yolu göreceli ise düzelt
+                if avatar_url.startswith('static/'):
+                    fixed_avatar_url = avatar_url
+                # uploads/ ile başlıyorsa bunu da düzelt
+                elif avatar_url.startswith('uploads/'):
+                    fixed_avatar_url = 'static/' + avatar_url
+                else:
+                    fixed_avatar_url = avatar_url
+            
             scores.append({
                 'user_id': user_id,
                 'username': username,
                 'total_score': total_score,
-                'avatar_url': avatar_url,
+                'avatar_url': fixed_avatar_url,
                 'rank': rank,
                 'is_current_user': user_id == current_user_id
             })
