@@ -1505,11 +1505,8 @@ def save_score():
             }
         })
     else:
-        # Kullanıcı giriş yapmamış, misafir olarak kaydedelim
-        # Basit puan hesaplaması
-        total_points = base_points + score_points
-        
-        # Ödül detayları
+        # Kullanıcı giriş yapmamış - skorunu kaydetmiyoruz
+        # Ödül detayları (gösterge amaçlı)
         rewards = {
             'base_points': int(base_points),
             'score_points': int(score_points),
@@ -1518,30 +1515,29 @@ def save_score():
             'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
         
-        # Yeni seviyeyi varsayalım
-        new_level = 1
-        
-        # Varsayılan XP bilgileri
+        # Varsayılan XP bilgileri (gösterge amaçlı)
         xp_base = multipliers['xp_base']
         xp_from_score = score * multipliers['xp_score_multiplier']
         xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
         
         xp_gain = int(xp_base + xp_from_score + xp_from_time)
+        total_points = base_points + score_points
         
-        # Misafir kullanıcılara bilgi mesajı ekleyelim
-        guest_message = "Skorunuz kaydedildi, ancak profilinize işlenmedi. Tam puan ve XP almak için giriş yapın!"
+        # Misafir kullanıcılara bilgi mesajı
+        guest_message = "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun."
         
         return jsonify({
-            'success': True, 
+            'success': False, 
             'message': guest_message,
             'guest': True,  # Misafir kullanıcı olduğunu belirt
+            'login_required': True,  # Giriş gerektiğini belirt
             'points': {
                 'total': int(total_points),
                 'rewards': rewards
             },
             'xp': {
                 'gain': xp_gain,
-                'level': new_level,
+                'level': 1,
                 'progress_percent': 0
             }
         })

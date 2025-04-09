@@ -448,6 +448,7 @@
     border-radius: 15px;
     padding: 15px;
     margin: 15px 0;
+    transition: all 0.3s ease;
     border: 1px solid rgba(106, 90, 224, 0.3);
   }
   
@@ -471,6 +472,33 @@
     gap: 10px;
     justify-content: center;
     margin-top: 8px;
+  }
+  
+  /* Giriş vurgulama sınıfı */
+  .highlight-login {
+    background: rgba(106, 90, 224, 0.2);
+    border: 2px solid rgba(106, 90, 224, 0.5);
+    animation: pulse-border 1.5s infinite;
+  }
+  
+  /* Giriş butonları animasyonu */
+  .animate-buttons .btn {
+    animation: pulse-buttons 1.5s infinite;
+    transform-origin: center;
+  }
+  
+  /* Buton animasyonu için keyframes */
+  @keyframes pulse-buttons {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(106, 90, 224, 0.7); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Kenarlık animasyonu için keyframes */
+  @keyframes pulse-border {
+    0% { border-color: rgba(106, 90, 224, 0.3); }
+    50% { border-color: rgba(106, 90, 224, 0.8); }
+    100% { border-color: rgba(106, 90, 224, 0.3); }
   }
 
   /* Level up animation */
@@ -1232,7 +1260,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }, 300);
           
           // Eğer API'den özel bir mesaj geldiyse göster
-          if (data.message && data.guest) {
+          if (data.message) {
             const messageEl = document.createElement('div');
             messageEl.className = 'guest-message-api mt-2';
             messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
@@ -1247,6 +1275,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const gameOverOverlay = document.getElementById('game-over-overlay');
             if (gameOverOverlay) {
               gameOverOverlay.appendChild(messageEl);
+            }
+          }
+          
+          // Eğer giriş yapılması gerekiyorsa vurgula
+          if (data.login_required) {
+            const guestInfo = document.getElementById('guest-info');
+            if (guestInfo) {
+              guestInfo.classList.add('highlight-login');
+              
+              // Giriş butonlarını daha belirgin yap
+              const loginButtons = guestInfo.querySelector('.guest-buttons');
+              if (loginButtons) {
+                loginButtons.classList.add('animate-buttons');
+              }
             }
           }
         }
