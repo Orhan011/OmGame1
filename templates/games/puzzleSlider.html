@@ -6,896 +6,668 @@
 <div class="page-container">
   <div class="game-container">
     <div class="game-header">
-      <h1>Puzzle Slider <span class="badge">Görsel Bulmaca</span></h1>
+      <h1>Puzzle Slider <span class="badge bg-accent">Görsel Bulmaca</span></h1>
       <p class="game-description">Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu.</p>
     </div>
 
-    <div class="puzzle-slider-modern">
-      <div class="puzzle-layout">
-        <!-- Sol panel - Oyun Tahtası -->
-        <div class="puzzle-game-panel">
-          <div class="puzzle-board-wrapper">
-            <div id="puzzle-board" class="puzzle-board size-3"></div>
-          </div>
-          <div class="puzzle-controls">
-            <button id="shuffle-btn" class="btn-game btn-primary">
-              <span class="btn-icon"><i class="fas fa-random"></i></span>
-              <span class="btn-text">Karıştır</span>
-            </button>
-            <button id="restart-btn" class="btn-game btn-secondary">
-              <span class="btn-icon"><i class="fas fa-redo-alt"></i></span>
-              <span class="btn-text">Yeniden Başlat</span>
-            </button>
-            <button id="hint-btn" class="btn-game btn-accent">
-              <span class="btn-icon"><i class="fas fa-lightbulb"></i></span>
-              <span class="btn-text">İpucu</span>
-            </button>
-          </div>
+    <div class="puzzle-game-container">
+      <!-- Oyun Alanı -->
+      <div class="puzzle-game-area">
+        <div class="puzzle-board-container">
+          <div id="puzzle-board" class="puzzle-board size-3"></div>
         </div>
-
-        <!-- Sağ panel - Oyun Bilgileri -->
-        <div class="puzzle-info-panel">
-          <!-- Oyun İstatistikleri -->
-          <div class="game-stats-card">
-            <div class="card-header">
-              <h3><i class="fas fa-chart-line"></i> Oyun Bilgileri</h3>
-            </div>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-walking"></i></div>
-                <div class="stat-info">
-                  <div class="stat-label">Hamleler</div>
-                  <div class="stat-value" id="moves">0</div>
-                </div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-info">
-                  <div class="stat-label">Süre</div>
-                  <div class="stat-value" id="timer">00:00</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Zorluk Seviyesi -->
-          <div class="difficulty-card">
-            <div class="card-header">
-              <h3><i class="fas fa-sliders-h"></i> Zorluk Seviyesi</h3>
-            </div>
-            <div class="difficulty-options">
-              <button class="difficulty-btn active" data-size="3">
-                <span class="diff-icon">3×3</span>
-                <span class="diff-name">Kolay</span>
-              </button>
-              <button class="difficulty-btn" data-size="4">
-                <span class="diff-icon">4×4</span>
-                <span class="diff-name">Orta</span>
-              </button>
-              <button class="difficulty-btn" data-size="5">
-                <span class="diff-icon">5×5</span>
-                <span class="diff-name">Zor</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Puzzle Tema Seçimi -->
-          <div class="theme-card">
-            <div class="card-header">
-              <h3><i class="fas fa-palette"></i> Tema</h3>
-            </div>
-            <div class="theme-options">
-              <button class="theme-btn active" data-theme="default">
-                <span class="theme-color" style="background: linear-gradient(135deg, #6a5ae0, #a890ff);"></span>
-                <span class="theme-name">Klasik</span>
-              </button>
-              <button class="theme-btn" data-theme="gradient">
-                <span class="theme-color" style="background: linear-gradient(135deg, #FF416C, #FF4B2B);"></span>
-                <span class="theme-name">Gradyan</span>
-              </button>
-              <button class="theme-btn" data-theme="neon">
-                <span class="theme-color" style="background: #000; border: 2px solid #0ff; box-shadow: 0 0 5px #0ff;"></span>
-                <span class="theme-name">Neon</span>
-              </button>
-              <button class="theme-btn" data-theme="dark">
-                <span class="theme-color" style="background: #121212; border: 1px solid #333;"></span>
-                <span class="theme-name">Karanlık</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Nasıl Oynanır -->
-          <div class="instructions-card">
-            <div class="card-header">
-              <h3><i class="fas fa-info-circle"></i> Nasıl Oynanır?</h3>
-            </div>
-            <ul class="instruction-list">
-              <li>Kareleri doğru sırada yerleştirmeye çalışın.</li>
-              <li>Boş kareye komşu olan bir kareye tıklayarak hareket ettirebilirsiniz.</li>
-              <li>Tüm kareleri 1'den başlayarak sırayla dizin.</li>
-              <li>Son kare boş kalmalıdır.</li>
-              <li>Zorluk seviyesini değiştirerek oyunu daha zor hale getirebilirsiniz.</li>
-              <li>İpucu butonu ile bir sonraki hamlenin önerisini alabilirsiniz.</li>
-            </ul>
-          </div>
-
-          <!-- Tüm Oyunlar Butonu -->
-          <a href="{{ url_for('all_games') }}" class="all-games-btn">
-            <i class="fas fa-th-large"></i> Tüm Oyunlar
-          </a>
+        
+        <div class="puzzle-controls">
+          <button id="shuffle-btn" class="ctrl-btn ctrl-primary">
+            <i class="fas fa-random"></i> Karıştır
+          </button>
+          <button id="restart-btn" class="ctrl-btn ctrl-warning">
+            <i class="fas fa-redo-alt"></i> Yeniden Başlat
+          </button>
+          <button id="hint-btn" class="ctrl-btn ctrl-info">
+            <i class="fas fa-lightbulb"></i> İpucu
+          </button>
         </div>
       </div>
+      
+      <!-- Bilgi Paneli -->
+      <div class="puzzle-info-area">
+        <!-- Skor ve Durum -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <h3><i class="fas fa-trophy"></i> Oyun Bilgileri</h3>
+          </div>
+          <div class="info-card-content">
+            <div class="stat-row">
+              <div class="stat-label"><i class="fas fa-walking"></i> Hamleler</div>
+              <div class="stat-value" id="moves">0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label"><i class="fas fa-clock"></i> Süre</div>
+              <div class="stat-value" id="timer">00:00</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Zorluk Seviyesi -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <h3><i class="fas fa-sliders-h"></i> Zorluk Seviyesi</h3>
+          </div>
+          <div class="info-card-content difficulty-btns">
+            <button class="difficulty-btn active" data-size="3">3×3</button>
+            <button class="difficulty-btn" data-size="4">4×4</button>
+            <button class="difficulty-btn" data-size="5">5×5</button>
+          </div>
+        </div>
+        
+        <!-- Yardım -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <h3><i class="fas fa-info-circle"></i> Nasıl Oynanır</h3>
+          </div>
+          <div class="info-card-content">
+            <ul class="help-list">
+              <li>Kareleri doğru sırada yerleştirmeye çalışın</li>
+              <li>Boş kareye komşu olan bir kareye tıklayarak hareket ettirebilirsiniz</li>
+              <li>Tüm kareleri 1'den başlayarak sırayla dizin</li>
+              <li>Son kare boş kalmalıdır</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Tüm Oyunlar -->
+        <a href="{{ url_for('all_games') }}" class="all-games-btn">
+          <i class="fas fa-th-large"></i> Tüm Oyunlar
+        </a>
+      </div>
     </div>
-
-    <!-- Başarı Modalı -->
-    <div id="success-modal" class="puzzle-success-modal">
-      <div class="success-content">
-        <div class="success-header">
-          <div class="trophy-icon">
-            <i class="fas fa-trophy"></i>
-          </div>
-          <h2>Tebrikler!</h2>
-          <p>Puzzle'ı başarıyla tamamladınız!</p>
+  </div>
+  
+  <!-- Başarı Modalı -->
+  <div id="success-modal" class="puzzle-success-modal">
+    <div class="success-modal-content">
+      <div class="trophy-icon">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <h2>Tebrikler!</h2>
+      <p>Puzzle'ı başarıyla tamamladınız.</p>
+      
+      <div class="success-stats">
+        <div class="success-stat">
+          <div class="success-stat-icon"><i class="fas fa-walking"></i></div>
+          <div class="success-stat-value" id="final-moves">0</div>
+          <div class="success-stat-label">Toplam Hamle</div>
         </div>
-        
-        <div class="success-stats">
-          <div class="success-stat">
-            <div class="success-stat-icon"><i class="fas fa-walking"></i></div>
-            <div class="success-stat-value" id="final-moves">0</div>
-            <div class="success-stat-label">Toplam Hamle</div>
-          </div>
-          <div class="success-stat">
-            <div class="success-stat-icon"><i class="fas fa-clock"></i></div>
-            <div class="success-stat-value" id="final-time">00:00</div>
-            <div class="success-stat-label">Geçen Süre</div>
-          </div>
+        <div class="success-stat">
+          <div class="success-stat-icon"><i class="fas fa-clock"></i></div>
+          <div class="success-stat-value" id="final-time">00:00</div>
+          <div class="success-stat-label">Geçen Süre</div>
         </div>
-        
-        <div class="success-actions">
-          <button id="play-again-btn" class="btn-play-again">
-            <i class="fas fa-redo-alt"></i> Tekrar Oyna
-          </button>
-          <a href="{{ url_for('all_games') }}" class="btn-all-games">
-            <i class="fas fa-th-large"></i> Tüm Oyunlar
-          </a>
-        </div>
+      </div>
+      
+      <div class="success-buttons">
+        <button id="play-again-btn" class="success-btn success-btn-primary">
+          <i class="fas fa-redo-alt"></i> Tekrar Oyna
+        </button>
+        <a href="{{ url_for('all_games') }}" class="success-btn success-btn-secondary">
+          <i class="fas fa-th-large"></i> Tüm Oyunlar
+        </a>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  /* Ana Konteyner */
-  .puzzle-slider-modern {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-  }
+/* Ana Container */
+.puzzle-game-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
 
-  /* İki Panelli Düzen */
-  .puzzle-layout {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin-top: 20px;
-  }
+.puzzle-game-area {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  /* Oyun Paneli */
-  .puzzle-game-panel {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
+.puzzle-info-area {
+  width: 320px;
+}
+
+/* Oyun Tahtası */
+.puzzle-board-container {
+  background: rgba(30, 30, 60, 0.5);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  justify-content: center;
+}
+
+.puzzle-board {
+  display: grid;
+  gap: 8px;
+}
+
+.size-3 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.size-4 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.size-5 {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+}
+
+.puzzle-tile {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.puzzle-tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  border-radius: 12px;
+}
+
+.puzzle-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-tile.empty {
+  background: rgba(30, 30, 60, 0.3);
+  box-shadow: none;
+  cursor: default;
+}
+
+.puzzle-tile.empty:hover {
+  transform: none;
+}
+
+.puzzle-tile.highlight {
+  animation: pulse-highlight 1.5s infinite;
+}
+
+@keyframes pulse-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(106, 90, 224, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0);
+  }
+}
+
+/* Kontroller */
+.puzzle-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 450px;
+  justify-content: center;
+}
+
+.ctrl-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ctrl-primary {
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+}
+
+.ctrl-warning {
+  background: linear-gradient(135deg, #FF9800, #FF5722);
+}
+
+.ctrl-info {
+  background: linear-gradient(135deg, #00BCD4, #2196F3);
+}
+
+.ctrl-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Bilgi Paneli */
+.info-card {
+  background: rgba(30, 30, 60, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.info-card-header {
+  background: rgba(20, 20, 40, 0.7);
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.info-card-header h3 i {
+  color: var(--accent-color);
+}
+
+.info-card-content {
+  padding: 15px;
+}
+
+/* Oyun Bilgileri */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* Zorluk Butonları */
+.difficulty-btns {
+  display: flex;
+  justify-content: space-between;
+}
+
+.difficulty-btn {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  background: rgba(40, 40, 80, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.difficulty-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.difficulty-btn:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.difficulty-btn.active {
+  background: var(--accent-color);
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+}
+
+.difficulty-btn:hover:not(.active) {
+  background: rgba(60, 60, 100, 0.5);
+}
+
+/* Yardım Listesi */
+.help-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.help-list li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+/* Tüm Oyunlar Butonu */
+.all-games-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #2c3e50, #4a6491);
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.all-games-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #34495e, #5d7fba);
+  color: white;
+  text-decoration: none;
+}
+
+/* Başarı Modalı */
+.puzzle-success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.success-modal-content {
+  background: rgba(30, 30, 60, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  max-width: 90%;
+  width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: modalFadeIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.trophy-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #FFD700, #FFA000);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+  animation: trophy-pulse 2s infinite alternate;
+}
+
+.trophy-icon i {
+  font-size: 40px;
+  color: white;
+}
+
+@keyframes trophy-pulse {
+  from {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.success-modal-content h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.success-modal-content p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 25px;
+}
+
+.success-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 25px;
+}
+
+.success-stat {
+  text-align: center;
+}
+
+.success-stat-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+.success-stat-icon i {
+  color: var(--accent-color);
+}
+
+.success-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.success-stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.success-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.success-btn {
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.success-btn-primary {
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+  color: white;
+  border: none;
+}
+
+.success-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.success-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animasyonlar */
+@keyframes board-shuffle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.board-shuffle {
+  animation: board-shuffle 0.3s ease;
+}
+
+/* Konfeti Animasyonu */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  animation: confetti-fall 3s ease-in-out forwards;
+  z-index: 100;
+  border-radius: 50%;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .puzzle-game-container {
     flex-direction: column;
-    align-items: center;
   }
-
-  /* Bilgi Paneli */
-  .puzzle-info-panel {
-    width: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* Kart Stilleri */
-  .game-stats-card, .difficulty-card, .theme-card, .instructions-card {
-    background: rgba(30, 30, 60, 0.6);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-
-  .game-stats-card:hover, .difficulty-card:hover, .theme-card:hover, .instructions-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Kart Başlıkları */
-  .card-header {
-    padding: 16px 20px;
-    background: rgba(20, 20, 40, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .card-header h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #fff;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .card-header i {
-    color: var(--accent-color);
-  }
-
-  /* İstatistik Stil */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 20px;
-  }
-
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 10px;
-    background: rgba(40, 40, 80, 0.4);
-    border-radius: 12px;
-  }
-
-  .stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--accent-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .stat-icon i {
-    font-size: 1.2rem;
-    color: white;
-  }
-
-  .stat-info {
-    flex: 1;
-  }
-
-  .stat-label {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 3px;
-  }
-
-  .stat-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: white;
-  }
-
-  /* Zorluk Seçici */
-  .difficulty-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 20px;
-  }
-
-  .difficulty-btn {
-    background: rgba(40, 40, 80, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .difficulty-btn:hover {
-    background: rgba(60, 60, 100, 0.5);
-    transform: translateY(-2px);
-  }
-
-  .difficulty-btn.active {
-    background: var(--accent-color);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-  }
-
-  .diff-icon {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: white;
-  }
-
-  .diff-name {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  /* Tema Seçici */
-  .theme-options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 20px;
-  }
-
-  .theme-btn {
-    background: rgba(40, 40, 80, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .theme-btn:hover {
-    background: rgba(60, 60, 100, 0.5);
-    transform: translateY(-2px);
-  }
-
-  .theme-btn.active {
-    border: 2px solid var(--accent-color);
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.2);
-  }
-
-  .theme-color {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .theme-name {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* Nasıl oynanır */
-  .instructions-card .instruction-list {
-    list-style-type: disc;
-    padding: 20px 20px 20px 40px;
-    margin: 0;
-  }
-
-  .instruction-list li {
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-
-  .instruction-list li:last-child {
-    margin-bottom: 0;
-  }
-
-  /* Tüm Oyunlar Butonu */
-  .all-games-btn {
-    background: linear-gradient(135deg, #2c3e50, #4a6491);
-    color: white;
-    border: none;
-    border-radius: 16px;
-    padding: 15px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .all-games-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, #34495e, #5d7fba);
-    color: white;
-    text-decoration: none;
-  }
-
-  /* Oyun Tahtası */
-  .puzzle-board-wrapper {
-    background: rgba(25, 25, 45, 0.7);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  .puzzle-game-area, .puzzle-info-area {
     width: 100%;
-    max-width: 500px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .puzzle-board {
-    display: grid;
-    gap: 8px;
+    max-width: 600px;
     margin: 0 auto;
   }
+}
 
-  .size-3 {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-  }
-
-  .size-4 {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-  }
-
-  .size-5 {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-  }
-
+@media (max-width: 576px) {
   .puzzle-tile {
-    width: 75px;
-    height: 75px;
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
   }
-
-  .puzzle-tile::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-    border-radius: 12px;
+  
+  .size-4 .puzzle-tile {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
   }
-
-  .puzzle-tile:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  }
-
-  .puzzle-tile.empty {
-    background: rgba(30, 30, 60, 0.2);
-    box-shadow: none;
-    cursor: default;
-  }
-
-  .puzzle-tile.empty:hover {
-    transform: none;
-  }
-
-  .puzzle-tile.highlight {
-    animation: pulse-highlight 1.5s infinite;
-    box-shadow: 0 0 0 5px rgba(106, 90, 224, 0.5), 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-
-  @keyframes pulse-highlight {
-    0% {
-      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7), 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    70% {
-      box-shadow: 0 0 0 15px rgba(106, 90, 224, 0), 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0), 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-  }
-
-  /* Theme styles */
-  .puzzle-tile.theme-gradient {
-    background: linear-gradient(135deg, #FF416C, #FF4B2B);
-  }
-
-  .puzzle-tile.theme-neon {
-    background: #000;
-    color: #0ff;
-    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
-    border: 2px solid #0ff;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.2);
-  }
-
-  .puzzle-tile.theme-dark {
-    background: #121212;
-    color: #e0e0e0;
-    border: 1px solid #333;
-  }
-
-  /* Oyun Kontrolleri */
-  .puzzle-controls {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .btn-game {
-    flex: 1;
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: white;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .btn-game .btn-icon {
-    font-size: 1.2rem;
-    height: 24px;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #6a5ae0, #8C66FF);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, #FF9800, #FF5722);
-  }
-
-  .btn-accent {
-    background: linear-gradient(135deg, #00BCD4, #2196F3);
-  }
-
-  .btn-game:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #5D4ECB, #7E58E2);
-  }
-
-  .btn-secondary:hover {
-    background: linear-gradient(135deg, #F57C00, #E64A19);
-  }
-
-  .btn-accent:hover {
-    background: linear-gradient(135deg, #00ACC1, #1E88E5);
-  }
-
-  /* Başarı Modalı */
-  .puzzle-success-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .success-content {
-    background: rgba(30, 30, 60, 0.95);
-    border-radius: 24px;
-    padding: 35px;
-    text-align: center;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    animation: modalFadeIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
-  .success-header {
-    margin-bottom: 25px;
-  }
-
-  .trophy-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #FFD700, #FFA000);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
-    animation: trophy-glow 2s infinite alternate;
-  }
-
-  .trophy-icon i {
-    font-size: 40px;
-    color: white;
-  }
-
-  @keyframes trophy-glow {
-    from {
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    }
-    to {
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
-    }
-  }
-
-  .success-content h2 {
-    color: white;
-    font-size: 2.2rem;
-    margin-bottom: 10px;
-  }
-
-  .success-content p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
-    margin-bottom: 0;
-  }
-
-  .success-stats {
-    display: flex;
-    justify-content: space-around;
-    margin: 30px 0;
-  }
-
-  .success-stat {
-    text-align: center;
-  }
-
-  .success-stat-icon {
+  
+  .size-5 .puzzle-tile {
     width: 40px;
     height: 40px;
-    margin: 0 auto 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 1.1rem;
   }
-
-  .success-stat-icon i {
-    font-size: 18px;
-    color: var(--accent-color);
-  }
-
-  .success-stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 5px;
-  }
-
-  .success-stat-label {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
-  }
-
-  .success-actions {
-    display: flex;
+  
+  .puzzle-controls {
     flex-direction: column;
-    gap: 15px;
   }
-
-  .btn-play-again, .btn-all-games {
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    text-decoration: none;
+  
+  .success-stat-value {
+    font-size: 1.6rem;
   }
-
-  .btn-play-again {
-    background: linear-gradient(135deg, #6a5ae0, #8C66FF);
-    color: white;
-    border: none;
-    cursor: pointer;
+  
+  .trophy-icon {
+    width: 60px;
+    height: 60px;
   }
-
-  .btn-all-games {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  .trophy-icon i {
+    font-size: 30px;
   }
-
-  .btn-play-again:hover, .btn-all-games:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-play-again:hover {
-    background: linear-gradient(135deg, #5D4ECB, #7E58E2);
-    color: white;
-  }
-
-  .btn-all-games:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    text-decoration: none;
-  }
-
-  @keyframes modalFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* Animasyonlar */
-  @keyframes board-shuffle {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(-2deg); }
-    75% { transform: rotate(2deg); }
-    100% { transform: rotate(0deg); }
-  }
-
-  .board-shuffle {
-    animation: board-shuffle 0.3s ease;
-  }
-
-  @keyframes tile-move {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
-  }
-
-  .tile-move {
-    animation: tile-move 0.3s ease;
-  }
-
-  /* Konfeti Animasyonu */
-  @keyframes confetti-fall {
-    0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-  }
-
-  .confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    pointer-events: none;
-    animation: confetti-fall 3s ease-in-out forwards;
-    z-index: 100;
-    border-radius: 50%;
-  }
-
-  /* Responsive Tasarım */
-  @media (max-width: 992px) {
-    .puzzle-layout {
-      flex-direction: column;
-    }
-
-    .puzzle-info-panel {
-      width: 100%;
-    }
-
-    .puzzle-game-panel, .puzzle-info-panel {
-      margin: 0 auto;
-      max-width: 600px;
-    }
-
-    .difficulty-options, .theme-options {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .puzzle-controls {
-      flex-direction: column;
-    }
-
-    .stats-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .difficulty-options, .theme-options {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .puzzle-tile {
-      width: 65px;
-      height: 65px;
-      font-size: 1.5rem;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .difficulty-options, .theme-options {
-      grid-template-columns: repeat(2, 1fr);
-      padding: 15px;
-    }
-
-    .puzzle-tile {
-      width: 50px;
-      height: 50px;
-      font-size: 1.2rem;
-    }
-
-    .size-5 .puzzle-tile {
-      width: 40px;
-      height: 40px;
-      font-size: 1rem;
-    }
-
-    .puzzle-controls {
-      gap: 10px;
-    }
-
-    .success-content {
-      padding: 25px 15px;
-    }
-
-    .trophy-icon {
-      width: 60px;
-      height: 60px;
-    }
-
-    .trophy-icon i {
-      font-size: 30px;
-    }
-
-    .success-content h2 {
-      font-size: 1.8rem;
-    }
-
-    .success-stat-value {
-      font-size: 1.6rem;
-    }
-  }
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
+  // DOM Elemanları
   const puzzleBoard = document.getElementById('puzzle-board');
-  const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const movesDisplay = document.getElementById('moves');
+  const timerDisplay = document.getElementById('timer');
   const shuffleBtn = document.getElementById('shuffle-btn');
   const restartBtn = document.getElementById('restart-btn');
   const hintBtn = document.getElementById('hint-btn');
-  const movesDisplay = document.getElementById('moves');
-  const timerDisplay = document.getElementById('timer');
+  const difficultyBtns = document.querySelectorAll('.difficulty-btn');
   const successModal = document.getElementById('success-modal');
   const finalMovesDisplay = document.getElementById('final-moves');
   const finalTimeDisplay = document.getElementById('final-time');
   const playAgainBtn = document.getElementById('play-again-btn');
-
-  // Game State
+  
+  // Oyun Durumu
   let boardSize = 3;
   let tiles = [];
   let emptyTileIndex = boardSize * boardSize - 1;
@@ -904,33 +676,11 @@ document.addEventListener('DOMContentLoaded', function() {
   let seconds = 0;
   let gameStarted = false;
   
-  // Initialize game
+  // Oyunu Başlat
   createBoard();
   shuffleTiles();
-
-  // Event listeners for difficulty buttons
-  difficultyBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const newSize = parseInt(this.getAttribute('data-size'));
-      if (newSize !== boardSize) {
-        boardSize = newSize;
-        
-        // Update board class
-        puzzleBoard.className = `puzzle-board size-${boardSize}`;
-        
-        // Reset game
-        resetGame();
-        createBoard();
-        shuffleTiles();
-        
-        // Update active button
-        difficultyBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      }
-    });
-  });
-
-  // Event listeners for buttons
+  
+  // Event Listeners
   shuffleBtn.addEventListener('click', function() {
     shuffleTiles();
     puzzleBoard.classList.add('board-shuffle');
@@ -950,35 +700,34 @@ document.addEventListener('DOMContentLoaded', function() {
     createBoard();
     shuffleTiles();
   });
-
-  // Theme buttons
-  const themeBtns = document.querySelectorAll('.theme-btn');
-  themeBtns.forEach(btn => {
+  
+  // Zorluk Seviyesi Butonu Dinleyicileri
+  difficultyBtns.forEach(btn => {
     btn.addEventListener('click', function() {
-      const theme = this.getAttribute('data-theme');
-      
-      // Remove all theme classes from tiles
-      tiles.forEach(tile => {
-        // Skip empty tiles
-        if (tile.classList.contains('empty')) return;
+      if (!this.classList.contains('active')) {
+        const newSize = parseInt(this.getAttribute('data-size'));
         
-        tile.classList.remove('theme-default', 'theme-gradient', 'theme-neon', 'theme-dark');
-        tile.classList.add(`theme-${theme}`);
-      });
-      
-      // Update active button
-      themeBtns.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
+        if (newSize !== boardSize) {
+          boardSize = newSize;
+          puzzleBoard.className = `puzzle-board size-${boardSize}`;
+          
+          resetGame();
+          createBoard();
+          shuffleTiles();
+          
+          // Aktif buton güncelleme
+          difficultyBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        }
+      }
     });
   });
-
-  // Create the puzzle board
+  
+  // Oyun Tahtası Oluşturma
   function createBoard() {
-    // Clear the board
     puzzleBoard.innerHTML = '';
     tiles = [];
     
-    // Create new tiles
     for (let i = 0; i < boardSize * boardSize; i++) {
       const tile = document.createElement('div');
       tile.className = 'puzzle-tile';
@@ -988,35 +737,24 @@ document.addEventListener('DOMContentLoaded', function() {
         tile.textContent = '';
       } else {
         tile.textContent = i + 1;
-        // Apply active theme - fail safely if no theme button is active
-        const activeThemeElement = document.querySelector('.theme-btn.active');
-        if (activeThemeElement) {
-          const activeTheme = activeThemeElement.getAttribute('data-theme');
-          tile.classList.add(`theme-${activeTheme}`);
-        } else {
-          // Default theme
-          tile.classList.add('theme-default');
-        }
       }
       
       tile.addEventListener('click', () => moveTile(i));
-      
       puzzleBoard.appendChild(tile);
       tiles.push(tile);
     }
     
-    // Set empty tile index
     emptyTileIndex = boardSize * boardSize - 1;
   }
-
-  // Show hint
+  
+  // İpucu Gösterme
   function showHint() {
-    // Find a valid move
     const validMoves = getValidMoves();
+    
     if (validMoves.length > 0) {
-      // Choose a move that would bring a tile to its correct position
       let bestMove = validMoves[0];
       
+      // Doğru pozisyona götürecek hamleyi seç
       for (const move of validMoves) {
         const tileValue = parseInt(tiles[move].textContent);
         const correctPosition = tileValue - 1;
@@ -1027,29 +765,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       
-      // Highlight the suggested tile
+      // İpucu vurgulama
       tiles.forEach(tile => tile.classList.remove('highlight'));
       tiles[bestMove].classList.add('highlight');
       
-      // Remove the highlight after 2 seconds
+      // 2 saniye sonra vurgulamayı kaldır
       setTimeout(() => {
         tiles[bestMove].classList.remove('highlight');
       }, 2000);
     }
   }
-
-  // Get valid moves
+  
+  // Geçerli Hamleleri Alma
   function getValidMoves() {
     const validMoves = [];
     const emptyRow = Math.floor(emptyTileIndex / boardSize);
     const emptyCol = emptyTileIndex % boardSize;
     
-    // Check all four directions
     const directions = [
-      { dr: -1, dc: 0 }, // up
-      { dr: 1, dc: 0 },  // down
-      { dr: 0, dc: -1 }, // left
-      { dr: 0, dc: 1 }   // right
+      { dr: -1, dc: 0 }, // yukarı
+      { dr: 1, dc: 0 },  // aşağı
+      { dr: 0, dc: -1 }, // sol
+      { dr: 0, dc: 1 }   // sağ
     ];
     
     for (const dir of directions) {
@@ -1064,34 +801,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     return validMoves;
   }
-
-  // Move a tile
+  
+  // Kareyi Hareket Ettirme
   function moveTile(index) {
-    // If game hasn't started, start the timer
     if (!gameStarted) {
       startTimer();
       gameStarted = true;
     }
     
-    // Check if the clicked tile is adjacent to the empty tile
     const validMoves = getValidMoves();
     
     if (validMoves.includes(index)) {
-      // Swap the tiles
+      // Kareleri değiştir
       swapTiles(index, emptyTileIndex);
       
-      // Update empty tile index
+      // Boş kare indeksini güncelle
       emptyTileIndex = index;
       
-      // Increment move counter
+      // Hamle sayısını artır
       moves++;
       movesDisplay.textContent = moves;
       
-      // Add move animation
-      tiles[emptyTileIndex].classList.add('tile-move');
-      setTimeout(() => tiles[emptyTileIndex].classList.remove('tile-move'), 300);
-      
-      // Check if puzzle is solved
+      // Tamamlandı mı kontrol et
       if (isPuzzleSolved()) {
         clearInterval(timer);
         showSuccessModal();
@@ -1099,8 +830,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-
-  // Swap two tiles
+  
+  // Kareleri Değiştirme
   function swapTiles(index1, index2) {
     const temp = {
       textContent: tiles[index1].textContent,
@@ -1113,34 +844,29 @@ document.addEventListener('DOMContentLoaded', function() {
     tiles[index2].textContent = temp.textContent;
     tiles[index2].className = temp.className;
   }
-
-  // Shuffle the tiles
+  
+  // Kareleri Karıştırma
   function shuffleTiles() {
-    const randomMoves = 100 + boardSize * 20; // More shuffling for larger boards
+    const randomMoves = 100 + boardSize * 20;
     
-    // Perform random moves
     for (let i = 0; i < randomMoves; i++) {
       const validMoves = getValidMoves();
       const randomIndex = Math.floor(Math.random() * validMoves.length);
       const randomTile = validMoves[randomIndex];
       
-      // Swap tiles
       swapTiles(randomTile, emptyTileIndex);
-      
-      // Update empty tile index
       emptyTileIndex = randomTile;
     }
     
-    // Reset game state
     resetGameState();
     
-    // Ensure puzzle is not already solved after shuffle
+    // Karıştırma sonrası çözülmüş olmamasını sağla
     if (isPuzzleSolved()) {
       shuffleTiles();
     }
   }
-
-  // Check if puzzle is solved
+  
+  // Bulmaca Tamamlandı mı Kontrolü
   function isPuzzleSolved() {
     for (let i = 0; i < tiles.length - 1; i++) {
       const tileValue = parseInt(tiles[i].textContent);
@@ -1150,21 +876,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return true;
   }
-
-  // Show success modal
+  
+  // Başarı Modalını Gösterme
   function showSuccessModal() {
-    // Update final stats
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = formatTime(seconds);
     
-    // Create confetti effect
     createConfetti();
-    
-    // Show the modal
     successModal.style.display = 'flex';
   }
-
-  // Create confetti effect
+  
+  // Konfeti Efekti
   function createConfetti() {
     const confettiCount = 100;
     const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
@@ -1181,14 +903,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       document.body.appendChild(confetti);
       
-      // Remove confetti after animation
       setTimeout(() => {
         confetti.remove();
       }, 5000);
     }
   }
-
-  // Start the timer
+  
+  // Zamanlayıcıyı Başlatma
   function startTimer() {
     if (timer) clearInterval(timer);
     
@@ -1198,58 +919,39 @@ document.addEventListener('DOMContentLoaded', function() {
       timerDisplay.textContent = formatTime(seconds);
     }, 1000);
   }
-
-  // Format time as MM:SS
+  
+  // Zamanı Biçimlendirme
   function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   
-  // Reset the game
+  // Oyunu Sıfırlama
   function resetGame() {
-    // Stop the timer
     if (timer) clearInterval(timer);
     
-    // Reset game state
     gameStarted = false;
     moves = 0;
     seconds = 0;
     
-    // Reset displays
     movesDisplay.textContent = moves;
     timerDisplay.textContent = '00:00';
-    
-    // Reset board to solved state
-    tiles.forEach((tile, index) => {
-      if (index !== boardSize * boardSize - 1) {
-        tile.textContent = index + 1;
-        tile.classList.remove('empty');
-      } else {
-        tile.textContent = '';
-        tile.classList.add('empty');
-      }
-    });
-    
-    emptyTileIndex = boardSize * boardSize - 1;
   }
   
-  // Reset game state without resetting board
+  // Oyun Durumunu Sıfırlama (tahta sıfırlamadan)
   function resetGameState() {
-    // Stop the timer
     if (timer) clearInterval(timer);
     
-    // Reset game state
     gameStarted = false;
     moves = 0;
     seconds = 0;
     
-    // Reset displays
     movesDisplay.textContent = moves;
     timerDisplay.textContent = '00:00';
   }
   
-  // Function to save score to the server
+  // Skoru Kaydetme
   function saveScore(score) {
     fetch('/api/save-score', {
       method: 'POST',
@@ -1270,8 +972,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Log a message to show that the game has been modernized
-  console.log("puzzleSlider oyunu modernize edildi.");
+  console.log('Puzzle Slider oyunu modernize edildi ve hata düzeltildi.');
 });
 </script>
 {% endblock %}
