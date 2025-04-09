@@ -3,10 +3,6 @@
 
 {% block title %}Matematik Mücadelesi - OmGame{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-{% endblock %}
-
 {% block content %}
 <div class="game-container">
   <div class="game-header">
@@ -195,7 +191,10 @@
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <style>
 /* Ana Oyun Stilleri */
 .game-container {
@@ -891,7 +890,9 @@
   animation: pulse 0.5s;
 }
 </style>
+{% endblock %}
 
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elementleri
