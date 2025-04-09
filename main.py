@@ -895,7 +895,7 @@ def logout():
 
 def xp_for_level(level):
     """Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar."""
-    return int(100 * (level ** 1.5))
+    return int(500 * (level ** 1.5))
 
 def calculate_level(xp):
     """Toplam XP'ye göre kullanıcı seviyesini hesaplar."""
@@ -903,10 +903,6 @@ def calculate_level(xp):
     while xp >= xp_for_level(level + 1):
         level += 1
     return level
-
-def xp_for_level(level):
-    """Belirli bir seviyeye ulaşmak için gereken XP miktarını hesaplar."""
-    return int(100 * (level ** 1.5))
 
 def get_user_scores():
     """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
@@ -1308,6 +1304,79 @@ def reset_password():
     
     return render_template('reset_password.html', email=email, token=token)
 
+# Oyun zorluğuna göre puan ve XP çarpanı hesaplama fonksiyonu
+def calculate_multipliers(game_type, difficulty=None):
+    """
+    Oyun türüne ve zorluğuna göre puan ve XP çarpanlarını hesaplar
+    
+    Args:
+        game_type (str): Oyun türü
+        difficulty (str, optional): Zorluk seviyesi (easy, medium, hard)
+        
+    Returns:
+        dict: Puan ve XP çarpanları
+    """
+    # Varsayılan çarpanlar
+    multipliers = {
+        'point_base': 50,  # Temel puan
+        'score_multiplier': 0.5,  # Skor çarpanı
+        'xp_base': 30,  # Temel XP
+        'xp_score_multiplier': 0.1,  # Skor başına XP
+        'difficulty_multiplier': 1.0  # Zorluk çarpanı
+    }
+    
+    # Oyun türüne göre özel çarpanlar
+    game_multipliers = {
+        'memoryCards': {'point_base': 70, 'score_multiplier': 0.6},
+        'wordPuzzle': {'point_base': 60, 'score_multiplier': 0.7},
+        'numberSequence': {'point_base': 80, 'score_multiplier': 0.5},
+        '3dRotation': {'point_base': 90, 'score_multiplier': 0.4},
+        'tetris': {'point_base': 40, 'score_multiplier': 0.8},
+        'wordle': {'point_base': 100, 'score_multiplier': 0.3},
+        'puzzle_slider': {'point_base': 60, 'score_multiplier': 0.6},
+        'chess': {'point_base': 120, 'score_multiplier': 0.2},
+        'simon_says': {'point_base': 50, 'score_multiplier': 0.7},
+        'typing_speed': {'point_base': 40, 'score_multiplier': 0.9},
+        'snake_game': {'point_base': 30, 'score_multiplier': 1.0},
+    }
+    
+    # Oyun türüne göre çarpanları güncelle
+    if game_type in game_multipliers:
+        multipliers.update(game_multipliers[game_type])
+    
+    # Zorluk seviyesine göre çarpanı ayarla
+    if difficulty:
+        if difficulty == 'easy':
+            multipliers['difficulty_multiplier'] = 0.8
+        elif difficulty == 'medium':
+            multipliers['difficulty_multiplier'] = 1.0
+        elif difficulty == 'hard':
+            multipliers['difficulty_multiplier'] = 1.5
+        elif difficulty == 'expert':
+            multipliers['difficulty_multiplier'] = 2.0
+    
+    return multipliers
+
+# Günlük bonus kontrolü
+def check_daily_bonus(user_id):
+    """
+    Kullanıcının günlük bonus hakkı olup olmadığını kontrol eder
+    
+    Args:
+        user_id (int): Kullanıcı ID
+    
+    Returns:
+        bool: Günlük bonus hakkı varsa True, yoksa False
+    """
+    user = User.query.get(user_id)
+    now = datetime.utcnow()
+    
+    # Eğer kullanıcı daha önce hiç oynamamışsa veya son aktif olduğu gün bugün değilse
+    if not user.last_active or user.last_active.date() < now.date():
+        return True
+    
+    return False
+
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
@@ -1318,31 +1387,80 @@ def save_score():
     
     game_type = data.get('game_type')
     score = data.get('score')
+    playtime = data.get('playtime', 60)  # Varsayılan oyun süresi 60 saniye
+    difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk medium
     
     if not game_type or not score:
         return jsonify({'success': False, 'message': 'Eksik veri!'})
     
     try:
         score = int(score)
+        playtime = int(playtime)
     except:
-        return jsonify({'success': False, 'message': 'Geçersiz skor!'})
+        return jsonify({'success': False, 'message': 'Geçersiz skor veya süre!'})
+    
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    now = datetime.utcnow()
+    
+    # Çarpanları hesapla
+    multipliers = calculate_multipliers(game_type, difficulty)
+    
+    # Temel puanları hesapla
+    base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
+    score_points = score * multipliers['score_multiplier']
+    
+    # Günlük bonus kontrolü
+    daily_bonus = 0
+    streak_bonus = 0
+    
+    if check_daily_bonus(user_id):
+        daily_bonus = 20  # Günlük ilk oyun bonusu
+        
+        # Ardışık günlerde oynama bonusu (streak bonus)
+        last_play_date = user.last_active
+        if last_play_date and (now.date() - last_play_date.date()).days == 1:
+            # Kullanıcının streak_count'u yoksa 0 kabul eder
+            streak_count = getattr(user, 'streak_count', 0) + 1
+            
+            # streak_count değeri yoksa ekle
+            if not hasattr(user, 'streak_count'):
+                user.streak_count = streak_count
+            else:
+                user.streak_count = streak_count
+                
+            # Streak bonusu hesapla (her ardışık gün için artan bonus)
+            streak_bonus = min(streak_count * 5, 50)  # Maximum 50 bonus
+        else:
+            # Ardışık oynama bozulmuşsa sıfırla
+            if hasattr(user, 'streak_count'):
+                user.streak_count = 1
+            else:
+                user.streak_count = 1
+    
+    # Toplam puanı hesapla
+    total_points = base_points + score_points + daily_bonus + streak_bonus
+    
+    # XP hesaplama
+    xp_base = multipliers['xp_base']
+    xp_from_score = score * multipliers['xp_score_multiplier']
+    xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
+    
+    xp_gain = int(xp_base + xp_from_score + xp_from_time)
     
     # Yeni skoru kaydet
     new_score = Score(
-        user_id=session['user_id'],
+        user_id=user_id,
         game_type=game_type,
         score=score
     )
     
     db.session.add(new_score)
     
-    # Kullanıcının deneyim puanını artır (oyun skorunun %10'u kadar)
-    user = User.query.get(session['user_id'])
-    xp_gain = int(score * 0.1)
+    # Kullanıcı bilgilerini güncelle
     user.experience_points += xp_gain
-    
-    # Kullanıcının toplam oyun sayısını güncelle
     user.total_games_played += 1
+    user.last_active = now
     
     # Kullanıcının en yüksek skorunu güncelle (gerekirse)
     if score > user.highest_score:
@@ -1352,13 +1470,35 @@ def save_score():
     
     # Yeni seviyeyi hesapla
     new_level = calculate_level(user.experience_points)
+    next_level_xp = xp_for_level(new_level + 1)
+    current_level_xp = xp_for_level(new_level)
+    xp_progress = user.experience_points - current_level_xp
+    xp_needed = next_level_xp - current_level_xp
+    
+    # Ödül detayları
+    rewards = {
+        'base_points': int(base_points),
+        'score_points': int(score_points),
+        'daily_bonus': daily_bonus,
+        'streak_bonus': streak_bonus,
+        'difficulty_multiplier': multipliers['difficulty_multiplier']
+    }
     
     return jsonify({
         'success': True, 
         'message': 'Skor kaydedildi!',
-        'xp_gain': xp_gain,
-        'total_xp': user.experience_points,
-        'level': new_level
+        'points': {
+            'total': int(total_points),
+            'rewards': rewards
+        },
+        'xp': {
+            'gain': xp_gain,
+            'total': user.experience_points,
+            'level': new_level,
+            'progress': xp_progress,
+            'needed': xp_needed,
+            'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
+        }
     })
 
 # Mevcut Kullanıcı API'si
@@ -1570,12 +1710,6 @@ def get_leaderboard_data(game_type):
     })
 
 # Yardımcı fonksiyonlar
-def calculate_level(score):
-    """
-    Skor değerine göre seviyeyi hesaplar
-    Basit bir algoritma: Her 100 puan için 1 seviye
-    """
-    return max(1, score // 100)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

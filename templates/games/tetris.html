@@ -367,6 +367,43 @@
     font-weight: 700;
     color: #8BC34A; /* Green color for level */
   }
+  
+  /* Bonus details styling */
+  .tetris-bonus-details {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(30, 30, 60, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  
+  .tetris-bonus-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .tetris-bonus-item span {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .tetris-bonus-item strong {
+    font-weight: 600;
+    color: #a890ff;
+  }
+  
+  /* Bonus types */
+  .daily-bonus strong {
+    color: #FFD54F; /* Amber color for daily bonus */
+  }
+  
+  .streak-bonus strong {
+    color: #FF7043; /* Deep Orange for streak bonus */
+  }
 
   /* Animations */
   @keyframes fadeIn {
@@ -596,6 +633,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const linesElement = document.getElementById('lines');
   const finalScoreElement = document.getElementById('final-score');
   
+  // Oyun başlangıç zamanını kaydetmek için
+  let gameStartTime;
+  
   // Canvas boyutlarını ayarla
   if (canvas) {
     canvas.width = 250;
@@ -789,6 +829,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hide overlays
     tetrisOverlay.style.display = 'none';
+    
+    // Oyun başlangıç zamanını kaydet
+    gameStartTime = new Date();
     
     // Start game loop
     lastDropTime = performance.now();
@@ -1043,6 +1086,19 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save score to the server
   function saveScore(score) {
+    // Oyun süresini hesapla (saniye olarak) - varsayılan 180 saniye
+    const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
+
+    // Zorluk seviyesini belirle (level'e göre)
+    let difficulty = 'easy';
+    if (level > 10) {
+      difficulty = 'expert';
+    } else if (level > 7) {
+      difficulty = 'hard';
+    } else if (level > 3) {
+      difficulty = 'medium';
+    }
+
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
@@ -1050,14 +1106,16 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({
         game_type: 'tetris',
-        score: score
+        score: score,
+        playtime: playtime,
+        difficulty: difficulty
       })
     })
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
       
-      // XP ve Seviye Bilgilerini Görüntüle
+      // Yeni puan ve XP verilerini göster
       if (data.success) {
         const xpGainElement = document.getElementById('xp-gain');
         const currentLevelElement = document.getElementById('current-level');
@@ -1065,8 +1123,45 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (xpGainElement && currentLevelElement && xpInfoElement) {
           // XP verilerini güncelle
-          xpGainElement.textContent = data.xp_gain;
-          currentLevelElement.textContent = data.level;
+          xpGainElement.textContent = data.xp.gain;
+          currentLevelElement.textContent = data.xp.level;
+          
+          // Bonus puanlarını ve detayları göster
+          const finalScoreContainer = document.querySelector('.tetris-final-score');
+          if (finalScoreContainer) {
+            // Diğer veriler için yeni elementler oluştur
+            // Puan detayları
+            const bonusDetails = document.createElement('div');
+            bonusDetails.className = 'tetris-bonus-details';
+            bonusDetails.innerHTML = `
+              <div class="tetris-bonus-item">
+                <span>Temel Puan:</span>
+                <strong>${data.points.rewards.base_points}</strong>
+              </div>
+              <div class="tetris-bonus-item">
+                <span>Skor Bonusu:</span>
+                <strong>${Math.floor(data.points.rewards.score_points)}</strong>
+              </div>
+              ${data.points.rewards.daily_bonus > 0 ? `
+                <div class="tetris-bonus-item daily-bonus">
+                  <span>Günlük Bonus:</span>
+                  <strong>+${data.points.rewards.daily_bonus}</strong>
+                </div>` : ''}
+              ${data.points.rewards.streak_bonus > 0 ? `
+                <div class="tetris-bonus-item streak-bonus">
+                  <span>Seri Bonusu:</span>
+                  <strong>+${data.points.rewards.streak_bonus}</strong>
+                </div>` : ''}
+            `;
+            
+            // Element bulunmazsa ekleme yap
+            if (!document.querySelector('.tetris-bonus-details')) {
+              finalScoreContainer.appendChild(bonusDetails);
+            }
+            
+            // Toplam puanı güncelle
+            finalScoreElement.textContent = data.points.total;
+          }
           
           // XP bilgilerini göster
           xpInfoElement.style.display = 'block';

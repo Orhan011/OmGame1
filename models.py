@@ -26,6 +26,8 @@ class User(db.Model):
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
     suspended_until = db.Column(db.DateTime)
+    # Oyun ve bonus istatistikleri
+    streak_count = db.Column(db.Integer, default=0)  # Ardışık oynama günü sayısı
     # Notification preferences
     email_notifications = db.Column(db.Boolean, default=True)
     achievement_notifications = db.Column(db.Boolean, default=True)
