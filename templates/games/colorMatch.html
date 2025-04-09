@@ -10,7 +10,7 @@
       <p class="game-description">Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin.</p>
     </div>
 
-    <div class="color-match-container">
+    <div class="modern-color-match">
       <!-- Oyun Paneli -->
       <div class="cm-game-panel">
         <!-- Oyun Bilgileri -->
@@ -46,7 +46,7 @@
             </div>
             <h2>Renk Eşleştirme</h2>
             <p>Zihinsel esnekliğinizi ve odaklanma yeteneğinizi geliştirmek için tasarlanmış hızlı bir oyun.</p>
-            
+
             <div class="cm-instructions-card">
               <div class="cm-card-header">
                 <i class="fas fa-info-circle"></i>
@@ -60,7 +60,7 @@
                 <li>Her doğru cevap için +10 puan, her yanlış için -5 puan alırsınız</li>
               </ul>
             </div>
-            
+
             <div class="cm-difficulty-selector">
               <div class="cm-difficulty-title">Zorluk Seviyesi</div>
               <div class="cm-difficulty-options">
@@ -78,21 +78,21 @@
                 </button>
               </div>
             </div>
-            
+
             <button id="start-btn" class="cm-start-btn">
               <i class="fas fa-play"></i>
               Oyuna Başla
             </button>
           </div>
         </div>
-        
+
         <!-- Oyun Ekranı -->
         <div id="game-screen" class="cm-screen" style="display: none;">
           <div class="cm-game-area">
             <div class="cm-word-container">
               <div id="color-word" class="cm-color-word">MAVİ</div>
             </div>
-            
+
             <div class="cm-answer-buttons">
               <button id="true-btn" class="cm-answer-btn cm-true-btn">
                 <i class="fas fa-check"></i>
@@ -103,15 +103,15 @@
                 <span>YANLIŞ</span>
               </button>
             </div>
-            
+
             <div id="feedback" class="cm-feedback"></div>
           </div>
-          
+
           <div class="cm-timer-container">
             <div id="timer-bar" class="cm-timer-bar"></div>
           </div>
         </div>
-        
+
         <!-- Sonuç Ekranı -->
         <div id="result-screen" class="cm-screen" style="display: none;">
           <div class="cm-screen-content">
@@ -119,7 +119,7 @@
               <i class="fas fa-award"></i>
             </div>
             <h2>Oyun Tamamlandı!</h2>
-            
+
             <div class="cm-results">
               <div class="cm-result-stat">
                 <div class="cm-result-value" id="final-score">0</div>
@@ -140,11 +140,11 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="cm-motivation">
               <p id="motivation-text">Harika iş çıkardın! Daha yüksek puan için tekrar oynamaya ne dersin?</p>
             </div>
-            
+
             <div class="cm-action-buttons">
               <button id="play-again-btn" class="cm-action-btn cm-play-again">
                 <i class="fas fa-sync-alt"></i>
@@ -158,69 +158,21 @@
           </div>
         </div>
       </div>
-      
-      <!-- Bilgi Paneli -->
-      <div class="cm-info-panel">
-        <div class="cm-info-card">
-          <div class="cm-info-header">
-            <i class="fas fa-brain"></i>
-            <h3>Beyin Egzersizi</h3>
-          </div>
-          <div class="cm-info-content">
-            <p>Renk Eşleştirme oyunu, <strong>Stroop Etkisi</strong> olarak bilinen psikolojik bir fenomene dayanır.</p>
-            <p>Bu egzersiz şunları geliştirmeye yardımcı olur:</p>
-            <ul class="cm-benefit-list">
-              <li>Bilişsel esneklik</li>
-              <li>Zihinsel odaklanma</li>
-              <li>Tepki süresi</li>
-              <li>Dikkat kontrolü</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="cm-info-card">
-          <div class="cm-info-header">
-            <i class="fas fa-lightbulb"></i>
-            <h3>İpuçları</h3>
-          </div>
-          <div class="cm-info-content">
-            <ul class="cm-tips-list">
-              <li>Kelimenin anlamına değil, yazıldığı renge odaklanın</li>
-              <li>Hızlı karar verin ama acele etmeyin</li>
-              <li>Düzenli pratik yapın</li>
-              <li>"Zor" modda en yüksek skorları kazanabilirsiniz</li>
-            </ul>
-          </div>
-        </div>
-        
-        <a href="{{ url_for('all_games') }}" class="cm-back-btn">
-          <i class="fas fa-arrow-left"></i>
-          Tüm Oyunlara Dön
-        </a>
-      </div>
     </div>
   </div>
 </div>
 
 <style>
 /* Renk Eşleştirme Oyunu Ana Konteyner */
-.color-match-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
+.modern-color-match {
   width: 100%;
-  margin-top: 20px;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 /* Oyun Paneli */
 .cm-game-panel {
-  flex: 1;
-  min-width: 300px;
-}
-
-/* Bilgi Paneli */
-.cm-info-panel {
-  width: 300px;
+  width: 100%;
 }
 
 /* İstatistik Çubuğu */
@@ -689,108 +641,7 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Bilgi Kartları */
-.cm-info-card {
-  background: rgba(20, 20, 40, 0.6);
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(5px);
-}
-
-.cm-info-header {
-  background: rgba(106, 90, 224, 0.1);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.cm-info-header i {
-  color: var(--accent-color);
-  font-size: 18px;
-  margin-right: 10px;
-}
-
-.cm-info-header h3 {
-  margin: 0;
-  color: white;
-  font-size: 1.1rem;
-}
-
-.cm-info-content {
-  padding: 16px;
-}
-
-.cm-info-content p {
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 12px;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.cm-benefit-list, .cm-tips-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.cm-benefit-list li, .cm-tips-list li {
-  color: rgba(255, 255, 255, 0.9);
-  padding: 8px 0 8px 24px;
-  position: relative;
-}
-
-.cm-benefit-list li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: #4CAF50;
-  font-weight: bold;
-}
-
-.cm-tips-list li::before {
-  content: '→';
-  position: absolute;
-  left: 0;
-  color: var(--accent-color);
-}
-
-.cm-back-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(40, 40, 60, 0.6);
-  color: white;
-  padding: 14px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.cm-back-btn:hover {
-  background: rgba(60, 60, 80, 0.6);
-  transform: translateY(-2px);
-  text-decoration: none;
-  color: white;
-}
-
 /* Responsive Tasarım */
-@media (max-width: 992px) {
-  .color-match-container {
-    flex-direction: column;
-  }
-
-  .cm-info-panel {
-    width: 100%;
-  }
-}
-
 @media (max-width: 576px) {
   .cm-stats-bar {
     padding: 10px;
@@ -833,28 +684,28 @@ document.addEventListener('DOMContentLoaded', function() {
   const startScreen = document.getElementById('start-screen');
   const gameScreen = document.getElementById('game-screen');
   const resultScreen = document.getElementById('result-screen');
-  
+
   const scoreDisplay = document.getElementById('score');
   const bestScoreDisplay = document.getElementById('best-score');
   const timerDisplay = document.getElementById('timer');
   const timerBar = document.getElementById('timer-bar');
-  
+
   const colorWord = document.getElementById('color-word');
   const feedbackDisplay = document.getElementById('feedback');
-  
+
   const startBtn = document.getElementById('start-btn');
   const trueBtn = document.getElementById('true-btn');
   const falseBtn = document.getElementById('false-btn');
   const playAgainBtn = document.getElementById('play-again-btn');
-  
+
   const finalScoreDisplay = document.getElementById('final-score');
   const correctAnswersDisplay = document.getElementById('correct-answers');
   const wrongAnswersDisplay = document.getElementById('wrong-answers');
   const avgReactionTimeDisplay = document.getElementById('avg-reaction-time');
   const motivationText = document.getElementById('motivation-text');
-  
+
   const difficultyBtns = document.querySelectorAll('.cm-difficulty-btn');
-  
+
   // Oyun Ayarları
   const colors = [
     { name: 'KIRMIZI', code: '#F44336' },
@@ -864,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'MOR', code: '#9C27B0' },
     { name: 'TURUNCU', code: '#FF9800' }
   ];
-  
+
   // Oyun Durumu
   let score = 0;
   let bestScore = 0;
@@ -880,13 +731,13 @@ document.addEventListener('DOMContentLoaded', function() {
   let totalReactionTime = 0;
   let reactionTimeCount = 0;
   let currentWordStartTime = 0;
-  
+
   // En iyi skoru kontrol et
   if (localStorage.getItem('colorMatchBestScore')) {
     bestScore = parseInt(localStorage.getItem('colorMatchBestScore'));
     bestScoreDisplay.textContent = bestScore;
   }
-  
+
   // Event Listeners
   startBtn.addEventListener('click', startGame);
   trueBtn.addEventListener('click', () => checkAnswer(true));
@@ -894,21 +745,21 @@ document.addEventListener('DOMContentLoaded', function() {
   playAgainBtn.addEventListener('click', () => {
     showScreen(startScreen);
   });
-  
+
   // Zorluk Seviyesi Seçimi
   difficultyBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       difficultySpeed = this.getAttribute('data-speed');
       difficultyBtns.forEach(b => b.classList.remove('active'));
       this.classList.add('active');
-      
+
       // Zorluk seviyesine göre kelime gösterim süresini ayarla
       if (difficultySpeed === 'slow') wordDisplayTime = 2000;
       else if (difficultySpeed === 'medium') wordDisplayTime = 1500;
       else if (difficultySpeed === 'fast') wordDisplayTime = 1000;
     });
   });
-  
+
   // Fonksiyonlar
   function startGame() {
     // Oyun durumunu sıfırla
@@ -918,66 +769,66 @@ document.addEventListener('DOMContentLoaded', function() {
     timeRemaining = gameTime;
     totalReactionTime = 0;
     reactionTimeCount = 0;
-    
+
     // Ekranları güncelle
     scoreDisplay.textContent = score;
     timerDisplay.textContent = timeRemaining;
     timerBar.style.width = '100%';
     feedbackDisplay.textContent = '';
     feedbackDisplay.className = 'cm-feedback';
-    
+
     // Oyun ekranını göster
     showScreen(gameScreen);
-    
+
     // Oyunu başlat
     gameRunning = true;
     displayNewWord();
-    
+
     // Zamanlayıcıyı başlat
     timer = setInterval(updateTimer, 1000);
   }
-  
+
   function displayNewWord() {
     if (!gameRunning) return;
-    
+
     // Geri bildirimi temizle
     feedbackDisplay.textContent = '';
     feedbackDisplay.className = 'cm-feedback';
-    
+
     // Rastgele renk adı ve renk kodu seç
     const colorNameIndex = Math.floor(Math.random() * colors.length);
     const colorCodeIndex = Math.floor(Math.random() * colors.length);
-    
+
     const colorName = colors[colorNameIndex].name;
     const colorCode = colors[colorCodeIndex].code;
-    
+
     // Kelimeyi ve rengini ayarla
     colorWord.textContent = colorName;
     colorWord.style.color = colorCode;
-    
+
     // Eşleşme durumunu belirle
     currentAnswer = (colorNameIndex === colorCodeIndex);
-    
+
     // Animasyon yenileme
     colorWord.style.animation = 'none';
     void colorWord.offsetWidth; // Animasyonu sıfırla
     colorWord.style.animation = 'word-appear 0.4s forwards';
-    
+
     // Reaksiyon süresi ölçümü için başlangıç zamanı
     currentWordStartTime = Date.now();
   }
-  
+
   function checkAnswer(userAnswer) {
     if (!gameRunning) return;
-    
+
     // Reaksiyon süresini hesapla
     const reactionTime = Date.now() - currentWordStartTime;
     totalReactionTime += reactionTime;
     reactionTimeCount++;
-    
+
     // Cevabın doğruluğunu kontrol et
     const isCorrect = (userAnswer === currentAnswer);
-    
+
     if (isCorrect) {
       // Doğru cevap
       score += 10;
@@ -993,24 +844,24 @@ document.addEventListener('DOMContentLoaded', function() {
       feedbackDisplay.className = 'cm-feedback wrong';
       playSound('wrong');
     }
-    
+
     // Skor göstergesini güncelle
     scoreDisplay.textContent = score;
-    
+
     // Kısa bir gecikme sonrası yeni kelime göster
     setTimeout(displayNewWord, 1000);
   }
-  
+
   function updateTimer() {
     timeRemaining--;
     timerDisplay.textContent = timeRemaining;
     timerBar.style.width = `${(timeRemaining / gameTime) * 100}%`;
-    
+
     // Oyun sona eriyor mu kontrol et
     if (timeRemaining <= 0) {
       endGame();
     }
-    
+
     // Son 10 saniye uyarısı
     if (timeRemaining <= 10) {
       timerDisplay.style.color = '#FF5252';
@@ -1018,56 +869,56 @@ document.addEventListener('DOMContentLoaded', function() {
       timerDisplay.style.color = '';
     }
   }
-  
+
   function endGame() {
     // Zamanlayıcıyı durdur
     clearInterval(timer);
-    
+
     // Oyunu durdur
     gameRunning = false;
-    
+
     // En iyi skoru kontrol et ve güncelle
     if (score > bestScore) {
       bestScore = score;
       localStorage.setItem('colorMatchBestScore', bestScore);
       bestScoreDisplay.textContent = bestScore;
     }
-    
+
     // Sonuç ekranı bilgilerini doldur
     finalScoreDisplay.textContent = score;
     correctAnswersDisplay.textContent = correctAnswers;
     wrongAnswersDisplay.textContent = wrongAnswers;
-    
+
     // Ortalama reaksiyon süresini hesapla
     let avgReactionTime = 0;
     if (reactionTimeCount > 0) {
       avgReactionTime = Math.round(totalReactionTime / reactionTimeCount);
     }
     avgReactionTimeDisplay.textContent = avgReactionTime;
-    
+
     // Motivasyon mesajını ayarla
     setMotivationMessage(score);
-    
+
     // Sesli bildirim
     playSound('gameOver');
-    
+
     // Skoru kaydet
     saveScore(score);
-    
+
     // Sonuç ekranını göster
     showScreen(resultScreen);
   }
-  
+
   function showScreen(screen) {
     // Tüm ekranları gizle
     startScreen.style.display = 'none';
     gameScreen.style.display = 'none';
     resultScreen.style.display = 'none';
-    
+
     // İstenen ekranı göster
     screen.style.display = 'flex';
   }
-  
+
   function setMotivationMessage(score) {
     if (score === 0) {
       motivationText.textContent = 'Endişelenme, herkes bir yerden başlar. Tekrar deneyerek gelişebilirsin!';
@@ -1083,7 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
       motivationText.textContent = 'İnanılmaz bir performans! Senin zihinsel odaklanma becerilerin olağanüstü!';
     }
   }
-  
+
   function playSound(type) {
     let sound;
     switch (type) {
@@ -1099,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     sound.play().catch(error => console.log('Ses çalınamadı', error));
   }
-  
+
   function saveScore(score) {
     fetch('/api/save-score', {
       method: 'POST',
@@ -1119,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
-  
+
   console.log('colorMatch oyunu modernize edildi.');
 });
 </script>
