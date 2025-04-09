@@ -3,196 +3,6 @@
 
 {% block title %}Matematik Mücadelesi - OmGame{% endblock %}
 
-{% block content %}
-<div class="game-container">
-  <div class="game-header">
-    <h1>Matematik Mücadelesi <span class="badge bg-gradient">Sayısal Beceri</span></h1>
-    <p class="game-description">Matematiksel zekânızı ve hızlı düşünme yeteneklerinizi test edin.</p>
-  </div>
-
-  <div class="math-game-container">
-    <!-- Başlangıç Ekranı -->
-    <div id="start-screen" class="math-screen active">
-      <div class="screen-content animate__animated animate__fadeIn">
-        <h2 class="gradient-text">Matematik Mücadelesine Hoş Geldiniz!</h2>
-        <p>Matematiksel becerilerinizi test edin ve en yüksek puanı almak için yarışın.</p>
-        
-        <div class="game-options">
-          <div class="option-section">
-            <h3><i class="fas fa-layer-group me-2"></i>Zorluk Seviyesi</h3>
-            <div class="option-buttons">
-              <button class="option-button active" data-difficulty="easy">
-                <i class="fas fa-child"></i>
-                <span>Kolay</span>
-              </button>
-              <button class="option-button" data-difficulty="medium">
-                <i class="fas fa-user"></i>
-                <span>Orta</span>
-              </button>
-              <button class="option-button" data-difficulty="hard">
-                <i class="fas fa-user-graduate"></i>
-                <span>Zor</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="option-section">
-            <h3><i class="fas fa-clock me-2"></i>Süre</h3>
-            <div class="option-buttons">
-              <button class="option-button" data-time="30">30 Saniye</button>
-              <button class="option-button active" data-time="60">60 Saniye</button>
-              <button class="option-button" data-time="120">2 Dakika</button>
-            </div>
-          </div>
-          
-          <div class="option-section">
-            <h3><i class="fas fa-calculator me-2"></i>İşlem Türleri</h3>
-            <div class="operation-checkboxes">
-              <label class="custom-checkbox">
-                <input type="checkbox" checked data-operation="addition">
-                <span class="checkmark"><i class="fas fa-check"></i></span>
-                <span class="label-text">Toplama (+)</span>
-              </label>
-              
-              <label class="custom-checkbox">
-                <input type="checkbox" checked data-operation="subtraction">
-                <span class="checkmark"><i class="fas fa-check"></i></span>
-                <span class="label-text">Çıkarma (-)</span>
-              </label>
-              
-              <label class="custom-checkbox">
-                <input type="checkbox" checked data-operation="multiplication">
-                <span class="checkmark"><i class="fas fa-check"></i></span>
-                <span class="label-text">Çarpma (×)</span>
-              </label>
-              
-              <label class="custom-checkbox">
-                <input type="checkbox" data-operation="division">
-                <span class="checkmark"><i class="fas fa-check"></i></span>
-                <span class="label-text">Bölme (÷)</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <button id="start-button" class="btn btn-gradient btn-lg">
-          <i class="fas fa-play me-2"></i>Oyuna Başla
-        </button>
-      </div>
-    </div>
-
-    <!-- Oyun Ekranı -->
-    <div id="game-screen" class="math-screen">
-      <div class="game-stats">
-        <div class="stat-item">
-          <div class="stat-icon">
-            <i class="fas fa-trophy"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="score">0</div>
-            <div class="stat-label">Puan</div>
-          </div>
-        </div>
-        
-        <div class="stat-item">
-          <div class="stat-icon">
-            <i class="fas fa-clock"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="timer">60</div>
-            <div class="stat-label">Süre</div>
-          </div>
-          <div class="timer-bar-container">
-            <div class="timer-bar" id="timer-bar"></div>
-          </div>
-        </div>
-        
-        <div class="stat-item">
-          <div class="stat-icon">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value" id="correct">0</div>
-            <div class="stat-label">Doğru</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="problem-container">
-        <div class="problem-card">
-          <div id="problem-text">5 + 3 = ?</div>
-        </div>
-      </div>
-
-      <div class="answer-controls">
-        <div class="answer-input-container">
-          <input type="number" id="answer-input" placeholder="Yanıtınız" inputmode="numeric" pattern="[0-9]*">
-          <button id="submit-answer" class="btn btn-primary">
-            <i class="fas fa-check me-2"></i>Kontrol Et
-          </button>
-        </div>
-        <div id="feedback" class="feedback"></div>
-      </div>
-    </div>
-
-    <!-- Sonuç Ekranı -->
-    <div id="result-screen" class="math-screen">
-      <div class="screen-content animate__animated animate__fadeIn">
-        <h2 class="gradient-text">Oyun Bitti!</h2>
-        <div class="result-stats">
-          <div class="result-stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-trophy"></i>
-            </div>
-            <div class="stat-value" id="final-score">0</div>
-            <div class="stat-label">Toplam Puan</div>
-          </div>
-          
-          <div class="result-stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-value" id="final-correct">0</div>
-            <div class="stat-label">Doğru Cevap</div>
-          </div>
-          
-          <div class="result-stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="stat-value" id="final-incorrect">0</div>
-            <div class="stat-label">Yanlış Cevap</div>
-          </div>
-        </div>
-        
-        <div class="result-details">
-          <div class="detail-item">
-            <div class="detail-icon"><i class="fas fa-percentage"></i></div>
-            <div class="detail-label">Doğruluk Oranı</div>
-            <div class="detail-value" id="accuracy">0%</div>
-          </div>
-          
-          <div class="detail-item">
-            <div class="detail-icon"><i class="fas fa-stopwatch"></i></div>
-            <div class="detail-label">Ortalama Yanıt Süresi</div>
-            <div class="detail-value" id="avg-time">0 saniye</div>
-          </div>
-        </div>
-        
-        <div class="result-actions">
-          <button id="play-again" class="btn btn-gradient">
-            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
-          </button>
-          <a href="{{ url_for('all_games') }}" class="btn btn-outline">
-            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <style>
@@ -890,6 +700,196 @@
   animation: pulse 0.5s;
 }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+  <div class="game-header">
+    <h1>Matematik Mücadelesi <span class="badge bg-gradient">Sayısal Beceri</span></h1>
+    <p class="game-description">Matematiksel zekânızı ve hızlı düşünme yeteneklerinizi test edin.</p>
+  </div>
+
+  <div class="math-game-container">
+    <!-- Başlangıç Ekranı -->
+    <div id="start-screen" class="math-screen active">
+      <div class="screen-content animate__animated animate__fadeIn">
+        <h2 class="gradient-text">Matematik Mücadelesine Hoş Geldiniz!</h2>
+        <p>Matematiksel becerilerinizi test edin ve en yüksek puanı almak için yarışın.</p>
+        
+        <div class="game-options">
+          <div class="option-section">
+            <h3><i class="fas fa-layer-group me-2"></i>Zorluk Seviyesi</h3>
+            <div class="option-buttons">
+              <button class="option-button active" data-difficulty="easy">
+                <i class="fas fa-child"></i>
+                <span>Kolay</span>
+              </button>
+              <button class="option-button" data-difficulty="medium">
+                <i class="fas fa-user"></i>
+                <span>Orta</span>
+              </button>
+              <button class="option-button" data-difficulty="hard">
+                <i class="fas fa-user-graduate"></i>
+                <span>Zor</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3><i class="fas fa-clock me-2"></i>Süre</h3>
+            <div class="option-buttons">
+              <button class="option-button" data-time="30">30 Saniye</button>
+              <button class="option-button active" data-time="60">60 Saniye</button>
+              <button class="option-button" data-time="120">2 Dakika</button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3><i class="fas fa-calculator me-2"></i>İşlem Türleri</h3>
+            <div class="operation-checkboxes">
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="addition">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Toplama (+)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="subtraction">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Çıkarma (-)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="multiplication">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Çarpma (×)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" data-operation="division">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Bölme (÷)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button id="start-button" class="btn btn-gradient btn-lg">
+          <i class="fas fa-play me-2"></i>Oyuna Başla
+        </button>
+      </div>
+    </div>
+
+    <!-- Oyun Ekranı -->
+    <div id="game-screen" class="math-screen">
+      <div class="game-stats">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="score">0</div>
+            <div class="stat-label">Puan</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="timer">60</div>
+            <div class="stat-label">Süre</div>
+          </div>
+          <div class="timer-bar-container">
+            <div class="timer-bar" id="timer-bar"></div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="correct">0</div>
+            <div class="stat-label">Doğru</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="problem-container">
+        <div class="problem-card">
+          <div id="problem-text">5 + 3 = ?</div>
+        </div>
+      </div>
+
+      <div class="answer-controls">
+        <div class="answer-input-container">
+          <input type="number" id="answer-input" placeholder="Yanıtınız" inputmode="numeric" pattern="[0-9]*">
+          <button id="submit-answer" class="btn btn-primary">
+            <i class="fas fa-check me-2"></i>Kontrol Et
+          </button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+      </div>
+    </div>
+
+    <!-- Sonuç Ekranı -->
+    <div id="result-screen" class="math-screen">
+      <div class="screen-content animate__animated animate__fadeIn">
+        <h2 class="gradient-text">Oyun Bitti!</h2>
+        <div class="result-stats">
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-value" id="final-score">0</div>
+            <div class="stat-label">Toplam Puan</div>
+          </div>
+          
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value" id="final-correct">0</div>
+            <div class="stat-label">Doğru Cevap</div>
+          </div>
+          
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-value" id="final-incorrect">0</div>
+            <div class="stat-label">Yanlış Cevap</div>
+          </div>
+        </div>
+        
+        <div class="result-details">
+          <div class="detail-item">
+            <div class="detail-icon"><i class="fas fa-percentage"></i></div>
+            <div class="detail-label">Doğruluk Oranı</div>
+            <div class="detail-value" id="accuracy">0%</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-icon"><i class="fas fa-stopwatch"></i></div>
+            <div class="detail-label">Ortalama Yanıt Süresi</div>
+            <div class="detail-value" id="avg-time">0 saniye</div>
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <button id="play-again" class="btn btn-gradient">
+            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline">
+            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
