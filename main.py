@@ -37,7 +37,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Veritabanı
-from models import db, User, Score, Article, Achievement, GameStat, AdminUser, Game, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog, GameSession
+from models import db, User, Score, Article, Achievement, GameStat, AdminUser, Game, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog
 
 # Veritabanını uygulama ile ilişkilendir
 db.init_app(app)
@@ -1308,72 +1308,6 @@ def reset_password():
     
     return render_template('reset_password.html', email=email, token=token)
 
-# Zorluk seviyesine göre çarpan hesaplama
-def get_difficulty_multiplier(difficulty=None):
-    if difficulty == 'hard':
-        return 1.5  # Zor zorluk
-    elif difficulty == 'medium':
-        return 1.2  # Orta zorluk
-    else:
-        return 1.0  # Kolay zorluk veya belirtilmemiş
-        
-# Ardışık gün bonusu hesaplama
-def calculate_streak_bonus(streak_count):
-    if streak_count <= 0:
-        return 0
-    elif streak_count < 3:
-        return 10  # 1-2 gün: 10 puan
-    elif streak_count < 7:
-        return 25  # 3-6 gün: 25 puan
-    elif streak_count < 30:
-        return 50  # 7-29 gün: 50 puan
-    else:
-        return 100  # 30+ gün: 100 puan
-
-# Oyun tamamlama puanı hesaplama
-def calculate_completion_points(game_type, score, difficulty=None):
-    # Oyun türüne göre temel puanlar
-    base_points = {
-        'wordPuzzle': 50,
-        'memoryMatch': 50,
-        'numberSequence': 60,
-        '3dRotation': 70,
-        'labyrinth': 65,
-        'puzzle': 50,
-        'memoryCards': 50,
-        'numberChain': 55,
-        'audioMemory': 60,
-        'nBack': 75,
-        'sudoku': 80,
-        'tetris': 45,
-        'wordle': 60,
-        'chess': 70,
-        'iqTest': 100,
-        'simonSays': 50,
-        'typingSpeed': 45,
-        'puzzleSlider': 55,
-        'colorMatch': 50,
-        'mathChallenge': 65,
-        'snakeGame': 40,
-        '2048': 60,
-    }
-    
-    # Oyun türü için temel puanı al, yoksa varsayılan 50 puan
-    base_point = base_points.get(game_type, 50)
-    
-    # Zorluk çarpanı uygula
-    difficulty_multiplier = get_difficulty_multiplier(difficulty)
-    
-    # Skor çarpanı (skora göre ek puan)
-    # Her oyun türü için farklı bir skor aralığı olabilir
-    # Başlangıç değeri olarak skoru 1000'e bölerek çarpan oluşturuyoruz
-    score_multiplier = max(0.1, min(2.0, score / 1000))
-    
-    # Toplam puan hesaplama
-    points = int(base_point * difficulty_multiplier + (score * score_multiplier * 0.2))
-    
-    return points
-
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
@@ -1384,135 +1318,48 @@ def save_score():
     
     game_type = data.get('game_type')
     score = data.get('score')
-    difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk: medium
-    playtime = data.get('playtime', 0)  # Varsayılan oynama süresi: 0 saniye
     
     if not game_type or not score:
         return jsonify({'success': False, 'message': 'Eksik veri!'})
     
     try:
         score = int(score)
-        playtime = int(playtime)
     except:
-        return jsonify({'success': False, 'message': 'Geçersiz veri formatı!'})
-    
-    # Kullanıcıyı al
-    user = User.query.get(session['user_id'])
-    
-    # Bugünün tarihi
-    today = datetime.now().date()
-    
-    # Ardışık gün hesaplama
-    if user.last_play_date:
-        # Son oyun tarihine 1 gün ekle
-        expected_date = user.last_play_date + timedelta(days=1)
-        
-        # Bugün beklenen tarih mi?
-        if today == expected_date:
-            user.streak_count += 1
-        # Bugün aynı gün mü?
-        elif today == user.last_play_date:
-            pass  # Streak'i değiştirme (aynı gün içinde)
-        else:
-            # Streak'i sıfırla
-            user.streak_count = 1
-    else:
-        # İlk oyun
-        user.streak_count = 1
-    
-    # Son oyun tarihini güncelle
-    user.last_play_date = today
-    
-    # Günlük ilk oyun bonusu için kontrol
-    # Son 24 saat içinde başka bir oyun oturumu var mı?
-    yesterday = datetime.now() - timedelta(hours=24)
-    recent_session = GameSession.query.filter(
-        GameSession.user_id == user.id,
-        GameSession.play_date > yesterday
-    ).first()
-    
-    daily_bonus_applied = False
-    if not recent_session:
-        daily_bonus_applied = True
-    
-    # Streak bonusu hesapla
-    streak_bonus = calculate_streak_bonus(user.streak_count)
-    
-    # Tamamlama puanı hesapla
-    base_points = calculate_completion_points(game_type, score, difficulty)
-    
-    # Günlük bonus ekle (ilk oyun ise)
-    daily_bonus = 20 if daily_bonus_applied else 0
-    
-    # Toplam puanları hesapla
-    total_points = base_points + streak_bonus + daily_bonus
-    
-    # XP kazanımı (dakika başına 5 XP + temel XP)
-    minutes_played = max(1, playtime // 60)  # En az 1 dakika
-    xp_gain = (minutes_played * 5) + int(score * 0.1)  # Dakika başına 5 XP + skor bazlı XP
+        return jsonify({'success': False, 'message': 'Geçersiz skor!'})
     
     # Yeni skoru kaydet
     new_score = Score(
         user_id=session['user_id'],
         game_type=game_type,
-        score=score,
-        points_earned=total_points,
-        xp_earned=xp_gain
+        score=score
     )
     
-    # Oyun oturumunu kaydet
-    new_session = GameSession(
-        user_id=session['user_id'],
-        game_type=game_type,
-        score=score,
-        points_earned=total_points,
-        xp_earned=xp_gain,
-        playtime=playtime,
-        difficulty=difficulty,
-        daily_bonus_applied=daily_bonus_applied,
-        streak_bonus_applied=(streak_bonus > 0)
-    )
+    db.session.add(new_score)
     
-    # Kullanıcı bilgilerini güncelle
+    # Kullanıcının deneyim puanını artır (oyun skorunun %10'u kadar)
+    user = User.query.get(session['user_id'])
+    xp_gain = int(score * 0.1)
     user.experience_points += xp_gain
-    user.total_points += total_points
+    
+    # Kullanıcının toplam oyun sayısını güncelle
     user.total_games_played += 1
     
     # Kullanıcının en yüksek skorunu güncelle (gerekirse)
     if score > user.highest_score:
         user.highest_score = score
     
-    # Veritabanına ekle
-    db.session.add(new_score)
-    db.session.add(new_session)
-    
-    # Seviye hesaplama
-    old_level = user.level
-    new_level = calculate_level(user.experience_points)
-    user.level = new_level
-    
-    # Değişiklikleri kaydet
     db.session.commit()
     
-    # Yanıt
-    response_data = {
+    # Yeni seviyeyi hesapla
+    new_level = calculate_level(user.experience_points)
+    
+    return jsonify({
         'success': True, 
         'message': 'Skor kaydedildi!',
-        'score': score,
-        'points': {
-            'base_points': base_points,
-            'streak_bonus': streak_bonus,
-            'daily_bonus': daily_bonus,
-            'total_points': total_points
-        },
         'xp_gain': xp_gain,
         'total_xp': user.experience_points,
-        'level': new_level,
-        'level_up': (new_level > old_level),
-        'streak_count': user.streak_count
-    }
-    
-    return jsonify(response_data)
+        'level': new_level
+    })
 
 # Mevcut Kullanıcı API'si
 @app.route('/api/current-user')
@@ -1625,89 +1472,6 @@ def get_scores_alt(game_type):
         logger.error(f"Alternatif skor verileri getirilirken hata oluştu ({game_type}): {str(e)}")
         return jsonify([]), 500
 
-# Kullanıcı istatistikleri API'si
-@app.route('/api/user/stats')
-def get_user_stats():
-    """Kullanıcı oyun istatistiklerini getiren API."""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
-    try:
-        user_id = session['user_id']
-        user = User.query.get(user_id)
-        
-        if not user:
-            return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı!'})
-        
-        # Kullanıcının son oyun oturumlarını al (son 10)
-        recent_sessions = GameSession.query.filter_by(user_id=user_id).order_by(
-            GameSession.play_date.desc()
-        ).limit(10).all()
-        
-        # Kullanıcının toplam istatistiklerini hesapla
-        total_playtime = db.session.query(db.func.sum(GameSession.playtime)).filter_by(user_id=user_id).scalar() or 0
-        total_points = user.total_points
-        total_xp = user.experience_points
-        level = user.level
-        streak_count = user.streak_count
-        
-        # Oyun türüne göre en yüksek skorlar
-        top_scores = db.session.query(
-            Score.game_type,
-            db.func.max(Score.score).label('max_score')
-        ).filter_by(
-            user_id=user_id
-        ).group_by(
-            Score.game_type
-        ).all()
-        
-        # Her oyun türü için en yüksek skorlar
-        game_scores = {}
-        for game_type, max_score in top_scores:
-            game_scores[game_type] = max_score
-        
-        # Seviye ilerleme yüzdesi
-        current_level_xp = xp_for_level(level)
-        next_level_xp = xp_for_level(level + 1)
-        xp_progress = ((total_xp - current_level_xp) / (next_level_xp - current_level_xp)) * 100
-        
-        # Son oturumları formatlama
-        formatted_sessions = []
-        for session in recent_sessions:
-            formatted_sessions.append({
-                'game_type': session.game_type,
-                'score': session.score,
-                'points_earned': session.points_earned,
-                'xp_earned': session.xp_earned,
-                'playtime': session.playtime,
-                'difficulty': session.difficulty,
-                'date': session.play_date.strftime('%Y-%m-%d %H:%M')
-            })
-        
-        return jsonify({
-            'success': True,
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'avatar_url': user.avatar_url,
-                'level': level,
-                'total_xp': total_xp,
-                'total_points': total_points,
-                'streak_count': streak_count,
-                'xp_progress': xp_progress,
-                'next_level_xp': next_level_xp,
-                'rank': user.rank,
-                'total_games_played': user.total_games_played,
-                'total_playtime': total_playtime,  # Saniye cinsinden
-                'total_playtime_formatted': f"{total_playtime // 3600}s {(total_playtime % 3600) // 60}d {total_playtime % 60}s"
-            },
-            'game_scores': game_scores,
-            'recent_sessions': formatted_sessions
-        })
-    except Exception as e:
-        logger.error(f"Kullanıcı istatistikleri alınırken hata: {str(e)}")
-        return jsonify({'success': False, 'message': 'İstatistikler alınırken bir hata oluştu!'}), 500
-
 # Toplam Skor API'si
 @app.route('/api/scores/aggregated')
 def get_aggregated_scores():
@@ -1806,26 +1570,12 @@ def get_leaderboard_data(game_type):
     })
 
 # Yardımcı fonksiyonlar
-def xp_for_level(level):
+def calculate_level(score):
     """
-    Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar
-    Formül: 500 × (seviye^1.5)
+    Skor değerine göre seviyeyi hesaplar
+    Basit bir algoritma: Her 100 puan için 1 seviye
     """
-    return int(500 * (level ** 1.5))
-
-def calculate_level(total_xp):
-    """
-    Toplam XP'ye göre kullanıcı seviyesini hesaplar
-    """
-    level = 1
-    
-    while True:
-        required_xp = xp_for_level(level + 1)
-        if total_xp < required_xp:
-            break
-        level += 1
-    
-    return level
+    return max(1, score // 100)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
