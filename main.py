@@ -745,7 +745,7 @@ def chess():
 def iq_test():
     """IQ Test: Zeka ve mantık oyunu
     Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin."""
-    return render_template('games/iqTest_enhanced.html')
+    return render_template('games/iqTest_simplified.html')
 
 # Simon Says Oyunu
 @app.route('/games/simon-says')
@@ -771,7 +771,7 @@ def tetris():
 def typing_speed():
     """Yazma Hızı: Klavye hızı testi
     Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
-    return render_template('games/typingSpeed_modern.html')
+    return render_template('games/typingSpeed_simplified.html')
     
 @app.route('/games/puzzle-slider')
 def puzzle_slider():
@@ -789,13 +789,13 @@ def color_match_game():
 def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
-    return render_template('games/mathChallenge_enhanced.html')
+    return render_template('games/mathChallenge_simplified.html')
 
 @app.route('/games/snake')
 def snake_game():
     """Yılan Oyunu: Klasik arcade
     Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
-    return render_template('games/snake_enhanced.html')
+    return render_template('games/snake_simplified.html')
 
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')

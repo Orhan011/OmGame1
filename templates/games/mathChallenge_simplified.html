@@ -1,0 +1,935 @@
+{% extends 'layout.html' %}
+
+{% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="math-container">
+    <h1>Matematik Mücadelesi</h1>
+    
+    <!-- Oyun alanı -->
+    <div class="game-area">
+      <!-- Başlangıç ekranı -->
+      <div id="start-screen" class="game-screen active">
+        <div class="modes-grid">
+          <div class="mode-card" data-mode="basic">
+            <div class="mode-icon">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <h3>Temel İşlemler</h3>
+            <p>Toplama, çıkarma, çarpma ve bölme işlemlerinden oluşan sorular</p>
+            <button class="btn btn-mode">BAŞLAT</button>
+          </div>
+          
+          <div class="mode-card" data-mode="sequence">
+            <div class="mode-icon">
+              <i class="fas fa-sort-numeric-up"></i>
+            </div>
+            <h3>Sayı Dizileri</h3>
+            <p>Sayı dizilerindeki mantığı bulma ve sonraki sayıyı tahmin etme</p>
+            <button class="btn btn-mode">BAŞLAT</button>
+          </div>
+          
+          <div class="mode-card" data-mode="equation">
+            <div class="mode-icon">
+              <i class="fas fa-superscript"></i>
+            </div>
+            <h3>Denklemler</h3>
+            <p>Bilinmeyenli denklemleri çözme ve değişkenleri bulma</p>
+            <button class="btn btn-mode">BAŞLAT</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Oyun ekranı -->
+      <div id="game-screen" class="game-screen">
+        <div class="game-header">
+          <div class="stats">
+            <div class="stat-item">
+              <span class="stat-label">Skor</span>
+              <span class="stat-value" id="score">0</span>
+            </div>
+            
+            <div class="stat-item">
+              <span class="stat-label">Seviye</span>
+              <span class="stat-value" id="level">1</span>
+            </div>
+            
+            <div class="stat-item">
+              <span class="stat-label">Süre</span>
+              <span class="stat-value" id="timer">30</span>
+            </div>
+          </div>
+          
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        
+        <div class="problem-container">
+          <div class="mode-title" id="mode-title">Temel İşlemler</div>
+          <div class="problem" id="problem">5 + 3 = ?</div>
+          
+          <div class="answer-container">
+            <div id="options-container" class="options-grid">
+              <!-- Seçenekler JavaScript ile eklenecek -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sonuç ekranı -->
+      <div id="result-screen" class="game-screen">
+        <div class="result-header">
+          <h2>Oyun Bitti!</h2>
+          <p>İşte performansınız:</p>
+        </div>
+        
+        <div class="result-stats">
+          <div class="result-item">
+            <div class="result-value" id="final-score">0</div>
+            <div class="result-label">Toplam Puan</div>
+          </div>
+          
+          <div class="result-item">
+            <div class="result-value" id="max-level">1</div>
+            <div class="result-label">Seviye</div>
+          </div>
+          
+          <div class="result-item">
+            <div class="result-value" id="accuracy">0%</div>
+            <div class="result-label">Doğruluk</div>
+          </div>
+        </div>
+        
+        <div class="details">
+          <div class="detail-row">
+            <span class="detail-label">Doğru Cevaplar:</span>
+            <span class="detail-value" id="correct-answers">0</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Yanlış Cevaplar:</span>
+            <span class="detail-value" id="wrong-answers">0</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Toplam Süre:</span>
+            <span class="detail-value" id="total-time">0 sn</span>
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <button id="save-result" class="btn btn-primary">SONUCU KAYDET</button>
+          <button id="play-again" class="btn btn-outline">TEKRAR OYNA</button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline">TÜM OYUNLAR</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+  }
+  
+  .math-container {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  h1 {
+    color: white;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  
+  .game-area {
+    position: relative;
+    min-height: 400px;
+  }
+  
+  .game-screen {
+    display: none;
+  }
+  
+  .game-screen.active {
+    display: block;
+  }
+  
+  /* Start Screen */
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .mode-card {
+    background: rgba(30, 30, 60, 0.6);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .mode-card:hover {
+    transform: translateY(-5px);
+    background: rgba(40, 40, 80, 0.7);
+    border-color: rgba(106, 90, 224, 0.3);
+  }
+  
+  .mode-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(106, 90, 224, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #6a5ae0;
+    margin: 0 auto 15px;
+  }
+  
+  .mode-card h3 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .mode-card p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    min-height: 60px;
+  }
+  
+  .btn-mode {
+    background: #6a5ae0;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+  
+  .btn-mode:hover {
+    background: #8777e0;
+    transform: translateY(-2px);
+  }
+  
+  /* Game Screen */
+  .game-header {
+    margin-bottom: 25px;
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .stat-item {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 8px;
+    padding: 8px 15px;
+    text-align: center;
+  }
+  
+  .stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+  }
+  
+  .stat-value {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background: rgba(40, 40, 80, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #6a5ae0;
+    transition: width 0.3s ease;
+  }
+  
+  .problem-container {
+    background: rgba(30, 30, 60, 0.6);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .mode-title {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+  
+  .problem {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+  
+  .answer-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .option {
+    background: rgba(40, 40, 80, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .option:hover {
+    background: rgba(50, 50, 90, 0.6);
+    transform: translateY(-2px);
+  }
+  
+  .option.correct {
+    background: rgba(46, 204, 113, 0.3);
+    border-color: #2ecc71;
+  }
+  
+  .option.incorrect {
+    background: rgba(231, 76, 60, 0.3);
+    border-color: #e74c3c;
+  }
+  
+  /* Result Screen */
+  .result-header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  
+  .result-header h2 {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .result-header p {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .result-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+  }
+  
+  .result-item {
+    text-align: center;
+  }
+  
+  .result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 5px;
+  }
+  
+  .result-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+  
+  .details {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .detail-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  .detail-value {
+    font-weight: 600;
+  }
+  
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .btn-primary {
+    background: #6a5ae0;
+    color: white;
+    border: none;
+  }
+  
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive Adjustments */
+  @media (min-width: 768px) {
+    .result-actions {
+      flex-direction: row;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .math-container {
+      padding: 15px;
+    }
+    
+    .modes-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .problem {
+      font-size: 1.6rem;
+    }
+    
+    .options-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .result-stats {
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("Matematik Mücadelesi oyunu basitleştirildi.");
+  
+  // DOM Elements
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  
+  const modeCards = document.querySelectorAll('.mode-card');
+  const modeButtons = document.querySelectorAll('.btn-mode');
+  const modeTitle = document.getElementById('mode-title');
+  
+  const scoreDisplay = document.getElementById('score');
+  const levelDisplay = document.getElementById('level');
+  const timerDisplay = document.getElementById('timer');
+  const progressFill = document.getElementById('progress-fill');
+  const problemDisplay = document.getElementById('problem');
+  const optionsContainer = document.getElementById('options-container');
+  
+  const finalScoreDisplay = document.getElementById('final-score');
+  const maxLevelDisplay = document.getElementById('max-level');
+  const accuracyDisplay = document.getElementById('accuracy');
+  const correctAnswersDisplay = document.getElementById('correct-answers');
+  const wrongAnswersDisplay = document.getElementById('wrong-answers');
+  const totalTimeDisplay = document.getElementById('total-time');
+  
+  const saveResultBtn = document.getElementById('save-result');
+  const playAgainBtn = document.getElementById('play-again');
+  
+  // Game variables
+  let currentMode = '';
+  let currentLevel = 1;
+  let score = 0;
+  let timeLeft = 30;
+  let timer = null;
+  let isGameActive = false;
+  let totalTime = 0;
+  let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let currentAnswer = null;
+  
+  // Mode-specific configs
+  const modeConfigs = {
+    basic: {
+      title: 'Temel İşlemler',
+      timePerLevel: 30,
+      generateProblem: function(level) {
+        let problem, answer;
+        const min = Math.max(1, level * 2);
+        const max = Math.min(100, level * 10);
+        
+        // Select random operation based on level
+        const operations = level < 3 ? ['+', '-'] : ['+', '-', '*', '/'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+        
+        let a, b;
+        
+        switch (operation) {
+          case '+':
+            a = Math.floor(Math.random() * (max - min) + min);
+            b = Math.floor(Math.random() * (max - min) + min);
+            problem = `${a} + ${b} = ?`;
+            answer = a + b;
+            break;
+          case '-':
+            a = Math.floor(Math.random() * (max - min) + min);
+            b = Math.floor(Math.random() * a + 1); // Ensure b < a to avoid negative answers
+            problem = `${a} - ${b} = ?`;
+            answer = a - b;
+            break;
+          case '*':
+            a = Math.floor(Math.random() * Math.min(12, level) + 1);
+            b = Math.floor(Math.random() * Math.min(12, level) + 1);
+            problem = `${a} × ${b} = ?`;
+            answer = a * b;
+            break;
+          case '/':
+            b = Math.floor(Math.random() * Math.min(10, level) + 1);
+            a = b * Math.floor(Math.random() * Math.min(10, level) + 1);
+            problem = `${a} ÷ ${b} = ?`;
+            answer = a / b;
+            break;
+        }
+        
+        return { problem, answer };
+      },
+      generateOptions: function(answer, level) {
+        let options = [answer];
+        const deviation = Math.max(1, answer * 0.2); // 20% deviation or minimum 1
+        
+        while (options.length < 4) {
+          let incorrectAnswer;
+          if (Math.random() < 0.5) {
+            // Add a close value
+            incorrectAnswer = Math.round(answer + (Math.random() * 2 - 1) * deviation);
+          } else {
+            // Add a random value
+            incorrectAnswer = Math.round(Math.random() * answer * 2);
+          }
+          
+          // Ensure unique values and not negative
+          if (!options.includes(incorrectAnswer) && incorrectAnswer >= 0) {
+            options.push(incorrectAnswer);
+          }
+        }
+        
+        // Shuffle options
+        return shuffleArray(options);
+      }
+    },
+    sequence: {
+      title: 'Sayı Dizileri',
+      timePerLevel: 30,
+      generateProblem: function(level) {
+        let sequence = [];
+        let problem, answer;
+        
+        // Different sequence types based on level
+        const sequenceType = Math.floor(Math.random() * 4);
+        
+        switch (sequenceType) {
+          case 0: // Arithmetic sequence (addition)
+            const diff = Math.max(1, Math.floor(level / 2));
+            const start = Math.floor(Math.random() * 20);
+            for (let i = 0; i < 4; i++) {
+              sequence.push(start + i * diff);
+            }
+            answer = start + 4 * diff;
+            break;
+          case 1: // Arithmetic sequence (subtraction)
+            const subDiff = Math.max(1, Math.floor(level / 2));
+            const subStart = Math.floor(Math.random() * 50) + subDiff * 5;
+            for (let i = 0; i < 4; i++) {
+              sequence.push(subStart - i * subDiff);
+            }
+            answer = subStart - 4 * subDiff;
+            break;
+          case 2: // Geometric sequence
+            if (level >= 3) {
+              const ratio = Math.max(2, Math.floor(level / 2));
+              const geoStart = Math.max(1, Math.floor(level / 2));
+              for (let i = 0; i < 4; i++) {
+                sequence.push(geoStart * Math.pow(ratio, i));
+              }
+              answer = geoStart * Math.pow(ratio, 4);
+            } else {
+              // Fallback to simple sequence for lower levels
+              for (let i = 1; i <= 4; i++) {
+                sequence.push(i * 2);
+              }
+              answer = 5 * 2;
+            }
+            break;
+          case 3: // Fibonacci-like sequence
+            if (level >= 4) {
+              sequence = [1, 1];
+              for (let i = 2; i < 4; i++) {
+                sequence.push(sequence[i-1] + sequence[i-2]);
+              }
+              answer = sequence[2] + sequence[3];
+            } else {
+              // Fallback to simple sequence for lower levels
+              for (let i = 1; i <= 4; i++) {
+                sequence.push(i);
+              }
+              answer = 5;
+            }
+            break;
+        }
+        
+        problem = sequence.join(', ') + ', ... ?';
+        return { problem, answer };
+      },
+      generateOptions: function(answer, level) {
+        let options = [answer];
+        const deviation = Math.max(1, Math.floor(answer * 0.2)); // 20% deviation
+        
+        while (options.length < 4) {
+          let incorrectAnswer;
+          if (Math.random() < 0.5) {
+            // Close value
+            incorrectAnswer = answer + (Math.random() < 0.5 ? 1 : -1) * Math.floor(Math.random() * deviation + 1);
+          } else {
+            // Operation error
+            incorrectAnswer = Math.abs(answer + Math.floor(Math.random() * answer));
+          }
+          
+          if (!options.includes(incorrectAnswer) && incorrectAnswer >= 0) {
+            options.push(incorrectAnswer);
+          }
+        }
+        
+        return shuffleArray(options);
+      }
+    },
+    equation: {
+      title: 'Denklemler',
+      timePerLevel: 40,
+      generateProblem: function(level) {
+        let problem, answer;
+        
+        if (level <= 2) {
+          // Simple equations with one variable
+          const x = Math.floor(Math.random() * 10) + 1;
+          const a = Math.floor(Math.random() * 5) + 1;
+          const b = Math.floor(Math.random() * 20);
+          
+          problem = `${a}x + ${b} = ${a*x + b}, x = ?`;
+          answer = x;
+        } else if (level <= 4) {
+          // Slightly more complex equations
+          const x = Math.floor(Math.random() * 10) + 1;
+          const a = Math.floor(Math.random() * 5) + 1;
+          const b = Math.floor(Math.random() * 10) + 1;
+          const c = a * x + b;
+          
+          problem = `${a}x + ${b} = ${c}, x = ?`;
+          answer = x;
+        } else {
+          // More complex equations
+          const x = Math.floor(Math.random() * 10) + 1;
+          const a = Math.floor(Math.random() * 5) + 1;
+          const b = Math.floor(Math.random() * 10) + 1;
+          const c = Math.floor(Math.random() * 10) + 1;
+          const d = a * x * x + b * x + c;
+          
+          problem = `${a}x² + ${b}x + ${c} = ${d}, x = ?`;
+          answer = x;
+        }
+        
+        return { problem, answer };
+      },
+      generateOptions: function(answer, level) {
+        let options = [answer];
+        
+        while (options.length < 4) {
+          let incorrectAnswer;
+          if (Math.random() < 0.5) {
+            // Close value
+            incorrectAnswer = answer + (Math.random() < 0.5 ? 1 : -1);
+          } else {
+            // Random value
+            incorrectAnswer = Math.floor(Math.random() * 10) + 1;
+          }
+          
+          if (!options.includes(incorrectAnswer) && incorrectAnswer >= 0) {
+            options.push(incorrectAnswer);
+          }
+        }
+        
+        return shuffleArray(options);
+      }
+    }
+  };
+  
+  // Event Listeners
+  modeButtons.forEach((button, index) => {
+    button.addEventListener('click', function() {
+      const modeCard = modeCards[index];
+      const mode = modeCard.getAttribute('data-mode');
+      startGame(mode);
+    });
+  });
+  
+  saveResultBtn.addEventListener('click', saveResult);
+  playAgainBtn.addEventListener('click', function() {
+    showScreen(startScreen);
+  });
+  
+  // Functions
+  function showScreen(screen) {
+    // Hide all screens
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    resultScreen.classList.remove('active');
+    
+    // Show requested screen
+    screen.classList.add('active');
+  }
+  
+  function startGame(mode) {
+    // Initialize game state
+    currentMode = mode;
+    currentLevel = 1;
+    score = 0;
+    timeLeft = modeConfigs[mode].timePerLevel;
+    isGameActive = true;
+    totalTime = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    
+    // Update UI
+    modeTitle.textContent = modeConfigs[mode].title;
+    scoreDisplay.textContent = score;
+    levelDisplay.textContent = currentLevel;
+    timerDisplay.textContent = timeLeft;
+    progressFill.style.width = '0%';
+    
+    // Generate first problem
+    generateProblem();
+    
+    // Start timer
+    if (timer) clearInterval(timer);
+    timer = setInterval(updateTimer, 1000);
+    
+    // Show game screen
+    showScreen(gameScreen);
+  }
+  
+  function generateProblem() {
+    const config = modeConfigs[currentMode];
+    const { problem, answer } = config.generateProblem(currentLevel);
+    
+    // Store current answer
+    currentAnswer = answer;
+    
+    // Display problem
+    problemDisplay.textContent = problem;
+    
+    // Generate and display options
+    const options = config.generateOptions(answer, currentLevel);
+    
+    optionsContainer.innerHTML = '';
+    options.forEach(option => {
+      const optionEl = document.createElement('div');
+      optionEl.className = 'option';
+      optionEl.textContent = option;
+      optionEl.addEventListener('click', () => checkAnswer(option));
+      optionsContainer.appendChild(optionEl);
+    });
+  }
+  
+  function checkAnswer(selectedAnswer) {
+    if (!isGameActive) return;
+    
+    // Find selected option element
+    const options = optionsContainer.querySelectorAll('.option');
+    let selectedOption;
+    
+    options.forEach(option => {
+      if (parseFloat(option.textContent) === selectedAnswer) {
+        selectedOption = option;
+      }
+    });
+    
+    // Check if answer is correct
+    const isCorrect = selectedAnswer === currentAnswer;
+    
+    // Update UI to show correctness
+    if (selectedOption) {
+      selectedOption.classList.add(isCorrect ? 'correct' : 'incorrect');
+    }
+    
+    // Disable further selection
+    options.forEach(option => {
+      option.style.pointerEvents = 'none';
+    });
+    
+    // Update stats
+    if (isCorrect) {
+      correctAnswers++;
+      score += currentLevel * 10;
+      scoreDisplay.textContent = score;
+    } else {
+      wrongAnswers++;
+    }
+    
+    // Wait before showing next problem
+    setTimeout(() => {
+      // Move to next level if correct
+      if (isCorrect) {
+        currentLevel++;
+        levelDisplay.textContent = currentLevel;
+        // Reset timer for next level
+        timeLeft = modeConfigs[currentMode].timePerLevel;
+        timerDisplay.textContent = timeLeft;
+      }
+      
+      // Generate new problem
+      generateProblem();
+    }, 1000);
+  }
+  
+  function updateTimer() {
+    if (!isGameActive) return;
+    
+    timeLeft--;
+    totalTime++;
+    timerDisplay.textContent = timeLeft;
+    
+    // Update progress bar
+    const progress = (1 - timeLeft / modeConfigs[currentMode].timePerLevel) * 100;
+    progressFill.style.width = `${progress}%`;
+    
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }
+  
+  function endGame() {
+    isGameActive = false;
+    clearInterval(timer);
+    
+    // Update result screen
+    finalScoreDisplay.textContent = score;
+    maxLevelDisplay.textContent = currentLevel;
+    
+    // Calculate accuracy
+    const accuracy = correctAnswers === 0 && wrongAnswers === 0 ? 
+      0 : Math.round((correctAnswers / (correctAnswers + wrongAnswers)) * 100);
+    accuracyDisplay.textContent = `${accuracy}%`;
+    
+    correctAnswersDisplay.textContent = correctAnswers;
+    wrongAnswersDisplay.textContent = wrongAnswers;
+    totalTimeDisplay.textContent = `${totalTime} sn`;
+    
+    // Show result screen
+    showScreen(resultScreen);
+  }
+  
+  function saveResult() {
+    // Prepare game stats
+    const gameStats = {
+      mode: currentMode,
+      level_reached: currentLevel,
+      correct_answers: correctAnswers,
+      wrong_answers: wrongAnswers,
+      accuracy: parseInt(accuracyDisplay.textContent),
+      time_played: totalTime
+    };
+    
+    // Post score to backend
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_type: 'math_challenge',
+        score: score,
+        difficulty: currentLevel <= 3 ? 'easy' : (currentLevel <= 6 ? 'medium' : 'hard'),
+        playtime: totalTime,
+        game_stats: gameStats
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Score saved:", data);
+      if (data.success) {
+        saveResultBtn.disabled = true;
+        saveResultBtn.textContent = 'SONUÇ KAYDEDİLDİ';
+      }
+    })
+    .catch(error => {
+      console.error("Error saving score:", error);
+    });
+  }
+  
+  // Helper Functions
+  function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+});
+</script>
+{% endblock %}
