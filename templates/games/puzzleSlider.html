@@ -959,6 +959,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Remove all theme classes from tiles
       tiles.forEach(tile => {
+        // Skip empty tiles
+        if (tile.classList.contains('empty')) return;
+        
         tile.classList.remove('theme-default', 'theme-gradient', 'theme-neon', 'theme-dark');
         tile.classList.add(`theme-${theme}`);
       });
@@ -985,9 +988,15 @@ document.addEventListener('DOMContentLoaded', function() {
         tile.textContent = '';
       } else {
         tile.textContent = i + 1;
-        // Apply active theme
-        const activeTheme = document.querySelector('.theme-btn.active').getAttribute('data-theme');
-        tile.classList.add(`theme-${activeTheme}`);
+        // Apply active theme - fail safely if no theme button is active
+        const activeThemeElement = document.querySelector('.theme-btn.active');
+        if (activeThemeElement) {
+          const activeTheme = activeThemeElement.getAttribute('data-theme');
+          tile.classList.add(`theme-${activeTheme}`);
+        } else {
+          // Default theme
+          tile.classList.add('theme-default');
+        }
       }
       
       tile.addEventListener('click', () => moveTile(i));
