@@ -602,10 +602,16 @@ def get_most_played_games(limit=4):
             "route": "audio_memory"
         },
         {
-            "name": "Sudoku",
-            "description": "Klasik mantık bulmacası ile analitik düşünme becerilerinizi geliştirin.",
-            "icon": "fas fa-th",
-            "route": "sudoku"
+            "name": "Tower Defense",
+            "description": "Stratejik kule savunma oyunuyla düşman dalgalarını durdurun.",
+            "icon": "fas fa-chess-rook",
+            "route": "tower_defense"
+        },
+        {
+            "name": "Space Shooter",
+            "description": "Uzay gemisiyle düşman gemilerine ve asteroitlere karşı savaşın.",
+            "icon": "fas fa-rocket",
+            "route": "space_shooter"
         }
     ]
     # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
@@ -651,9 +657,7 @@ def login():
 # OYUNLAR
 
 # 3D Rotasyon Oyunu
-@app.route('/games/3d-rotation')
-def three_d_rotation():
-    return render_template('games/3dRotation.html')
+# 3D Döndürme Oyunu kaldırıldı
 
 # Kelime Bulmaca Oyunu
 @app.route('/games/word-puzzle')
@@ -703,11 +707,21 @@ def audio_memory():
 def n_back():
     return render_template('games/nBack.html')
 
-# Sudoku Oyunu
-@app.route('/games/sudoku')
-@app.route('/sudoku')
-def sudoku():
-    return render_template('games/sudoku.html')
+# Sudoku Oyunu kaldırıldı
+
+# Tower Defense Oyunu
+@app.route('/games/tower-defense')
+def tower_defense():
+    """Tower Defense: Strateji oyunu
+    Kuleleri stratejik noktalara yerleştirerek düşman dalgalarını durdurun."""
+    return render_template('games/tower_defense.html')
+
+# Space Shooter Oyunu
+@app.route('/games/space-shooter')
+def space_shooter():
+    """Space Shooter: Uzay savaş oyunu
+    Uzay gemisiyle düşman gemilerine ve asteroitlere karşı savaşın."""
+    return render_template('games/space_shooter.html')
 
 # 2048 Oyunu
 @app.route('/2048')
@@ -1338,7 +1352,6 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'memoryCards': {'point_base': 70, 'score_multiplier': 0.6},
         'wordPuzzle': {'point_base': 60, 'score_multiplier': 0.7},
         'numberSequence': {'point_base': 80, 'score_multiplier': 0.5},
-        '3dRotation': {'point_base': 90, 'score_multiplier': 0.4},
         'tetris': {'point_base': 40, 'score_multiplier': 0.8},
         'wordle': {'point_base': 100, 'score_multiplier': 0.3},
         'puzzle_slider': {'point_base': 60, 'score_multiplier': 0.6},
@@ -1348,13 +1361,14 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'snake_game': {'point_base': 30, 'score_multiplier': 1.0},
         'audioMemory': {'point_base': 65, 'score_multiplier': 0.6},
         'nBack': {'point_base': 85, 'score_multiplier': 0.45},
-        'sudoku': {'point_base': 75, 'score_multiplier': 0.5},
         '2048': {'point_base': 45, 'score_multiplier': 0.75},
         'labyrinth': {'point_base': 80, 'score_multiplier': 0.5},
         'puzzle': {'point_base': 60, 'score_multiplier': 0.65},
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
+        'tower_defense': {'point_base': 85, 'score_multiplier': 0.5},
+        'space_shooter': {'point_base': 75, 'score_multiplier': 0.6},
         'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
     }
     
@@ -1394,20 +1408,20 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'memoryCards': 2.5,  # 2.5 dakika
                 'wordPuzzle': 3.0,  # 3 dakika
                 'wordle': 2.0,  # 2 dakika
-                'sudoku': 5.0,  # 5 dakika
                 '2048': 3.0,  # 3 dakika
                 'simon_says': 2.0,  # 2 dakika
                 'audioMemory': 2.0,  # 2 dakika
                 'nBack': 3.0,  # 3 dakika
                 'numberSequence': 2.5,  # 2.5 dakika
-                '3dRotation': 2.0,  # 2 dakika
                 'labyrinth': 4.0,  # 4 dakika
                 'puzzle': 3.0,  # 3 dakika
                 'color_match': 1.5,  # 1.5 dakika
                 'math_challenge': 2.0,  # 2 dakika
                 'iq_test': 10.0,  # 10 dakika
                 'numberChain': 2.5,  # 2.5 dakika
-                'puzzle_slider': 2.0  # 2 dakika
+                'puzzle_slider': 2.0,  # 2 dakika
+                'tower_defense': 4.0,  # 4 dakika
+                'space_shooter': 3.0  # 3 dakika
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1427,21 +1441,21 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'tetris': 100,
                 'chess': 40,
                 'wordle': 20,
-                'sudoku': 60,
                 '2048': 80,
                 'snake_game': 120,
                 'simon_says': 25,
                 'audioMemory': 35,
                 'nBack': 40,
                 'numberSequence': 45,
-                '3dRotation': 30,
                 'labyrinth': 50,
                 'puzzle': 35,
                 'color_match': 60,
                 'math_challenge': 30,
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'iq_test': 20,
-                'numberChain': 40
+                'numberChain': 40,
+                'tower_defense': 70,  # Stratejik hamle sayısı 
+                'space_shooter': 150  # Düşman gemilerine ve asteroitlere ateş etme sayısı
             }.get(game_type, 50)
             
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1915,7 +1929,6 @@ def get_leaderboard_data(game_type):
         'all': 'Tüm Oyunlar',
         'wordPuzzle': 'Kelime Bulmaca',
         'memoryMatch': 'Hafıza Eşleştirme',
-        '3dRotation': '3D Rotasyon',
         'numberSequence': 'Sayı Dizisi',
         'memoryCards': 'Hafıza Kartları',
         'numberChain': 'Sayı Zinciri',
@@ -1923,10 +1936,11 @@ def get_leaderboard_data(game_type):
         'puzzle': 'Bulmaca',
         'audioMemory': 'Sesli Hafıza',
         'nBack': 'N-Back',
-        'sudoku': 'Sudoku',
         '2048': '2048',
         'wordle': 'Wordle',
-        'chess': 'Satranç'
+        'chess': 'Satranç',
+        'tower_defense': 'Kule Savunması',
+        'space_shooter': 'Uzay Savaşı'
     }
     
     return jsonify({
