@@ -710,6 +710,7 @@ def n_back():
 # Sudoku Oyunu kaldırıldı
 
 # Tower Defense Oyunu
+@app.route('/tower_defense')
 @app.route('/games/tower-defense')
 def tower_defense():
     """Tower Defense: Strateji oyunu
@@ -718,6 +719,7 @@ def tower_defense():
 
 # Space Shooter Oyunu
 @app.route('/games/space-shooter')
+@app.route('/space_shooter')
 def space_shooter():
     """Space Shooter: Uzay savaş oyunu
     Uzay gemisiyle düşman gemilerine ve asteroitlere karşı savaşın."""
