@@ -1240,19 +1240,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const bonusDetails = document.createElement('div');
             bonusDetails.className = 'tetris-bonus-details';
             
-            // Puanlama sistemleri karşılaştırması (eğer her iki puanlama da mevcutsa)
+            // Yeni puanlama sistem bilgisi
             let scoringSystemInfo = '';
-            if (data.multipliers && data.multipliers.old_score && data.multipliers.new_score) {
+            if (data.score_info && data.score_info.total_score) {
               scoringSystemInfo = `
                 <div class="tetris-scoring-systems">
-                  <div class="tetris-scoring-title">Puanlama Sistemleri:</div>
+                  <div class="tetris-scoring-title">Puanlama Detayları:</div>
                   <div class="tetris-bonus-item">
-                    <span>Eski Sistem:</span>
-                    <strong>${data.multipliers.old_score}</strong>
+                    <span>Oyun Skoru:</span>
+                    <strong>${score}</strong>
                   </div>
                   <div class="tetris-bonus-item">
-                    <span>Yeni Sistem:</span>
-                    <strong>${data.multipliers.new_score}</strong>
+                    <span>Performans Puanı:</span>
+                    <strong>${data.score_info.total_score}</strong>
                   </div>
                 </div>
               `;
