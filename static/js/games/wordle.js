@@ -647,9 +647,6 @@ document.addEventListener('DOMContentLoaded', function() {
       updateRatingStars(0);
     }
     
-    // Skoru kaydet (localStorage veya backend'e gönderilebilir)
-    saveScore();
-    
     // Sonuç ekranını göster
     setTimeout(() => {
       gameContainer.style.display = 'none';
@@ -791,12 +788,35 @@ document.addEventListener('DOMContentLoaded', function() {
       copyScore();
     }
   }
+
+  // Paylaş butonlarını başlat - button varsa
+  const copyScoreBtn = document.getElementById('copy-score');
+  const shareScoreBtn = document.getElementById('share-score');
+
+  if (copyScoreBtn) {
+    copyScoreBtn.addEventListener('click', copyScore);
+  }
+
+  if (shareScoreBtn) {
+    shareScoreBtn.addEventListener('click', shareScore);
+  }
 });
 
   /**
    * Skoru veritabanına kaydeder ve skor gösterimini günceller
    */
   function saveScoreWithDetails(score) {
+    // Eğer gameState tanımlı değilse (oyun başlamadan çağrılıyorsa) işlemi yapma
+    if (typeof gameState === 'undefined' || !gameState) {
+      console.warn('Skor kaydedilmiyor: Oyun durumu tanımlı değil');
+      return;
+    }
+    
+    if (!score && score !== 0) {
+      console.warn('Skor kaydedilmiyor: Geçerli bir skor yok');
+      return;
+    }
+    
     // Oyun istatistiklerini topla
     const gameStartTime = new Date(localStorage.getItem('wordleGameStartTime') || Date.now());
     const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
