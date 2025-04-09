@@ -2,6 +2,16 @@
 
 {% block title %}Puzzle Slider - OmGame{% endblock %}
 
+{% block extra_styles %}
+<style>
+  /* Ödül sistemi için gereken ek stiller burada */
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/reward-system.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container">
@@ -953,23 +963,33 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru Kaydetme
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'puzzle_slider',
-        score: score
+    // Yeni ödül sistemini kullan
+    if (window.rewardSystem) {
+      const difficulty = boardSize === 3 ? 'easy' : boardSize === 4 ? 'medium' : 'hard';
+      
+      window.rewardSystem.saveScore('puzzle_slider', score, difficulty, seconds);
+    } else {
+      // Eski yöntem (ödül sistemi yüklenmemişse)
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          game_type: 'puzzle_slider',
+          score: score,
+          difficulty: boardSize === 3 ? 'easy' : boardSize === 4 ? 'medium' : 'hard',
+          playtime: seconds
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log('Score saved:', data);
+      })
+      .catch(error => {
+        console.error('Error saving score:', error);
+      });
+    }
   }
   
   console.log('Puzzle Slider oyunu modernize edildi ve hata düzeltildi.');

@@ -26,6 +26,10 @@ class User(db.Model):
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
     suspended_until = db.Column(db.DateTime)
+    total_points = db.Column(db.Integer, default=0)  # Toplam biriken puanlar
+    level = db.Column(db.Integer, default=1)  # Kullanıcı seviyesi
+    last_play_date = db.Column(db.Date)  # Son oyun tarihi
+    streak_count = db.Column(db.Integer, default=0)  # Ardışık günlerde oynama sayısı
     # Notification preferences
     email_notifications = db.Column(db.Boolean, default=True)
     achievement_notifications = db.Column(db.Boolean, default=True)
@@ -42,9 +46,32 @@ class Score(db.Model):
     game_type = db.Column(db.String(50), nullable=False)  # wordPuzzle, memoryMatch, numberSequence, 3dRotation
     score = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    # Yeni alanlar
+    points_earned = db.Column(db.Integer, default=0)  # Kazanılan puanlar
+    xp_earned = db.Column(db.Integer, default=0)      # Kazanılan XP
 
     def __repr__(self):
         return f'<Score {self.game_type}: {self.score}>'
+        
+class GameSession(db.Model):
+    __tablename__ = 'game_sessions'  # Oyun oturumları
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)
+    score = db.Column(db.Integer, default=0)           # Oyun skoru
+    points_earned = db.Column(db.Integer, default=0)   # Kazanılan puanlar
+    xp_earned = db.Column(db.Integer, default=0)       # Kazanılan XP
+    playtime = db.Column(db.Integer, default=0)        # Saniye cinsinden oynama süresi
+    completed = db.Column(db.Boolean, default=True)    # Oyun tamamlandı mı
+    difficulty = db.Column(db.String(20))              # Oyun zorluğu (easy, medium, hard)
+    play_date = db.Column(db.DateTime, default=datetime.utcnow)
+    streak_bonus_applied = db.Column(db.Boolean, default=False)  # Ardışık gün bonusu uygulandı mı
+    daily_bonus_applied = db.Column(db.Boolean, default=False)   # Günlük ilk oyun bonusu uygulandı mı
+    
+    user = db.relationship('User', backref=db.backref('game_sessions', lazy=True))
+    
+    def __repr__(self):
+        return f'<GameSession {self.game_type}, User: {self.user_id}, Score: {self.score}>'
 
 class Article(db.Model):
     __tablename__ = 'articles'  # Explicit table name
