@@ -4,6 +4,975 @@
 {% block title %}Renk Eşleştirme - OmGame{% endblock %}
 
 {% block content %}
-<!-- Doğrudan yeni modernize edilmiş oyun içeriğini içe aktar -->
-{% include 'games/colorMatch.html' %}
+<div class="page-container">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>Renk Eşleştirme <span class="badge bg-accent">Odaklanma Oyunu</span></h1>
+      <p class="game-description">Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin.</p>
+    </div>
+
+    <div class="modern-color-match">
+      <!-- Oyun Paneli -->
+      <div class="cm-game-panel">
+        <!-- Oyun Bilgileri -->
+        <div class="cm-stats-bar">
+          <div class="cm-stat">
+            <div class="cm-stat-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="cm-stat-value" id="score">0</div>
+            <div class="cm-stat-label">Skor</div>
+          </div>
+          <div class="cm-stat">
+            <div class="cm-stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="cm-stat-value" id="best-score">0</div>
+            <div class="cm-stat-label">En İyi</div>
+          </div>
+          <div class="cm-stat">
+            <div class="cm-stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="cm-stat-value" id="timer">60</div>
+            <div class="cm-stat-label">Süre</div>
+          </div>
+        </div>
+
+        <!-- Başlangıç Ekranı -->
+        <div id="start-screen" class="cm-screen">
+          <div class="cm-screen-content">
+            <div class="cm-logo">
+              <i class="fas fa-palette"></i>
+            </div>
+            <h2>Renk Eşleştirme</h2>
+            <p>Zihinsel esnekliğinizi ve odaklanma yeteneğinizi geliştirmek için tasarlanmış hızlı bir oyun.</p>
+
+            <div class="cm-instructions-card">
+              <div class="cm-card-header">
+                <i class="fas fa-info-circle"></i>
+                <h3>Nasıl Oynanır?</h3>
+              </div>
+              <ul class="cm-instruction-list">
+                <li>Ekranda renkli yazılmış kelimeler göreceksiniz</li>
+                <li>Kelimenin <strong>anlamı</strong> ile <strong>rengi</strong> eşleşiyor mu karar verin</li>
+                <li>Eşleşiyorsa <span class="cm-key">DOĞRU</span> butonuna basın</li>
+                <li>Eşleşmiyorsa <span class="cm-key">YANLIŞ</span> butonuna basın</li>
+                <li>Her doğru cevap için +10 puan, her yanlış için -5 puan alırsınız</li>
+              </ul>
+            </div>
+
+            <div class="cm-difficulty-selector">
+              <div class="cm-difficulty-title">Zorluk Seviyesi</div>
+              <div class="cm-difficulty-options">
+                <button class="cm-difficulty-btn active" data-speed="slow">
+                  <i class="fas fa-walking"></i>
+                  <span>Kolay</span>
+                </button>
+                <button class="cm-difficulty-btn" data-speed="medium">
+                  <i class="fas fa-running"></i>
+                  <span>Orta</span>
+                </button>
+                <button class="cm-difficulty-btn" data-speed="fast">
+                  <i class="fas fa-bolt"></i>
+                  <span>Zor</span>
+                </button>
+              </div>
+            </div>
+
+            <button id="start-btn" class="cm-start-btn">
+              <i class="fas fa-play"></i>
+              Oyuna Başla
+            </button>
+          </div>
+        </div>
+
+        <!-- Oyun Ekranı -->
+        <div id="game-screen" class="cm-screen" style="display: none;">
+          <div class="cm-game-area">
+            <div class="cm-word-container">
+              <div id="color-word" class="cm-color-word">MAVİ</div>
+            </div>
+
+            <div class="cm-answer-buttons">
+              <button id="true-btn" class="cm-answer-btn cm-true-btn">
+                <i class="fas fa-check"></i>
+                <span>DOĞRU</span>
+              </button>
+              <button id="false-btn" class="cm-answer-btn cm-false-btn">
+                <i class="fas fa-times"></i>
+                <span>YANLIŞ</span>
+              </button>
+            </div>
+
+            <div id="feedback" class="cm-feedback"></div>
+          </div>
+
+          <div class="cm-timer-container">
+            <div id="timer-bar" class="cm-timer-bar"></div>
+          </div>
+        </div>
+
+        <!-- Sonuç Ekranı -->
+        <div id="result-screen" class="cm-screen" style="display: none;">
+          <div class="cm-screen-content">
+            <div class="cm-result-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <h2>Oyun Tamamlandı!</h2>
+
+            <div class="cm-results">
+              <div class="cm-result-stat">
+                <div class="cm-result-value" id="final-score">0</div>
+                <div class="cm-result-label">Toplam Puan</div>
+              </div>
+              <div class="cm-result-metrics">
+                <div class="cm-metric">
+                  <i class="fas fa-check-circle"></i>
+                  <span id="correct-answers">0</span> Doğru
+                </div>
+                <div class="cm-metric">
+                  <i class="fas fa-times-circle"></i>
+                  <span id="wrong-answers">0</span> Yanlış
+                </div>
+                <div class="cm-metric">
+                  <i class="fas fa-bolt"></i>
+                  <span id="avg-reaction-time">0</span> ms Tepki Süresi
+                </div>
+              </div>
+            </div>
+
+            <div class="cm-motivation">
+              <p id="motivation-text">Harika iş çıkardın! Daha yüksek puan için tekrar oynamaya ne dersin?</p>
+            </div>
+
+            <div class="cm-action-buttons">
+              <button id="play-again-btn" class="cm-action-btn cm-play-again">
+                <i class="fas fa-sync-alt"></i>
+                Tekrar Oyna
+              </button>
+              <a href="{{ url_for('all_games') }}" class="cm-action-btn cm-all-games">
+                <i class="fas fa-th-large"></i>
+                Tüm Oyunlar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // DOM Elemanları
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+
+  const scoreDisplay = document.getElementById('score');
+  const bestScoreDisplay = document.getElementById('best-score');
+  const timerDisplay = document.getElementById('timer');
+  const timerBar = document.getElementById('timer-bar');
+
+  const colorWord = document.getElementById('color-word');
+  const feedbackDisplay = document.getElementById('feedback');
+
+  const startBtn = document.getElementById('start-btn');
+  const trueBtn = document.getElementById('true-btn');
+  const falseBtn = document.getElementById('false-btn');
+  const playAgainBtn = document.getElementById('play-again-btn');
+
+  const finalScoreDisplay = document.getElementById('final-score');
+  const correctAnswersDisplay = document.getElementById('correct-answers');
+  const wrongAnswersDisplay = document.getElementById('wrong-answers');
+  const avgReactionTimeDisplay = document.getElementById('avg-reaction-time');
+  const motivationText = document.getElementById('motivation-text');
+
+  const difficultyBtns = document.querySelectorAll('.cm-difficulty-btn');
+
+  // Oyun Ayarları
+  const colors = [
+    { name: 'KIRMIZI', code: '#F44336' },
+    { name: 'MAVİ', code: '#2196F3' },
+    { name: 'YEŞİL', code: '#4CAF50' },
+    { name: 'SARI', code: '#FFEB3B' },
+    { name: 'MOR', code: '#9C27B0' },
+    { name: 'TURUNCU', code: '#FF9800' }
+  ];
+
+  // Oyun Durumu
+  let score = 0;
+  let bestScore = 0;
+  let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let gameTime = 60; // saniye
+  let timeRemaining = gameTime;
+  let timer = null;
+  let currentAnswer = null;
+  let gameRunning = false;
+  let difficultySpeed = 'slow';
+  let wordDisplayTime = 2000; // ms, zorluk seviyesine göre ayarlanacak
+  let totalReactionTime = 0;
+  let reactionTimeCount = 0;
+  let currentWordStartTime = 0;
+
+  // En iyi skoru kontrol et
+  if (localStorage.getItem('colorMatchBestScore')) {
+    bestScore = parseInt(localStorage.getItem('colorMatchBestScore'));
+    bestScoreDisplay.textContent = bestScore;
+  }
+
+  // Event Listeners
+  startBtn.addEventListener('click', startGame);
+  trueBtn.addEventListener('click', () => checkAnswer(true));
+  falseBtn.addEventListener('click', () => checkAnswer(false));
+  playAgainBtn.addEventListener('click', () => {
+    showScreen(startScreen);
+  });
+
+  // Zorluk Seviyesi Seçimi
+  difficultyBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      difficultySpeed = this.getAttribute('data-speed');
+      difficultyBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      // Zorluk seviyesine göre kelime gösterim süresini ayarla
+      if (difficultySpeed === 'slow') wordDisplayTime = 2000;
+      else if (difficultySpeed === 'medium') wordDisplayTime = 1500;
+      else if (difficultySpeed === 'fast') wordDisplayTime = 1000;
+    });
+  });
+
+  // Fonksiyonlar
+  function startGame() {
+    // Oyun durumunu sıfırla
+    score = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    timeRemaining = gameTime;
+    totalReactionTime = 0;
+    reactionTimeCount = 0;
+
+    // Ekranları güncelle
+    scoreDisplay.textContent = score;
+    timerDisplay.textContent = timeRemaining;
+    timerBar.style.width = '100%';
+    feedbackDisplay.textContent = '';
+    feedbackDisplay.className = 'cm-feedback';
+
+    // Oyun ekranını göster
+    showScreen(gameScreen);
+
+    // Oyunu başlat
+    gameRunning = true;
+    displayNewWord();
+
+    // Zamanlayıcıyı başlat
+    timer = setInterval(updateTimer, 1000);
+  }
+
+  function displayNewWord() {
+    if (!gameRunning) return;
+
+    // Geri bildirimi temizle
+    feedbackDisplay.textContent = '';
+    feedbackDisplay.className = 'cm-feedback';
+
+    // Rastgele renk adı ve renk kodu seç
+    const colorNameIndex = Math.floor(Math.random() * colors.length);
+    const colorCodeIndex = Math.floor(Math.random() * colors.length);
+
+    const colorName = colors[colorNameIndex].name;
+    const colorCode = colors[colorCodeIndex].code;
+
+    // Kelimeyi ve rengini ayarla
+    colorWord.textContent = colorName;
+    colorWord.style.color = colorCode;
+
+    // Eşleşme durumunu belirle
+    currentAnswer = (colorNameIndex === colorCodeIndex);
+
+    // Animasyon yenileme
+    colorWord.style.animation = 'none';
+    void colorWord.offsetWidth; // Animasyonu sıfırla
+    colorWord.style.animation = 'word-appear 0.4s forwards';
+
+    // Reaksiyon süresi ölçümü için başlangıç zamanı
+    currentWordStartTime = Date.now();
+  }
+
+  function checkAnswer(userAnswer) {
+    if (!gameRunning) return;
+
+    // Reaksiyon süresini hesapla
+    const reactionTime = Date.now() - currentWordStartTime;
+    totalReactionTime += reactionTime;
+    reactionTimeCount++;
+
+    // Cevabın doğruluğunu kontrol et
+    const isCorrect = (userAnswer === currentAnswer);
+
+    if (isCorrect) {
+      // Doğru cevap
+      score += 10;
+      correctAnswers++;
+      feedbackDisplay.textContent = 'Doğru!';
+      feedbackDisplay.className = 'cm-feedback correct';
+      playSound('correct');
+    } else {
+      // Yanlış cevap
+      score = Math.max(0, score - 5);
+      wrongAnswers++;
+      feedbackDisplay.textContent = 'Yanlış!';
+      feedbackDisplay.className = 'cm-feedback wrong';
+      playSound('wrong');
+    }
+
+    // Skor göstergesini güncelle
+    scoreDisplay.textContent = score;
+
+    // Kısa bir gecikme sonrası yeni kelime göster
+    setTimeout(displayNewWord, 1000);
+  }
+
+  function updateTimer() {
+    timeRemaining--;
+    timerDisplay.textContent = timeRemaining;
+    timerBar.style.width = `${(timeRemaining / gameTime) * 100}%`;
+
+    // Oyun sona eriyor mu kontrol et
+    if (timeRemaining <= 0) {
+      endGame();
+    }
+
+    // Son 10 saniye uyarısı
+    if (timeRemaining <= 10) {
+      timerDisplay.style.color = '#FF5252';
+    } else {
+      timerDisplay.style.color = '';
+    }
+  }
+
+  function endGame() {
+    // Zamanlayıcıyı durdur
+    clearInterval(timer);
+
+    // Oyunu durdur
+    gameRunning = false;
+
+    // En iyi skoru kontrol et ve güncelle
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('colorMatchBestScore', bestScore);
+      bestScoreDisplay.textContent = bestScore;
+    }
+
+    // Sonuç ekranı bilgilerini doldur
+    finalScoreDisplay.textContent = score;
+    correctAnswersDisplay.textContent = correctAnswers;
+    wrongAnswersDisplay.textContent = wrongAnswers;
+
+    // Ortalama reaksiyon süresini hesapla
+    let avgReactionTime = 0;
+    if (reactionTimeCount > 0) {
+      avgReactionTime = Math.round(totalReactionTime / reactionTimeCount);
+    }
+    avgReactionTimeDisplay.textContent = avgReactionTime;
+
+    // Motivasyon mesajını ayarla
+    setMotivationMessage(score);
+
+    // Sesli bildirim
+    playSound('gameOver');
+
+    // Skoru kaydet
+    saveScore(score);
+
+    // Sonuç ekranını göster
+    showScreen(resultScreen);
+  }
+
+  function showScreen(screen) {
+    // Tüm ekranları gizle
+    startScreen.style.display = 'none';
+    gameScreen.style.display = 'none';
+    resultScreen.style.display = 'none';
+
+    // İstenen ekranı göster
+    screen.style.display = 'flex';
+  }
+
+  function setMotivationMessage(score) {
+    if (score === 0) {
+      motivationText.textContent = 'Endişelenme, herkes bir yerden başlar. Tekrar deneyerek gelişebilirsin!';
+    } else if (score < 50) {
+      motivationText.textContent = 'İyi bir başlangıç! Daha hızlı ve doğru cevaplar vererek skorunu artırabilirsin.';
+    } else if (score < 100) {
+      motivationText.textContent = 'Harika ilerleme kaydediyorsun! Daha iyi skorlar için konsantrasyonunu artır.';
+    } else if (score < 150) {
+      motivationText.textContent = 'Çok iyi iş çıkardın! Bir sonraki hedefin 200 puan olsun.';
+    } else if (score < 200) {
+      motivationText.textContent = 'Muhteşem! Gerçekten bu oyunda ustalaşmaya başladın.';
+    } else {
+      motivationText.textContent = 'İnanılmaz bir performans! Senin zihinsel odaklanma becerilerin olağanüstü!';
+    }
+  }
+
+  function playSound(type) {
+    let sound;
+    switch (type) {
+      case 'correct':
+        sound = new Audio('/static/sounds/correct.mp3');
+        break;
+      case 'wrong':
+        sound = new Audio('/static/sounds/wrong.mp3');
+        break;
+      case 'gameOver':
+        sound = new Audio('/static/sounds/game-over.mp3');
+        break;
+    }
+    sound.play().catch(error => console.log('Ses çalınamadı', error));
+  }
+
+  function saveScore(score) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'color_match',
+        score: score
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+
+  console.log('colorMatch oyunu modernize edildi.');
+});
+</script>
+
+<style>
+/* Renk Eşleştirme Oyunu Ana Konteyner */
+.modern-color-match {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Oyun Paneli */
+.cm-game-panel {
+  width: 100%;
+}
+
+/* İstatistik Çubuğu */
+.cm-stats-bar {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(20, 20, 40, 0.6);
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.cm-stat {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+}
+
+.cm-stat:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cm-stat-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(106, 90, 224, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
+.cm-stat-icon i {
+  color: var(--accent-color);
+  font-size: 16px;
+}
+
+.cm-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+}
+
+.cm-stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+/* Ortak Ekran Stili */
+.cm-screen {
+  background: rgba(20, 20, 40, 0.6);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cm-screen-content {
+  padding: 30px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Başlangıç Ekranı */
+.cm-logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 20px rgba(106, 90, 224, 0.3);
+}
+
+.cm-logo i {
+  font-size: 40px;
+  color: white;
+}
+
+.cm-screen h2 {
+  color: white;
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.cm-screen p {
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.cm-instructions-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.cm-card-header {
+  background: rgba(106, 90, 224, 0.1);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cm-card-header i {
+  color: var(--accent-color);
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.cm-card-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.cm-instruction-list {
+  list-style-type: none;
+  padding: 16px;
+  margin: 0;
+}
+
+.cm-instruction-list li {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px 0 8px 24px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.cm-instruction-list li::before {
+  content: '•';
+  position: absolute;
+  left: 8px;
+  color: var(--accent-color);
+  font-size: 1.2em;
+}
+
+.cm-key {
+  display: inline-block;
+  background: rgba(106, 90, 224, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin: 0 2px;
+  color: var(--accent-color);
+}
+
+.cm-difficulty-selector {
+  margin-bottom: 24px;
+}
+
+.cm-difficulty-title {
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.cm-difficulty-options {
+  display: flex;
+  gap: 10px;
+}
+
+.cm-difficulty-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cm-difficulty-btn i {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.cm-difficulty-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cm-difficulty-btn.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px rgba(106, 90, 224, 0.4);
+}
+
+.cm-start-btn {
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+  border: none;
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(106, 90, 224, 0.3);
+  margin-top: auto;
+}
+
+.cm-start-btn:hover {
+  box-shadow: 0 10px 20px rgba(106, 90, 224, 0.4);
+  transform: translateY(-2px);
+}
+
+.cm-start-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 5px 10px rgba(106, 90, 224, 0.3);
+}
+
+/* Oyun Ekranı */
+.cm-game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.cm-word-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.cm-color-word {
+  font-size: 4.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: word-appear 0.4s forwards;
+}
+
+@keyframes word-appear {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cm-answer-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cm-answer-btn {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.cm-true-btn {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+}
+
+.cm-false-btn {
+  background: linear-gradient(135deg, #F44336, #C62828);
+}
+
+.cm-answer-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cm-answer-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.cm-feedback {
+  height: 30px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.cm-feedback.correct {
+  color: #4CAF50;
+}
+
+.cm-feedback.wrong {
+  color: #F44336;
+}
+
+.cm-timer-container {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cm-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #6a5ae0, #8C66FF);
+  transition: width linear 0.1s;
+}
+
+/* Sonuç Ekranı */
+.cm-result-icon {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #FFD700, #FFA000);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.cm-result-icon i {
+  font-size: 50px;
+  color: white;
+}
+
+.cm-results {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.cm-result-stat {
+  margin-bottom: 20px;
+}
+
+.cm-result-value {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--accent-color);
+  margin-bottom: 5px;
+}
+
+.cm-result-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.cm-result-metrics {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cm-metric {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.cm-metric i {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.cm-metric i.fa-check-circle {
+  color: #4CAF50;
+}
+
+.cm-metric i.fa-times-circle {
+  color: #F44336;
+}
+
+.cm-metric i.fa-bolt {
+  color: #FFC107;
+}
+
+.cm-motivation {
+  text-align: center;
+  margin: 16px 0 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+}
+
+.cm-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.cm-action-btn {
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cm-play-again {
+  background: linear-gradient(135deg, #6a5ae0, #8C66FF);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 16px rgba(106, 90, 224, 0.3);
+}
+
+.cm-all-games {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cm-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Tasarım */
+@media (max-width: 576px) {
+  .cm-stats-bar {
+    padding: 10px;
+  }
+
+  .cm-stat-value {
+    font-size: 1.5rem;
+  }
+
+  .cm-screen {
+    height: auto;
+    min-height: 480px;
+  }
+
+  .cm-screen-content {
+    padding: 20px;
+  }
+
+  .cm-color-word {
+    font-size: 3.5rem;
+  }
+
+  .cm-answer-buttons {
+    flex-direction: column;
+  }
+
+  .cm-difficulty-btn span {
+    font-size: 0.9rem;
+  }
+
+  .cm-result-value {
+    font-size: 3rem;
+  }
+}
+</style>
 {% endblock %}
