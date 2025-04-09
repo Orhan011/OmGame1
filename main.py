@@ -1468,15 +1468,36 @@ def save_score():
     # Çarpanları hesapla 
     multipliers = calculate_multipliers(game_type, difficulty, game_stats)
     
-    # Eğer nihai puan hesaplanmışsa onu kullan
+    # Hem eski hem de yeni puanlama sistemini kullan
+    # Eski hesaplama yöntemi
+    old_base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
+    old_score_points = score * multipliers['score_multiplier']
+    old_total_points = old_base_points + old_score_points
+    
+    # Yeni hesaplama yöntemi (eğer kullanılabilirse)
     if multipliers.get('final_score'):
+        # Yeni puanlama sisteminden gelen nihai puan
         final_score = multipliers['final_score']
-        score_points = final_score * 0.5  # Skor puanı hesaplaması için varsayılan çarpan
-        base_points = final_score * 0.5  # Temel puan hesaplaması için varsayılan çarpan
+        new_base_points = final_score * 0.5
+        new_score_points = final_score * 0.5
+        new_total_points = final_score
+        
+        # Hem eski hem de yeni puanları sakla
+        multipliers['old_score'] = int(old_total_points)
+        multipliers['new_score'] = int(new_total_points)
+        
+        # Puanlamaların ortalamasını al veya daha yüksek olanı seç
+        # Burada yeni puanlama sistemini tercih ediyoruz
+        base_points = new_base_points
+        score_points = new_score_points
     else:
         # Eski hesaplama yöntemi (geriye dönük uyumluluk için)
-        base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
-        score_points = score * multipliers['score_multiplier']
+        base_points = old_base_points
+        score_points = old_score_points
+        
+        # Eski puanı sakla
+        multipliers['old_score'] = int(old_total_points)
+        multipliers['new_score'] = None
     
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:
@@ -1572,7 +1593,8 @@ def save_score():
                 'progress': xp_progress,
                 'needed': xp_needed,
                 'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
-            }
+            },
+            'multipliers': multipliers  # Multipliers bilgisini de gönder (old_score ve new_score bilgilerini içerir)
         })
     else:
         # Kullanıcı giriş yapmamış - skorunu kaydetmiyoruz
@@ -1609,7 +1631,8 @@ def save_score():
                 'gain': xp_gain,
                 'level': 1,
                 'progress_percent': 0
-            }
+            },
+            'multipliers': multipliers  # Multipliers bilgisini misafir kullanıcılar için de gönder
         })
 
 # Mevcut Kullanıcı API'si
@@ -1662,7 +1685,7 @@ def get_scores(game_type):
             Score.game_type == game_type
         ).order_by(
             Score.score.desc()
-        ).limit(10).all()
+        ).all()  # Tüm kullanıcıları getirmek için limit kaldırıldı
     
         result = []
         for score, username, avatar_url, rank in scores:
@@ -1703,7 +1726,6 @@ def get_scores_alt(game_type):
             JOIN scores s ON s.user_id = max_scores.user_id AND s.score = max_scores.max_score AND s.game_type = '{game_type}'
             JOIN users u ON u.id = s.user_id
             ORDER BY s.score DESC
-            LIMIT 10
         """)
         
         scores = []
@@ -1761,7 +1783,7 @@ def get_aggregated_scores():
             User.id == aggregated.c.user_id
         ).order_by(
             aggregated.c.total_score.desc()
-        ).limit(10).all()
+        ).all()  # Tüm kullanıcıları göstermek için limit kaldırıldı
         
         scores = []
         for user_id, username, avatar_url, rank, total_score in result:

@@ -1239,6 +1239,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Puan detayları
             const bonusDetails = document.createElement('div');
             bonusDetails.className = 'tetris-bonus-details';
+            
+            // Puanlama sistemleri karşılaştırması (eğer her iki puanlama da mevcutsa)
+            let scoringSystemInfo = '';
+            if (data.multipliers && data.multipliers.old_score && data.multipliers.new_score) {
+              scoringSystemInfo = `
+                <div class="tetris-scoring-systems">
+                  <div class="tetris-scoring-title">Puanlama Sistemleri:</div>
+                  <div class="tetris-bonus-item">
+                    <span>Eski Sistem:</span>
+                    <strong>${data.multipliers.old_score}</strong>
+                  </div>
+                  <div class="tetris-bonus-item">
+                    <span>Yeni Sistem:</span>
+                    <strong>${data.multipliers.new_score}</strong>
+                  </div>
+                </div>
+              `;
+            }
+            
             bonusDetails.innerHTML = `
               <div class="tetris-bonus-item">
                 <span>Temel Puan:</span>
@@ -1258,6 +1277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   <span>Seri Bonusu:</span>
                   <strong>+${data.points.rewards.streak_bonus}</strong>
                 </div>` : ''}
+              ${scoringSystemInfo}
             `;
             
             // Element bulunmazsa ekleme yap
