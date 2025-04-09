@@ -53,9 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
     lastInputTime: 0,
     debounceTime: 200 // ms
   };
-  
-  // Oyun başlangıç zamanı
-  let gameStartTime = 0;
 
   // Aktif hücre referansı
   let activeCell = null;
@@ -100,9 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
    * Oyunu başlatır
    */
   function startGame() {
-    // Oyun başlangıç zamanını kaydet
-    gameStartTime = Date.now();
-    
     // Arayüzü sıfırla
     startScreen.style.display = 'none';
     gameContainer.style.display = 'block';
@@ -812,47 +806,26 @@ document.addEventListener('DOMContentLoaded', function() {
    * Skoru veritabanına kaydeder
    */
   function saveScore(score) {
-    // Oyun süresi hesaplama
-    const gameEndTime = Date.now();
-    const playDuration = Math.floor((gameEndTime - gameStartTime) / 1000); // Saniye cinsinden süre
-    
-    // Zorluk seviyesi, tahmin sayısına göre belirlenir
-    let difficulty = 'normal';
-    if (currentRow <= 3) { // 3 veya daha az tahminde doğru cevap - zor
-      difficulty = 'hard';
-    } else if (currentRow >= 5) { // 5 veya daha fazla tahminde doğru cevap - kolay
-      difficulty = 'easy';
-    }
-    
-    fetch('/api/save-score', {
+    fetch('/save_score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         game_type: 'wordle',
-        score: score,
-        difficulty: difficulty,
-        play_duration: playDuration,
-        completed: gameState === 'won' // Oyun tamamlandı mı?
+        score: score
       })
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Skor kaydedildi:', data);
-      if (data.success) {
-        // Başarıyla kaydedildiğinde seviye bilgilerini güncelleme
-        if (data.leveled_up) {
-          showMessage(`Tebrikler! Seviye ${data.level} oldunuz! +${data.points_earned} puan, +${data.xp_earned} XP kazandınız.`, 'success');
-        } else {
-          showMessage(`+${data.points_earned} puan, +${data.xp_earned} XP kazandınız!`, 'success');
-        }
-      } else if (data.message === 'Oturum açık değil!') {
-        showMessage('Skorunuzu kaydetmek için giriş yapmalısınız!', 'warning');
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Skor kaydedilemedi');
       }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Skor başarıyla kaydedildi:', data);
     })
     .catch(error => {
       console.error('Skor kaydetme hatası:', error);
-      showMessage('Skor kaydedilirken hata oluştu!', 'error');
     });
   }

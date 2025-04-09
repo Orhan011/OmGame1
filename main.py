@@ -895,7 +895,7 @@ def logout():
 
 def xp_for_level(level):
     """Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar."""
-    return int(500 * (level ** 1.5))
+    return int(100 * (level ** 1.5))
 
 def calculate_level(xp):
     """Toplam XP'ye göre kullanıcı seviyesini hesaplar."""
@@ -903,117 +903,6 @@ def calculate_level(xp):
     while xp >= xp_for_level(level + 1):
         level += 1
     return level
-    
-def calculate_points(score, difficulty='normal', play_duration=0, daily_first=False, streak_count=0):
-    """
-    Puan hesaplama fonksiyonu
-    
-    Parametreler:
-    - score: Oyunda alınan ham puan
-    - difficulty: Zorluk seviyesi (easy, normal, hard)
-    - play_duration: Oyun süresi (saniye)
-    - daily_first: Günün ilk oyunu mu?
-    - streak_count: Ardışık gün sayısı
-    
-    Formül: (Temel Puan × Zorluk Çarpanı) + (Skor × Skor Çarpanı) + Bonuslar
-    """
-    # Zorluk çarpanı
-    difficulty_multiplier = {
-        'easy': 0.8,
-        'normal': 1.0,
-        'hard': 1.5
-    }.get(difficulty, 1.0)
-    
-    # Temel puan (oyunu tamamlamaktan gelen)
-    base_points = 50
-    
-    # Skor çarpanı (oyun performansına bağlı)
-    score_multiplier = 0.5
-    
-    # Bonuslar
-    bonuses = 0
-    
-    # Günlük ilk oyun bonusu
-    if daily_first:
-        bonuses += 20
-    
-    # Ardışık gün bonusu (her gün için +5, maximum 7 gün)
-    streak_bonus = min(streak_count, 7) * 5
-    bonuses += streak_bonus
-    
-    # Toplam puan hesaplama
-    total_points = int((base_points * difficulty_multiplier) + (score * score_multiplier) + bonuses)
-    
-    return total_points
-    
-def calculate_xp_gain(score, play_duration=0, completed=True):
-    """
-    XP hesaplama fonksiyonu
-    
-    Parametreler:
-    - score: Oyunda alınan ham puan
-    - play_duration: Oyun süresi (saniye)
-    - completed: Oyun tamamlandı mı?
-    
-    Formül: Temel XP + (Skor XP'si) + (Süre XP'si)
-    """
-    # Oyunu tamamlamadan kaynaklı XP
-    completion_xp = 10 if completed else 0
-    
-    # Skordan kazanılan XP (skor * 0.1)
-    score_xp = int(score * 0.1)
-    
-    # Süreden kazanılan XP (her dakika için 5 XP)
-    duration_xp = int((play_duration / 60) * 5)
-    
-    # Toplam XP
-    total_xp = completion_xp + score_xp + duration_xp
-    
-    return total_xp
-    
-def check_daily_first_game(user_id):
-    """
-    Kullanıcının bugün ilk oyunu mu kontrol eder
-    """
-    today = datetime.now().date()
-    today_start = datetime.combine(today, datetime.min.time())
-    today_end = datetime.combine(today, datetime.max.time())
-    
-    # Bugünkü oyun sayısı
-    games_today = Score.query.filter(
-        Score.user_id == user_id,
-        Score.timestamp >= today_start,
-        Score.timestamp <= today_end
-    ).count()
-    
-    return games_today == 0
-    
-def update_login_streak(user):
-    """
-    Kullanıcının günlük giriş serisini günceller
-    """
-    today = datetime.now().date()
-    
-    # Eğer son giriş tarihi yoksa veya bugünse bir şey yapma
-    if user.last_login_date is None:
-        user.last_login_date = today
-        user.daily_login_streak = 1
-        return user.daily_login_streak
-    
-    # Eğer son giriş bugünse, güncelleme yapma
-    if user.last_login_date == today:
-        return user.daily_login_streak
-        
-    # Eğer son giriş dünse, streak'i artır
-    yesterday = today - timedelta(days=1)
-    if user.last_login_date == yesterday:
-        user.daily_login_streak += 1
-    else:
-        # Eğer ardışık değilse, streak sıfırlanır
-        user.daily_login_streak = 1
-    
-    user.last_login_date = today
-    return user.daily_login_streak
 
 def xp_for_level(level):
     """Belirli bir seviyeye ulaşmak için gereken XP miktarını hesaplar."""
@@ -1429,70 +1318,28 @@ def save_score():
     
     game_type = data.get('game_type')
     score = data.get('score')
-    difficulty = data.get('difficulty', 'normal')
-    play_duration = data.get('play_duration', 0)
-    completed = data.get('completed', True)
     
     if not game_type or not score:
         return jsonify({'success': False, 'message': 'Eksik veri!'})
     
     try:
         score = int(score)
-        play_duration = int(play_duration)
     except:
-        return jsonify({'success': False, 'message': 'Geçersiz veri!'})
-    
-    user_id = session['user_id']
-    user = User.query.get(user_id)
-    
-    # Günlük ilk oyun mu kontrol et
-    daily_first_game = check_daily_first_game(user_id)
-    
-    # Kullanıcının giriş serisini güncelle
-    streak_count = update_login_streak(user)
-    
-    # Puanları hesapla
-    points_earned = calculate_points(
-        score=score, 
-        difficulty=difficulty, 
-        play_duration=play_duration, 
-        daily_first=daily_first_game, 
-        streak_count=streak_count
-    )
-    
-    # XP'yi hesapla
-    xp_earned = calculate_xp_gain(
-        score=score,
-        play_duration=play_duration,
-        completed=completed
-    )
-    
-    # Son oyun tarihini güncelle
-    user.last_play_date = datetime.now()
-    
-    # Toplam puanları güncelle
-    user.total_points += points_earned
-    
-    # Leveling sistemi için XP hesaplaması
-    old_level = user.level
-    level_data = user.add_xp(xp_earned)
-    new_level = level_data["new_level"]
-    leveled_up = level_data["leveled_up"]
+        return jsonify({'success': False, 'message': 'Geçersiz skor!'})
     
     # Yeni skoru kaydet
     new_score = Score(
-        user_id=user_id,
+        user_id=session['user_id'],
         game_type=game_type,
-        score=score,
-        points_earned=points_earned,
-        xp_earned=xp_earned,
-        difficulty=difficulty,
-        play_duration=play_duration,
-        completed=completed,
-        bonus_points=points_earned - int(score * 0.5) - (50 if difficulty == 'normal' else (40 if difficulty == 'easy' else 75))
+        score=score
     )
     
     db.session.add(new_score)
+    
+    # Kullanıcının deneyim puanını artır (oyun skorunun %10'u kadar)
+    user = User.query.get(session['user_id'])
+    xp_gain = int(score * 0.1)
+    user.experience_points += xp_gain
     
     # Kullanıcının toplam oyun sayısını güncelle
     user.total_games_played += 1
@@ -1503,24 +1350,15 @@ def save_score():
     
     db.session.commit()
     
-    # Bir sonraki seviyeye ne kadar XP kaldığını hesapla
-    next_level_xp = xp_for_level(new_level + 1)
-    current_level_xp = xp_for_level(new_level)
-    xp_progress = ((user.experience_points - current_level_xp) / (next_level_xp - current_level_xp)) * 100
+    # Yeni seviyeyi hesapla
+    new_level = calculate_level(user.experience_points)
     
     return jsonify({
         'success': True, 
         'message': 'Skor kaydedildi!',
-        'points_earned': points_earned,
-        'xp_earned': xp_earned,
-        'total_points': user.total_points,
+        'xp_gain': xp_gain,
         'total_xp': user.experience_points,
-        'level': new_level,
-        'leveled_up': leveled_up,
-        'next_level_xp': next_level_xp,
-        'xp_progress': xp_progress,
-        'daily_first_game': daily_first_game,
-        'streak_count': streak_count
+        'level': new_level
     })
 
 # Mevcut Kullanıcı API'si
@@ -1642,29 +1480,46 @@ def get_aggregated_scores():
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
         
-        # Kullanıcıların toplam puanlarına göre sıralama yap
-        users = db.session.query(
+        # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
+        subquery = db.session.query(
+            Score.user_id,
+            Score.game_type,
+            db.func.max(Score.score).label('max_score')
+        ).group_by(
+            Score.user_id,
+            Score.game_type
+        ).subquery()
+        
+        # Alt sorgudan gelen sonuçları topla
+        aggregated = db.session.query(
+            subquery.c.user_id,
+            db.func.sum(subquery.c.max_score).label('total_score')
+        ).group_by(
+            subquery.c.user_id
+        ).subquery()
+        
+        # Kullanıcı bilgileriyle birleştir
+        result = db.session.query(
             User.id,
             User.username,
             User.avatar_url,
             User.rank,
-            User.level,
-            User.total_points
-        ).filter(
-            User.total_points > 0
+            aggregated.c.total_score
+        ).join(
+            aggregated,
+            User.id == aggregated.c.user_id
         ).order_by(
-            User.total_points.desc()
-        ).limit(25).all()
+            aggregated.c.total_score.desc()
+        ).limit(10).all()
         
         scores = []
-        for user_id, username, avatar_url, rank, level, total_points in users:
+        for user_id, username, avatar_url, rank, total_score in result:
             scores.append({
                 'user_id': user_id,
                 'username': username,
-                'total_score': total_points,  # Artık toplam puanları kullanıyoruz
+                'total_score': total_score,
                 'avatar_url': avatar_url,
                 'rank': rank,
-                'level': level,
                 'is_current_user': user_id == current_user_id
             })
         

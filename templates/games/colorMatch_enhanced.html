@@ -751,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let timeRemaining = gameTime;
   let timePerWord = 3000; // ms
   let timer = null;
-  let gameStartTime = 0;
   let wordTimer = null;
   let currentAnswer = null;
   let gameRunning = false;
@@ -853,9 +852,6 @@ document.addEventListener('DOMContentLoaded', function() {
     currentLevel = 1;
     streak = 0;
     maxStreak = 0;
-    
-    // Record game start time
-    gameStartTime = Date.now();
     
     // Update displays
     scoreDisplay.textContent = score;
@@ -1248,18 +1244,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save score to the server
   function saveScore(score) {
-    // Oyun süresi ve zorluk hesaplama
-    const gameEndTime = Date.now();
-    const playDuration = Math.floor((gameEndTime - gameStartTime) / 1000); // Saniye cinsinden süre
-    
-    // Zorluk seviyesi, kullanıcının ayarlarına göre belirlenir
-    let difficulty = 'normal';
-    if (difficultySpeed === 'fast') { // Hızlı mod
-      difficulty = 'hard';
-    } else if (difficultySpeed === 'slow') { // Yavaş mod
-      difficulty = 'easy';
-    }
-    
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
@@ -1267,23 +1251,13 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({
         game_type: 'color_match',
-        score: score,
-        difficulty: difficulty,
-        play_duration: playDuration,
-        completed: true // Oyunu tamamladı
+        score: score
       })
     })
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
-      if (data.success) {
-        // Başarıyla kaydedildiğinde seviye bilgilerini güncelleme
-        if (data.leveled_up) {
-          showNotification(`Tebrikler! Seviye ${data.level} oldunuz! +${data.points_earned} puan, +${data.xp_earned} XP kazandınız.`);
-        } else {
-          showNotification(`+${data.points_earned} puan, +${data.xp_earned} XP kazandınız!`);
-        }
-      } else if (data.message === 'Oturum açık değil!') {
+      if (!data.success && data.message === 'Oturum açık değil!') {
         showNotification('Skorunuzu kaydetmek için giriş yapmalısınız!');
       }
     })

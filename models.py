@@ -17,27 +17,15 @@ class User(db.Model):
     bio = db.Column(db.Text)
     avatar_url = db.Column(db.String(2000))
     location = db.Column(db.String(100))
-    
-    # Puan ve XP Sistemi
-    experience_points = db.Column(db.Integer, default=0)  # Toplam XP
-    level = db.Column(db.Integer, default=1)  # Kullanıcı seviyesi 
-    total_points = db.Column(db.Integer, default=0)  # Tüm zamanlarda kazanılan toplam puan
-    rank = db.Column(db.String(50), default='Başlangıç')  # Kullanıcı rütbesi
-    
-    # Oyun ve Aktivite Takibi
-    total_games_played = db.Column(db.Integer, default=0)  # Toplam oynanan oyun sayısı
-    highest_score = db.Column(db.Integer, default=0)  # Tüm oyunlar arasında en yüksek skor
-    last_play_date = db.Column(db.DateTime)  # Son oyun oynama tarihi
-    daily_login_streak = db.Column(db.Integer, default=0)  # Ardışık giriş yapılan gün sayısı
-    last_login_date = db.Column(db.Date)  # Son giriş yapılan tarih
-    
-    # Kullanıcı Tercihleri
+    experience_points = db.Column(db.Integer, default=0)
+    rank = db.Column(db.String(50), default='Başlangıç')
+    total_games_played = db.Column(db.Integer, default=0)
+    highest_score = db.Column(db.Integer, default=0)
     theme_preference = db.Column(db.String(20), default='dark')
     account_status = db.Column(db.String(20), default='active')
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
     suspended_until = db.Column(db.DateTime)
-    
     # Notification preferences
     email_notifications = db.Column(db.Boolean, default=True)
     achievement_notifications = db.Column(db.Boolean, default=True)
@@ -46,29 +34,6 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
-        
-    def update_level(self):
-        """Kullanıcının seviyesini tecrübe puanlarına göre günceller"""
-        current_xp = self.experience_points
-        new_level = 1
-        
-        # Seviye formülü: Her seviye için 500 × (mevcut seviye^1.5) XP gerekir
-        while True:
-            xp_needed = int(500 * (new_level ** 1.5))
-            if current_xp < xp_needed:
-                break
-            current_xp -= xp_needed
-            new_level += 1
-            
-        self.level = new_level
-        return new_level
-        
-    def add_xp(self, amount):
-        """Kullanıcıya XP ekler ve seviyesini günceller"""
-        old_level = self.level
-        self.experience_points += amount
-        new_level = self.update_level()
-        return {"old_level": old_level, "new_level": new_level, "leveled_up": new_level > old_level}
 
 class Score(db.Model):
     __tablename__ = 'scores'  # Explicit table name
@@ -76,12 +41,6 @@ class Score(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     game_type = db.Column(db.String(50), nullable=False)  # wordPuzzle, memoryMatch, numberSequence, 3dRotation
     score = db.Column(db.Integer, nullable=False)
-    points_earned = db.Column(db.Integer, default=0)  # Oyundan kazanılan puanlar
-    xp_earned = db.Column(db.Integer, default=0)  # Oyundan kazanılan XP
-    difficulty = db.Column(db.String(20), default='normal')  # easy, normal, hard
-    play_duration = db.Column(db.Integer, default=0)  # Saniye cinsinden oyun süresi
-    completed = db.Column(db.Boolean, default=True)  # Oyunun tamamlanıp tamamlanmadığı
-    bonus_points = db.Column(db.Integer, default=0)  # Bonus puanlar (günlük, streak vb.)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -114,25 +73,9 @@ class Achievement(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     image_url = db.Column(db.String(2000))
-    points = db.Column(db.Integer, default=0)  # Başarım açıldığında verilen puan
-    xp_reward = db.Column(db.Integer, default=0)  # Başarım açıldığında verilen XP
+    points = db.Column(db.Integer, default=0)
     requirement = db.Column(db.JSON)  # Başarı koşulları
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class UserAchievement(db.Model):
-    """Kullanıcıların kazandığı başarımları izleyen tablo"""
-    __tablename__ = 'user_achievements'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    achievement_id = db.Column(db.Integer, db.ForeignKey('achievements.id'), nullable=False)
-    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # İlişkiler
-    achievement = db.relationship('Achievement', backref=db.backref('user_achievements', lazy=True))
-    
-    def __repr__(self):
-        return f'<UserAchievement {self.achievement_id} for user {self.user_id}>'
 
 
 class GameStat(db.Model):
