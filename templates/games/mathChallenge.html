@@ -3,85 +3,122 @@
 
 {% block title %}Matematik Mücadelesi - OmGame{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="game-container">
   <div class="game-header">
-    <h1>Matematik Mücadelesi <span class="badge">Sayısal Beceri</span></h1>
-    <p class="game-description">Hızlı düşünme ve matematiksel becerilerinizi test edin.</p>
+    <h1>Matematik Mücadelesi <span class="badge bg-gradient">Sayısal Beceri</span></h1>
+    <p class="game-description">Matematiksel zekânızı ve hızlı düşünme yeteneklerinizi test edin.</p>
   </div>
 
-  <div class="math-modern-container">
-    <div id="start-screen" class="math-screen">
-      <h2>Matematik Mücadelesine Hoş Geldiniz!</h2>
-      <p>Verilen süre içinde matematik problemlerini çözmeye çalışın.</p>
-      
-      <div class="game-options">
-        <div class="option-section">
-          <h3>Zorluk Seviyesi</h3>
-          <div class="button-group">
-            <button class="option-button active" data-difficulty="easy">Kolay</button>
-            <button class="option-button" data-difficulty="medium">Orta</button>
-            <button class="option-button" data-difficulty="hard">Zor</button>
+  <div class="math-game-container">
+    <!-- Başlangıç Ekranı -->
+    <div id="start-screen" class="math-screen active">
+      <div class="screen-content animate__animated animate__fadeIn">
+        <h2 class="gradient-text">Matematik Mücadelesine Hoş Geldiniz!</h2>
+        <p>Matematiksel becerilerinizi test edin ve en yüksek puanı almak için yarışın.</p>
+        
+        <div class="game-options">
+          <div class="option-section">
+            <h3><i class="fas fa-layer-group me-2"></i>Zorluk Seviyesi</h3>
+            <div class="option-buttons">
+              <button class="option-button active" data-difficulty="easy">
+                <i class="fas fa-child"></i>
+                <span>Kolay</span>
+              </button>
+              <button class="option-button" data-difficulty="medium">
+                <i class="fas fa-user"></i>
+                <span>Orta</span>
+              </button>
+              <button class="option-button" data-difficulty="hard">
+                <i class="fas fa-user-graduate"></i>
+                <span>Zor</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3><i class="fas fa-clock me-2"></i>Süre</h3>
+            <div class="option-buttons">
+              <button class="option-button" data-time="30">30 Saniye</button>
+              <button class="option-button active" data-time="60">60 Saniye</button>
+              <button class="option-button" data-time="120">2 Dakika</button>
+            </div>
+          </div>
+          
+          <div class="option-section">
+            <h3><i class="fas fa-calculator me-2"></i>İşlem Türleri</h3>
+            <div class="operation-checkboxes">
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="addition">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Toplama (+)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="subtraction">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Çıkarma (-)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" checked data-operation="multiplication">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Çarpma (×)</span>
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" data-operation="division">
+                <span class="checkmark"><i class="fas fa-check"></i></span>
+                <span class="label-text">Bölme (÷)</span>
+              </label>
+            </div>
           </div>
         </div>
         
-        <div class="option-section">
-          <h3>Süre</h3>
-          <div class="button-group">
-            <button class="option-button" data-time="30">30 Saniye</button>
-            <button class="option-button active" data-time="60">60 Saniye</button>
-            <button class="option-button" data-time="120">2 Dakika</button>
-          </div>
-        </div>
-        
-        <div class="option-section">
-          <h3>İşlem Türleri</h3>
-          <div class="operation-options">
-            <label class="checkbox-container">
-              <input type="checkbox" checked data-operation="addition">
-              <span class="checkmark"></span>
-              <span class="option-label">Toplama</span>
-            </label>
-            <label class="checkbox-container">
-              <input type="checkbox" checked data-operation="subtraction">
-              <span class="checkmark"></span>
-              <span class="option-label">Çıkarma</span>
-            </label>
-            <label class="checkbox-container">
-              <input type="checkbox" checked data-operation="multiplication">
-              <span class="checkmark"></span>
-              <span class="option-label">Çarpma</span>
-            </label>
-            <label class="checkbox-container">
-              <input type="checkbox" data-operation="division">
-              <span class="checkmark"></span>
-              <span class="option-label">Bölme</span>
-            </label>
-          </div>
-        </div>
+        <button id="start-button" class="btn btn-gradient btn-lg">
+          <i class="fas fa-play me-2"></i>Oyuna Başla
+        </button>
       </div>
-      
-      <button id="start-game" class="btn btn-primary btn-lg">
-        <i class="fas fa-play me-2"></i>Oyuna Başla
-      </button>
     </div>
 
-    <div id="game-screen" class="math-screen" style="display: none;">
+    <!-- Oyun Ekranı -->
+    <div id="game-screen" class="math-screen">
       <div class="game-stats">
         <div class="stat-item">
-          <div class="stat-label">Skor</div>
-          <div class="stat-value" id="score">0</div>
+          <div class="stat-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="score">0</div>
+            <div class="stat-label">Puan</div>
+          </div>
         </div>
-        <div class="stat-item timer-container">
-          <div class="stat-label">Süre</div>
-          <div class="stat-value" id="timer">60</div>
-          <div class="timer-progress">
+        
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="timer">60</div>
+            <div class="stat-label">Süre</div>
+          </div>
+          <div class="timer-bar-container">
             <div class="timer-bar" id="timer-bar"></div>
           </div>
         </div>
+        
         <div class="stat-item">
-          <div class="stat-label">Doğru</div>
-          <div class="stat-value" id="correct">0</div>
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="correct">0</div>
+            <div class="stat-label">Doğru</div>
+          </div>
         </div>
       </div>
 
@@ -92,628 +129,772 @@
       </div>
 
       <div class="answer-controls">
-        <div class="answer-input">
-          <input type="number" id="answer-input" placeholder="Cevabınız" inputmode="numeric" pattern="[0-9]*">
+        <div class="answer-input-container">
+          <input type="number" id="answer-input" placeholder="Yanıtınız" inputmode="numeric" pattern="[0-9]*">
           <button id="submit-answer" class="btn btn-primary">
             <i class="fas fa-check me-2"></i>Kontrol Et
           </button>
         </div>
+        <div id="feedback" class="feedback"></div>
       </div>
-
-      <div id="feedback" class="feedback"></div>
     </div>
 
-    <div id="result-screen" class="math-screen" style="display: none;">
-      <h2>Oyun Bitti!</h2>
-      <div class="result-stats">
-        <div class="result-stat">
-          <div class="result-value" id="final-score">0</div>
-          <div class="result-label">Toplam Puan</div>
+    <!-- Sonuç Ekranı -->
+    <div id="result-screen" class="math-screen">
+      <div class="screen-content animate__animated animate__fadeIn">
+        <h2 class="gradient-text">Oyun Bitti!</h2>
+        <div class="result-stats">
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-value" id="final-score">0</div>
+            <div class="stat-label">Toplam Puan</div>
+          </div>
+          
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value" id="final-correct">0</div>
+            <div class="stat-label">Doğru Cevap</div>
+          </div>
+          
+          <div class="result-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-value" id="final-incorrect">0</div>
+            <div class="stat-label">Yanlış Cevap</div>
+          </div>
         </div>
-        <div class="result-stat">
-          <div class="result-value" id="final-correct">0</div>
-          <div class="result-label">Doğru Cevap</div>
+        
+        <div class="result-details">
+          <div class="detail-item">
+            <div class="detail-icon"><i class="fas fa-percentage"></i></div>
+            <div class="detail-label">Doğruluk Oranı</div>
+            <div class="detail-value" id="accuracy">0%</div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-icon"><i class="fas fa-stopwatch"></i></div>
+            <div class="detail-label">Ortalama Yanıt Süresi</div>
+            <div class="detail-value" id="avg-time">0 saniye</div>
+          </div>
         </div>
-        <div class="result-stat">
-          <div class="result-value" id="final-incorrect">0</div>
-          <div class="result-label">Yanlış Cevap</div>
+        
+        <div class="result-actions">
+          <button id="play-again" class="btn btn-gradient">
+            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
+          </button>
+          <a href="{{ url_for('all_games') }}" class="btn btn-outline">
+            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+          </a>
         </div>
-      </div>
-      
-      <div class="result-details">
-        <div class="detail-item">
-          <span class="detail-label">Doğruluk Oranı:</span>
-          <span class="detail-value" id="accuracy">0%</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Ortalama Yanıt Süresi:</span>
-          <span class="detail-value" id="avg-time">0 saniye</span>
-        </div>
-      </div>
-      
-      <div class="result-actions">
-        <button id="play-again" class="btn btn-primary">
-          <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
-        </button>
-        <a href="{{ url_for('all_games') }}" class="btn btn-outline-light">
-          <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
-        </a>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .game-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-  }
+/* Ana Oyun Stilleri */
+.game-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  .math-modern-container {
-    max-width: 700px;
-    margin: 0 auto;
-  }
+.game-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-  .math-screen {
-    background: rgba(40, 44, 80, 0.7);
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
-  
-  .math-screen:hover {
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px);
-  }
+.game-header h1 {
+  color: white;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-  .math-screen h2 {
-    color: var(--accent-color);
-    margin-bottom: 20px;
-    font-size: 2rem;
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-  }
+.badge {
+  background: linear-gradient(135deg, #6a5ae0, #a890ff);
+  color: white;
+  font-size: 0.9rem;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.3);
+}
 
-  .math-screen p {
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 25px;
-    font-size: 1.1rem;
-    line-height: 1.5;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+.game-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-  /* Game Options */
-  .game-options {
-    background: rgba(30, 34, 70, 0.7);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    text-align: left;
-  }
+.bg-gradient {
+  background: linear-gradient(135deg, #6a5ae0, #a890ff);
+}
 
-  .option-section {
-    margin-bottom: 20px;
-  }
+.gradient-text {
+  background: linear-gradient(135deg, #6a5ae0, #a890ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
 
-  .option-section:last-child {
-    margin-bottom: 0;
-  }
+/* Oyun Konteyner ve Ekranlar */
+.math-game-container {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
 
-  .option-section h3 {
-    color: white;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 5px;
-  }
-  
-  .option-section h3:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, var(--accent-color), transparent);
-  }
+.math-screen {
+  display: none;
+  background: rgba(30, 34, 60, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
 
-  .button-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
+.math-screen.active {
+  display: block;
+}
 
-  .option-button {
-    padding: 10px 15px;
-    background: rgba(60, 64, 100, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-grow: 1;
-    text-align: center;
-    font-weight: 500;
-  }
+.screen-content {
+  text-align: center;
+}
 
-  .option-button:hover {
-    background: rgba(80, 84, 120, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  }
+.math-screen h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
 
-  .option-button.active {
-    background: rgba(106, 90, 224, 0.5);
-    border-color: var(--accent-color);
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-  }
+.math-screen p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .operation-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-  }
+/* Oyun Seçenekleri */
+.game-options {
+  background: rgba(20, 24, 50, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: left;
+}
 
-  .checkbox-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-    padding-left: 35px;
-    cursor: pointer;
-    font-size: 1rem;
-    color: white;
-    user-select: none;
-  }
+.option-section {
+  margin-bottom: 25px;
+}
 
-  .checkbox-container input {
-    position: absolute;
+.option-section:last-child {
+  margin-bottom: 0;
+}
+
+.option-section h3 {
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.option-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.option-button {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 15px;
+  background: rgba(40, 44, 80, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.option-button i {
+  font-size: 1.2rem;
+}
+
+.option-button:hover {
+  background: rgba(60, 64, 100, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.option-button.active {
+  background: rgba(106, 90, 224, 0.3);
+  border-color: #6a5ae0;
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.2);
+}
+
+/* İşlem Seçenekleri Checkbox */
+.operation-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding: 12px 15px;
+  background: rgba(40, 44, 80, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.custom-checkbox:hover {
+  background: rgba(60, 64, 100, 0.6);
+  transform: translateY(-3px);
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 22px;
+  width: 22px;
+  min-width: 22px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  transition: all 0.2s ease;
+}
+
+.checkmark i {
+  color: white;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #6a5ae0;
+  border-color: #6a5ae0;
+}
+
+.custom-checkbox input:checked ~ .checkmark i {
+  opacity: 1;
+}
+
+.label-text {
+  color: white;
+  font-weight: 500;
+}
+
+/* Başlat Butonu */
+.btn-gradient {
+  background: linear-gradient(135deg, #6a5ae0, #a890ff);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(106, 90, 224, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px rgba(106, 90, 224, 0.4);
+}
+
+.btn-gradient:active {
+  transform: translateY(-2px);
+}
+
+/* Oyun İstatistik Kartları */
+.game-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  background: rgba(20, 24, 50, 0.7);
+  border-radius: 15px;
+  padding: 15px;
+  gap: 10px;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  position: relative;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: rgba(106, 90, 224, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.stat-icon i {
+  color: #a890ff;
+  font-size: 1.2rem;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+}
+
+.timer-bar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #6a5ae0, #a890ff);
+  transition: width 1s linear;
+}
+
+/* Problem Kart */
+.problem-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+  min-height: 180px;
+}
+
+.problem-card {
+  background: rgba(20, 24, 50, 0.7);
+  border-radius: 15px;
+  padding: 40px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.problem-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border-color: rgba(106, 90, 224, 0.2);
+}
+
+#problem-text {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Cevap Kontrolleri */
+.answer-controls {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.answer-input-container {
+  display: flex;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+#answer-input {
+  flex: 1;
+  padding: 15px 20px;
+  background: rgba(40, 44, 80, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#answer-input:focus {
+  outline: none;
+  border-color: #6a5ae0;
+  box-shadow: 0 0 15px rgba(106, 90, 224, 0.3);
+}
+
+#submit-answer {
+  padding: 12px 25px;
+  background: #6a5ae0;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 160px;
+}
+
+#submit-answer:hover {
+  background: #7f6bff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(106, 90, 224, 0.3);
+}
+
+/* Geri Bildirim */
+.feedback {
+  font-size: 1.2rem;
+  font-weight: 600;
+  height: 30px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.feedback.correct {
+  color: #4CAF50;
+}
+
+.feedback.incorrect {
+  color: #F44336;
+}
+
+/* Sonuç Ekranı */
+.result-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.result-stat-card {
+  background: rgba(20, 24, 50, 0.7);
+  border-radius: 15px;
+  padding: 25px 20px;
+  min-width: 140px;
+  text-align: center;
+  flex: 1;
+  max-width: 200px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.result-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(106, 90, 224, 0.2);
+}
+
+.result-stat-card .stat-icon {
+  margin: 0 auto 15px;
+  width: 50px;
+  height: 50px;
+}
+
+.result-stat-card .stat-value {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #6a5ae0, #a890ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.result-stat-card .stat-label {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Detay Bilgileri */
+.result-details {
+  background: rgba(20, 24, 50, 0.7);
+  border-radius: 15px;
+  padding: 5px 20px;
+  margin-bottom: 30px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-icon {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  border-radius: 50%;
+  background: rgba(106, 90, 224, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.detail-icon i {
+  color: #a890ff;
+  font-size: 1rem;
+}
+
+.detail-label {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* Sonuç Ekranı Butonları */
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+#play-again {
+  min-width: 180px;
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Puan Animasyonu */
+@keyframes scoreFloat {
+  0% {
     opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+    transform: translate(-50%, -50%) scale(0.8);
   }
-
-  .checkmark {
-    position: absolute;
-    left: 0;
-    height: 22px;
-    width: 22px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1.2);
   }
-
-  .checkbox-container:hover .checkmark {
-    background-color: rgba(255, 255, 255, 0.2);
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -100px) scale(1);
   }
-
-  .checkbox-container input:checked ~ .checkmark {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -120px) scale(0.8);
   }
+}
 
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-    left: 7px;
-    top: 3px;
-    width: 6px;
-    height: 12px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+.score-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4CAF50;
+  pointer-events: none;
+  z-index: 100;
+  animation: scoreFloat 1s forwards;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+  .math-screen {
+    padding: 20px;
   }
-
-  .checkbox-container input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  .option-label {
-    font-weight: 500;
-  }
-
-  /* Game Stats */
+  
   .game-stats {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    background: rgba(30, 34, 70, 0.7);
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .stat-item {
-    flex: 1;
-    text-align: center;
-    position: relative;
-  }
-  
-  .stat-item:not(:last-child):after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 25%;
-    height: 50%;
-    width: 1px;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .stat-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
-  }
-
-  .stat-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    line-height: 1;
-  }
-  
-  .timer-container {
-    position: relative;
-  }
-  
-  .timer-progress {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 8px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .timer-bar {
-    height: 100%;
-    background: var(--accent-color);
-    width: 100%;
-    transition: width 1s linear;
-    border-radius: 2px;
-  }
-
-  /* Problem Container */
-  .problem-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 25px;
-    min-height: 150px;
-  }
-
-  .problem-card {
-    background: rgba(50, 54, 100, 0.7);
-    border-radius: 12px;
-    padding: 25px;
-    min-width: 70%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-  }
-  
-  .problem-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-  }
-
-  #problem-text {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Answer Controls */
-  .answer-controls {
-    margin-bottom: 20px;
-  }
-
-  .answer-input {
-    display: flex;
-    gap: 15px;
-    max-width: 450px;
-    margin: 0 auto;
-  }
-
-  #answer-input {
-    flex: 1;
-    padding: 12px 15px;
-    background: rgba(60, 64, 100, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: white;
-    font-size: 1.2rem;
-    text-align: center;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  #answer-input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 15px rgba(106, 90, 224, 0.3);
-  }
-
-  #submit-answer {
-    padding: 12px 25px;
-    font-size: 1.1rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    border: none;
-    font-weight: 600;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  #submit-answer:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-  }
-  
-  #submit-answer:active {
-    transform: translateY(-1px);
-  }
-
-  /* Feedback */
-  .feedback {
-    font-size: 1.3rem;
-    font-weight: 600;
-    height: 40px;
-    transition: all 0.3s ease;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  }
-
-  .feedback.correct {
-    color: #4CAF50;
-  }
-
-  .feedback.incorrect {
-    color: #F44336;
-  }
-
-  /* Result Screen */
-  .result-stats {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
     flex-wrap: wrap;
   }
-
-  .result-stat {
-    background: rgba(50, 54, 100, 0.7);
-    border-radius: 12px;
-    padding: 20px;
-    min-width: 120px;
-    flex: 1;
-    max-width: 180px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+  
+  .stat-item {
+    flex: 1 0 100%;
+    padding: 8px 15px;
   }
   
-  .result-stat:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  .problem-card {
+    padding: 30px 15px;
   }
-
-  .result-value {
+  
+  #problem-text {
     font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .result-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .result-details {
-    background: rgba(50, 54, 100, 0.7);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    color: white;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .detail-item:last-child {
-    border-bottom: none;
-  }
-
-  .detail-label {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .detail-value {
-    font-weight: 600;
-  }
-
-  .result-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    max-width: 450px;
-    margin: 0 auto;
   }
   
-  #play-again {
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    border: none;
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-weight: 600;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
-    transition: all 0.3s ease;
+  .operation-checkboxes {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  #play-again:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
+  .answer-input-container {
+    flex-direction: column;
   }
   
-  .btn-outline-light {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Start Game Button */
-  #start-game {
-    background: linear-gradient(135deg, #6a5ae0, #a890ff);
-    border: none;
-    padding: 16px 35px;
-    border-radius: 30px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.3);
-    transition: all 0.3s ease;
-    margin-top: 15px;
-    display: inline-flex;
-    align-items: center;
+  .result-stats {
     gap: 10px;
   }
   
-  #start-game:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(106, 90, 224, 0.4);
+  .result-stat-card {
+    min-width: 100px;
+    padding: 15px 10px;
   }
   
-  #start-game:active {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.2);
+  .result-stat-card .stat-value {
+    font-size: 1.8rem;
   }
+  
+  .result-actions {
+    flex-direction: column;
+  }
+  
+  #play-again, .btn-outline {
+    width: 100%;
+  }
+}
 
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .math-screen {
-      padding: 20px 15px;
-    }
-    
-    .game-stats {
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    .stat-item {
-      flex: 1 0 30%;
-    }
-    
-    .stat-item:after {
-      display: none;
-    }
-    
-    .stat-value {
-      font-size: 1.5rem;
-    }
-    
-    #problem-text {
-      font-size: 2rem;
-    }
-    
-    .operation-options {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .answer-input {
-      flex-direction: column;
-    }
-    
-    .result-stats {
-      gap: 10px;
-    }
-    
-    .result-stat {
-      min-width: 100px;
-      padding: 15px;
-    }
-    
-    .result-value {
-      font-size: 1.8rem;
-    }
+@media (max-width: 480px) {
+  .math-screen h2 {
+    font-size: 1.5rem;
   }
+  
+  .math-screen p {
+    font-size: 0.95rem;
+  }
+  
+  .option-section h3 {
+    font-size: 1rem;
+  }
+  
+  .option-buttons {
+    flex-direction: column;
+  }
+  
+  .operation-checkboxes {
+    grid-template-columns: 1fr;
+  }
+  
+  #problem-text {
+    font-size: 1.8rem;
+  }
+}
 
-  @media (max-width: 480px) {
-    .math-screen h2 {
-      font-size: 1.5rem;
-    }
-    
-    .math-screen p {
-      font-size: 0.95rem;
-    }
-    
-    .option-section h3 {
-      font-size: 1rem;
-    }
-    
-    .button-group {
-      flex-direction: column;
-    }
-    
-    .option-button {
-      width: 100%;
-    }
-    
-    #problem-text {
-      font-size: 1.7rem;
-    }
-    
-    .result-actions {
-      flex-direction: column;
-    }
-    
-    #play-again, .btn-outline-light {
-      width: 100%;
-    }
+/* Animasyonlar */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse {
+  animation: pulse 0.5s;
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
+  // DOM Elementleri
   const startScreen = document.getElementById('start-screen');
   const gameScreen = document.getElementById('game-screen');
   const resultScreen = document.getElementById('result-screen');
@@ -722,8 +903,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const timeButtons = document.querySelectorAll('[data-time]');
   const operationCheckboxes = document.querySelectorAll('[data-operation]');
   
-  const startGameBtn = document.getElementById('start-game');
-  const playAgainBtn = document.getElementById('play-again');
+  const startButton = document.getElementById('start-button');
+  const playAgainButton = document.getElementById('play-again');
   
   const problemText = document.getElementById('problem-text');
   const answerInput = document.getElementById('answer-input');
@@ -741,14 +922,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const accuracyEl = document.getElementById('accuracy');
   const avgTimeEl = document.getElementById('avg-time');
 
-  // Game Configuration
+  // Oyun Yapılandırması
   let gameConfig = {
     difficulty: 'easy',
-    time: 60, // seconds
+    time: 60, // saniye
     operations: ['addition', 'subtraction', 'multiplication']
   };
   
-  // Game State
+  // Oyun Durumu
   let gameState = {
     score: 0,
     correctAnswers: 0,
@@ -761,7 +942,7 @@ document.addEventListener('DOMContentLoaded', function() {
     problemStartTime: 0
   };
 
-  // Event Listeners for Configuration
+  // Yapılandırma için Event Listener'lar
   difficultyButtons.forEach(btn => {
     btn.addEventListener('click', function() {
       difficultyButtons.forEach(b => b.classList.remove('active'));
@@ -778,9 +959,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Start Game Button
-  startGameBtn.addEventListener('click', function() {
-    // Get selected operations
+  // Başlat Butonu
+  startButton.addEventListener('click', function() {
+    // Seçilen işlemleri al
     gameConfig.operations = [];
     operationCheckboxes.forEach(checkbox => {
       if (checkbox.checked) {
@@ -788,73 +969,73 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Make sure at least one operation is selected
+    // En az bir işlem seçildiğinden emin ol
     if (gameConfig.operations.length === 0) {
       alert('Lütfen en az bir işlem türü seçin!');
       return;
     }
     
-    // Start the game
+    // Oyunu başlat
     startGame();
   });
 
-  // Submit Answer Button
+  // Cevap Gönder Butonu
   submitAnswerBtn.addEventListener('click', checkAnswer);
 
-  // Answer Input Enter Key
+  // Cevap Giriş Alanı Enter Tuşu
   answerInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
       checkAnswer();
     }
   });
 
-  // Play Again Button
-  playAgainBtn.addEventListener('click', function() {
+  // Tekrar Oyna Butonu
+  playAgainButton.addEventListener('click', function() {
     showScreen(startScreen);
   });
 
-  // Functions
+  // Fonksiyonlar
   function startGame() {
-    // Reset game state
+    // Oyun durumunu sıfırla
     gameState.score = 0;
     gameState.correctAnswers = 0;
     gameState.incorrectAnswers = 0;
     gameState.totalResponseTime = 0;
     
-    // Reset UI
+    // Arayüzü sıfırla
     scoreEl.textContent = gameState.score;
     correctEl.textContent = gameState.correctAnswers;
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
     
-    // Set timer
+    // Zamanlayıcıyı ayarla
     gameState.timeRemaining = gameConfig.time;
     timerEl.textContent = gameState.timeRemaining;
     timerBar.style.width = '100%';
     
-    // Show game screen
+    // Oyun ekranını göster
     showScreen(gameScreen);
     
-    // Focus answer input
+    // Cevap giriş alanına odaklan
     answerInput.value = '';
     answerInput.focus();
     
-    // Generate first problem
+    // İlk problemi oluştur
     generateProblem();
     
-    // Start timer
+    // Zamanlayıcıyı başlat
     gameState.startTimestamp = Date.now();
     gameState.problemStartTime = Date.now();
     gameState.timer = setInterval(updateTimer, 1000);
   }
 
   function generateProblem() {
-    // Choose random operation from selected operations
+    // Seçilen işlemlerden rastgele bir işlem seç
     const operation = gameConfig.operations[Math.floor(Math.random() * gameConfig.operations.length)];
     
     let num1, num2, problem, answer;
     
-    // Generate numbers based on difficulty and operation
+    // Zorluk seviyesi ve işleme göre sayıları oluştur
     switch (operation) {
       case 'addition':
         if (gameConfig.difficulty === 'easy') {
@@ -902,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
         
       case 'division':
-        // For division, first generate the answer, then multiply to get the dividend
+        // Bölme için, önce cevabı oluşturup, sonra bölen ile çarparak bölüneni oluştur
         if (gameConfig.difficulty === 'easy') {
           answer = Math.floor(Math.random() * 5) + 1;
           num2 = Math.floor(Math.random() * 5) + 1;
@@ -913,150 +1094,145 @@ document.addEventListener('DOMContentLoaded', function() {
           answer = Math.floor(Math.random() * 12) + 1;
           num2 = Math.floor(Math.random() * 12) + 1;
         }
-        num1 = answer * num2; // This ensures whole number answers
+        num1 = answer * num2; // Tam bölünme sağlamak için
         problem = `${num1} ÷ ${num2} = ?`;
         break;
     }
     
-    // Update UI
+    // Arayüzü güncelle
     problemText.textContent = problem;
     gameState.currentAnswer = answer;
     
-    // Reset input
+    // Giriş alanını sıfırla
     answerInput.value = '';
     answerInput.focus();
     
-    // Reset feedback
+    // Geri bildirimi sıfırla
     feedbackEl.textContent = '';
     feedbackEl.className = 'feedback';
     
-    // Record problem start time
+    // Problem başlangıç zamanını kaydet
     gameState.problemStartTime = Date.now();
   }
 
   function checkAnswer() {
-    // Get user's answer
+    // Kullanıcının cevabını al
     const userAnswer = parseInt(answerInput.value);
     
-    // If input is empty or not a number, do nothing
+    // Giriş boş veya sayı değilse, hiçbir şey yapma
     if (isNaN(userAnswer)) {
       return;
     }
     
-    // Calculate response time
+    // Yanıt süresini hesapla
     const responseTime = (Date.now() - gameState.problemStartTime) / 1000;
     gameState.totalResponseTime += responseTime;
     
-    // Check if answer is correct
+    // Cevabın doğru olup olmadığını kontrol et
     if (userAnswer === gameState.currentAnswer) {
-      // Correct answer
+      // Doğru cevap
       feedbackEl.textContent = 'Doğru!';
       feedbackEl.className = 'feedback correct';
       
-      // Update score (faster answers get more points)
+      // Puanı güncelle (daha hızlı cevaplar daha çok puan alır)
       const timeBonus = Math.max(0, 10 - Math.floor(responseTime));
       const difficultyMultiplier = gameConfig.difficulty === 'easy' ? 1 : (gameConfig.difficulty === 'medium' ? 2 : 3);
       const pointsEarned = 10 + timeBonus * difficultyMultiplier;
       
-      // Add score animation
+      // Puan animasyonu ekle
       const scoreAnimation = document.createElement('div');
       scoreAnimation.className = 'score-animation';
       scoreAnimation.textContent = `+${pointsEarned}`;
-      scoreAnimation.style.position = 'absolute';
-      scoreAnimation.style.top = '50%';
-      scoreAnimation.style.left = '50%';
-      scoreAnimation.style.transform = 'translate(-50%, -50%)';
-      scoreAnimation.style.color = '#4CAF50';
-      scoreAnimation.style.fontWeight = 'bold';
-      scoreAnimation.style.fontSize = '1.5rem';
-      scoreAnimation.style.zIndex = '10';
-      scoreAnimation.style.pointerEvents = 'none';
-      scoreAnimation.style.animation = 'scoreFloat 1s forwards';
-      
       document.querySelector('.problem-container').appendChild(scoreAnimation);
       
-      // Remove animation after it completes
+      // Animasyon tamamlandıktan sonra kaldır
       setTimeout(() => {
         scoreAnimation.remove();
       }, 1000);
       
       gameState.score += pointsEarned;
       gameState.correctAnswers++;
+      
+      // Skor elementini kısa süre vurgula
+      scoreEl.parentElement.classList.add('pulse');
+      setTimeout(() => {
+        scoreEl.parentElement.classList.remove('pulse');
+      }, 500);
     } else {
-      // Incorrect answer
+      // Yanlış cevap
       feedbackEl.textContent = `Yanlış! Doğru cevap: ${gameState.currentAnswer}`;
       feedbackEl.className = 'feedback incorrect';
       
       gameState.incorrectAnswers++;
     }
     
-    // Update UI
+    // Arayüzü güncelle
     scoreEl.textContent = gameState.score;
     correctEl.textContent = gameState.correctAnswers;
     
-    // Animate the score update
-    scoreEl.parentElement.classList.add('flash');
-    setTimeout(() => {
-      scoreEl.parentElement.classList.remove('flash');
-    }, 500);
-    
-    // Generate new problem after a short delay
+    // Kısa bir gecikmeden sonra yeni problem oluştur
     setTimeout(generateProblem, 1500);
   }
 
   function updateTimer() {
     gameState.timeRemaining--;
     
-    // Update UI
+    // Arayüzü güncelle
     timerEl.textContent = gameState.timeRemaining;
     const percentLeft = (gameState.timeRemaining / gameConfig.time) * 100;
     timerBar.style.width = `${percentLeft}%`;
     
-    // Change color when time is running out
+    // Süre azaldığında renk değiştir
     if (gameState.timeRemaining <= 10) {
-      timerBar.style.backgroundColor = '#F44336';
+      timerBar.style.background = 'linear-gradient(to right, #ff4d4d, #ff8080)';
+      
+      // Son 5 saniyede titreşim efekti
+      if (gameState.timeRemaining <= 5) {
+        timerEl.classList.add('pulse');
+      }
     }
     
-    // Check if time is up
+    // Süre dolduğunda oyunu bitir
     if (gameState.timeRemaining <= 0) {
       endGame();
     }
   }
 
   function endGame() {
-    // Stop timer
+    // Zamanlayıcıyı durdur
     clearInterval(gameState.timer);
+    timerEl.classList.remove('pulse');
     
-    // Calculate statistics
+    // İstatistikleri hesapla
     const totalAnswers = gameState.correctAnswers + gameState.incorrectAnswers;
     const accuracy = totalAnswers > 0 ? Math.round((gameState.correctAnswers / totalAnswers) * 100) : 0;
     const avgTime = totalAnswers > 0 ? (gameState.totalResponseTime / totalAnswers).toFixed(1) : 0;
     
-    // Update result screen
+    // Sonuç ekranını güncelle
     finalScoreEl.textContent = gameState.score;
     finalCorrectEl.textContent = gameState.correctAnswers;
     finalIncorrectEl.textContent = gameState.incorrectAnswers;
     accuracyEl.textContent = `${accuracy}%`;
     avgTimeEl.textContent = `${avgTime} saniye`;
     
-    // Save score
+    // Skoru kaydet
     saveScore(gameState.score);
     
-    // Show result screen
+    // Sonuç ekranını göster
     showScreen(resultScreen);
   }
 
   function showScreen(screen) {
-    // Hide all screens
-    startScreen.style.display = 'none';
-    gameScreen.style.display = 'none';
-    resultScreen.style.display = 'none';
+    // Tüm ekranları gizle
+    startScreen.classList.remove('active');
+    gameScreen.classList.remove('active');
+    resultScreen.classList.remove('active');
     
-    // Show the specified screen
-    screen.style.display = 'block';
+    // Belirtilen ekranı göster
+    screen.classList.add('active');
   }
   
-  // Function to save score to the server
+  // Skoru sunucuya kaydetme fonksiyonu
   function saveScore(score) {
     fetch('/api/save-score', {
       method: 'POST',
@@ -1076,40 +1252,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
-  
-  // Add score float animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes scoreFloat {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-      }
-      20% {
-        opacity: 1;
-        transform: translate(-50%, -60%) scale(1.2);
-      }
-      80% {
-        opacity: 1;
-        transform: translate(-50%, -100px) scale(1);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -120px) scale(0.8);
-      }
-    }
-    
-    @keyframes flash {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    
-    .flash {
-      animation: flash 0.5s ease;
-    }
-  `;
-  document.head.appendChild(style);
 });
 </script>
 {% endblock %}
