@@ -104,7 +104,18 @@
             <p id="game-result-message" class="text-center mb-3">Tebrikler! Kelimeyi buldunuz.</p>
             <p class="text-center">Cevap: <span id="answer-reveal" class="fw-bold"></span></p>
 
-            <div class="results-stats">
+            <!-- Bu div, saveScoreAndDisplay fonksiyonu tarafından güncellenecek -->
+            <div id="game-score-container">
+              <!-- Yeni puan sistemi buraya yüklenecek -->
+              <div class="loading-score">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p>Skorunuz hesaplanıyor...</p>
+              </div>
+            </div>
+
+            <div class="results-stats d-none">
               <div class="result-stat">
                 <i class="fas fa-trophy"></i>
                 <div class="result-stat-value">
@@ -147,7 +158,7 @@
               <i class="fas fa-redo me-2"></i>Tekrar Oyna
             </button>
             <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary btn-lg">
-              <i class="fas fa-trophy me-2"></i>Skor TablosuSkor Tablosu
+              <i class="fas fa-trophy me-2"></i>Skor Tablosu
             </a>
           </div>
         </div>

@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-responsive-modernizer.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 
 <!-- Sayfa Özel CSS Dosyaları -->
 <!--  Profil CSS dosyası kaldırıldı -->
@@ -225,6 +226,7 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 {% block scripts %}{% endblock %}
 <!-- iOS Swipe Navigasyon Script -->
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
