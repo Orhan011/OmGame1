@@ -20,12 +20,11 @@
           <i class="fas fa-clock"></i> <span id="timer">00:00</span>
         </div>
       </div>
-      
+
       <!-- Oyun Tahtası -->
       <div class="puzzle-board-wrapper">
-        <div id="puzzle-board" class="puzzle-board size-3"></div>
-      </div>
-      
+        <div id="puzzle-board" class="puzzle-board size-5"></div> </div>
+
       <!-- Oyun Kontrolleri (Tek Satırda) -->
       <div class="compact-controls">
         <button id="shuffle-btn" class="compact-btn">
@@ -37,7 +36,7 @@
         <button id="hint-btn" class="compact-btn">
           <i class="fas fa-lightbulb"></i> İpucu
         </button>
-        
+
         <!-- Zorluk Seçenekleri -->
         <div class="difficulty-options">
           <button class="difficulty-btn active" data-size="3">3×3</button>
@@ -57,7 +56,7 @@
           <h2>Tebrikler!</h2>
           <p>Puzzle'ı başarıyla tamamladınız!</p>
         </div>
-        
+
         <div class="success-stats">
           <div class="success-stat">
             <div class="success-stat-icon"><i class="fas fa-walking"></i></div>
@@ -70,7 +69,7 @@
             <div class="success-stat-label">Geçen Süre</div>
           </div>
         </div>
-        
+
         <div class="success-actions">
           <button id="play-again-btn" class="btn-play-again">
             <i class="fas fa-redo-alt"></i> Tekrar Oyna
@@ -457,7 +456,7 @@
     gap: 15px;
     margin-bottom: 10px;
   }
-  
+
   .stat-bubble {
     background: rgba(30, 30, 60, 0.6);
     border-radius: 50px;
@@ -467,17 +466,17 @@
     gap: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
-  
+
   .stat-bubble i {
     color: var(--accent-color);
   }
-  
+
   .stat-bubble span {
     font-size: 1.2rem;
     font-weight: 700;
     color: white;
   }
-  
+
   /* Kompakt kontroller */
   .compact-controls {
     display: flex;
@@ -488,7 +487,7 @@
     max-width: 700px;
     flex-wrap: wrap;
   }
-  
+
   .compact-btn {
     background: rgba(30, 30, 60, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -503,31 +502,31 @@
     align-items: center;
     gap: 5px;
   }
-  
+
   .compact-btn:first-child {
     background: linear-gradient(135deg, #6a5ae0, #8C66FF);
   }
-  
+
   .compact-btn:nth-child(2) {
     background: linear-gradient(135deg, #FF9800, #FF5722);
   }
-  
+
   .compact-btn:nth-child(3) {
     background: linear-gradient(135deg, #00BCD4, #2196F3);
   }
-  
+
   .compact-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   }
-  
+
   /* Butonların yanında yer alacak zorluk seçenekleri */
   .difficulty-options {
     display: flex;
     gap: 5px;
     margin-left: 10px;
   }
-  
+
   .difficulty-btn {
     background: rgba(40, 40, 80, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -539,7 +538,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  
+
   .difficulty-btn.active {
     background: var(--accent-color);
   }
@@ -857,7 +856,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let timer = null;
   let seconds = 0;
   let gameStarted = false;
-  
+
   // Initialize game
   createBoard();
   shuffleTiles();
@@ -868,15 +867,15 @@ document.addEventListener('DOMContentLoaded', function() {
       const newSize = parseInt(this.getAttribute('data-size'));
       if (newSize !== boardSize) {
         boardSize = newSize;
-        
+
         // Update board class
         puzzleBoard.className = `puzzle-board size-${boardSize}`;
-        
+
         // Reset game
         resetGame();
         createBoard();
         shuffleTiles();
-        
+
         // Update active button
         difficultyBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
@@ -888,16 +887,16 @@ document.addEventListener('DOMContentLoaded', function() {
   shuffleBtn.addEventListener('click', function() {
     shuffleTiles();
     puzzleBoard.classList.add('board-shuffle');
-    setTimeout(() => puzzleBoard.classList.remove('board-shuffle'), 300);
+    setTimeout(() =>puzzleBoard.classList.remove('board-shuffle'), 300);
   });
-  
+
   restartBtn.addEventListener('click', function() {
     resetGame();
     createBoard();
   });
-  
+
   hintBtn.addEventListener('click', showHint);
-  
+
   playAgainBtn.addEventListener('click', function() {
     successModal.style.display = 'none';
     resetGame();
@@ -910,13 +909,13 @@ document.addEventListener('DOMContentLoaded', function() {
   themeBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       const theme = this.getAttribute('data-theme');
-      
+
       // Remove all theme classes from tiles
       tiles.forEach(tile => {
         tile.classList.remove('theme-default', 'theme-gradient', 'theme-neon', 'theme-dark');
         tile.classList.add(`theme-${theme}`);
       });
-      
+
       // Update active button
       themeBtns.forEach(b => b.classList.remove('active'));
       this.classList.add('active');
@@ -928,12 +927,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear the board
     puzzleBoard.innerHTML = '';
     tiles = [];
-    
+
     // Create new tiles
     for (let i = 0; i < boardSize * boardSize; i++) {
       const tile = document.createElement('div');
       tile.className = 'puzzle-tile';
-      
+
       if (i === boardSize * boardSize - 1) {
         tile.classList.add('empty');
         tile.textContent = '';
@@ -943,13 +942,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeTheme = document.querySelector('.theme-btn.active').getAttribute('data-theme');
         tile.classList.add(`theme-${activeTheme}`);
       }
-      
+
       tile.addEventListener('click', () => moveTile(i));
-      
+
       puzzleBoard.appendChild(tile);
       tiles.push(tile);
     }
-    
+
     // Set empty tile index
     emptyTileIndex = boardSize * boardSize - 1;
   }
@@ -961,21 +960,21 @@ document.addEventListener('DOMContentLoaded', function() {
     if (validMoves.length > 0) {
       // Choose a move that would bring a tile to its correct position
       let bestMove = validMoves[0];
-      
+
       for (const move of validMoves) {
         const tileValue = parseInt(tiles[move].textContent);
         const correctPosition = tileValue - 1;
-        
+
         if (move !== correctPosition) {
           bestMove = move;
           break;
         }
       }
-      
+
       // Highlight the suggested tile
       tiles.forEach(tile => tile.classList.remove('highlight'));
       tiles[bestMove].classList.add('highlight');
-      
+
       // Remove the highlight after 2 seconds
       setTimeout(() => {
         tiles[bestMove].classList.remove('highlight');
@@ -988,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const validMoves = [];
     const emptyRow = Math.floor(emptyTileIndex / boardSize);
     const emptyCol = emptyTileIndex % boardSize;
-    
+
     // Check all four directions
     const directions = [
       { dr: -1, dc: 0 }, // up
@@ -996,17 +995,17 @@ document.addEventListener('DOMContentLoaded', function() {
       { dr: 0, dc: -1 }, // left
       { dr: 0, dc: 1 }   // right
     ];
-    
+
     for (const dir of directions) {
       const newRow = emptyRow + dir.dr;
       const newCol = emptyCol + dir.dc;
-      
+
       if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
         const tileIndex = newRow * boardSize + newCol;
         validMoves.push(tileIndex);
       }
     }
-    
+
     return validMoves;
   }
 
@@ -1017,25 +1016,25 @@ document.addEventListener('DOMContentLoaded', function() {
       startTimer();
       gameStarted = true;
     }
-    
+
     // Check if the clicked tile is adjacent to the empty tile
     const validMoves = getValidMoves();
-    
+
     if (validMoves.includes(index)) {
       // Swap the tiles
       swapTiles(index, emptyTileIndex);
-      
+
       // Update empty tile index
       emptyTileIndex = index;
-      
+
       // Increment move counter
       moves++;
       movesDisplay.textContent = moves;
-      
+
       // Add move animation
       tiles[emptyTileIndex].classList.add('tile-move');
       setTimeout(() => tiles[emptyTileIndex].classList.remove('tile-move'), 300);
-      
+
       // Check if puzzle is solved
       if (isPuzzleSolved()) {
         clearInterval(timer);
@@ -1051,10 +1050,10 @@ document.addEventListener('DOMContentLoaded', function() {
       textContent: tiles[index1].textContent,
       className: tiles[index1].className
     };
-    
+
     tiles[index1].textContent = tiles[index2].textContent;
     tiles[index1].className = tiles[index2].className;
-    
+
     tiles[index2].textContent = temp.textContent;
     tiles[index2].className = temp.className;
   }
@@ -1062,23 +1061,23 @@ document.addEventListener('DOMContentLoaded', function() {
   // Shuffle the tiles
   function shuffleTiles() {
     const randomMoves = 100 + boardSize * 20; // More shuffling for larger boards
-    
+
     // Perform random moves
     for (let i = 0; i < randomMoves; i++) {
       const validMoves = getValidMoves();
       const randomIndex = Math.floor(Math.random() * validMoves.length);
       const randomTile = validMoves[randomIndex];
-      
+
       // Swap tiles
       swapTiles(randomTile, emptyTileIndex);
-      
+
       // Update empty tile index
       emptyTileIndex = randomTile;
     }
-    
+
     // Reset game state
     resetGameState();
-    
+
     // Ensure puzzle is not already solved after shuffle
     if (isPuzzleSolved()) {
       shuffleTiles();
@@ -1101,10 +1100,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update final stats
     finalMovesDisplay.textContent = moves;
     finalTimeDisplay.textContent = formatTime(seconds);
-    
+
     // Create confetti effect
     createConfetti();
-    
+
     // Show the modal
     successModal.style.display = 'flex';
   }
@@ -1113,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function createConfetti() {
     const confettiCount = 100;
     const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
-    
+
     for (let i = 0; i < confettiCount; i++) {
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
@@ -1123,9 +1122,9 @@ document.addEventListener('DOMContentLoaded', function() {
       confetti.style.height = confetti.style.width;
       confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
       confetti.style.animationDelay = `${Math.random() * 0.5}s`;
-      
+
       document.body.appendChild(confetti);
-      
+
       // Remove confetti after animation
       setTimeout(() => {
         confetti.remove();
@@ -1136,7 +1135,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Start the timer
   function startTimer() {
     if (timer) clearInterval(timer);
-    
+
     seconds = 0;
     timer = setInterval(() => {
       seconds++;
@@ -1150,21 +1149,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const seconds = totalSeconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
-  
+
   // Reset the game
   function resetGame() {
     // Stop the timer
     if (timer) clearInterval(timer);
-    
+
     // Reset game state
     gameStarted = false;
     moves = 0;
     seconds = 0;
-    
+
     // Reset displays
     movesDisplay.textContent = moves;
     timerDisplay.textContent = '00:00';
-    
+
     // Reset board to solved state
     tiles.forEach((tile, index) => {
       if (index !== boardSize * boardSize - 1) {
@@ -1175,25 +1174,25 @@ document.addEventListener('DOMContentLoaded', function() {
         tile.classList.add('empty');
       }
     });
-    
+
     emptyTileIndex = boardSize * boardSize - 1;
   }
-  
+
   // Reset game state without resetting board
   function resetGameState() {
     // Stop the timer
     if (timer) clearInterval(timer);
-    
+
     // Reset game state
     gameStarted = false;
     moves = 0;
     seconds = 0;
-    
+
     // Reset displays
     movesDisplay.textContent = moves;
     timerDisplay.textContent = '00:00';
   }
-  
+
   // Function to save score to the server
   function saveScore(score) {
     fetch('/api/save-score', {
@@ -1214,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
-  
+
   // Log a message to show that the game has been modernized
   console.log("puzzleSlider oyunu modernize edildi.");
 });
