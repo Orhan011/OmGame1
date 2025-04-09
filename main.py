@@ -602,16 +602,16 @@ def get_most_played_games(limit=4):
             "route": "audio_memory"
         },
         {
-            "name": "Tower Defense",
-            "description": "Stratejik kule savunma oyunuyla düşman dalgalarını durdurun.",
-            "icon": "fas fa-chess-rook",
-            "route": "tower_defense"
+            "name": "2048",
+            "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
+            "icon": "fas fa-cubes",
+            "route": "game_2048"
         },
         {
-            "name": "Space Shooter",
-            "description": "Uzay gemisiyle düşman gemilerine ve asteroitlere karşı savaşın.",
-            "icon": "fas fa-rocket",
-            "route": "space_shooter"
+            "name": "Satranç",
+            "description": "Stratejik düşünme ve planlama becerilerinizi geliştirin.",
+            "icon": "fas fa-chess",
+            "route": "chess"
         }
     ]
     # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
@@ -1355,8 +1355,6 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'tower_defense': {'point_base': 85, 'score_multiplier': 0.5},
-        'space_shooter': {'point_base': 75, 'score_multiplier': 0.6},
         'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
     }
     
@@ -1408,8 +1406,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'iq_test': 10.0,  # 10 dakika
                 'numberChain': 2.5,  # 2.5 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
-                'tower_defense': 4.0,  # 4 dakika
-                'space_shooter': 3.0  # 3 dakika
+                'puzzle_slider': 2.0  # 2 dakika
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1442,8 +1439,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'iq_test': 20,
                 'numberChain': 40,
-                'tower_defense': 70,  # Stratejik hamle sayısı 
-                'space_shooter': 150  # Düşman gemilerine ve asteroitlere ateş etme sayısı
+                'typing_speed': 200,  # Yazmada daha fazla hamle normal
+                'snake_game': 100  # Yılan uzadıkça daha fazla hamle
             }.get(game_type, 50)
             
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1927,8 +1924,8 @@ def get_leaderboard_data(game_type):
         '2048': '2048',
         'wordle': 'Wordle',
         'chess': 'Satranç',
-        'tower_defense': 'Kule Savunması',
-        'space_shooter': 'Uzay Savaşı'
+        'puzzle_slider': 'Resim Bulmaca',
+        'snake_game': 'Yılan Oyunu'
     }
     
     return jsonify({
