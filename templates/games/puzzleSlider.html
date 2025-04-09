@@ -11,38 +11,118 @@
     </div>
 
     <div class="puzzle-slider-modern">
-      <!-- Basit Üst Kısım -->
-      <div class="simple-stats">
-        <div class="stat-bubble moves-bubble">
-          <i class="fas fa-walking"></i> <span id="moves">0</span>
+      <div class="puzzle-layout">
+        <!-- Sol panel - Oyun Tahtası -->
+        <div class="puzzle-game-panel">
+          <div class="puzzle-board-wrapper">
+            <div id="puzzle-board" class="puzzle-board size-3"></div>
+          </div>
+          <div class="puzzle-controls">
+            <button id="shuffle-btn" class="btn-game btn-primary">
+              <span class="btn-icon"><i class="fas fa-random"></i></span>
+              <span class="btn-text">Karıştır</span>
+            </button>
+            <button id="restart-btn" class="btn-game btn-secondary">
+              <span class="btn-icon"><i class="fas fa-redo-alt"></i></span>
+              <span class="btn-text">Yeniden Başlat</span>
+            </button>
+            <button id="hint-btn" class="btn-game btn-accent">
+              <span class="btn-icon"><i class="fas fa-lightbulb"></i></span>
+              <span class="btn-text">İpucu</span>
+            </button>
+          </div>
         </div>
-        <div class="stat-bubble timer-bubble">
-          <i class="fas fa-clock"></i> <span id="timer">00:00</span>
-        </div>
-      </div>
-      
-      <!-- Oyun Tahtası -->
-      <div class="puzzle-board-wrapper">
-        <div id="puzzle-board" class="puzzle-board size-3"></div>
-      </div>
-      
-      <!-- Oyun Kontrolleri (Tek Satırda) -->
-      <div class="compact-controls">
-        <button id="shuffle-btn" class="compact-btn">
-          <i class="fas fa-random"></i> Karıştır
-        </button>
-        <button id="restart-btn" class="compact-btn">
-          <i class="fas fa-redo-alt"></i> Yeniden Başlat
-        </button>
-        <button id="hint-btn" class="compact-btn">
-          <i class="fas fa-lightbulb"></i> İpucu
-        </button>
-        
-        <!-- Zorluk Seçenekleri -->
-        <div class="difficulty-options">
-          <button class="difficulty-btn active" data-size="3">3×3</button>
-          <button class="difficulty-btn" data-size="4">4×4</button>
-          <button class="difficulty-btn" data-size="5">5×5</button>
+
+        <!-- Sağ panel - Oyun Bilgileri -->
+        <div class="puzzle-info-panel">
+          <!-- Oyun İstatistikleri -->
+          <div class="game-stats-card">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-line"></i> Oyun Bilgileri</h3>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-walking"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Hamleler</div>
+                  <div class="stat-value" id="moves">0</div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Süre</div>
+                  <div class="stat-value" id="timer">00:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Zorluk Seviyesi -->
+          <div class="difficulty-card">
+            <div class="card-header">
+              <h3><i class="fas fa-sliders-h"></i> Zorluk Seviyesi</h3>
+            </div>
+            <div class="difficulty-options">
+              <button class="difficulty-btn active" data-size="3">
+                <span class="diff-icon">3×3</span>
+                <span class="diff-name">Kolay</span>
+              </button>
+              <button class="difficulty-btn" data-size="4">
+                <span class="diff-icon">4×4</span>
+                <span class="diff-name">Orta</span>
+              </button>
+              <button class="difficulty-btn" data-size="5">
+                <span class="diff-icon">5×5</span>
+                <span class="diff-name">Zor</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Puzzle Tema Seçimi -->
+          <div class="theme-card">
+            <div class="card-header">
+              <h3><i class="fas fa-palette"></i> Tema</h3>
+            </div>
+            <div class="theme-options">
+              <button class="theme-btn active" data-theme="default">
+                <span class="theme-color" style="background: linear-gradient(135deg, #6a5ae0, #a890ff);"></span>
+                <span class="theme-name">Klasik</span>
+              </button>
+              <button class="theme-btn" data-theme="gradient">
+                <span class="theme-color" style="background: linear-gradient(135deg, #FF416C, #FF4B2B);"></span>
+                <span class="theme-name">Gradyan</span>
+              </button>
+              <button class="theme-btn" data-theme="neon">
+                <span class="theme-color" style="background: #000; border: 2px solid #0ff; box-shadow: 0 0 5px #0ff;"></span>
+                <span class="theme-name">Neon</span>
+              </button>
+              <button class="theme-btn" data-theme="dark">
+                <span class="theme-color" style="background: #121212; border: 1px solid #333;"></span>
+                <span class="theme-name">Karanlık</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Nasıl Oynanır -->
+          <div class="instructions-card">
+            <div class="card-header">
+              <h3><i class="fas fa-info-circle"></i> Nasıl Oynanır?</h3>
+            </div>
+            <ul class="instruction-list">
+              <li>Kareleri doğru sırada yerleştirmeye çalışın.</li>
+              <li>Boş kareye komşu olan bir kareye tıklayarak hareket ettirebilirsiniz.</li>
+              <li>Tüm kareleri 1'den başlayarak sırayla dizin.</li>
+              <li>Son kare boş kalmalıdır.</li>
+              <li>Zorluk seviyesini değiştirerek oyunu daha zor hale getirebilirsiniz.</li>
+              <li>İpucu butonu ile bir sonraki hamlenin önerisini alabilirsiniz.</li>
+            </ul>
+          </div>
+
+          <!-- Tüm Oyunlar Butonu -->
+          <a href="{{ url_for('all_games') }}" class="all-games-btn">
+            <i class="fas fa-th-large"></i> Tüm Oyunlar
+          </a>
         </div>
       </div>
     </div>
@@ -344,7 +424,7 @@
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
     width: 100%;
-    max-width: 700px;
+    max-width: 500px;
     display: flex;
     justify-content: center;
   }
@@ -371,14 +451,14 @@
   }
 
   .puzzle-tile {
-    width: 100px;
-    height: 100px;
+    width: 75px;
+    height: 75px;
     background: linear-gradient(135deg, #6a5ae0, #a890ff);
     border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: white;
     cursor: pointer;
@@ -450,98 +530,64 @@
     border: 1px solid #333;
   }
 
-  /* Yeni kompakt kontroller */
-  .simple-stats {
+  /* Oyun Kontrolleri */
+  .puzzle-controls {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 10px;
+    width: 100%;
+    max-width: 500px;
   }
-  
-  .stat-bubble {
-    background: rgba(30, 30, 60, 0.6);
-    border-radius: 50px;
-    padding: 8px 15px;
+
+  .btn-game {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .stat-bubble i {
-    color: var(--accent-color);
-  }
-  
-  .stat-bubble span {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: white;
-  }
-  
-  /* Kompakt kontroller */
-  .compact-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin: 15px auto;
-    max-width: 700px;
-    flex-wrap: wrap;
-  }
-  
-  .compact-btn {
-    background: rgba(30, 30, 60, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
-  
-  .compact-btn:first-child {
+
+  .btn-game .btn-icon {
+    font-size: 1.2rem;
+    height: 24px;
+  }
+
+  .btn-primary {
     background: linear-gradient(135deg, #6a5ae0, #8C66FF);
   }
-  
-  .compact-btn:nth-child(2) {
+
+  .btn-secondary {
     background: linear-gradient(135deg, #FF9800, #FF5722);
   }
-  
-  .compact-btn:nth-child(3) {
+
+  .btn-accent {
     background: linear-gradient(135deg, #00BCD4, #2196F3);
   }
-  
-  .compact-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+
+  .btn-game:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   }
-  
-  /* Butonların yanında yer alacak zorluk seçenekleri */
-  .difficulty-options {
-    display: flex;
-    gap: 5px;
-    margin-left: 10px;
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #5D4ECB, #7E58E2);
   }
-  
-  .difficulty-btn {
-    background: rgba(40, 40, 80, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
-    padding: 8px 12px;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #F57C00, #E64A19);
   }
-  
-  .difficulty-btn.active {
-    background: var(--accent-color);
+
+  .btn-accent:hover {
+    background: linear-gradient(135deg, #00ACC1, #1E88E5);
   }
 
   /* Başarı Modalı */
