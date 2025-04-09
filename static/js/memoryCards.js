@@ -1056,28 +1056,61 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get final score from display
     const finalScoreValue = parseInt(finalScore.textContent);
+    const totalTime = timer; // Oyun süresi
+    const totalMoves = moves; // Toplam hamle sayısı
     
-    // Prepare data for submission
-    const scoreData = {
-      game_type: 'memoryCards',
-      score: finalScoreValue
+    // Zorluk seviyesini belirle
+    let difficulty = 'medium';
+    if (currentDifficulty === 'easy') {
+      difficulty = 'easy';
+    } else if (currentDifficulty === 'hard') {
+      difficulty = 'hard';
+    } else if (currentDifficulty === 'expert') {
+      difficulty = 'expert';
+    }
+    
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      duration_seconds: totalTime,
+      move_count: totalMoves,
+      hint_count: initialHints - hintsLeft,
+      pairs_count: totalPairs,
+      theme: currentTheme
     };
     
-    // Send score to server
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(scoreData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
+    // Yeni skor gösterimi için container oluştur
+    if (!document.getElementById('game-score-container')) {
+      const scoreContainer = document.createElement('div');
+      scoreContainer.id = 'game-score-container';
+      scoreContainer.innerHTML = `
+        <div class="loading-score">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+          </div>
+          <p>Skorunuz hesaplanıyor...</p>
+        </div>
+      `;
+      
+      // Yerleştirme - mevcut sonuç istatistiklerinden sonra ekle
+      const resultsStats = document.querySelector('.results-stats');
+      if (resultsStats) {
+        resultsStats.style.display = 'none'; // Eski istatistikleri gizle
+        resultsStats.parentNode.insertBefore(scoreContainer, resultsStats.nextSibling);
+      }
+    }
+    
+    // Callback fonksiyonu - skor HTML'ini gösterir
+    const updateScoreDisplay = function(scoreHtml, data) {
+      const scoreContainer = document.getElementById('game-score-container');
+      if (scoreContainer) {
+        scoreContainer.innerHTML = scoreHtml;
+      }
+      
+      if (data && data.success) {
         showAlert('Skorunuz başarıyla kaydedildi!', 'success');
         saveScoreBtn.textContent = '✓ Kaydedildi';
         saveScoreBtn.classList.add('btn-success');
-      } else if (data.message === 'Login required') {
+      } else if (data && data.login_required) {
         // Giriş yapmamış kullanıcılar için giriş yapma butonu göster
         showAlert('Skorunuzu kaydetmek için giriş yapmalısınız.', 'warning');
         saveScoreBtn.textContent = '🔑 Giriş Yap';
@@ -1088,20 +1121,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Butonu giriş sayfasına yönlendirme işlevine güncelleyin
         saveScoreBtn.removeEventListener('click', saveScore);
         saveScoreBtn.addEventListener('click', function() {
-          // API'den gelen yönlendirme URL'sini kullan, yoksa varsayılan URL'yi kullan
-          const redirectUrl = data.redirect_url || '/login?redirect=games/memory-cards';
-          window.location.href = redirectUrl;
+          window.location.href = '/login?redirect=memory_cards';
         });
       } else {
         showAlert('Skor kaydedilemedi. Lütfen tekrar deneyin.', 'error');
         saveScoreBtn.disabled = false;
       }
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
-      showAlert('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
-      saveScoreBtn.disabled = false;
-    });
+    };
+    
+    // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
+    saveScoreAndDisplay('memoryCards', finalScoreValue, totalTime, difficulty, gameStats, updateScoreDisplay);
   }
   
   /**

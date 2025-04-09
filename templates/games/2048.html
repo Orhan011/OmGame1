@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/games/2048.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 </head>
 <body>
     <div class="page-container">
@@ -48,6 +49,7 @@
                 <div class="overlay-content">
                     <h2>Tebrikler!</h2>
                     <p>2048'e ulaştın!</p>
+                    <!-- Skor container eklenecek -->
                     <button id="continue" class="primary-btn">Devam Et</button>
                     <a href="/leaderboard" class="secondary-btn">Skor Tablosu</a>
                 </div>
@@ -63,6 +65,7 @@
     </div>
     </div>
     <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
     <script src="{{ url_for('static', filename='js/games/2048.js') }}"></script>
 </body>
 </html>

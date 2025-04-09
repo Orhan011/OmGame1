@@ -73,10 +73,23 @@
       <!-- Game Over Container -->
       <div id="game-over-container" class="text-center game-container" style="display: none;">
         <h2 class="mb-4">Oyun Bitti!</h2>
+        
         <div class="result-card mb-4">
-          <div class="result-score">
+          <!-- Eski skor görünümü (gizlenecek) -->
+          <div class="result-score" style="display: none;">
             <span id="final-score">0</span>
             <small>puan</small>
+          </div>
+          
+          <!-- Yeni skor görünümü için konteyner -->
+          <div id="game-score-container">
+            <!-- Buraya saveScoreAndDisplay fonksiyonu içeriği yüklenecek -->
+            <div class="loading-score">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+              </div>
+              <p>Skorunuz hesaplanıyor...</p>
+            </div>
           </div>
         </div>
         

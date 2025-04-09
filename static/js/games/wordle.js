@@ -690,7 +690,27 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function saveScore() {
     // Skoru kaydetmek için yeni fonksiyonu çağır
-    saveScoreWithDetails(gameState.score);
+    try {
+      // Eğer hiç parametre verilmezse, gameState'den skoru al
+      if (arguments.length === 0) {
+        saveScoreWithDetails(gameState.score);
+      } 
+      // Eğer parametre verilirse (örn. endGame içinden), o skoru kullan
+      else {
+        saveScoreWithDetails(arguments[0]);
+      }
+    } catch (e) {
+      console.error("Skor kaydetme hatası:", e);
+      // Hata durumunda basit kaydetme yöntemiyle dene
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_type: 'wordle',
+          score: gameState.score
+        })
+      }).catch(err => console.error("Yedek skor kaydı hatası:", err));
+    }
   }
 
   /**

@@ -325,13 +325,37 @@ document.addEventListener('DOMContentLoaded', function() {
       timer.stop();
     }
     
+    // Game duration and other statistics
+    const totalSeconds = isNaN(timer) ? 0 : timer;
+    
     // Show game over screen
     gameContainer.style.display = 'none';
     gameOverContainer.style.display = 'block';
+    
+    // Update score display (still keeping this for backwards compatibility)
     finalScoreDisplay.textContent = score;
     
-    // Save score
-    window.saveScore('3dRotation', score);
+    // Zorluk seviyesini belirle
+    const difficulty = level <= 2 ? 'easy' : level <= 4 ? 'medium' : 'hard';
+    
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      duration_seconds: totalSeconds,
+      level: level,
+      rotation_count: level * 2, // Örnek bir değer, gerçek rotasyon sayısını tutmuyorsanız
+      success_rate: score / (level * 10) // Başarı oranını hesapla
+    };
+    
+    // Callback fonksiyonu - skor HTML'ini gösterir
+    const updateScoreDisplay = function(scoreHtml) {
+      const scoreContainer = document.getElementById('game-score-container');
+      if (scoreContainer) {
+        scoreContainer.innerHTML = scoreHtml;
+      }
+    };
+    
+    // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
+    saveScoreAndDisplay('3dRotation', score, totalSeconds, difficulty, gameStats, updateScoreDisplay);
     
     // Add play again button functionality
     document.getElementById('play-again').addEventListener('click', startGame);

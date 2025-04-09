@@ -47,6 +47,9 @@ class ModernMergePuzzle {
         // Clear existing grid
         this.columnsGridElement.innerHTML = '';
 
+        // Oyun başlangıç zamanını kaydet
+        sessionStorage.setItem('2048_game_start_time', Date.now());
+
         // Create columns
         for (let i = 0; i < 5; i++) {
             const column = document.createElement('div');
@@ -867,7 +870,35 @@ class ModernMergePuzzle {
 
         if (highest >= 2048 && !this.won) {
             this.won = true;
-            document.getElementById('game-won').classList.remove('hidden');
+            
+            // Game-won paneline yükleme göstergesi ekle
+            const gameWonPanel = document.getElementById('game-won');
+            const overlayContent = gameWonPanel.querySelector('.overlay-content');
+            
+            // Skor alanı ekle
+            if (!gameWonPanel.querySelector('#game-score-container')) {
+                const scoreContainer = document.createElement('div');
+                scoreContainer.id = 'game-score-container';
+                scoreContainer.innerHTML = `
+                    <div class="loading-score">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                        <p>Skorunuz hesaplanıyor...</p>
+                    </div>
+                `;
+                
+                // "Tebrikler" başlığından sonra ekle
+                if (overlayContent && overlayContent.children.length > 0) {
+                    overlayContent.insertBefore(scoreContainer, overlayContent.children[1]);
+                } else {
+                    overlayContent.appendChild(scoreContainer);
+                }
+            }
+            
+            // Paneli göster
+            gameWonPanel.classList.remove('hidden');
+            
             // Oyun kazanıldığında skoru kaydet
             this.saveScore();
             return;
@@ -888,7 +919,35 @@ class ModernMergePuzzle {
         // If all columns are full, game over
         if (fullColumns === this.columns.length) {
             this.gameOver = true;
-            this.finalScoreElement.textContent = this.score;
+            
+            // Game-over paneline yükleme göstergesi ekle
+            const gameOverPanel = document.getElementById('game-over');
+            const overlayContent = gameOverPanel.querySelector('.overlay-content');
+            
+            // Skor alanı ekle
+            if (!gameOverPanel.querySelector('#game-score-container')) {
+                const scoreContainer = document.createElement('div');
+                scoreContainer.id = 'game-score-container';
+                scoreContainer.innerHTML = `
+                    <div class="loading-score">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                        <p>Skorunuz hesaplanıyor...</p>
+                    </div>
+                `;
+                
+                // Score'dan sonra ekle
+                const scoreElement = gameOverPanel.querySelector('.final-score');
+                if (scoreElement) {
+                    const scoreParent = scoreElement.parentElement;
+                    scoreParent.style.display = 'none'; // Eski skoru gizle
+                    overlayContent.insertBefore(scoreContainer, scoreParent.nextSibling);
+                } else {
+                    overlayContent.appendChild(scoreContainer);
+                }
+            }
+            
             document.getElementById('game-over').classList.remove('hidden');
             // Oyun bittiğinde skoru kaydet
             this.saveScore();
@@ -1061,28 +1120,71 @@ class ModernMergePuzzle {
         
         console.log(`Skor gönderiliyor: ${this.score}`);
         
-        // Backend'e skoru gönder
-        fetch('/api/save-score', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                game_type: '2048_game', // API endpoint'imiz game_type parametresi bekliyor
-                score: this.score
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP hata! Durum: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Skor başarıyla kaydedildi:', data);
+        // Oyun istatistiklerini topla
+        const gameStartTime = sessionStorage.getItem('2048_game_start_time');
+        const playtime = Math.floor((Date.now() - (gameStartTime || Date.now())) / 1000);
+        
+        // Zorluk seviyesini en yüksek blok değerine göre belirle
+        let difficulty = 'easy';
+        let highestValue = 0;
+        
+        this.columns.forEach(column => {
+            column.forEach(value => {
+                highestValue = Math.max(highestValue, value);
+            });
+        });
+        
+        if (highestValue >= 1024) {
+            difficulty = 'hard';
+        } else if (highestValue >= 512) {
+            difficulty = 'medium';
+        }
+        
+        // Oyun istatistiklerini topla
+        const gameStats = {
+            duration_seconds: playtime,
+            move_count: this.moveHistory.length,
+            highest_block: highestValue,
+            block_count: this.getTotalBlockCount()
+        };
+        
+        // Game-over paneline yükleme göstergesi ekle
+        const gameOverPanel = document.getElementById('game-over');
+        const overlayContent = gameOverPanel.querySelector('.overlay-content');
+        
+        // Skor alanı ekle
+        if (!gameOverPanel.querySelector('#game-score-container')) {
+            const scoreContainer = document.createElement('div');
+            scoreContainer.id = 'game-score-container';
+            scoreContainer.innerHTML = `
+                <div class="loading-score">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p>Skorunuz hesaplanıyor...</p>
+                </div>
+            `;
             
-            if (data.success && data.achievement) {
-                // Başarı bildirimi göster
+            // Score'dan sonra ekle
+            const scoreElement = gameOverPanel.querySelector('.final-score');
+            if (scoreElement) {
+                const scoreParent = scoreElement.parentElement;
+                scoreParent.style.display = 'none'; // Eski skoru gizle
+                overlayContent.insertBefore(scoreContainer, scoreParent.nextSibling);
+            } else {
+                overlayContent.appendChild(scoreContainer);
+            }
+        }
+        
+        // Yeni skor gösterimi için callback fonksiyonu
+        const updateScoreDisplay = function(scoreHtml, data) {
+            const scoreContainer = document.getElementById('game-score-container');
+            if (scoreContainer) {
+                scoreContainer.innerHTML = scoreHtml;
+            }
+            
+            // Başarı bildirimi göster
+            if (data && data.success && data.achievement) {
                 const notification = document.createElement('div');
                 notification.className = 'level-notification';
                 notification.textContent = `🏆 Başarı: ${data.achievement.title}`;
@@ -1098,26 +1200,19 @@ class ModernMergePuzzle {
                     }, 2000);
                 }, 100);
             }
-        })
-        .catch(error => {
-            console.error('Skor gönderme hatası:', error);
-            // Hata bilgisini daha detaylı göster
-            const errorNotification = document.createElement('div');
-            errorNotification.className = 'level-notification';
-            errorNotification.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(200, 0, 0, 0.9))';
-            errorNotification.textContent = `❌ Skor kaydedilemedi`;
-            document.body.appendChild(errorNotification);
-            
-            setTimeout(() => {
-                errorNotification.classList.add('show');
-                setTimeout(() => {
-                    errorNotification.classList.remove('show');
-                    setTimeout(() => {
-                        errorNotification.remove();
-                    }, 500);
-                }, 2000);
-            }, 100);
+        };
+        
+        // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
+        saveScoreAndDisplay('2048', this.score, playtime, difficulty, gameStats, updateScoreDisplay);
+    },
+    
+    // Toplam blok sayısını hesapla
+    getTotalBlockCount() {
+        let count = 0;
+        this.columns.forEach(column => {
+            count += column.length;
         });
+        return count;
     }
 
     undoMove() {
