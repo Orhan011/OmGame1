@@ -3,8 +3,18 @@
 {% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
 
 {% block content %}
-<!-- Orijinal oyunu içe aktar -->
-{% include 'games/mathChallenge.html' %}
+<div class="container py-5 text-center">
+  <h1 class="mb-4">Matematik Mücadelesi</h1>
+  <div class="alert alert-info">
+    Bu oyun kaldırılmıştır.
+  </div>
+  
+  <div class="text-center mt-4">
+    <a href="{{ url_for('all_games') }}" class="btn btn-primary">
+      <i class="fas fa-th-large me-2"></i>Tüm Oyunları Görüntüle
+    </a>
+  </div>
+</div>
 
 <!-- Modernize edici -->
 {% include 'games/modernizer.html' %}
