@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sudoku.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 <style>
   .selector-label, .sudoku-title {
     color: var(--accent-color, #6a5ae0);
@@ -94,8 +95,33 @@
     </div>
   </div>
 </div>
+
+<!-- Game Completed Menu -->
+<div class="pause-menu-overlay" id="game-completed" style="display: none;">
+  <div class="pause-menu-content">
+    <h2 class="pause-title">Tebrikler!</h2>
+    <p class="pause-description">Sudoku bulmacasını başarıyla tamamladınız.</p>
+    
+    <!-- Skor bilgileri -->
+    <div id="game-score-container">
+      <!-- Yeni puan sistemi buraya yüklenecek -->
+      <div class="loading-score">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p>Skorunuz hesaplanıyor...</p>
+      </div>
+    </div>
+    
+    <div class="pause-menu-buttons mt-4">
+      <button id="new-game-after-win" class="btn btn-primary">Yeni Oyun</button>
+      <a href="{{ url_for('leaderboard') }}" class="btn btn-outline-primary">Skor Tablosu</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 <script src="{{ url_for('static', filename='js/sudoku.js') }}"></script>
 {% endblock %}

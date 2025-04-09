@@ -705,6 +705,7 @@ def n_back():
 
 # Sudoku Oyunu
 @app.route('/games/sudoku')
+@app.route('/sudoku')
 def sudoku():
     return render_template('games/sudoku.html')
 

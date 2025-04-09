@@ -438,6 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
       clearInterval(gameState.timerInterval);
     }
     
+    // Başlangıç zamanını kaydet (skor hesaplama için)
+    localStorage.setItem('sudokuGameStartTime', new Date().toString());
+    
     gameState.timer = 0;
     timerElement.textContent = formatTime(gameState.timer);
     
@@ -476,37 +479,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Skor gönder
     sendScore();
     
+    // Zafer ekranını göster
+    document.getElementById('game-completed').style.display = 'flex';
+    
     // Tebrik mesajı
     const timeMessage = formatTime(gameState.timer);
     showAlert(`Tebrikler! Sudoku'yu ${timeMessage} sürede tamamladınız!`, 'success');
+    
+    // Yeni oyun butonunu aktif et
+    document.getElementById('new-game-after-win').addEventListener('click', () => {
+      document.getElementById('game-completed').style.display = 'none';
+      generateNewGame();
+    });
   }
 
   function sendScore() {
-    // Zorluk seviyesine göre puan hesapla
-    let baseScore = 1000;
+    // Oyun istatistiklerini hazırla
+    const gameStartTime = localStorage.getItem('sudokuGameStartTime');
+    const playtime = gameState.timer; // Saniye cinsinden
     
-    switch(gameState.difficulty) {
-      case 'easy':   baseScore = 1000; break;
-      case 'medium': baseScore = 2000; break;
-      case 'hard':   baseScore = 3000; break;
-    }
+    // Zorluk seviyesini belirle
+    let difficulty = gameState.difficulty;
     
-    // Süreye göre puan düşür (20 dakikadan sonra puan kalmaz)
-    const timeBonus = Math.max(0, 1 - (gameState.timer / 1200));
-    const finalScore = Math.round(baseScore * timeBonus);
+    // İpucu sayısını hesapla (tahta doldurma sayısı)
+    const hintCount = document.querySelectorAll('.sudoku-cell.fixed').length - getDifficultyRemovalCount();
     
-    // Skoru sunucuya gönder
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_type: 'sudoku',
-        score: finalScore
-      })
-    })
-    .then(response => response.json())
-    .then(data => console.log('Skor gönderildi:', data))
-    .catch(error => console.error('Skor gönderme hatası:', error));
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      duration_seconds: playtime,
+      move_count: document.querySelectorAll('.sudoku-cell:not(.fixed)').length,
+      hint_count: hintCount,
+      grid_size: 9, // 9x9 Sudoku
+      empty_cells: getDifficultyRemovalCount()
+    };
+    
+    // Zafer ekranında skoru göster
+    const updateScoreDisplay = function(scoreHtml, data) {
+      const scoreContainer = document.getElementById('game-score-container');
+      if (scoreContainer) {
+        scoreContainer.innerHTML = scoreHtml;
+      }
+    };
+    
+    // Ortak puan hesaplama ve gösterme fonksiyonunu kullan
+    saveScoreAndDisplay('sudoku', 0, playtime, difficulty, gameStats, updateScoreDisplay);
   }
 
   // Yardımcı Fonksiyonlar
