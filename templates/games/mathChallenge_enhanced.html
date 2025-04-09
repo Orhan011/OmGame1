@@ -3,19 +3,2173 @@
 {% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-  <h1 class="mb-4">Matematik Mücadelesi</h1>
-  <div class="alert alert-info">
-    Bu oyun kaldırılmıştır.
-  </div>
-  
-  <div class="text-center mt-4">
-    <a href="{{ url_for('all_games') }}" class="btn btn-primary">
-      <i class="fas fa-th-large me-2"></i>Tüm Oyunları Görüntüle
-    </a>
+<div class="page-container">
+  <div class="math-game-wrapper">
+    <div class="game-header">
+      <h1><i class="fas fa-calculator"></i> Matematik Mücadelesi <span class="badge">Sayısal Beceri</span></h1>
+      <p class="game-description">Matematiksel yeteneklerinizi test edin ve hızlı düşünmeyi geliştirin</p>
+    </div>
+
+    <div class="game-dashboard">
+      <!-- Sol panel - Oyun alanı -->
+      <div class="game-area-panel">
+        <div class="math-game-container">
+          <!-- Başlangıç ekranı -->
+          <div id="start-screen" class="game-screen">
+            <div class="game-mode-selection">
+              <h2>Oyun Modu Seçin</h2>
+              <div class="game-modes">
+                <div class="game-mode-card active" data-mode="arithmetic">
+                  <div class="mode-icon"><i class="fas fa-plus-minus"></i></div>
+                  <div class="mode-title">Aritmetik</div>
+                  <div class="mode-description">Dört işlem becerilerinizi test edin</div>
+                </div>
+                
+                <div class="game-mode-card" data-mode="equation">
+                  <div class="mode-icon"><i class="fas fa-equals"></i></div>
+                  <div class="mode-title">Denklemler</div>
+                  <div class="mode-description">Eksik sayıları bulun</div>
+                </div>
+                
+                <div class="game-mode-card" data-mode="comparison">
+                  <div class="mode-icon"><i class="fas fa-greater-than"></i></div>
+                  <div class="mode-title">Karşılaştırma</div>
+                  <div class="mode-description">Büyük/küçük ilişkisini belirleyin</div>
+                </div>
+              </div>
+              
+              <div class="difficulty-selection">
+                <h3>Zorluk Seviyesi</h3>
+                <div class="difficulty-slider-container">
+                  <div class="difficulty-labels">
+                    <span>Kolay</span>
+                    <span>Orta</span>
+                    <span>Zor</span>
+                  </div>
+                  <input type="range" min="1" max="3" value="2" class="difficulty-slider" id="difficulty-selector">
+                </div>
+              </div>
+              
+              <div class="game-settings">
+                <div class="time-setting">
+                  <label for="time-selector">Süre:</label>
+                  <select id="time-selector" class="form-select">
+                    <option value="30">30 Saniye</option>
+                    <option value="60" selected>60 Saniye</option>
+                    <option value="120">2 Dakika</option>
+                    <option value="300">5 Dakika</option>
+                  </select>
+                </div>
+                
+                <div class="questions-setting">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="sound-toggle" checked>
+                    <label class="form-check-label" for="sound-toggle">Ses Efektleri</label>
+                  </div>
+                </div>
+              </div>
+              
+              <button id="start-game-btn" class="btn btn-primary btn-lg btn-pulse">
+                <i class="fas fa-play"></i> OYUNU BAŞLAT
+              </button>
+            </div>
+          </div>
+          
+          <!-- Oyun ekranı -->
+          <div id="game-screen" class="game-screen" style="display: none;">
+            <div class="game-header-bar">
+              <div class="game-stats">
+                <div class="stat">
+                  <span class="stat-label">Skor</span>
+                  <span class="stat-value" id="score-display">0</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Doğru</span>
+                  <span class="stat-value" id="correct-display">0</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Yanlış</span>
+                  <span class="stat-value" id="wrong-display">0</span>
+                </div>
+              </div>
+              
+              <div class="game-timer">
+                <div class="progress-container">
+                  <div class="progress-bar" id="time-progress"></div>
+                </div>
+                <div class="timer-display" id="timer-display">01:00</div>
+              </div>
+            </div>
+            
+            <div class="question-container">
+              <div class="question-card">
+                <div class="question-expression" id="question-text">8 + 7 = ?</div>
+                
+                <div class="answer-options" id="answer-container">
+                  <button class="answer-option" data-value="12">12</button>
+                  <button class="answer-option" data-value="15">15</button>
+                  <button class="answer-option" data-value="16">16</button>
+                  <button class="answer-option" data-value="14">14</button>
+                </div>
+                
+                <div class="equation-inputs" id="equation-container" style="display: none;">
+                  <input type="number" id="equation-answer" class="equation-input" placeholder="?">
+                  <button id="submit-answer" class="btn btn-primary">Kontrol Et</button>
+                </div>
+                
+                <div class="comparison-options" id="comparison-container" style="display: none;">
+                  <button class="comparison-option" data-value="<"><i class="fas fa-less-than"></i></button>
+                  <button class="comparison-option" data-value="="><i class="fas fa-equals"></i></button>
+                  <button class="comparison-option" data-value=">"><i class="fas fa-greater-than"></i></button>
+                </div>
+              </div>
+              
+              <div class="feedback-message" id="feedback">
+                <!-- Feedback doğru/yanlış -->
+              </div>
+            </div>
+            
+            <div class="game-controls">
+              <button id="next-question" class="btn btn-outline-light" disabled>
+                <i class="fas fa-forward"></i> SONRAKİ SORU
+              </button>
+              <button id="pause-game" class="btn btn-outline-light">
+                <i class="fas fa-pause"></i> DURAKLAT
+              </button>
+              <button id="end-game" class="btn btn-outline-danger">
+                <i class="fas fa-stop"></i> BİTİR
+              </button>
+            </div>
+          </div>
+          
+          <!-- Sonuç ekranı -->
+          <div id="result-screen" class="game-screen" style="display: none;">
+            <div class="result-content">
+              <div class="result-header">
+                <i class="fas fa-award result-icon"></i>
+                <h2>Oyun Bitti!</h2>
+              </div>
+              
+              <div class="final-score-container">
+                <div class="final-score">
+                  <div class="score-label">Toplam Puan</div>
+                  <div class="score-value" id="final-score">0</div>
+                </div>
+                
+                <div class="performance-meter">
+                  <div class="meter-label">Performans</div>
+                  <div class="meter-bar">
+                    <div class="meter-fill" id="performance-meter"></div>
+                  </div>
+                  <div class="meter-value" id="performance-value">İyi</div>
+                </div>
+              </div>
+              
+              <div class="result-stats">
+                <div class="stat-group">
+                  <div class="stat-label">Doğru Yanıtlar</div>
+                  <div class="stat-value" id="final-correct">0</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Yanlış Yanıtlar</div>
+                  <div class="stat-value" id="final-wrong">0</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Doğruluk Oranı</div>
+                  <div class="stat-value" id="final-accuracy">0%</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Ortalama Süre</div>
+                  <div class="stat-value" id="avg-time">0s</div>
+                </div>
+              </div>
+              
+              <div class="result-actions">
+                <button id="play-again-btn" class="btn btn-primary btn-lg">
+                  <i class="fas fa-redo-alt"></i> TEKRAR OYNA
+                </button>
+                <button id="share-result-btn" class="btn btn-outline-info">
+                  <i class="fas fa-share-alt"></i> PAYLAŞ
+                </button>
+                <a href="{{ url_for('all_games') }}" class="btn btn-outline-light">
+                  <i class="fas fa-th-large"></i> TÜM OYUNLAR
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Duraklat Modal -->
+          <div id="pause-modal" class="game-modal">
+            <div class="modal-content">
+              <h2><i class="fas fa-pause"></i> Oyun Duraklatıldı</h2>
+              <p>Matematik Mücadelesi'ne devam etmek için aşağıdaki butona tıklayın.</p>
+              <div class="modal-actions">
+                <button id="resume-game" class="btn btn-primary">
+                  <i class="fas fa-play"></i> DEVAM ET
+                </button>
+                <button id="quit-game" class="btn btn-outline-danger">
+                  <i class="fas fa-sign-out-alt"></i> OYUNDAN ÇIK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sağ panel - İstatistikler ve İpuçları -->
+      <div class="game-info-panel">
+        <!-- Oyuncu istatistikleri -->
+        <div class="player-stats-panel">
+          <h3><i class="fas fa-chart-line"></i> İstatistikleriniz</h3>
+          
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="best-score">0</div>
+                <div class="stat-label">En Yüksek Skor</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-brain"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="total-played">0</div>
+                <div class="stat-label">Toplam Oyun</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="best-accuracy">0%</div>
+                <div class="stat-label">En İyi Doğruluk</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="best-time">0s</div>
+                <div class="stat-label">En İyi Süre</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- İpuçları ve bilgiler -->
+        <div class="tips-panel">
+          <h3><i class="fas fa-lightbulb"></i> İpuçları</h3>
+          
+          <div class="tips-list">
+            <div class="tip-item">
+              <div class="tip-number">1</div>
+              <div class="tip-content">
+                <strong>Mental hesaplama</strong> için sayıları parçalara ayırmayı deneyin.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">2</div>
+              <div class="tip-content">
+                <strong>9 ile çarpma</strong> için sayıyı 10 ile çarpıp, sayının kendisini çıkarın.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">3</div>
+              <div class="tip-content">
+                <strong>Kalan hesabı</strong> için bölünen sayıdan tam bölüm kadarını çıkarın.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">4</div>
+              <div class="tip-content">
+                <strong>Hız</strong> kadar doğruluk da önemlidir. Acele ederken dikkatli olun.
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menü Butonu -->
+        <a href="{{ url_for('all_games') }}" class="back-to-menu-btn">
+          <i class="fas fa-th-large"></i> TÜM OYUNLAR
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Modernize edici -->
 {% include 'games/modernizer.html' %}
+
+<style>
+  /* Ana Konteyner Stilleri */
+  .math-game-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .game-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .game-header h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(106, 90, 224, 0.8);
+    margin-bottom: 10px;
+  }
+  
+  .game-header .badge {
+    background: linear-gradient(135deg, #6a5ae0, #a992ff);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 400;
+    vertical-align: middle;
+    box-shadow: 0 2px 10px rgba(106, 90, 224, 0.5);
+  }
+  
+  .game-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+  }
+  
+  /* Dashboard layout */
+  .game-dashboard {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .game-area-panel {
+    flex: 1;
+    min-width: 320px;
+  }
+  
+  .game-info-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Oyun Konteyner Stilleri */
+  .math-game-container {
+    background: rgba(20, 20, 40, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 0 15px rgba(106, 90, 224, 0.3);
+    overflow: hidden;
+    border: 1px solid rgba(106, 90, 224, 0.3);
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .game-screen {
+    padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Başlangıç Ekranı */
+  .game-mode-selection {
+    text-align: center;
+  }
+  
+  .game-mode-selection h2 {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+  
+  .game-modes {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .game-mode-card {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.9), rgba(30, 30, 50, 0.9));
+    border-radius: 15px;
+    padding: 20px;
+    width: 170px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .game-mode-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .game-mode-card.active {
+    border-color: #6a5ae0;
+    background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(40, 40, 70, 0.9));
+  }
+  
+  .mode-icon {
+    font-size: 2rem;
+    color: #6a5ae0;
+    margin-bottom: 15px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mode-title {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .mode-description {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .difficulty-selection {
+    margin-bottom: 30px;
+  }
+  
+  .difficulty-selection h3 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .difficulty-slider-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .difficulty-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .difficulty-labels span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+  
+  .difficulty-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #2ecc71, #f1c40f, #e74c3c);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  
+  .difficulty-slider:hover {
+    opacity: 1;
+  }
+  
+  .difficulty-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #6a5ae0;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.7);
+  }
+  
+  .difficulty-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #6a5ae0;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.7);
+  }
+  
+  .game-settings {
+    display: flex;
+    gap: 20px;
+    max-width: 400px;
+    margin: 0 auto 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .time-setting, .questions-setting {
+    background: rgba(30, 30, 50, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .time-setting label, .questions-setting label {
+    color: rgba(255, 255, 255, 0.8);
+    margin-right: 10px;
+  }
+  
+  .form-select {
+    background-color: rgba(40, 40, 70, 0.7);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 8px;
+  }
+  
+  .form-check-input {
+    background-color: rgba(40, 40, 70, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .form-check-input:checked {
+    background-color: #6a5ae0;
+    border-color: #6a5ae0;
+  }
+  
+  .form-check-label {
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 5px;
+  }
+  
+  #start-game-btn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+  
+  .btn-pulse {
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(106, 90, 224, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0);
+    }
+  }
+  
+  /* Oyun Ekranı */
+  .game-header-bar {
+    display: flex;
+    margin-bottom: 20px;
+    background: rgba(30, 30, 50, 0.7);
+    border-radius: 10px;
+    padding: 10px 15px;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .game-stats {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stat-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+  
+  .stat-value {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .game-timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+  }
+  
+  .progress-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(20, 20, 35, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #6a5ae0, #a992ff);
+    width: 100%;
+    border-radius: 4px;
+    transition: width 1s linear;
+  }
+  
+  .timer-display {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .question-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .question-card {
+    background: rgba(40, 40, 80, 0.7);
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .question-expression {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 30px;
+    font-weight: 600;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .answer-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .answer-option {
+    background: rgba(30, 30, 50, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 1.5rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .answer-option:hover {
+    background: rgba(50, 50, 80, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .answer-option.correct {
+    background: rgba(46, 204, 113, 0.3);
+    border-color: #2ecc71;
+  }
+  
+  .answer-option.wrong {
+    background: rgba(231, 76, 60, 0.3);
+    border-color: #e74c3c;
+  }
+  
+  .equation-inputs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .equation-input {
+    background: rgba(30, 30, 50, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 1.5rem;
+    color: white;
+    width: 100px;
+    text-align: center;
+  }
+  
+  .equation-input:focus {
+    outline: none;
+    border-color: #6a5ae0;
+  }
+  
+  .comparison-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .comparison-option {
+    background: rgba(30, 30, 50, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .comparison-option:hover {
+    background: rgba(50, 50, 80, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .feedback-message {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .feedback-correct {
+    color: #2ecc71;
+  }
+  
+  .feedback-wrong {
+    color: #e74c3c;
+  }
+  
+  .game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .game-controls button {
+    min-width: 120px;
+  }
+  
+  /* Sonuç Ekranı */
+  .result-content {
+    background: rgba(40, 40, 80, 0.7);
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    animation: scaleIn 0.5s ease;
+  }
+  
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  .result-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .result-icon {
+    font-size: 4rem;
+    color: #f1c40f;
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+  }
+  
+  .result-header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  
+  .final-score-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+  
+  .final-score {
+    text-align: center;
+  }
+  
+  .final-score .score-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .final-score .score-value {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #6a5ae0;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
+  }
+  
+  .performance-meter {
+    text-align: center;
+    min-width: 200px;
+  }
+  
+  .meter-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .meter-bar {
+    height: 20px;
+    background: rgba(20, 20, 35, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .meter-fill {
+    height: 100%;
+    background: linear-gradient(to right, #e74c3c, #f1c40f, #2ecc71);
+    border-radius: 10px;
+    width: 75%;
+    transition: width 1s ease;
+  }
+  
+  .meter-value {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    background: rgba(30, 30, 50, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .stat-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-group .stat-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+  }
+  
+  .stat-group .stat-value {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .result-actions button, .result-actions a {
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  /* Oyun Modal */
+  .game-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: rgba(40, 40, 80, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(106, 90, 224, 0.3);
+  }
+  
+  .modal-content h2 {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .modal-content p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 25px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  /* Sağ Panel Stilleri */
+  .player-stats-panel, .tips-panel {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.9), rgba(30, 30, 50, 0.9));
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+  }
+  
+  .player-stats-panel h3, .tips-panel h3 {
+    color: #6a5ae0;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .stat-item {
+    background: rgba(30, 30, 50, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .stat-item:hover {
+    background: rgba(40, 40, 70, 0.7);
+    transform: translateY(-2px);
+    border-color: rgba(106, 90, 224, 0.3);
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(106, 90, 224, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #6a5ae0;
+    margin-right: 10px;
+  }
+  
+  .stat-content {
+    flex: 1;
+  }
+  
+  .stat-content .stat-value {
+    font-size: 1.2rem;
+    color: white;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  .stat-content .stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .tip-item {
+    display: flex;
+    gap: 15px;
+    background: rgba(30, 30, 50, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .tip-item:hover {
+    background: rgba(40, 40, 70, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .tip-number {
+    width: 30px;
+    height: 30px;
+    background: rgba(106, 90, 224, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a992ff;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .tip-content {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .tip-content strong {
+    color: white;
+    font-weight: 600;
+  }
+  
+  .back-to-menu-btn {
+    display: block;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.9), rgba(30, 30, 50, 0.9));
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .back-to-menu-btn:hover {
+    background: linear-gradient(135deg, rgba(50, 50, 100, 0.9), rgba(40, 40, 70, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    color: white;
+  }
+  
+  /* Responsive Düzenlemeler */
+  @media (max-width: 768px) {
+    .game-dashboard {
+      flex-direction: column;
+    }
+    
+    .game-info-panel {
+      width: 100%;
+    }
+    
+    .game-modes, .game-settings {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .game-mode-card {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .result-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .answer-options {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .modal-actions {
+      flex-direction: column;
+    }
+    
+    .game-header-bar {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("mathChallenge oyunu modernize edildi.");
+  
+  // DOM Elements
+  const startScreen = document.getElementById('start-screen');
+  const gameScreen = document.getElementById('game-screen');
+  const resultScreen = document.getElementById('result-screen');
+  
+  const modeCards = document.querySelectorAll('.game-mode-card');
+  const difficultySlider = document.getElementById('difficulty-selector');
+  const timeSelector = document.getElementById('time-selector');
+  const soundToggle = document.getElementById('sound-toggle');
+  const startGameBtn = document.getElementById('start-game-btn');
+  
+  const scoreDisplay = document.getElementById('score-display');
+  const correctDisplay = document.getElementById('correct-display');
+  const wrongDisplay = document.getElementById('wrong-display');
+  const timerDisplay = document.getElementById('timer-display');
+  const timeProgress = document.getElementById('time-progress');
+  
+  const questionText = document.getElementById('question-text');
+  const answerContainer = document.getElementById('answer-container');
+  const equationContainer = document.getElementById('equation-container');
+  const comparisonContainer = document.getElementById('comparison-container');
+  const equationAnswer = document.getElementById('equation-answer');
+  const submitAnswer = document.getElementById('submit-answer');
+  const feedback = document.getElementById('feedback');
+  
+  const nextQuestionBtn = document.getElementById('next-question');
+  const pauseGameBtn = document.getElementById('pause-game');
+  const endGameBtn = document.getElementById('end-game');
+  
+  const pauseModal = document.getElementById('pause-modal');
+  const resumeGameBtn = document.getElementById('resume-game');
+  const quitGameBtn = document.getElementById('quit-game');
+  
+  const finalScore = document.getElementById('final-score');
+  const performanceMeter = document.getElementById('performance-meter');
+  const performanceValue = document.getElementById('performance-value');
+  const finalCorrect = document.getElementById('final-correct');
+  const finalWrong = document.getElementById('final-wrong');
+  const finalAccuracy = document.getElementById('final-accuracy');
+  const avgTime = document.getElementById('avg-time');
+  
+  const playAgainBtn = document.getElementById('play-again-btn');
+  const shareResultBtn = document.getElementById('share-result-btn');
+  
+  const bestScore = document.getElementById('best-score');
+  const totalPlayed = document.getElementById('total-played');
+  const bestAccuracy = document.getElementById('best-accuracy');
+  const bestTime = document.getElementById('best-time');
+  
+  // Game settings
+  let gameMode = 'arithmetic';
+  let difficulty = 2; // 1=easy, 2=medium, 3=hard
+  let timeLimit = 60; // seconds
+  let isSoundEnabled = true;
+  
+  // Game state
+  let score = 0;
+  let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let currentQuestion = {};
+  let gameTimer = null;
+  let timeRemaining = 0;
+  let isGameRunning = false;
+  let isGamePaused = false;
+  let questionStartTime = 0;
+  let questionTimes = [];
+  
+  // Sound effects
+  const sounds = {
+    correct: new Audio('/static/sounds/correct.mp3'),
+    wrong: new Audio('/static/sounds/wrong.mp3'),
+    gameOver: new Audio('/static/sounds/game-over.mp3'),
+    click: new Audio('/static/sounds/click.mp3'),
+    countdown: new Audio('/static/sounds/countdown.mp3')
+  };
+  
+  // Load saved player stats
+  loadPlayerStats();
+  
+  // Event listeners for game mode selection
+  modeCards.forEach(card => {
+    card.addEventListener('click', function() {
+      modeCards.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      gameMode = this.getAttribute('data-mode');
+      playSound('click');
+    });
+  });
+  
+  // Difficulty slider
+  difficultySlider.addEventListener('input', function() {
+    difficulty = parseInt(this.value);
+    playSound('click');
+  });
+  
+  // Time selector
+  timeSelector.addEventListener('change', function() {
+    timeLimit = parseInt(this.value);
+    playSound('click');
+  });
+  
+  // Sound toggle
+  soundToggle.addEventListener('change', function() {
+    isSoundEnabled = this.checked;
+    playSound('click');
+  });
+  
+  // Start game button
+  startGameBtn.addEventListener('click', function() {
+    startScreen.style.display = 'none';
+    gameScreen.style.display = 'flex';
+    startGame();
+  });
+  
+  // Pause game button
+  pauseGameBtn.addEventListener('click', togglePause);
+  
+  // Resume game button
+  resumeGameBtn.addEventListener('click', function() {
+    pauseModal.style.display = 'none';
+    resumeGame();
+  });
+  
+  // Quit game button
+  quitGameBtn.addEventListener('click', function() {
+    pauseModal.style.display = 'none';
+    endGame();
+  });
+  
+  // End game button
+  endGameBtn.addEventListener('click', function() {
+    if (confirm('Oyunu bitirmek istediğinize emin misiniz?')) {
+      endGame();
+    }
+  });
+  
+  // Next question button
+  nextQuestionBtn.addEventListener('click', function() {
+    generateQuestion();
+    nextQuestionBtn.disabled = true;
+    feedback.innerHTML = '';
+    feedback.className = '';
+  });
+  
+  // Submit equation answer
+  submitAnswer.addEventListener('click', function() {
+    if (equationAnswer.value.trim() === '') return;
+    
+    checkAnswer(equationAnswer.value);
+    equationAnswer.value = '';
+  });
+  
+  // Equation input enter key
+  equationAnswer.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      if (equationAnswer.value.trim() === '') return;
+      
+      checkAnswer(equationAnswer.value);
+      equationAnswer.value = '';
+    }
+  });
+  
+  // Play again button
+  playAgainBtn.addEventListener('click', function() {
+    resultScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+  });
+  
+  // Share result button
+  shareResultBtn.addEventListener('click', function() {
+    const shareText = `🧮 Matematik Mücadelesi'nde ${score} puan yaptım! Doğruluk oranım: ${finalAccuracy.textContent} #ZekaPark #MatematikMücadelesi`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'ZekaPark Matematik Mücadelesi Skorumu Paylaş',
+        text: shareText,
+        url: window.location.href
+      }).catch(err => {
+        console.log('Share failed:', err);
+        copyToClipboard(shareText);
+        alert('Paylaşım metni panoya kopyalandı!');
+      });
+    } else {
+      copyToClipboard(shareText);
+      alert('Paylaşım metni panoya kopyalandı!');
+    }
+  });
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (!isGameRunning) return;
+    
+    if (e.key === 'p' || e.key === 'P') {
+      togglePause();
+    } else if (e.key === 'n' || e.key === 'N') {
+      if (!nextQuestionBtn.disabled) {
+        nextQuestionBtn.click();
+      }
+    }
+  });
+  
+  // Game Functions
+  function startGame() {
+    // Reset game state
+    score = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    timeRemaining = timeLimit;
+    isGameRunning = true;
+    isGamePaused = false;
+    questionTimes = [];
+    
+    // Update UI
+    scoreDisplay.textContent = score;
+    correctDisplay.textContent = correctAnswers;
+    wrongDisplay.textContent = wrongAnswers;
+    updateTimerDisplay();
+    
+    // Generate first question
+    generateQuestion();
+    
+    // Start timer
+    startTimer();
+    
+    playSound('click');
+  }
+  
+  function generateQuestion() {
+    // Reset question state
+    questionStartTime = Date.now();
+    
+    // Clear previous inputs/options
+    answerContainer.innerHTML = '';
+    equationContainer.style.display = 'none';
+    comparisonContainer.style.display = 'none';
+    
+    let question = {};
+    
+    switch (gameMode) {
+      case 'arithmetic':
+        question = generateArithmeticQuestion();
+        showMultipleChoiceOptions(question);
+        break;
+        
+      case 'equation':
+        question = generateEquationQuestion();
+        showEquationInput(question);
+        break;
+        
+      case 'comparison':
+        question = generateComparisonQuestion();
+        showComparisonOptions(question);
+        break;
+    }
+    
+    currentQuestion = question;
+    questionText.textContent = question.text;
+  }
+  
+  function generateArithmeticQuestion() {
+    const operations = ['+', '-', '*', '/'];
+    const opWeights = difficulty === 1 ? [0.4, 0.3, 0.2, 0.1] : 
+                    difficulty === 2 ? [0.25, 0.25, 0.25, 0.25] : 
+                    [0.2, 0.2, 0.3, 0.3];
+    
+    // Choose operation based on weights
+    let operation = chooseWeighted(operations, opWeights);
+    
+    let num1, num2, answer;
+    
+    switch (operation) {
+      case '+': // Addition
+        num1 = difficulty === 1 ? randomInt(1, 20) : 
+              difficulty === 2 ? randomInt(10, 50) : 
+              randomInt(25, 100);
+        
+        num2 = difficulty === 1 ? randomInt(1, 20) : 
+              difficulty === 2 ? randomInt(10, 50) : 
+              randomInt(25, 100);
+        
+        answer = num1 + num2;
+        break;
+        
+      case '-': // Subtraction
+        if (difficulty === 1) {
+          num1 = randomInt(5, 20);
+          num2 = randomInt(1, num1);
+        } else if (difficulty === 2) {
+          num1 = randomInt(20, 50);
+          num2 = randomInt(1, num1);
+        } else {
+          num1 = randomInt(50, 100);
+          num2 = randomInt(10, num1);
+        }
+        
+        answer = num1 - num2;
+        break;
+        
+      case '*': // Multiplication
+        if (difficulty === 1) {
+          num1 = randomInt(1, 10);
+          num2 = randomInt(1, 10);
+        } else if (difficulty === 2) {
+          num1 = randomInt(5, 12);
+          num2 = randomInt(5, 12);
+        } else {
+          num1 = randomInt(10, 20);
+          num2 = randomInt(5, 15);
+        }
+        
+        answer = num1 * num2;
+        break;
+        
+      case '/': // Division
+        if (difficulty === 1) {
+          num2 = randomInt(1, 10);
+          answer = randomInt(1, 10);
+          num1 = num2 * answer;
+        } else if (difficulty === 2) {
+          num2 = randomInt(2, 12);
+          answer = randomInt(2, 12);
+          num1 = num2 * answer;
+        } else {
+          num2 = randomInt(2, 20);
+          answer = randomInt(2, 15);
+          num1 = num2 * answer;
+        }
+        break;
+    }
+    
+    const question = {
+      text: `${num1} ${operation} ${num2} = ?`,
+      answer: answer,
+      options: generateOptions(answer)
+    };
+    
+    return question;
+  }
+  
+  function generateEquationQuestion() {
+    let num1, num2, num3, missingPos, missingValue;
+    
+    // Decide which position to leave blank
+    missingPos = randomInt(1, 3);
+    
+    if (difficulty === 1) {
+      // Easy: Simple addition or subtraction
+      const operation = Math.random() < 0.5 ? '+' : '-';
+      
+      if (operation === '+') {
+        num1 = randomInt(1, 20);
+        num2 = randomInt(1, 20);
+        num3 = num1 + num2;
+      } else {
+        num3 = randomInt(10, 30);
+        num2 = randomInt(1, num3);
+        num1 = num3 + num2;
+      }
+      
+      // Determine the missing value
+      if (missingPos === 1) missingValue = num1;
+      else if (missingPos === 2) missingValue = num2;
+      else missingValue = num3;
+      
+      // Create equation text
+      const equation = missingPos === 1 ? `? ${operation} ${num2} = ${num3}` :
+                      missingPos === 2 ? `${num1} ${operation} ? = ${num3}` :
+                      `${num1} ${operation} ${num2} = ?`;
+                      
+      return {
+        text: equation,
+        answer: missingValue
+      };
+      
+    } else if (difficulty === 2) {
+      // Medium: Mixed operations
+      const operations = ['+', '-', '*'];
+      const operation = operations[randomInt(0, 2)];
+      
+      if (operation === '+') {
+        num1 = randomInt(10, 50);
+        num2 = randomInt(10, 50);
+        num3 = num1 + num2;
+      } else if (operation === '-') {
+        num3 = randomInt(10, 30);
+        num2 = randomInt(5, 20);
+        num1 = num3 + num2;
+      } else { // multiplication
+        num1 = randomInt(2, 12);
+        num2 = randomInt(2, 12);
+        num3 = num1 * num2;
+      }
+      
+      // Determine the missing value
+      if (missingPos === 1) missingValue = num1;
+      else if (missingPos === 2) missingValue = num2;
+      else missingValue = num3;
+      
+      // Create equation text
+      const equation = missingPos === 1 ? `? ${operation} ${num2} = ${num3}` :
+                      missingPos === 2 ? `${num1} ${operation} ? = ${num3}` :
+                      `${num1} ${operation} ${num2} = ?`;
+                      
+      return {
+        text: equation,
+        answer: missingValue
+      };
+      
+    } else {
+      // Hard: Complex equations or multi-step
+      const rand = Math.random();
+      
+      if (rand < 0.33) {
+        // Two-step equation with brackets
+        const num1 = randomInt(5, 15);
+        const num2 = randomInt(5, 15);
+        const num3 = randomInt(5, 15);
+        
+        const result = (num1 + num2) * num3;
+        
+        // Only mask the result for hard mode
+        return {
+          text: `(${num1} + ${num2}) × ${num3} = ?`,
+          answer: result
+        };
+        
+      } else if (rand < 0.66) {
+        // Equation with division
+        const divisor = randomInt(2, 10);
+        const result = randomInt(2, 10);
+        const dividend = divisor * result;
+        
+        // Only mask the result for hard mode
+        return {
+          text: `${dividend} ÷ ${divisor} = ?`,
+          answer: result
+        };
+        
+      } else {
+        // Mixed operations in order
+        const num1 = randomInt(5, 15);
+        const num2 = randomInt(5, 15);
+        const num3 = randomInt(2, 8);
+        
+        const result = num1 + num2 - num3;
+        
+        // Mask any position
+        if (missingPos === 1) {
+          return {
+            text: `? + ${num2} - ${num3} = ${result}`,
+            answer: num1
+          };
+        } else if (missingPos === 2) {
+          return {
+            text: `${num1} + ? - ${num3} = ${result}`,
+            answer: num2
+          };
+        } else {
+          return {
+            text: `${num1} + ${num2} - ? = ${result}`,
+            answer: num3
+          };
+        }
+      }
+    }
+  }
+  
+  function generateComparisonQuestion() {
+    let leftExpr, rightExpr, leftValue, rightValue;
+    
+    if (difficulty === 1) {
+      // Easy: Direct number comparison
+      leftValue = randomInt(1, 50);
+      
+      // Ensure difference is noticeable but not too obvious
+      const diff = randomInt(5, 15) * (Math.random() < 0.5 ? 1 : -1);
+      rightValue = leftValue + diff;
+      
+      leftExpr = leftValue.toString();
+      rightExpr = rightValue.toString();
+      
+    } else if (difficulty === 2) {
+      // Medium: Simple expressions
+      const op1 = Math.random() < 0.5 ? '+' : '-';
+      const op2 = Math.random() < 0.5 ? '+' : '-';
+      
+      const a = randomInt(5, 20);
+      const b = randomInt(1, 10);
+      const c = randomInt(5, 20);
+      const d = randomInt(1, 10);
+      
+      if (op1 === '+') leftValue = a + b;
+      else leftValue = a - b;
+      
+      if (op2 === '+') rightValue = c + d;
+      else rightValue = c - d;
+      
+      leftExpr = `${a} ${op1} ${b}`;
+      rightExpr = `${c} ${op2} ${d}`;
+      
+    } else {
+      // Hard: Mixed operations or fractions
+      const rand = Math.random();
+      
+      if (rand < 0.5) {
+        // Mixed operations
+        const a = randomInt(5, 20);
+        const b = randomInt(2, 10);
+        const c = randomInt(1, 5);
+        
+        const d = randomInt(5, 20);
+        const e = randomInt(2, 10);
+        
+        leftValue = a + b * c;
+        rightValue = d * e;
+        
+        leftExpr = `${a} + ${b} × ${c}`;
+        rightExpr = `${d} × ${e}`;
+        
+      } else {
+        // Fractions or averages
+        const a = randomInt(10, 30);
+        const b = randomInt(3, 10);
+        const c = randomInt(5, 15);
+        const d = randomInt(5, 15);
+        
+        leftValue = a / b;
+        rightValue = (c + d) / 2;
+        
+        leftExpr = `${a} ÷ ${b}`;
+        rightExpr = `(${c} + ${d}) ÷ 2`;
+      }
+    }
+    
+    let correctAnswer;
+    if (leftValue < rightValue) correctAnswer = '<';
+    else if (leftValue === rightValue) correctAnswer = '=';
+    else correctAnswer = '>';
+    
+    return {
+      text: `${leftExpr} ? ${rightExpr}`,
+      leftValue: leftValue,
+      rightValue: rightValue,
+      answer: correctAnswer
+    };
+  }
+  
+  function generateOptions(correctAnswer) {
+    let options = [correctAnswer];
+    
+    // Define the range for wrong options based on correct answer
+    let min, max;
+    const absAnswer = Math.abs(correctAnswer);
+    
+    if (absAnswer <= 10) {
+      min = Math.max(1, correctAnswer - 5);
+      max = correctAnswer + 5;
+    } else if (absAnswer <= 50) {
+      min = Math.max(1, correctAnswer - 10);
+      max = correctAnswer + 10;
+    } else {
+      min = Math.max(1, correctAnswer - 20);
+      max = correctAnswer + 20;
+    }
+    
+    // Generate wrong options
+    while (options.length < 4) {
+      let wrongOption;
+      
+      // Strategies for wrong options
+      const strategy = Math.random();
+      
+      if (strategy < 0.6) {
+        // Random value in range
+        wrongOption = randomInt(min, max);
+      } else if (strategy < 0.8) {
+        // Off-by-one error
+        wrongOption = correctAnswer + (Math.random() < 0.5 ? 1 : -1);
+      } else {
+        // Transposition error (e.g. 12 -> 21)
+        const strAnswer = correctAnswer.toString();
+        if (strAnswer.length >= 2) {
+          const digits = strAnswer.split('');
+          const i = randomInt(0, digits.length - 1);
+          const j = randomInt(0, digits.length - 1);
+          
+          if (i !== j) {
+            [digits[i], digits[j]] = [digits[j], digits[i]];
+            wrongOption = parseInt(digits.join(''));
+          } else {
+            wrongOption = correctAnswer + randomInt(1, 5) * (Math.random() < 0.5 ? 1 : -1);
+          }
+        } else {
+          wrongOption = correctAnswer + randomInt(1, 5) * (Math.random() < 0.5 ? 1 : -1);
+        }
+      }
+      
+      // Make sure wrong option is not the same as correct answer and not already in options
+      if (wrongOption !== correctAnswer && !options.includes(wrongOption)) {
+        options.push(wrongOption);
+      }
+    }
+    
+    // Shuffle options
+    return shuffleArray(options);
+  }
+  
+  function showMultipleChoiceOptions(question) {
+    answerContainer.style.display = 'grid';
+    answerContainer.innerHTML = '';
+    
+    question.options.forEach(option => {
+      const button = document.createElement('button');
+      button.className = 'answer-option';
+      button.textContent = option;
+      button.setAttribute('data-value', option);
+      
+      button.addEventListener('click', function() {
+        checkAnswer(option);
+      });
+      
+      answerContainer.appendChild(button);
+    });
+  }
+  
+  function showEquationInput(question) {
+    answerContainer.style.display = 'none';
+    equationContainer.style.display = 'flex';
+    
+    // Focus on input field
+    setTimeout(() => {
+      equationAnswer.focus();
+    }, 100);
+  }
+  
+  function showComparisonOptions(question) {
+    answerContainer.style.display = 'none';
+    comparisonContainer.style.display = 'flex';
+    
+    const options = comparisonContainer.querySelectorAll('.comparison-option');
+    
+    options.forEach(option => {
+      const value = option.getAttribute('data-value');
+      
+      option.addEventListener('click', function() {
+        checkAnswer(value);
+      });
+    });
+  }
+  
+  function checkAnswer(userAnswer) {
+    // Calculate question time
+    const questionTime = (Date.now() - questionStartTime) / 1000;
+    questionTimes.push(questionTime);
+    
+    // Normalize user answer
+    let normalizedAnswer;
+    
+    if (gameMode === 'comparison') {
+      normalizedAnswer = userAnswer; // Keep as string for comparison symbols
+    } else {
+      normalizedAnswer = parseInt(userAnswer);
+    }
+    
+    // Check if answer is correct
+    const isCorrect = normalizedAnswer === currentQuestion.answer;
+    
+    // Update stats
+    if (isCorrect) {
+      correctAnswers++;
+      
+      // Calculate score based on answer time and difficulty
+      let timeBonus = Math.max(0, 10 - Math.floor(questionTime));
+      let difficultyMultiplier = difficulty;
+      let questionScore = 10 + timeBonus * difficultyMultiplier;
+      
+      score += questionScore;
+      
+      // Show feedback
+      feedback.textContent = `Doğru! +${questionScore} puan`;
+      feedback.className = 'feedback-message feedback-correct';
+      
+      // Play sound
+      playSound('correct');
+      
+    } else {
+      wrongAnswers++;
+      
+      // Show feedback
+      feedback.textContent = 'Yanlış! Doğru cevap: ' + currentQuestion.answer;
+      feedback.className = 'feedback-message feedback-wrong';
+      
+      // Play sound
+      playSound('wrong');
+    }
+    
+    // Update UI
+    scoreDisplay.textContent = score;
+    correctDisplay.textContent = correctAnswers;
+    wrongDisplay.textContent = wrongAnswers;
+    
+    // Highlight correct/wrong answer
+    if (gameMode === 'arithmetic') {
+      const options = answerContainer.querySelectorAll('.answer-option');
+      
+      options.forEach(option => {
+        const value = parseInt(option.getAttribute('data-value'));
+        
+        if (value === currentQuestion.answer) {
+          option.classList.add('correct');
+        } else if (value === parseInt(userAnswer)) {
+          option.classList.add('wrong');
+        }
+        
+        // Disable options
+        option.disabled = true;
+      });
+    } else if (gameMode === 'comparison') {
+      const options = comparisonContainer.querySelectorAll('.comparison-option');
+      
+      options.forEach(option => {
+        const value = option.getAttribute('data-value');
+        
+        if (value === currentQuestion.answer) {
+          option.classList.add('correct');
+        } else if (value === userAnswer) {
+          option.classList.add('wrong');
+        }
+        
+        // Disable options
+        option.disabled = true;
+      });
+    }
+    
+    // Enable next question button
+    nextQuestionBtn.disabled = false;
+  }
+  
+  function startTimer() {
+    if (gameTimer) clearInterval(gameTimer);
+    
+    timeRemaining = timeLimit;
+    updateTimerDisplay();
+    
+    gameTimer = setInterval(() => {
+      if (isGamePaused) return;
+      
+      timeRemaining--;
+      updateTimerDisplay();
+      
+      // Update progress bar width
+      const progressWidth = (timeRemaining / timeLimit) * 100;
+      timeProgress.style.width = `${progressWidth}%`;
+      
+      // Change progress bar color as time runs out
+      if (timeRemaining <= timeLimit * 0.25) {
+        timeProgress.style.background = 'linear-gradient(to right, #e74c3c, #f39c12)';
+      }
+      
+      if (timeRemaining <= 0) {
+        clearInterval(gameTimer);
+        endGame();
+      }
+    }, 1000);
+  }
+  
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  function togglePause() {
+    if (isGamePaused) {
+      resumeGame();
+    } else {
+      pauseGame();
+    }
+  }
+  
+  function pauseGame() {
+    isGamePaused = true;
+    pauseModal.style.display = 'flex';
+    playSound('click');
+  }
+  
+  function resumeGame() {
+    isGamePaused = false;
+    pauseModal.style.display = 'none';
+    playSound('click');
+  }
+  
+  function endGame() {
+    // Stop game
+    isGameRunning = false;
+    if (gameTimer) clearInterval(gameTimer);
+    
+    // Calculate final stats
+    const totalQuestions = correctAnswers + wrongAnswers;
+    const accuracyPercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    const averageTime = questionTimes.length > 0 ? 
+                      (questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length).toFixed(1) : 
+                      0;
+    
+    // Update result screen
+    finalScore.textContent = score;
+    finalCorrect.textContent = correctAnswers;
+    finalWrong.textContent = wrongAnswers;
+    finalAccuracy.textContent = `${accuracyPercentage}%`;
+    avgTime.textContent = `${averageTime}s`;
+    
+    // Set performance meter
+    let performancePercentage;
+    if (totalQuestions === 0) {
+      performancePercentage = 0;
+      performanceValue.textContent = 'Yetersiz';
+    } else {
+      // Calculate performance based on score, accuracy and average time
+      performancePercentage = Math.min(100, Math.max(0, 
+        (score / (totalQuestions * 10 * difficulty) * 50) + // Score component
+        (accuracyPercentage * 0.3) + // Accuracy component
+        (Math.max(0, 10 - averageTime) * 2) // Time component
+      ));
+      
+      if (performancePercentage >= 90) {
+        performanceValue.textContent = 'Mükemmel!';
+      } else if (performancePercentage >= 75) {
+        performanceValue.textContent = 'Çok İyi';
+      } else if (performancePercentage >= 60) {
+        performanceValue.textContent = 'İyi';
+      } else if (performancePercentage >= 40) {
+        performanceValue.textContent = 'Orta';
+      } else {
+        performanceValue.textContent = 'Geliştirilmeli';
+      }
+    }
+    
+    performanceMeter.style.width = `${performancePercentage}%`;
+    
+    // Update player stats
+    updatePlayerStats();
+    
+    // Show result screen
+    gameScreen.style.display = 'none';
+    resultScreen.style.display = 'flex';
+    
+    // Play game over sound
+    playSound('gameOver');
+    
+    // Save score
+    saveScore();
+  }
+  
+  function saveScore() {
+    // Calculate stats for the game
+    const totalQuestions = correctAnswers + wrongAnswers;
+    const accuracyPercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    const averageTime = questionTimes.length > 0 ? 
+                      (questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length).toFixed(1) : 
+                      0;
+    
+    // Difficulty string for API
+    const difficultyString = difficulty === 1 ? 'easy' : 
+                           difficulty === 2 ? 'medium' : 
+                           'hard';
+    
+    // Game stats for detailed analytics
+    const gameStats = {
+      game_mode: gameMode,
+      difficulty: difficultyString,
+      total_questions: totalQuestions,
+      correct_answers: correctAnswers,
+      wrong_answers: wrongAnswers,
+      accuracy: accuracyPercentage,
+      average_time: parseFloat(averageTime),
+      question_times: questionTimes
+    };
+    
+    // Post score to backend
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_type: 'math_challenge',
+        score: score,
+        difficulty: difficultyString,
+        playtime: timeLimit - timeRemaining,
+        game_stats: gameStats
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Score saved:", data);
+    })
+    .catch(error => {
+      console.error("Error saving score:", error);
+    });
+  }
+  
+  function loadPlayerStats() {
+    // Default values
+    let stats = {
+      best_score: 0,
+      total_played: 0,
+      best_accuracy: 0,
+      best_time: 0
+    };
+    
+    // Try to load from local storage
+    if (localStorage.getItem('mathChallengeStats')) {
+      try {
+        stats = JSON.parse(localStorage.getItem('mathChallengeStats'));
+      } catch (e) {
+        console.error('Error loading stats from localStorage:', e);
+      }
+    }
+    
+    // Update UI
+    bestScore.textContent = stats.best_score;
+    totalPlayed.textContent = stats.total_played;
+    bestAccuracy.textContent = `${stats.best_accuracy}%`;
+    bestTime.textContent = stats.best_time > 0 ? `${stats.best_time}s` : '-';
+  }
+  
+  function updatePlayerStats() {
+    // Load current stats
+    let stats = {
+      best_score: 0,
+      total_played: 0,
+      best_accuracy: 0,
+      best_time: 0
+    };
+    
+    if (localStorage.getItem('mathChallengeStats')) {
+      try {
+        stats = JSON.parse(localStorage.getItem('mathChallengeStats'));
+      } catch (e) {
+        console.error('Error loading stats from localStorage:', e);
+      }
+    }
+    
+    // Calculate new stats
+    const totalQuestions = correctAnswers + wrongAnswers;
+    const accuracyPercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    const averageTime = questionTimes.length > 0 ? 
+                      (questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length).toFixed(1) : 
+                      0;
+    
+    // Update stats
+    stats.best_score = Math.max(stats.best_score, score);
+    stats.total_played++;
+    stats.best_accuracy = Math.max(stats.best_accuracy, accuracyPercentage);
+    
+    // Only update best time if we have an average and it's better (lower) than current best
+    // Or if current best is 0 (not set)
+    if (averageTime > 0 && (stats.best_time === 0 || parseFloat(averageTime) < stats.best_time)) {
+      stats.best_time = parseFloat(averageTime);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('mathChallengeStats', JSON.stringify(stats));
+    
+    // Update UI
+    bestScore.textContent = stats.best_score;
+    totalPlayed.textContent = stats.total_played;
+    bestAccuracy.textContent = `${stats.best_accuracy}%`;
+    bestTime.textContent = stats.best_time > 0 ? `${stats.best_time}s` : '-';
+  }
+  
+  function playSound(soundName) {
+    if (isSoundEnabled && sounds[soundName]) {
+      try {
+        sounds[soundName].currentTime = 0;
+        sounds[soundName].play();
+      } catch (error) {
+        console.log(`Sound play error (${soundName}):`, error);
+      }
+    }
+  }
+  
+  // Helper functions
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+  
+  function chooseWeighted(options, weights) {
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    const random = Math.random() * totalWeight;
+    let weightSum = 0;
+    
+    for (let i = 0; i < options.length; i++) {
+      weightSum += weights[i];
+      if (random < weightSum) {
+        return options[i];
+      }
+    }
+    
+    return options[options.length - 1];
+  }
+  
+  function copyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  }
+});
+</script>
 {% endblock %}
