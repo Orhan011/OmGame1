@@ -1310,13 +1310,14 @@ def reset_password():
     return render_template('reset_password.html', email=email, token=token)
 
 # Oyun zorluğuna göre puan ve XP çarpanı hesaplama fonksiyonu
-def calculate_multipliers(game_type, difficulty=None):
+def calculate_multipliers(game_type, difficulty=None, game_stats=None):
     """
-    Oyun türüne ve zorluğuna göre puan ve XP çarpanlarını hesaplar
+    Oyun türüne, zorluğuna ve oyun istatistiklerine göre puan ve XP çarpanlarını hesaplar
     
     Args:
         game_type (str): Oyun türü
         difficulty (str, optional): Zorluk seviyesi (easy, medium, hard)
+        game_stats (dict, optional): Oyun istatistikleri (süre, hamle sayısı, ipucu sayısı, vb.)
         
     Returns:
         dict: Puan ve XP çarpanları
@@ -1327,7 +1328,8 @@ def calculate_multipliers(game_type, difficulty=None):
         'score_multiplier': 0.5,  # Skor çarpanı
         'xp_base': 30,  # Temel XP
         'xp_score_multiplier': 0.1,  # Skor başına XP
-        'difficulty_multiplier': 1.0  # Zorluk çarpanı
+        'difficulty_multiplier': 1.0,  # Zorluk çarpanı
+        'final_score': None  # Hesaplanacak nihai skor
     }
     
     # Oyun türüne göre özel çarpanlar
@@ -1360,6 +1362,67 @@ def calculate_multipliers(game_type, difficulty=None):
         elif difficulty == 'expert':
             multipliers['difficulty_multiplier'] = 2.0
     
+    # Eğer oyun istatistikleri verildiyse, daha gerçekçi bir puan hesapla
+    if game_stats:
+        # Başlangıç puanı
+        base_score = 50
+        
+        # Oyun süresini puan hesaplamasına kat
+        duration_seconds = game_stats.get('duration_seconds', 0)
+        duration_minutes = duration_seconds / 60.0
+        
+        # Süreye bağlı puanlama (oyuna göre değişebilir)
+        duration_score = 0
+        if game_type in ['tetris', 'snake_game']:
+            # Bu oyunlarda uzun süre dayanmak iyidir
+            duration_score = min(30, int(duration_minutes * 5))
+        else:
+            # Bu oyunlarda hızlı bitirmek iyidir
+            optimal_duration = game_stats.get('optimal_duration', 3)  # Dakika cinsinden optimal süre
+            if duration_minutes <= optimal_duration:
+                duration_score = int(30 * (optimal_duration - duration_minutes) / optimal_duration)
+            else:
+                duration_score = max(0, int(30 * (1 - (duration_minutes - optimal_duration) / (optimal_duration * 2))))
+        
+        # Hamle sayısına bağlı puanlama
+        move_count = game_stats.get('move_count', 0)
+        move_score = 0
+        if move_count > 0:
+            # Oyun tipine göre optimal hamle sayısı değişir
+            optimal_moves = {
+                'memoryCards': 30,
+                'wordPuzzle': 25,
+                'puzzle_slider': 40,
+                'tetris': 100,
+                'chess': 40
+            }.get(game_type, 50)
+            
+            # Optimal hamlelerden daha fazla yapıldıysa puan düşer
+            if move_count <= optimal_moves:
+                move_score = 20
+            else:
+                move_score = max(0, int(20 * (1 - (move_count - optimal_moves) / optimal_moves)))
+        
+        # İpucu kullanımına bağlı puanlama
+        hint_count = game_stats.get('hint_count', 0)
+        hint_penalty = min(20, hint_count * 5)  # Her ipucu 5 puan düşürür, max 20 puan
+        
+        # Doğruluk oranına bağlı puanlama
+        accuracy = game_stats.get('accuracy', 0)  # 0-100 arası
+        accuracy_score = int(accuracy * 0.2)  # Max 20 puan
+        
+        # Brüt puanı hesapla
+        raw_score = base_score + duration_score + move_score + accuracy_score - hint_penalty
+        
+        # Zorluk seviyesi katsayısını uygula
+        adjusted_score = raw_score * multipliers['difficulty_multiplier']
+        
+        # Sınırları uygula (10-100 arası)
+        final_score = max(10, min(100, int(adjusted_score)))
+        
+        # Nihai puanı ayarla
+        multipliers['final_score'] = final_score
+    
     return multipliers
 
 # Günlük bonus kontrolü
@@ -1391,6 +1454,7 @@ def save_score():
     score = data.get('score')
     playtime = data.get('playtime', 60)  # Varsayılan oyun süresi 60 saniye
     difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk medium
+    game_stats = data.get('game_stats', {})  # Oyun istatistikleri
     
     if not game_type or not score:
         return jsonify({'success': False, 'message': 'Eksik veri!'})
@@ -1402,11 +1466,17 @@ def save_score():
         return jsonify({'success': False, 'message': 'Geçersiz skor veya süre!'})
     
     # Çarpanları hesapla 
-    multipliers = calculate_multipliers(game_type, difficulty)
+    multipliers = calculate_multipliers(game_type, difficulty, game_stats)
     
-    # Temel puanları hesapla
-    base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
-    score_points = score * multipliers['score_multiplier']
+    # Eğer nihai puan hesaplanmışsa onu kullan
+    if multipliers.get('final_score'):
+        final_score = multipliers['final_score']
+        score_points = final_score * 0.5  # Skor puanı hesaplaması için varsayılan çarpan
+        base_points = final_score * 0.5  # Temel puan hesaplaması için varsayılan çarpan
+    else:
+        # Eski hesaplama yöntemi (geriye dönük uyumluluk için)
+        base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
+        score_points = score * multipliers['score_multiplier']
     
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:

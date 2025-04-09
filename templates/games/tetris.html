@@ -841,6 +841,13 @@ document.addEventListener('DOMContentLoaded', function() {
   let dropInterval = 1000; // milliseconds
   let lastDropTime = 0;
   
+  // İstatistikler için oyun verileri
+  let totalMoves = 0;      // Toplam hamle sayısı
+  let hintCount = 0;       // İpucu kullanma sayısı (tetris'te yok)
+  let rotateCount = 0;     // Döndürme sayısı
+  let hardDropCount = 0;   // Sert düşürme sayısı
+  let accuracy = 100;      // Doğruluk yüzdesi (tetris'te varsayılan olarak 100)
+  
   let player = {
     matrix: null,
     pos: {x: 0, y: 0},
@@ -870,6 +877,13 @@ document.addEventListener('DOMContentLoaded', function() {
     lines = 0;
     dropInterval = 1000;
     gameOver = false;
+    
+    // Reset oyun istatistikleri
+    totalMoves = 0;
+    hintCount = 0;
+    rotateCount = 0;
+    hardDropCount = 0;
+    accuracy = 100;
     
     // Update UI
     scoreElement.textContent = score;
@@ -1170,6 +1184,16 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (level > 3) {
       difficulty = 'medium';
     }
+    
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      duration_seconds: playtime,
+      move_count: totalMoves,
+      hint_count: hintCount,
+      rotate_count: rotateCount,
+      hard_drop_count: hardDropCount,
+      accuracy: accuracy
+    };
 
     fetch('/api/save-score', {
       method: 'POST',
@@ -1180,7 +1204,8 @@ document.addEventListener('DOMContentLoaded', function() {
         game_type: 'tetris',
         score: score,
         playtime: playtime,
-        difficulty: difficulty
+        difficulty: difficulty,
+        game_stats: gameStats
       })
     })
     .then(response => response.json())
@@ -1319,19 +1344,28 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Check for line clears
       checkLines();
+    } else {
+      // Drop hareketi de bir hamledir
+      totalMoves++;
     }
   }
   
   // Hard drop piece
   function hardDrop() {
+    let dropDistance = 0;
     while (!checkCollision()) {
       player.pos.y++;
+      dropDistance++;
     }
     
     player.pos.y--;
     mergePiece();
     resetPlayer();
     getNextPiece();
+    
+    // İstatistikleri güncelle
+    hardDropCount++;
+    totalMoves++;
     
     // Check for line clears
     checkLines();
@@ -1343,6 +1377,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (checkCollision()) {
       player.pos.x -= dir;
+    } else {
+      // Hamle sayısını artır
+      totalMoves++;
     }
   }
   
@@ -1382,8 +1419,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (checkCollision()) {
           player.pos.x--;
           player.matrix = originalMatrix;
+        } else {
+          // Rotasyon başarılı olduysa
+          rotateCount++;
+          totalMoves++;
         }
+      } else {
+        // Rotasyon başarılı olduysa
+        rotateCount++;
+        totalMoves++;
       }
+    } else {
+      // Rotasyon başarılı olduysa
+      rotateCount++;
+      totalMoves++;
     }
   }
   
