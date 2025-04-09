@@ -116,7 +116,20 @@
                 </div>
               </div>
               
-              <button id="play-again" class="btn btn-primary btn-lg">
+              <!-- Misafir kullanıcı bilgilendirme -->
+              <div id="guest-info" class="guest-info" style="display: none;">
+                <p class="guest-message"><i class="fas fa-info-circle me-2"></i>Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
+                <div class="guest-buttons">
+                  <a href="{{ url_for('login') }}" class="btn btn-success">
+                    <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                  </a>
+                  <a href="{{ url_for('register') }}" class="btn btn-outline-info">
+                    <i class="fas fa-user-plus me-2"></i>Kaydol
+                  </a>
+                </div>
+              </div>
+              
+              <button id="play-again" class="btn btn-primary btn-lg mt-3">
                 <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
               </button>
               <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg mt-3">
@@ -429,6 +442,37 @@
     100% { transform: translateY(-30px); opacity: 0; }
   }
   
+  /* Misafir kullanıcı bilgilendirme */
+  .guest-info {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid rgba(106, 90, 224, 0.3);
+  }
+  
+  .guest-message {
+    color: #FFC107;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  
+  .guest-message-api {
+    color: #4CAF50;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+  
+  .guest-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
   /* Level up animation */
   .level-up-animation {
     position: absolute;
@@ -1120,11 +1164,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const xpGainElement = document.getElementById('xp-gain');
         const currentLevelElement = document.getElementById('current-level');
         const xpInfoElement = document.querySelector('.tetris-xp-info');
+        const guestInfoElement = document.getElementById('guest-info');
+        
+        // Misafir kullanıcı kontrolü
+        if (data.guest) {
+          // Misafir kullanıcı bilgilerini göster
+          if (guestInfoElement) {
+            guestInfoElement.style.display = 'block';
+          }
+        }
         
         if (xpGainElement && currentLevelElement && xpInfoElement) {
           // XP verilerini güncelle
           xpGainElement.textContent = data.xp.gain;
-          currentLevelElement.textContent = data.xp.level;
+          currentLevelElement.textContent = data.xp.level || 1;
           
           // Bonus puanlarını ve detayları göster
           const finalScoreContainer = document.querySelector('.tetris-final-score');
@@ -1163,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             finalScoreElement.textContent = data.points.total;
           }
           
-          // XP bilgilerini göster
+          // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
           xpInfoElement.style.display = 'block';
           
           // XP kazanımı animasyonu
@@ -1177,6 +1230,25 @@ document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
             currentLevelElement.classList.remove('score-update');
           }, 300);
+          
+          // Eğer API'den özel bir mesaj geldiyse göster
+          if (data.message && data.guest) {
+            const messageEl = document.createElement('div');
+            messageEl.className = 'guest-message-api mt-2';
+            messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
+            
+            // Önceki mesaj varsa kaldır
+            const oldMessage = document.querySelector('.guest-message-api');
+            if (oldMessage) {
+              oldMessage.remove();
+            }
+            
+            // Game over overlay'e ekle
+            const gameOverOverlay = document.getElementById('game-over-overlay');
+            if (gameOverOverlay) {
+              gameOverOverlay.appendChild(messageEl);
+            }
+          }
         }
       }
     })

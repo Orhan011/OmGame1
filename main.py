@@ -752,11 +752,16 @@ def simon_says():
     return render_template('games/simonSays.html')
 
 # Tetris Oyunu
+@app.route('/tetris')
+def tetris_redirect():
+    """Tetris oyununa yönlendirme"""
+    return redirect(url_for('tetris'))
+
 @app.route('/games/tetris')
 def tetris():
     """Tetris: Klasik blok puzzle oyunu
     Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
-    return render_template('games/tetris_modern.html')
+    return render_template('games/tetris.html')
 
 # Typing Speed Oyunu
 @app.route('/games/typing-speed')
@@ -1380,9 +1385,6 @@ def check_daily_bonus(user_id):
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-    
     data = request.get_json()
     
     game_type = data.get('game_type')
@@ -1399,107 +1401,150 @@ def save_score():
     except:
         return jsonify({'success': False, 'message': 'Geçersiz skor veya süre!'})
     
-    user_id = session['user_id']
-    user = User.query.get(user_id)
-    now = datetime.utcnow()
-    
-    # Çarpanları hesapla
+    # Çarpanları hesapla 
     multipliers = calculate_multipliers(game_type, difficulty)
     
     # Temel puanları hesapla
     base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
     score_points = score * multipliers['score_multiplier']
     
-    # Günlük bonus kontrolü
-    daily_bonus = 0
-    streak_bonus = 0
-    
-    if check_daily_bonus(user_id):
-        daily_bonus = 20  # Günlük ilk oyun bonusu
+    # Kullanıcı giriş yapmış mı kontrol et
+    if 'user_id' in session:
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        now = datetime.utcnow()
         
-        # Ardışık günlerde oynama bonusu (streak bonus)
-        last_play_date = user.last_active
-        if last_play_date and (now.date() - last_play_date.date()).days == 1:
-            # Kullanıcının streak_count'u yoksa 0 kabul eder
-            streak_count = getattr(user, 'streak_count', 0) + 1
+        # Günlük bonus kontrolü
+        daily_bonus = 0
+        streak_bonus = 0
+        
+        if check_daily_bonus(user_id):
+            daily_bonus = 20  # Günlük ilk oyun bonusu
             
-            # streak_count değeri yoksa ekle
-            if not hasattr(user, 'streak_count'):
-                user.streak_count = streak_count
-            else:
-                user.streak_count = streak_count
+            # Ardışık günlerde oynama bonusu (streak bonus)
+            last_play_date = user.last_active
+            if last_play_date and (now.date() - last_play_date.date()).days == 1:
+                # Kullanıcının streak_count'u yoksa 0 kabul eder
+                streak_count = getattr(user, 'streak_count', 0) + 1
                 
-            # Streak bonusu hesapla (her ardışık gün için artan bonus)
-            streak_bonus = min(streak_count * 5, 50)  # Maximum 50 bonus
-        else:
-            # Ardışık oynama bozulmuşsa sıfırla
-            if hasattr(user, 'streak_count'):
-                user.streak_count = 1
+                # streak_count değeri yoksa ekle
+                if not hasattr(user, 'streak_count'):
+                    user.streak_count = streak_count
+                else:
+                    user.streak_count = streak_count
+                    
+                # Streak bonusu hesapla (her ardışık gün için artan bonus)
+                streak_bonus = min(streak_count * 5, 50)  # Maximum 50 bonus
             else:
-                user.streak_count = 1
-    
-    # Toplam puanı hesapla
-    total_points = base_points + score_points + daily_bonus + streak_bonus
-    
-    # XP hesaplama
-    xp_base = multipliers['xp_base']
-    xp_from_score = score * multipliers['xp_score_multiplier']
-    xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
-    
-    xp_gain = int(xp_base + xp_from_score + xp_from_time)
-    
-    # Yeni skoru kaydet
-    new_score = Score(
-        user_id=user_id,
-        game_type=game_type,
-        score=score
-    )
-    
-    db.session.add(new_score)
-    
-    # Kullanıcı bilgilerini güncelle
-    user.experience_points += xp_gain
-    user.total_games_played += 1
-    user.last_active = now
-    
-    # Kullanıcının en yüksek skorunu güncelle (gerekirse)
-    if score > user.highest_score:
-        user.highest_score = score
-    
-    db.session.commit()
-    
-    # Yeni seviyeyi hesapla
-    new_level = calculate_level(user.experience_points)
-    next_level_xp = xp_for_level(new_level + 1)
-    current_level_xp = xp_for_level(new_level)
-    xp_progress = user.experience_points - current_level_xp
-    xp_needed = next_level_xp - current_level_xp
-    
-    # Ödül detayları
-    rewards = {
-        'base_points': int(base_points),
-        'score_points': int(score_points),
-        'daily_bonus': daily_bonus,
-        'streak_bonus': streak_bonus,
-        'difficulty_multiplier': multipliers['difficulty_multiplier']
-    }
-    
-    return jsonify({
-        'success': True, 
-        'message': 'Skor kaydedildi!',
-        'points': {
-            'total': int(total_points),
-            'rewards': rewards
-        },
-        'xp': {
-            'gain': xp_gain,
-            'total': user.experience_points,
-            'level': new_level,
-            'progress': xp_progress,
-            'needed': xp_needed,
-            'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
+                # Ardışık oynama bozulmuşsa sıfırla
+                if hasattr(user, 'streak_count'):
+                    user.streak_count = 1
+                else:
+                    user.streak_count = 1
+        
+        # Toplam puanı hesapla
+        total_points = base_points + score_points + daily_bonus + streak_bonus
+        
+        # XP hesaplama
+        xp_base = multipliers['xp_base']
+        xp_from_score = score * multipliers['xp_score_multiplier']
+        xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
+        
+        xp_gain = int(xp_base + xp_from_score + xp_from_time)
+        
+        # Yeni skoru kaydet
+        new_score = Score(
+            user_id=user_id,
+            game_type=game_type,
+            score=score
+        )
+        
+        db.session.add(new_score)
+        
+        # Kullanıcı bilgilerini güncelle
+        user.experience_points += xp_gain
+        user.total_games_played += 1
+        user.last_active = now
+        
+        # Kullanıcının en yüksek skorunu güncelle (gerekirse)
+        if score > user.highest_score:
+            user.highest_score = score
+        
+        db.session.commit()
+        
+        # Yeni seviyeyi hesapla
+        new_level = calculate_level(user.experience_points)
+        next_level_xp = xp_for_level(new_level + 1)
+        current_level_xp = xp_for_level(new_level)
+        xp_progress = user.experience_points - current_level_xp
+        xp_needed = next_level_xp - current_level_xp
+        
+        # Ödül detayları
+        rewards = {
+            'base_points': int(base_points),
+            'score_points': int(score_points),
+            'daily_bonus': daily_bonus,
+            'streak_bonus': streak_bonus,
+            'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
-    })
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Skor kaydedildi!',
+            'points': {
+                'total': int(total_points),
+                'rewards': rewards
+            },
+            'xp': {
+                'gain': xp_gain,
+                'total': user.experience_points,
+                'level': new_level,
+                'progress': xp_progress,
+                'needed': xp_needed,
+                'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
+            }
+        })
+    else:
+        # Kullanıcı giriş yapmamış, misafir olarak kaydedelim
+        # Basit puan hesaplaması
+        total_points = base_points + score_points
+        
+        # Ödül detayları
+        rewards = {
+            'base_points': int(base_points),
+            'score_points': int(score_points),
+            'daily_bonus': 0,
+            'streak_bonus': 0,
+            'difficulty_multiplier': multipliers['difficulty_multiplier']
+        }
+        
+        # Yeni seviyeyi varsayalım
+        new_level = 1
+        
+        # Varsayılan XP bilgileri
+        xp_base = multipliers['xp_base']
+        xp_from_score = score * multipliers['xp_score_multiplier']
+        xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
+        
+        xp_gain = int(xp_base + xp_from_score + xp_from_time)
+        
+        # Misafir kullanıcılara bilgi mesajı ekleyelim
+        guest_message = "Skorunuz kaydedildi, ancak profilinize işlenmedi. Tam puan ve XP almak için giriş yapın!"
+        
+        return jsonify({
+            'success': True, 
+            'message': guest_message,
+            'guest': True,  # Misafir kullanıcı olduğunu belirt
+            'points': {
+                'total': int(total_points),
+                'rewards': rewards
+            },
+            'xp': {
+                'gain': xp_gain,
+                'level': new_level,
+                'progress_percent': 0
+            }
+        })
 
 # Mevcut Kullanıcı API'si
 @app.route('/api/current-user')
