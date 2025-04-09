@@ -1468,36 +1468,38 @@ def save_score():
     # Çarpanları hesapla 
     multipliers = calculate_multipliers(game_type, difficulty, game_stats)
     
-    # Hem eski hem de yeni puanlama sistemini kullan
-    # Eski hesaplama yöntemi
-    old_base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
-    old_score_points = score * multipliers['score_multiplier']
-    old_total_points = old_base_points + old_score_points
-    
-    # Yeni hesaplama yöntemi (eğer kullanılabilirse)
+    # Artık sadece yeni puanlama sistemini kullanıyoruz
+    # Performansa dayalı puanlama
     if multipliers.get('final_score'):
         # Yeni puanlama sisteminden gelen nihai puan
         final_score = multipliers['final_score']
-        new_base_points = final_score * 0.5
-        new_score_points = final_score * 0.5
-        new_total_points = final_score
+        base_points = final_score * 0.5
+        score_points = final_score * 0.5
+        total_points = final_score
         
-        # Hem eski hem de yeni puanları sakla
-        multipliers['old_score'] = int(old_total_points)
-        multipliers['new_score'] = int(new_total_points)
-        
-        # Puanlamaların ortalamasını al veya daha yüksek olanı seç
-        # Burada yeni puanlama sistemini tercih ediyoruz
-        base_points = new_base_points
-        score_points = new_score_points
+        # Puan bilgisini multipliers'a ekle
+        multipliers['total_score'] = int(total_points)
     else:
-        # Eski hesaplama yöntemi (geriye dönük uyumluluk için)
-        base_points = old_base_points
-        score_points = old_score_points
+        # Eğer yeni sistem için gerekli veriler yoksa, basit bir hesaplama yap
+        # Ama rastgele değil, daha belirleyici bir formül kullan
         
-        # Eski puanı sakla
-        multipliers['old_score'] = int(old_total_points)
-        multipliers['new_score'] = None
+        # Zorluk seviyesine dayalı taban puan
+        base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
+        
+        # Oyun skoruna dayalı ek puan (bu gerçek oyun performansını yansıtır)
+        score_points = score * multipliers['score_multiplier']
+        
+        # Oyun süresine dayalı ek puan
+        playtime_minutes = playtime / 60.0
+        duration_points = min(20, int(playtime_minutes * 2))  # En fazla 20 puan
+        
+        # Toplam puanı hesapla
+        total_points = base_points + score_points + duration_points
+        
+        # Sınırları uygula (10-100 arası)
+        total_points = max(10, min(100, int(total_points)))
+        
+        multipliers['total_score'] = int(total_points)
     
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:
@@ -1594,7 +1596,11 @@ def save_score():
                 'needed': xp_needed,
                 'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
             },
-            'multipliers': multipliers  # Multipliers bilgisini de gönder (old_score ve new_score bilgilerini içerir)
+            'score_info': {
+                'total_score': multipliers.get('total_score', int(total_points)),
+                'difficulty': difficulty,
+                'game_type': game_type
+            }
         })
     else:
         # Kullanıcı giriş yapmamış - skorunu kaydetmiyoruz
@@ -1632,7 +1638,11 @@ def save_score():
                 'level': 1,
                 'progress_percent': 0
             },
-            'multipliers': multipliers  # Multipliers bilgisini misafir kullanıcılar için de gönder
+            'score_info': {
+                'total_score': multipliers.get('total_score', int(total_points)),
+                'difficulty': difficulty,
+                'game_type': game_type
+            }
         })
 
 # Mevcut Kullanıcı API'si
