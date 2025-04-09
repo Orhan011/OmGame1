@@ -4,146 +4,151 @@
 {% block title %}Matematik Mücadelesi - OmGame{% endblock %}
 
 {% block content %}
-<div class="page-container">
-  <div class="game-container">
-    <div class="game-header">
-      <h1>Matematik Mücadelesi <span class="badge">Sayısal Beceri</span></h1>
-      <p class="game-description">Hızlı düşünme ve matematiksel becerilerinizi test edin.</p>
+<div class="game-container">
+  <div class="game-header">
+    <h1>Matematik Mücadelesi <span class="badge">Sayısal Beceri</span></h1>
+    <p class="game-description">Hızlı düşünme ve matematiksel becerilerinizi test edin.</p>
+  </div>
+
+  <div class="math-container">
+    <div id="start-screen" class="math-screen">
+      <h2>Matematik Mücadelesine Hoş Geldiniz!</h2>
+      <p>Verilen süre içinde matematik problemlerini çözmeye çalışın.</p>
+      
+      <div class="game-options">
+        <div class="option-section">
+          <h3>Zorluk Seviyesi</h3>
+          <div class="button-group">
+            <button class="option-button active" data-difficulty="easy">Kolay</button>
+            <button class="option-button" data-difficulty="medium">Orta</button>
+            <button class="option-button" data-difficulty="hard">Zor</button>
+          </div>
+        </div>
+        
+        <div class="option-section">
+          <h3>Süre</h3>
+          <div class="button-group">
+            <button class="option-button" data-time="30">30 Saniye</button>
+            <button class="option-button active" data-time="60">60 Saniye</button>
+            <button class="option-button" data-time="120">2 Dakika</button>
+          </div>
+        </div>
+        
+        <div class="option-section">
+          <h3>İşlem Türleri</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" checked data-operation="addition"> Toplama
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" checked data-operation="subtraction"> Çıkarma
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" checked data-operation="multiplication"> Çarpma
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" data-operation="division"> Bölme
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <button id="start-game" class="btn btn-primary btn-lg">
+        <i class="fas fa-play me-2"></i>Oyuna Başla
+      </button>
     </div>
 
-    <div class="math-container">
-      <div id="start-screen" class="math-screen">
-        <h2>Matematik Mücadelesine Hoş Geldiniz!</h2>
-        <p>Verilen süre içinde matematik problemlerini çözmeye çalışın.</p>
-        
-        <div class="game-options">
-          <div class="option-section">
-            <h3>Zorluk Seviyesi</h3>
-            <div class="button-group">
-              <button class="option-button active" data-difficulty="easy">Kolay</button>
-              <button class="option-button" data-difficulty="medium">Orta</button>
-              <button class="option-button" data-difficulty="hard">Zor</button>
-            </div>
-          </div>
-          
-          <div class="option-section">
-            <h3>Süre</h3>
-            <div class="button-group">
-              <button class="option-button" data-time="30">30 Saniye</button>
-              <button class="option-button active" data-time="60">60 Saniye</button>
-              <button class="option-button" data-time="120">2 Dakika</button>
-            </div>
-          </div>
-          
-          <div class="option-section">
-            <h3>İşlem Türleri</h3>
-            <div class="checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="addition"> Toplama
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="subtraction"> Çıkarma
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" checked data-operation="multiplication"> Çarpma
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" data-operation="division"> Bölme
-              </label>
-            </div>
-          </div>
+    <div id="game-screen" class="math-screen" style="display: none;">
+      <div class="game-hud">
+        <div class="hud-item">
+          <span class="hud-label">Skor</span>
+          <span class="hud-value" id="score">0</span>
         </div>
-        
-        <button id="start-game" class="btn btn-primary btn-lg">
-          <i class="fas fa-play me-2"></i>Oyuna Başla
-        </button>
+        <div class="hud-item hud-timer">
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="timer-bar"></div>
+          </div>
+          <span class="hud-value" id="timer">60</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Doğru</span>
+          <span class="hud-value" id="correct">0</span>
+        </div>
       </div>
 
-      <div id="game-screen" class="math-screen" style="display: none;">
-        <div class="game-hud">
-          <div class="hud-item">
-            <span class="hud-label">Skor</span>
-            <span class="hud-value" id="score">0</span>
-          </div>
-          <div class="hud-item hud-timer">
-            <div class="progress-bar-container">
-              <div class="progress-bar" id="timer-bar"></div>
-            </div>
-            <span class="hud-value" id="timer">60</span>
-          </div>
-          <div class="hud-item">
-            <span class="hud-label">Doğru</span>
-            <span class="hud-value" id="correct">0</span>
-          </div>
-        </div>
+      <div class="math-problem">
+        <div id="problem-text">5 + 3 = ?</div>
+      </div>
 
-        <div class="math-problem">
-          <div id="problem-text">5 + 3 = ?</div>
-        </div>
-
+      <div class="answer-controls">
         <div class="answer-input">
           <input type="number" id="answer-input" placeholder="Cevabınız" inputmode="numeric" pattern="[0-9]*">
           <button id="submit-answer" class="btn btn-primary">
             <i class="fas fa-check me-2"></i>Kontrol Et
           </button>
         </div>
-
-        <div id="feedback" class="feedback"></div>
       </div>
 
-      <div id="result-screen" class="math-screen" style="display: none;">
-        <h2>Oyun Bitti!</h2>
-        <div class="result-stats">
-          <div class="result-stat">
-            <div class="result-value" id="final-score">0</div>
-            <div class="result-label">Toplam Puan</div>
-          </div>
-          <div class="result-stat">
-            <div class="result-value" id="final-correct">0</div>
-            <div class="result-label">Doğru Cevap</div>
-          </div>
-          <div class="result-stat">
-            <div class="result-value" id="final-incorrect">0</div>
-            <div class="result-label">Yanlış Cevap</div>
-          </div>
+      <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="result-screen" class="math-screen" style="display: none;">
+      <h2>Oyun Bitti!</h2>
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-value" id="final-score">0</div>
+          <div class="result-label">Toplam Puan</div>
         </div>
-        
-        <div class="result-details">
-          <div class="detail-item">
-            <span class="detail-label">Doğruluk Oranı:</span>
-            <span class="detail-value" id="accuracy">0%</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Ortalama Yanıt Süresi:</span>
-            <span class="detail-value" id="avg-time">0 saniye</span>
-          </div>
+        <div class="result-stat">
+          <div class="result-value" id="final-correct">0</div>
+          <div class="result-label">Doğru Cevap</div>
         </div>
-        
-        <div class="result-actions">
-          <button id="play-again" class="btn btn-primary btn-lg">
-            <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
-          </button>
-          <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
-            <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
-          </a>
+        <div class="result-stat">
+          <div class="result-value" id="final-incorrect">0</div>
+          <div class="result-label">Yanlış Cevap</div>
         </div>
+      </div>
+      
+      <div class="result-details">
+        <div class="detail-item">
+          <span class="detail-label">Doğruluk Oranı:</span>
+          <span class="detail-value" id="accuracy">0%</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Ortalama Yanıt Süresi:</span>
+          <span class="detail-value" id="avg-time">0 saniye</span>
+        </div>
+      </div>
+      
+      <div class="result-actions">
+        <button id="play-again" class="btn btn-primary">
+          <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
+        </button>
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-light">
+          <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
+        </a>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .math-container {
-    max-width: 100%;
+  .game-container {
+    max-width: 800px;
     margin: 0 auto;
-    padding: 0 10px;
+    padding: 20px;
+  }
+
+  .math-container {
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .math-screen {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
@@ -152,13 +157,13 @@
 
   .math-screen h2 {
     color: var(--accent-color);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-size: 1.8rem;
   }
 
   .math-screen p {
     color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-size: 1rem;
   }
 
@@ -167,7 +172,7 @@
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
     padding: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     text-align: left;
   }
 
@@ -232,7 +237,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   .hud-item {
@@ -243,24 +248,24 @@
     display: block;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 
   .hud-value {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--accent-color);
   }
 
   .hud-timer {
     flex: 1;
-    margin: 0 20px;
+    margin: 0 15px;
   }
 
   .progress-bar-container {
-    height: 10px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
     margin-bottom: 5px;
   }
@@ -276,26 +281,30 @@
   .math-problem {
     background: rgba(40, 40, 80, 0.5);
     border-radius: 10px;
-    padding: 30px;
-    margin-bottom: 30px;
+    padding: 25px;
+    margin-bottom: 20px;
   }
 
   #problem-text {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: white;
   }
 
-  /* Answer Input */
+  /* Answer Controls */
+  .answer-controls {
+    margin-bottom: 15px;
+  }
+
   .answer-input {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   #answer-input {
     flex: 1;
-    padding: 12px 15px;
+    padding: 10px 15px;
     background: rgba(30, 30, 60, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
@@ -329,7 +338,7 @@
   .result-stats {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 15px;
   }
@@ -337,19 +346,19 @@
   .result-stat {
     background: rgba(40, 40, 80, 0.5);
     border-radius: 10px;
-    padding: 20px;
-    min-width: 150px;
+    padding: 15px;
+    min-width: 120px;
   }
 
   .result-value {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--accent-color);
     margin-bottom: 5px;
   }
 
   .result-label {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
   }
 
@@ -357,13 +366,13 @@
     background: rgba(40, 40, 80, 0.5);
     border-radius: 10px;
     padding: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   .detail-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -382,43 +391,33 @@
 
   .result-actions {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     gap: 10px;
-    max-width: 300px;
-    margin: 0 auto;
   }
 
   /* Responsive Design */
   @media (max-width: 768px) {
     .math-screen {
-      padding: 20px;
-    }
-
-    .game-options {
-      padding: 15px;
+      padding: 20px 15px;
     }
 
     #problem-text {
-      font-size: 2rem;
-    }
-
-    .result-stats {
-      gap: 10px;
+      font-size: 1.8rem;
     }
 
     .result-stat {
-      padding: 15px;
-      min-width: 120px;
+      padding: 12px;
+      min-width: 100px;
     }
 
     .result-value {
-      font-size: 2rem;
+      font-size: 1.6rem;
     }
   }
 
   @media (max-width: 480px) {
     .math-screen {
-      padding: 15px;
+      padding: 15px 10px;
     }
 
     .option-section h3 {
@@ -435,24 +434,19 @@
     }
 
     #problem-text {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
 
     .answer-input {
       flex-direction: column;
     }
-
-    #answer-input {
-      padding: 10px;
-      font-size: 1.1rem;
+    
+    .hud-value {
+      font-size: 1.2rem;
     }
-
-    .result-value {
-      font-size: 1.7rem;
-    }
-
-    .result-label {
-      font-size: 0.9rem;
+    
+    .result-actions {
+      flex-direction: column;
     }
   }
 </style>
