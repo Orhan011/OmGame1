@@ -15,8 +15,6 @@ class ModernMergePuzzle {
         this.nextBlockValue = null;
         this.soundEnabled = localStorage.getItem('soundEnabled') === 'false' ? false : true;
         this.themeMode = localStorage.getItem('themeMode') || 'light';
-        this.gameStartTime = Date.now(); // Oyun başlangıç zamanını kaydet
-        this.maxValueReached = 2; // En yüksek değer takibi
 
         // Ses efektleri
         this.sounds = {};
@@ -649,9 +647,6 @@ class ModernMergePuzzle {
             // Taşın değerini güncelle
             targetBlock.dataset.value = newValue;
             targetBlock.textContent = newValue;
-            
-            // Maksimum değeri güncelle (puan hesaplaması için kullanılacak)
-            this.maxValueReached = Math.max(this.maxValueReached, newValue);
 
             // Parçacık efekti oluştur (merging taşların etrafında)
             this.createParticleEffect(targetBlock);
@@ -1042,11 +1037,6 @@ class ModernMergePuzzle {
         this.score = 0;
         this.level = 1;
         localStorage.setItem('level', this.level);
-        
-        // Reset max value tracker for difficulty calculation
-        this.maxValueReached = 2;
-        // Reset game time for scoring
-        this.gameStartTime = Date.now();
 
         this.gameOver = false;
         this.won = false;
@@ -1070,47 +1060,28 @@ class ModernMergePuzzle {
         }
         
         console.log(`Skor gönderiliyor: ${this.score}`);
-
-        // Oyun istatistiklerini topla
-        const gameTime = Math.floor((Date.now() - this.gameStartTime) / 1000);
-        const gameStats = {
-            duration_seconds: gameTime || 60,
-            move_count: this.moveHistory.length,
-            max_value: this.maxValueReached || 2048,
-            columns_filled: this.columns.filter(col => col.length > 0).length
-        };
         
-        // Zorluk seviyesini belirle
-        let difficulty = 'medium';
-        if (this.maxValueReached >= 1024) {
-            difficulty = 'hard';
-        } else if (this.maxValueReached <= 128) {
-            difficulty = 'easy';
-        }
-
-        // Skor görüntüleme için callback fonksiyonu
-        const updateScoreDisplay = (scoreHtml, data) => {
-            // Game over container'daki score container'a yeni skoru yükle
-            const scoreContainer = document.getElementById('game-score-container');
-            if (scoreContainer) {
-                // Eski görüntüyü gizle
-                const oldScoreDisplay = document.querySelector('.old-score-display');
-                if (oldScoreDisplay) {
-                    oldScoreDisplay.style.display = 'none';
-                }
-                
-                // Yeni skoru göster
-                scoreContainer.innerHTML = scoreHtml;
+        // Backend'e skoru gönder
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                game_type: '2048_game', // API endpoint'imiz game_type parametresi bekliyor
+                score: this.score
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP hata! Durum: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Skor başarıyla kaydedildi:', data);
             
-            // Ayrıca kazanma ekranı için de
-            const winScoreContainer = document.getElementById('game-win-score-container');
-            if (winScoreContainer && this.won) {
-                winScoreContainer.innerHTML = scoreHtml;
-            }
-            
-            // Başarı bildirimi kontrolü
-            if (data && data.success && data.achievement) {
+            if (data.success && data.achievement) {
                 // Başarı bildirimi göster
                 const notification = document.createElement('div');
                 notification.className = 'level-notification';
@@ -1127,29 +1098,26 @@ class ModernMergePuzzle {
                     }, 2000);
                 }, 100);
             }
-        };
-        
-        // Skoru ortak fonksiyon ile kaydet ve göster
-        saveScoreAndDisplay('2048', this.score, gameStats.duration_seconds, difficulty, gameStats, updateScoreDisplay);
-    }
-
-    // Hata mesajı gösterme
-    showErrorNotification(message) {
-        const errorNotification = document.createElement('div');
-        errorNotification.className = 'level-notification';
-        errorNotification.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(200, 0, 0, 0.9))';
-        errorNotification.textContent = message || '❌ Skor kaydedilemedi';
-        document.body.appendChild(errorNotification);
-        
-        setTimeout(() => {
-            errorNotification.classList.add('show');
+        })
+        .catch(error => {
+            console.error('Skor gönderme hatası:', error);
+            // Hata bilgisini daha detaylı göster
+            const errorNotification = document.createElement('div');
+            errorNotification.className = 'level-notification';
+            errorNotification.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(200, 0, 0, 0.9))';
+            errorNotification.textContent = `❌ Skor kaydedilemedi`;
+            document.body.appendChild(errorNotification);
+            
             setTimeout(() => {
-                errorNotification.classList.remove('show');
+                errorNotification.classList.add('show');
                 setTimeout(() => {
-                    errorNotification.remove();
-                }, 500);
-            }, 2000);
-        }, 100);
+                    errorNotification.classList.remove('show');
+                    setTimeout(() => {
+                        errorNotification.remove();
+                    }, 500);
+                }, 2000);
+            }, 100);
+        });
     }
 
     undoMove() {
