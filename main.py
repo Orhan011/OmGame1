@@ -709,21 +709,7 @@ def n_back():
 
 # Sudoku Oyunu kaldırıldı
 
-# Tower Defense Oyunu
-@app.route('/tower_defense')
-@app.route('/games/tower-defense')
-def tower_defense():
-    """Tower Defense: Strateji oyunu
-    Kuleleri stratejik noktalara yerleştirerek düşman dalgalarını durdurun."""
-    return render_template('games/tower_defense.html')
-
-# Space Shooter Oyunu
-@app.route('/games/space-shooter')
-@app.route('/space_shooter')
-def space_shooter():
-    """Space Shooter: Uzay savaş oyunu
-    Uzay gemisiyle düşman gemilerine ve asteroitlere karşı savaşın."""
-    return render_template('games/space_shooter.html')
+# Tower Defense ve Space Shooter oyunları kaldırıldı
 
 # 2048 Oyunu
 @app.route('/2048')
