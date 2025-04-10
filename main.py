@@ -792,7 +792,7 @@ def login_required(f):
             flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
             return redirect(url_for('login', redirect=request.url))
         return f(*args, **kwargs)
-    return login_required
+    return decorated_function
 
 # Mayın Tarlası Oyunu
 @app.route('/games/minesweeper')
