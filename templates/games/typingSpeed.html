@@ -1,4 +1,3 @@
-
 {% extends 'layout.html' %}
 
 {% block title %}Yazma Hızı Testi - ZekaPark{% endblock %}
@@ -16,7 +15,7 @@
       <div class="intro-content">
         <h2>Yazma Becerinizi Test Edin</h2>
         <p>Metni olabildiğince hızlı ve doğru yazarak becerilerinizi geliştirin.</p>
-        
+
         <div class="test-settings">
           <div class="setting-group">
             <h3>Süre Seçin:</h3>
@@ -26,7 +25,7 @@
               <button class="time-option" data-time="120">2 dakika</button>
             </div>
           </div>
-          
+
           <div class="setting-group">
             <h3>Zorluk Seçin:</h3>
             <div class="difficulty-options">
@@ -36,7 +35,7 @@
             </div>
           </div>
         </div>
-        
+
         <button id="start-btn" class="typing-btn primary-btn">
           <i class="fas fa-keyboard"></i> Teste Başla
         </button>
@@ -46,22 +45,24 @@
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="typing-section">
       <div class="game-stats">
-        <div class="stat-item">
-          <div class="stat-label">Süre</div>
-          <div class="stat-value" id="timer">60</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">KDK</div>
-          <div class="stat-value" id="wpm">0</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Doğruluk</div>
-          <div class="stat-value" id="accuracy">100%</div>
+        <div class="stats-squares">
+          <div class="stats-square">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="timer">60</div>
+          </div>
+          <div class="stats-square">
+            <div class="stat-label">Yanlış Harf</div>
+            <div class="stat-value" id="error-count">0</div>
+          </div>
+          <div class="stats-square">
+            <div class="stat-label">Doğruluk</div>
+            <div class="stat-value" id="accuracy">100%</div>
+          </div>
         </div>
       </div>
 
       <div id="text-display" class="text-display"></div>
-      
+
       <div class="input-container">
         <input type="text" id="typing-input" class="typing-input" placeholder="Yazmaya başlamak için tıklayın..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
@@ -80,7 +81,7 @@
     <div id="result-screen" class="typing-section">
       <div class="result-content">
         <h2><i class="fas fa-trophy"></i> Sonuçlarınız</h2>
-        
+
         <div class="result-summary">
           <div class="result-item primary">
             <div class="result-value" id="result-wpm">0</div>
@@ -91,7 +92,7 @@
             <div class="result-label">Doğruluk</div>
           </div>
         </div>
-        
+
         <div class="result-details">
           <div class="detail-row">
             <div class="detail-label">Toplam Karakter:</div>
@@ -110,7 +111,7 @@
             <div class="detail-value" id="result-time">0</div>
           </div>
         </div>
-        
+
         <div class="result-actions">
           <button id="try-again-btn" class="typing-btn primary-btn">
             <i class="fas fa-redo-alt"></i> Tekrar Dene
@@ -235,28 +236,44 @@
   margin-bottom: 20px;
 }
 
-.stat-item {
-  flex: 1;
-  text-align: center;
-  padding: 15px 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
+.stats-squares {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
 
-.stat-item:last-child {
-  border-right: none;
-}
+  .stats-square {
+    background: rgba(30, 30, 60, 0.7);
+    border-radius: 10px;
+    padding: 12px 15px;
+    width: 110px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
 
-.stat-label {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 5px;
-}
+  .stats-square:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-color: rgba(106, 90, 224, 0.3);
+  }
 
-.stat-value {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--accent-color);
-}
+  .stats-square .stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+
+  .stats-square .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+  }
+
 
 .text-display {
   background: rgba(30, 30, 60, 0.5);
@@ -443,48 +460,59 @@
   .typing-game-header h1 {
     font-size: 1.8rem;
   }
-  
+
   .typing-wrapper {
     padding: 15px;
   }
-  
+
   .text-display {
     font-size: 1rem;
     padding: 15px;
     min-height: 120px;
   }
-  
+
   .typing-input {
     padding: 12px;
     font-size: 1rem;
   }
-  
+
   .typing-btn {
     padding: 10px 20px;
     font-size: 0.95rem;
   }
-  
+
   .result-summary {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .result-item {
     min-width: auto;
     width: 100%;
   }
-  
+
   .game-controls, .result-actions {
     flex-direction: column;
   }
-  
-  .stat-value {
-    font-size: 1.1rem;
-  }
-  
-  .stat-label {
-    font-size: 0.75rem;
-  }
+
+  .stats-squares {
+      flex-direction: row;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .stats-square {
+      padding: 8px 10px;
+      width: 90px;
+    }
+
+    .stats-square .stat-label {
+      font-size: 0.7rem;
+    }
+
+    .stats-square .stat-value {
+      font-size: 1.2rem;
+    }
 }
 </style>
 
@@ -494,21 +522,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const introScreen = document.getElementById('intro-screen');
   const gameScreen = document.getElementById('game-screen');
   const resultScreen = document.getElementById('result-screen');
-  
+
   const startBtn = document.getElementById('start-btn');
   const restartBtn = document.getElementById('restart-btn');
   const tryAgainBtn = document.getElementById('try-again-btn');
-  
+
   const timeOptions = document.querySelectorAll('.time-option');
   const difficultyOptions = document.querySelectorAll('.difficulty-option');
-  
+
   const textDisplay = document.getElementById('text-display');
   const typingInput = document.getElementById('typing-input');
-  
+
   const timerElement = document.getElementById('timer');
   const wpmElement = document.getElementById('wpm');
   const accuracyElement = document.getElementById('accuracy');
-  
+  const errorCountElement = document.getElementById('error-count'); // Added error count element
+
   const resultWpm = document.getElementById('result-wpm');
   const resultAccuracy = document.getElementById('result-accuracy');
   const resultChars = document.getElementById('result-chars');
@@ -538,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Test Ayarları
   let timeLimit = 60; // varsayılan süre
   let difficulty = 'medium'; // varsayılan zorluk
-  
+
   // Test Durumu
   let timer;
   let timeLeft;
@@ -588,11 +617,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function initTest() {
     // Durumu sıfırla
     resetTest();
-    
+
     // Zorluk seviyesine göre rastgele metin seç
     const randomIndex = Math.floor(Math.random() * textCorpus[difficulty].length);
     currentText = textCorpus[difficulty][randomIndex];
-    
+
     // Metni karakterlere ayrıştır ve ekranda göster
     textDisplay.innerHTML = '';
     currentText.split('').forEach(char => {
@@ -601,21 +630,22 @@ document.addEventListener('DOMContentLoaded', function() {
       charSpan.className = 'char';
       textDisplay.appendChild(charSpan);
     });
-    
+
     // İlk karakteri aktif olarak işaretle
     const firstChar = textDisplay.querySelector('.char');
     if (firstChar) {
       firstChar.classList.add('active');
     }
-    
+
     // Timer'ı ayarla
     timeLeft = timeLimit;
     timerElement.textContent = timeLeft;
-    
+    errorCountElement.textContent = 0; // Initialize error count
+
     // Girdi alanını temizle ve odakla
     typingInput.value = '';
     typingInput.focus();
-    
+
     // Başlangıç zamanını kaydet
     startTime = new Date().getTime();
   }
@@ -630,6 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
     errorCount = 0;
     wpmElement.textContent = '0';
     accuracyElement.textContent = '100%';
+    errorCountElement.textContent = '0'; // Reset error count
   }
 
   // Ekran gösterme
@@ -637,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
     introScreen.classList.remove('active');
     gameScreen.classList.remove('active');
     resultScreen.classList.remove('active');
-    
+
     screen.classList.add('active');
   }
 
@@ -649,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (timeLeft > 0) {
           timeLeft--;
           timerElement.textContent = timeLeft;
-          
+
           // Son 10 saniye uyarısı
           if (timeLeft <= 10) {
             timerElement.style.color = '#ff4757';
@@ -665,44 +696,45 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateStats() {
     // Geçen süre (dakika)
     const elapsedTime = (timeLimit - timeLeft) / 60;
-    
+
     // WPM hesapla (1 kelime = 5 karakter)
     if (elapsedTime > 0) {
       const wpm = Math.round((correctTyped / 5) / elapsedTime);
       wpmElement.textContent = wpm;
     }
-    
+
     // Doğruluk oranı
     if (totalTyped > 0) {
       const accuracy = Math.floor((correctTyped / totalTyped) * 100);
       accuracyElement.textContent = `${accuracy}%`;
     }
+    errorCountElement.textContent = errorCount; // Update error count
   }
 
   // Testi bitir
   function endTest() {
     clearInterval(timer);
     isTestActive = false;
-    
+
     // Sonuçları hesapla
     const elapsedTime = (timeLimit - timeLeft) / 60; // dakika
     const wpm = Math.round((correctTyped / 5) / elapsedTime);
     const accuracy = totalTyped > 0 ? Math.floor((correctTyped / totalTyped) * 100) : 100;
-    
+
     // Sonuç ekranını güncelle
     resultWpm.textContent = wpm;
     resultAccuracy.textContent = `${accuracy}%`;
     resultChars.textContent = totalTyped;
     resultCorrect.textContent = correctTyped;
     resultErrors.textContent = errorCount;
-    
+
     // Kullanılan süreyi biçimlendir
     const timeUsed = formatTime(timeLimit - timeLeft);
     resultTime.textContent = timeUsed;
-    
+
     // Skoru kaydet
     saveScore(wpm);
-    
+
     // Sonuç ekranını göster
     showScreen(resultScreen);
   }
@@ -736,16 +768,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!isTestActive) {
       startTimer();
     }
-    
+
     const typedChar = typingInput.value;
     typingInput.value = ''; // Her karakter girişinden sonra input'u temizle
-    
+
     if (currentCharIndex < currentText.length) {
       totalTyped++;
-      
+
       const chars = textDisplay.querySelectorAll('.char');
       const currentChar = chars[currentCharIndex];
-      
+
       // Doğru karakteri yazıp yazmadığını kontrol et
       if (typedChar === currentText[currentCharIndex]) {
         currentChar.classList.add('correct');
@@ -754,10 +786,10 @@ document.addEventListener('DOMContentLoaded', function() {
         currentChar.classList.add('incorrect');
         errorCount++;
       }
-      
+
       // Sonraki karaktere geç
       currentCharIndex++;
-      
+
       // Aktif karakteri güncelle
       if (currentCharIndex < currentText.length) {
         chars.forEach(char => char.classList.remove('active'));
@@ -767,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initTest();
         return;
       }
-      
+
       // İstatistikleri güncelle
       updateStats();
     }
@@ -777,16 +809,16 @@ document.addEventListener('DOMContentLoaded', function() {
   typingInput.addEventListener('focus', () => {
     typingInput.classList.add('focused');
   });
-  
+
   typingInput.addEventListener('blur', () => {
     typingInput.classList.remove('focused');
   });
-  
+
   // Metin alanına tıklandığında input alanına odaklan
   textDisplay.addEventListener('click', () => {
     typingInput.focus();
   });
-  
+
   // Başlangıçta intro ekranını göster
   showScreen(introScreen);
 });
