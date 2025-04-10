@@ -525,7 +525,7 @@ def initialize_database():
                         <li><strong>Kendi Rekorlarınızı Takip Edin:</strong> Gelişiminizi takip edin ve kendi skorlarınızı geçmeye çalışın.</li>
                         <li><strong>Rakiplerinizi Gözlemleyin:</strong> Lider tablosundaki üst düzey oyuncuların stratejilerini anlamaya çalışın.</li>
                         <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
-                        <li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
+                        <li><li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
                     </ol>
 <p>ZekaPark oyunlarında yüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
@@ -777,8 +777,14 @@ def typing_speed():
 @app.route('/games/puzzle-slider')
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
-    Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu."""
+    Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu"""
     return render_template('games/puzzleSlider.html')
+
+@app.route('/games/minesweeper')
+def minesweeper():
+    """Mayın Tarlası: Mantık ve strateji oyunu
+    Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
+    return render_template('games/minesweeper.html')
 
 @app.route('/games/color-match')
 def color_match_game():
@@ -1394,7 +1400,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
+        'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
+        'minesweeper': {'point_base': 90, 'score_multiplier': 0.4} # Mayın Tarlası için çarpanlar eklendi
     }
 
     # Oyun türüne göre çarpanları güncelle
@@ -1443,7 +1450,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'color_match': 1.5,  # 1.5 dakika
                 'math_challenge': 2.0,  # 2 dakika
                 'iq_test': 10.0,  # 10 dakika
-                'numberChain': 2.5  # 2.5 dakika
+                'numberChain': 2.5,  # 2.5 dakika
+                'minesweeper': 5.0  # Mayın Tarlası için optimal süre
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1476,7 +1484,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'iq_test': 20,
                 'numberChain': 40,
-                'typing_speed': 200  # Yazmada daha fazla hamle normal
+                'minesweeper': 50  # Mayın Tarlası için optimal hamle sayısı
             }.get(game_type, 50)
 
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1961,7 +1969,8 @@ def get_leaderboard_data(game_type):
         'wordle': 'Wordle',
         'chess': 'Satranç',
         'puzzle_slider': 'Resim Bulmaca',
-        'snake_game': 'Yılan Oyunu'
+        'snake_game': 'Yılan Oyunu',
+        'minesweeper': 'Mayın Tarlası'  # Mayın Tarlası eklendi
     }
 
     return jsonify({
