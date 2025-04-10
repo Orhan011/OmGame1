@@ -585,27 +585,33 @@ def get_most_played_games(limit=4):
     # Varsayılan oyunlar listesi (veritabanı hatası durumunda kullanılacak)
     popular_games = []
     
+    # Çıkarılacak oyun türleri
+    excluded_games = ["2048", "memory_cards"]
+    
     try:
         # Son 24 saat içinde oynanan oyunları al
         yesterday = datetime.now() - timedelta(days=1)
         
-        # En çok oynanan oyunları bul
+        # En çok oynanan oyunları bul (çıkarılacak oyunlar hariç)
         popular_games = Score.query.with_entities(
             Score.game_type, 
             func.count(Score.id).label('play_count')
         ).filter(
-            Score.timestamp >= yesterday
+            Score.timestamp >= yesterday,
+            ~Score.game_type.in_(excluded_games)  # Belirtilen oyunları hariç tut
         ).group_by(
             Score.game_type
         ).order_by(
             desc('play_count')
         ).limit(limit).all()
         
-        # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al
+        # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al (çıkarılacak oyunlar hariç)
         if len(popular_games) < limit:
             popular_games = Score.query.with_entities(
                 Score.game_type, 
                 func.count(Score.id).label('play_count')
+            ).filter(
+                ~Score.game_type.in_(excluded_games)  # Belirtilen oyunları hariç tut
             ).group_by(
                 Score.game_type
             ).order_by(
@@ -633,23 +639,11 @@ def get_most_played_games(limit=4):
             "icon": "fas fa-keyboard",
             "route": "wordle"
         },
-        "memory_cards": {
-            "name": "Hafıza Kartları",
-            "description": "Eşleşen kartları bularak görsel hafıza ve odaklanma becerilerinizi geliştirin.",
-            "icon": "fas fa-clone",
-            "route": "memory_cards"
-        },
         "audio_memory": {
             "name": "Sesli Hafıza",
             "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
             "icon": "fas fa-music",
             "route": "audio_memory"
-        },
-        "2048": {
-            "name": "2048",
-            "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
-            "icon": "fas fa-cubes",
-            "route": "game_2048"
         },
         "chess": {
             "name": "Satranç",
@@ -697,7 +691,7 @@ def get_most_played_games(limit=4):
     
     # Varsayılan oyunlar (veri yoksa kullanılacak)
     default_games = [
-        "wordle", "memory_cards", "audio_memory", "2048"
+        "wordle", "audio_memory", "tetris", "snake"
     ]
     
     # Popüler oyun verilerine göre oyun listesini oluştur
