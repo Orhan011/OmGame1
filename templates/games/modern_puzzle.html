@@ -1,0 +1,1610 @@
+{% extends 'layout.html' %}
+
+{% block title %}Modern Puzzle - ZekaPark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-wrapper">
+    <div class="game-header">
+      <h1><i class="fas fa-puzzle-piece"></i> Modern Puzzle <span class="badge">Zihin Geliştirici</span></h1>
+      <p class="game-description">Görsel ve zihinsel becerileri geliştiren modern bir puzzle oyunu</p>
+    </div>
+
+    <div class="game-dashboard">
+      <!-- Sol panel - Oyun alanı -->
+      <div class="game-area-panel">
+        <div class="game-container">
+          <!-- Başlangıç ekranı -->
+          <div id="start-screen" class="game-screen">
+            <div class="game-mode-selection">
+              <h2>Oyun Modu Seçin</h2>
+              <div class="game-modes">
+                <div class="game-mode-card active" data-mode="classic">
+                  <div class="mode-icon"><i class="fas fa-th-large"></i></div>
+                  <div class="mode-title">Klasik</div>
+                  <div class="mode-description">Geleneksel puzzle deneyimi</div>
+                </div>
+                
+                <div class="game-mode-card" data-mode="time-attack">
+                  <div class="mode-icon"><i class="fas fa-stopwatch"></i></div>
+                  <div class="mode-title">Zamana Karşı</div>
+                  <div class="mode-description">Süre bitmeden tamamlayın</div>
+                </div>
+                
+                <div class="game-mode-card" data-mode="challenge">
+                  <div class="mode-icon"><i class="fas fa-award"></i></div>
+                  <div class="mode-title">Mücadele</div>
+                  <div class="mode-description">Zorlaştırılmış seviyeleri aşın</div>
+                </div>
+              </div>
+              
+              <div class="difficulty-selection">
+                <h3>Zorluk Seviyesi</h3>
+                <div class="difficulty-slider-container">
+                  <div class="difficulty-labels">
+                    <span>Kolay</span>
+                    <span>Orta</span>
+                    <span>Zor</span>
+                  </div>
+                  <input type="range" min="1" max="3" value="2" class="difficulty-slider" id="difficulty-selector">
+                </div>
+              </div>
+              
+              <div class="game-settings">
+                <div class="puzzle-size-setting">
+                  <label for="size-selector">Puzzle Boyutu:</label>
+                  <select id="size-selector" class="form-select">
+                    <option value="3">3x3 (Kolay)</option>
+                    <option value="4" selected>4x4 (Orta)</option>
+                    <option value="5">5x5 (Zor)</option>
+                    <option value="6">6x6 (Uzman)</option>
+                  </select>
+                </div>
+                
+                <div class="theme-setting">
+                  <label for="theme-selector">Tema:</label>
+                  <select id="theme-selector" class="form-select">
+                    <option value="nature">Doğa</option>
+                    <option value="space" selected>Uzay</option>
+                    <option value="animals">Hayvanlar</option>
+                    <option value="art">Sanat</option>
+                  </select>
+                </div>
+                
+                <div class="sound-setting">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="sound-toggle" checked>
+                    <label class="form-check-label" for="sound-toggle">Ses Efektleri</label>
+                  </div>
+                </div>
+              </div>
+              
+              <button id="start-game-btn" class="btn btn-primary btn-lg btn-pulse">
+                <i class="fas fa-play"></i> OYUNU BAŞLAT
+              </button>
+            </div>
+          </div>
+          
+          <!-- Oyun ekranı -->
+          <div id="game-screen" class="game-screen" style="display: none;">
+            <div class="game-header-bar">
+              <div class="game-stats">
+                <div class="stat">
+                  <span class="stat-label">Skor</span>
+                  <span class="stat-value" id="score-display">0</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Hamle</span>
+                  <span class="stat-value" id="moves-display">0</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Süre</span>
+                  <span class="stat-value" id="time-display">00:00</span>
+                </div>
+              </div>
+              
+              <div class="game-progress">
+                <div class="progress-container">
+                  <div class="progress-bar" id="progress-bar"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="puzzle-container">
+              <div class="preview-image" id="preview-image">
+                <!-- Önizleme resmi burada gösterilecek -->
+              </div>
+              
+              <div class="puzzle-board" id="puzzle-board">
+                <!-- Puzzle parçaları JavaScript ile eklenecek -->
+              </div>
+            </div>
+            
+            <div class="game-controls">
+              <button id="shuffle-btn" class="btn btn-outline-light">
+                <i class="fas fa-random"></i> KARIŞTIR
+              </button>
+              <button id="pause-game" class="btn btn-outline-light">
+                <i class="fas fa-pause"></i> DURAKLAT
+              </button>
+              <button id="hint-btn" class="btn btn-outline-warning">
+                <i class="fas fa-lightbulb"></i> İPUCU
+              </button>
+              <button id="end-game" class="btn btn-outline-danger">
+                <i class="fas fa-stop"></i> BİTİR
+              </button>
+            </div>
+          </div>
+          
+          <!-- Sonuç ekranı -->
+          <div id="result-screen" class="game-screen" style="display: none;">
+            <div class="result-content">
+              <div class="result-header">
+                <i class="fas fa-trophy result-icon"></i>
+                <h2>Tebrikler!</h2>
+                <p>Puzzle'ı başarıyla tamamladınız.</p>
+              </div>
+              
+              <div class="complete-image-container">
+                <img id="complete-image" src="" alt="Tamamlanmış Puzzle">
+              </div>
+              
+              <div class="final-score-container">
+                <div class="final-score">
+                  <div class="score-label">Toplam Puan</div>
+                  <div class="score-value" id="final-score">0</div>
+                </div>
+                
+                <div class="performance-meter">
+                  <div class="meter-label">Performans</div>
+                  <div class="meter-bar">
+                    <div class="meter-fill" id="performance-meter"></div>
+                  </div>
+                  <div class="meter-value" id="performance-value">İyi</div>
+                </div>
+              </div>
+              
+              <div class="result-stats">
+                <div class="stat-group">
+                  <div class="stat-label">Toplam Hamle</div>
+                  <div class="stat-value" id="final-moves">0</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Geçen Süre</div>
+                  <div class="stat-value" id="final-time">00:00</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Zorluk</div>
+                  <div class="stat-value" id="final-difficulty">Orta</div>
+                </div>
+                <div class="stat-group">
+                  <div class="stat-label">Kullanılan İpucu</div>
+                  <div class="stat-value" id="final-hints">0</div>
+                </div>
+              </div>
+              
+              <div class="result-actions">
+                <button id="play-again-btn" class="btn btn-primary btn-lg">
+                  <i class="fas fa-redo-alt"></i> TEKRAR OYNA
+                </button>
+                <button id="share-result-btn" class="btn btn-outline-info">
+                  <i class="fas fa-share-alt"></i> PAYLAŞ
+                </button>
+                <a href="{{ url_for('all_games') }}" class="btn btn-outline-light">
+                  <i class="fas fa-th-large"></i> TÜM OYUNLAR
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Duraklat Modal -->
+          <div id="pause-modal" class="game-modal">
+            <div class="modal-content">
+              <h2><i class="fas fa-pause"></i> Oyun Duraklatıldı</h2>
+              <p>Modern Puzzle'a devam etmek için aşağıdaki butona tıklayın.</p>
+              <div class="modal-actions">
+                <button id="resume-game" class="btn btn-primary">
+                  <i class="fas fa-play"></i> DEVAM ET
+                </button>
+                <button id="quit-game" class="btn btn-outline-danger">
+                  <i class="fas fa-sign-out-alt"></i> OYUNDAN ÇIK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sağ panel - İstatistikler ve İpuçları -->
+      <div class="game-info-panel">
+        <!-- Oyuncu istatistikleri -->
+        <div class="player-stats-panel">
+          <h3><i class="fas fa-chart-line"></i> İstatistikleriniz</h3>
+          
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="best-score">0</div>
+                <div class="stat-label">En Yüksek Skor</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-puzzle-piece"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="total-played">0</div>
+                <div class="stat-label">Toplam Oyun</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-stopwatch"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="best-time">00:00</div>
+                <div class="stat-label">En İyi Süre</div>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <div class="stat-icon"><i class="fas fa-award"></i></div>
+              <div class="stat-content">
+                <div class="stat-value" id="highest-level">1</div>
+                <div class="stat-label">En Yüksek Seviye</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- İpuçları ve bilgiler -->
+        <div class="tips-panel">
+          <h3><i class="fas fa-lightbulb"></i> İpuçları</h3>
+          
+          <div class="tips-list">
+            <div class="tip-item">
+              <div class="tip-number">1</div>
+              <div class="tip-content">
+                <strong>Köşe parçalarını</strong> önce yerleştirin, ardından kenarları tamamlayın.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">2</div>
+              <div class="tip-content">
+                <strong>Renk gruplarına</strong> dikkat edin, benzer renkli alanları birleştirin.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">3</div>
+              <div class="tip-content">
+                <strong>Önizleme resmine</strong> bakarak genel kompozisyonu anlayın.
+              </div>
+            </div>
+            
+            <div class="tip-item">
+              <div class="tip-number">4</div>
+              <div class="tip-content">
+                <strong>Daha az hamle</strong> yaparsanız daha yüksek puan alırsınız.
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menü Butonu -->
+        <a href="{{ url_for('all_games') }}" class="back-to-menu-btn">
+          <i class="fas fa-th-large"></i> TÜM OYUNLAR
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modernize edici -->
+{% include 'games/modernizer.html' %}
+
+<style>
+  /* Ana Konteyner Stilleri */
+  .game-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .game-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .game-header h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(106, 90, 224, 0.8);
+    margin-bottom: 10px;
+  }
+  
+  .game-header .badge {
+    background: linear-gradient(135deg, #6a5ae0, #a992ff);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 400;
+    vertical-align: middle;
+    box-shadow: 0 2px 10px rgba(106, 90, 224, 0.5);
+  }
+  
+  .game-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+  }
+  
+  /* Dashboard layout */
+  .game-dashboard {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .game-area-panel {
+    flex: 1;
+    min-width: 320px;
+  }
+  
+  .game-info-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Oyun Konteyner Stilleri */
+  .game-container {
+    background: rgba(20, 20, 40, 0.8);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 0 15px rgba(106, 90, 224, 0.3);
+    overflow: hidden;
+    border: 1px solid rgba(106, 90, 224, 0.3);
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .game-screen {
+    padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Başlangıç Ekranı */
+  .game-mode-selection {
+    text-align: center;
+  }
+  
+  .game-mode-selection h2 {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+  
+  .game-modes {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .game-mode-card {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.9), rgba(30, 30, 50, 0.9));
+    border-radius: 15px;
+    padding: 20px;
+    width: 170px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .game-mode-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .game-mode-card.active {
+    border-color: #6a5ae0;
+    background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(40, 40, 70, 0.9));
+  }
+  
+  .mode-icon {
+    font-size: 2rem;
+    color: #6a5ae0;
+    margin-bottom: 15px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mode-title {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .mode-description {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .difficulty-selection {
+    margin-bottom: 30px;
+  }
+  
+  .difficulty-selection h3 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .difficulty-slider-container {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .difficulty-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+  
+  .difficulty-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  .difficulty-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6a5ae0;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.8);
+  }
+  
+  .game-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto 30px;
+  }
+  
+  .game-settings label {
+    color: white;
+    margin-right: 10px;
+    min-width: 120px;
+    text-align: left;
+  }
+  
+  .form-select, .form-check-input {
+    background-color: rgba(30, 30, 60, 0.7);
+    border: 1px solid rgba(106, 90, 224, 0.5);
+    color: white;
+  }
+  
+  .form-select:focus, .form-check-input:focus {
+    border-color: #6a5ae0;
+    box-shadow: 0 0 0 0.25rem rgba(106, 90, 224, 0.25);
+  }
+  
+  .form-check-label {
+    color: white;
+  }
+  
+  .form-check-input:checked {
+    background-color: #6a5ae0;
+    border-color: #6a5ae0;
+  }
+  
+  .btn-pulse {
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(106, 90, 224, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(106, 90, 224, 0);
+    }
+  }
+
+  /* Oyun Ekranı */
+  .game-header-bar {
+    margin-bottom: 25px;
+  }
+  
+  .game-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .stat {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 8px;
+    padding: 8px 15px;
+    text-align: center;
+    flex: 1;
+    margin: 0 5px;
+  }
+  
+  .stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+  }
+  
+  .stat-value {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .game-progress {
+    margin-bottom: 20px;
+  }
+  
+  .progress-container {
+    height: 8px;
+    background: rgba(40, 40, 80, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #6a5ae0;
+    transition: width 0.3s ease;
+  }
+  
+  .puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 25px;
+    flex: 1;
+  }
+  
+  .preview-image {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 150px;
+    height: 150px;
+  }
+  
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .puzzle-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 2px;
+    background-color: rgba(20, 20, 35, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1/1;
+  }
+  
+  .puzzle-piece {
+    background-size: 400% 400%;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    position: relative;
+  }
+  
+  .puzzle-piece:hover {
+    transform: scale(0.97);
+    box-shadow: 0 3px 8px rgba(106, 90, 224, 0.5);
+  }
+  
+  .puzzle-piece.correct {
+    box-shadow: 0 0 10px rgba(46, 213, 115, 0.7);
+  }
+  
+  .game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  /* Sonuç Ekranı */
+  .result-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .result-header {
+    margin-bottom: 30px;
+  }
+  
+  .result-icon {
+    font-size: 3rem;
+    color: gold;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  .result-header h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .result-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+  }
+  
+  .complete-image-container {
+    margin-bottom: 25px;
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 300px;
+    margin: 0 auto 30px;
+  }
+  
+  .complete-image-container img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  .final-score-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  
+  .final-score {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.8), rgba(30, 30, 50, 0.8));
+    padding: 15px 25px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .final-score .score-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+  
+  .final-score .score-value {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+  
+  .performance-meter {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.8), rgba(30, 30, 50, 0.8));
+    padding: 15px 25px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .meter-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .meter-bar {
+    height: 8px;
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    width: 120px;
+  }
+  
+  .meter-fill {
+    height: 100%;
+    width: 75%;
+    background: linear-gradient(to right, #6a5ae0, #a992ff);
+  }
+  
+  .meter-value {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .result-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .stat-group {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 8px;
+    padding: 10px 15px;
+    min-width: 120px;
+  }
+  
+  .stat-group .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .stat-group .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  /* Modal */
+  .game-modal {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 25, 0.9);
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    background: linear-gradient(135deg, rgba(40, 40, 80, 0.95), rgba(30, 30, 50, 0.95));
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(106, 90, 224, 0.3);
+  }
+  
+  .modal-content h2 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+  }
+  
+  .modal-content p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 25px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  /* Sağ Panel */
+  .player-stats-panel, .tips-panel {
+    background: rgba(20, 20, 40, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(106, 90, 224, 0.2);
+  }
+  
+  .player-stats-panel h3, .tips-panel h3 {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .player-stats-panel h3 i, .tips-panel h3 i {
+    color: #6a5ae0;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .stat-item {
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .stat-icon {
+    background: rgba(106, 90, 224, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6a5ae0;
+    font-size: 1.1rem;
+  }
+  
+  .stat-content {
+    text-align: center;
+    flex: 1;
+  }
+  
+  .stat-content .stat-value {
+    font-size: 1.2rem;
+    margin-bottom: 3px;
+  }
+  
+  .stat-content .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .tip-item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .tip-number {
+    background: rgba(106, 90, 224, 0.2);
+    color: #6a5ae0;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .tip-content {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    flex: 1;
+  }
+  
+  .back-to-menu-btn {
+    display: block;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(30, 30, 60, 0.6);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin-top: auto;
+    border: 1px solid rgba(106, 90, 224, 0.2);
+  }
+  
+  .back-to-menu-btn:hover {
+    background: rgba(40, 40, 80, 0.8);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+  
+  .back-to-menu-btn i {
+    margin-right: 8px;
+    color: #6a5ae0;
+  }
+  
+  /* Responsive Ayarlamaları */
+  @media (max-width: 768px) {
+    .game-header h1 {
+      font-size: 2rem;
+    }
+    
+    .game-modes {
+      gap: 10px;
+    }
+    
+    .game-mode-card {
+      width: 150px;
+      padding: 15px;
+    }
+    
+    .mode-icon {
+      font-size: 1.8rem;
+      height: 50px;
+    }
+    
+    .mode-title {
+      font-size: 1.1rem;
+    }
+    
+    .puzzle-board {
+      padding: 10px;
+    }
+    
+    .player-stats-panel, .tips-panel {
+      padding: 15px;
+    }
+    
+    .final-score .score-value {
+      font-size: 2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .game-screen {
+      padding: 20px 15px;
+    }
+    
+    .game-mode-card {
+      width: 120px;
+      padding: 12px;
+    }
+    
+    .mode-icon {
+      font-size: 1.5rem;
+      height: 40px;
+      margin-bottom: 10px;
+    }
+    
+    .mode-title {
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+    
+    .mode-description {
+      font-size: 0.75rem;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .result-stats {
+      gap: 10px;
+    }
+    
+    .stat-group {
+      min-width: 100px;
+      padding: 8px 12px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM elementleri
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const pauseModal = document.getElementById('pause-modal');
+    
+    const modeCards = document.querySelectorAll('.game-mode-card');
+    const difficultySlider = document.getElementById('difficulty-selector');
+    const sizeSelector = document.getElementById('size-selector');
+    const themeSelector = document.getElementById('theme-selector');
+    const soundToggle = document.getElementById('sound-toggle');
+    const startGameBtn = document.getElementById('start-game-btn');
+    
+    const scoreDisplay = document.getElementById('score-display');
+    const movesDisplay = document.getElementById('moves-display');
+    const timeDisplay = document.getElementById('time-display');
+    const progressBar = document.getElementById('progress-bar');
+    
+    const puzzleBoard = document.getElementById('puzzle-board');
+    const previewImage = document.getElementById('preview-image');
+    
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const pauseGameBtn = document.getElementById('pause-game');
+    const hintBtn = document.getElementById('hint-btn');
+    const endGameBtn = document.getElementById('end-game');
+    
+    const finalScore = document.getElementById('final-score');
+    const finalMoves = document.getElementById('final-moves');
+    const finalTime = document.getElementById('final-time');
+    const finalDifficulty = document.getElementById('final-difficulty');
+    const finalHints = document.getElementById('final-hints');
+    const performanceMeter = document.getElementById('performance-meter');
+    const performanceValue = document.getElementById('performance-value');
+    
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const shareResultBtn = document.getElementById('share-result-btn');
+    
+    const resumeGameBtn = document.getElementById('resume-game');
+    const quitGameBtn = document.getElementById('quit-game');
+    
+    // Oyun durumu verileri
+    let gameState = {
+      mode: 'classic',
+      difficulty: 2, // 1: kolay, 2: orta, 3: zor
+      size: 4,
+      theme: 'space',
+      soundEnabled: true,
+      isGameRunning: false,
+      isPaused: false,
+      moves: 0,
+      score: 0,
+      time: 0,
+      hintsUsed: 0,
+      timerInterval: null,
+      puzzlePieces: [],
+      correctPositions: 0
+    };
+    
+    // Ses efektleri
+    const sounds = {
+      click: new Audio('/static/sounds/click.mp3'),
+      correct: new Audio('/static/sounds/correct.mp3'),
+      wrong: new Audio('/static/sounds/wrong.mp3'),
+      complete: new Audio('/static/sounds/level-complete.mp3'),
+      hint: new Audio('/static/sounds/hint.mp3')
+    };
+    
+    // Temalar ve resimleri
+    const themes = {
+      nature: [
+        '/static/images/puzzles/nature1.jpg',
+        '/static/images/puzzles/nature2.jpg',
+        '/static/images/puzzles/nature3.jpg'
+      ],
+      space: [
+        '/static/images/puzzles/space1.jpg',
+        '/static/images/puzzles/space2.jpg',
+        '/static/images/puzzles/space3.jpg'
+      ],
+      animals: [
+        '/static/images/puzzles/animal1.jpg',
+        '/static/images/puzzles/animal2.jpg',
+        '/static/images/puzzles/animal3.jpg'
+      ],
+      art: [
+        '/static/images/puzzles/art1.jpg',
+        '/static/images/puzzles/art2.jpg',
+        '/static/images/puzzles/art3.jpg'
+      ]
+    };
+    
+    // Varsayılan resim (eğer temada resim yoksa)
+    const defaultImage = '/static/images/puzzles/default.jpg';
+    
+    // Event listeners
+    modeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        modeCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        gameState.mode = card.getAttribute('data-mode');
+        playSound('click');
+      });
+    });
+    
+    difficultySlider.addEventListener('input', () => {
+      gameState.difficulty = parseInt(difficultySlider.value);
+      playSound('click');
+    });
+    
+    sizeSelector.addEventListener('change', () => {
+      gameState.size = parseInt(sizeSelector.value);
+      playSound('click');
+    });
+    
+    themeSelector.addEventListener('change', () => {
+      gameState.theme = themeSelector.value;
+      playSound('click');
+    });
+    
+    soundToggle.addEventListener('change', () => {
+      gameState.soundEnabled = soundToggle.checked;
+      if (gameState.soundEnabled) {
+        playSound('click');
+      }
+    });
+    
+    startGameBtn.addEventListener('click', startGame);
+    pauseGameBtn.addEventListener('click', togglePause);
+    endGameBtn.addEventListener('click', endGame);
+    shuffleBtn.addEventListener('click', shufflePuzzle);
+    hintBtn.addEventListener('click', showHint);
+    
+    playAgainBtn.addEventListener('click', resetGame);
+    
+    resumeGameBtn.addEventListener('click', resumeGame);
+    quitGameBtn.addEventListener('click', quitGame);
+    
+    // Oyun fonksiyonları
+    function startGame() {
+      startScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
+      
+      gameState.isGameRunning = true;
+      gameState.moves = 0;
+      gameState.score = 0;
+      gameState.time = 0;
+      gameState.hintsUsed = 0;
+      gameState.correctPositions = 0;
+      
+      updateDisplays();
+      createPuzzle();
+      startTimer();
+      
+      playSound('click');
+    }
+    
+    function createPuzzle() {
+      // Puzzle boyutu ayarla
+      puzzleBoard.style.gridTemplateColumns = `repeat(${gameState.size}, 1fr)`;
+      
+      // Seçilen tema ve rastgele resim
+      const theme = themes[gameState.theme] || themes.space;
+      const randomIndex = Math.floor(Math.random() * theme.length);
+      const imageSrc = theme[randomIndex] || defaultImage;
+      
+      // Önizleme resmi
+      previewImage.innerHTML = `<img src="${imageSrc}" alt="Puzzle">`;
+      
+      // Puzzle parçaları oluştur
+      puzzleBoard.innerHTML = '';
+      gameState.puzzlePieces = [];
+      
+      for (let i = 0; i < gameState.size * gameState.size; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.dataset.index = i;
+        
+        // Parça arka plan pozisyonu hesapla
+        const row = Math.floor(i / gameState.size);
+        const col = i % gameState.size;
+        const posX = (col / (gameState.size - 1)) * 100;
+        const posY = (row / (gameState.size - 1)) * 100;
+        
+        piece.style.backgroundImage = `url(${imageSrc})`;
+        piece.style.backgroundPosition = `${posX}% ${posY}%`;
+        piece.style.backgroundSize = `${gameState.size * 100}%`;
+        
+        piece.addEventListener('click', () => movePiece(i));
+        
+        puzzleBoard.appendChild(piece);
+        gameState.puzzlePieces.push({
+          element: piece,
+          currentIndex: i,
+          targetIndex: i
+        });
+      }
+      
+      // Puzzle'ı karıştır
+      shufflePuzzle();
+    }
+    
+    function shufflePuzzle() {
+      // Rastgele karıştır
+      for (let i = 0; i < gameState.size * gameState.size * 3; i++) {
+        const randomIndex = Math.floor(Math.random() * gameState.puzzlePieces.length);
+        const randomIndex2 = Math.floor(Math.random() * gameState.puzzlePieces.length);
+        
+        if (randomIndex !== randomIndex2) {
+          swapPieces(randomIndex, randomIndex2);
+        }
+      }
+      
+      // Doğru pozisyonları yeniden hesapla
+      checkCorrectPositions();
+      updateProgress();
+      
+      playSound('click');
+    }
+    
+    function movePiece(index) {
+      if (!gameState.isGameRunning || gameState.isPaused) return;
+      
+      const piece = gameState.puzzlePieces.find(p => p.currentIndex === index);
+      if (!piece) return;
+      
+      // Adjacent piece'i bul ve swap yap
+      const adjacentIndices = getAdjacentIndices(index);
+      for (const adjIndex of adjacentIndices) {
+        const adjPiece = gameState.puzzlePieces.find(p => p.currentIndex === adjIndex);
+        if (adjPiece) {
+          swapPieces(index, adjIndex);
+          gameState.moves++;
+          updateDisplays();
+          checkCorrectPositions();
+          updateProgress();
+          
+          playSound('click');
+          
+          // Oyun tamamlandı mı kontrol et
+          if (gameState.correctPositions === gameState.puzzlePieces.length) {
+            gameComplete();
+          }
+          
+          break;
+        }
+      }
+    }
+    
+    function swapPieces(index1, index2) {
+      const piece1 = gameState.puzzlePieces.find(p => p.currentIndex === index1);
+      const piece2 = gameState.puzzlePieces.find(p => p.currentIndex === index2);
+      
+      if (!piece1 || !piece2) return;
+      
+      // Pozisyonları değiştir
+      const tempIndex = piece1.currentIndex;
+      piece1.currentIndex = piece2.currentIndex;
+      piece2.currentIndex = tempIndex;
+      
+      // DOM'da yerlerini değiştir
+      puzzleBoard.insertBefore(piece1.element, piece2.element);
+      puzzleBoard.insertBefore(piece2.element, piece1.element);
+    }
+    
+    function getAdjacentIndices(index) {
+      const row = Math.floor(index / gameState.size);
+      const col = index % gameState.size;
+      const adjacent = [];
+      
+      // Üst
+      if (row > 0) {
+        adjacent.push(index - gameState.size);
+      }
+      
+      // Alt
+      if (row < gameState.size - 1) {
+        adjacent.push(index + gameState.size);
+      }
+      
+      // Sol
+      if (col > 0) {
+        adjacent.push(index - 1);
+      }
+      
+      // Sağ
+      if (col < gameState.size - 1) {
+        adjacent.push(index + 1);
+      }
+      
+      return adjacent;
+    }
+    
+    function checkCorrectPositions() {
+      gameState.correctPositions = 0;
+      
+      for (const piece of gameState.puzzlePieces) {
+        if (piece.currentIndex === piece.targetIndex) {
+          gameState.correctPositions++;
+          piece.element.classList.add('correct');
+        } else {
+          piece.element.classList.remove('correct');
+        }
+      }
+    }
+    
+    function showHint() {
+      if (!gameState.isGameRunning || gameState.isPaused) return;
+      
+      // Rastgele yanlış bir parçayı doğru konumuna getir
+      const incorrectPieces = gameState.puzzlePieces.filter(p => p.currentIndex !== p.targetIndex);
+      
+      if (incorrectPieces.length > 0) {
+        const randomPiece = incorrectPieces[Math.floor(Math.random() * incorrectPieces.length)];
+        const currentIndex = randomPiece.currentIndex;
+        const targetIndex = randomPiece.targetIndex;
+        
+        const targetPiece = gameState.puzzlePieces.find(p => p.currentIndex === targetIndex);
+        
+        if (targetPiece) {
+          swapPieces(currentIndex, targetIndex);
+          gameState.hintsUsed++;
+          gameState.moves++;
+          updateDisplays();
+          checkCorrectPositions();
+          updateProgress();
+          
+          playSound('hint');
+        }
+      }
+    }
+    
+    function updateDisplays() {
+      scoreDisplay.textContent = calculateScore();
+      movesDisplay.textContent = gameState.moves;
+      timeDisplay.textContent = formatTime(gameState.time);
+    }
+    
+    function updateProgress() {
+      const progressPercent = (gameState.correctPositions / gameState.puzzlePieces.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+    }
+    
+    function startTimer() {
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+      
+      gameState.timerInterval = setInterval(() => {
+        if (gameState.isGameRunning && !gameState.isPaused) {
+          gameState.time++;
+          timeDisplay.textContent = formatTime(gameState.time);
+        }
+      }, 1000);
+    }
+    
+    function togglePause() {
+      if (!gameState.isGameRunning) return;
+      
+      gameState.isPaused = !gameState.isPaused;
+      
+      if (gameState.isPaused) {
+        pauseModal.style.display = 'flex';
+      } else {
+        pauseModal.style.display = 'none';
+      }
+      
+      playSound('click');
+    }
+    
+    function resumeGame() {
+      gameState.isPaused = false;
+      pauseModal.style.display = 'none';
+      playSound('click');
+    }
+    
+    function quitGame() {
+      pauseModal.style.display = 'none';
+      endGame();
+    }
+    
+    function endGame() {
+      if (!gameState.isGameRunning) return;
+      
+      clearInterval(gameState.timerInterval);
+      gameState.isGameRunning = false;
+      gameState.isPaused = false;
+      
+      // Sonuç ekranını göster
+      gameScreen.style.display = 'none';
+      resultScreen.style.display = 'flex';
+      
+      // Sonuç değerleri
+      const finalScoreValue = calculateScore();
+      finalScore.textContent = finalScoreValue;
+      finalMoves.textContent = gameState.moves;
+      finalTime.textContent = formatTime(gameState.time);
+      finalHints.textContent = gameState.hintsUsed;
+      
+      // Zorluk seviyesi
+      switch(gameState.difficulty) {
+        case 1: finalDifficulty.textContent = 'Kolay'; break;
+        case 2: finalDifficulty.textContent = 'Orta'; break;
+        case 3: finalDifficulty.textContent = 'Zor'; break;
+      }
+      
+      // Performans değerlendirmesi
+      let performance = 0;
+      const timePerPiece = gameState.time / (gameState.size * gameState.size);
+      const movesPerPiece = gameState.moves / (gameState.size * gameState.size);
+      
+      if (gameState.correctPositions === gameState.puzzlePieces.length) {
+        // Tüm parçalar doğru yerleştirilmiş
+        performance += 50;
+        
+        // Süre değerlendirmesi
+        if (timePerPiece < 5) performance += 30;
+        else if (timePerPiece < 10) performance += 20;
+        else if (timePerPiece < 15) performance += 10;
+        
+        // Hamle değerlendirmesi
+        if (movesPerPiece < 3) performance += 20;
+        else if (movesPerPiece < 5) performance += 15;
+        else if (movesPerPiece < 8) performance += 10;
+        
+        // İpucu kullanımı değerlendirmesi
+        if (gameState.hintsUsed === 0) performance += 20;
+        else if (gameState.hintsUsed <= 2) performance += 10;
+      } else {
+        // Yarım kalmış oyun
+        performance = (gameState.correctPositions / gameState.puzzlePieces.length) * 100;
+      }
+      
+      // Performance metresi
+      performanceMeter.style.width = `${performance}%`;
+      
+      // Performans değerlendirmesi
+      if (performance >= 90) {
+        performanceValue.textContent = 'Mükemmel!';
+      } else if (performance >= 70) {
+        performanceValue.textContent = 'Çok İyi';
+      } else if (performance >= 50) {
+        performanceValue.textContent = 'İyi';
+      } else if (performance >= 30) {
+        performanceValue.textContent = 'Ortalama';
+      } else {
+        performanceValue.textContent = 'Geliştirilmeli';
+      }
+      
+      // Skorları kaydet
+      saveScore(finalScoreValue);
+      
+      playSound('complete');
+    }
+    
+    function gameComplete() {
+      // Tüm parçalar doğru yerleştirilmiş
+      clearInterval(gameState.timerInterval);
+      gameState.isGameRunning = false;
+      
+      setTimeout(() => {
+        // Sonuç ekranını göster
+        endGame();
+      }, 1000);
+    }
+    
+    function resetGame() {
+      // Oyunu sıfırla ve başlangıç ekranına dön
+      clearInterval(gameState.timerInterval);
+      gameState.isGameRunning = false;
+      gameState.isPaused = false;
+      
+      startScreen.style.display = 'flex';
+      gameScreen.style.display = 'none';
+      resultScreen.style.display = 'none';
+      
+      playSound('click');
+    }
+    
+    function calculateScore() {
+      // Skor hesaplama
+      let baseScore = gameState.correctPositions * 100;
+      
+      // Zorluk seviyesi çarpanı
+      const difficultyMultiplier = gameState.difficulty * 0.5;
+      
+      // Süre ve hamle cezası
+      const timePenalty = Math.min(gameState.time * 0.5, baseScore * 0.3);
+      const movesPenalty = Math.min(gameState.moves * 2, baseScore * 0.3);
+      const hintPenalty = gameState.hintsUsed * 50;
+      
+      // Final skor
+      const finalScore = Math.max(0, Math.floor((baseScore * (1 + difficultyMultiplier)) - timePenalty - movesPenalty - hintPenalty));
+      
+      return finalScore;
+    }
+    
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function saveScore(score) {
+      // API'ye skor gönder
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          game_type: 'modern_puzzle',
+          score: score,
+          difficulty: gameState.difficulty,
+          game_stats: {
+            mode: gameState.mode,
+            time: gameState.time,
+            moves: gameState.moves,
+            hints_used: gameState.hintsUsed,
+            puzzle_size: gameState.size,
+            theme: gameState.theme
+          }
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Score saved:', data);
+      })
+      .catch(error => {
+        console.error('Error saving score:', error);
+      });
+    }
+    
+    function playSound(soundName) {
+      if (gameState.soundEnabled && sounds[soundName]) {
+        // Sesi durdur ve baştan başlat
+        sounds[soundName].pause();
+        sounds[soundName].currentTime = 0;
+        sounds[soundName].play().catch(e => console.log('Sound playback prevented', e));
+      }
+    }
+    
+    // İstatistikleri yükle
+    loadStats();
+    
+    function loadStats() {
+      // İstatistikleri API'den yükle
+      fetch('/api/scores/modern_puzzle')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.scores.length > 0) {
+            document.getElementById('best-score').textContent = data.scores[0].score;
+            document.getElementById('total-played').textContent = data.total_games;
+            
+            // En iyi süre ve seviye (eğer API'den geliyorsa)
+            if (data.best_time) {
+              document.getElementById('best-time').textContent = formatTime(data.best_time);
+            }
+            
+            if (data.highest_level) {
+              document.getElementById('highest-level').textContent = data.highest_level;
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading stats:', error);
+        });
+    }
+    
+    // Modernize edici fonksiyonu çağır
+    if (typeof modernizeGame === 'function') {
+      modernizeGame('modern_puzzle');
+    }
+  });
+</script>
+{% endblock %}

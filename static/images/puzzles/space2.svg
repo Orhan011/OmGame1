@@ -1,0 +1,102 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Space background gradient -->
+    <linearGradient id="space-bg-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#000428" />
+      <stop offset="100%" stop-color="#004e92" />
+    </linearGradient>
+    
+    <!-- Star pattern -->
+    <pattern id="stars-2" width="300" height="300" patternUnits="userSpaceOnUse">
+      <rect width="300" height="300" fill="none" />
+      <circle cx="10" cy="10" r="1" fill="white" opacity="0.8" />
+      <circle cx="30" cy="55" r="1.5" fill="white" opacity="0.7" />
+      <circle cx="55" cy="15" r="1" fill="white" opacity="0.5" />
+      <circle cx="80" cy="40" r="1.2" fill="white" opacity="0.6" />
+      <circle cx="120" cy="70" r="1" fill="white" opacity="0.8" />
+      <circle cx="150" cy="30" r="1.5" fill="white" opacity="0.6" />
+      <circle cx="170" cy="90" r="1" fill="white" opacity="0.7" />
+      <circle cx="190" cy="180" r="1.2" fill="white" opacity="0.5" />
+      <circle cx="160" cy="120" r="1" fill="white" opacity="0.9" />
+      <circle cx="130" cy="140" r="1.5" fill="white" opacity="0.7" />
+      <circle cx="90" cy="180" r="1" fill="white" opacity="0.8" />
+      <circle cx="50" cy="150" r="1.2" fill="white" opacity="0.6" />
+      <circle cx="20" cy="190" r="1" fill="white" opacity="0.7" />
+      <circle cx="210" cy="210" r="1" fill="white" opacity="0.8" />
+      <circle cx="230" cy="255" r="1.5" fill="white" opacity="0.7" />
+      <circle cx="255" cy="215" r="1" fill="white" opacity="0.5" />
+      <circle cx="280" cy="240" r="1.2" fill="white" opacity="0.6" />
+    </pattern>
+    
+    <!-- Earth texture pattern -->
+    <radialGradient id="earth" cx="50%" cy="50%" r="50%" fx="35%" fy="35%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="40%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </radialGradient>
+    
+    <!-- Moon texture pattern -->
+    <radialGradient id="moon" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#f3f4f6" />
+      <stop offset="50%" stop-color="#d1d5db" />
+      <stop offset="100%" stop-color="#9ca3af" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#space-bg-2)" />
+  <rect width="600" height="600" fill="url(#stars-2)" />
+  
+  <!-- Earth Glow -->
+  <circle cx="350" cy="300" r="130" fill="#60a5fa" opacity="0.15" />
+  
+  <!-- Earth -->
+  <circle cx="350" cy="300" r="100" fill="url(#earth)" />
+  
+  <!-- Earth Cloud Layers -->
+  <g opacity="0.6">
+    <path d="M 290,250 C 320,240 350,260 380,240 S 410,230 420,260" 
+          fill="none" stroke="white" stroke-width="10" />
+    <path d="M 300,350 C 330,340 360,360 390,340 S 420,330 430,360" 
+          fill="none" stroke="white" stroke-width="8" />
+    <path d="M 320,300 C 340,290 360,310 380,290 S 400,280 410,300" 
+          fill="none" stroke="white" stroke-width="5" />
+  </g>
+  
+  <!-- Continents -->
+  <g fill="#10b981" opacity="0.7">
+    <path d="M 330,230 C 350,220 370,240 360,260 S 330,270 330,230" />
+    <path d="M 370,270 C 390,260 410,280 400,300 S 370,310 370,270" />
+    <path d="M 310,290 C 330,280 350,300 340,320 S 310,330 310,290" />
+  </g>
+  
+  <!-- Moon orbit path -->
+  <circle cx="350" cy="300" r="180" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="5,5" />
+  
+  <!-- Moon -->
+  <circle cx="530" cy="300" r="40" fill="url(#moon)" opacity="0.9" />
+  
+  <!-- Moon Craters -->
+  <g opacity="0.2">
+    <circle cx="515" cy="285" r="8" fill="#4b5563" />
+    <circle cx="540" cy="310" r="6" fill="#4b5563" />
+    <circle cx="525" cy="320" r="5" fill="#4b5563" />
+  </g>
+  
+  <!-- Asteroids -->
+  <g fill="#d1d5db">
+    <circle cx="200" cy="150" r="3" />
+    <circle cx="220" cy="170" r="2" />
+    <circle cx="240" cy="155" r="4" />
+    <circle cx="210" cy="190" r="3" />
+    <circle cx="180" cy="175" r="2" />
+  </g>
+  
+  <!-- Comet -->
+  <g>
+    <circle cx="150" cy="450" r="5" fill="white" opacity="0.9" />
+    <path d="M 150,450 L 200,400" stroke="white" stroke-width="2" opacity="0.6" />
+    <path d="M 150,450 L 220,380" stroke="white" stroke-width="1" opacity="0.4" />
+    <path d="M 150,450 L 240,360" stroke="white" stroke-width="0.5" opacity="0.2" />
+  </g>
+</svg>

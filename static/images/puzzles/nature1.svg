@@ -1,0 +1,159 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Nature background gradient -->
+    <linearGradient id="sky-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+    
+    <!-- Mountain gradient -->
+    <linearGradient id="mountain-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#374151" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+    
+    <!-- Sun gradient -->
+    <radialGradient id="sun-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#fcd34d" />
+      <stop offset="80%" stop-color="#f59e0b" />
+    </radialGradient>
+    
+    <!-- Tree gradient -->
+    <linearGradient id="tree-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    
+    <!-- Ground gradient -->
+    <linearGradient id="ground-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#65a30d" />
+      <stop offset="100%" stop-color="#4d7c0f" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="600" height="600" fill="url(#sky-gradient)" />
+  
+  <!-- Sun -->
+  <circle cx="450" cy="100" r="60" fill="url(#sun-gradient)" />
+  <circle cx="450" cy="100" r="80" fill="url(#sun-gradient)" opacity="0.3" />
+  <circle cx="450" cy="100" r="100" fill="url(#sun-gradient)" opacity="0.1" />
+  
+  <!-- Clouds -->
+  <g fill="white" opacity="0.8">
+    <ellipse cx="100" cy="120" rx="50" ry="30" />
+    <ellipse cx="150" cy="110" rx="60" ry="35" />
+    <ellipse cx="200" cy="125" rx="45" ry="25" />
+    
+    <ellipse cx="400" cy="150" rx="40" ry="20" />
+    <ellipse cx="450" cy="155" rx="50" ry="30" />
+    <ellipse cx="500" cy="145" rx="35" ry="25" />
+  </g>
+  
+  <!-- Distant mountains -->
+  <path d="M 0,250 L 100,170 L 150,220 L 250,150 L 350,200 L 450,130 L 550,190 L 600,170 L 600,600 L 0,600 Z" 
+        fill="url(#mountain-gradient)" opacity="0.7" />
+  
+  <!-- Mid mountains -->
+  <path d="M 0,300 L 80,220 L 150,280 L 250,190 L 320,250 L 400,180 L 500,240 L 600,200 L 600,600 L 0,600 Z" 
+        fill="url(#mountain-gradient)" opacity="0.8" />
+  
+  <!-- Snow caps -->
+  <path d="M 80,220 L 95,212 L 110,225 L 125,215 L 150,280 M 250,190 L 270,180 L 290,195 L 310,185 L 320,250 M 400,180 L 420,170 L 440,185 L 460,175 L 500,240" 
+        fill="none" stroke="white" stroke-width="5" />
+  
+  <!-- Hills -->
+  <path d="M 0,350 L 100,320 L 200,350 L 300,310 L 400,360 L 500,330 L 600,350 L 600,600 L 0,600 Z" 
+        fill="#065f46" />
+  
+  <!-- Ground/field -->
+  <path d="M 0,400 L 600,400 L 600,600 L 0,600 Z" fill="url(#ground-gradient)" />
+  
+  <!-- Lake -->
+  <ellipse cx="350" cy="450" rx="150" ry="50" fill="#3b82f6" opacity="0.8" />
+  <ellipse cx="350" cy="450" rx="140" ry="45" fill="#60a5fa" opacity="0.5" />
+  
+  <!-- Trees (pine) -->
+  <g transform="translate(100, 350)">
+    <rect x="-5" y="25" width="10" height="20" fill="#7f1d1d" />
+    <polygon points="0,0 -25,25 25,25" fill="url(#tree-gradient)" />
+    <polygon points="0,-10 -20,15 20,15" fill="url(#tree-gradient)" />
+    <polygon points="0,-20 -15,5 15,5" fill="url(#tree-gradient)" />
+  </g>
+  
+  <g transform="translate(150, 370)">
+    <rect x="-4" y="20" width="8" height="15" fill="#7f1d1d" />
+    <polygon points="0,0 -20,20 20,20" fill="url(#tree-gradient)" />
+    <polygon points="0,-8 -15,12 15,12" fill="url(#tree-gradient)" />
+    <polygon points="0,-16 -10,4 10,4" fill="url(#tree-gradient)" />
+  </g>
+  
+  <g transform="translate(200, 360)">
+    <rect x="-4.5" y="22" width="9" height="18" fill="#7f1d1d" />
+    <polygon points="0,0 -22,22 22,22" fill="url(#tree-gradient)" />
+    <polygon points="0,-9 -17,13 17,13" fill="url(#tree-gradient)" />
+    <polygon points="0,-18 -12,4 12,4" fill="url(#tree-gradient)" />
+  </g>
+  
+  <g transform="translate(500, 350)">
+    <rect x="-5" y="25" width="10" height="20" fill="#7f1d1d" />
+    <polygon points="0,0 -25,25 25,25" fill="url(#tree-gradient)" />
+    <polygon points="0,-10 -20,15 20,15" fill="url(#tree-gradient)" />
+    <polygon points="0,-20 -15,5 15,5" fill="url(#tree-gradient)" />
+  </g>
+  
+  <g transform="translate(550, 370)">
+    <rect x="-4" y="20" width="8" height="15" fill="#7f1d1d" />
+    <polygon points="0,0 -20,20 20,20" fill="url(#tree-gradient)" />
+    <polygon points="0,-8 -15,12 15,12" fill="url(#tree-gradient)" />
+    <polygon points="0,-16 -10,4 10,4" fill="url(#tree-gradient)" />
+  </g>
+  
+  <!-- Flowers -->
+  <g transform="translate(50, 500)">
+    <line x1="0" y1="0" x2="0" y2="15" stroke="#65a30d" stroke-width="2" />
+    <circle cx="0" cy="0" r="3" fill="#ec4899" />
+    <circle cx="3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="0" cy="0" r="1" fill="#fcd34d" />
+  </g>
+  
+  <g transform="translate(80, 520)">
+    <line x1="0" y1="0" x2="0" y2="15" stroke="#65a30d" stroke-width="2" />
+    <circle cx="0" cy="0" r="3" fill="#ec4899" />
+    <circle cx="3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="0" cy="0" r="1" fill="#fcd34d" />
+  </g>
+  
+  <g transform="translate(400, 520)">
+    <line x1="0" y1="0" x2="0" y2="15" stroke="#65a30d" stroke-width="2" />
+    <circle cx="0" cy="0" r="3" fill="#ec4899" />
+    <circle cx="3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="-3" r="3" fill="#ec4899" />
+    <circle cx="3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="-3" cy="3" r="3" fill="#ec4899" />
+    <circle cx="0" cy="0" r="1" fill="#fcd34d" />
+  </g>
+  
+  <!-- Fallen leaves -->
+  <g fill="#fb923c" opacity="0.7">
+    <ellipse cx="70" cy="550" rx="5" ry="3" transform="rotate(30, 70, 550)" />
+    <ellipse cx="90" cy="560" rx="4" ry="2" transform="rotate(-20, 90, 560)" />
+    <ellipse cx="120" cy="545" rx="6" ry="3" transform="rotate(45, 120, 545)" />
+    <ellipse cx="450" cy="550" rx="5" ry="3" transform="rotate(15, 450, 550)" />
+    <ellipse cx="480" cy="560" rx="4" ry="2" transform="rotate(-35, 480, 560)" />
+    <ellipse cx="520" cy="545" rx="6" ry="3" transform="rotate(60, 520, 545)" />
+  </g>
+  
+  <!-- Birds -->
+  <g stroke="#1f2937" stroke-width="2" fill="none">
+    <path d="M 320,100 C 325,95 330,100 335,95" />
+    <path d="M 350,80 C 355,75 360,80 365,75" />
+    <path d="M 240,120 C 245,115 250,120 255,115" />
+  </g>
+</svg>

@@ -1,0 +1,85 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Space background gradient -->
+    <linearGradient id="space-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0c29" />
+      <stop offset="50%" stop-color="#302b63" />
+      <stop offset="100%" stop-color="#24243e" />
+    </linearGradient>
+    
+    <!-- Star pattern -->
+    <pattern id="stars" width="200" height="200" patternUnits="userSpaceOnUse">
+      <rect width="200" height="200" fill="none" />
+      <circle cx="10" cy="10" r="1" fill="white" opacity="0.8" />
+      <circle cx="30" cy="55" r="1.5" fill="white" opacity="0.7" />
+      <circle cx="55" cy="15" r="1" fill="white" opacity="0.5" />
+      <circle cx="80" cy="40" r="1.2" fill="white" opacity="0.6" />
+      <circle cx="120" cy="70" r="1" fill="white" opacity="0.8" />
+      <circle cx="150" cy="30" r="1.5" fill="white" opacity="0.6" />
+      <circle cx="170" cy="90" r="1" fill="white" opacity="0.7" />
+      <circle cx="190" cy="180" r="1.2" fill="white" opacity="0.5" />
+      <circle cx="160" cy="120" r="1" fill="white" opacity="0.9" />
+      <circle cx="130" cy="140" r="1.5" fill="white" opacity="0.7" />
+      <circle cx="90" cy="180" r="1" fill="white" opacity="0.8" />
+      <circle cx="50" cy="150" r="1.2" fill="white" opacity="0.6" />
+      <circle cx="20" cy="190" r="1" fill="white" opacity="0.7" />
+    </pattern>
+    
+    <!-- Radial glow for planets -->
+    <radialGradient id="planet-glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.3)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+    
+    <!-- Planet gradients -->
+    <radialGradient id="planet1" cx="40%" cy="40%" r="60%" fx="40%" fy="40%">
+      <stop offset="0%" stop-color="#7b68ee" />
+      <stop offset="100%" stop-color="#4a67e8" />
+    </radialGradient>
+    
+    <radialGradient id="planet2" cx="30%" cy="30%" r="70%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#ff7e5f" />
+      <stop offset="100%" stop-color="#e74a3b" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#space-bg)" />
+  <rect width="600" height="600" fill="url(#stars)" />
+  
+  <!-- Distant Galaxies -->
+  <ellipse cx="500" cy="100" rx="80" ry="20" fill="rgba(255,130,200,0.1)" />
+  <ellipse cx="100" cy="450" rx="100" ry="30" fill="rgba(130,200,255,0.1)" />
+  
+  <!-- Nebula -->
+  <g opacity="0.3">
+    <path d="M 200,200 C 250,150 350,300 400,200 S 500,150 550,250 S 500,350 400,400 S 200,350 200,200" 
+          fill="none" stroke="url(#planet1)" stroke-width="40" />
+    <path d="M 100,300 C 150,250 250,400 300,300 S 400,250 450,350 S 400,450 300,500 S 100,450 100,300" 
+          fill="none" stroke="url(#planet2)" stroke-width="30" />
+  </g>
+  
+  <!-- Planets -->
+  <circle cx="200" cy="200" r="100" fill="url(#planet-glow)" opacity="0.5" />
+  <circle cx="200" cy="200" r="60" fill="url(#planet1)" />
+  
+  <circle cx="400" cy="350" r="80" fill="url(#planet-glow)" opacity="0.5" />
+  <circle cx="400" cy="350" r="50" fill="url(#planet2)" />
+  
+  <!-- Rings around planet -->
+  <ellipse cx="400" cy="350" rx="80" ry="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="5" transform="rotate(-15, 400, 350)" />
+  
+  <!-- Shooting star -->
+  <path d="M 500,100 L 400,200" stroke="white" stroke-width="2" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite" />
+  </path>
+  
+  <!-- Small stars/asteroids -->
+  <g>
+    <circle cx="150" cy="100" r="2" fill="white" opacity="0.9" />
+    <circle cx="280" cy="420" r="3" fill="white" opacity="0.8" />
+    <circle cx="500" cy="380" r="2" fill="white" opacity="0.7" />
+    <circle cx="350" cy="120" r="3" fill="white" opacity="0.9" />
+    <circle cx="120" cy="300" r="2" fill="white" opacity="0.8" />
+  </g>
+</svg>

@@ -1,0 +1,144 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bg-gradient-art" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    
+    <linearGradient id="yellow-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fcd34d" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    
+    <linearGradient id="pink-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    
+    <linearGradient id="blue-teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+    
+    <linearGradient id="green-yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#fcd34d" />
+    </linearGradient>
+    
+    <!-- Patterns -->
+    <pattern id="dots-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="2" fill="white" opacity="0.3" />
+    </pattern>
+    
+    <pattern id="lines-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="20" y2="20" stroke="white" stroke-width="0.5" opacity="0.2" />
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="600" fill="url(#bg-gradient-art)" />
+  <rect width="600" height="600" fill="url(#dots-pattern)" />
+  
+  <!-- Abstract Art Elements -->
+  
+  <!-- Large Circle -->
+  <circle cx="300" cy="300" r="150" fill="none" stroke="white" stroke-width="2" opacity="0.5" />
+  
+  <!-- Intersecting Circles -->
+  <circle cx="200" cy="250" r="100" fill="url(#yellow-orange)" opacity="0.7" />
+  <circle cx="350" cy="200" r="80" fill="url(#pink-purple)" opacity="0.7" />
+  <circle cx="400" cy="350" r="120" fill="url(#blue-teal)" opacity="0.7" />
+  <circle cx="250" cy="400" r="90" fill="url(#green-yellow)" opacity="0.7" />
+  
+  <!-- Lines -->
+  <g stroke="white" stroke-width="1" opacity="0.6">
+    <line x1="100" y1="100" x2="500" y2="500" />
+    <line x1="500" y1="100" x2="100" y2="500" />
+    <line x1="300" y1="100" x2="300" y2="500" />
+    <line x1="100" y1="300" x2="500" y2="300" />
+  </g>
+  
+  <!-- Mondrian-inspired Rectangles -->
+  <g opacity="0.8">
+    <rect x="50" y="50" width="100" height="100" fill="#ef4444" stroke="black" stroke-width="5" />
+    <rect x="450" y="50" width="100" height="100" fill="#3b82f6" stroke="black" stroke-width="5" />
+    <rect x="50" y="450" width="100" height="100" fill="#fcd34d" stroke="black" stroke-width="5" />
+    <rect x="450" y="450" width="100" height="100" fill="#10b981" stroke="black" stroke-width="5" />
+  </g>
+  
+  <!-- Kandinsky-inspired Shapes -->
+  <g>
+    <circle cx="150" cy="250" r="30" fill="none" stroke="#fcd34d" stroke-width="3" />
+    <circle cx="450" cy="250" r="30" fill="none" stroke="#ec4899" stroke-width="3" />
+    <circle cx="250" cy="150" r="20" fill="#fcd34d" />
+    <circle cx="350" cy="450" r="20" fill="#ec4899" />
+    
+    <line x1="150" y1="250" x2="250" y2="150" stroke="#fcd34d" stroke-width="2" />
+    <line x1="450" y1="250" x2="350" y2="450" stroke="#ec4899" stroke-width="2" />
+  </g>
+  
+  <!-- Miró-inspired Elements -->
+  <g>
+    <path d="M 200,180 C 220,150 250,190 230,210 Z" fill="#0ea5e9" />
+    <path d="M 350,380 C 370,350 400,390 380,410 Z" fill="#f59e0b" />
+    
+    <line x1="200" y1="180" x2="350" y2="380" stroke="black" stroke-width="3" />
+    
+    <circle cx="200" cy="180" r="5" fill="black" />
+    <circle cx="350" cy="380" r="5" fill="black" />
+    <circle cx="275" cy="280" r="8" fill="#ef4444" />
+  </g>
+  
+  <!-- Pollock-inspired Splatters -->
+  <g>
+    <circle cx="120" cy="120" r="3" fill="white" />
+    <circle cx="125" cy="125" r="2" fill="white" />
+    <circle cx="130" cy="115" r="4" fill="white" />
+    <circle cx="110" cy="130" r="3" fill="white" />
+    
+    <circle cx="480" cy="120" r="3" fill="white" />
+    <circle cx="485" cy="125" r="2" fill="white" />
+    <circle cx="490" cy="115" r="4" fill="white" />
+    <circle cx="470" cy="130" r="3" fill="white" />
+    
+    <circle cx="120" cy="480" r="3" fill="white" />
+    <circle cx="125" cy="485" r="2" fill="white" />
+    <circle cx="130" cy="475" r="4" fill="white" />
+    <circle cx="110" cy="490" r="3" fill="white" />
+    
+    <circle cx="480" cy="480" r="3" fill="white" />
+    <circle cx="485" cy="485" r="2" fill="white" />
+    <circle cx="490" cy="475" r="4" fill="white" />
+    <circle cx="470" cy="490" r="3" fill="white" />
+  </g>
+  
+  <!-- Warhol-inspired Pop Art Element -->
+  <g transform="translate(300, 300)">
+    <rect x="-50" y="-50" width="100" height="100" fill="#fcd34d" />
+    <circle cx="0" cy="0" r="40" fill="#ef4444" />
+    <path d="M -20,-10 C -10,-20 10,-20 20,-10 C 10,10 -10,10 -20,-10 Z" fill="white" />
+  </g>
+  
+  <!-- Optical Illusion Element (Vasarely-inspired) -->
+  <g transform="translate(150, 450)">
+    <rect x="-30" y="-30" width="60" height="60" fill="black" />
+    <rect x="-25" y="-25" width="50" height="50" fill="white" />
+    <rect x="-20" y="-20" width="40" height="40" fill="black" />
+    <rect x="-15" y="-15" width="30" height="30" fill="white" />
+    <rect x="-10" y="-10" width="20" height="20" fill="black" />
+    <rect x="-5" y="-5" width="10" height="10" fill="white" />
+  </g>
+  
+  <g transform="translate(450, 150)">
+    <rect x="-30" y="-30" width="60" height="60" fill="black" />
+    <rect x="-25" y="-25" width="50" height="50" fill="white" />
+    <rect x="-20" y="-20" width="40" height="40" fill="black" />
+    <rect x="-15" y="-15" width="30" height="30" fill="white" />
+    <rect x="-10" y="-10" width="20" height="20" fill="black" />
+    <rect x="-5" y="-5" width="10" height="10" fill="white" />
+  </g>
+  
+  <!-- Signature -->
+  <text x="500" y="580" font-family="'Brush Script MT', cursive" font-size="20" fill="white" opacity="0.7">Art Puzzle</text>
+</svg>
