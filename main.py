@@ -789,11 +789,17 @@ def color_match_game():
 def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
-    return render_template('games/mathChallenge_enhanced.html')
+    return render_template('games/mathChallenge_simplified.html')
 
 @app.route('/snake')
-def snake():
-    return render_template('games/snake.html')
+def snake_redirect():
+    return redirect(url_for('snake_game'))
+    
+@app.route('/games/snake')
+def snake_game():
+    """Yılan Oyunu: Klasik arcade
+    Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
+    return render_template('games/snake_simplified.html')
 
 @app.route('/pattern-flow')
 def pattern_flow():
