@@ -11,15 +11,19 @@
       <canvas id="game-canvas" width="400" height="400"></canvas>
       
       <div class="game-controls">
-        <!-- Skor bilgilerini kaldırdık -->
-        <div class="game-title">
-          <h2>Yılan Oyunu</h2>
-        </div>
-        
         <div class="buttons">
           <button id="start-game" class="btn btn-primary">BAŞLAT</button>
           <button id="pause-game" class="btn btn-outline-light" disabled>DURAKLAT</button>
         </div>
+      </div>
+      
+      <div class="mobile-controls">
+        <button id="up-btn" class="control-btn">⬆️</button>
+        <div class="middle-controls">
+          <button id="left-btn" class="control-btn">⬅️</button>
+          <button id="right-btn" class="control-btn">➡️</button>
+        </div>
+        <button id="down-btn" class="control-btn">⬇️</button>
       </div>
     </div>
     
@@ -205,14 +209,16 @@
   .modal {
     display: none;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
-    height: 100%;
+    max-width: 400px;
     background: rgba(0, 0, 0, 0.7);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    border-radius: 15px;
   }
   
   .modal-content {
@@ -295,9 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const startBtn = document.getElementById('start-game');
   const pauseBtn = document.getElementById('pause-game');
   const playAgainBtn = document.getElementById('play-again');
-  
   const finalScoreEl = document.getElementById('final-score');
-  
   const gameOverModal = document.getElementById('game-over-modal');
 
   // Game settings
@@ -373,7 +377,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Dokunmatik kontroller için buton referanslarını kaldırdık
+  // Mobile control buttons
+  const upBtn = document.getElementById('up-btn');
+  const leftBtn = document.getElementById('left-btn');
+  const rightBtn = document.getElementById('right-btn');
+  const downBtn = document.getElementById('down-btn');
+
+  // Touch button controls
+  upBtn.addEventListener('click', function() {
+    if (direction !== 'down') nextDirection = 'up';
+  });
+  
+  leftBtn.addEventListener('click', function() {
+    if (direction !== 'right') nextDirection = 'left';
+  });
+  
+  rightBtn.addEventListener('click', function() {
+    if (direction !== 'left') nextDirection = 'right';
+  });
+  
+  downBtn.addEventListener('click', function() {
+    if (direction !== 'up') nextDirection = 'down';
+  });
   
   // Touch swipe controls
   let touchStartX = 0;
