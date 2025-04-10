@@ -146,6 +146,35 @@
     transform: translateY(-2px);
   }
   
+  .game-settings {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+  }
+  
+  .setting-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .setting-group label {
+    color: white;
+    font-size: 0.9rem;
+  }
+  
+  .game-setting {
+    background: rgba(40, 40, 80, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
   .mobile-controls {
     display: flex;
     flex-direction: column;
@@ -311,6 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   wallsSelect.addEventListener('change', function() {
     wallsEnabled = this.value === 'on';
+  });
   
   // Game state
   let snake = [];
