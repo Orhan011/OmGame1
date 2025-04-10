@@ -44,7 +44,6 @@
 
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="typing-section">
-
       <div id="text-display" class="text-display"></div>
 
       <div class="input-container">
@@ -61,11 +60,11 @@
       </div>
     </div>
 
-    <!-- Sonuçlar doğrudan oyun ekranının içinde gösterilecek -->
+    <!-- Sonuçlar Overlay -->
     <div id="result-overlay" class="result-overlay">
       <div class="result-content-minimal">
         <h2><i class="fas fa-trophy"></i> Sonuçlarınız</h2>
-        
+
         <div class="result-summary-minimal">
           <div class="result-minimal-row">
             <span class="result-minimal-label">Kelime/Dakika:</span>
@@ -80,7 +79,7 @@
             <span class="result-minimal-value" id="result-errors">0</span>
           </div>
         </div>
-        
+
         <div class="result-minimal-actions">
           <button id="try-again-btn" class="typing-btn primary-btn">
             <i class="fas fa-redo-alt"></i> Tekrar Dene
@@ -120,6 +119,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
   width: 100%;
+  position: relative;
 }
 
 /* Bölüm Stili */
@@ -197,68 +197,6 @@
 }
 
 /* Oyun Ekranı */
-
-/* Sonuç Overlay Stili */
-.result-overlay {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(20, 20, 40, 0.9);
-  z-index: 100;
-  backdrop-filter: blur(5px);
-  justify-content: center;
-  align-items: center;
-}
-
-.result-content-minimal {
-  background: rgba(30, 30, 60, 0.8);
-  border-radius: 15px;
-  padding: 25px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(106, 90, 224, 0.3);
-  text-align: center;
-}
-
-.result-summary-minimal {
-  margin: 25px 0;
-}
-
-.result-minimal-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.result-minimal-row:last-child {
-  border-bottom: none;
-}
-
-.result-minimal-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1rem;
-  text-align: left;
-}
-
-.result-minimal-value {
-  font-weight: 600;
-  color: var(--accent-color);
-  font-size: 1.1rem;
-}
-
-.result-minimal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-
 .text-display {
   background: rgba(30, 30, 60, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -323,84 +261,64 @@
   gap: 15px;
 }
 
-/* Sonuç Ekranı */
-.result-content {
-  text-align: center;
-  padding: 20px 0;
-}
-
-.result-content h2 {
-  color: var(--accent-color);
-  font-size: 1.8rem;
-  margin-bottom: 25px;
-}
-
-.result-summary {
-  display: flex;
+/* Sonuç Overlay Stili */
+.result-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 40, 0.9);
+  z-index: 100;
+  backdrop-filter: blur(5px);
   justify-content: center;
-  gap: 30px;
-  margin-bottom: 30px;
+  align-items: center;
 }
 
-.result-item {
-  background: rgba(30, 30, 60, 0.5);
-  border-radius: 12px;
-  padding: 20px;
-  min-width: 150px;
-}
-
-.result-item.primary {
+.result-content-minimal {
+  background: rgba(30, 30, 60, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(106, 90, 224, 0.3);
+  text-align: center;
 }
 
-.result-value {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--accent-color);
-  margin-bottom: 5px;
+.result-summary-minimal {
+  margin: 25px 0;
 }
 
-.result-label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.result-details {
-  background: rgba(30, 30, 60, 0.5);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 30px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.detail-row {
+.result-minimal-row {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 10px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.detail-row:last-child {
+.result-minimal-row:last-child {
   border-bottom: none;
 }
 
-.detail-label {
+.result-minimal-label {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
+  font-size: 1rem;
+  text-align: left;
 }
 
-.detail-value {
+.result-minimal-value {
   font-weight: 600;
-  color: #fff;
-  font-size: 0.95rem;
+  color: var(--accent-color);
+  font-size: 1.1rem;
 }
 
-.result-actions {
+.result-minimal-actions {
   display: flex;
   justify-content: center;
   gap: 15px;
+  margin-top: 20px;
 }
 
 /* Buton Stili */
@@ -465,37 +383,10 @@
     font-size: 0.95rem;
   }
 
-  .result-summary {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .result-item {
-    min-width: auto;
-    width: 100%;
-  }
-
-  .game-controls, .result-actions {
-    flex-direction: column;
-  }
-
-  .corner-stat {
-    padding: 5px 10px;
-    min-width: 60px;
-  }
-  
-  .corner-stat-value {
-    font-size: 1.2rem;
-  }
-  
-  .corner-stat-label {
-    font-size: 0.6rem;
-  }
-  
   .result-content-minimal {
     padding: 20px 15px;
   }
-  
+
   .result-minimal-actions {
     flex-direction: column;
     gap: 10px;
@@ -508,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // DOM Elementleri
   const introScreen = document.getElementById('intro-screen');
   const gameScreen = document.getElementById('game-screen');
-  const resultScreen = document.getElementById('result-screen');
+  const resultOverlay = document.getElementById('result-overlay');
 
   const startBtn = document.getElementById('start-btn');
   const restartBtn = document.getElementById('restart-btn');
@@ -520,14 +411,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const textDisplay = document.getElementById('text-display');
   const typingInput = document.getElementById('typing-input');
 
-  // İstatistik elemanları kaldırıldı
-
   const resultWpm = document.getElementById('result-wpm');
   const resultAccuracy = document.getElementById('result-accuracy');
-  const resultChars = document.getElementById('result-chars');
-  const resultCorrect = document.getElementById('result-correct');
   const resultErrors = document.getElementById('result-errors');
-  const resultTime = document.getElementById('result-time');
 
   // Metin Korpusu - Zorluk Seviyelerine Göre
   const textCorpus = {
@@ -542,9 +428,9 @@ document.addEventListener('DOMContentLoaded', function() {
       "Sağlıklı beslenme ve düzenli egzersiz, uzun ve kaliteli bir yaşam için vazgeçilmezdir. Dengeli bir diyet ve haftada en az üç gün orta şiddetli egzersiz yapmak, birçok hastalığın önlenmesine yardımcı olabilir."
     ],
     hard: [
-      "Yapay zekâ teknolojilerindeki hızlı gelişmeler, günlük yaşantımızdan iş dünyasına kadar birçok alanı etkilemektedir. Makine öğrenimi algoritmaları, büyük veri analizi ve doğal dil işleme gibi teknikler sayesinde, bilgisayarlar insana özgü kabul edilen birçok görevi başarıyla yerine getirebilmektedir. Bu gelişmelerin etik ve sosyal sonuçları ise kapsamlı bir şekilde tartışılmaktadır.",
-      "Küresel iklim değişikliği, 21. yüzyılın en büyük çevre sorunlarından biri olarak kabul edilmektedir. Artan sıcaklıklar, yükselen deniz seviyeleri ve aşırı hava olayları, dünya genelinde ekosistemleri ve insan topluluklarını tehdit etmektedir. Karbon emisyonlarını azaltmak ve yenilenebilir enerji kaynaklarına yönelmek, bu soruna karşı alınabilecek en önemli önlemler arasındadır.",
-      "Modern toplumda bilgi ve iletişim teknolojileri, bireylerin günlük yaşamlarını ve sosyal etkileşimlerini kökten değiştirmiştir. Akıllı telefonlar, sosyal medya platformları ve anlık mesajlaşma uygulamaları, iletişim kurma biçimlerimizi dönüştürürken, sürekli bağlantıda olma hali ve dijital yorgunluk gibi yeni kavramları da beraberinde getirmiştir."
+      "Yapay zekâ teknolojilerindeki hızlı gelişmeler, günlük yaşantımızdan iş dünyasına kadar birçok alanı etkilemektedir. Makine öğrenimi algoritmaları, büyük veri analizi ve doğal dil işleme gibi teknikler sayesinde, bilgisayarlar insana özgü kabul edilen birçok görevi başarıyla yerine getirebilmektedir.",
+      "Küresel iklim değişikliği, 21. yüzyılın en büyük çevre sorunlarından biri olarak kabul edilmektedir. Artan sıcaklıklar, yükselen deniz seviyeleri ve aşırı hava olayları, dünya genelinde ekosistemleri ve insan topluluklarını tehdit etmektedir.",
+      "Modern toplumda bilgi ve iletişim teknolojileri, bireylerin günlük yaşamlarını ve sosyal etkileşimlerini kökten değiştirmiştir. Akıllı telefonlar, sosyal medya platformları ve anlık mesajlaşma uygulamaları, iletişim kurma biçimlerimizi dönüştürmüştür."
     ]
   };
 
@@ -561,7 +447,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let totalTyped = 0;
   let correctTyped = 0;
   let errorCount = 0;
-  let startTime;
 
   // Süre seçenekleri
   timeOptions.forEach(option => {
@@ -594,6 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Tekrar dene
   tryAgainBtn.addEventListener('click', () => {
+    resultOverlay.style.display = 'none';
     showScreen(introScreen);
   });
 
@@ -627,9 +513,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Girdi alanını temizle ve odakla
     typingInput.value = '';
     typingInput.focus();
-
-    // Başlangıç zamanını kaydet
-    startTime = new Date().getTime();
   }
 
   // Test durumunu sıfırla
@@ -640,21 +523,16 @@ document.addEventListener('DOMContentLoaded', function() {
     totalTyped = 0;
     correctTyped = 0;
     errorCount = 0;
-    // İstatistik değerleri kaldırıldı
   }
 
   // Ekran gösterme
   function showScreen(screen) {
     introScreen.classList.remove('active');
     gameScreen.classList.remove('active');
-
     screen.classList.add('active');
-    
+
     // Sonuç overlay'ını gizle (eğer görünüyorsa)
-    const resultOverlay = document.getElementById('result-overlay');
-    if (resultOverlay) {
-      resultOverlay.style.display = 'none';
-    }
+    resultOverlay.style.display = 'none';
   }
 
   // Zamanlayıcıyı başlat
@@ -664,17 +542,11 @@ document.addEventListener('DOMContentLoaded', function() {
       timer = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
-          // İstatistik elemanları kaldırıldı
         } else {
           endTest();
         }
       }, 1000);
     }
-  }
-
-  // İstatistikleri güncelle - İstatistik elemanları kaldırıldığı için boş fonksiyon
-  function updateStats() {
-    // İstatistik güncellemesi kaldırıldı
   }
 
   // Testi bitir
@@ -684,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sonuçları hesapla
     const elapsedTime = (timeLimit - timeLeft) / 60; // dakika
-    const wpm = Math.round((correctTyped / 5) / elapsedTime);
+    const wpm = Math.round((correctTyped / 5) / (elapsedTime || 1));
     const accuracy = totalTyped > 0 ? Math.floor((correctTyped / totalTyped) * 100) : 100;
 
     // Sonuç ekranını güncelle
@@ -696,21 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
     saveScore(wpm);
 
     // Sonuç overlay'ını göster
-    const resultOverlay = document.getElementById('result-overlay');
     resultOverlay.style.display = 'flex';
-    
-    // Try Again butonuna event listener ekle
-    document.getElementById('try-again-btn').addEventListener('click', function() {
-      resultOverlay.style.display = 'none';
-      initTest();
-    });
-  }
-
-  // Zamanı biçimlendir
-  function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 
   // Skoru kaydet
@@ -766,9 +624,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initTest();
         return;
       }
-
-      // İstatistikleri güncelle
-      updateStats();
     }
   });
 
