@@ -203,7 +203,45 @@
       <a href="{{ url_for('memory_match') }}" class="game-btn">Oyna</a>
     </div>
 
-    <!-- Kaldırılan oyunlar: Sudoku, Tangram, Bulmaca ve Solitaire -->
+    <!-- Sudoku -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-th"></i></div>
+      <div class="game-info">
+        <h3>Sudoku</h3>
+        <p>Sayı bulmaca oyunu.</p>
+      </div>
+      <a href="{{ url_for('sudoku') }}" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Tangram -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-puzzle-piece"></i></div>
+      <div class="game-info">
+        <h3>Tangram</h3>
+        <p>Geometrik bulmaca oyunu.</p>
+      </div>
+      <a href="{{ url_for('tangram') }}" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Crossword -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-table"></i></div>
+      <div class="game-info">
+        <h3>Bulmaca</h3>
+        <p>Kelime bulmaca oyunu.</p>
+      </div>
+      <a href="{{ url_for('crossword') }}" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Solitaire -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-clone"></i></div>
+      <div class="game-info">
+        <h3>Solitaire</h3>
+        <p>Klasik kart oyunu.</p>
+      </div>
+      <a href="{{ url_for('solitaire') }}" class="game-btn">Oyna</a>
+    </div>
 
   </div>
 

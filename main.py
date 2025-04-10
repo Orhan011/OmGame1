@@ -862,7 +862,12 @@ def solitaire():
 
 @app.route('/all-games')
 def all_games():
-    return render_template('all_games.html')
+    """Tüm oyunları listeleyen sayfa"""
+    try:
+        return render_template('all_games.html')
+    except Exception as e:
+        logger.error(f"Error rendering all_games.html: {str(e)}")
+        return f"An error occurred: {str(e)}", 500
 
 # Skor Tablosu
 @app.route('/leaderboard')
