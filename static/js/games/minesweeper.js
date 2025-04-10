@@ -553,6 +553,75 @@ document.addEventListener('DOMContentLoaded', function() {
     
     resultMines.textContent = gameState.mines;
     
+    // Kazanılmışsa skoru kaydet
+    if (isWin) {
+      // Skoru hesapla - zorluk seviyesi, süre ve ipucu kullanımı faktörleri
+      let baseScore = 0;
+      switch (gameState.difficulty) {
+        case 'beginner':
+          baseScore = 100;
+          break;
+        case 'intermediate':
+          baseScore = 200;
+          break;
+        case 'expert':
+          baseScore = 400;
+          break;
+      }
+      
+      // Süre faktörü - zorluk seviyesine göre farklı süre limitleri
+      let timeLimit = 0;
+      switch (gameState.difficulty) {
+        case 'beginner':
+          timeLimit = 120; // 2 dakika
+          break;
+        case 'intermediate':
+          timeLimit = 300; // 5 dakika
+          break;
+        case 'expert':
+          timeLimit = 600; // 10 dakika
+          break;
+      }
+      
+      // Süre puanı: süre ne kadar azsa o kadar çok puan
+      let timeScore = Math.max(0, timeLimit - gameState.timer);
+      timeScore = Math.min(timeScore, timeLimit); // Çok hızlı tamamlanırsa da makul bir puan olsun
+      
+      // İpucu kullanımı cezası
+      const hintPenalty = gameState.hintUsed ? 0.8 : 1.0;
+      
+      // Toplam puanı hesapla
+      const totalScore = Math.round((baseScore + timeScore) * hintPenalty);
+      
+      // Oyun istatistikleri
+      const gameStats = {
+        timeSpent: gameState.timer,
+        difficultyLevel: gameState.difficulty,
+        mineCount: gameState.mines,
+        hintUsed: gameState.hintUsed
+      };
+      
+      // Skoru API'a gönder
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_type: 'minesweeper',
+          score: totalScore,
+          difficulty: gameState.difficulty,
+          playtime: gameState.timer,
+          game_stats: gameStats
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Skor başarıyla kaydedildi:', data);
+      })
+      .catch(error => {
+        console.error('Skor kaydedilirken hata oluştu:', error);
+      });
+    }
+    
     // Modalı göster
     resultModal.show();
   }
