@@ -78,12 +78,8 @@
           </div>
         </div>
 
-        <div class="mobile-input-container">
-          <input type="text" id="letter-input" maxlength="1" placeholder="Harf giriniz" autocomplete="off" autocorrect="off" autocapitalize="characters">
-          <button id="submit-letter" class="primary-button modern-button pulse-effect">
-            <i class="fas fa-check"></i> Tahmin Et
-          </button>
-        </div>
+        <!-- Mobil giriş alanı kaldırıldı, sadece sanal klavye kullanılıyor -->
+        <input type="hidden" id="letter-input" maxlength="1" autocomplete="off">
         
         <div class="used-letters-container">
           <h3>Kullanılan Harfler</h3>
@@ -164,7 +160,8 @@
 <style>
 /* Hangman Modernize Edilmiş Stiller */
 .hangman-game-wrapper {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -316,62 +313,95 @@
   box-shadow: none;
 }
 
-/* Virtual Keyboard */
+/* Modern Virtual Keyboard */
 .virtual-keyboard {
-  background: rgba(20, 20, 35, 0.7);
-  border-radius: 15px;
-  padding: 15px 10px;
-  margin-bottom: 20px;
+  background: rgba(20, 20, 35, 0.8);
+  border-radius: 20px;
+  padding: 20px 15px;
+  margin-bottom: 30px;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
-              inset 0 0 15px rgba(106, 90, 224, 0.2);
-  border: 1px solid rgba(106, 90, 224, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 
+              inset 0 0 20px rgba(106, 90, 224, 0.3);
+  border: 1px solid rgba(106, 90, 224, 0.3);
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
 }
 
 .key-btn {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
   border: none;
-  background: linear-gradient(135deg, rgba(50, 50, 80, 0.9), rgba(40, 40, 70, 0.8));
+  background: linear-gradient(145deg, rgba(60, 60, 100, 0.95), rgba(50, 50, 90, 0.85));
   color: white;
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.key-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .key-btn:hover {
-  background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(50, 50, 90, 0.8));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(145deg, rgba(80, 80, 130, 0.95), rgba(60, 60, 100, 0.85));
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.key-btn:hover:before {
+  opacity: 1;
 }
 
 .key-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3),
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .key-btn.correct {
-  background: linear-gradient(135deg, rgba(40, 160, 70, 0.8), rgba(30, 130, 60, 0.7));
+  background: linear-gradient(145deg, rgba(50, 190, 90, 0.9), rgba(40, 160, 70, 0.8));
   color: white;
-  box-shadow: 0 2px 8px rgba(40, 180, 70, 0.4);
+  box-shadow: 0 4px 12px rgba(40, 180, 70, 0.5),
+              inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+  animation: correctKeyPress 0.5s ease forwards;
+}
+
+@keyframes correctKeyPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+  100% { transform: scale(1.05); }
 }
 
 .key-btn.wrong {
-  background: linear-gradient(135deg, rgba(180, 40, 40, 0.8), rgba(150, 30, 30, 0.7));
-  color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 2px 8px rgba(180, 40, 40, 0.4);
+  background: linear-gradient(145deg, rgba(210, 60, 60, 0.8), rgba(180, 40, 40, 0.7));
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(180, 40, 40, 0.4),
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
   pointer-events: none;
+  opacity: 0.8;
+  transform: scale(0.95);
 }
 
 /* Mobil giriş stilleri */
@@ -1006,40 +1036,25 @@ document.addEventListener('DOMContentLoaded', function() {
     startNewGame();
   });
 
-  // Harf giriş alanını odakla
-  letterInput.addEventListener('focus', function() {
-    // Mobil klavyede büyük harf kullanımını teşvik et
-    this.setAttribute('inputmode', 'text');
-  });
-  
-  // Otomatik tahmin için harf girişini dinle
-  letterInput.addEventListener('input', function(e) {
-    // Harf girişi yapıldığında:
-    this.value = this.value.toUpperCase(); // Büyük harfe çevir
+  // Fiziksel klavye ile de harfleri destekleyelim
+  document.addEventListener('keydown', function(e) {
+    if (gameOver) return;
     
-    // Tek harf girildiğinde otomatik olarak tahmini değerlendir
-    if (this.value.length === 1 && /^[A-ZĞÜŞİÖÇ]$/.test(this.value)) {
-      setTimeout(() => {
-        submitGuess();
-      }, 200); // Kullanıcının görmesi için kısa bir gecikme
-    } else if (this.value.length > 1) {
-      // Birden fazla harf girilirse ilk harfi al
-      this.value = this.value.charAt(0);
-      setTimeout(() => {
-        submitGuess();
-      }, 200);
-    }
-  });
-  
-  // Tahmin düğmesini yine de aktif tut
-  submitLetterBtn.addEventListener('click', function() {
-    submitGuess();
-  });
-  
-  // Enter tuşuyla da tahmin yapabilme (isteğe bağlı)
-  letterInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      submitGuess();
+    // Sadece harfler ile etkileşime geçelim
+    if (/^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
+      const letter = e.key.toUpperCase();
+      letterInput.value = letter;
+      
+      // Sanal klavyede basılan tuşun görsel efektini gösterelim
+      keyButtons.forEach(button => {
+        if (button.getAttribute('data-key') === letter) {
+          button.classList.add('key-pressed');
+          setTimeout(() => {
+            button.classList.remove('key-pressed');
+            submitGuess();
+          }, 200);
+        }
+      });
     }
   });
 
