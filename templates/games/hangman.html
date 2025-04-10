@@ -6,7 +6,7 @@
 <div class="page-container">
   <div class="game-container hangman-game-wrapper">
     <div class="game-header">
-      <h1>Adam Asmaca <span class="badge">Kelime Oyunu</span></h1>
+      <h1>Adam Asmaca <span class="badge badge-glow">Kelime Oyunu</span></h1>
       <p>Gizli kelimeyi bulmak için harfleri tahmin edin, her yanlış tahminde resim tamamlanır. Dikkatli olun, 6 yanlış hakkınız var!</p>
     </div>
 
@@ -36,9 +36,53 @@
           <div id="word-container"></div>
         </div>
 
+        <!-- Türkçe Klavye Düzeni -->
+        <div class="virtual-keyboard">
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="Q">Q</button>
+            <button class="key-btn" data-key="W">W</button>
+            <button class="key-btn" data-key="E">E</button>
+            <button class="key-btn" data-key="R">R</button>
+            <button class="key-btn" data-key="T">T</button>
+            <button class="key-btn" data-key="Y">Y</button>
+            <button class="key-btn" data-key="U">U</button>
+            <button class="key-btn" data-key="I">I</button>
+            <button class="key-btn" data-key="O">O</button>
+            <button class="key-btn" data-key="P">P</button>
+            <button class="key-btn" data-key="Ğ">Ğ</button>
+            <button class="key-btn" data-key="Ü">Ü</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="A">A</button>
+            <button class="key-btn" data-key="S">S</button>
+            <button class="key-btn" data-key="D">D</button>
+            <button class="key-btn" data-key="F">F</button>
+            <button class="key-btn" data-key="G">G</button>
+            <button class="key-btn" data-key="H">H</button>
+            <button class="key-btn" data-key="J">J</button>
+            <button class="key-btn" data-key="K">K</button>
+            <button class="key-btn" data-key="L">L</button>
+            <button class="key-btn" data-key="Ş">Ş</button>
+            <button class="key-btn" data-key="İ">İ</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="Z">Z</button>
+            <button class="key-btn" data-key="X">X</button>
+            <button class="key-btn" data-key="C">C</button>
+            <button class="key-btn" data-key="V">V</button>
+            <button class="key-btn" data-key="B">B</button>
+            <button class="key-btn" data-key="N">N</button>
+            <button class="key-btn" data-key="M">M</button>
+            <button class="key-btn" data-key="Ö">Ö</button>
+            <button class="key-btn" data-key="Ç">Ç</button>
+          </div>
+        </div>
+
         <div class="mobile-input-container">
           <input type="text" id="letter-input" maxlength="1" placeholder="Harf giriniz" autocomplete="off" autocorrect="off" autocapitalize="characters">
-          <button id="submit-letter" class="primary-button">Tahmin Et</button>
+          <button id="submit-letter" class="primary-button modern-button pulse-effect">
+            <i class="fas fa-check"></i> Tahmin Et
+          </button>
         </div>
         
         <div class="used-letters-container">
@@ -49,25 +93,27 @@
       
       <div class="game-info-panel">
         <div class="game-stats">
-          <div class="stat-item">
+          <div class="stat-item glow-border">
             <div class="stat-label">Kalan Hak</div>
             <div class="stat-value" id="remaining-attempts">6</div>
           </div>
-          <div class="stat-item">
+          <div class="stat-item glow-border">
             <div class="stat-label">Skor</div>
             <div class="stat-value" id="score">0</div>
           </div>
-          <div class="stat-item">
+          <div class="stat-item glow-border">
             <div class="stat-label">Zorluk</div>
             <div class="stat-value" id="difficulty">Orta</div>
           </div>
         </div>
         
         <div class="game-controls">
-          <button id="new-game-btn" class="primary-button">Yeni Oyun</button>
+          <button id="new-game-btn" class="primary-button modern-button">
+            <i class="fas fa-redo-alt"></i> Yeni Oyun
+          </button>
           <div class="difficulty-selector">
             <label for="difficulty-select">Zorluk Seviyesi:</label>
-            <select id="difficulty-select">
+            <select id="difficulty-select" class="modern-select">
               <option value="easy">Kolay</option>
               <option value="medium" selected>Orta</option>
               <option value="hard">Zor</option>
@@ -75,37 +121,41 @@
           </div>
         </div>
         
-        <div class="game-rules">
-          <h3>Nasıl Oynanır?</h3>
+        <div class="game-rules card-container">
+          <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
           <ul>
-            <li>Tahmin etmeniz gereken gizli bir kelime var</li>
-            <li>Kutuya bir harf girerek tahmin yapın</li>
-            <li>Doğru tahminlerde harf yerlerine yerleşir</li>
-            <li>Yanlış tahminler için 6 hakkınız var</li>
-            <li>Her yanlış tahminde adamın bir parçası çizilir</li>
-            <li>Tüm kelimeyi bulmadan adam tamamlanırsa kaybedersiniz</li>
+            <li><i class="fas fa-lightbulb"></i> Tahmin etmeniz gereken gizli bir kelime var</li>
+            <li><i class="fas fa-keyboard"></i> Klavyeden veya sanal klavyeden harf seçin</li>
+            <li><i class="fas fa-check-circle"></i> Doğru tahminlerde harf yerlerine yerleşir</li>
+            <li><i class="fas fa-exclamation-triangle"></i> Yanlış tahminler için 6 hakkınız var</li>
+            <li><i class="fas fa-user-alt"></i> Her yanlış tahminde adamın bir parçası çizilir</li>
+            <li><i class="fas fa-skull"></i> Tüm kelimeyi bulmadan adam tamamlanırsa kaybedersiniz</li>
           </ul>
         </div>
         
-        <div class="category-info">
-          <h3>Kategori</h3>
-          <p id="category-display">Genel</p>
+        <div class="category-info card-container">
+          <h3><i class="fas fa-tag"></i> Kategori</h3>
+          <p id="category-display" class="category-text">Genel</p>
         </div>
       </div>
     </div>
     
     <div id="game-modal" class="game-modal">
       <div class="modal-content">
-        <h2 id="result-title">Oyun Bitti</h2>
+        <div class="modal-header">
+          <h2 id="result-title">Oyun Bitti</h2>
+        </div>
         <p id="result-message"></p>
         <p id="word-reveal"></p>
-        <div class="modal-stats">
+        <div class="modal-stats glow-border">
           <div class="modal-stat">
             <span class="modal-stat-label">Skor:</span>
             <span id="final-score" class="modal-stat-value">0</span>
           </div>
         </div>
-        <button id="play-again-btn" class="primary-button">Tekrar Oyna</button>
+        <button id="play-again-btn" class="primary-button modern-button pulse-effect">
+          <i class="fas fa-play"></i> Tekrar Oyna
+        </button>
       </div>
     </div>
   </div>
@@ -119,6 +169,57 @@
   padding: 20px;
 }
 
+.game-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.game-header h1 {
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 15px;
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  background: linear-gradient(45deg, #6a5ae0, #a26bf9);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 1rem;
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.badge-glow {
+  animation: glow 1.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.7);
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(106, 90, 224, 0.5);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(162, 107, 249, 0.8);
+  }
+}
+
+.game-dashboard {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 25px;
+}
+
+.game-area-panel, .game-info-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .hangman-drawing-container {
   background: rgba(20, 20, 35, 0.7);
   border-radius: 15px;
@@ -130,6 +231,13 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
               inset 0 0 15px rgba(106, 90, 224, 0.2);
   border: 1px solid rgba(106, 90, 224, 0.2);
+  transition: all 0.3s ease;
+}
+
+.hangman-drawing-container:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 
+              inset 0 0 20px rgba(106, 90, 224, 0.3);
+  transform: translateY(-5px);
 }
 
 .hangman-part.hidden {
@@ -151,6 +259,11 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
               inset 0 0 15px rgba(106, 90, 224, 0.2);
   border: 1px solid rgba(106, 90, 224, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.word-display:hover {
+  transform: translateY(-3px);
 }
 
 #word-container {
@@ -158,6 +271,7 @@
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+  min-height: 60px;
 }
 
 .letter-box {
@@ -171,20 +285,93 @@
   justify-content: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--accent-color);
+  color: var(--accent-color, #6a5ae0);
   text-transform: uppercase;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .letter-box.revealed {
   background: rgba(106, 90, 224, 0.3);
   border-color: rgba(106, 90, 224, 0.5);
   transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(106, 90, 224, 0.3);
+  animation: revealLetter 0.5s ease forwards;
+}
+
+@keyframes revealLetter {
+  0% {
+    transform: rotateY(90deg) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateY(0) scale(1.05);
+    opacity: 1;
+  }
 }
 
 .letter-box.space {
   background: transparent;
   border-color: transparent;
+  box-shadow: none;
+}
+
+/* Virtual Keyboard */
+.virtual-keyboard {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 15px 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.key-btn {
+  width: 35px;
+  height: 35px;
+  border: none;
+  background: linear-gradient(135deg, rgba(50, 50, 80, 0.9), rgba(40, 40, 70, 0.8));
+  color: white;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.key-btn:hover {
+  background: linear-gradient(135deg, rgba(60, 60, 100, 0.9), rgba(50, 50, 90, 0.8));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.key-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.key-btn.correct {
+  background: linear-gradient(135deg, rgba(40, 160, 70, 0.8), rgba(30, 130, 60, 0.7));
+  color: white;
+  box-shadow: 0 2px 8px rgba(40, 180, 70, 0.4);
+}
+
+.key-btn.wrong {
+  background: linear-gradient(135deg, rgba(180, 40, 40, 0.8), rgba(150, 30, 30, 0.7));
+  color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(180, 40, 40, 0.4);
+  pointer-events: none;
 }
 
 /* Mobil giriş stilleri */
@@ -210,6 +397,7 @@
   transition: all 0.2s ease;
   letter-spacing: 2px;
   font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #letter-input:focus {
@@ -219,14 +407,76 @@
   transform: scale(1.03);
 }
 
-#letter-input:focus {
-  border-color: rgba(106, 90, 224, 0.7);
-  box-shadow: 0 0 15px rgba(106, 90, 224, 0.3);
+/* Modern button styles */
+.modern-button {
+  background: linear-gradient(45deg, #6a5ae0, #a26bf9);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  padding: 12px 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-#submit-letter {
-  height: 50px;
-  min-width: 120px;
+.modern-button:hover {
+  background: linear-gradient(45deg, #7b6bf1, #b985ff);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.5);
+  transform: translateY(-2px);
+}
+
+.modern-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px rgba(106, 90, 224, 0.3);
+}
+
+.modern-button i {
+  font-size: 1.1rem;
+}
+
+.pulse-effect {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(106, 90, 224, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(106, 90, 224, 0);
+  }
+}
+
+/* Modern select styles */
+.modern-select {
+  background: rgba(40, 40, 70, 0.5);
+  border: 2px solid rgba(106, 90, 224, 0.3);
+  border-radius: 10px;
+  color: white;
+  padding: 8px 15px;
+  outline: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a26bf9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.modern-select:focus {
+  border-color: rgba(106, 90, 224, 0.7);
+  box-shadow: 0 0 15px rgba(106, 90, 224, 0.3);
 }
 
 /* Kullanılan harfler kutusu */
@@ -243,8 +493,24 @@
 
 .used-letters-container h3 {
   margin-top: 0;
-  margin-bottom: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.used-letters-container h3::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #6a5ae0, #a26bf9);
+  border-radius: 3px;
 }
 
 #used-letters {
@@ -260,21 +526,188 @@
   height: 35px;
   line-height: 35px;
   text-align: center;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: appearLetter 0.3s ease forwards;
+}
+
+@keyframes appearLetter {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .used-letter.correct {
   background: rgba(40, 180, 70, 0.3);
   border: 1px solid rgba(40, 180, 70, 0.5);
+  color: rgba(220, 255, 220, 0.95);
 }
 
 .used-letter.wrong {
   background: rgba(180, 40, 40, 0.3);
   border: 1px solid rgba(180, 40, 40, 0.5);
+  color: rgba(255, 220, 220, 0.95);
 }
 
+/* Game Statistics */
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-item {
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 15px;
+  padding: 15px 10px;
+  text-align: center;
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.glow-border {
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg, #6a5ae0, #a26bf9, #6a5ae0, #a26bf9);
+  background-size: 400% 400%;
+  border-radius: 17px;
+  animation: borderGlow 3s ease infinite;
+}
+
+@keyframes borderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent-color, #6a5ae0);
+}
+
+/* Game Controls */
+.game-controls {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.difficulty-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.difficulty-selector label {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+/* Game info cards */
+.card-container {
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.card-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-container h3 {
+  color: var(--accent-color, #6a5ae0);
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-container ul {
+  list-style-type: none;
+  padding-left: 5px;
+  margin-bottom: 0;
+}
+
+.card-container li {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-container li i {
+  color: var(--accent-color, #6a5ae0);
+  font-size: 1rem;
+  min-width: 20px;
+}
+
+.category-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #a26bf9;
+  background: rgba(40, 40, 70, 0.5);
+  padding: 8px 15px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Styles */
 .game-modal {
   display: none;
   position: fixed;
@@ -286,22 +719,48 @@
   z-index: 1000;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(5px);
 }
 
 .game-modal.active {
   display: flex;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
   background: rgba(30, 30, 50, 0.95);
   border-radius: 20px;
-  padding: 30px;
+  padding: 0 0 30px;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
   text-align: center;
   border: 1px solid rgba(106, 90, 224, 0.3);
   animation: modalFadeIn 0.4s ease forwards;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: linear-gradient(45deg, #6a5ae0, #a26bf9);
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  margin-bottom: 25px;
+}
+
+.modal-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 2rem;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes modalFadeIn {
@@ -315,59 +774,71 @@
   }
 }
 
-.modal-content h2 {
-  color: var(--accent-color);
-  margin-bottom: 15px;
-  font-size: 2rem;
-}
-
 .modal-content p {
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 20px;
   font-size: 1.1rem;
+  padding: 0 30px;
 }
 
 #word-reveal {
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 20px;
-  color: var(--accent-color);
+  color: var(--accent-color, #6a5ae0);
+  padding: 10px 20px;
+  background: rgba(40, 40, 70, 0.3);
+  border-radius: 10px;
+  display: inline-block;
 }
 
 .modal-stats {
   background: rgba(40, 40, 70, 0.5);
   border-radius: 12px;
   padding: 15px;
-  margin-bottom: 20px;
+  margin: 0 30px 25px;
 }
 
 .modal-stat {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  align-items: center;
 }
 
 .modal-stat-label {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.modal-stat-value {
-  color: var(--accent-color);
-  font-weight: 600;
-}
-
-#play-again-btn {
-  width: 100%;
-  padding: 15px;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1.1rem;
 }
 
+.modal-stat-value {
+  color: var(--accent-color, #6a5ae0);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+#play-again-btn {
+  width: calc(100% - 60px);
+  padding: 15px;
+  font-size: 1.1rem;
+  margin: 0 30px;
+}
+
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .game-dashboard {
+    grid-template-columns: 1fr;
+  }
+  
+  .game-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .letter-box {
-    width: 35px;
-    height: 35px;
-    font-size: 1.4rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
   }
   
   .hangman-drawing-container svg {
@@ -382,6 +853,34 @@
   #submit-letter {
     width: 100%;
   }
+  
+  .key-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .game-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .stat-item:last-child {
+    grid-column: span 2;
+  }
+  
+  .letter-box {
+    width: 32px;
+    height: 32px;
+    font-size: 1.3rem;
+  }
+  
+  .key-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -394,6 +893,16 @@
   .hangman-drawing-container svg {
     width: 200px;
     height: 200px;
+  }
+  
+  .keyboard-row {
+    gap: 4px;
+  }
+  
+  .key-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
   }
 }
 </style>
