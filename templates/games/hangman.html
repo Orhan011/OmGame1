@@ -1,6 +1,10 @@
 {% extends 'layout.html' %}
 {% block title %}Adam Asmaca - Zekapark{% endblock %}
 
+{% block head_extra %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container hangman-game-wrapper">
@@ -727,6 +731,7 @@
 @media (max-width: 768px) {
   .hangman-game-wrapper {
     padding: 15px 10px;
+    border-radius: 15px;
   }
 
   .game-header h1 {
@@ -744,11 +749,12 @@
   .hangman-drawing-container {
     margin: 0 auto 15px;
     padding: 10px;
+    max-width: 180px;
   }
 
   #hangman-svg {
-    width: 160px;
-    height: 160px;
+    width: 150px;
+    height: 150px;
   }
 
   .letter-box {
@@ -759,7 +765,10 @@
   }
 
   .virtual-keyboard {
+    width: 95%;
+    max-width: 350px;
     padding: 8px 5px;
+    margin: 10px auto;
   }
 
   .key-btn {
@@ -767,10 +776,12 @@
     height: 36px;
     font-size: 0.85rem;
     margin-bottom: 3px;
+    border-radius: 4px;
   }
 
   .keyboard-row {
     gap: 3px;
+    margin-bottom: 5px;
   }
 
   .modal-buttons {
@@ -781,10 +792,12 @@
 
   .primary-button, .share-button {
     max-width: 100%;
+    padding: 12px 0;
   }
 
   .difficulty-selector {
     flex-direction: column;
+    gap: 8px;
   }
 
   .difficulty-options {
@@ -803,6 +816,25 @@
     width: 100%;
     max-width: 250px;
   }
+  
+  .game-info {
+    margin-bottom: 10px;
+  }
+
+  .used-letters-section {
+    padding: 10px;
+  }
+
+  .game-modal.active {
+    align-items: flex-start;
+    padding-top: 50px;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 480px) {
@@ -816,8 +848,8 @@
   }
 
   .letter-box {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     font-size: 1rem;
     margin: 0 2px;
   }
@@ -825,19 +857,19 @@
   .key-btn {
     min-width: 24px;
     height: 32px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     border-radius: 4px;
   }
 
   .keyboard-row {
-    gap: 3px;
+    gap: 2px;
   }
 
   .virtual-keyboard {
     width: 98%;
     max-width: none;
     padding: 5px 3px;
-  }}
+  }
 
   .difficulty-btn {
     padding: 5px 10px;
@@ -864,12 +896,102 @@
     font-size: 0.9rem;
     padding: 10px 15px;
   }
+  
+  .hangman-drawing-container {
+    max-width: 160px;
+  }
+  
+  #hangman-svg {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .category-display {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  .word-display {
+    padding: 15px 5px;
+  }
+  
+  .used-letters-section h3 {
+    font-size: 1rem;
+  }
+  
+  .hint-button {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  .keyboard-spacer {
+    width: 8px;
+  }
+  
+  .keyboard-spacer-large {
+    width: 12px;
+  }
+}
+
+/* Çok küçük ekranlar için ek düzenlemeler */
+@media (max-width: 350px) {
+  .letter-box {
+    width: 18px;
+    height: 18px;
+    font-size: 0.9rem;
+    margin: 0 1px;
+  }
+  
+  .key-btn {
+    min-width: 20px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+  
+  .difficulty-options {
+    gap: 5px;
+  }
+  
+  .difficulty-btn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .game-header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .hangman-drawing-container {
+    max-width: 140px;
+  }
+  
+  #hangman-svg {
+    width: 120px;
+    height: 120px;
+  }
 }
 </style>
 
 <script>
 // Adam Asmaca Oyunu JS
 document.addEventListener('DOMContentLoaded', function() {
+  // Mobil cihazlarda daha iyi bir deneyim için
+  // Dokunmatik geri bildirimi iyileştir
+  const addTouchFeedback = () => {
+    const buttons = document.querySelectorAll('.key-btn, .difficulty-btn, .hint-button, .primary-button, .share-button');
+    
+    buttons.forEach(button => {
+      button.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.95)';
+      });
+      
+      button.addEventListener('touchend', function() {
+        this.style.transform = '';
+      });
+    });
+  };
+  
+  addTouchFeedback();
   // Kelime listesi - zorluk seviyesine göre
   const wordLists = {
     easy: [
