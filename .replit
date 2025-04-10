@@ -5,10 +5,10 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+run = ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 main:app"]
 
 [workflows]
-runButton = "Restart OmGame App"
+runButton = "Run OmGame"
 
 [[workflows.workflow]]
 name = "Project"
@@ -76,6 +76,19 @@ args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 [[workflows.workflow]]
 name = "Restart OmGame App"
 author = 41206644
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill gunicorn || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
+
+[[workflows.workflow]]
+name = "Run OmGame"
+author = 41364940
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
