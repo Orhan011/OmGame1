@@ -62,7 +62,7 @@
         <div id="used-letters" class="used-letters-container"></div>
       </div>
 
-      <!-- Türkçe Klavye -->
+      <!-- Türkçe Klavye - Yeni Dizilim -->
       <div class="virtual-keyboard">
         <div class="keyboard-row">
           <button class="key-btn" data-key="Q">Q</button>
@@ -75,10 +75,9 @@
           <button class="key-btn" data-key="İ">İ</button>
           <button class="key-btn" data-key="O">O</button>
           <button class="key-btn" data-key="P">P</button>
-          <button class="key-btn" data-key="Ğ">Ğ</button>
-          <button class="key-btn" data-key="Ü">Ü</button>
         </div>
         <div class="keyboard-row">
+          <div class="keyboard-spacer"></div>
           <button class="key-btn" data-key="A">A</button>
           <button class="key-btn" data-key="S">S</button>
           <button class="key-btn" data-key="D">D</button>
@@ -88,10 +87,10 @@
           <button class="key-btn" data-key="J">J</button>
           <button class="key-btn" data-key="K">K</button>
           <button class="key-btn" data-key="L">L</button>
-          <button class="key-btn" data-key="Ş">Ş</button>
-          <button class="key-btn" data-key="İ">İ</button>
+          <div class="keyboard-spacer"></div>
         </div>
         <div class="keyboard-row">
+          <div class="keyboard-spacer-large"></div>
           <button class="key-btn" data-key="Z">Z</button>
           <button class="key-btn" data-key="X">X</button>
           <button class="key-btn" data-key="C">C</button>
@@ -99,8 +98,7 @@
           <button class="key-btn" data-key="B">B</button>
           <button class="key-btn" data-key="N">N</button>
           <button class="key-btn" data-key="M">M</button>
-          <button class="key-btn" data-key="Ö">Ö</button>
-          <button class="key-btn" data-key="Ç">Ç</button>
+          <div class="keyboard-spacer-large"></div>
         </div>
       </div>
 
@@ -452,55 +450,54 @@
 .virtual-keyboard {
   background: rgba(40, 40, 60, 0.8);
   border-radius: 5px;
-  padding: 5px 3px;
+  padding: 3px 2px;
   margin-top: 10px;
-  width: 65%;
-  max-width: 320px;
+  width: 50%;
+  max-width: 280px;
   margin-left: auto;
   margin-right: auto;
   overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 2px;
-  margin-bottom: 2px;
-  flex-wrap: wrap;
+  gap: 1px;
+  margin-bottom: 1px;
+  flex-wrap: nowrap;
 }
 
 .keyboard-row:last-child {
   margin-bottom: 0;
 }
 
+.keyboard-spacer {
+  width: 8px;
+}
+
+.keyboard-spacer-large {
+  width: 14px;
+}
+
 .key-btn {
-    width: 12px;
-    height: 14px;
-    border: none;
-    background: rgba(60, 60, 80, 0.8);
-    color: white;
-    border-radius: 1px;
-    font-size: 0.45rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .keyboard-row {
-    gap: 1px;
-  }
-
-  .virtual-keyboard {
-    width: 50%;
-    padding: 2px 1px;
-  }
+  width: 10px;
+  height: 12px;
+  border: none;
+  background: rgba(60, 60, 80, 0.8);
+  color: white;
+  border-radius: 1px;
+  font-size: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
 
 .key-btn:hover, .key-btn:active {
   background: rgba(80, 80, 120, 0.9);
