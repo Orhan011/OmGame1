@@ -790,12 +790,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/games/minesweeper')
-@login_required
-def minesweeper():
-    """Mayın Tarlası: Mantık ve strateji oyunu
-    Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
-    return render_template('games/minesweeper.html')
+# Minesweeper artık routes.py'da tanımlandı
 
 @app.route('/games/color-match')
 def color_match_game():

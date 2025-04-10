@@ -34,6 +34,8 @@ def send_welcome_email(email, username):
 @app.route('/games/minesweeper')
 @login_required
 def minesweeper():
+    """Mayın Tarlası: Mantık ve strateji oyunu
+    Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
     return render_template('games/minesweeper.html')
 
 
