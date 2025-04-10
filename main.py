@@ -525,7 +525,7 @@ def initialize_database():
                         <li><strong>Kendi Rekorlarınızı Takip Edin:</strong> Gelişiminizi takip edin ve kendi skorlarınızı geçmeye çalışın.</li>
                         <li><strong>Rakiplerinizi Gözlemleyin:</strong> Lider tablosundaki üst düzey oyuncuların stratejilerini anlamaya çalışın.</li>
                         <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
-                        <li><li><strong>Başarısızlıkları Analiz Edin: Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
+                        <li><li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
                     </ol>
 <p>ZekaPark oyunlarındayüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
@@ -582,16 +582,40 @@ def get_most_played_games(limit=4):
     # sorgu ile değiştirilebilir
 
     # Şu an için en popüler 4 oyun (sıralama önemli değil)
-    games = Game.query.order_by(Game.play_count.desc()).limit(limit).all()
-    result = []
-    for game in games:
-        result.append({
-            "name": game.name,
-            "description": game.short_description,
-            "icon": "fas fa-font", # Placeholder icon
-            "route": game.slug
-        })
-    return result
+    games = [
+        {
+            "name": "Kelime Bulmaca",
+            "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
+            "icon": "fas fa-font",
+            "route": "wordle"
+        },
+        {
+            "name": "Hafıza Kartları",
+            "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
+            "icon": "fas fa-clone",
+            "route": "memory_cards"
+        },
+        {
+            "name": "Sesli Hafıza",
+            "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
+            "icon": "fas fa-music",
+            "route": "audio_memory"
+        },
+        {
+            "name": "2048",
+            "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
+            "icon": "fas fa-cubes",
+            "route": "game_2048"
+        },
+        {
+            "name": "Satranç",
+            "description": "Stratejik düşünme ve planlama becerilerinizi geliştirin.",
+            "icon": "fas fa-chess",
+            "route": "chess"
+        }
+    ]
+    # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
+    return games[:limit]
 
 # Ana Sayfa
 @app.route('/')
@@ -638,43 +662,36 @@ def login():
 # Kelime Bulmaca Oyunu
 @app.route('/games/word-puzzle')
 def word_puzzle():
-    increment_game_play_count('word-puzzle')
     return render_template('games/wordPuzzle.html')
 
 # Hafıza Eşleştirme Oyunu
 @app.route('/games/memory-match')
 def memory_match():
-    increment_game_play_count('memory-match')
     return render_template('games/memoryMatch.html')
 
 # 3D Labirent Oyunu
 @app.route('/games/labyrinth')
 def labyrinth():
-    increment_game_play_count('labyrinth')
     return render_template('games/labyrinth.html')
 
 # Bulmaca Oyunu
 @app.route('/games/puzzle')
 def puzzle():
-    increment_game_play_count('puzzle')
     return render_template('games/puzzle.html')
 
 # Sayı Dizisi Oyunu
 @app.route('/games/number-sequence')
 def number_sequence():
-    increment_game_play_count('number-sequence')
     return render_template('games/numberSequence.html')
 
 # Hafıza Kartları Oyunu
 @app.route('/games/memory-cards')
 def memory_cards():
-    increment_game_play_count('memory-cards')
     return render_template('games/memoryCards.html')
 
 # Sayı Zinciri Oyunu
 @app.route('/games/number-chain')
 def number_chain():
-    increment_game_play_count('number-chain')
     return render_template('games/numberChain.html')
 
 # Sesli Hafıza Oyunu
@@ -683,13 +700,11 @@ def audio_memory():
     """Sesli Hafıza: Melodi oyunu
     İşitsel hafızayı geliştirmek için tasarlanmış interaktif bir oyun.
     Doğa sesleri, enstrümanlar veya diğer sesler ile hafıza egzersizi."""
-    increment_game_play_count('audio-memory')
     return render_template('games/audioMemory.html')
 
 # N-Back Oyunu
 @app.route('/games/n-back')
 def n_back():
-    increment_game_play_count('n-back')
     return render_template('games/nBack.html')
 
 # Sudoku Oyunu kaldırıldı
@@ -704,7 +719,6 @@ def game_2048_redirect():
 
 @app.route('/games/2048')
 def game_2048():
-    increment_game_play_count('2048')
     return render_template('games/2048.html')
 
 # Wordle Oyunu
@@ -716,7 +730,6 @@ def wordle_redirect():
 @app.route('/games/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
-    increment_game_play_count('wordle')
     return render_template('games/wordle.html')
 
 # Satranç Oyunu
@@ -728,7 +741,6 @@ def chess_redirect():
 @app.route('/games/chess')
 def chess():
     """Satranç oyunu"""
-    increment_game_play_count('chess')
     return render_template('games/chess.html')
 
 # IQ Test Oyunu
@@ -736,13 +748,11 @@ def chess():
 def iq_test():
     """IQ Test: Zeka ve mantık oyunu
     Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin."""
-    increment_game_play_count('iq-test')
     return render_template('games/iqTest_simplified.html')
 
 # Simon Says Oyunu
 @app.route('/simon_says')
 def simon_says():
-    increment_game_play_count('simon_says')
     return render_template('games/simonSays.html')
 
 # Kelime Avı Oyunu
@@ -759,7 +769,6 @@ def tetris_redirect():
 def tetris():
     """Tetris: Klasik blok puzzle oyunu
     Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
-    increment_game_play_count('tetris')
     return render_template('games/tetris.html')
 
 # Typing Speed Oyunu
@@ -767,14 +776,12 @@ def tetris():
 def typing_speed():
     """Yazma Hızı: Klavye hızı testi
     Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
-    increment_game_play_count('typing-speed')
     return render_template('games/typingSpeed_simplified.html')
 
 @app.route('/games/puzzle-slider')
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu"""
-    increment_game_play_count('puzzle-slider')
     return render_template('games/puzzleSlider.html')
 
 # Login required decorator
@@ -785,7 +792,7 @@ def login_required(f):
             flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
             return redirect(url_for('login', redirect=request.url))
         return f(*args, **kwargs)
-    return login_required
+    return decorated_function
 
 # Mayın Tarlası Oyunu
 @app.route('/games/minesweeper')
@@ -793,21 +800,18 @@ def login_required(f):
 def minesweeper():
     """Mayın Tarlası: Mantık ve strateji oyunu
     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
-    increment_game_play_count('minesweeper')
     return render_template('games/minesweeper.html')
 
 @app.route('/games/color-match')
 def color_match_game():
     """Renk Eşleştirme: Odaklanma oyunu
     Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin."""
-    increment_game_play_count('color-match')
     return render_template('games/colorMatch_modern.html')
 
 @app.route('/games/math-challenge')
 def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
-    increment_game_play_count('math-challenge')
     return render_template('games/mathChallenge_simplified.html')
 
 @app.route('/snake')
@@ -819,7 +823,6 @@ def snake_redirect():
 def snake_game():
     """Yılan Oyunu: Klasik arcade
     Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
-    increment_game_play_count('snake_game')
     return render_template('games/snake_simplified.html')
 
 
@@ -832,7 +835,6 @@ def sudoku():
     """Sudoku: Sayı bulmaca oyunu
     9x9 grid üzerinde her satır, sütun ve 3x3 karede 1-9 arasındaki tüm rakamları yerleştirerek
     mantık ve problem çözme becerilerinizi geliştirin."""
-    increment_game_play_count('sudoku')
     try:
         return render_template('games/sudoku.html')
     except Exception as e:
@@ -844,7 +846,6 @@ def sudoku():
 def tangram():
     """Tangram: Geometrik bulmaca oyunu
     Farklı geometrik şekilleri birleştirerek belirli formları oluşturun ve mekansal zekânızı geliştirin."""
-    increment_game_play_count('tangram')
     try:
         return render_template('games/tangram.html')
     except Exception as e:
@@ -856,7 +857,6 @@ def tangram():
 def crossword():
     """Bulmaca: Kelime bulmaca oyunu
     İpuçlarına göre kelimeleri grid üzerinde yerleştirerek kelime haznenizi ve mantıksal düşünme becerilerinizi geliştirin."""
-    increment_game_play_count('crossword')
     try:
         return render_template('games/crossword.html')
     except Exception as e:
@@ -868,7 +868,6 @@ def crossword():
 def solitaire():
     """Solitaire: Klasik kart oyunu
     Kartları uygun şekilde sıralayarak stratejik düşünme ve planlama becerilerinizi geliştirin."""
-    increment_game_play_count('solitaire')
     try:
         return render_template('games/solitaire.html')
     except Exception as e:
@@ -1395,15 +1394,6 @@ def reset_password():
             return redirect(url_for('login'))
 
     return render_template('reset_password.html', email=email, token=token)
-
-def increment_game_play_count(game_slug):
-    """
-    Verilen oyunun oynanma sayısını artırır.
-    """
-    game = Game.query.filter_by(slug=game_slug).first()
-    if game:
-        game.play_count +=1
-        db.session.commit()
 
 # Oyun zorluğuna göre puan ve XP çarpanı hesaplama fonksiyonu
 def calculate_multipliers(game_type, difficulty=None, game_stats=None):
