@@ -835,28 +835,44 @@ def sudoku():
     """Sudoku: Sayı bulmaca oyunu
     9x9 grid üzerinde her satır, sütun ve 3x3 karede 1-9 arasındaki tüm rakamları yerleştirerek
     mantık ve problem çözme becerilerinizi geliştirin."""
-    return render_template('games/sudoku.html')
+    try:
+        return render_template('games/sudoku.html')
+    except Exception as e:
+        logger.error(f"Error rendering sudoku.html: {str(e)}")
+        return render_template('games/sudoku.html')
 
 # Tangram
 @app.route('/games/tangram')
 def tangram():
     """Tangram: Geometrik bulmaca oyunu
     Farklı geometrik şekilleri birleştirerek belirli formları oluşturun ve mekansal zekânızı geliştirin."""
-    return render_template('games/tangram.html')
+    try:
+        return render_template('games/tangram.html')
+    except Exception as e:
+        logger.error(f"Error rendering tangram.html: {str(e)}")
+        return render_template('games/sudoku.html')
 
 # Crossword
 @app.route('/games/crossword')
 def crossword():
     """Bulmaca: Kelime bulmaca oyunu
     İpuçlarına göre kelimeleri grid üzerinde yerleştirerek kelime haznenizi ve mantıksal düşünme becerilerinizi geliştirin."""
-    return render_template('games/crossword.html')
+    try:
+        return render_template('games/crossword.html')
+    except Exception as e:
+        logger.error(f"Error rendering crossword.html: {str(e)}")
+        return render_template('games/crossword.html')
 
 # Solitaire
 @app.route('/games/solitaire')
 def solitaire():
     """Solitaire: Klasik kart oyunu
     Kartları uygun şekilde sıralayarak stratejik düşünme ve planlama becerilerinizi geliştirin."""
-    return render_template('games/solitaire.html')
+    try:
+        return render_template('games/solitaire.html')
+    except Exception as e:
+        logger.error(f"Error rendering solitaire.html: {str(e)}")
+        return render_template('games/solitaire.html')
 
 # Minesweeper rotası yukarıda tanımlanmıştır
 
