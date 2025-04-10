@@ -159,8 +159,8 @@
   }
 
   .memory-board.medium {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, 1fr);
   }
 
   .memory-board.hard {
@@ -381,14 +381,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Audio
   let flipSound, matchSound, noMatchSound, gameCompleteSound;
+  let soundEnabled = true;
   
   try {
     flipSound = new Audio('/static/sounds/card-flip.mp3');
     matchSound = new Audio('/static/sounds/match.mp3');
     noMatchSound = new Audio('/static/sounds/no-match.mp3');
     gameCompleteSound = new Audio('/static/sounds/game-complete.mp3');
+    
+    // Ses dosyalarını yükle
+    flipSound.load();
+    matchSound.load();
+    noMatchSound.load();
+    gameCompleteSound.load();
   } catch (error) {
     console.error("Error loading sounds:", error);
+    soundEnabled = false;
+  }
+  
+  // Ses çalma yardımcı fonksiyonu
+  function playSound(sound) {
+    if (soundEnabled && sound) {
+      try {
+        sound.currentTime = 0;
+        let playPromise = sound.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+            console.log("Ses çalma hatası görmezden geliniyor");
+          });
+        }
+      } catch (error) {
+        // Ses çalma hatalarını sessizce yakala
+      }
+    }
   }
 
   // Initialize game
@@ -529,14 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.classList.add('flip');
     
     // Play flip sound
-    try {
-      if (flipSound) {
-        flipSound.currentTime = 0;
-        flipSound.play().catch(e => console.log("Error playing sound:", e));
-      }
-    } catch (error) {
-      console.error("Error playing flip sound:", error);
-    }
+    playSound(flipSound);
     
     if (!hasFlippedCard) {
       // First card flipped
@@ -570,14 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
       matchesDisplay.textContent = matches;
       
       // Play match sound
-      try {
-        if (matchSound) {
-          matchSound.currentTime = 0;
-          matchSound.play().catch(e => console.log("Error playing sound:", e));
-        }
-      } catch (error) {
-        console.error("Error playing match sound:", error);
-      }
+      playSound(matchSound);
       
       // Check if all pairs are found
       if (matches === totalPairs) {
@@ -589,14 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // Cards don't match
       // Play no match sound
-      try {
-        if (noMatchSound) {
-          noMatchSound.currentTime = 0;
-          noMatchSound.play().catch(e => console.log("Error playing sound:", e));
-        }
-      } catch (error) {
-        console.error("Error playing no-match sound:", error);
-      }
+      playSound(noMatchSound);
       
       // Flip cards back after a delay
       setTimeout(() => {
@@ -658,14 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clearInterval(timer);
     
     // Play complete sound
-    try {
-      if (gameCompleteSound) {
-        gameCompleteSound.currentTime = 0;
-        gameCompleteSound.play().catch(e => console.log("Error playing sound:", e));
-      }
-    } catch (error) {
-      console.error("Error playing game complete sound:", error);
-    }
+    playSound(gameCompleteSound);
     
     // Show success message
     finalMovesDisplay.textContent = moves;

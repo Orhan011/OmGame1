@@ -527,7 +527,7 @@ def initialize_database():
                         <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
                         <li><li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
                     </ol>
-<p>ZekaPark oyunlarında yüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
+<p>ZekaPark oyunlarındayüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
                     category="tip"
                 ),
@@ -792,10 +792,11 @@ def login_required(f):
             flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
             return redirect(url_for('login', redirect=request.url))
         return f(*args, **kwargs)
-    return decorated_function
+    return login_required
 
 # Mayın Tarlası Oyunu
 @app.route('/games/minesweeper')
+@login_required
 def minesweeper():
     """Mayın Tarlası: Mantık ve strateji oyunu
     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
@@ -1417,7 +1418,9 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
         'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
-        'minesweeper': {'point_base': 90, 'score_multiplier': 0.4} # Mayın Tarlası için çarpanlar eklendi
+        'minesweeper': {'point_base': 90, 'score_multiplier': 0.4},
+        'memoryMatch': {'point_base': 60, 'score_multiplier': 0.7} # Memory Match için çarpanlar eklendi
+
     }
 
     # Oyun türüne göre çarpanları güncelle
@@ -1467,7 +1470,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'math_challenge': 2.0,  # 2 dakika
                 'iq_test': 10.0,  # 10 dakika
                 'numberChain': 2.5,  # 2.5 dakika
-                'minesweeper': 5.0  # Mayın Tarlası için optimal süre
+                'minesweeper': 5.0,  # Mayın Tarlası için optimal süre
+                'memoryMatch': 2.0  # Memory Match için optimal süre eklendi
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1500,7 +1504,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'iq_test': 20,
                 'numberChain': 40,
-                'minesweeper': 50  # Mayın Tarlası için optimal hamle sayısı
+                'minesweeper': 50,  # Mayın Tarlası için optimal hamle sayısı
+                'memoryMatch': 25 # Memory Match için optimal hamle sayısı eklendi
             }.get(game_type, 50)
 
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
