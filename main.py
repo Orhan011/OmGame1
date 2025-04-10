@@ -577,45 +577,133 @@ def init_db_route():
 
 def get_most_played_games(limit=4):
     """En çok oynanan oyunları sayısına göre döndürür."""
-    # Burada gerçek veritabanı verisi yerine sabit oyun listesi kullanılıyor
-    # İleriki aşamalarda, veritabanından en çok oynanan oyunları çeken 
-    # sorgu ile değiştirilebilir
+    try:
+        # Veritabanından en çok oynanan oyunları getir
+        popular_games = Game.query.order_by(Game.play_count.desc()).limit(limit).all()
+        
+        games = []
+        
+        # Eğer veritabanında oyun yoksa, varsayılan oyunları göster
+        if not popular_games:
+            return [
+                {
+                    "name": "Kelime Bulmaca",
+                    "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
+                    "icon": "fas fa-font",
+                    "route": "wordle"
+                },
+                {
+                    "name": "Hafıza Kartları",
+                    "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
+                    "icon": "fas fa-clone",
+                    "route": "memory_cards"
+                },
+                {
+                    "name": "Sesli Hafıza",
+                    "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
+                    "icon": "fas fa-music",
+                    "route": "audio_memory"
+                },
+                {
+                    "name": "2048",
+                    "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
+                    "icon": "fas fa-cubes",
+                    "route": "game_2048"
+                }
+            ]
+            
+        # Her oyun için gerekli bilgileri topla
+        for game in popular_games:
+            # Oyun tipine göre ikon belirle
+            icon = "fas fa-gamepad"  # Varsayılan ikon
+            
+            # Oyun türüne göre ikon belirleme
+            if "word" in game.slug or "kelime" in game.slug.lower():
+                icon = "fas fa-font"
+            elif "memory" in game.slug or "hafıza" in game.slug.lower():
+                icon = "fas fa-clone"
+            elif "audio" in game.slug or "ses" in game.slug.lower():
+                icon = "fas fa-music"
+            elif "2048" in game.slug or "number" in game.slug:
+                icon = "fas fa-cubes"
+            elif "chess" in game.slug or "satranç" in game.slug.lower():
+                icon = "fas fa-chess"
+            elif "snake" in game.slug or "yılan" in game.slug.lower():
+                icon = "fas fa-snake"
+            elif "tetris" in game.slug:
+                icon = "fas fa-shapes"
+            elif "puzzle" in game.slug or "bulmaca" in game.slug.lower():
+                icon = "fas fa-puzzle-piece"
+            elif "mine" in game.slug or "mayın" in game.slug.lower():
+                icon = "fas fa-bomb"
+            elif "typing" in game.slug or "yazma" in game.slug.lower():
+                icon = "fas fa-keyboard"
+                
+            # Oyun için route adını belirle
+            route = game.slug
+            
+            # Bazı özel durumlara göre route ayarla
+            if game.slug == "2048":
+                route = "game_2048"
+            elif game.slug == "memory-cards" or game.slug == "hafiza-kartlari":
+                route = "memory_cards"
+            elif game.slug == "audio-memory" or game.slug == "sesli-hafiza":
+                route = "audio_memory"
+                
+            games.append({
+                "name": game.name,
+                "description": game.short_description,
+                "icon": icon,
+                "route": route
+            })
+            
+        return games
+    except Exception as e:
+        logger.error(f"En popüler oyunları getirirken hata: {str(e)}")
+        # Hata durumunda varsayılan oyunları döndür
+        return [
+            {
+                "name": "Kelime Bulmaca",
+                "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
+                "icon": "fas fa-font",
+                "route": "wordle"
+            },
+            {
+                "name": "Hafıza Kartları",
+                "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
+                "icon": "fas fa-clone",
+                "route": "memory_cards"
+            },
+            {
+                "name": "Sesli Hafıza",
+                "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
+                "icon": "fas fa-music",
+                "route": "audio_memory"
+            },
+            {
+                "name": "2048",
+                "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
+                "icon": "fas fa-cubes",
+                "route": "game_2048"
+            }
+        ]
 
-    # Şu an için en popüler 4 oyun (sıralama önemli değil)
-    games = [
-        {
-            "name": "Kelime Bulmaca",
-            "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
-            "icon": "fas fa-font",
-            "route": "wordle"
-        },
-        {
-            "name": "Hafıza Kartları",
-            "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
-            "icon": "fas fa-clone",
-            "route": "memory_cards"
-        },
-        {
-            "name": "Sesli Hafıza",
-            "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
-            "icon": "fas fa-music",
-            "route": "audio_memory"
-        },
-        {
-            "name": "2048",
-            "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
-            "icon": "fas fa-cubes",
-            "route": "game_2048"
-        },
-        {
-            "name": "Satranç",
-            "description": "Stratejik düşünme ve planlama becerilerinizi geliştirin.",
-            "icon": "fas fa-chess",
-            "route": "chess"
-        }
-    ]
-    # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
-    return games[:limit]
+# Oyun oynama sayısını artıran fonksiyon
+def increment_game_play_count(game_slug):
+    """
+    Belirli bir oyunun oynama sayısını bir artırır.
+    
+    Args:
+        game_slug (str): Oyunun slug değeri
+    """
+    try:
+        game = Game.query.filter_by(slug=game_slug).first()
+        if game:
+            game.play_count += 1
+            db.session.commit()
+    except Exception as e:
+        logger.error(f"Oyun sayacı artırma hatası ({game_slug}): {str(e)}")
+        db.session.rollback()
 
 # Ana Sayfa
 @app.route('/')
@@ -662,21 +750,25 @@ def login():
 # Kelime Bulmaca Oyunu
 @app.route('/games/word-puzzle')
 def word_puzzle():
+    increment_game_play_count('word-puzzle')
     return render_template('games/wordPuzzle.html')
 
 # Hafıza Eşleştirme Oyunu
 @app.route('/games/memory-match')
 def memory_match():
+    increment_game_play_count('memory-match')
     return render_template('games/memoryMatch.html')
 
 # 3D Labirent Oyunu
 @app.route('/games/labyrinth')
 def labyrinth():
+    increment_game_play_count('labyrinth')
     return render_template('games/labyrinth.html')
 
 # Bulmaca Oyunu
 @app.route('/games/puzzle')
 def puzzle():
+    increment_game_play_count('puzzle')
     return render_template('games/puzzle.html')
 
 # Sayı Dizisi Oyunu
@@ -719,6 +811,7 @@ def game_2048_redirect():
 
 @app.route('/games/2048')
 def game_2048():
+    increment_game_play_count('2048')
     return render_template('games/2048.html')
 
 # Wordle Oyunu
@@ -730,6 +823,7 @@ def wordle_redirect():
 @app.route('/games/wordle')
 def wordle():
     """Wordle kelime tahmin oyunu"""
+    increment_game_play_count('wordle')
     return render_template('games/wordle.html')
 
 # Satranç Oyunu
@@ -741,6 +835,7 @@ def chess_redirect():
 @app.route('/games/chess')
 def chess():
     """Satranç oyunu"""
+    increment_game_play_count('chess')
     return render_template('games/chess.html')
 
 # IQ Test Oyunu
@@ -769,6 +864,7 @@ def tetris_redirect():
 def tetris():
     """Tetris: Klasik blok puzzle oyunu
     Düşen blokları doğru yerleştirerek çizgileri tamamlayın."""
+    increment_game_play_count('tetris')
     return render_template('games/tetris.html')
 
 # Typing Speed Oyunu
@@ -776,12 +872,14 @@ def tetris():
 def typing_speed():
     """Yazma Hızı: Klavye hızı testi
     Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin."""
+    increment_game_play_count('typing-speed')
     return render_template('games/typingSpeed_simplified.html')
 
 @app.route('/games/puzzle-slider')
 def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu"""
+    increment_game_play_count('puzzle-slider')
     return render_template('games/puzzleSlider.html')
 
 # Login required decorator
