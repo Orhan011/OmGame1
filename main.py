@@ -780,18 +780,7 @@ def puzzle_slider():
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu"""
     return render_template('games/puzzleSlider.html')
 
-# login_required decorator'ü tanımlama
-def login_required(view_func):
-    @wraps(view_func)
-    def decorated_view(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
-            return redirect(url_for('login', redirect=request.path))
-        return view_func(*args, **kwargs)
-    return login_required
-
 @app.route('/games/minesweeper')
-@login_required
 def minesweeper():
     """Mayın Tarlası: Mantık ve strateji oyunu
     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
