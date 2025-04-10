@@ -29,13 +29,23 @@
       </div>
     </div>
     
-    <div class="mobile-controls">
-      <button id="up-btn" class="control-btn up-btn">▲</button>
-      <div class="middle-controls">
-        <button id="left-btn" class="control-btn left-btn">◀</button>
-        <button id="right-btn" class="control-btn right-btn">▶</button>
+    <div class="game-settings">
+      <div class="setting-group">
+        <label for="difficulty">Zorluk:</label>
+        <select id="difficulty" class="game-setting">
+          <option value="easy">Kolay</option>
+          <option value="medium" selected>Orta</option>
+          <option value="hard">Zor</option>
+        </select>
       </div>
-      <button id="down-btn" class="control-btn down-btn">▼</button>
+      
+      <div class="setting-group">
+        <label for="walls">Duvar Engeli:</label>
+        <select id="walls" class="game-setting">
+          <option value="on" selected>Açık</option>
+          <option value="off">Kapalı</option>
+        </select>
+      </div>
     </div>
     
     <div id="game-over-modal" class="modal">
@@ -171,7 +181,7 @@
   
   .modal {
     display: none;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -277,6 +287,30 @@ document.addEventListener('DOMContentLoaded', function() {
   // Game settings
   let speed = 150; // Milliseconds between updates
   let wallsEnabled = true;
+  
+  // Settings UI elements
+  const difficultySelect = document.getElementById('difficulty');
+  const wallsSelect = document.getElementById('walls');
+  
+  // Set up settings handlers
+  difficultySelect.addEventListener('change', function() {
+    const difficulty = this.value;
+    if (difficulty === 'easy') {
+      speed = 200; // Slower
+    } else if (difficulty === 'medium') {
+      speed = 150; // Default
+    } else if (difficulty === 'hard') {
+      speed = 100; // Faster
+    }
+    
+    if (gameRunning) {
+      clearInterval(gameLoop);
+      gameLoop = setInterval(updateGame, speed);
+    }
+  });
+  
+  wallsSelect.addEventListener('change', function() {
+    wallsEnabled = this.value === 'on';
   
   // Game state
   let snake = [];
