@@ -452,20 +452,21 @@
   border-radius: 5px;
   padding: 4px 3px;
   margin-top: 10px;
-  width: 55%;
-  max-width: 300px;
+  width: 70%;
+  max-width: 350px;
   margin-left: auto;
   margin-right: auto;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 2px;
-  margin-bottom: 3px;
+  gap: 3px;
+  margin-bottom: 4px;
   flex-wrap: nowrap;
+  width: 100%;
 }
 
 .keyboard-row:last-child {
@@ -481,13 +482,13 @@
 }
 
 .key-btn {
-  width: 14px;
-  height: 16px;
+  width: 20px;
+  height: 22px;
   border: none;
   background: rgba(60, 60, 80, 0.8);
   color: white;
-  border-radius: 1px;
-  font-size: 0.65rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -822,7 +823,7 @@
   }
 
   .key-btn {
-    min-width: 22px;
+    min-width: 24px;
     height: 32px;
     font-size: 0.85rem;
     border-radius: 4px;
@@ -833,9 +834,10 @@
   }
 
   .virtual-keyboard {
-    width: 95%;
+    width: 98%;
+    max-width: none;
     padding: 5px 3px;
-  }
+  }}
 
   .difficulty-btn {
     padding: 5px 10px;
