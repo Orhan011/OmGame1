@@ -745,7 +745,7 @@ def chess():
 def iq_test():
     """IQ Test: Zeka ve mantık oyunu
     Farklı kategorilerde zeka ve mantık sorularını çözerek IQ seviyenizi test edin."""
-    return render_template('games/iqTest_enhanced.html')
+    return render_template('games/iqTest_simplified.html')
 
 # Simon Says Oyunu
 @app.route('/games/simon-says')
