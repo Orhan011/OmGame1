@@ -20,6 +20,11 @@ def send_welcome_email(email, username):
     msg.body = f"Merhaba {username},\nOmGame dünyasına hoş geldin!  Keyifli oyunlar dileriz."
     mail.send(msg)
 
+@app.route('/games/minesweeper')
+@login_required
+def minesweeper():
+    return render_template('games/minesweeper.html')
+
 
 # routes.py
 # Bu dosya artık kullanılmıyor, yönlendirmeler main.py içerisinde.
