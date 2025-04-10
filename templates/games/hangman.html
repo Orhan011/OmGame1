@@ -977,9 +977,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const finalScore = document.getElementById('final-score');
   const playAgainBtn = document.getElementById('play-again-btn');
   const hangmanParts = document.querySelectorAll('.hangman-part');
+  const keyButtons = document.querySelectorAll('.key-btn');
 
   // Oyunu başlat
   initGame();
+  
+  // Sanal klavye düğmelerini etkinleştir
+  keyButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      if (gameOver) return;
+      
+      const letter = this.getAttribute('data-key');
+      letterInput.value = letter;
+      submitGuess();
+    });
+  });
 
   // Zorluk seviyesi değiştirme
   difficultySelect.addEventListener('change', function() {
@@ -1058,12 +1070,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Adam asmaca çizimini sıfırla
     resetHangman();
     
+    // Sanal klavyeyi sıfırla
+    resetVirtualKeyboard();
+    
     // Kategoriyi göster
     categoryDisplay.textContent = currentCategory;
     
     // Input'u temizle ve odakla
     letterInput.value = '';
     letterInput.focus();
+  }
+  
+  // Sanal klavyeyi sıfırla
+  function resetVirtualKeyboard() {
+    keyButtons.forEach(button => {
+      button.classList.remove('correct', 'wrong');
+      button.disabled = false;
+    });
   }
 
   // Kelime gösterimini güncelle
@@ -1146,7 +1169,9 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUsedLetters();
     
     // Doğru tahmin mi?
-    if (currentWord.includes(letter)) {
+    const isCorrect = currentWord.includes(letter);
+    
+    if (isCorrect) {
       // Doğru tahmin
       updateWordDisplay();
       showMessage('Doğru tahmin!', 'success');
@@ -1155,9 +1180,21 @@ document.addEventListener('DOMContentLoaded', function() {
       score += 10;
       scoreElement.textContent = score;
       
+      // Sanal klavyeyi güncelle
+      updateVirtualKeyboard(letter, true);
+      
+      // Başarı animasyonu
+      playLetterAnimation(letter, true);
+      
       // Oyun kazanıldı mı?
       if (isGameWon()) {
-        endGame(true);
+        // Başarı efekti
+        playSuccessEffect();
+        
+        // Biraz bekle, sonra modalı göster
+        setTimeout(() => {
+          endGame(true);
+        }, 1000);
       }
     } else {
       // Yanlış tahmin
@@ -1165,13 +1202,73 @@ document.addEventListener('DOMContentLoaded', function() {
       remainingAttemptsElement.textContent = remainingAttempts;
       showMessage('Yanlış tahmin!', 'error');
       
+      // Sanal klavyeyi güncelle
+      updateVirtualKeyboard(letter, false);
+      
+      // Başarısızlık animasyonu
+      playLetterAnimation(letter, false);
+      
       // Adam asmaca çizimini güncelle
       updateHangman();
       
       // Oyun kaybedildi mi?
       if (remainingAttempts <= 0) {
-        endGame(false);
+        // Başarısızlık efekti 
+        playFailureEffect();
+        
+        // Biraz bekle, sonra modalı göster
+        setTimeout(() => {
+          endGame(false);
+        }, 1000);
       }
+    }
+  }
+  
+  // Sanal klavyeyi güncelle
+  function updateVirtualKeyboard(letter, isCorrect) {
+    keyButtons.forEach(button => {
+      if (button.getAttribute('data-key') === letter) {
+        button.classList.add(isCorrect ? 'correct' : 'wrong');
+        // Yanlış tahminde düğmeleri devre dışı bırakabiliriz (isteğe bağlı)
+        if (!isCorrect) {
+          button.disabled = true;
+        }
+      }
+    });
+  }
+  
+  // Harf tahmini için animasyon
+  function playLetterAnimation(letter, isCorrect) {
+    // Ekranda görsel bir geri bildirim
+    const feedbackElement = document.createElement('div');
+    feedbackElement.className = 'letter-feedback ' + (isCorrect ? 'correct-feedback' : 'wrong-feedback');
+    feedbackElement.textContent = letter;
+    
+    document.body.appendChild(feedbackElement);
+    
+    // Animasyon bittikten sonra elementi kaldır
+    setTimeout(() => {
+      feedbackElement.remove();
+    }, 1000);
+  }
+  
+  // Başarı efekti
+  function playSuccessEffect() {
+    // Kutlama animasyonu
+    const letterBoxes = document.querySelectorAll('.letter-box');
+    letterBoxes.forEach((box, index) => {
+      setTimeout(() => {
+        box.classList.add('success-animation');
+      }, index * 100);
+    });
+  }
+  
+  // Başarısızlık efekti
+  function playFailureEffect() {
+    // Hangman son animasyonu
+    const drawingContainer = document.querySelector('.hangman-drawing-container');
+    if (drawingContainer) {
+      drawingContainer.classList.add('failure-animation');
     }
   }
 
@@ -1232,9 +1329,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isWon) {
       resultTitle.textContent = 'Tebrikler!';
       resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
+      gameModal.classList.add('win-modal');
+      gameModal.classList.remove('lose-modal');
     } else {
       resultTitle.textContent = 'Oyun Bitti';
       resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
+      gameModal.classList.add('lose-modal');
+      gameModal.classList.remove('win-modal');
     }
     
     wordReveal.textContent = `Kelime: ${currentWord}`;
@@ -1242,6 +1343,119 @@ document.addEventListener('DOMContentLoaded', function() {
     // Skoru kaydet
     saveScore();
   }
+  
+  // CSS Stillerini ekle
+  const customStyles = document.createElement('style');
+  customStyles.textContent = `
+    .letter-feedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5rem;
+      font-weight: bold;
+      z-index: 9999;
+      animation: feedbackAnimation 1s forwards;
+      pointer-events: none;
+    }
+    
+    .correct-feedback {
+      color: #28B446;
+    }
+    
+    .wrong-feedback {
+      color: #EA4335;
+    }
+    
+    @keyframes feedbackAnimation {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+    }
+    
+    .success-animation {
+      animation: successPulse 0.5s ease-in-out;
+    }
+    
+    @keyframes successPulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 180, 70, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px 10px rgba(40, 180, 70, 0.5);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 180, 70, 0);
+      }
+    }
+    
+    .failure-animation {
+      animation: shakeEffect 0.5s ease-in-out;
+    }
+    
+    @keyframes shakeEffect {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      20% {
+        transform: translateX(-10px);
+      }
+      40% {
+        transform: translateX(10px);
+      }
+      60% {
+        transform: translateX(-10px);
+      }
+      80% {
+        transform: translateX(10px);
+      }
+    }
+    
+    .win-modal .modal-header {
+      background: linear-gradient(45deg, #28B446, #34A853);
+    }
+    
+    .lose-modal .modal-header {
+      background: linear-gradient(45deg, #EA4335, #C62828);
+    }
+    
+    .key-btn.correct {
+      background: linear-gradient(45deg, #28B446, #34A853);
+      color: white;
+      border-color: #28B446;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(40, 180, 70, 0.5);
+    }
+    
+    .key-btn.wrong {
+      background: linear-gradient(45deg, #EA4335, #C62828);
+      color: white;
+      border-color: #EA4335;
+      opacity: 0.7;
+    }
+    
+    .key-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  `;
+  document.head.appendChild(customStyles);
 
   // UI güncelleme
   function updateUI() {

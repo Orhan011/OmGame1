@@ -708,12 +708,18 @@ def get_most_played_games(limit=4):
             "description": "Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin.",
             "icon": "fas fa-palette",
             "route": "color_match_game"
+        },
+        "hangman": {
+            "name": "Adam Asmaca",
+            "description": "Gizli kelimeyi bulmak için harfleri tahmin edin ve kelimeyi tamamlamaya çalışın.",
+            "icon": "fas fa-user-slash",
+            "route": "hangman"
         }
     }
     
     # Varsayılan oyunlar (veri yoksa kullanılacak)
     default_games = [
-        "wordle", "audio_memory", "tetris", "snake"
+        "wordle", "audio_memory", "tetris", "hangman", "snake"
     ]
     
     # Popüler oyun verilerine göre oyun listesini oluştur
@@ -1013,7 +1019,13 @@ def tangram():
         logger.error(f"Error rendering tangram.html: {str(e)}")
         return render_template('games/sudoku.html')
 
-# Crossword
+# Hangman (Adam Asmaca)
+@app.route('/hangman')
+def hangman_redirect():
+    """Adam Asmaca oyununa yönlendirme"""
+    # Yönlendirmeyi /games/hangman rotasına yap
+    return redirect(url_for('hangman'))
+
 @app.route('/games/hangman')
 def hangman():
     """Adam Asmaca: Kelime tahmin oyunu
