@@ -11,15 +11,9 @@
       <canvas id="game-canvas" width="400" height="400"></canvas>
       
       <div class="game-controls">
-        <div class="stats">
-          <div class="stat-item">
-            <span>Skor:</span>
-            <span id="score">0</span>
-          </div>
-          <div class="stat-item">
-            <span>En Yüksek:</span>
-            <span id="high-score">0</span>
-          </div>
+        <!-- Skor bilgilerini kaldırdık -->
+        <div class="game-title">
+          <h2>Yılan Oyunu</h2>
         </div>
         
         <div class="buttons">
@@ -298,20 +292,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
   
-  const scoreEl = document.getElementById('score');
-  const highScoreEl = document.getElementById('high-score');
-  
   const startBtn = document.getElementById('start-game');
   const pauseBtn = document.getElementById('pause-game');
   const playAgainBtn = document.getElementById('play-again');
   
-  const upBtn = document.getElementById('up-btn');
-  const downBtn = document.getElementById('down-btn');
-  const leftBtn = document.getElementById('left-btn');
-  const rightBtn = document.getElementById('right-btn');
+  const finalScoreEl = document.getElementById('final-score');
   
   const gameOverModal = document.getElementById('game-over-modal');
-  const finalScoreEl = document.getElementById('final-score');
 
   // Game settings
   let speed = 150; // Milliseconds between updates
@@ -361,11 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize
   drawEmptyBoard();
   
-  // Check for stored high score
-  if (localStorage.getItem('snakeHighScore')) {
-    highScore = parseInt(localStorage.getItem('snakeHighScore'));
-    highScoreEl.textContent = highScore;
-  }
+  // Hiçbir skor tutmuyoruz artık
   
   // Control buttons
   startBtn.addEventListener('click', startGame);
@@ -390,22 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Mobile controls
-  upBtn.addEventListener('click', function() {
-    if (direction !== 'down') nextDirection = 'up';
-  });
-  
-  downBtn.addEventListener('click', function() {
-    if (direction !== 'up') nextDirection = 'down';
-  });
-  
-  leftBtn.addEventListener('click', function() {
-    if (direction !== 'right') nextDirection = 'left';
-  });
-  
-  rightBtn.addEventListener('click', function() {
-    if (direction !== 'left') nextDirection = 'right';
-  });
+  // Dokunmatik kontroller için buton referanslarını kaldırdık
   
   // Touch swipe controls
   let touchStartX = 0;
@@ -461,8 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     nextDirection = 'right';
     score = 0;
     
-    // Update UI
-    scoreEl.textContent = score;
+    // Skoru güncellemeye gerek yok artık
     
     // Generate initial food
     generateFood();
@@ -549,16 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (head.x === food.x && head.y === food.y) {
       // Don't remove tail, effectively growing the snake
       
-      // Increase score and update UI
+      // Basit skor artırma
       score += 10;
-      scoreEl.textContent = score;
-      
-      // Update high score if needed
-      if (score > highScore) {
-        highScore = score;
-        highScoreEl.textContent = highScore;
-        localStorage.setItem('snakeHighScore', highScore);
-      }
       
       // Generate new food
       generateFood();
