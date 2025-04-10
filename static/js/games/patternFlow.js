@@ -14,20 +14,27 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Temel DOM Elementleri
+  // Temel DOM Elementleri - querySelector ile daha güvenli seçim yapma
   const gameContainer = document.getElementById('pattern-flow-container');
-  const patternDisplay = document.getElementById('pattern-display');
-  const controlPanel = document.getElementById('control-panel');
-  const scoreDisplay = document.getElementById('score-display');
-  const timerDisplay = document.getElementById('timer-display');
-  const levelDisplay = document.getElementById('level-display');
-  const startButton = document.getElementById('start-game');
-  const pauseButton = document.getElementById('pause-game');
-  const resetButton = document.getElementById('reset-game');
-  const settingsButton = document.getElementById('settings-button');
-  const feedbackArea = document.getElementById('feedback-area');
-  const tutorialArea = document.getElementById('tutorial-container');
-  const resultsContainer = document.getElementById('results-container');
+  const patternDisplay = document.querySelector('#pattern-display') || document.createElement('div');
+  const controlPanel = document.querySelector('#control-panel') || document.createElement('div');
+  const scoreDisplay = document.querySelector('#score-display');
+  const timerDisplay = document.querySelector('#timer-display');
+  const levelDisplay = document.querySelector('#level-display');
+  const startButton = document.querySelector('#start-game');
+  const pauseButton = document.querySelector('#pause-game');
+  const resetButton = document.querySelector('#reset-game');
+  const settingsButton = document.querySelector('#settings-button');
+  const feedbackArea = document.querySelector('#feedback-area') || document.createElement('div');
+  const tutorialArea = document.querySelector('#tutorial-container');
+  const resultsContainer = document.querySelector('#results-container');
+  
+  console.log("DOM elementleri yükleniyor:", {
+    gameContainer: !!gameContainer,
+    patternDisplay: !!patternDisplay,
+    controlPanel: !!controlPanel,
+    startButton: !!startButton
+  });
   
   // Sonuç Ekranı Elementleri
   const finalScoreDisplay = document.getElementById('final-score');
@@ -84,16 +91,16 @@ document.addEventListener('DOMContentLoaded', function() {
     combo: new Audio('/static/sounds/combo.mp3')
   };
   
-  // Örüntü Türleri
+  // Görüntü Türleri
   const patternTypes = [
     'sequential',  // Ardışık değişimler
     'arithmetic',  // Aritmetik ilişkiler
     'geometric',   // Geometrik ilişkiler
     'fibonacci',   // Fibonacci benzeri seriler
-    'recursive',   // Öz yinelemeli örüntüler
-    'alternating', // Dönüşümlü/Alternatif örüntüler
-    'mirrored',    // Aynalama örüntüleri
-    'composite'    // Karmaşık, çok kurallı örüntüler
+    'recursive',   // Öz yinelemeli görüntüler
+    'alternating', // Dönüşümlü/Alternatif görüntüler
+    'mirrored',    // Aynalama görüntüleri
+    'composite'    // Karmaşık, çok kurallı görüntüler
   ];
   
   // Semboller
@@ -112,13 +119,26 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Oyun Başlatma
   function initGame() {
-    // Event Listeners - null kontrolü ile güvenli hale getir
-    if (startButton) startButton.addEventListener('click', startGame);
-    if (pauseButton) pauseButton.addEventListener('click', togglePause);
-    if (resetButton) resetButton.addEventListener('click', resetGame);
-    if (settingsButton) settingsButton.addEventListener('click', toggleSettings);
-    if (playAgainButton) playAgainButton.addEventListener('click', resetGame);
-    if (shareButton) shareButton.addEventListener('click', shareScore);
+    // Event Listeners - daha güvenli hale getirme
+    try {
+      if (startButton) {
+        console.log("Start button bulundu, event listener ekleniyor");
+        startButton.addEventListener('click', startGame);
+      } else {
+        console.error("Start button bulunamadı");
+      }
+      if (pauseButton) pauseButton.addEventListener('click', togglePause);
+      if (resetButton) resetButton.addEventListener('click', resetGame);
+      if (settingsButton) settingsButton.addEventListener('click', toggleSettings);
+      
+      const playAgainButton = document.querySelector('#play-again');
+      const shareButton = document.querySelector('#share-score');
+      
+      if (playAgainButton) playAgainButton.addEventListener('click', resetGame);
+      if (shareButton) shareButton.addEventListener('click', shareScore);
+    } catch (error) {
+      console.error("Event listener hatası:", error);
+    }
     
     // Oyun konteynerini hazırla
     prepareGameContainer();
@@ -683,19 +703,19 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="tutorial-step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <strong>Gözlem Aşaması:</strong> Size gösterilen örüntüyü dikkatlice inceleyin. Bu örüntü matematik, mantık veya görsel kurallara göre oluşturulmuştur.
+              <strong>Gözlem Aşaması:</strong> Size gösterilen görüntüyü dikkatlice inceleyin. Bu görüntü matematik, mantık veya görsel kurallara göre oluşturulmuştur.
             </div>
           </div>
           <div class="tutorial-step">
             <div class="step-number">2</div>
             <div class="step-content">
-              <strong>Analiz Yapın:</strong> Örüntüdeki elemanların birbiriyle ilişkisini, tekrarlayan yapıları veya aralarındaki matematiksel bağlantıları keşfetmeye çalışın.
+              <strong>Analiz Yapın:</strong> Görüntüdeki elemanların birbiriyle ilişkisini, tekrarlayan yapıları veya aralarındaki matematiksel bağlantıları keşfetmeye çalışın.
             </div>
           </div>
           <div class="tutorial-step">
             <div class="step-number">3</div>
             <div class="step-content">
-              <strong>Çözüm Aşaması:</strong> Tespit ettiğiniz mantığa göre, örüntünün bir sonraki elemanını veya eksik parçayı seçin.
+              <strong>Çözüm Aşaması:</strong> Tespit ettiğiniz mantığa göre, görüntünün bir sonraki elemanını veya eksik parçayı seçin.
             </div>
           </div>
           <div class="tutorial-step">
@@ -914,7 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
     playSound('click');
     
     // Bildirim göster
-    showFeedback('Oyun başladı! Örüntüyü analiz edin...', 'info');
+    showFeedback('Oyun başladı! Görüntüyü analiz edin...', 'info');
   }
   
   // Oyunu duraklat/devam ettir
