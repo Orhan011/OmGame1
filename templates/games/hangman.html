@@ -1,0 +1,757 @@
+{% extends 'layout.html' %}
+{% block title %}Adam Asmaca - Zekapark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container hangman-game-wrapper">
+    <div class="game-header">
+      <h1>Adam Asmaca <span class="badge">Kelime Oyunu</span></h1>
+      <p>Gizli kelimeyi bulmak için harfleri tahmin edin, her yanlış tahminde resim tamamlanır. Dikkatli olun, 6 yanlış hakkınız var!</p>
+    </div>
+
+    <div class="game-dashboard">
+      <div class="game-area-panel">
+        <div class="hangman-display">
+          <div class="hangman-drawing-container">
+            <svg id="hangman-svg" width="300" height="300" viewBox="0 0 300 300">
+              <!-- Darağacı (her zaman görünür) -->
+              <line x1="60" y1="20" x2="200" y2="20" stroke="#fff" stroke-width="4"/>
+              <line x1="60" y1="20" x2="60" y2="280" stroke="#fff" stroke-width="4"/>
+              <line x1="20" y1="280" x2="100" y2="280" stroke="#fff" stroke-width="4"/>
+              <line x1="140" y1="20" x2="140" y2="60" stroke="#fff" stroke-width="4"/>
+              
+              <!-- Asılacak adamın parçaları (yanlış tahminlerde görünecek) -->
+              <circle id="head" cx="140" cy="85" r="25" stroke="#fff" stroke-width="4" fill="none" class="hangman-part hidden"/>
+              <line id="body" x1="140" y1="110" x2="140" y2="190" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+              <line id="left-arm" x1="140" y1="130" x2="100" y2="160" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+              <line id="right-arm" x1="140" y1="130" x2="180" y2="160" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+              <line id="left-leg" x1="140" y1="190" x2="110" y2="250" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+              <line id="right-leg" x1="140" y1="190" x2="170" y2="250" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="word-display">
+          <div id="word-container"></div>
+        </div>
+
+        <div class="keyboard-container">
+          <div class="keyboard-row">
+            <button class="keyboard-key" data-key="q">Q</button>
+            <button class="keyboard-key" data-key="w">W</button>
+            <button class="keyboard-key" data-key="e">E</button>
+            <button class="keyboard-key" data-key="r">R</button>
+            <button class="keyboard-key" data-key="t">T</button>
+            <button class="keyboard-key" data-key="y">Y</button>
+            <button class="keyboard-key" data-key="u">U</button>
+            <button class="keyboard-key" data-key="i">I</button>
+            <button class="keyboard-key" data-key="o">O</button>
+            <button class="keyboard-key" data-key="p">P</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="keyboard-key" data-key="a">A</button>
+            <button class="keyboard-key" data-key="s">S</button>
+            <button class="keyboard-key" data-key="d">D</button>
+            <button class="keyboard-key" data-key="f">F</button>
+            <button class="keyboard-key" data-key="g">G</button>
+            <button class="keyboard-key" data-key="h">H</button>
+            <button class="keyboard-key" data-key="j">J</button>
+            <button class="keyboard-key" data-key="k">K</button>
+            <button class="keyboard-key" data-key="l">L</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="keyboard-key" data-key="z">Z</button>
+            <button class="keyboard-key" data-key="x">X</button>
+            <button class="keyboard-key" data-key="c">C</button>
+            <button class="keyboard-key" data-key="v">V</button>
+            <button class="keyboard-key" data-key="b">B</button>
+            <button class="keyboard-key" data-key="n">N</button>
+            <button class="keyboard-key" data-key="m">M</button>
+            <button class="keyboard-key" data-key="ö">Ö</button>
+            <button class="keyboard-key" data-key="ç">Ç</button>
+            <button class="keyboard-key" data-key="ş">Ş</button>
+            <button class="keyboard-key" data-key="ü">Ü</button>
+            <button class="keyboard-key" data-key="ı">I</button>
+            <button class="keyboard-key" data-key="ğ">Ğ</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="game-info-panel">
+        <div class="game-stats">
+          <div class="stat-item">
+            <div class="stat-label">Kalan Hak</div>
+            <div class="stat-value" id="remaining-attempts">6</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Skor</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Zorluk</div>
+            <div class="stat-value" id="difficulty">Orta</div>
+          </div>
+        </div>
+        
+        <div class="game-controls">
+          <button id="new-game-btn" class="primary-button">Yeni Oyun</button>
+          <div class="difficulty-selector">
+            <label for="difficulty-select">Zorluk Seviyesi:</label>
+            <select id="difficulty-select">
+              <option value="easy">Kolay</option>
+              <option value="medium" selected>Orta</option>
+              <option value="hard">Zor</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="game-rules">
+          <h3>Nasıl Oynanır?</h3>
+          <ul>
+            <li>Tahmin etmeniz gereken gizli bir kelime var</li>
+            <li>Klavyeden bir harf seçerek tahmin yapın</li>
+            <li>Doğru tahminlerde harf yerine yerleşir</li>
+            <li>Yanlış tahminler için 6 hakkınız var</li>
+            <li>Her yanlış tahminde adamın bir parçası çizilir</li>
+            <li>Tüm kelimeyi bulmadan adam tamamlanırsa kaybedersiniz</li>
+          </ul>
+        </div>
+        
+        <div class="category-info">
+          <h3>Kategori</h3>
+          <p id="category-display">Genel</p>
+        </div>
+      </div>
+    </div>
+    
+    <div id="game-modal" class="game-modal">
+      <div class="modal-content">
+        <h2 id="result-title">Oyun Bitti</h2>
+        <p id="result-message"></p>
+        <p id="word-reveal"></p>
+        <div class="modal-stats">
+          <div class="modal-stat">
+            <span class="modal-stat-label">Skor:</span>
+            <span id="final-score" class="modal-stat-value">0</span>
+          </div>
+        </div>
+        <button id="play-again-btn" class="primary-button">Tekrar Oyna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Hangman Özel Stilleri */
+.hangman-game-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.hangman-drawing-container {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.hangman-part.hidden {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hangman-part {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.word-display {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+#word-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.letter-box {
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(40, 40, 70, 0.5);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.letter-box.revealed {
+  background: rgba(106, 90, 224, 0.3);
+  border-color: rgba(106, 90, 224, 0.5);
+  transform: scale(1.05);
+}
+
+.letter-box.space {
+  background: transparent;
+  border-color: transparent;
+}
+
+.keyboard-container {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.keyboard-key {
+  min-width: 40px;
+  height: 45px;
+  background: rgba(50, 50, 80, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  max-width: 50px;
+}
+
+.keyboard-key:hover {
+  background: rgba(70, 70, 110, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.keyboard-key.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.keyboard-key.correct {
+  background: rgba(40, 180, 70, 0.3);
+  border-color: rgba(40, 180, 70, 0.5);
+}
+
+.keyboard-key.wrong {
+  background: rgba(180, 40, 40, 0.3);
+  border-color: rgba(180, 40, 40, 0.5);
+}
+
+.game-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: rgba(30, 30, 50, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  border: 1px solid rgba(106, 90, 224, 0.3);
+  animation: modalFadeIn 0.4s ease forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  font-size: 2rem;
+}
+
+.modal-content p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+#word-reveal {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--accent-color);
+}
+
+.modal-stats {
+  background: rgba(40, 40, 70, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.modal-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.modal-stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-stat-value {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+#play-again-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .letter-box {
+    width: 35px;
+    height: 35px;
+    font-size: 1.4rem;
+  }
+  
+  .keyboard-key {
+    min-width: 30px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .hangman-drawing-container svg {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .letter-box {
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+  }
+  
+  .keyboard-key {
+    min-width: 25px;
+    height: 35px;
+    font-size: 0.9rem;
+    padding: 2px;
+  }
+  
+  .hangman-drawing-container svg {
+    width: 200px;
+    height: 200px;
+  }
+}
+</style>
+
+<script>
+// Adam Asmaca Oyunu JS
+document.addEventListener('DOMContentLoaded', function() {
+  // Kelime listesi - zorluk seviyesine göre
+  const wordLists = {
+    easy: [
+      {word: "ELMA", category: "Meyve"},
+      {word: "MASA", category: "Mobilya"},
+      {word: "KAPI", category: "Ev Eşyası"},
+      {word: "KALEM", category: "Kırtasiye"},
+      {word: "KÖPEK", category: "Hayvan"},
+      {word: "KEDI", category: "Hayvan"},
+      {word: "SU", category: "İçecek"},
+      {word: "GÖZ", category: "Vücut"},
+      {word: "TOP", category: "Oyuncak"},
+      {word: "EV", category: "Yapı"}
+    ],
+    medium: [
+      {word: "TELEFON", category: "Teknoloji"},
+      {word: "BİLGİSAYAR", category: "Teknoloji"},
+      {word: "PORTAKAL", category: "Meyve"},
+      {word: "ARMUT", category: "Meyve"},
+      {word: "KAPLAN", category: "Hayvan"},
+      {word: "İSTANBUL", category: "Şehir"},
+      {word: "ANKARA", category: "Şehir"},
+      {word: "BUZDOLABI", category: "Elektrikli Eşya"},
+      {word: "KAHVE", category: "İçecek"},
+      {word: "TAVŞAN", category: "Hayvan"}
+    ],
+    hard: [
+      {word: "KÜTÜPHANE", category: "Mekan"},
+      {word: "PROGRAMLAMA", category: "Teknoloji"},
+      {word: "ARKEOLOJİ", category: "Bilim"},
+      {word: "FELSEFE", category: "Akademik"},
+      {word: "MATEMATİK", category: "Akademik"},
+      {word: "BİYOLOJİ", category: "Bilim"},
+      {word: "DEMOKRASİ", category: "Siyaset"},
+      {word: "MÜZE", category: "Kültür"},
+      {word: "SPOR", category: "Aktivite"},
+      {word: "ÜNİVERSİTE", category: "Eğitim"}
+    ]
+  };
+
+  // Oyun değişkenleri
+  let currentWord = "";
+  let currentCategory = "";
+  let guessedLetters = [];
+  let remainingAttempts = 6;
+  let score = 0;
+  let gameOver = false;
+  let currentDifficulty = "medium";
+
+  // DOM elementleri
+  const wordContainer = document.getElementById('word-container');
+  const keyboardKeys = document.querySelectorAll('.keyboard-key');
+  const remainingAttemptsElement = document.getElementById('remaining-attempts');
+  const scoreElement = document.getElementById('score');
+  const difficultyElement = document.getElementById('difficulty');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const difficultySelect = document.getElementById('difficulty-select');
+  const categoryDisplay = document.getElementById('category-display');
+  const gameModal = document.getElementById('game-modal');
+  const resultTitle = document.getElementById('result-title');
+  const resultMessage = document.getElementById('result-message');
+  const wordReveal = document.getElementById('word-reveal');
+  const finalScore = document.getElementById('final-score');
+  const playAgainBtn = document.getElementById('play-again-btn');
+  const hangmanParts = document.querySelectorAll('.hangman-part');
+
+  // Oyunu başlat
+  initGame();
+
+  // Zorluk seviyesi değiştirme
+  difficultySelect.addEventListener('change', function() {
+    currentDifficulty = this.value;
+    updateDifficultyDisplay();
+  });
+
+  // Yeni oyun düğmesi
+  newGameBtn.addEventListener('click', startNewGame);
+  playAgainBtn.addEventListener('click', function() {
+    gameModal.classList.remove('active');
+    startNewGame();
+  });
+
+  // Klavye tuşları için olay dinleyicileri
+  keyboardKeys.forEach(key => {
+    key.addEventListener('click', function() {
+      if (gameOver || this.classList.contains('disabled')) return;
+      
+      const letter = this.getAttribute('data-key').toUpperCase();
+      handleGuess(letter);
+    });
+  });
+
+  // Fiziksel klavye dinleyicisi
+  document.addEventListener('keydown', function(event) {
+    if (gameOver) return;
+    
+    // Türkçe harfler ve Latin alfabesi desteklenir
+    const validKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇĞİÖŞÜ';
+    const key = event.key.toUpperCase();
+    
+    if (validKeys.includes(key)) {
+      handleGuess(key);
+      
+      // İlgili klavye tuşunu görsel olarak tıkla
+      keyboardKeys.forEach(keyElement => {
+        if (keyElement.getAttribute('data-key').toUpperCase() === key) {
+          keyElement.classList.add('active');
+          setTimeout(() => {
+            keyElement.classList.remove('active');
+          }, 200);
+        }
+      });
+    }
+  });
+
+  // Oyunu başlatan fonksiyon
+  function initGame() {
+    updateDifficultyDisplay();
+    startNewGame();
+  }
+
+  // Yeni oyun başlat
+  function startNewGame() {
+    // Oyun değişkenlerini sıfırla
+    guessedLetters = [];
+    remainingAttempts = 6;
+    gameOver = false;
+    
+    // Rastgele kelime seç
+    const randomIndex = Math.floor(Math.random() * wordLists[currentDifficulty].length);
+    const wordObj = wordLists[currentDifficulty][randomIndex];
+    currentWord = wordObj.word.toUpperCase();
+    currentCategory = wordObj.category;
+    
+    // UI güncelle
+    updateWordDisplay();
+    updateUI();
+    
+    // Adam asmaca çizimini sıfırla
+    resetHangman();
+    
+    // Klavyeyi sıfırla
+    resetKeyboard();
+    
+    // Kategoriyi göster
+    categoryDisplay.textContent = currentCategory;
+  }
+
+  // Kelime gösterimini güncelle
+  function updateWordDisplay() {
+    wordContainer.innerHTML = '';
+    
+    for (let i = 0; i < currentWord.length; i++) {
+      const letter = currentWord[i];
+      const letterBox = document.createElement('div');
+      
+      if (letter === ' ') {
+        letterBox.className = 'letter-box space';
+        letterBox.textContent = '';
+      } else {
+        letterBox.className = 'letter-box';
+        if (guessedLetters.includes(letter)) {
+          letterBox.textContent = letter;
+          letterBox.classList.add('revealed');
+        } else {
+          letterBox.textContent = '';
+        }
+      }
+      
+      wordContainer.appendChild(letterBox);
+    }
+  }
+
+  // Tahmin işleme
+  function handleGuess(letter) {
+    if (guessedLetters.includes(letter) || gameOver) return;
+    
+    guessedLetters.push(letter);
+    
+    // Tuşları güncelle
+    updateKeyboard(letter);
+    
+    // Doğru tahmin mi?
+    if (currentWord.includes(letter)) {
+      // Doğru tahmin
+      updateWordDisplay();
+      
+      // Skor güncelle
+      score += 10;
+      scoreElement.textContent = score;
+      
+      // Oyun kazanıldı mı?
+      if (isGameWon()) {
+        endGame(true);
+      }
+    } else {
+      // Yanlış tahmin
+      remainingAttempts--;
+      remainingAttemptsElement.textContent = remainingAttempts;
+      
+      // Adam asmaca çizimini güncelle
+      updateHangman();
+      
+      // Oyun kaybedildi mi?
+      if (remainingAttempts <= 0) {
+        endGame(false);
+      }
+    }
+  }
+
+  // Klavyeyi güncelle
+  function updateKeyboard(letter) {
+    keyboardKeys.forEach(key => {
+      if (key.getAttribute('data-key').toUpperCase() === letter) {
+        key.classList.add('disabled');
+        
+        if (currentWord.includes(letter)) {
+          key.classList.add('correct');
+        } else {
+          key.classList.add('wrong');
+        }
+      }
+    });
+  }
+
+  // Klavyeyi sıfırla
+  function resetKeyboard() {
+    keyboardKeys.forEach(key => {
+      key.classList.remove('disabled', 'correct', 'wrong');
+    });
+  }
+
+  // Adam asmaca çizimini güncelle
+  function updateHangman() {
+    const partIndex = 6 - remainingAttempts - 1;
+    if (partIndex >= 0 && partIndex < hangmanParts.length) {
+      hangmanParts[partIndex].classList.remove('hidden');
+    }
+  }
+
+  // Adam asmaca çizimini sıfırla
+  function resetHangman() {
+    hangmanParts.forEach(part => {
+      part.classList.add('hidden');
+    });
+  }
+
+  // Oyun kazanıldı mı kontrol et
+  function isGameWon() {
+    for (let i = 0; i < currentWord.length; i++) {
+      const letter = currentWord[i];
+      if (letter !== ' ' && !guessedLetters.includes(letter)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Oyunu bitir
+  function endGame(isWon) {
+    gameOver = true;
+    
+    // Skor hesapla
+    let finalScoreValue = score;
+    if (isWon) {
+      // Kalan haklara göre bonus
+      finalScoreValue += remainingAttempts * 15;
+      
+      // Zorluk seviyesine göre bonus
+      if (currentDifficulty === 'hard') {
+        finalScoreValue *= 2;
+      } else if (currentDifficulty === 'medium') {
+        finalScoreValue *= 1.5;
+      }
+      
+      finalScoreValue = Math.floor(finalScoreValue);
+    }
+    
+    // Skor UI güncellemesi
+    score = finalScoreValue;
+    scoreElement.textContent = score;
+    
+    // Modalı göster
+    gameModal.classList.add('active');
+    finalScore.textContent = score;
+    
+    if (isWon) {
+      resultTitle.textContent = 'Tebrikler!';
+      resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
+    } else {
+      resultTitle.textContent = 'Oyun Bitti';
+      resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
+    }
+    
+    wordReveal.textContent = `Kelime: ${currentWord}`;
+    
+    // Skoru kaydet
+    saveScore();
+  }
+
+  // UI güncelleme
+  function updateUI() {
+    remainingAttemptsElement.textContent = remainingAttempts;
+    scoreElement.textContent = score;
+  }
+
+  // Zorluk seviyesi gösterimini güncelle
+  function updateDifficultyDisplay() {
+    let displayText = "Orta";
+    
+    if (currentDifficulty === "easy") {
+      displayText = "Kolay";
+    } else if (currentDifficulty === "hard") {
+      displayText = "Zor";
+    }
+    
+    difficultyElement.textContent = displayText;
+  }
+
+  // Skoru kaydet
+  function saveScore() {
+    // Oyun süresi ve diğer istatistikleri hesapla
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_type: 'hangman',
+        score: score,
+        difficulty: currentDifficulty,
+        playtime: 0, // Burada oyun süresi takip edilmedi, gerçek uygulamada süre eklenebilir
+        game_stats: {
+          remainingAttempts: remainingAttempts,
+          wordLength: currentWord.length
+        }
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -803,6 +803,12 @@ def word_puzzle():
 @app.route('/games/memory-match')
 def memory_match():
     return render_template('games/memoryMatch.html')
+    
+@app.route('/games/memory-card-flip')
+def memory_card_flip():
+    """Hafıza Kart Çevirme: Görsel hafıza oyunu
+    Çeşitli temalardaki kartları eşleştirerek hafızanızı ve konsantrasyon yeteneğinizi geliştirin!"""
+    return render_template('games/memory_card_flip.html')
 
 # 3D Labirent Oyunu
 @app.route('/games/labyrinth')
@@ -948,6 +954,12 @@ def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
     return render_template('games/mathChallenge_simplified.html')
+    
+@app.route('/games/breakout')
+def breakout():
+    """Breakout: Blok kırma oyunu
+    Topu pedal ile yönlendirerek tüm blokları kırmaya çalışın. Hız ve el koordinasyonunuzu geliştirin!"""
+    return render_template('games/breakout.html')
 
 @app.route('/snake')
 def snake_redirect():
@@ -988,6 +1000,12 @@ def tangram():
         return render_template('games/sudoku.html')
 
 # Crossword
+@app.route('/games/hangman')
+def hangman():
+    """Adam Asmaca: Kelime tahmin oyunu
+    Gizli kelimeyi bulmak için harfleri tahmin edin ve kelimeyi tamamlamaya çalışın."""
+    return render_template('games/hangman.html')
+
 @app.route('/games/crossword')
 def crossword():
     """Bulmaca: Kelime bulmaca oyunu

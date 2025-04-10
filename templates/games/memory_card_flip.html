@@ -1,0 +1,758 @@
+{% extends 'layout.html' %}
+{% block title %}Hafıza Kart Çevirme - Zekapark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container memory-game-wrapper">
+    <div class="game-header">
+      <h1>Hafıza Kart Çevirme <span class="badge">Hafıza Oyunu</span></h1>
+      <p>Çeşitli temalardaki kartları eşleştirerek hafızanızı ve konsantrasyon yeteneğinizi geliştirin!</p>
+    </div>
+
+    <div class="game-dashboard">
+      <div class="game-area-panel">
+        <div class="memory-game-container">
+          <div id="memory-cards" class="memory-cards"></div>
+        </div>
+      </div>
+      
+      <div class="game-info-panel">
+        <div class="game-stats">
+          <div class="stat-item">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="time">00:00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Hamle</div>
+            <div class="stat-value" id="moves">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Skor</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+        </div>
+        
+        <div class="game-controls">
+          <button id="new-game-btn" class="primary-button">Yeni Oyun</button>
+          <div class="difficulty-selector">
+            <label for="difficulty-select">Zorluk Seviyesi:</label>
+            <select id="difficulty-select">
+              <option value="easy">Kolay (4x3)</option>
+              <option value="medium" selected>Orta (5x4)</option>
+              <option value="hard">Zor (6x5)</option>
+            </select>
+          </div>
+          <div class="theme-selector">
+            <label for="theme-select">Tema:</label>
+            <select id="theme-select">
+              <option value="animals">Hayvanlar</option>
+              <option value="fruits" selected>Meyveler</option>
+              <option value="tech">Teknoloji</option>
+              <option value="nature">Doğa</option>
+              <option value="sports">Spor</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="game-rules">
+          <h3>Nasıl Oynanır?</h3>
+          <ul>
+            <li>Ekrandaki kartların tümü kapalıdır</li>
+            <li>Her seferinde iki kart açabilirsiniz</li>
+            <li>Eğer açtığınız iki kart eşleşirse, kartlar açık kalır</li>
+            <li>Eşleşmezse, kartlar tekrar kapanır</li>
+            <li>Tüm kartları eşleştirmeye çalışın</li>
+            <li>Daha az hamle ve sürede tamamlarsanız daha yüksek puan alırsınız</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div id="game-modal" class="game-modal">
+      <div class="modal-content">
+        <h2 id="result-title">Tebrikler!</h2>
+        <p id="result-message">Tüm kartları başarıyla eşleştirdiniz!</p>
+        <div class="modal-stats">
+          <div class="modal-stat">
+            <span class="modal-stat-label">Süre:</span>
+            <span id="final-time" class="modal-stat-value">00:00</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-label">Hamle:</span>
+            <span id="final-moves" class="modal-stat-value">0</span>
+          </div>
+          <div class="modal-stat">
+            <span class="modal-stat-label">Skor:</span>
+            <span id="final-score" class="modal-stat-value">0</span>
+          </div>
+        </div>
+        <button id="play-again-btn" class="primary-button">Tekrar Oyna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Hafıza Oyunu Özel Stilleri */
+.memory-game-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.memory-game-container {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  position: relative;
+}
+
+.memory-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-gap: 15px;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+.memory-card {
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: scale(1);
+  transition: transform 0.5s;
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.memory-card:active {
+  transform: scale(0.97);
+  transition: transform 0.2s;
+}
+
+.memory-card.flip {
+  transform: rotateY(180deg);
+}
+
+.memory-card.matched {
+  box-shadow: 0 0 15px rgba(106, 90, 224, 0.6);
+  animation: matchedPulse 1s infinite alternate;
+}
+
+@keyframes matchedPulse {
+  from {
+    box-shadow: 0 0 10px rgba(106, 90, 224, 0.3);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(106, 90, 224, 0.8);
+  }
+}
+
+.front-face,
+.back-face {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.front-face {
+  background: linear-gradient(135deg, #6a5ae0, #a992ff);
+  transform: rotateY(180deg);
+}
+
+.back-face {
+  background: linear-gradient(135deg, #2a2a4a, #3a3a6a);
+  border: 2px solid rgba(106, 90, 224, 0.3);
+}
+
+.card-image {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+}
+
+.card-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+}
+
+.card-logo {
+  width: 50%;
+  height: 50%;
+  opacity: 0.6;
+}
+
+.game-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: rgba(30, 30, 50, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  border: 1px solid rgba(106, 90, 224, 0.3);
+  animation: modalFadeIn 0.4s ease forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  font-size: 2rem;
+}
+
+.modal-content p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.modal-stats {
+  background: rgba(40, 40, 70, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.modal-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.modal-stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-stat-value {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+#play-again-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .memory-cards {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-gap: 10px;
+  }
+  
+  .memory-card {
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .memory-cards {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-gap: 8px;
+  }
+  
+  .memory-card {
+    height: 90px;
+  }
+}
+</style>
+
+<script>
+// Hafıza Kart Çevirme Oyunu JS
+document.addEventListener('DOMContentLoaded', function() {
+  // Tema kartları
+  const cardThemes = {
+    animals: [
+      { name: 'cat', emoji: '🐱' },
+      { name: 'dog', emoji: '🐶' },
+      { name: 'rabbit', emoji: '🐰' },
+      { name: 'fox', emoji: '🦊' },
+      { name: 'tiger', emoji: '🐯' },
+      { name: 'monkey', emoji: '🐵' },
+      { name: 'panda', emoji: '🐼' },
+      { name: 'penguin', emoji: '🐧' },
+      { name: 'lion', emoji: '🦁' },
+      { name: 'cow', emoji: '🐮' },
+      { name: 'horse', emoji: '🐴' },
+      { name: 'pig', emoji: '🐷' },
+      { name: 'frog', emoji: '🐸' },
+      { name: 'bear', emoji: '🐻' },
+      { name: 'wolf', emoji: '🐺' }
+    ],
+    fruits: [
+      { name: 'apple', emoji: '🍎' },
+      { name: 'banana', emoji: '🍌' },
+      { name: 'orange', emoji: '🍊' },
+      { name: 'lemon', emoji: '🍋' },
+      { name: 'grapes', emoji: '🍇' },
+      { name: 'watermelon', emoji: '🍉' },
+      { name: 'strawberry', emoji: '🍓' },
+      { name: 'pear', emoji: '🍐' },
+      { name: 'peach', emoji: '🍑' },
+      { name: 'cherries', emoji: '🍒' },
+      { name: 'kiwi', emoji: '🥝' },
+      { name: 'pineapple', emoji: '🍍' },
+      { name: 'coconut', emoji: '🥥' },
+      { name: 'mango', emoji: '🥭' },
+      { name: 'avocado', emoji: '🥑' }
+    ],
+    tech: [
+      { name: 'computer', emoji: '💻' },
+      { name: 'phone', emoji: '📱' },
+      { name: 'tv', emoji: '📺' },
+      { name: 'camera', emoji: '📷' },
+      { name: 'watch', emoji: '⌚' },
+      { name: 'joystick', emoji: '🎮' },
+      { name: 'headphones', emoji: '🎧' },
+      { name: 'radio', emoji: '📻' },
+      { name: 'satellite', emoji: '📡' },
+      { name: 'battery', emoji: '🔋' },
+      { name: 'lightbulb', emoji: '💡' },
+      { name: 'printer', emoji: '🖨️' },
+      { name: 'keyboard', emoji: '⌨️' },
+      { name: 'disk', emoji: '💾' },
+      { name: 'robot', emoji: '🤖' }
+    ],
+    nature: [
+      { name: 'tree', emoji: '🌳' },
+      { name: 'flower', emoji: '🌸' },
+      { name: 'sun', emoji: '☀️' },
+      { name: 'moon', emoji: '🌙' },
+      { name: 'cloud', emoji: '☁️' },
+      { name: 'rain', emoji: '🌧️' },
+      { name: 'leaf', emoji: '🍃' },
+      { name: 'mountain', emoji: '⛰️' },
+      { name: 'volcano', emoji: '🌋' },
+      { name: 'wave', emoji: '🌊' },
+      { name: 'fire', emoji: '🔥' },
+      { name: 'rainbow', emoji: '🌈' },
+      { name: 'earth', emoji: '🌍' },
+      { name: 'star', emoji: '⭐' },
+      { name: 'snowflake', emoji: '❄️' }
+    ],
+    sports: [
+      { name: 'football', emoji: '⚽' },
+      { name: 'basketball', emoji: '🏀' },
+      { name: 'baseball', emoji: '⚾' },
+      { name: 'tennis', emoji: '🎾' },
+      { name: 'volleyball', emoji: '🏐' },
+      { name: 'rugby', emoji: '🏉' },
+      { name: 'billiards', emoji: '🎱' },
+      { name: 'tabletennis', emoji: '🏓' },
+      { name: 'badminton', emoji: '🏸' },
+      { name: 'boxing', emoji: '🥊' },
+      { name: 'skiing', emoji: '⛷️' },
+      { name: 'skating', emoji: '⛸️' },
+      { name: 'swimming', emoji: '🏊' },
+      { name: 'cycling', emoji: '🚴' },
+      { name: 'weightlifting', emoji: '🏋️' }
+    ]
+  };
+
+  // Oyun değişkenleri
+  let cards = [];
+  let hasFlippedCard = false;
+  let lockBoard = false;
+  let firstCard, secondCard;
+  let moves = 0;
+  let score = 0;
+  let matchedPairs = 0;
+  let totalPairs = 0;
+  let timer;
+  let seconds = 0;
+  let isGameActive = false;
+  let currentDifficulty = 'medium';
+  let currentTheme = 'fruits';
+
+  // DOM elementleri
+  const memoryCards = document.getElementById('memory-cards');
+  const movesElement = document.getElementById('moves');
+  const scoreElement = document.getElementById('score');
+  const timeElement = document.getElementById('time');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const difficultySelect = document.getElementById('difficulty-select');
+  const themeSelect = document.getElementById('theme-select');
+  const gameModal = document.getElementById('game-modal');
+  const finalTimeElement = document.getElementById('final-time');
+  const finalMovesElement = document.getElementById('final-moves');
+  const finalScoreElement = document.getElementById('final-score');
+  const playAgainBtn = document.getElementById('play-again-btn');
+
+  // Oyunu başlat
+  initGame();
+
+  // Zorluk seviyesi değiştirme
+  difficultySelect.addEventListener('change', function() {
+    currentDifficulty = this.value;
+    resetGame();
+  });
+
+  // Tema değiştirme
+  themeSelect.addEventListener('change', function() {
+    currentTheme = this.value;
+    resetGame();
+  });
+
+  // Yeni oyun düğmesi
+  newGameBtn.addEventListener('click', resetGame);
+  playAgainBtn.addEventListener('click', function() {
+    gameModal.classList.remove('active');
+    resetGame();
+  });
+
+  // Oyunu başlatan fonksiyon
+  function initGame() {
+    createCards();
+    startTimer();
+  }
+
+  // Yeni oyun başlat
+  function resetGame() {
+    // Oyun değişkenlerini sıfırla
+    moves = 0;
+    score = 0;
+    matchedPairs = 0;
+    seconds = 0;
+    lockBoard = false;
+    hasFlippedCard = false;
+    
+    // UI'ı güncelle
+    movesElement.textContent = moves;
+    scoreElement.textContent = score;
+    timeElement.textContent = formatTime(seconds);
+    
+    // Zamanı sıfırla
+    clearInterval(timer);
+    
+    // Kartları temizle ve yeniden oluştur
+    memoryCards.innerHTML = '';
+    createCards();
+    
+    // Zamanı başlat
+    startTimer();
+  }
+
+  // Kartları oluştur
+  function createCards() {
+    // Zorluk seviyesine göre boyutları belirle
+    let gridSize = { rows: 4, cols: 5 }; // Varsayılan (orta)
+    
+    if (currentDifficulty === 'easy') {
+      gridSize = { rows: 3, cols: 4 };
+    } else if (currentDifficulty === 'hard') {
+      gridSize = { rows: 5, cols: 6 };
+    }
+    
+    // Toplam kart sayısı
+    const totalCards = gridSize.rows * gridSize.cols;
+    // Çift sayıda kart olmalı
+    const pairCount = Math.floor(totalCards / 2);
+    totalPairs = pairCount;
+    
+    // Kart temasını seç
+    const selectedTheme = cardThemes[currentTheme];
+    
+    // Rastgele kart içeriklerini seç
+    const randomThemeCards = [...selectedTheme]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, pairCount);
+    
+    // Her karttan iki tane olacak şekilde dizi oluştur
+    cards = [];
+    randomThemeCards.forEach(card => {
+      cards.push({ ...card });
+      cards.push({ ...card });
+    });
+    
+    // Kartları karıştır
+    cards = shuffleArray(cards);
+    
+    // Grid stilini ayarla
+    memoryCards.style.gridTemplateColumns = `repeat(${gridSize.cols}, 1fr)`;
+    
+    // Kartları DOM'a ekle
+    cards.forEach((card, index) => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('memory-card');
+      cardElement.dataset.name = card.name;
+      cardElement.dataset.index = index;
+      
+      cardElement.innerHTML = `
+        <div class="front-face">
+          <span class="emoji">${card.emoji}</span>
+        </div>
+        <div class="back-face">
+          <div class="card-pattern"></div>
+          <img class="card-logo" src="/static/images/logo_icon.png" alt="Logo">
+        </div>
+      `;
+      
+      cardElement.addEventListener('click', flipCard);
+      memoryCards.appendChild(cardElement);
+    });
+    
+    // Oyunun başladığını işaretle
+    isGameActive = true;
+  }
+
+  // Kartı çevir
+  function flipCard() {
+    if (lockBoard) return;
+    if (this === firstCard) return;
+    
+    this.classList.add('flip');
+    
+    if (!hasFlippedCard) {
+      // İlk kart çevrildi
+      hasFlippedCard = true;
+      firstCard = this;
+      return;
+    }
+    
+    // İkinci kart çevrildi
+    secondCard = this;
+    
+    // Hamle sayısını artır
+    moves++;
+    movesElement.textContent = moves;
+    
+    // Eşleşme kontrolü
+    checkForMatch();
+  }
+
+  // Kart eşleşmesi kontrolü
+  function checkForMatch() {
+    let isMatch = firstCard.dataset.name === secondCard.dataset.name;
+    
+    if (isMatch) {
+      // Eşleşme
+      disableCards();
+      matchedPairs++;
+      
+      // Skor hesapla ve güncelle
+      const matchScore = calculateMatchScore();
+      score += matchScore;
+      scoreElement.textContent = score;
+      
+      // Görsel efekt
+      firstCard.classList.add('matched');
+      secondCard.classList.add('matched');
+      
+      // Tüm eşleşmeler bulundu mu?
+      if (matchedPairs === totalPairs) {
+        setTimeout(() => {
+          endGame();
+        }, 1000);
+      }
+    } else {
+      // Eşleşmedi
+      unflipCards();
+    }
+  }
+
+  // Eşleşen kartları devre dışı bırak
+  function disableCards() {
+    firstCard.removeEventListener('click', flipCard);
+    secondCard.removeEventListener('click', flipCard);
+    
+    resetBoard();
+  }
+
+  // Eşleşmeyen kartları geri çevir
+  function unflipCards() {
+    lockBoard = true;
+    
+    setTimeout(() => {
+      firstCard.classList.remove('flip');
+      secondCard.classList.remove('flip');
+      
+      resetBoard();
+    }, 1000);
+  }
+
+  // Oyun tahtasını sıfırla
+  function resetBoard() {
+    [hasFlippedCard, lockBoard] = [false, false];
+    [firstCard, secondCard] = [null, null];
+  }
+
+  // Diziyi karıştır
+  function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+
+  // Zaman sayacını başlat
+  function startTimer() {
+    seconds = 0;
+    timeElement.textContent = formatTime(seconds);
+    
+    clearInterval(timer);
+    timer = setInterval(() => {
+      seconds++;
+      timeElement.textContent = formatTime(seconds);
+    }, 1000);
+  }
+
+  // Zamanı formatlama
+  function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  // Eşleşme skoru hesaplama
+  function calculateMatchScore() {
+    let baseScore = 50;
+    
+    // Hamle sayısına göre bonus
+    const movesPenalty = moves > 2 ? (moves - 2) * 5 : 0;
+    
+    // Zamana göre bonus (her 10 saniye için 5 puan düşür, minimum 0)
+    const timePenalty = Math.floor(seconds / 10) * 5;
+    
+    // Zorluk seviyesine göre çarpan
+    let difficultyMultiplier = 1;
+    if (currentDifficulty === 'hard') {
+      difficultyMultiplier = 2;
+    } else if (currentDifficulty === 'medium') {
+      difficultyMultiplier = 1.5;
+    }
+    
+    // Son skoru hesapla
+    let finalScore = (baseScore - movesPenalty - timePenalty) * difficultyMultiplier;
+    
+    // Minimum 10 puan
+    return Math.max(10, Math.floor(finalScore));
+  }
+
+  // Oyun bitimi
+  function endGame() {
+    // Zamanı durdur
+    clearInterval(timer);
+    isGameActive = false;
+    
+    // Final skoru hesapla
+    let finalScore = score;
+    
+    // Kalan süre bonusu (100 puan - her 10 saniye için 5 puan düşür, minimum 0)
+    let timeBonus = Math.max(0, 100 - Math.floor(seconds / 10) * 5);
+    
+    // Hamle verimliliği (kartSayısı / hamle) * 100
+    let moveEfficiency = (totalPairs * 2) / Math.max(1, moves) * 100;
+    
+    // Zorluk seviyesine göre çarpan
+    let difficultyMultiplier = 1;
+    if (currentDifficulty === 'hard') {
+      difficultyMultiplier = 2;
+    } else if (currentDifficulty === 'medium') {
+      difficultyMultiplier = 1.5;
+    }
+    
+    // Final skoru hesapla
+    finalScore = (score + timeBonus + moveEfficiency) * difficultyMultiplier;
+    finalScore = Math.floor(finalScore);
+    
+    // UI güncelle
+    score = finalScore;
+    scoreElement.textContent = score;
+    
+    // Modalı göster
+    gameModal.classList.add('active');
+    finalTimeElement.textContent = formatTime(seconds);
+    finalMovesElement.textContent = moves;
+    finalScoreElement.textContent = finalScore;
+    
+    // Skoru kaydet
+    saveScore();
+  }
+
+  // Skoru kaydet
+  function saveScore() {
+    // Oyun süresi ve diğer istatistikleri hesapla
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_type: 'memory_card_flip',
+        score: score,
+        difficulty: currentDifficulty,
+        playtime: seconds,
+        game_stats: {
+          moves: moves,
+          pairs: totalPairs,
+          theme: currentTheme
+        }
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+
+  // Sayfa kapatıldığında zamanı durdur
+  window.addEventListener('beforeunload', function() {
+    clearInterval(timer);
+  });
+});
+</script>
+{% endblock %}

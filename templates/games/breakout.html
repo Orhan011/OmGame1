@@ -1,0 +1,1147 @@
+{% extends 'layout.html' %}
+{% block title %}Breakout - Blok Kırma - Zekapark{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="game-container breakout-game-wrapper">
+    <div class="game-header">
+      <h1>Breakout <span class="badge">Blok Kırma</span></h1>
+      <p>Topu pedal ile yönlendirerek tüm blokları kırmaya çalışın. Hız ve el koordinasyonunuzu geliştirin!</p>
+    </div>
+
+    <div class="game-dashboard">
+      <div class="game-area-panel">
+        <div class="breakout-canvas-container">
+          <canvas id="breakoutCanvas" width="800" height="600"></canvas>
+          <div id="start-screen" class="breakout-overlay">
+            <h2>Breakout</h2>
+            <p>Blokları kırmak için topu fırlat</p>
+            <button id="start-button" class="primary-button">Oyunu Başlat</button>
+          </div>
+          <div id="level-up-screen" class="breakout-overlay hide">
+            <h2>Seviye Atladın!</h2>
+            <p>Tebrikler! Devam etmek için tıkla</p>
+            <div class="level-up-info">
+              <span id="level-display">Seviye: 1</span>
+            </div>
+            <button id="next-level-button" class="primary-button">Devam Et</button>
+          </div>
+          <div id="pause-screen" class="breakout-overlay hide">
+            <h2>Oyun Duraklatıldı</h2>
+            <p>Devam etmek için tıkla</p>
+            <button id="resume-button" class="primary-button">Devam Et</button>
+          </div>
+          <div id="game-over-screen" class="breakout-overlay hide">
+            <h2>Oyun Bitti</h2>
+            <p id="end-message">Kaybettiniz!</p>
+            <div class="game-over-stats">
+              <div class="game-over-stat">
+                <span class="stat-label">Skor:</span>
+                <span id="final-score">0</span>
+              </div>
+              <div class="game-over-stat">
+                <span class="stat-label">Seviye:</span>
+                <span id="final-level">1</span>
+              </div>
+              <div class="game-over-stat">
+                <span class="stat-label">Kırılan Bloklar:</span>
+                <span id="final-blocks">0</span>
+              </div>
+            </div>
+            <button id="restart-button" class="primary-button">Tekrar Oyna</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="game-info-panel">
+        <div class="game-stats">
+          <div class="stat-item">
+            <div class="stat-label">Skor</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Seviye</div>
+            <div class="stat-value" id="level">1</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Can</div>
+            <div class="stat-value" id="lives">3</div>
+          </div>
+        </div>
+        
+        <div class="game-controls">
+          <button id="pause-button" class="primary-button">Duraklat</button>
+          <div class="difficulty-selector">
+            <label for="difficulty-select">Zorluk Seviyesi:</label>
+            <select id="difficulty-select">
+              <option value="easy">Kolay</option>
+              <option value="medium" selected>Orta</option>
+              <option value="hard">Zor</option>
+            </select>
+          </div>
+          <div class="theme-selector">
+            <label for="theme-select">Tema:</label>
+            <select id="theme-select">
+              <option value="neon">Neon</option>
+              <option value="retro" selected>Retro</option>
+              <option value="space">Uzay</option>
+              <option value="pastel">Pastel</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="game-rules">
+          <h3>Nasıl Oynanır?</h3>
+          <ul>
+            <li>Pedalı hareket ettirmek için fare veya sol/sağ ok tuşlarını kullanın</li>
+            <li>Topu pedaldan sektirebilmek için doğru zamanlama yapın</li>
+            <li>Mümkün olduğunca fazla bloğu kırın</li>
+            <li>Top düşerse can kaybedersiniz</li>
+            <li>Tüm blokları kırınca yeni seviyeye geçersiniz</li>
+            <li>Bazı bloklardan güçlendirmeler düşebilir</li>
+          </ul>
+        </div>
+        
+        <div class="power-ups-info">
+          <h3>Güçlendirmeler</h3>
+          <div class="power-up-item">
+            <div class="power-up-icon" style="background-color: #FFC107;">E</div>
+            <div class="power-up-desc">Pedal Genişletme: Pedalın boyutunu artırır</div>
+          </div>
+          <div class="power-up-item">
+            <div class="power-up-icon" style="background-color: #4CAF50;">S</div>
+            <div class="power-up-desc">Yavaşlatma: Topun hızını azaltır</div>
+          </div>
+          <div class="power-up-item">
+            <div class="power-up-icon" style="background-color: #F44336;">M</div>
+            <div class="power-up-desc">Çoklu Top: Ekstra toplar ekler</div>
+          </div>
+          <div class="power-up-item">
+            <div class="power-up-icon" style="background-color: #2196F3;">L</div>
+            <div class="power-up-desc">Ekstra Can: Bir can ekler</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Breakout Özel Stilleri */
+.breakout-game-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.breakout-canvas-container {
+  background: rgba(20, 20, 35, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
+              inset 0 0 15px rgba(106, 90, 224, 0.2);
+  border: 1px solid rgba(106, 90, 224, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+#breakoutCanvas {
+  display: block;
+  background: rgba(10, 10, 20, 0.7);
+  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  cursor: none;
+}
+
+.breakout-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10, 10, 30, 0.85);
+  z-index: 10;
+  border-radius: 15px;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.breakout-overlay.hide {
+  display: none;
+}
+
+.breakout-overlay h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, #6a5ae0, #a890ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(106, 90, 224, 0.3);
+}
+
+.breakout-overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breakout-overlay button {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 20px;
+}
+
+.level-up-info {
+  background: rgba(40, 40, 70, 0.7);
+  padding: 15px 30px;
+  border-radius: 10px;
+  margin: 10px 0 20px;
+  font-size: 1.3rem;
+  color: var(--accent-color);
+}
+
+.game-over-stats {
+  background: rgba(40, 40, 70, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 300px;
+}
+
+.game-over-stat {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.game-over-stat .stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.game-over-stat span:last-child {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.power-ups-info {
+  background: rgba(30, 30, 50, 0.5);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.power-ups-info h3 {
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.power-up-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.power-up-icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.power-up-desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .breakout-overlay h2 {
+    font-size: 2rem;
+  }
+  
+  .breakout-overlay p {
+    font-size: 1rem;
+  }
+  
+  .power-up-desc {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .breakout-canvas-container {
+    padding: 10px;
+  }
+  
+  .breakout-overlay h2 {
+    font-size: 1.7rem;
+  }
+  
+  .level-up-info {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+  }
+  
+  .game-over-stats {
+    padding: 15px;
+  }
+  
+  .power-up-item {
+    margin-bottom: 5px;
+  }
+  
+  .power-up-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+}
+</style>
+
+<script>
+// Breakout (Blok Kırma) Oyunu JS
+document.addEventListener('DOMContentLoaded', function() {
+  // Canvas ve kontekst
+  const canvas = document.getElementById('breakoutCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Oyun değişkenleri
+  let gameInterval;
+  let isPaused = false;
+  let isGameOver = false;
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let blocksDestroyed = 0;
+  let totalBlocksDestroyed = 0;
+  
+  // DOM elementleri
+  const scoreDisplay = document.getElementById('score');
+  const livesDisplay = document.getElementById('lives');
+  const levelDisplay = document.getElementById('level');
+  const startScreen = document.getElementById('start-screen');
+  const pauseScreen = document.getElementById('pause-screen');
+  const levelUpScreen = document.getElementById('level-up-screen');
+  const gameOverScreen = document.getElementById('game-over-screen');
+  const startButton = document.getElementById('start-button');
+  const pauseButton = document.getElementById('pause-button');
+  const resumeButton = document.getElementById('resume-button');
+  const nextLevelButton = document.getElementById('next-level-button');
+  const restartButton = document.getElementById('restart-button');
+  const difficultySelect = document.getElementById('difficulty-select');
+  const themeSelect = document.getElementById('theme-select');
+  const finalScoreDisplay = document.getElementById('final-score');
+  const finalLevelDisplay = document.getElementById('final-level');
+  const finalBlocksDisplay = document.getElementById('final-blocks');
+  const endMessageDisplay = document.getElementById('end-message');
+  const levelDisplayOverlay = document.getElementById('level-display');
+  
+  // Pedal değişkenleri
+  const paddleHeight = 15;
+  let paddleWidth = 100;
+  let paddleX = (canvas.width - paddleWidth) / 2;
+  
+  // Top değişkenleri
+  const ballRadius = 10;
+  let balls = [];
+  let ballSpeed = 5;
+  
+  // Blok değişkenleri
+  let blockRowCount = 5;
+  let blockColumnCount = 10;
+  let blockWidth = 70;
+  let blockHeight = 25;
+  let blockPadding = 10;
+  let blockOffsetTop = 50;
+  let blockOffsetLeft = 30;
+  let blocks = [];
+  
+  // Güçlendirme değişkenleri
+  let powerUps = [];
+  const powerUpSize = 20;
+  const powerUpSpeed = 2;
+  const powerUpTypes = ['enlarge', 'slow', 'multi', 'life'];
+  
+  // Zorluk ve tema
+  let currentDifficulty = 'medium';
+  let currentTheme = 'retro';
+  
+  // Tema renkleri
+  const themes = {
+    neon: {
+      background: '#000',
+      ball: '#FF00FF',
+      paddle: '#00FFFF',
+      blocks: ['#FF00FF', '#00FFFF', '#FFFF00', '#00FF00', '#FF0000'],
+      text: '#FFFFFF',
+      powerUps: {
+        enlarge: '#FFC107',
+        slow: '#4CAF50',
+        multi: '#F44336',
+        life: '#2196F3'
+      },
+      glow: true
+    },
+    retro: {
+      background: '#222',
+      ball: '#FFF',
+      paddle: '#888',
+      blocks: ['#FF5252', '#FF9800', '#FFC107', '#8BC34A', '#03A9F4'],
+      text: '#FFF',
+      powerUps: {
+        enlarge: '#FFC107',
+        slow: '#4CAF50',
+        multi: '#F44336',
+        life: '#2196F3'
+      },
+      glow: false
+    },
+    space: {
+      background: '#0A0A2A',
+      ball: '#FFFFFF',
+      paddle: '#3F51B5',
+      blocks: ['#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#00BCD4'],
+      text: '#FFFFFF',
+      powerUps: {
+        enlarge: '#FFC107',
+        slow: '#4CAF50',
+        multi: '#F44336',
+        life: '#2196F3'
+      },
+      glow: true
+    },
+    pastel: {
+      background: '#F5F5F5',
+      ball: '#FF4081',
+      paddle: '#9575CD',
+      blocks: ['#80CBC4', '#A5D6A7', '#FFF59D', '#FFCC80', '#EF9A9A'],
+      text: '#333',
+      powerUps: {
+        enlarge: '#FFC107',
+        slow: '#4CAF50',
+        multi: '#F44336',
+        life: '#2196F3'
+      },
+      glow: false
+    }
+  };
+  
+  // Zorluk ayarları
+  const difficulties = {
+    easy: {
+      ballSpeed: 4,
+      paddleWidth: 120,
+      lives: 5
+    },
+    medium: {
+      ballSpeed: 5,
+      paddleWidth: 100,
+      lives: 3
+    },
+    hard: {
+      ballSpeed: 7,
+      paddleWidth: 80,
+      lives: 2
+    }
+  };
+  
+  // Fare hareketi
+  let mouseX = 0;
+  
+  // Düğme olay dinleyicileri
+  startButton.addEventListener('click', startGame);
+  pauseButton.addEventListener('click', togglePause);
+  resumeButton.addEventListener('click', togglePause);
+  nextLevelButton.addEventListener('click', startNextLevel);
+  restartButton.addEventListener('click', resetGame);
+  
+  // Zorluk ve tema değişimleri
+  difficultySelect.addEventListener('change', function() {
+    currentDifficulty = this.value;
+    resetGame();
+  });
+  
+  themeSelect.addEventListener('change', function() {
+    currentTheme = this.value;
+  });
+  
+  // Fare hareketi
+  canvas.addEventListener('mousemove', mouseMoveHandler);
+  
+  // Tuş basımı
+  document.addEventListener('keydown', keyDownHandler);
+  
+  // Başlangıç ekranını göster
+  showStartScreen();
+  
+  // Başlangıç ekranı
+  function showStartScreen() {
+    startScreen.classList.remove('hide');
+    pauseScreen.classList.add('hide');
+    levelUpScreen.classList.add('hide');
+    gameOverScreen.classList.add('hide');
+    pauseButton.disabled = true;
+  }
+  
+  // Oyunu başlat
+  function startGame() {
+    startScreen.classList.add('hide');
+    pauseButton.disabled = false;
+    
+    // Zorluk ayarlarını uygula
+    applyDifficultySettings();
+    
+    // Blokları oluştur
+    createBlocks();
+    
+    // Topu oluştur
+    createBall();
+    
+    // Skorları sıfırla
+    resetScores();
+    
+    // Oyun döngüsünü başlat
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(draw, 10);
+    
+    isGameOver = false;
+    isPaused = false;
+  }
+  
+  // Zorluğa göre ayarları uygula
+  function applyDifficultySettings() {
+    const settings = difficulties[currentDifficulty];
+    ballSpeed = settings.ballSpeed;
+    paddleWidth = settings.paddleWidth;
+    lives = settings.lives;
+    
+    // Güncellenmiş değerleri göster
+    updateScoreDisplay();
+  }
+  
+  // Blokları oluştur
+  function createBlocks() {
+    blocks = [];
+    blocksDestroyed = 0;
+    
+    for (let c = 0; c < blockColumnCount; c++) {
+      blocks[c] = [];
+      for (let r = 0; r < blockRowCount; r++) {
+        const blockX = (c * (blockWidth + blockPadding)) + blockOffsetLeft;
+        const blockY = (r * (blockHeight + blockPadding)) + blockOffsetTop;
+        
+        // Seviyeye göre blok dayanıklılığı
+        let hitPoints = 1;
+        if (level > 1) {
+          // Her 3 seviyede bir, bazı blokların dayanıklılığını artır
+          if (level > 3 && r < 2 && Math.random() < 0.3) {
+            hitPoints = 2;
+          }
+          // 6. seviyeden sonra bazı blokları daha da dayanıklı yap
+          if (level > 6 && r === 0 && Math.random() < 0.2) {
+            hitPoints = 3;
+          }
+        }
+        
+        // Güçlendirme olasılığı
+        let powerUp = null;
+        if (Math.random() < 0.1) { // %10 olasılık
+          const powerUpIndex = Math.floor(Math.random() * powerUpTypes.length);
+          powerUp = powerUpTypes[powerUpIndex];
+        }
+        
+        blocks[c][r] = { 
+          x: blockX, 
+          y: blockY, 
+          status: 1, 
+          hitPoints: hitPoints,
+          powerUp: powerUp,
+          color: themes[currentTheme].blocks[r % themes[currentTheme].blocks.length]
+        };
+      }
+    }
+  }
+  
+  // Top oluştur
+  function createBall() {
+    balls = [];
+    const ball = {
+      x: canvas.width / 2,
+      y: canvas.height - 30,
+      dx: ballSpeed * (Math.random() > 0.5 ? 1 : -1), // Rastgele yön
+      dy: -ballSpeed,
+      radius: ballRadius,
+      color: themes[currentTheme].ball
+    };
+    balls.push(ball);
+  }
+  
+  // Skorları sıfırla
+  function resetScores() {
+    if (isGameOver) {
+      score = 0;
+      level = 1;
+      totalBlocksDestroyed = 0;
+    }
+    updateScoreDisplay();
+  }
+  
+  // Skoru güncelle
+  function updateScoreDisplay() {
+    scoreDisplay.textContent = score;
+    livesDisplay.textContent = lives;
+    levelDisplay.textContent = level;
+  }
+  
+  // Oyunu durdur/devam ettir
+  function togglePause() {
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+      pauseScreen.classList.remove('hide');
+      clearInterval(gameInterval);
+    } else {
+      pauseScreen.classList.add('hide');
+      gameInterval = setInterval(draw, 10);
+    }
+  }
+  
+  // Oyun döngüsü
+  function draw() {
+    // Canvas'ı temizle
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Arkaplan rengi
+    ctx.fillStyle = themes[currentTheme].background;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Blokları çiz
+    drawBlocks();
+    
+    // Pedalı çiz
+    drawPaddle();
+    
+    // Topları çiz
+    drawBalls();
+    
+    // Güçlendirmeleri çiz
+    drawPowerUps();
+    
+    // Çarpışma kontrolü
+    collisionDetection();
+    
+    // Pedal hareketi
+    movePaddle();
+    
+    // Toplar boşsa (hepsi düştüyse) ve hala can varsa yeni top oluştur
+    if (balls.length === 0 && lives > 0) {
+      createBall();
+      lives--;
+      updateScoreDisplay();
+    }
+    
+    // Oyun bitti mi kontrol et
+    if (lives <= 0) {
+      gameOver(false); // Kaybettin
+      return;
+    }
+    
+    // Tüm bloklar kırıldı mı kontrol et
+    if (blocksDestroyed >= blockRowCount * blockColumnCount) {
+      levelUp();
+      return;
+    }
+  }
+  
+  // Blokları çiz
+  function drawBlocks() {
+    for (let c = 0; c < blockColumnCount; c++) {
+      for (let r = 0; r < blockRowCount; r++) {
+        const block = blocks[c][r];
+        if (block.status === 1) {
+          // Blok rengi
+          let blockColor = block.color;
+          
+          // Dayanıklılığa göre renk tonu
+          if (block.hitPoints > 1) {
+            // Daha dayanıklı bloklar için renk değişimi
+            const brightness = block.hitPoints === 2 ? '80%' : '60%';
+            ctx.fillStyle = blockColor;
+          } else {
+            ctx.fillStyle = blockColor;
+          }
+          
+          ctx.beginPath();
+          ctx.rect(block.x, block.y, blockWidth, blockHeight);
+          ctx.fill();
+          ctx.closePath();
+          
+          // Parlaklık efekti
+          if (themes[currentTheme].glow) {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = blockColor;
+          }
+          
+          // Dayanıklılık göstergesi
+          if (block.hitPoints > 1) {
+            ctx.font = '14px Arial';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(block.hitPoints, block.x + blockWidth/2, block.y + blockHeight/2);
+          }
+          
+          // Efekti sıfırla
+          ctx.shadowBlur = 0;
+        }
+      }
+    }
+  }
+  
+  // Pedalı çiz
+  function drawPaddle() {
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+    ctx.fillStyle = themes[currentTheme].paddle;
+    ctx.fill();
+    ctx.closePath();
+    
+    // Parlaklık efekti
+    if (themes[currentTheme].glow) {
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = themes[currentTheme].paddle;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+  
+  // Topları çiz
+  function drawBalls() {
+    for (let i = 0; i < balls.length; i++) {
+      const ball = balls[i];
+      
+      // Top hareketi
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+      
+      // Yan duvarlarla çarpışma
+      if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
+        ball.dx = -ball.dx;
+      }
+      
+      // Üst duvarla çarpışma
+      if (ball.y + ball.dy < ball.radius) {
+        ball.dy = -ball.dy;
+      } 
+      // Alt duvarla çarpışma (düşme)
+      else if (ball.y + ball.dy > canvas.height - ball.radius) {
+        // Pedalla çarpışma
+        if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
+          // Pedalın hangi kısmına çarptığına göre yansıma açısı değiştir
+          const hitPos = (ball.x - paddleX) / paddleWidth;
+          // -1 ile 1 arasında bir değer (orta 0)
+          const angle = hitPos * 2 - 1;
+          // Açıya göre yatay hızı belirle
+          ball.dx = angle * ballSpeed;
+          ball.dy = -ball.dy;
+        } else {
+          // Topu kaldır
+          balls.splice(i, 1);
+          i--;
+          continue;
+        }
+      }
+      
+      // Topu çiz
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
+      
+      // Parlaklık efekti
+      if (themes[currentTheme].glow) {
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = ball.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+  
+  // Güçlendirmeleri çiz
+  function drawPowerUps() {
+    for (let i = 0; i < powerUps.length; i++) {
+      const powerUp = powerUps[i];
+      
+      // Güçlendirme hareketi
+      powerUp.y += powerUpSpeed;
+      
+      // Ekrandan çıktı mı kontrol et
+      if (powerUp.y > canvas.height) {
+        powerUps.splice(i, 1);
+        i--;
+        continue;
+      }
+      
+      // Pedalla çarpışma kontrolü
+      if (
+        powerUp.y + powerUpSize > canvas.height - paddleHeight &&
+        powerUp.x + powerUpSize > paddleX &&
+        powerUp.x < paddleX + paddleWidth
+      ) {
+        // Güçlendirmeyi uygula
+        applyPowerUp(powerUp.type);
+        
+        // Güçlendirmeyi kaldır
+        powerUps.splice(i, 1);
+        i--;
+        continue;
+      }
+      
+      // Güçlendirmeyi çiz
+      ctx.beginPath();
+      ctx.rect(powerUp.x, powerUp.y, powerUpSize, powerUpSize);
+      ctx.fillStyle = themes[currentTheme].powerUps[powerUp.type];
+      ctx.fill();
+      ctx.closePath();
+      
+      // Güçlendirme harfi
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      let letter = '';
+      switch (powerUp.type) {
+        case 'enlarge': letter = 'E'; break;
+        case 'slow': letter = 'S'; break;
+        case 'multi': letter = 'M'; break;
+        case 'life': letter = 'L'; break;
+      }
+      
+      ctx.fillText(letter, powerUp.x + powerUpSize/2, powerUp.y + powerUpSize/2);
+      
+      // Parlaklık efekti
+      if (themes[currentTheme].glow) {
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = themes[currentTheme].powerUps[powerUp.type];
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+  
+  // Güçlendirme uygula
+  function applyPowerUp(type) {
+    switch (type) {
+      case 'enlarge':
+        // Pedalı genişlet
+        paddleWidth = Math.min(paddleWidth * 1.5, canvas.width * 0.4);
+        // 10 saniye sonra normal boyuta döndür
+        setTimeout(() => {
+          paddleWidth = difficulties[currentDifficulty].paddleWidth;
+        }, 10000);
+        break;
+      case 'slow':
+        // Topları yavaşlat
+        for (let i = 0; i < balls.length; i++) {
+          const ball = balls[i];
+          ball.dx = ball.dx * 0.7;
+          ball.dy = ball.dy * 0.7;
+        }
+        // 8 saniye sonra normal hıza döndür
+        setTimeout(() => {
+          for (let i = 0; i < balls.length; i++) {
+            const ball = balls[i];
+            ball.dx = ball.dx / 0.7;
+            ball.dy = ball.dy / 0.7;
+          }
+        }, 8000);
+        break;
+      case 'multi':
+        // Ekstra top
+        if (balls.length > 0) {
+          const refBall = balls[0];
+          for (let i = 0; i < 2; i++) {
+            const newBall = {
+              x: refBall.x,
+              y: refBall.y,
+              dx: Math.random() * 2 * ballSpeed - ballSpeed,
+              dy: -ballSpeed,
+              radius: ballRadius,
+              color: themes[currentTheme].ball
+            };
+            balls.push(newBall);
+          }
+        }
+        break;
+      case 'life':
+        // Ekstra can
+        lives++;
+        updateScoreDisplay();
+        break;
+    }
+  }
+  
+  // Çarpışma kontrolü
+  function collisionDetection() {
+    for (let i = 0; i < balls.length; i++) {
+      const ball = balls[i];
+      
+      for (let c = 0; c < blockColumnCount; c++) {
+        for (let r = 0; r < blockRowCount; r++) {
+          const block = blocks[c][r];
+          if (block.status === 1) {
+            // Top ile blok arasındaki çarpışma kontrolü
+            if (
+              ball.x > block.x &&
+              ball.x < block.x + blockWidth &&
+              ball.y > block.y &&
+              ball.y < block.y + blockHeight
+            ) {
+              // Top yönünü değiştir
+              ball.dy = -ball.dy;
+              
+              // Bloğun dayanıklılığını azalt
+              block.hitPoints--;
+              
+              // Blok kırıldı mı?
+              if (block.hitPoints <= 0) {
+                block.status = 0;
+                blocksDestroyed++;
+                totalBlocksDestroyed++;
+                
+                // Skor ekle (seviye bazlı bonus)
+                score += 10 * level;
+                updateScoreDisplay();
+                
+                // Güçlendirme bırak
+                if (block.powerUp) {
+                  powerUps.push({
+                    x: block.x + blockWidth/2 - powerUpSize/2,
+                    y: block.y + blockHeight,
+                    type: block.powerUp
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Pedal hareketi
+  function movePaddle() {
+    // Fare hareketine göre pedal pozisyonunu güncelle
+    if (mouseX > 0) {
+      paddleX = mouseX - paddleWidth / 2;
+    }
+    
+    // Pedal sınırları
+    if (paddleX < 0) {
+      paddleX = 0;
+    } else if (paddleX + paddleWidth > canvas.width) {
+      paddleX = canvas.width - paddleWidth;
+    }
+  }
+  
+  // Fare hareketi
+  function mouseMoveHandler(e) {
+    const relativeX = e.clientX - canvas.getBoundingClientRect().left;
+    if (relativeX > 0 && relativeX < canvas.width) {
+      mouseX = relativeX;
+    }
+  }
+  
+  // Tuş basımı
+  function keyDownHandler(e) {
+    if (e.key === 'Right' || e.key === 'ArrowRight') {
+      paddleX += 20;
+    } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+      paddleX -= 20;
+    } else if (e.key === 'p' || e.key === 'P') {
+      togglePause();
+    } else if (e.key === ' ' && (isGameOver || startScreen.classList.contains('hide') === false)) {
+      if (startScreen.classList.contains('hide') === false) {
+        startGame();
+      } else if (isGameOver) {
+        resetGame();
+      }
+    }
+    
+    // Pedal sınırları
+    if (paddleX < 0) {
+      paddleX = 0;
+    } else if (paddleX + paddleWidth > canvas.width) {
+      paddleX = canvas.width - paddleWidth;
+    }
+  }
+  
+  // Seviye yükselt
+  function levelUp() {
+    level++;
+    levelDisplayOverlay.textContent = `Seviye: ${level}`;
+    levelUpScreen.classList.remove('hide');
+    clearInterval(gameInterval);
+  }
+  
+  // Sonraki seviyeye başla
+  function startNextLevel() {
+    levelUpScreen.classList.add('hide');
+    
+    // Seviyeye göre zorluk artışı
+    if (level > 3) {
+      // Her 3 seviyede bir top hızını artır
+      ballSpeed = difficulties[currentDifficulty].ballSpeed + (Math.floor((level - 1) / 3) * 0.5);
+    }
+    
+    // Blokları oluştur
+    createBlocks();
+    
+    // Yeni top oluştur
+    createBall();
+    
+    // Skoru güncelle
+    updateScoreDisplay();
+    
+    // Bonus puan
+    score += 50 * level;
+    updateScoreDisplay();
+    
+    // Oyun döngüsünü yeniden başlat
+    gameInterval = setInterval(draw, 10);
+  }
+  
+  // Oyun bitti
+  function gameOver(isWin) {
+    clearInterval(gameInterval);
+    isGameOver = true;
+    
+    // Oyun bitti ekranını göster
+    gameOverScreen.classList.remove('hide');
+    
+    // Sonuç metnini ayarla
+    if (isWin) {
+      endMessageDisplay.textContent = 'Tebrikler! Oyunu kazandınız!';
+    } else {
+      endMessageDisplay.textContent = 'Oyun Bitti! Tüm canlarınızı kaybettiniz.';
+    }
+    
+    // Son istatistikleri göster
+    finalScoreDisplay.textContent = score;
+    finalLevelDisplay.textContent = level;
+    finalBlocksDisplay.textContent = totalBlocksDestroyed;
+    
+    // Skoru kaydet
+    saveScore();
+  }
+  
+  // Oyunu sıfırla
+  function resetGame() {
+    gameOverScreen.classList.add('hide');
+    level = 1;
+    score = 0;
+    totalBlocksDestroyed = 0;
+    blocksDestroyed = 0;
+    
+    // Zorluk ayarlarını uygula
+    applyDifficultySettings();
+    
+    // Blokları oluştur
+    createBlocks();
+    
+    // Topu oluştur
+    createBall();
+    
+    // Güçlendirmeleri temizle
+    powerUps = [];
+    
+    // Skorları güncelle
+    updateScoreDisplay();
+    
+    // Oyun döngüsünü başlat
+    if (gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(draw, 10);
+    
+    isGameOver = false;
+    isPaused = false;
+  }
+  
+  // Skoru kaydet
+  function saveScore() {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        game_type: 'breakout',
+        score: score,
+        difficulty: currentDifficulty,
+        playtime: 0, // Bu oyunda süre takibi yok
+        game_stats: {
+          level: level,
+          blocksDestroyed: totalBlocksDestroyed,
+          theme: currentTheme
+        }
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Score saved:', data);
+    })
+    .catch(error => {
+      console.error('Error saving score:', error);
+    });
+  }
+  
+  // Canvas'ı duyarlı hale getir
+  function resizeCanvas() {
+    const container = document.querySelector('.breakout-canvas-container');
+    const containerWidth = container.clientWidth - 40; // Padding çıkar
+    
+    if (containerWidth < 800) {
+      const aspectRatio = canvas.height / canvas.width;
+      const newWidth = containerWidth;
+      const newHeight = newWidth * aspectRatio;
+      
+      canvas.style.width = newWidth + 'px';
+      canvas.style.height = newHeight + 'px';
+    } else {
+      canvas.style.width = '';
+      canvas.style.height = '';
+    }
+  }
+  
+  // Sayfa yüklendiğinde ve boyutu değiştiğinde canvas'ı duyarlı yap
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  
+  // Sayfa kapandığında interval'i temizle
+  window.addEventListener('beforeunload', function() {
+    if (gameInterval) clearInterval(gameInterval);
+  });
+});
+</script>
+{% endblock %}
