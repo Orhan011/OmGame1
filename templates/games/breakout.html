@@ -1038,6 +1038,12 @@ document.addEventListener('DOMContentLoaded', function() {
     clearInterval(gameInterval);
     isGameOver = true;
     
+    // DOM elementlerinin var olduğundan emin ol
+    if (!gameOverScreen || !endMessageDisplay || !finalScoreDisplay || !finalLevelDisplay || !finalBlocksDisplay) {
+      console.error("Gerekli DOM elementleri bulunamadı");
+      return;
+    }
+    
     // Oyun bitti ekranını göster
     gameOverScreen.classList.remove('hide');
     

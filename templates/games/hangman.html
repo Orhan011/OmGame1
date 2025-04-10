@@ -688,19 +688,22 @@ document.addEventListener('DOMContentLoaded', function() {
     score = finalScoreValue;
     scoreElement.textContent = score;
     
-    // Modalı göster
-    gameModal.classList.add('active');
-    finalScore.textContent = score;
-    
-    if (isWon) {
-      resultTitle.textContent = 'Tebrikler!';
-      resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
-    } else {
-      resultTitle.textContent = 'Oyun Bitti';
-      resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
+    // DOM elementlerinin var olduğundan emin ol
+    if (gameModal && finalScore) {
+      // Modalı göster
+      gameModal.classList.add('active');
+      finalScore.textContent = score;
+      
+      if (isWon) {
+        resultTitle.textContent = 'Tebrikler!';
+        resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
+      } else {
+        resultTitle.textContent = 'Oyun Bitti';
+        resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
+      }
+      
+      wordReveal.textContent = `Kelime: ${currentWord}`;
     }
-    
-    wordReveal.textContent = `Kelime: ${currentWord}`;
     
     // Skoru kaydet
     saveScore();

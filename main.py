@@ -120,40 +120,62 @@ def utility_processor():
     def get_current_user():
         """Session'daki kullanıcı kimliğine göre mevcut kullanıcıyı döndürür"""
         if 'user_id' in session:
-            return User.query.get(session['user_id'])
+            try:
+                user = User.query.get(session['user_id'])
+                return user
+            except Exception as e:
+                print(f"Kullanıcı bilgisi alınırken hata: {str(e)}")
+                db.session.rollback()
         return None
 
     def get_user_data():
         """Session'daki kullanıcı bilgilerini döndürür"""
         if 'user_id' in session:
-            user = User.query.get(session['user_id'])
-            return {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'full_name': user.full_name,
-                'avatar_url': user.avatar_url,
-                'experience_points': user.experience_points,
-                'rank': user.rank,
-                'theme_preference': user.theme_preference
-            }
+            try:
+                user = User.query.get(session['user_id'])
+                if user:
+                    return {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'full_name': user.full_name,
+                        'avatar_url': user.avatar_url,
+                        'experience_points': user.experience_points,
+                        'rank': user.rank,
+                        'theme_preference': user.theme_preference or 'dark'
+                    }
+            except Exception as e:
+                # Veritabanı hatası olursa session'ı temizle
+                print(f"Kullanıcı verisi alınırken hata: {str(e)}")
+                # Önceki işlemi geri al
+                db.session.rollback()
         return None
 
     def get_avatar_url():
         """Kullanıcının avatar URL'sini döndürür"""
         if 'user_id' in session:
-            return get_user_avatar(session['user_id'])
+            try:
+                return get_user_avatar(session['user_id'])
+            except Exception as e:
+                print(f"Kullanıcı avatar url'si alınırken hata: {str(e)}")
+                db.session.rollback()
+                return None
         return None
 
     def get_user_scores():
         """Kullanıcının oyun skorlarını bir sözlük olarak döndürür."""
         if 'user_id' in session:
-            scores = Score.query.filter_by(user_id=session['user_id']).all()
-            result = {}
-            for score in scores:
-                if score.game_type not in result or score.score > result[score.game_type]:
-                    result[score.game_type] = score.score
-            return result
+            try:
+                scores = Score.query.filter_by(user_id=session['user_id']).all()
+                result = {}
+                for score in scores:
+                    if score.game_type not in result or score.score > result[score.game_type]:
+                        result[score.game_type] = score.score
+                return result
+            except Exception as e:
+                print(f"Kullanıcı skorları alınırken hata: {str(e)}")
+                db.session.rollback()
+                return {}
         return {}
 
     return dict(

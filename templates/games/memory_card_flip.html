@@ -571,6 +571,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Kart eşleşmesi kontrolü
   function checkForMatch() {
+    // firstCard veya secondCard null ise hata oluşmasını önle
+    if (!firstCard || !secondCard) {
+      resetBoard();
+      return;
+    }
+    
     let isMatch = firstCard.dataset.name === secondCard.dataset.name;
     
     if (isMatch) {
