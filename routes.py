@@ -1,7 +1,18 @@
-from flask import url_for, render_template, login_required
-from app import app # Assuming app is defined elsewhere
-from flask_mail import Message # Assuming flask_mail is installed and configured
-from app import mail # Assuming mail is configured in app.py
+from flask import url_for, render_template
+from app import app, mail # app ve mail app.py'den import ediliyor
+from flask_mail import Message
+from functools import wraps # login_required için gerekli
+
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        from flask import session, flash, redirect, request
+        if 'user_id' not in session:
+            flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
+            return redirect(url_for('login', redirect=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # Wordle rota tanımını ekleyin
