@@ -794,17 +794,14 @@ def math_challenge():
 @app.route('/snake')
 def snake_redirect():
     return redirect(url_for('snake_game'))
-    
+
 @app.route('/games/snake')
 def snake_game():
     """Yılan Oyunu: Klasik arcade
     Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
     return render_template('games/snake_simplified.html')
 
-@app.route('/pattern-flow')
-def pattern_flow():
-    return render_template('games/patternFlow.html')
-
+# Pattern Flow oyunu kaldırıldı
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
 def all_games():
@@ -1339,7 +1336,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'score_multiplier': 0.5,  # Skor çarpanı
         'xp_base': 30,  # Temel XP
         'xp_score_multiplier': 0.1,  # Skor başına XP
-        'difficulty_multiplier': 1.0,  # Zorluk çarpanı
+        '`difficulty_multiplier': 1.0,  # Zorluk çarpanı
         'final_score': None  # Hesaplanacak nihai skor
     }
 
@@ -1363,8 +1360,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
-        'pattern_flow': {'point_base': 90, 'score_multiplier': 0.45} # Pattern Flow için çarpanlar
+        'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
     }
 
     # Oyun türüne göre çarpanları güncelle
@@ -1416,7 +1412,6 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'numberChain': 2.5,  # 2.5 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
-                'pattern_flow': 4.0  # Pattern Flow için optimal süre
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1451,7 +1446,6 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'numberChain': 40,
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'snake_game': 100,  # Yılan uzadıkça daha fazla hamle
-                'pattern_flow': 35  # Pattern Flow için optimal hamle sayısı
             }.get(game_type, 50)
 
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1936,8 +1930,7 @@ def get_leaderboard_data(game_type):
         'wordle': 'Wordle',
         'chess': 'Satranç',
         'puzzle_slider': 'Resim Bulmaca',
-        'snake_game': 'Yılan Oyunu',
-        'pattern_flow': 'Pattern Flow' # Pattern Flow eklendi
+        'snake_game': 'Yılan Oyunu'
     }
 
     return jsonify({
