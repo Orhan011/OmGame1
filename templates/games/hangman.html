@@ -12,30 +12,30 @@
 
     <div class="game-dashboard">
       <div class="game-area-panel">
-        <!-- Ana oyun alanını iki sütuna bölelim -->
+        <!-- Ana oyun alanını iki sütuna bölelim - Minimalist tasarıma uygun olarak -->
         <div class="game-main-content">
           <!-- Sol sütun - Adam asmaca çizimi -->
           <div class="hangman-display">
             <div class="hangman-drawing-container">
-              <svg id="hangman-svg" width="200" height="200" viewBox="0 0 300 300">
-                <!-- Darağacı (her zaman görünür) -->
-                <line x1="60" y1="20" x2="200" y2="20" stroke="#fff" stroke-width="4"/>
-                <line x1="60" y1="20" x2="60" y2="280" stroke="#fff" stroke-width="4"/>
-                <line x1="20" y1="280" x2="100" y2="280" stroke="#fff" stroke-width="4"/>
-                <line x1="140" y1="20" x2="140" y2="60" stroke="#fff" stroke-width="4"/>
+              <svg id="hangman-svg" width="180" height="180" viewBox="0 0 300 300">
+                <!-- Darağacı (her zaman görünür) - Sadece basit çizgiler -->
+                <line x1="60" y1="20" x2="200" y2="20" stroke="#fff" stroke-width="3"/>
+                <line x1="60" y1="20" x2="60" y2="280" stroke="#fff" stroke-width="3"/>
+                <line x1="20" y1="280" x2="100" y2="280" stroke="#fff" stroke-width="3"/>
+                <line x1="140" y1="20" x2="140" y2="60" stroke="#fff" stroke-width="3"/>
                 
                 <!-- Asılacak adamın parçaları (yanlış tahminlerde görünecek) -->
-                <circle id="head" cx="140" cy="85" r="25" stroke="#fff" stroke-width="4" fill="none" class="hangman-part hidden"/>
-                <line id="body" x1="140" y1="110" x2="140" y2="190" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
-                <line id="left-arm" x1="140" y1="130" x2="100" y2="160" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
-                <line id="right-arm" x1="140" y1="130" x2="180" y2="160" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
-                <line id="left-leg" x1="140" y1="190" x2="110" y2="250" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
-                <line id="right-leg" x1="140" y1="190" x2="170" y2="250" stroke="#fff" stroke-width="4" class="hangman-part hidden"/>
+                <circle id="head" cx="140" cy="85" r="25" stroke="#fff" stroke-width="3" fill="none" class="hangman-part hidden"/>
+                <line id="body" x1="140" y1="110" x2="140" y2="190" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
+                <line id="left-arm" x1="140" y1="130" x2="100" y2="160" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
+                <line id="right-arm" x1="140" y1="130" x2="180" y2="160" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
+                <line id="left-leg" x1="140" y1="190" x2="110" y2="250" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
+                <line id="right-leg" x1="140" y1="190" x2="170" y2="250" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
               </svg>
             </div>
           </div>
 
-          <!-- Sağ sütun - Kelime gösterimi -->
+          <!-- Sağ sütun - Kelime gösterimi (minimalist tasarım) -->
           <div class="word-display">
             <div id="word-container"></div>
           </div>
@@ -298,45 +298,43 @@
 }
 
 .letter-box {
-  width: 50px;
-  height: 50px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  background: rgba(40, 40, 70, 0.5);
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--accent-color, #6a5ae0);
+  color: white;
   text-transform: uppercase;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  margin: 0 5px;
 }
 
 .letter-box.revealed {
-  background: rgba(106, 90, 224, 0.3);
-  border-color: rgba(106, 90, 224, 0.5);
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(106, 90, 224, 0.3);
-  animation: revealLetter 0.5s ease forwards;
+  border-bottom-color: rgba(106, 90, 224, 0.8);
+  animation: revealLetter 0.4s ease forwards;
 }
 
 @keyframes revealLetter {
   0% {
-    transform: rotateY(90deg) scale(0.8);
+    transform: translateY(-10px);
     opacity: 0;
   }
   100% {
-    transform: rotateY(0) scale(1.05);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
 .letter-box.space {
   background: transparent;
-  border-color: transparent;
-  box-shadow: none;
+  border: none;
+  margin: 0 15px;
 }
 
 /* Modern Virtual Keyboard */
@@ -360,74 +358,38 @@
 }
 
 .key-btn {
-  width: 45px;
-  height: 45px;
+  width: 40px;
+  height: 40px;
   border: none;
-  background: linear-gradient(145deg, rgba(60, 60, 100, 0.95), rgba(50, 50, 90, 0.85));
+  background: rgba(60, 60, 100, 0.65);
   color: white;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
-}
-
-.key-btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 .key-btn:hover {
-  background: linear-gradient(145deg, rgba(80, 80, 130, 0.95), rgba(60, 60, 100, 0.85));
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.2);
-}
-
-.key-btn:hover:before {
-  opacity: 1;
+  background: rgba(80, 80, 130, 0.8);
+  transform: translateY(-2px);
 }
 
 .key-btn:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3),
-              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(1px);
 }
 
 .key-btn.correct {
-  background: linear-gradient(145deg, rgba(50, 190, 90, 0.9), rgba(40, 160, 70, 0.8));
+  background: rgba(40, 160, 70, 0.8);
   color: white;
-  box-shadow: 0 4px 12px rgba(40, 180, 70, 0.5),
-              inset 0 1px 1px rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-  animation: correctKeyPress 0.5s ease forwards;
-}
-
-@keyframes correctKeyPress {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.12); }
-  100% { transform: scale(1.05); }
 }
 
 .key-btn.wrong {
-  background: linear-gradient(145deg, rgba(210, 60, 60, 0.8), rgba(180, 40, 40, 0.7));
-  color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 12px rgba(180, 40, 40, 0.4),
-              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  background: rgba(180, 40, 40, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   pointer-events: none;
-  opacity: 0.8;
-  transform: scale(0.95);
+  opacity: 0.7;
 }
 
 /* Mobil giriş stilleri */
@@ -537,36 +499,21 @@
 
 /* Kullanılan harfler kutusu */
 .used-letters-container {
-  background: rgba(20, 20, 35, 0.7);
-  border-radius: 15px;
-  padding: 15px;
-  margin-bottom: 20px;
+  background: rgba(20, 20, 35, 0.5);
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
-              inset 0 0 15px rgba(106, 90, 224, 0.2);
-  border: 1px solid rgba(106, 90, 224, 0.2);
 }
 
 .used-letters-container h3 {
   margin-top: 0;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: rgba(255, 255, 255, 0.9);
-  font-weight: 600;
-  position: relative;
-  display: inline-block;
-  padding-bottom: 8px;
-}
-
-.used-letters-container h3::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(to right, #6a5ae0, #a26bf9);
-  border-radius: 3px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 #used-letters {
@@ -578,15 +525,14 @@
 
 .used-letter {
   display: inline-block;
-  width: 35px;
-  height: 35px;
-  line-height: 35px;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
   text-align: center;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 50%;
+  font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   animation: appearLetter 0.3s ease forwards;
 }
 
@@ -603,14 +549,12 @@
 
 .used-letter.correct {
   background: rgba(40, 180, 70, 0.3);
-  border: 1px solid rgba(40, 180, 70, 0.5);
-  color: rgba(220, 255, 220, 0.95);
+  color: rgba(220, 255, 220, 1);
 }
 
 .used-letter.wrong {
   background: rgba(180, 40, 40, 0.3);
-  border: 1px solid rgba(180, 40, 40, 0.5);
-  color: rgba(255, 220, 220, 0.95);
+  color: rgba(255, 220, 220, 1);
 }
 
 /* Game Statistics */
