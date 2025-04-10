@@ -781,7 +781,6 @@ def puzzle_slider():
     return render_template('games/puzzleSlider.html')
 
 @app.route('/games/minesweeper')
-@login_required
 def minesweeper():
     """Mayın Tarlası: Mantık ve strateji oyunu
     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
