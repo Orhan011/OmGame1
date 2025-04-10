@@ -748,11 +748,14 @@ def iq_test():
     return render_template('games/iqTest_simplified.html')
 
 # Simon Says Oyunu
-@app.route('/games/simon-says')
+@app.route('/simon_says')
 def simon_says():
-    """Simon Says: Hafıza oyunu
-    Renkli düğmelerin yanma sırasını hatırlayarak hafızanızı güçlendirin."""
     return render_template('games/simonSays.html')
+
+# Kelime Avı Oyunu
+@app.route('/word_search')
+def word_search():
+    return render_template('games/wordSearch.html')
 
 # Tetris Oyunu
 @app.route('/tetris')
@@ -1342,7 +1345,7 @@ def reset_password():
         if password != confirm_password:
             flash('Şifreler eşleşmiyor!', 'danger')
         elif len(password) < 8:
-            flash('Şifre en az 8 karakter olmalıdır!', 'danger')
+            flash('Şifre en az 8 karakter olmalıdır!')
         else:
             # Şifreyi güncelle ve token'ı temizle
             user.password_hash = generate_password_hash(password)
@@ -1398,7 +1401,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
+        'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
+        'word_search': {'point_base': 70, 'score_multiplier': 0.6} # Kelime Avı için çarpanlar eklendi
     }
 
     # Oyun türüne göre çarpanları güncelle
@@ -1450,6 +1454,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'numberChain': 2.5,  # 2.5 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
                 'puzzle_slider': 2.0,  # 2 dakika
+                'word_search': 3.0  # Kelime Avı için optimal süre eklendi
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1484,6 +1489,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'numberChain': 40,
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'snake_game': 100,  # Yılan uzadıkça daha fazla hamle
+                'word_search': 30  # Kelime Avı için optimal hamle sayısı eklendi
             }.get(game_type, 50)
 
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1968,7 +1974,8 @@ def get_leaderboard_data(game_type):
         'wordle': 'Wordle',
         'chess': 'Satranç',
         'puzzle_slider': 'Resim Bulmaca',
-        'snake_game': 'Yılan Oyunu'
+        'snake_game': 'Yılan Oyunu',
+        'word_search': 'Kelime Avı' # Kelime Avı eklendi
     }
 
     return jsonify({
