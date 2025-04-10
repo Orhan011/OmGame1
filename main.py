@@ -56,6 +56,61 @@ def allowed_file(filename):
     """Dosya uzantısının izin verilen uzantılardan olup olmadığını kontrol eder."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def send_welcome_email(to_email, username):
+    """
+    Sends a welcome email to a newly registered user
+
+    Uses the configured Gmail account (omgameee@gmail.com) to send welcome emails
+    """
+    try:
+        from_email = "omgameee@gmail.com"
+        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = "OmGame - Hoş Geldiniz!"
+
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h2 style="color: #4a67e8; text-align: center;">OmGame Dünyasına Hoş Geldiniz!</h2>
+                <p>Merhaba {username},</p>
+                <p>OmGame'e kaydolduğunuz için teşekkür ederiz! Artık beyin geliştirici oyunlarımıza erişebilir, 
+                   skorlarınızı takip edebilir ve liderlik tablolarında yerinizi alabilirsiniz.</p>
+                
+                <h3 style="color: #4a67e8;">OmGame'de Neler Yapabilirsiniz?</h3>
+                <ul>
+                    <li>Farklı kategorilerde beyin geliştirici oyunlar oynayabilirsiniz</li>
+                    <li>Oyunlardaki performansınızla XP kazanarak seviye atlayabilirsiniz</li>
+                    <li>Diğer oyuncularla rekabet edebilirsiniz</li>
+                    <li>Oynadıkça beyninizi geliştirebilirsiniz</li>
+                </ul>
+                
+                <p>Hemen giriş yapın ve oyunları keşfetmeye başlayın: <a href="https://omgame.replit.app">OmGame</a></p>
+                
+                <p>Herhangi bir sorunuz veya öneriniz varsa, bize bildirmekten çekinmeyin.</p>
+                
+                <p>İyi oyunlar,<br>OmGame Ekibi</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        msg.attach(MIMEText(body, 'html'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(from_email, password)
+        text = msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"E-posta gönderirken hata oluştu: {e}")
+        return False
+
 def send_verification_email(to_email, verification_code):
     """
     Sends a verification email with the provided code
@@ -1148,10 +1203,13 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        # Hoş geldin e-postası gönder
+        send_welcome_email(email, username)
+
         # Otomatik giriş yap
         session['user_id'] = new_user.id
 
-        flash('Kayıt başarılı! Hoş geldiniz!', 'success')
+        flash('Kayıt başarılı! Hoş geldiniz! E-posta adresinize bir hoş geldin mesajı gönderdik.', 'success')
         return redirect(url_for('index'))
 
     return render_template('register.html')
@@ -1955,13 +2013,17 @@ def save_score():
 
         db.session.commit()
 
-        # Yeni seviyeyi hesapla
+        # Eski seviyeyi kaydet ve yeni seviyeyi hesapla
+        old_level = calculate_level(user.experience_points - xp_gain)
         new_level = calculate_level(user.experience_points)
         next_level_xp = xp_for_level(new_level + 1)
         current_level_xp = xp_for_level(new_level)
         xp_progress = user.experience_points - current_level_xp
         xp_needed = next_level_xp - current_level_xp
-
+        
+        # Seviye yükseltme oldu mu kontrol et
+        level_up = new_level > old_level
+        
         # Ödül detayları
         rewards = {
             'base_points': int(base_points),
@@ -1984,13 +2046,19 @@ def save_score():
                 'level': new_level,
                 'progress': xp_progress,
                 'needed': xp_needed,
-                'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100
+                'progress_percent': int((xp_progress / xp_needed) * 100) if xp_needed > 0 else 100,
+                'level_up': level_up,
+                'old_level': old_level
             },
             'score_info': {
                 'total_score': multipliers.get('total_score', int(total_points)),
                 'difficulty': difficulty,
                 'game_type': game_type
-            }
+            },
+            'redirect_params': {
+                'levelUp': True,
+                'newLevel': new_level
+            } if level_up else {}
         })
     else:
         # Kullanıcı giriş yapmamış - skorunu kaydetmiyoruz

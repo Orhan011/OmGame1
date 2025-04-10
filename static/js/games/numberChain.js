@@ -1556,14 +1556,22 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore() {
-    fetch('/save_score', {
+    fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         game_type: 'numberChain',
-        score: gameState.score
+        score: gameState.score,
+        difficulty: difficulty.toLowerCase(),
+        playtime: Math.floor(Date.now() - gameState.startTime),
+        game_stats: {
+          level: currentLevel,
+          sequence_length: maxSequenceReached,
+          correct_answers: correctAnswers,
+          completed: currentLevel > DIFFICULTIES[difficulty].maxLevel
+        }
       })
     })
     .then(response => response.json())

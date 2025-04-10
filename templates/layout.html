@@ -4,28 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}OmGame - Bilişsel Beceri Oyunları{% endblock %}</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Bootstrap CSS optimize edildi -->
+<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"></noscript>
+<!-- Google Fonts optimize edildi -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"></noscript>
 
-<!-- Temel CSS Dosyaları -->
+<!-- Temel CSS Dosyaları - Kritik render yolu için optimize edildi -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 
-    <!-- iOS Swipe Navigasyon CSS - Optimizasyon için erken yükleme -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}" media="all">
+<!-- Sayfa Özel CSS Dosyaları - Sayfa tipine göre şartlı olarak yüklenir -->
+{% if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password', 'reset_code'] %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endif %}
+
+{% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-responsive-modernizer.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
+{% endif %}
 
-<!-- Sayfa Özel CSS Dosyaları -->
-<!--  Profil CSS dosyası kaldırıldı -->
+{% if request.endpoint == 'leaderboard' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+{% endif %}
+
+{% if request.endpoint in ['profile', 'profile_v2'] %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile_new.css') }}">
+{% endif %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -73,15 +84,28 @@ function loadArticleContent() {
 }
 </script>
 
-<!-- THREE.js ve ilgili kütüphaneler -->
+<!-- Bootstrap Icons & Font Awesome optimize edildi -->
+<link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+<!-- THREE.js ve ilgili kütüphaneler - sadece 3D oyunlarda kullanılır -->
+{% if request.endpoint in ['labyrinth'] %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
+{% endif %}
+
+<!-- Favicon optimize edildi -->
+<link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo.png') }}">
 <!-- Meta Tags-->
 <meta name="description" content="Zihinsel becerilerinizi geliştirmek için bilimsel olarak tasarlanmış bilişsel oyunlar. IQ, hafıza, konsantrasyon ve çözüm odaklı düşünmeyi geliştirin.">
 <meta name="keywords" content="OmGame, beyin geliştirme, iq oyunları, zihin oyunları, hafıza geliştirme, bilişsel beceriler">
+<meta name="theme-color" content="#343a40">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 </head>
 <body>
 <!-- Dinamik Arkaplan Efekti -->
@@ -221,14 +245,112 @@ function loadArticleContent() {
 </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Sweet Alert 2 - Gelişmiş ve güzel bildirimler için -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}"></script>
-<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+<!-- Bootstrap JS optimize edildi -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+<!-- Sweet Alert 2 - Sadece bildirim/uyarı içeren sayfalarda kullanılır -->
+{% if request.endpoint not in ['login', 'register', 'forgot_password', 'reset_password', 'reset_code'] %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+{% endif %}
+
+<!-- Ana JS dosyaları - lazy load kullanarak gecikmeli yükleme -->
+<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+<!-- Oyun sayfalarına özel JS dosyaları -->
+{% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
+<script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
+<!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
+{% endif %}
+
 {% block scripts %}{% endblock %}
-<!-- iOS Swipe Navigasyon Script -->
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
+
+<!-- iOS Swipe Navigasyon - Touch cihazlar için optimize edildi -->
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}" defer></script>
+
+<script>
+// Seviye yükseltme bildirimi ve konfeti animasyonu
+function showLevelUpNotification(newLevel) {
+  // Konfeti animasyonu - sadece kütüphane yüklüyse çalışır
+  if (typeof confetti === 'function') {
+    const duration = 3 * 1000; // 3 saniye
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Konfeti animasyonu çalıştır
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // İki farklı açıdan konfeti yağdır
+      confetti(Object.assign({}, defaults, { 
+        particleCount, 
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+      }));
+      confetti(Object.assign({}, defaults, { 
+        particleCount, 
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+      }));
+    }, 250);
+  }
+
+  // Bildirim göster - SweetAlert2 yüklüyse çalışır
+  if (typeof Swal === 'object') {
+    Swal.fire({
+      title: 'Tebrikler!',
+      text: `${newLevel}. seviyeye yükseldiniz!`,
+      icon: 'success',
+      confirmButtonText: 'Harika!',
+      background: '#343a40',
+      color: '#fff',
+      iconColor: '#4a67e8',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    });
+  } else {
+    // SweetAlert yüklü değilse basit bir bildirim
+    alert(`Tebrikler! ${newLevel}. seviyeye yükseldiniz!`);
+  }
+}
+
+// Level up bildirimini kontrol et (sayfa yüklendiğinde)
+document.addEventListener('DOMContentLoaded', function() {
+  const levelUpParam = new URLSearchParams(window.location.search).get('levelUp');
+  const newLevel = new URLSearchParams(window.location.search).get('newLevel');
+  
+  if (levelUpParam === 'true' && newLevel) {
+    // Konfeti kütüphanesi yüklü değilse lazy-load et
+    if (typeof confetti !== 'function' && document.querySelector('script[src*="confetti.browser.min.js"]') === null) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+      script.onload = function() {
+        // Konfeti ve bildirim göster
+        showLevelUpNotification(newLevel);
+      };
+      document.body.appendChild(script);
+    } else {
+      // Konfeti ve bildirim göster
+      showLevelUpNotification(newLevel);
+    }
+    
+    // URL'den parametreleri temizle (sayfa yenilendiğinde tekrar göstermesin)
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+});
+</script>
   </body>
 </html>

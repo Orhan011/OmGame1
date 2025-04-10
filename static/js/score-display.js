@@ -60,6 +60,8 @@ function createScoreDisplay(scoreData) {
  * @param {string} difficulty - Zorluk seviyesi
  * @param {object} gameStats - Oyunla ilgili istatistikler
  * @param {function} callback - Sonuç HTML'i ile çağrılacak fonksiyon
+ *                            - İlk parametre oluşturulan HTML, ikinci parametre API yanıtı, 
+ *                            - üçüncü parametre ise opsiyonel bir onay callback'i
  */
 function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', gameStats = {}, callback) {
     const scoreData = {
@@ -81,8 +83,36 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
     .then(response => response.json())
     .then(data => {
         console.log('Score saved:', data);
-        const scoreHtml = createScoreDisplay(data);
         
+        // Seviye yükseltme kontrolü
+        if (data.xp && data.xp.level_up) {
+            console.log(`Seviye yükseltme! Eski seviye: ${data.xp.old_level}, Yeni seviye: ${data.xp.level}`);
+            
+            // Seviye yükseltme olduğunda oyun sayfasından çıkarken anasayfaya seviye parametreleriyle yönlendir
+            if (data.redirect_params) {
+                // Mevcut sayfayı kaydet
+                const currentPage = window.location.pathname;
+                
+                // Ana sayfa olmadığımızdan emin olalım
+                if (currentPage !== '/' && currentPage !== '/index') {
+                    // Oyun bitimini işle
+                    const scoreHtml = createScoreDisplay(data);
+                    if (typeof callback === 'function') {
+                        callback(scoreHtml, data, () => {
+                            // Callback tamamlandıktan sonra anasayfaya yönlendir (seviye bilgisiyle)
+                            window.location.href = `/?levelUp=true&newLevel=${data.xp.level}`;
+                        });
+                    } else {
+                        // Anasayfaya yönlendir (seviye bilgisiyle)
+                        window.location.href = `/?levelUp=true&newLevel=${data.xp.level}`;
+                    }
+                    return; // Yönlendirme başladı, işlemi sonlandır
+                }
+            }
+        }
+        
+        // Normal durum (seviye yükseltme yoksa)
+        const scoreHtml = createScoreDisplay(data);
         if (typeof callback === 'function') {
             callback(scoreHtml, data);
         }

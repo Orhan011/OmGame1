@@ -1178,14 +1178,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru sunucuya gönder
   function saveScore() {
-    fetch('/save_score', {
+    fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         game_type: 'wordPuzzle',
-        score: gameState.score
+        score: gameState.score,
+        difficulty: gameState.difficulty || 'medium',
+        playtime: gameState.playTime || 0,
+        game_stats: {
+          correct_words: gameState.correctWords || 0,
+          completed: gameState.completed || false,
+          level: gameState.level || 1
+        }
       })
     })
     .then(response => response.json())

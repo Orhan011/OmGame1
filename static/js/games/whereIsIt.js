@@ -830,14 +830,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru kaydetme
   function saveScore(gameType, score) {
-    fetch('/save_score', {
+    fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         game_type: gameType,
-        score: score
+        score: score,
+        difficulty: gameState.difficulty || 'medium',
+        playtime: gameState.elapsedTime || 0,
+        game_stats: {
+          correct_answers: gameState.correctAnswers || 0,
+          total_rounds: gameState.round || 0,
+          completed: gameState.gameOver || false
+        }
       })
     })
     .then(response => response.json())
