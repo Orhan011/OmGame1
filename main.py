@@ -880,22 +880,10 @@ def solitaire():
 def all_games():
     """Tüm oyunları listeleyen sayfa"""
     try:
-        # Check database connection before rendering template
-        try:
-            # Try to get a user as a simple database connection test
-            User.query.first()
-        except Exception as db_error:
-            logger.error(f"Database connection error: {str(db_error)}")
-            # Handle database error but still render the template
-            flash('Veritabanı bağlantısında bir sorun oluştu. Bazı özellikler geçici olarak kullanılamayabilir.', 'warning')
-            # Close and recreate the connection if possible
-            db.session.remove()
-        
         return render_template('all_games.html')
     except Exception as e:
         logger.error(f"Error rendering all_games.html: {str(e)}")
-        # Return a more user-friendly error page
-        return render_template('error.html', error_message="Oyun listesi yüklenirken bir hata oluştu."), 500
+        return f"An error occurred: {str(e)}", 500
 
 # Skor Tablosu
 @app.route('/leaderboard')
