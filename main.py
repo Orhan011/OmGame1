@@ -1164,14 +1164,61 @@ def logout():
     return redirect(url_for('index'))
 
 def xp_for_level(level):
-    """Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar."""
-    return int(500 * (level ** 1.5))
+    """
+    Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar.
+    Yeni formül ile seviye başına gereken XP miktarı daha dengeli artıyor.
+    - Başlangıç seviyelerinde daha hızlı seviye atlama
+    - İleri seviyelerde zorluk kademeli olarak artıyor
+    - Başarı hissini artırmak için ilk 10 seviye daha kolay
+    """
+    # Temel XP değeri (1. seviye için)
+    base_xp = 400
+    
+    # Düşük seviyelerde daha hızlı ilerleme için çarpan
+    if level <= 5:
+        # İlk 5 seviyede hızlı ilerleme
+        return int(base_xp * level * 1.2)
+    elif level <= 10:
+        # 6-10 seviyelerinde orta düzey ilerleme
+        return int(base_xp * 5 * 1.2 + base_xp * (level - 5) * 1.5)
+    elif level <= 20:
+        # 11-20 seviyelerinde biraz daha zorlaştırma
+        return int(base_xp * 5 * 1.2 + base_xp * 5 * 1.5 + base_xp * (level - 10) * 1.8)
+    else:
+        # 20+ seviyelerde daha zorlayıcı
+        return int(base_xp * 5 * 1.2 + base_xp * 5 * 1.5 + base_xp * 10 * 1.8 + base_xp * (level - 20) * 2.2)
 
 def calculate_level(xp):
-    """Toplam XP'ye göre kullanıcı seviyesini hesaplar."""
+    """
+    Toplam XP'ye göre kullanıcı seviyesini hesaplar.
+    Optimize edilmiş algoritma - her seviyeyi kontrol etmek yerine ikili arama kullanır.
+    """
+    # Başlangıç seviyesinden başla
     level = 1
-    while xp >= xp_for_level(level + 1):
+    
+    # Kullanıcı 0 XP ile başlıyor
+    if xp <= 0:
+        return level
+    
+    # Maksimum seviye sınırı (performans için)
+    max_check_level = 100
+    
+    # İkili arama ile seviye bulma - daha hızlı hesaplama
+    left, right = 1, max_check_level
+    while left <= right:
+        mid = (left + right) // 2
+        if xp_for_level(mid) <= xp < xp_for_level(mid + 1):
+            return mid
+        elif xp < xp_for_level(mid):
+            right = mid - 1
+        else:
+            left = mid + 1
+    
+    # Eğer ikili arama sonuç vermezse, doğrusal arama yap
+    level = 1
+    while level < max_check_level and xp >= xp_for_level(level + 1):
         level += 1
+        
     return level
 
 def get_user_scores():
@@ -1849,18 +1896,50 @@ def save_score():
         # Toplam puanı hesapla
         total_points = base_points + score_points + daily_bonus + streak_bonus
 
-        # XP hesaplama
+        # Geliştirilmiş XP hesaplama sistemi
+        # Temel XP değeri (oyun türü ve zorluğa göre)
         xp_base = multipliers['xp_base']
+        
+        # Oyun performansına bağlı XP (skor ne kadar yüksekse o kadar çok XP)
         xp_from_score = score * multipliers['xp_score_multiplier']
-        xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
+        
+        # Oyunda harcanan zamanına bağlı XP - her dakika için 5 XP, 
+        # ama çok uzun oyunlarda azalan getiri
+        playtime_minutes = playtime / 60
+        if playtime_minutes <= 5:
+            # 5 dakikaya kadar tam XP
+            xp_from_time = playtime_minutes * 5
+        else:
+            # 5 dakikadan sonra azalan XP
+            xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
+        
+        # Zorluk seviyesine göre ek XP bonusu
+        difficulty_bonus = 1.0
+        if difficulty == 'easy':
+            difficulty_bonus = 0.8
+        elif difficulty == 'medium':
+            difficulty_bonus = 1.0
+        elif difficulty == 'hard':
+            difficulty_bonus = 1.5
+            
+        # Tamamlama başarısına göre bonus
+        completion_bonus = 0
+        if game_stats.get('completed', False):
+            completion_bonus = int(xp_base * 0.3)  # Oyunu tamamlamak için %30 bonus
+            
+        # Ard arda kazanma (streak) bonusu
+        streak_xp_bonus = 0
+        if hasattr(user, 'streak_count') and user.streak_count > 1:
+            streak_xp_bonus = min(user.streak_count * 2, 30)  # Maksimum 30 XP bonus
+        
+        # Toplam XP hesaplama
+        xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus + completion_bonus + streak_xp_bonus)
 
-        xp_gain = int(xp_base + xp_from_score + xp_from_time)
-
-        # Yeni skoru kaydet
+        # Yeni skoru kaydet (toplam puanı kullanarak)
         new_score = Score(
             user_id=user_id,
             game_type=game_type,
-            score=score
+            score=int(total_points)  # Oyun puanı yerine hesaplanan toplam puanı kaydediyoruz
         )
 
         db.session.add(new_score)
@@ -1924,12 +2003,29 @@ def save_score():
             'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
 
-        # Varsayılan XP bilgileri (gösterge amaçlı)
+        # Misafir kullanıcılar için tahmini XP hesaplama (gösterge amaçlı)
+        # Geliştirilmiş XP hesaplama sistemi (misafir kullanıcılar için)
         xp_base = multipliers['xp_base']
         xp_from_score = score * multipliers['xp_score_multiplier']
-        xp_from_time = playtime / 60 * 5  # Her dakika için 5 XP
-
-        xp_gain = int(xp_base + xp_from_score + xp_from_time)
+        
+        # Zorluk seviyesine göre ek XP bonusu
+        difficulty_bonus = 1.0
+        if difficulty == 'easy':
+            difficulty_bonus = 0.8
+        elif difficulty == 'medium':
+            difficulty_bonus = 1.0
+        elif difficulty == 'hard':
+            difficulty_bonus = 1.5
+            
+        # Oyun süresine göre hesaplama
+        playtime_minutes = playtime / 60
+        if playtime_minutes <= 5:
+            xp_from_time = playtime_minutes * 5
+        else:
+            xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
+            
+        # Misafir kullanıcıya göstermek için toplam XP - giriş yapınca alabilecekleri miktar
+        xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus)
         total_points = base_points + score_points
 
         # Misafir kullanıcılara bilgi mesajı
