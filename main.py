@@ -801,6 +801,17 @@ def snake_game():
     Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın."""
     return render_template('games/snake_simplified.html')
 
+# Galaktik Mücadele oyunu: Uzay temalı mini oyunlar koleksiyonu
+@app.route('/galactic-challenge')
+def galactic_challenge_redirect():
+    return redirect(url_for('galactic_challenge'))
+
+@app.route('/games/galactic-challenge')
+def galactic_challenge():
+    """Galaktik Mücadele: Uzay temalı mini oyunlar koleksiyonu
+    Uzayın derinliklerinde yeteneklerinizi test edin ve stratejik düşünme becerilerinizi geliştirin."""
+    return render_template('games/galacticChallenge.html')
+
 # Pattern Flow oyunu kaldırıldı
 # Tüm Oyunlar Sayfası
 @app.route('/all-games')
