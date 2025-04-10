@@ -835,12 +835,7 @@ def solitaire():
     Kartları uygun şekilde sıralayarak stratejik düşünme ve planlama becerilerinizi geliştirin."""
     return render_template('games/solitaire.html')
 
-# Minesweeper
-@app.route('/games/minesweeper')
-def minesweeper():
-    """Mayın Tarlası: Klasik mantık oyunu
-    Gizli mayınları bulma ve işaretleme stratejisi ile mantıksal düşünme becerilerinizi geliştirin."""
-    return render_template('games/minesweeper.html')
+# Minesweeper rotası artık routes.py dosyasında tanımlanmıştır
 
 @app.route('/all-games')
 def all_games():
