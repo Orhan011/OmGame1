@@ -723,7 +723,7 @@ def game_2048():
 # Wordle Oyunu
 @app.route('/wordle')
 def wordle_redirect():
-    return redirect(url_for('wordle'))
+    return redirect(url_for('wordle', _external=False))
 
 @app.route('/games/wordle')
 def wordle():

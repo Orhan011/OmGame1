@@ -15,16 +15,17 @@ def login_required(f):
     return decorated_function
 
 
-# Wordle rota tanımını ekleyin
-@app.route('/games/wordle')
-@login_required # Added login_required decorator as suggested by the context
-def game_wordle():
-    return render_template('games/wordle.html')
+# This route is now defined in main.py
+# @app.route('/games/wordle')
+# @login_required
+# def game_wordle():
+#     return render_template('games/wordle.html')
 
-@app.route('/games/wordPuzzle')
-@login_required
-def game_wordPuzzle():
-    return render_template('games/wordPuzzle.html')
+# This route is now defined in main.py using kebab-case convention (/games/word-puzzle)
+# @app.route('/games/wordPuzzle')
+# @login_required
+# def game_wordPuzzle():
+#     return render_template('games/wordPuzzle.html')
 
 def send_welcome_email(email, username):
     msg = Message('OmGame Dünyasına Hoş Geldiniz!', sender='noreply@omgame.com', recipients=[email]) # Replace with your actual sender address
