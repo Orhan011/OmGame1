@@ -202,11 +202,21 @@
   border: 2px solid rgba(106, 90, 224, 0.3);
   border-radius: 10px;
   color: white;
-  font-size: 20px;
+  font-size: 28px;
   text-align: center;
   text-transform: uppercase;
   padding: 0 15px;
   outline: none;
+  transition: all 0.2s ease;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+#letter-input:focus {
+  background: rgba(50, 50, 90, 0.7);
+  border-color: rgba(106, 90, 224, 0.7);
+  box-shadow: 0 0 20px rgba(106, 90, 224, 0.4);
+  transform: scale(1.03);
 }
 
 #letter-input:focus {
@@ -480,22 +490,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mobil klavyede büyük harf kullanımını teşvik et
     this.setAttribute('inputmode', 'text');
   });
-
-  // Tahmin gönderme düğmesi
+  
+  // Otomatik tahmin için harf girişini dinle
+  letterInput.addEventListener('input', function(e) {
+    // Harf girişi yapıldığında:
+    this.value = this.value.toUpperCase(); // Büyük harfe çevir
+    
+    // Tek harf girildiğinde otomatik olarak tahmini değerlendir
+    if (this.value.length === 1 && /^[A-ZĞÜŞİÖÇ]$/.test(this.value)) {
+      setTimeout(() => {
+        submitGuess();
+      }, 200); // Kullanıcının görmesi için kısa bir gecikme
+    } else if (this.value.length > 1) {
+      // Birden fazla harf girilirse ilk harfi al
+      this.value = this.value.charAt(0);
+      setTimeout(() => {
+        submitGuess();
+      }, 200);
+    }
+  });
+  
+  // Tahmin düğmesini yine de aktif tut
   submitLetterBtn.addEventListener('click', function() {
     submitGuess();
   });
-
-  // Enter tuşuyla da tahmin yapabilme
+  
+  // Enter tuşuyla da tahmin yapabilme (isteğe bağlı)
   letterInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       submitGuess();
     }
-  });
-
-  // Harf giriş alanında otomatik büyük harfe çevirme
-  letterInput.addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
   });
 
   // Oyunu başlatan fonksiyon
