@@ -1,0 +1,824 @@
+
+/* Ana Konteyner */
+.minesweeper-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  color: #333;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+}
+
+.mine-game-container {
+  width: 95%;
+  max-width: 1100px;
+  margin: 1rem auto;
+  padding: 0.5rem;
+}
+
+/* Başlık ve Üst Kontrol Bölümü */
+.game-header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.game-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.game-title h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-subtitle {
+  font-size: 1rem;
+  color: #636e72;
+  margin-bottom: 1rem;
+}
+
+.game-controls-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.7rem 1.2rem;
+  border-radius: 0.6rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+}
+
+.stat-box i {
+  margin-right: 0.8rem;
+}
+
+.mines-counter {
+  background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+  color: white;
+}
+
+.timer {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+}
+
+.difficulty-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.difficulty-select {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #e0e0e0 0%, #d3d3d3 100%);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 230px;
+}
+
+.difficulty-select:hover {
+  background: linear-gradient(135deg, #d3d3d3 0%, #c4c4c4 100%);
+}
+
+.difficulty-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 163, 223, 0.5);
+}
+
+.control-btn {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn i {
+  margin-right: 0.5rem;
+}
+
+.new-game {
+  background: linear-gradient(135deg, #5ba7f1 0%, #2c67ec 100%);
+  color: white;
+}
+
+.new-game:hover {
+  background: linear-gradient(135deg, #4a97e9 0%, #1a56eb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(44, 103, 236, 0.3);
+}
+
+/* Oyun Tahtası Bölümü */
+.game-board-section {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+#mine-field-container {
+  position: relative;
+  max-width: 100%;
+  overflow: auto;
+  padding: 0.5rem;
+}
+
+.board-background {
+  position: relative;
+  display: inline-block;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.board-shadow {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.05);
+  filter: blur(10px);
+  border-radius: 8px;
+}
+
+.mine-field {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-gap: 1px;
+  background-color: #bbb;
+  border: 2px solid #999;
+  border-radius: 4px;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Hücre stilleri */
+.cell {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e6e6e6 0%, #d9d9d9 100%);
+  border: 2px solid;
+  border-color: #f0f0f0 #aaa #aaa #f0f0f0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cell:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
+}
+
+.cell:hover:not(.revealed):not(.flagged):not(.question) {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e3e3e3 100%);
+  transform: scale(1.03);
+  z-index: 2;
+}
+
+.cell:active:not(.revealed):not(.flagged):not(.question) {
+  transform: scale(0.98);
+}
+
+.cell.revealed {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  border: 1px solid #ccc;
+  font-weight: 600;
+}
+
+/* Bayrak ve soru işareti */
+.cell.flagged {
+  border-color: #f0f0f0 #aaa #aaa #f0f0f0;
+}
+
+.cell.flagged i, .cell.question i {
+  font-size: 1rem;
+  animation: pop-in 0.2s ease-out;
+}
+
+.cell.flagged i {
+  color: #e74c3c;
+}
+
+.cell.question i {
+  color: #3498db;
+}
+
+/* Patlayan mayın */
+.cell.mine-exploded {
+  background: #e74c3c;
+  border-color: #c0392b;
+  animation: explode 0.5s ease-out;
+}
+
+.cell.mine-exploded i {
+  color: #2c3e50;
+  animation: spin 0.5s ease-out;
+}
+
+/* Sayı renkleri */
+.cell.revealed[data-mines="1"] { color: #3498db; } /* Mavi */
+.cell.revealed[data-mines="2"] { color: #2ecc71; } /* Yeşil */
+.cell.revealed[data-mines="3"] { color: #e74c3c; } /* Kırmızı */
+.cell.revealed[data-mines="4"] { color: #9b59b6; } /* Mor */
+.cell.revealed[data-mines="5"] { color: #e67e22; } /* Turuncu */
+.cell.revealed[data-mines="6"] { color: #16a085; } /* Yeşilimsi mavi */
+.cell.revealed[data-mines="7"] { color: #2c3e50; } /* Koyu mavi */
+.cell.revealed[data-mines="8"] { color: #7f8c8d; } /* Gri */
+
+/* Oyun Seçenekleri Bölümü */
+.game-options-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  margin-bottom: 1.5rem;
+}
+
+.options-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.option-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.option-label {
+  margin-left: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Toggle Anahtarı */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #2196F3;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+/* Yardım Butonları */
+.help-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.help-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e6e6e6 100%);
+  color: #2c3e50;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.help-btn i {
+  margin-right: 0.5rem;
+}
+
+.help-btn:hover {
+  background: linear-gradient(135deg, #e6e6e6 0%, #d7d7d7 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Yardım Paneli */
+.help-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow-y: auto;
+  transition: transform 0.3s ease-out;
+  transform: translateX(0);
+}
+
+.help-panel.hidden {
+  transform: translateX(100%);
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.help-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #343a40;
+}
+
+.help-content {
+  padding: 1rem;
+}
+
+.help-section {
+  margin-bottom: 1.5rem;
+}
+
+.help-section h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.control-instruction {
+  display: flex;
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.control-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  background: #e9ecef;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.control-info {
+  padding: 0.75rem;
+  flex: 1;
+}
+
+.control-info h5 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.control-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.help-section ul {
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.help-section p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+}
+
+/* Modal Stilleri */
+.modal-content {
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+.modal-title {
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.btn-close {
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.result-message {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.result-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.win .result-icon {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f8b64c 100%);
+  color: #ff9f1a;
+  box-shadow: 0 8px 20px rgba(250, 177, 160, 0.3);
+  animation: bounce 1s ease-out;
+}
+
+.lose .result-icon {
+  background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(214, 48, 49, 0.3);
+  animation: shake 0.8s ease-out;
+}
+
+.result-message h4 {
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.result-message p {
+  color: #636e72;
+  margin-bottom: 0;
+}
+
+.result-stats {
+  display: flex;
+  justify-content: space-around;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #636e72;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 0 1.5rem 1.5rem;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #5ba7f1 0%, #2c67ec 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(44, 103, 236, 0.3);
+}
+
+.modal-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(44, 103, 236, 0.35);
+}
+
+.modal-btn.secondary {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  color: #2c3e50;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.modal-btn.secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* İpucu Modalı */
+.hint-content {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.hint-icon {
+  font-size: 3rem;
+  color: #f9ca24;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 10px rgba(249, 202, 36, 0.3);
+  animation: pulse 1.5s infinite;
+}
+
+#hint-text {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 0;
+}
+
+/* Animasyonlar */
+@keyframes pop-in {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes explode {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-20px); }
+  60% { transform: translateY(-10px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* İpucu vurgulamaları */
+.highlight-safe {
+  position: relative;
+}
+
+.highlight-safe:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(46, 204, 113, 0.5);
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+.highlight-mine {
+  position: relative;
+}
+
+.highlight-mine:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(231, 76, 60, 0.5);
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+.highlight-hint {
+  position: relative;
+  z-index: 10;
+}
+
+.highlight-hint:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(241, 196, 15, 0.7);
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+  z-index: -1;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+  .game-title h1 {
+    font-size: 1.8rem;
+  }
+  
+  .game-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .stat-box {
+    min-width: 90px;
+    padding: 0.6rem 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .options-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .cell {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  
+  .help-panel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 576px) {
+  .game-title h1 {
+    font-size: 1.6rem;
+  }
+  
+  .game-stats {
+    gap: 1rem;
+  }
+  
+  .stat-box {
+    min-width: 80px;
+    padding: 0.5rem 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .difficulty-select {
+    min-width: 100%;
+  }
+  
+  .control-btn {
+    padding: 0.6rem 1rem;
+  }
+  
+  .help-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .help-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .cell {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+}
