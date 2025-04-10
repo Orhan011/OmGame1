@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 {% block title %}Adam Asmaca - Zekapark{% endblock %}
 
@@ -11,18 +12,18 @@
 
     <div class="game-dashboard">
       <div class="game-area-panel">
-        <!-- Yeni düzen: Adam asmaca sol köşede, kelimeler sağda, kullanılan harfler altta -->
+        <!-- Ana oyun alanını iki sütuna bölelim - Minimalist tasarıma uygun olarak -->
         <div class="game-main-content">
-          <!-- Sol köşe - Küçültülmüş Adam asmaca çizimi -->
+          <!-- Sol sütun - Adam asmaca çizimi -->
           <div class="hangman-display">
             <div class="hangman-drawing-container">
-              <svg id="hangman-svg" width="150" height="150" viewBox="0 0 300 300">
+              <svg id="hangman-svg" width="180" height="180" viewBox="0 0 300 300">
                 <!-- Darağacı (her zaman görünür) - Sadece basit çizgiler -->
                 <line x1="60" y1="20" x2="200" y2="20" stroke="#fff" stroke-width="3"/>
                 <line x1="60" y1="20" x2="60" y2="280" stroke="#fff" stroke-width="3"/>
                 <line x1="20" y1="280" x2="100" y2="280" stroke="#fff" stroke-width="3"/>
                 <line x1="140" y1="20" x2="140" y2="60" stroke="#fff" stroke-width="3"/>
-
+                
                 <!-- Asılacak adamın parçaları (yanlış tahminlerde görünecek) -->
                 <circle id="head" cx="140" cy="85" r="25" stroke="#fff" stroke-width="3" fill="none" class="hangman-part hidden"/>
                 <line id="body" x1="140" y1="110" x2="140" y2="190" stroke="#fff" stroke-width="3" class="hangman-part hidden"/>
@@ -34,19 +35,64 @@
             </div>
           </div>
 
-          <!-- Sağ taraf - Kelime gösterimi (minimalist tasarım) -->
+          <!-- Sağ sütun - Kelime gösterimi (minimalist tasarım) -->
           <div class="word-display">
             <div id="word-container"></div>
           </div>
         </div>
 
-        <!-- Kullanılan harfler kutusu - Altta -->
+        <!-- Kullanılan harfler kutusu - Artık altta -->
         <div class="used-letters-container">
           <h3>Kullanılan Harfler</h3>
           <div id="used-letters"></div>
         </div>
-      </div>
 
+        <!-- Türkçe Klavye Düzeni -->
+        <div class="virtual-keyboard">
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="Q">Q</button>
+            <button class="key-btn" data-key="W">W</button>
+            <button class="key-btn" data-key="E">E</button>
+            <button class="key-btn" data-key="R">R</button>
+            <button class="key-btn" data-key="T">T</button>
+            <button class="key-btn" data-key="Y">Y</button>
+            <button class="key-btn" data-key="U">U</button>
+            <button class="key-btn" data-key="I">I</button>
+            <button class="key-btn" data-key="O">O</button>
+            <button class="key-btn" data-key="P">P</button>
+            <button class="key-btn" data-key="Ğ">Ğ</button>
+            <button class="key-btn" data-key="Ü">Ü</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="A">A</button>
+            <button class="key-btn" data-key="S">S</button>
+            <button class="key-btn" data-key="D">D</button>
+            <button class="key-btn" data-key="F">F</button>
+            <button class="key-btn" data-key="G">G</button>
+            <button class="key-btn" data-key="H">H</button>
+            <button class="key-btn" data-key="J">J</button>
+            <button class="key-btn" data-key="K">K</button>
+            <button class="key-btn" data-key="L">L</button>
+            <button class="key-btn" data-key="Ş">Ş</button>
+            <button class="key-btn" data-key="İ">İ</button>
+          </div>
+          <div class="keyboard-row">
+            <button class="key-btn" data-key="Z">Z</button>
+            <button class="key-btn" data-key="X">X</button>
+            <button class="key-btn" data-key="C">C</button>
+            <button class="key-btn" data-key="V">V</button>
+            <button class="key-btn" data-key="B">B</button>
+            <button class="key-btn" data-key="N">N</button>
+            <button class="key-btn" data-key="M">M</button>
+            <button class="key-btn" data-key="Ö">Ö</button>
+            <button class="key-btn" data-key="Ç">Ç</button>
+          </div>
+        </div>
+
+        <!-- Mobil giriş alanı kaldırıldı, sadece sanal klavye kullanılıyor -->
+        <input type="hidden" id="letter-input" maxlength="1" autocomplete="off">
+      </div>
+      
       <div class="game-info-panel">
         <div class="game-stats">
           <div class="stat-item glow-border">
@@ -62,7 +108,7 @@
             <div class="stat-value" id="difficulty">Orta</div>
           </div>
         </div>
-
+        
         <div class="game-controls">
           <button id="new-game-btn" class="primary-button modern-button">
             <i class="fas fa-redo-alt"></i> Yeni Oyun
@@ -76,7 +122,7 @@
             </select>
           </div>
         </div>
-
+        
         <div class="game-rules card-container">
           <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
           <ul>
@@ -88,14 +134,14 @@
             <li><i class="fas fa-skull"></i> Tüm kelimeyi bulmadan adam tamamlanırsa kaybedersiniz</li>
           </ul>
         </div>
-
+        
         <div class="category-info card-container">
           <h3><i class="fas fa-tag"></i> Kategori</h3>
           <p id="category-display" class="category-text">Genel</p>
         </div>
       </div>
     </div>
-
+    
     <div id="game-modal" class="game-modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -782,7 +828,7 @@
   .game-dashboard {
     grid-template-columns: 1fr;
   }
-
+  
   .game-stats {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -793,11 +839,11 @@
   .game-main-content {
     flex-direction: column;
   }
-
+  
   .hangman-display {
     margin: 0 auto 15px;
   }
-
+  
   .word-display {
     width: 100%;
   }
@@ -809,18 +855,18 @@
     height: 40px;
     font-size: 1.5rem;
   }
-
+  
   .hangman-drawing-container svg {
     width: 200px;
     height: 200px;
   }
-
+  
   .key-btn {
     width: 36px;
     height: 36px;
     font-size: 0.95rem;
   }
-
+  
   .game-main-content {
     gap: 10px;
   }
@@ -830,23 +876,23 @@
   .game-stats {
     grid-template-columns: 1fr 1fr;
   }
-
+  
   .stat-item:last-child {
     grid-column: span 2;
   }
-
+  
   .letter-box {
     width: 32px;
     height: 32px;
     font-size: 1.3rem;
   }
-
+  
   .key-btn {
     width: 32px;
     height: 32px;
     font-size: 0.9rem;
   }
-
+  
   .keyboard-row {
     gap: 6px;
   }
@@ -858,16 +904,16 @@
     height: 28px;
     font-size: 1.2rem;
   }
-
+  
   .hangman-drawing-container svg {
     width: 180px;
     height: 180px;
   }
-
+  
   .keyboard-row {
     gap: 4px;
   }
-
+  
   .key-btn {
     width: 28px;
     height: 28px;
@@ -950,12 +996,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Oyunu başlat
   initGame();
-
+  
   // Sanal klavye düğmelerini etkinleştir
   keyButtons.forEach(button => {
     button.addEventListener('click', function() {
       if (gameOver) return;
-
+      
       const letter = this.getAttribute('data-key');
       letterInput.value = letter;
       submitGuess();
@@ -978,12 +1024,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Fiziksel klavye ile de harfleri destekleyelim
   document.addEventListener('keydown', function(e) {
     if (gameOver) return;
-
+    
     // Sadece harfler ile etkileşime geçelim
     if (/^[a-zA-ZğüşıöçĞÜŞİÖÇ]$/.test(e.key)) {
       const letter = e.key.toUpperCase();
       letterInput.value = letter;
-
+      
       // Sanal klavyede basılan tuşun görsel efektini gösterelim
       keyButtons.forEach(button => {
         if (button.getAttribute('data-key') === letter) {
@@ -1009,32 +1055,32 @@ document.addEventListener('DOMContentLoaded', function() {
     guessedLetters = [];
     remainingAttempts = 6;
     gameOver = false;
-
+    
     // Rastgele kelime seç
     const randomIndex = Math.floor(Math.random() * wordLists[currentDifficulty].length);
     const wordObj = wordLists[currentDifficulty][randomIndex];
     currentWord = wordObj.word.toUpperCase();
     currentCategory = wordObj.category;
-
+    
     // UI güncelle
     updateWordDisplay();
     updateUsedLetters();
     updateUI();
-
+    
     // Adam asmaca çizimini sıfırla
     resetHangman();
-
+    
     // Sanal klavyeyi sıfırla
     resetVirtualKeyboard();
-
+    
     // Kategoriyi göster
     categoryDisplay.textContent = currentCategory;
-
+    
     // Input'u temizle ve odakla
     letterInput.value = '';
     letterInput.focus();
   }
-
+  
   // Sanal klavyeyi sıfırla
   function resetVirtualKeyboard() {
     keyButtons.forEach(button => {
@@ -1046,11 +1092,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Kelime gösterimini güncelle
   function updateWordDisplay() {
     wordContainer.innerHTML = '';
-
+    
     for (let i = 0; i < currentWord.length; i++) {
       const letter = currentWord[i];
       const letterBox = document.createElement('div');
-
+      
       if (letter === ' ') {
         letterBox.className = 'letter-box space';
         letterBox.textContent = '';
@@ -1063,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', function() {
           letterBox.textContent = '';
         }
       }
-
+      
       wordContainer.appendChild(letterBox);
     }
   }
@@ -1071,21 +1117,21 @@ document.addEventListener('DOMContentLoaded', function() {
   // Kullanılan harfleri göster
   function updateUsedLetters() {
     usedLettersContainer.innerHTML = '';
-
+    
     // Alfabetik sıraya göre harfleri göster
     const sortedLetters = [...guessedLetters].sort();
-
+    
     sortedLetters.forEach(letter => {
       const letterElement = document.createElement('span');
       letterElement.className = 'used-letter';
       letterElement.textContent = letter;
-
+      
       if (currentWord.includes(letter)) {
         letterElement.classList.add('correct');
       } else {
         letterElement.classList.add('wrong');
       }
-
+      
       usedLettersContainer.appendChild(letterElement);
     });
   }
@@ -1093,18 +1139,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Tahmin gönderme fonksiyonu
   function submitGuess() {
     if (gameOver) return;
-
+    
     const letter = letterInput.value.trim().toUpperCase();
-
+    
     if (!letter || letter.length !== 1 || !/^[A-ZĞÜŞİÖÇ]$/.test(letter)) {
       showMessage('Lütfen geçerli bir harf girin!', 'warning');
       letterInput.value = '';
       letterInput.focus();
       return;
     }
-
+    
     handleGuess(letter);
-
+    
     // Input'u temizle ve odakla
     letterInput.value = '';
     letterInput.focus();
@@ -1116,35 +1162,35 @@ document.addEventListener('DOMContentLoaded', function() {
       showMessage('Bu harfi zaten tahmin ettiniz!', 'warning');
       return;
     }
-
+    
     guessedLetters.push(letter);
-
+    
     // Kullanılan harfleri güncelle
     updateUsedLetters();
-
+    
     // Doğru tahmin mi?
     const isCorrect = currentWord.includes(letter);
-
+    
     if (isCorrect) {
       // Doğru tahmin
       updateWordDisplay();
       showMessage('Doğru tahmin!', 'success');
-
+      
       // Skor güncelle
       score += 10;
       scoreElement.textContent = score;
-
+      
       // Sanal klavyeyi güncelle
       updateVirtualKeyboard(letter, true);
-
+      
       // Başarı animasyonu
       playLetterAnimation(letter, true);
-
+      
       // Oyun kazanıldı mı?
       if (isGameWon()) {
         // Başarı efekti
         playSuccessEffect();
-
+        
         // Biraz bekle, sonra modalı göster
         setTimeout(() => {
           endGame(true);
@@ -1155,21 +1201,21 @@ document.addEventListener('DOMContentLoaded', function() {
       remainingAttempts--;
       remainingAttemptsElement.textContent = remainingAttempts;
       showMessage('Yanlış tahmin!', 'error');
-
+      
       // Sanal klavyeyi güncelle
       updateVirtualKeyboard(letter, false);
-
+      
       // Başarısızlık animasyonu
       playLetterAnimation(letter, false);
-
+      
       // Adam asmaca çizimini güncelle
       updateHangman();
-
+      
       // Oyun kaybedildi mi?
       if (remainingAttempts <= 0) {
         // Başarısızlık efekti 
         playFailureEffect();
-
+        
         // Biraz bekle, sonra modalı göster
         setTimeout(() => {
           endGame(false);
@@ -1177,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-
+  
   // Sanal klavyeyi güncelle
   function updateVirtualKeyboard(letter, isCorrect) {
     keyButtons.forEach(button => {
@@ -1190,22 +1236,22 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
+  
   // Harf tahmini için animasyon
   function playLetterAnimation(letter, isCorrect) {
     // Ekranda görsel bir geri bildirim
     const feedbackElement = document.createElement('div');
     feedbackElement.className = 'letter-feedback ' + (isCorrect ? 'correct-feedback' : 'wrong-feedback');
     feedbackElement.textContent = letter;
-
+    
     document.body.appendChild(feedbackElement);
-
+    
     // Animasyon bittikten sonra elementi kaldır
     setTimeout(() => {
       feedbackElement.remove();
     }, 1000);
   }
-
+  
   // Başarı efekti
   function playSuccessEffect() {
     // Kutlama animasyonu
@@ -1216,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, index * 100);
     });
   }
-
+  
   // Başarısızlık efekti
   function playFailureEffect() {
     // Hangman son animasyonu
@@ -1255,31 +1301,31 @@ document.addEventListener('DOMContentLoaded', function() {
   // Oyunu bitir
   function endGame(isWon) {
     gameOver = true;
-
+    
     // Skor hesapla
     let finalScoreValue = score;
     if (isWon) {
       // Kalan haklara göre bonus
       finalScoreValue += remainingAttempts * 15;
-
+      
       // Zorluk seviyesine göre bonus
       if (currentDifficulty === 'hard') {
         finalScoreValue *= 2;
       } else if (currentDifficulty === 'medium') {
         finalScoreValue *= 1.5;
       }
-
+      
       finalScoreValue = Math.floor(finalScoreValue);
     }
-
+    
     // Skor UI güncellemesi
     score = finalScoreValue;
     scoreElement.textContent = score;
-
+    
     // Modalı göster
     gameModal.classList.add('active');
     finalScore.textContent = score;
-
+    
     if (isWon) {
       resultTitle.textContent = 'Tebrikler!';
       resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
@@ -1291,13 +1337,13 @@ document.addEventListener('DOMContentLoaded', function() {
       gameModal.classList.add('lose-modal');
       gameModal.classList.remove('win-modal');
     }
-
+    
     wordReveal.textContent = `Kelime: ${currentWord}`;
-
+    
     // Skoru kaydet
     saveScore();
   }
-
+  
   // CSS Stillerini ekle
   const customStyles = document.createElement('style');
   customStyles.textContent = `
@@ -1312,15 +1358,15 @@ document.addEventListener('DOMContentLoaded', function() {
       animation: feedbackAnimation 1s forwards;
       pointer-events: none;
     }
-
+    
     .correct-feedback {
       color: #28B446;
     }
-
+    
     .wrong-feedback {
       color: #EA4335;
     }
-
+    
     @keyframes feedbackAnimation {
       0% {
         opacity: 0;
@@ -1339,11 +1385,11 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: translate(-50%, -50%) scale(0.8);
       }
     }
-
+    
     .success-animation {
       animation: successPulse 0.5s ease-in-out;
     }
-
+    
     @keyframes successPulse {
       0% {
         transform: scale(1);
@@ -1358,11 +1404,11 @@ document.addEventListener('DOMContentLoaded', function() {
         box-shadow: 0 0 0 0 rgba(40, 180, 70, 0);
       }
     }
-
+    
     .failure-animation {
       animation: shakeEffect 0.5s ease-in-out;
     }
-
+    
     @keyframes shakeEffect {
       0%, 100% {
         transform: translateX(0);
@@ -1380,15 +1426,15 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: translateX(10px);
       }
     }
-
+    
     .win-modal .modal-header {
       background: linear-gradient(45deg, #28B446, #34A853);
     }
-
+    
     .lose-modal .modal-header {
       background: linear-gradient(45deg, #EA4335, #C62828);
     }
-
+    
     .key-btn.correct {
       background: linear-gradient(45deg, #28B446, #34A853);
       color: white;
@@ -1396,14 +1442,14 @@ document.addEventListener('DOMContentLoaded', function() {
       transform: scale(1.05);
       box-shadow: 0 0 10px rgba(40, 180, 70, 0.5);
     }
-
+    
     .key-btn.wrong {
       background: linear-gradient(45deg, #EA4335, #C62828);
       color: white;
       border-color: #EA4335;
       opacity: 0.7;
     }
-
+    
     .key-btn:disabled {
       cursor: not-allowed;
       opacity: 0.5;
@@ -1420,13 +1466,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Zorluk seviyesi gösterimini güncelle
   function updateDifficultyDisplay() {
     let displayText = "Orta";
-
+    
     if (currentDifficulty === "easy") {
       displayText = "Kolay";
     } else if (currentDifficulty === "hard") {
       displayText = "Zor";
     }
-
+    
     difficultyElement.textContent = displayText;
   }
 
@@ -1434,21 +1480,21 @@ document.addEventListener('DOMContentLoaded', function() {
   function showMessage(text, type = 'info') {
     // Mesaj elementi daha önce tanımlanmadığı için oluşturalım
     let messageContainer = document.getElementById('message-container');
-
+    
     if (!messageContainer) {
       messageContainer = document.createElement('div');
       messageContainer.id = 'message-container';
       messageContainer.className = 'message-container';
       document.querySelector('.game-area-panel').prepend(messageContainer);
     }
-
+    
     const messageElement = document.createElement('div');
     messageElement.className = `game-message ${type}`;
     messageElement.textContent = text;
-
+    
     messageContainer.innerHTML = '';
     messageContainer.appendChild(messageElement);
-
+    
     setTimeout(() => {
       messageElement.remove();
     }, 3000);
