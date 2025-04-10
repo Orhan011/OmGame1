@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 
 {% block title %}Hafıza Eşleştirme - ZekaPark{% endblock %}
@@ -148,6 +149,8 @@
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: fit-content;
+    margin: 0 auto;
   }
 
   .memory-board.easy {
@@ -156,8 +159,8 @@
   }
 
   .memory-board.medium {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
   }
 
   .memory-board.hard {
@@ -318,13 +321,13 @@
     }
 
     .memory-board.medium .memory-card {
-      width: 50px;
-      height: 50px;
+      width: 55px;
+      height: 55px;
     }
 
     .memory-board.hard .memory-card {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
     }
 
     .memory-card-front i {
@@ -370,14 +373,23 @@ document.addEventListener('DOMContentLoaded', function() {
     'fa-sun', 'fa-cloud', 'fa-tree', 'fa-apple-alt', 'fa-car', 'fa-home',
     'fa-gift', 'fa-plane', 'fa-rocket', 'fa-anchor', 'fa-coffee', 'fa-key',
     'fa-music', 'fa-camera', 'fa-football-ball', 'fa-basketball-ball', 'fa-book', 'fa-pen',
-    'fa-globe', 'fa-flag', 'fa-crown', 'fa-gem', 'fa-leaf', 'fa-fire'
+    'fa-globe', 'fa-flag', 'fa-crown', 'fa-gem', 'fa-leaf', 'fa-fire',
+    'fa-pizza-slice', 'fa-ice-cream', 'fa-cookie', 'fa-lemon', 'fa-pepper-hot', 'fa-egg',
+    'fa-chess-knight', 'fa-chess-king', 'fa-chess-queen', 'fa-chess-rook', 'fa-snowflake', 'fa-umbrella',
+    'fa-glasses', 'fa-hat-wizard', 'fa-ghost', 'fa-spider', 'fa-cat', 'fa-dog'
   ];
 
   // Audio
-  const flipSound = new Audio('/static/sounds/card-flip.mp3');
-  const matchSound = new Audio('/static/sounds/match.mp3');
-  const noMatchSound = new Audio('/static/sounds/no-match.mp3');
-  const gameCompleteSound = new Audio('/static/sounds/game-complete.mp3');
+  let flipSound, matchSound, noMatchSound, gameCompleteSound;
+  
+  try {
+    flipSound = new Audio('/static/sounds/card-flip.mp3');
+    matchSound = new Audio('/static/sounds/match.mp3');
+    noMatchSound = new Audio('/static/sounds/no-match.mp3');
+    gameCompleteSound = new Audio('/static/sounds/game-complete.mp3');
+  } catch (error) {
+    console.error("Error loading sounds:", error);
+  }
 
   // Initialize game
   initializeGame();
@@ -517,7 +529,14 @@ document.addEventListener('DOMContentLoaded', function() {
     this.classList.add('flip');
     
     // Play flip sound
-    flipSound.play();
+    try {
+      if (flipSound) {
+        flipSound.currentTime = 0;
+        flipSound.play().catch(e => console.log("Error playing sound:", e));
+      }
+    } catch (error) {
+      console.error("Error playing flip sound:", error);
+    }
     
     if (!hasFlippedCard) {
       // First card flipped
@@ -551,7 +570,14 @@ document.addEventListener('DOMContentLoaded', function() {
       matchesDisplay.textContent = matches;
       
       // Play match sound
-      matchSound.play();
+      try {
+        if (matchSound) {
+          matchSound.currentTime = 0;
+          matchSound.play().catch(e => console.log("Error playing sound:", e));
+        }
+      } catch (error) {
+        console.error("Error playing match sound:", error);
+      }
       
       // Check if all pairs are found
       if (matches === totalPairs) {
@@ -563,7 +589,14 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // Cards don't match
       // Play no match sound
-      noMatchSound.play();
+      try {
+        if (noMatchSound) {
+          noMatchSound.currentTime = 0;
+          noMatchSound.play().catch(e => console.log("Error playing sound:", e));
+        }
+      } catch (error) {
+        console.error("Error playing no-match sound:", error);
+      }
       
       // Flip cards back after a delay
       setTimeout(() => {
@@ -577,6 +610,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove event listeners to prevent further flipping
     firstCard.removeEventListener('click', flipCard);
     secondCard.removeEventListener('click', flipCard);
+    
+    // Add matched class for styling
+    firstCard.classList.add('matched');
+    secondCard.classList.add('matched');
     
     // Reset board state
     resetBoard();
@@ -600,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function restartGame() {
     // First unflip all cards
     cards.forEach(card => {
-      card.classList.remove('flip');
+      card.classList.remove('flip', 'matched');
     });
     
     // Wait for animation to complete
@@ -608,13 +645,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // Reset game state
       resetGameState();
       
+      // Recreate cards for the new difficulty
+      createCards();
+      
       // Shuffle cards
       shuffleCards();
-      
-      // Re-add event listeners
-      cards.forEach(card => {
-        card.addEventListener('click', flipCard);
-      });
     }, 500);
   }
 
@@ -623,7 +658,14 @@ document.addEventListener('DOMContentLoaded', function() {
     clearInterval(timer);
     
     // Play complete sound
-    gameCompleteSound.play();
+    try {
+      if (gameCompleteSound) {
+        gameCompleteSound.currentTime = 0;
+        gameCompleteSound.play().catch(e => console.log("Error playing sound:", e));
+      }
+    } catch (error) {
+      console.error("Error playing game complete sound:", error);
+    }
     
     // Show success message
     finalMovesDisplay.textContent = moves;
@@ -647,7 +689,8 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({
         game_type: 'memory_match',
-        score: score
+        score: score,
+        difficulty: difficulty
       })
     })
     .then(response => response.json())
