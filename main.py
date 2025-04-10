@@ -580,32 +580,41 @@ def get_most_played_games(limit=4):
     # Oyun istatistiklerini analiz et
     from sqlalchemy import func, desc
     from datetime import datetime, timedelta
+    import logging
     
-    # Son 24 saat içinde oynanan oyunları al
-    yesterday = datetime.now() - timedelta(days=1)
+    # Varsayılan oyunlar listesi (veritabanı hatası durumunda kullanılacak)
+    popular_games = []
     
-    # En çok oynanan oyunları bul
-    popular_games = Score.query.with_entities(
-        Score.game_type, 
-        func.count(Score.id).label('play_count')
-    ).filter(
-        Score.timestamp >= yesterday
-    ).group_by(
-        Score.game_type
-    ).order_by(
-        desc('play_count')
-    ).limit(limit).all()
-    
-    # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al
-    if len(popular_games) < limit:
+    try:
+        # Son 24 saat içinde oynanan oyunları al
+        yesterday = datetime.now() - timedelta(days=1)
+        
+        # En çok oynanan oyunları bul
         popular_games = Score.query.with_entities(
             Score.game_type, 
             func.count(Score.id).label('play_count')
+        ).filter(
+            Score.timestamp >= yesterday
         ).group_by(
             Score.game_type
         ).order_by(
             desc('play_count')
         ).limit(limit).all()
+        
+        # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al
+        if len(popular_games) < limit:
+            popular_games = Score.query.with_entities(
+                Score.game_type, 
+                func.count(Score.id).label('play_count')
+            ).group_by(
+                Score.game_type
+            ).order_by(
+                desc('play_count')
+            ).limit(limit).all()
+    except Exception as e:
+        # Herhangi bir hata oluşursa logla ve boş liste döndür
+        logging.error(f"Oyun istatistikleri alınırken hata oluştu: {str(e)}")
+        popular_games = []
     
     # Oyun listesini oluştur
     games = []
@@ -715,9 +724,46 @@ def get_most_played_games(limit=4):
 # Ana Sayfa
 @app.route('/')
 def index():
-    # En çok oynanan 4 oyunu çek
-    most_played_games = get_most_played_games(limit=4)
-    return render_template('index.html', most_played_games=most_played_games)
+    try:
+        # En çok oynanan 4 oyunu çek
+        most_played_games = get_most_played_games(limit=4)
+        return render_template('index.html', most_played_games=most_played_games)
+    except Exception as e:
+        # Herhangi bir hata olursa logla ve varsayılan oyunları göster
+        import logging
+        logging.error(f"Ana sayfa yüklenirken hata oluştu: {str(e)}")
+        
+        # Varsayılan oyunlar
+        default_game_info = {
+            "wordle": {
+                "name": "Wordle",
+                "description": "5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!",
+                "icon": "fas fa-keyboard",
+                "route": "wordle"
+            },
+            "memory_cards": {
+                "name": "Hafıza Kartları",
+                "description": "Eşleşen kartları bularak görsel hafıza ve odaklanma becerilerinizi geliştirin.",
+                "icon": "fas fa-clone",
+                "route": "memory_cards"
+            },
+            "audio_memory": {
+                "name": "Sesli Hafıza",
+                "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
+                "icon": "fas fa-music",
+                "route": "audio_memory"
+            },
+            "2048": {
+                "name": "2048",
+                "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
+                "icon": "fas fa-cubes",
+                "route": "game_2048"
+            }
+        }
+        
+        default_games = ["wordle", "memory_cards", "audio_memory", "2048"]
+        most_played_games = [default_game_info[game] for game in default_games]
+        return render_template('index.html', most_played_games=most_played_games)
 
 # Giriş Sayfası
 @app.route('/login', methods=['GET', 'POST'])
