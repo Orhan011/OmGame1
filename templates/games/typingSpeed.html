@@ -45,7 +45,7 @@
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="typing-section">
       <div class="game-stats">
-        <div class="stats-squares">
+        <div class="stats-squares compact">
           <div class="stats-square">
             <div class="stat-label">Süre</div>
             <div class="stat-value" id="timer">60</div>
@@ -242,6 +242,16 @@
     gap: 15px;
     margin-bottom: 20px;
   }
+  
+  .stats-squares.compact {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    overflow-x: auto;
+    padding: 5px 0;
+  }
 
   .stats-square {
     background: rgba(30, 30, 60, 0.7);
@@ -252,6 +262,16 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+  }
+  
+  .stats-squares.compact .stats-square {
+    padding: 8px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .stats-square:hover {
@@ -500,10 +520,20 @@
       gap: 8px;
       margin-bottom: 15px;
     }
+    
+    .stats-squares.compact {
+      gap: 6px;
+    }
 
     .stats-square {
       padding: 8px 10px;
       width: 90px;
+    }
+    
+    .stats-squares.compact .stats-square {
+      width: 70px;
+      height: 70px;
+      padding: 6px;
     }
 
     .stats-square .stat-label {
