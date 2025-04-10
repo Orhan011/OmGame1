@@ -1,16 +1,353 @@
 
 {% extends 'layout.html' %}
 
-{% block title %}Matematik Mücadelesi - OmGame{% endblock %}
+{% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center">
-  <h1 class="mb-4">Matematik Mücadelesi</h1>
-  <div class="alert alert-info">
-    Bu oyun kaldırılmıştır.
+<div class="modernized-game-container">
+  <div class="modernized-game-section">
+    <div class="modernized-game-header">
+      <h1>Matematik Mücadelesi</h1>
+    </div>
+    
+    <div class="modernized-math-container text-center">
+      <div class="modernized-math-problem">
+        <div class="modernized-math-problem-text" id="problem-text">5 + 3 = ?</div>
+      </div>
+      
+      <div class="modernized-math-input">
+        <input type="number" id="answer-input" placeholder="Cevabınızı yazın" inputmode="numeric">
+        <button id="submit-answer" class="modernized-btn modernized-btn-primary">Kontrol Et</button>
+      </div>
+      
+      <div class="modernized-stats-bar">
+        <div class="modernized-stat-item">
+          <div class="modernized-stat-label">Skor</div>
+          <div class="modernized-stat-value" id="score">0</div>
+        </div>
+        <div class="modernized-stat-item">
+          <div class="modernized-stat-label">Süre</div>
+          <div class="modernized-stat-value" id="timer">60</div>
+        </div>
+        <div class="modernized-stat-item">
+          <div class="modernized-stat-label">Seviye</div>
+          <div class="modernized-stat-value" id="level">1</div>
+        </div>
+      </div>
+      
+      <div class="modernized-game-controls">
+        <button id="start-game" class="modernized-btn modernized-btn-primary">Başla</button>
+        <a href="{{ url_for('all_games') }}" class="modernized-btn modernized-btn-secondary">Geri Dön</a>
+      </div>
+    </div>
   </div>
-  <a href="{{ url_for('all_games') }}" class="btn btn-primary mt-3">
-    <i class="fas fa-arrow-left me-2"></i>Tüm Oyunlara Dön
-  </a>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const problemText = document.getElementById('problem-text');
+  const answerInput = document.getElementById('answer-input');
+  const submitButton = document.getElementById('submit-answer');
+  const startButton = document.getElementById('start-game');
+  const scoreElement = document.getElementById('score');
+  const timerElement = document.getElementById('timer');
+  const levelElement = document.getElementById('level');
+  
+  let score = 0;
+  let timeLeft = 60;
+  let level = 1;
+  let timer;
+  let currentAnswer;
+  let gameRunning = false;
+  
+  // Giriş alanını ve düğmeyi başlangıçta devre dışı bırak
+  answerInput.disabled = true;
+  submitButton.disabled = true;
+  
+  // Problemi oluştur
+  function generateProblem() {
+    let num1, num2, operator;
+    const operators = ['+', '-', '*'];
+    
+    // Seviyeye göre zorluk
+    if (level === 1) {
+      num1 = Math.floor(Math.random() * 10) + 1;
+      num2 = Math.floor(Math.random() * 10) + 1;
+      operator = operators[Math.floor(Math.random() * 2)]; // Sadece + ve -
+    } else if (level === 2) {
+      num1 = Math.floor(Math.random() * 20) + 1;
+      num2 = Math.floor(Math.random() * 15) + 1;
+      operator = operators[Math.floor(Math.random() * 2)]; // Sadece + ve -
+    } else {
+      num1 = Math.floor(Math.random() * 20) + 1;
+      num2 = Math.floor(Math.random() * 10) + 1;
+      operator = operators[Math.floor(Math.random() * 3)]; // +, - ve *
+    }
+    
+    // Çarpma işlemini × olarak göster
+    const displayOperator = operator === '*' ? '×' : operator;
+    
+    // Problemi görüntüle
+    problemText.textContent = `${num1} ${displayOperator} ${num2} = ?`;
+    
+    // Cevabı hesapla
+    if (operator === '+') {
+      currentAnswer = num1 + num2;
+    } else if (operator === '-') {
+      currentAnswer = num1 - num2;
+    } else {
+      currentAnswer = num1 * num2;
+    }
+  }
+  
+  // Oyunu başlat
+  function startGame() {
+    // Oyunu sıfırla
+    score = 0;
+    timeLeft = 60;
+    level = 1;
+    
+    scoreElement.textContent = score;
+    timerElement.textContent = timeLeft;
+    levelElement.textContent = level;
+    
+    // Giriş alanını ve düğmeyi etkinleştir
+    answerInput.disabled = false;
+    submitButton.disabled = false;
+    startButton.disabled = true;
+    
+    // İlk problemi oluştur
+    generateProblem();
+    
+    // Odağı giriş alanına ayarla
+    answerInput.focus();
+    
+    // Zamanlayıcıyı başlat
+    gameRunning = true;
+    timer = setInterval(updateTimer, 1000);
+  }
+  
+  // Zamanlayıcıyı güncelle
+  function updateTimer() {
+    timeLeft--;
+    timerElement.textContent = timeLeft;
+    
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }
+  
+  // Oyunu bitir
+  function endGame() {
+    clearInterval(timer);
+    
+    // Giriş alanını ve düğmeyi devre dışı bırak
+    answerInput.disabled = true;
+    submitButton.disabled = true;
+    startButton.disabled = false;
+    
+    problemText.textContent = `Oyun bitti! Skorunuz: ${score}`;
+    gameRunning = false;
+    
+    // Skoru kaydet
+    saveScore(score);
+  }
+  
+  // Cevabı kontrol et
+  function checkAnswer() {
+    if (!gameRunning) return;
+    
+    const userAnswer = parseInt(answerInput.value);
+    
+    if (!isNaN(userAnswer)) {
+      if (userAnswer === currentAnswer) {
+        // Doğru cevap
+        score += 10;
+        scoreElement.textContent = score;
+        
+        // Her 50 puanda seviye atla
+        if (score % 50 === 0) {
+          level++;
+          levelElement.textContent = level;
+        }
+        
+        // Yeni problem
+        generateProblem();
+      } else {
+        // Yanlış cevap
+        score = Math.max(0, score - 5);
+        scoreElement.textContent = score;
+      }
+      
+      // Giriş alanını temizle
+      answerInput.value = '';
+      answerInput.focus();
+    }
+  }
+  
+  // Skoru kaydet
+  function saveScore(finalScore) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game_type: 'math_challenge',
+        score: finalScore
+      })
+    })
+    .then(response => response.json())
+    .then(data => console.log('Score saved:', data))
+    .catch(error => console.error('Error saving score:', error));
+  }
+  
+  // Düğme işleyicileri
+  startButton.addEventListener('click', startGame);
+  submitButton.addEventListener('click', checkAnswer);
+  
+  // Enter tuşuna basıldığında kontrol et
+  answerInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+});
+</script>
+
+<style>
+  .modernized-game-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+  }
+  
+  .modernized-game-section {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .modernized-math-container {
+    text-align: center;
+  }
+  
+  .modernized-math-problem {
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 10px;
+    padding: 30px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .modernized-math-problem-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+  }
+  
+  .modernized-math-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .modernized-math-input input {
+    flex: 1;
+    padding: 12px 15px;
+    background: rgba(30, 30, 60, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  .modernized-math-input input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+  }
+  
+  .modernized-stats-bar {
+    display: flex;
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+  
+  .modernized-stat-item {
+    flex: 1;
+    padding: 10px 15px;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .modernized-stat-item:last-child {
+    border-right: none;
+  }
+  
+  .modernized-stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3px;
+  }
+  
+  .modernized-stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent-color);
+  }
+  
+  .modernized-game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .modernized-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .modernized-btn-primary {
+    background: linear-gradient(135deg, #6a5ae0, #9277FF);
+    color: white;
+  }
+  
+  .modernized-btn-secondary {
+    background: rgba(40, 40, 80, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @media (max-width: 768px) {
+    .modernized-math-problem-text {
+      font-size: 2rem;
+    }
+    
+    .modernized-math-input {
+      flex-direction: column;
+    }
+    
+    .modernized-btn {
+      width: 100%;
+    }
+  }
+</style>
 {% endblock %}

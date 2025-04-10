@@ -3,109 +3,59 @@
 {% block title %}Yazma Hızı Testi - ZekaPark{% endblock %}
 
 {% block content %}
-<div class="page-container">
-  <div class="game-container">
-    <div class="game-header">
-      <h1>Yazma Hızı <span class="badge">Klavye Hız Testi</span></h1>
-      <p class="game-description">Belirli metinleri hızlı ve doğru bir şekilde yazarak yazma becerilerinizi geliştirin.</p>
+<div class="modernized-game-container">
+  <div class="modernized-game-section">
+    <div class="modernized-game-header">
+      <h1>Yazma Hızı Testi</h1>
     </div>
 
     <div class="typing-container">
-      <div class="typing-test-wrapper">
-        <div class="typing-header">
-          <div class="typing-stats">
-            <div class="stat-item">
-              <div class="stat-label">Süre</div>
-              <div class="stat-value" id="timer">60</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-label">Kelime/DK</div>
-              <div class="stat-value" id="wpm">0</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-label">Doğruluk</div>
-              <div class="stat-value" id="accuracy">100%</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-label">Hatalar</div>
-              <div class="stat-value" id="errors">0</div>
+      <div id="test-intro" class="typing-intro active">
+        <div class="intro-container">
+          <h3>Yazma Hızınızı Test Edin</h3>
+          <p>Metni olabildiğince hızlı ve doğru yazarak yazma becerinizi ölçün.</p>
+
+          <div class="test-settings">
+            <div class="setting-group">
+              <span class="setting-label">Süre: </span>
+              <div class="setting-options">
+                <button class="setting-option" data-time="30">30 sn</button>
+                <button class="setting-option active" data-time="60">1 dk</button>
+                <button class="setting-option" data-time="120">2 dk</button>
+              </div>
             </div>
           </div>
 
-          <div class="typing-mode">
-            <button id="mode-words" class="mode-button active">Kelime Modu</button>
-            <button id="mode-time" class="mode-button">Zaman Modu</button>
+          <button id="start-test" class="modernized-btn modernized-btn-primary">
+            <i class="fas fa-keyboard me-2"></i>Teste Başla
+          </button>
+        </div>
+      </div>
+
+      <div id="typing-area" class="typing-area" style="display: none;">
+        <div class="typing-stats">
+          <div class="stat-item">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="timer">60</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Kelime/DK</div>
+            <div class="stat-value" id="wpm">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Doğruluk</div>
+            <div class="stat-value" id="accuracy">100%</div>
           </div>
         </div>
 
-        <div class="typing-content">
-          <div id="test-intro" class="test-intro active">
-            <h3>Yazma Hız Testine Hoş Geldiniz</h3>
-            <p>Bu test yazma hızınızı ve doğruluğunuzu ölçmek için tasarlanmıştır.</p>
-            
-            <div class="test-options">
-              <div class="option-section">
-                <h4>Mod Seçin:</h4>
-                <div class="radio-group">
-                  <div class="radio-option">
-                    <input type="radio" id="words-mode" name="test-mode" value="words" checked>
-                    <label for="words-mode">Kelime Modu</label>
-                    <span class="help-text">Belirli sayıda kelimeyi tamamlayarak hızınızı ölçün</span>
-                  </div>
-                  <div class="radio-option">
-                    <input type="radio" id="time-mode" name="test-mode" value="time">
-                    <label for="time-mode">Zaman Modu</label>
-                    <span class="help-text">Belirli bir süre içinde yazarak hızınızı ölçün</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="option-section" id="words-option">
-                <h4>Kelime Sayısı:</h4>
-                <div class="button-group">
-                  <button class="option-button" data-words="10">10</button>
-                  <button class="option-button active" data-words="25">25</button>
-                  <button class="option-button" data-words="50">50</button>
-                  <button class="option-button" data-words="100">100</button>
-                </div>
-              </div>
-              
-              <div class="option-section" id="time-option" style="display: none;">
-                <h4>Süre (saniye):</h4>
-                <div class="button-group">
-                  <button class="option-button" data-time="30">30</button>
-                  <button class="option-button active" data-time="60">60</button>
-                  <button class="option-button" data-time="120">120</button>
-                  <button class="option-button" data-time="300">300</button>
-                </div>
-              </div>
-              
-              <div class="option-section">
-                <h4>Zorluk Seviyesi:</h4>
-                <div class="button-group">
-                  <button class="difficulty-button active" data-difficulty="easy">Kolay</button>
-                  <button class="difficulty-button" data-difficulty="medium">Orta</button>
-                  <button class="difficulty-button" data-difficulty="hard">Zor</button>
-                </div>
-              </div>
-            </div>
-            
-            <button id="start-test" class="btn btn-primary btn-lg">
-              <i class="fas fa-keyboard me-2"></i>Teste Başla
-            </button>
-          </div>
-
-          <div id="typing-text-area" class="typing-text-area">
-            <div class="typing-text" id="typing-text"></div>
-            <input type="text" id="input-field" class="input-field" placeholder="Yazmaya başlamak için buraya tıklayın..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          </div>
-        </div>
+        <div class="typing-text" id="typing-text"></div>
+        <input type="text" id="input-field" class="input-field" placeholder="Yazmaya başlamak için tıklayın..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
         <div class="typing-controls">
-          <button id="restart-test" class="btn btn-outline-warning">
+          <button id="restart-test" class="modernized-btn modernized-btn-secondary">
             <i class="fas fa-redo-alt me-2"></i>Yeniden Başlat
           </button>
-          <a href="{{ url_for('all_games') }}" class="btn btn-outline-secondary">
+          <a href="{{ url_for('all_games') }}" class="modernized-btn modernized-btn-secondary">
             <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
           </a>
         </div>
@@ -115,54 +65,40 @@
         <h2><i class="fas fa-chart-line me-2"></i>Test Sonuçları</h2>
 
         <div class="results-summary">
-          <div class="results-item result-main">
+          <div class="results-item">
             <div class="result-value" id="result-wpm">0</div>
             <div class="result-label">Kelime/Dakika (WPM)</div>
           </div>
-          <div class="results-item result-main">
+          <div class="results-item">
             <div class="result-value" id="result-accuracy">100%</div>
             <div class="result-label">Doğruluk</div>
           </div>
         </div>
 
         <div class="results-details">
-          <div class="results-column">
-            <div class="results-item">
-              <div class="result-label">Karakterler</div>
-              <div class="result-value" id="result-characters">0</div>
-            </div>
-            <div class="results-item">
-              <div class="result-label">Hatalar</div>
-              <div class="result-value" id="result-errors">0</div>
-            </div>
+          <div class="results-row">
+            <div class="results-label">Karakterler:</div>
+            <div class="results-value" id="result-characters">0</div>
           </div>
-          <div class="results-column">
-            <div class="results-item">
-              <div class="result-label">Doğru Kelimeler</div>
-              <div class="result-value" id="result-correct-words">0</div>
-            </div>
-            <div class="results-item">
-              <div class="result-label">Yanlış Kelimeler</div>
-              <div class="result-value" id="result-wrong-words">0</div>
-            </div>
+          <div class="results-row">
+            <div class="results-label">Hatalar:</div>
+            <div class="results-value" id="result-errors">0</div>
           </div>
-          <div class="results-column">
-            <div class="results-item">
-              <div class="result-label">Doğru Vuruşlar</div>
-              <div class="result-value" id="result-correct-chars">0</div>
-            </div>
-            <div class="results-item">
-              <div class="result-label">Kullandığınız Süre</div>
-              <div class="result-value" id="result-time-used">0</div>
-            </div>
+          <div class="results-row">
+            <div class="results-label">Doğru Kelimeler:</div>
+            <div class="results-value" id="result-correct-words">0</div>
+          </div>
+          <div class="results-row">
+            <div class="results-label">Kullanılan Süre:</div>
+            <div class="results-value" id="result-time-used">0</div>
           </div>
         </div>
 
         <div class="results-actions">
-          <button id="retry-test" class="btn btn-primary btn-lg">
+          <button id="retry-test" class="modernized-btn modernized-btn-primary">
             <i class="fas fa-redo-alt me-2"></i>Tekrar Dene
           </button>
-          <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg">
+          <a href="{{ url_for('all_games') }}" class="modernized-btn modernized-btn-secondary">
             <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
           </a>
         </div>
@@ -172,28 +108,92 @@
 </div>
 
 <style>
-  .typing-container {
+  .modernized-game-container {
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 10px;
+    padding: 0 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
   }
 
-  .typing-test-wrapper {
+  .modernized-game-section {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 700px;
   }
 
-  .typing-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .typing-intro {
+    display: none;
+    text-align: center;
+  }
+
+  .typing-intro.active {
+    display: block;
+  }
+
+  .intro-container {
+    padding: 20px;
+  }
+
+  .typing-intro h3 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+  }
+
+  .typing-intro p {
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 20px;
-    flex-wrap: wrap;
+  }
+
+  .test-settings {
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .setting-group {
+    margin-bottom: 10px;
+  }
+
+  .setting-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+
+  .setting-options {
+    display: flex;
+    justify-content: center;
     gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .setting-option {
+    background: rgba(40, 40, 80, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 8px 15px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .setting-option.active {
+    background: rgba(106, 90, 224, 0.6);
+    border-color: var(--accent-color);
+  }
+
+  .typing-area {
+    margin-bottom: 20px;
   }
 
   .typing-stats {
@@ -201,17 +201,14 @@
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
     overflow: hidden;
-    flex-wrap: wrap;
-    width: 100%;
+    margin-bottom: 15px;
   }
 
   .stat-item {
+    flex: 1;
     padding: 10px 15px;
     text-align: center;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    flex-grow: 1;
-    flex-basis: 0;
-    min-width: 70px;
   }
 
   .stat-item:last-child {
@@ -227,158 +224,7 @@
   .stat-value {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #fff;
-  }
-
-  #wpm, #result-wpm {
     color: var(--accent-color);
-  }
-
-  #errors, #result-errors {
-    color: #ff4757;
-  }
-
-  .typing-mode {
-    display: flex;
-    overflow: hidden;
-    border-radius: 10px;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .mode-button {
-    padding: 8px 12px;
-    background: rgba(30, 30, 60, 0.5);
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-grow: 1;
-    text-align: center;
-  }
-
-  .mode-button.active {
-    background: var(--accent-color);
-  }
-
-  .mode-button:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-
-  .mode-button:last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-
-  .typing-content {
-    position: relative;
-    margin-bottom: 20px;
-  }
-
-  .test-intro {
-    display: none;
-    text-align: center;
-    padding: 15px;
-  }
-
-  .test-intro.active {
-    display: block;
-  }
-
-  .test-intro h3 {
-    color: var(--accent-color);
-    margin-bottom: 10px;
-    font-weight: 600;
-    font-size: 1.4rem;
-  }
-
-  .test-intro p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-  }
-
-  .test-options {
-    background: rgba(30, 30, 60, 0.5);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-  }
-
-  .option-section {
-    margin-bottom: 12px;
-  }
-
-  .option-section:last-child {
-    margin-bottom: 0;
-  }
-
-  .option-section h4 {
-    font-size: 0.9rem;
-    color: #fff;
-    margin-bottom: 8px;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .option-button, .difficulty-button {
-    padding: 6px 12px;
-    background: rgba(40, 40, 80, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-  }
-
-  .option-button:hover, .difficulty-button:hover {
-    background: rgba(60, 60, 100, 0.5);
-  }
-
-  .option-button.active, .difficulty-button.active {
-    animation: pulse 2s infinite;
-    background: rgba(106, 90, 224, 0.6);
-    border-color: var(--accent-color);
-  }
-
-  .radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .radio-option {
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-
-  .radio-option input[type="radio"] {
-    margin-right: 8px;
-  }
-
-  .radio-option label {
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  .help-text {
-    margin-left: 8px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    display: inline-block;
-  }
-
-  .typing-text-area {
-    display: none;
-    margin-bottom: 15px;
   }
 
   .typing-text {
@@ -389,7 +235,7 @@
     font-size: 1.1rem;
     line-height: 1.6;
     min-height: 120px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: rgba(255, 255, 255, 0.7);
     user-select: none;
     overflow-wrap: break-word;
@@ -404,6 +250,7 @@
     color: #fff;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    margin-bottom: 15px;
   }
 
   .input-field:focus {
@@ -417,34 +264,26 @@
     gap: 10px;
   }
 
-  /* Text Character Styling */
   .char {
     display: inline-block;
     position: relative;
   }
 
-  .correct {
-    color: #6ab04c;
+  .char.correct {
+    color: #4CAF50;
   }
 
-  .incorrect {
-    color: #ff4757;
+  .char.incorrect {
+    color: #F44336;
     text-decoration: underline;
   }
 
-  .active {
+  .char.active {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
   }
 
-  /* Results Screen */
   .typing-results {
-    background: rgba(25, 25, 45, 0.7);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
   }
 
@@ -462,57 +301,49 @@
     flex-wrap: wrap;
   }
 
-  .result-main {
-    background: rgba(30, 30, 60, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    min-width: 150px;
-    flex-grow: 1;
-  }
-
-  .result-main .result-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-  }
-
-  .result-main .result-label {
-    font-size: 0.9rem;
-  }
-
-  .results-details {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-  }
-
-  .results-column {
+  .results-item {
     background: rgba(30, 30, 60, 0.5);
     border-radius: 10px;
     padding: 15px;
+    min-width: 120px;
     flex-grow: 1;
-    max-width: 220px;
-    min-width: 150px;
   }
 
-  .results-item {
-    margin-bottom: 10px;
+  .result-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--accent-color);
   }
 
-  .results-column .results-item:last-child {
-    margin-bottom: 0;
+  .result-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
   }
 
-  .results-item .result-label {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 3px;
+  .results-details {
+    background: rgba(30, 30, 60, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
   }
 
-  .results-item .result-value {
-    font-size: 1.2rem;
+  .results-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .results-row:last-child {
+    border-bottom: none;
+  }
+
+  .results-label {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .results-value {
     font-weight: 600;
     color: #fff;
   }
@@ -521,447 +352,142 @@
     display: flex;
     justify-content: center;
     gap: 10px;
-    flex-wrap: wrap;
   }
-  
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slideInUp {
-    from { 
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to { 
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  
-  @keyframes highlightChar {
-    0% { background-color: rgba(106, 90, 224, 0.3); }
-    100% { background-color: transparent; }
-  }
-  
-  /* Visual feedback for correct/incorrect typing */
-  .char.correct {
-    color: #6ab04c;
-    animation: highlightChar 0.3s ease-out;
-  }
-  
-  .char.incorrect {
-    color: #ff4757;
-    text-decoration: underline;
-    animation: shake 0.3s ease-in-out;
-  }
-  
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
-  }
-  
-  .char.active {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    animation: pulse 1s infinite;
-  }
-  
-  /* Results animations */
-  .typing-results {
-    animation: fadeIn 0.5s ease-out;
-  }
-  
-  .results-summary, .results-details, .results-actions {
-    animation: slideInUp 0.5s ease-out;
-    animation-fill-mode: both;
-  }
-  
-  .results-details {
-    animation-delay: 0.1s;
-  }
-  
-  .results-actions {
-    animation-delay: 0.2s;
-  }
-  
-  /* Improved button styles */
-  .btn {
+
+  .modernized-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
-  
-  .btn:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
+
+  .modernized-btn-primary {
+    background: linear-gradient(135deg, #6a5ae0, #9277FF);
+    color: white;
   }
-  
-  .btn:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
+
+  .modernized-btn-secondary {
+    background: rgba(40, 40, 80, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
   }
-  
-  @keyframes ripple {
-    0% {
-      transform: scale(0, 0);
-      opacity: 0.5;
-    }
-    20% {
-      transform: scale(25, 25);
-      opacity: 0.3;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(40, 40);
-    }
-  }
-  
-  /* Mobil Optimizasyonlar */
+
   @media (max-width: 768px) {
-    /* Improve touch experience */
-    .option-button, .difficulty-button {
-      min-height: 40px;
-      min-width: 40px;
-    }
-    
-    .input-field {
-      font-size: 16px; /* Prevent auto-zoom on iOS */
-    }
-    .game-container {
-      padding: 10px;
-    }
-    
-    .typing-test-wrapper, .typing-results {
-      padding: 15px;
-    }
-    
-    .typing-header {
-      gap: 5px;
-      margin-bottom: 15px;
-    }
-    
-    .stat-item {
-      padding: 8px;
-    }
-    
-    .stat-label {
-      font-size: 0.7rem;
-    }
-    
-    .stat-value {
-      font-size: 1rem;
-    }
-    
-    .test-intro h3 {
-      font-size: 1.2rem;
-    }
-    
-    .test-intro p {
-      font-size: 0.85rem;
-    }
-    
-    .test-options {
-      padding: 12px;
-    }
-    
-    .option-section h4 {
-      font-size: 0.8rem;
-    }
-    
-    .option-button, .difficulty-button {
-      padding: 5px 10px;
-      font-size: 0.8rem;
-    }
-    
-    .radio-option label {
-      font-size: 0.8rem;
-    }
-    
-    .help-text {
-      font-size: 0.7rem;
-    }
-    
     .typing-text {
       font-size: 1rem;
-      padding: 12px;
       min-height: 100px;
     }
-    
-    .input-field {
-      padding: 10px;
+
+    .modernized-game-section {
+      padding: 15px;
     }
-    
+
     .results-summary {
+      flex-direction: column;
       gap: 10px;
     }
-    
-    .result-main {
-      padding: 12px;
-      min-width: 120px;
+
+    .results-actions {
+      flex-direction: column;
     }
-    
-    .result-main .result-value {
-      font-size: 2rem;
+
+    .modernized-btn {
+      width: 100%;
     }
-    
-    .results-column {
-      padding: 12px;
-      min-width: 120px;
-    }
-    
-    /* Improve touch experience */
-    .option-button, .difficulty-button {
-      min-height: 40px;
-      min-width: 40px;
-    }
-    
-    .input-field {
-      font-size: 16px; /* Prevent auto-zoom on iOS */
+
+    .typing-controls {
+      flex-direction: column;
     }
   }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
+  // DOM Elementleri
   const testIntro = document.getElementById('test-intro');
-  const typingTextArea = document.getElementById('typing-text-area');
+  const typingArea = document.getElementById('typing-area');
   const resultsScreen = document.getElementById('results-screen');
-  
-  const wordsMode = document.getElementById('words-mode');
-  const timeMode = document.getElementById('time-mode');
-  const wordsOption = document.getElementById('words-option');
-  const timeOption = document.getElementById('time-option');
-  
-  const wordButtons = document.querySelectorAll('[data-words]');
-  const timeButtons = document.querySelectorAll('[data-time]');
-  const difficultyButtons = document.querySelectorAll('[data-difficulty]');
-  
+
+  const timeOptions = document.querySelectorAll('.setting-option[data-time]');
   const startTestBtn = document.getElementById('start-test');
   const restartTestBtn = document.getElementById('restart-test');
   const retryTestBtn = document.getElementById('retry-test');
-  
+
   const typingText = document.getElementById('typing-text');
   const inputField = document.getElementById('input-field');
-  
+
   const timerElement = document.getElementById('timer');
   const wpmElement = document.getElementById('wpm');
   const accuracyElement = document.getElementById('accuracy');
-  const errorsElement = document.getElementById('errors');
-  
+
   const resultWpm = document.getElementById('result-wpm');
   const resultAccuracy = document.getElementById('result-accuracy');
   const resultCharacters = document.getElementById('result-characters');
   const resultErrors = document.getElementById('result-errors');
   const resultCorrectWords = document.getElementById('result-correct-words');
-  const resultWrongWords = document.getElementById('result-wrong-words');
-  const resultCorrectChars = document.getElementById('result-correct-chars');
   const resultTimeUsed = document.getElementById('result-time-used');
 
-  // Sample texts for different difficulty levels
-  const texts = {
-    easy: [
-      "Güneşli bir günde parkta yürüyüş yapmak insana huzur verir. Doğanın sesleri ve temiz hava zihnimizi temizler.",
-      "Kitap okumak en sevdiğim aktivitelerden biridir. Her kitap beni farklı dünyalara götürür ve yeni bilgiler edinmemi sağlar.",
-      "Sağlıklı beslenmek için sebze ve meyve tüketimini artırmak gerekir. Düzenli egzersiz yapmak da sağlığımız için çok önemlidir."
-    ],
-    medium: [
-      "Teknolojinin hızla gelişmesi günlük yaşantımızı büyük ölçüde değiştiriyor. Akıllı telefonlar ve bilgisayarlar artık hayatımızın vazgeçilmez bir parçası haline geldi. Bu araçların bilinçli kullanımı, dijital çağda başarılı olmak için önemlidir.",
-      "Küresel ısınma, dünyanın karşı karşıya olduğu en büyük çevresel sorunlardan biridir. Fosil yakıtların kullanımı, ormansızlaşma ve endüstriyel faaliyetler sera gazı emisyonlarını artırarak iklim değişikliğine neden olmaktadır.",
-      "Eğitim, bir toplumun gelişmesinde en önemli faktörlerden biridir. Kaliteli bir eğitim sistemi, bireylerin potansiyellerini tam olarak gerçekleştirmelerine ve topluma değerli katkılar sunmalarına olanak tanır."
-    ],
-    hard: [
-      "Kuantum fiziği, maddenin ve enerjinin en temel seviyede nasıl davrandığını inceleyen bir fizik dalıdır. Klasik fiziğin açıklayamadığı mikro düzeydeki olayları açıklamak için geliştirilmiştir. Kuantum mekaniği, parçacıkların hem dalga hem de parçacık özelliği gösterebildiğini ve belirli fiziksel özelliklerin yalnızca olasılıklar olarak ifade edilebileceğini öne sürer.",
-      "Yapay zekâ ve makine öğrenimi günümüzde birçok sektörde devrim yaratıyor. Doğal dil işleme, görüntü tanıma ve karar verme algoritmalarındaki ilerlemeler, makinelerin insan benzeri görevleri giderek daha etkili bir şekilde yerine getirmesini sağlıyor. Bu teknolojilerin sorumlu ve etik bir şekilde geliştirilmesi, toplum üzerindeki potansiyel olumsuz etkilerini en aza indirmek için kritik öneme sahiptir.",
-      "Nöroloji ve bilişsel psikoloji alanlarındaki araştırmalar, insan beyninin işleyişi hakkında önemli bilgiler sunmaktadır. Beynin nöroplastisitesi, yani yeni bağlantılar oluşturabilme ve mevcut bağlantıları yeniden düzenleyebilme yeteneği, öğrenme ve bellek oluşturma süreçlerinin temelini oluşturur. Bu anlayış, eğitim metodolojilerinin geliştirilmesine ve çeşitli nörodejeneratif hastalıkların tedavisine katkıda bulunmaktadır."
-    ]
-  };
+  // Örnek metinler
+  const texts = [
+    "Güneşli bir günde parkta yürüyüş yapmak insana huzur verir. Doğanın sesleri ve temiz hava zihnimizi temizler.",
+    "Kitap okumak en sevdiğim aktivitelerden biridir. Her kitap beni farklı dünyalara götürür ve yeni bilgiler edinmemi sağlar.",
+    "Teknolojinin hızla gelişmesi günlük yaşantımızı büyük ölçüde değiştiriyor. Akıllı telefonlar ve bilgisayarlar artık hayatımızın vazgeçilmez bir parçası haline geldi."
+  ];
 
-  // Test Configuration
-  let testMode = 'words'; // 'words' or 'time'
-  let wordCount = 25;
-  let timeLimit = 60; // seconds
-  let difficulty = 'easy';
-  let currentText = '';
-  
-  // Test State
+  // Test Ayarları
+  let timeLimit = 60; // saniye
+
+  // Test Durumu
   let time = 0;
   let timer;
   let isTyping = false;
   let charIndex = 0;
   let mistakes = 0;
   let correctWords = 0;
-  let wrongWords = 0;
-  let correctChars = 0;
   let currentWordIndex = 0;
-  let lastWord = '';
 
-  // Event listeners for test configuration
-  wordsMode.addEventListener('change', function() {
-    if (this.checked) {
-      testMode = 'words';
-      wordsOption.style.display = 'block';
-      timeOption.style.display = 'none';
-      
-      document.getElementById('mode-words').classList.add('active');
-      document.getElementById('mode-time').classList.remove('active');
-    }
-  });
-
-  timeMode.addEventListener('change', function() {
-    if (this.checked) {
-      testMode = 'time';
-      wordsOption.style.display = 'none';
-      timeOption.style.display = 'block';
-      
-      document.getElementById('mode-words').classList.remove('active');
-      document.getElementById('mode-time').classList.add('active');
-    }
-  });
-
-  document.getElementById('mode-words').addEventListener('click', function() {
-    wordsMode.checked = true;
-    wordsMode.dispatchEvent(new Event('change'));
-    playSound("click");
-  });
-
-  document.getElementById('mode-time').addEventListener('click', function() {
-    timeMode.checked = true;
-    timeMode.dispatchEvent(new Event('change'));
-    playSound("click");
-  });
-
-  wordButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      wordButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      wordCount = parseInt(this.getAttribute('data-words'));
-      playSound("click");
-    });
-  });
-
-  timeButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      timeButtons.forEach(btn => btn.classList.remove('active'));
+  // Süre seçimi
+  timeOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      timeOptions.forEach(opt => opt.classList.remove('active'));
       this.classList.add('active');
       timeLimit = parseInt(this.getAttribute('data-time'));
     });
   });
 
-  difficultyButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      difficultyButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      difficulty = this.getAttribute('data-difficulty');
-    });
-  });
-
-  // Sound functions
-  function playSound(soundType) {
-    try {
-      let sound;
-      switch(soundType) {
-        case 'start':
-          sound = new Audio('/static/sounds/success.mp3');
-          break;
-        case 'key':
-          sound = new Audio('/static/sounds/click.mp3');
-          sound.volume = 0.2;
-          break;
-        case 'error':
-          sound = new Audio('/static/sounds/wrong.mp3');
-          sound.volume = 0.3;
-          break;
-        case 'complete':
-          sound = new Audio('/static/sounds/game-complete.mp3');
-          break;
-        default:
-          return;
-      }
-      sound.play().catch(e => console.log('Sound playback prevented', e));
-    } catch (e) {
-      console.log('Sound error:', e);
-    }
-  }
-
-  // Sound functions
-  function playSound(soundType) {
-    try {
-      let sound;
-      switch(soundType) {
-        case 'start':
-          sound = new Audio('/static/sounds/success.mp3');
-          break;
-        case 'key':
-          sound = new Audio('/static/sounds/click.mp3');
-          sound.volume = 0.2;
-          break;
-        case 'error':
-          sound = new Audio('/static/sounds/wrong.mp3');
-          sound.volume = 0.3;
-          break;
-        case 'complete':
-          sound = new Audio('/static/sounds/game-complete.mp3');
-          break;
-        default:
-          return;
-      }
-      sound.play().catch(e => console.log('Sound playback prevented', e));
-    } catch (e) {
-      console.log('Sound error:', e);
-    }
-  }
-  // Start test
+  // Testi başlat
   startTestBtn.addEventListener('click', function() {
-    playSound('start');
-    playSound('start');
     initTest();
   });
 
-  // Restart test
+  // Testi yeniden başlat
   restartTestBtn.addEventListener('click', function() {
-    playSound('start');
-    playSound('start');
     initTest();
   });
 
-  // Retry test
+  // Testi tekrar dene
   retryTestBtn.addEventListener('click', function() {
-    playSound('start');
-    playSound('start');
-    testIntro.classList.add('active');
     resultsScreen.style.display = 'none';
+    testIntro.classList.add('active');
   });
 
-  // Initialize test
+  // Testi başlat
   function initTest() {
-    // Reset state
+    // Durumu sıfırla
     resetTest();
-    
-    // Get random text based on difficulty
-    const textArray = texts[difficulty];
-    const randomIndex = Math.floor(Math.random() * textArray.length);
-    currentText = textArray[randomIndex];
-    
-    // Prepare text for display
+
+    // Rastgele metin seç
+    const randomIndex = Math.floor(Math.random() * texts.length);
+    const currentText = texts[randomIndex];
+
+    // Metni görüntülemek için hazırla
     typingText.innerHTML = '';
     currentText.split('').forEach(char => {
       const charSpan = document.createElement('span');
@@ -969,449 +495,175 @@ document.addEventListener('DOMContentLoaded', function() {
       charSpan.className = 'char';
       typingText.appendChild(charSpan);
     });
-    
-    // Set timer display
-    if (testMode === 'time') {
-      timerElement.textContent = timeLimit;
-    } else {
-      const wordsInText = currentText.split(' ').length;
-      if (wordsInText < wordCount) {
-        // If the text has fewer words than requested, repeat the text
-        let repeatedText = currentText;
-        while (repeatedText.split(' ').length < wordCount) {
-          repeatedText += ' ' + currentText;
-        }
-        
-        // Trim to exact word count
-        const words = repeatedText.split(' ');
-        repeatedText = words.slice(0, wordCount).join(' ');
-        
-        // Update current text and display
-        currentText = repeatedText;
-        typingText.innerHTML = '';
-        currentText.split('').forEach(char => {
-          const charSpan = document.createElement('span');
-          charSpan.textContent = char;
-          charSpan.className = 'char';
-          typingText.appendChild(charSpan);
-        });
-      }
-      
-      // Set counter to word count
-      timerElement.textContent = 0;
-    }
-    
-    // Show typing area
+
+    // Zaman görüntüsünü ayarla
+    timerElement.textContent = timeLimit;
+
+    // Yazma alanını göster
     testIntro.classList.remove('active');
-    typingTextArea.style.display = 'block';
-    
-    // Focus input field
+    typingArea.style.display = 'block';
+    resultsScreen.style.display = 'none';
+
+    // Giriş alanına odaklan
     setTimeout(() => {
       inputField.focus();
     }, 200);
   }
 
-  // Reset test state
+  // Test durumunu sıfırla
   function resetTest() {
     isTyping = false;
     charIndex = 0;
     mistakes = 0;
     correctWords = 0;
-    wrongWords = 0;
-    correctChars = 0;
-    time = 0;
+    time = timeLimit;
     currentWordIndex = 0;
-    lastWord = '';
-    
-    // Clear input field
+
+    // Giriş alanını temizle
     inputField.value = '';
-    
-    // Reset display elements
+
+    // Görüntüleme elemanlarını sıfırla
     wpmElement.textContent = '0';
     accuracyElement.textContent = '100%';
-    errorsElement.textContent = '0';
-    
-    // Clear any existing timer
+
+    // Varolan zamanlayıcıyı temizle
     clearInterval(timer);
   }
 
-  // Process typing input
+  // Yazma işlemini işle
   inputField.addEventListener('input', function(e) {
-    // Play keypress sound
-    playSound("key");
-    // Start timer on first input
+    // İlk girişte zamanlayıcıyı başlat
     if (!isTyping) {
       isTyping = true;
-      
-      // Start timer
-      if (testMode === 'time') {
-        time = timeLimit;
-        timer = setInterval(updateTimeTimer, 1000);
-      } else {
-        timer = setInterval(updateWordTimer, 1000);
-      }
+      timer = setInterval(updateTimer, 1000);
     }
-    
+
     const typedChar = e.target.value.charAt(e.target.value.length - 1);
     const characters = typingText.querySelectorAll('.char');
-    
-    // Check if we've reached the end of the text
+
+    // Metnin sonuna ulaşıldı mı kontrol et
     if (charIndex >= characters.length) {
-      if (testMode === 'words') {
-        // In word mode, end the test when all text is typed
-        clearInterval(timer);
-        endTest();
-    // Update result section with animated counters
-    let wpmCounter = 0;
-    let accuracyCounter = 0;
-    
-    // Animate WPM counter
-    const wpmInterval = setInterval(() => {
-      wpmCounter += Math.ceil(wpm / 50);
-      if (wpmCounter >= wpm) {
-        wpmCounter = wpm;
-        clearInterval(wpmInterval);
-      }
-      resultWpm.textContent = wpmCounter;
-    }, 20);
-    
-    // Animate accuracy counter
-    const accuracyInterval = setInterval(() => {
-      accuracyCounter += Math.ceil(accuracy / 50);
-      if (accuracyCounter >= accuracy) {
-        accuracyCounter = accuracy;
-        clearInterval(accuracyInterval);
-      }
-      resultAccuracy.textContent = `${accuracyCounter}%`;
-    }, 20);
-      }
+      clearInterval(timer);
+      endTest();
       return;
     }
-    
-    // Check the typed character
+
+    // Yazılan karakteri kontrol et
     if (typedChar === characters[charIndex].textContent) {
       characters[charIndex].classList.add('correct');
-      correctChars++;
     } else {
       characters[charIndex].classList.add('incorrect');
       mistakes++;
     }
-    
-    // Move active cursor to next character
+
+    // Aktif karakteri sonraki karaktere taşı
     charIndex++;
-    
-    // Set active character
+
+    // Sonraki karakteri aktif olarak işaretle
     if (charIndex < characters.length) {
       characters.forEach(char => char.classList.remove('active'));
       characters[charIndex].classList.add('active');
     }
-    
-    // Check for completed words
+
+    // Tamamlanan kelimeleri kontrol et
     if (typedChar === ' ' || charIndex >= characters.length) {
-      const typedWord = e.target.value.trim();
-      const currentWord = getCurrentWord(currentWordIndex);
-      
-      if (typedWord === currentWord) {
-        correctWords++;
-      } else {
-        wrongWords++;
-      }
-      
-      currentWordIndex++;
-      inputField.value = '';
+      correctWords++;
     }
-    
-    // Update stats
+
+    // İstatistikleri güncelle
     updateStats();
   });
 
-  // Get current word from text
-  function getCurrentWord(index) {
-    const words = currentText.split(' ');
-    return words[index] || '';
-  }
-
-  // Update typing statistics
+  // İstatistikleri güncelle
   function updateStats() {
-    // Calculate WPM
-    const elapsedTime = testMode === 'time' ? (timeLimit - time) / 60 : time / 60;
+    // WPM hesapla
+    const elapsedTime = (timeLimit - time) / 60;
     if (elapsedTime > 0) {
       const wpm = Math.round(((charIndex - mistakes) / 5) / elapsedTime);
       wpmElement.textContent = wpm;
     }
-    
-    // Calculate accuracy
+
+    // Doğruluk hesapla
     const accuracy = charIndex > 0 
       ? Math.round(((charIndex - mistakes) / charIndex) * 100) 
       : 100;
-    
+
     accuracyElement.textContent = `${accuracy}%`;
-    errorsElement.textContent = mistakes;
   }
 
-  // Update timer for time mode
-  function updateTimeTimer() {
+  // Zamanlayıcıyı güncelle
+  function updateTimer() {
     if (time > 0) {
       time--;
       timerElement.textContent = time;
-      
-      // Update styles for last 10 seconds
+
+      // Son 10 saniye için stilleri güncelle
       if (time <= 10) {
         timerElement.style.color = '#ff4757';
       }
-      
-      // Update WPM in real-time
+
+      // WPM'i gerçek zamanlı güncelle
       updateStats();
     } else {
       clearInterval(timer);
       endTest();
-    // Update result section with animated counters
-    let wpmCounter = 0;
-    let accuracyCounter = 0;
-    
-    // Animate WPM counter
-    const wpmInterval = setInterval(() => {
-      wpmCounter += Math.ceil(wpm / 50);
-      if (wpmCounter >= wpm) {
-        wpmCounter = wpm;
-        clearInterval(wpmInterval);
-      }
-      resultWpm.textContent = wpmCounter;
-    }, 20);
-    
-    // Animate accuracy counter
-    const accuracyInterval = setInterval(() => {
-      accuracyCounter += Math.ceil(accuracy / 50);
-      if (accuracyCounter >= accuracy) {
-        accuracyCounter = accuracy;
-        clearInterval(accuracyInterval);
-      }
-      resultAccuracy.textContent = `${accuracyCounter}%`;
-    }, 20);
     }
   }
 
-  // Update timer for word mode
-  function updateWordTimer() {
-    time++;
-    timerElement.textContent = time;
-    
-    // Update WPM in real-time
-    updateStats();
-  }
-
-  // Function to end the test
+  // Testi bitir
   function endTest() {
-    // Play completion sound
-    playSound('complete');
-  
-    // Calculate final stats
-    // Play completion sound
-    playSound('complete');
-  
-    // Calculate final stats
-    const timeElapsed = time / 60; // convert to minutes
+    // Son istatistikleri hesapla
+    const timeElapsed = (timeLimit - time) / 60; // dakikaya çevir
     const wpm = Math.round(((charIndex - mistakes) / 5) / timeElapsed);
     const accuracy = charIndex > 0 
       ? Math.round(((charIndex - mistakes) / charIndex) * 100) 
       : 100;
 
-    // Update results with animations
-    resultWpm.textContent = '0';
-    resultAccuracy.textContent = '0%';
-    
-    // Create counters for animated number display
-    let wpmCounter = 0;
-    let accuracyCounter = 0;
-    
-    // Animate WPM counter
-    const wpmInterval = setInterval(() => {
-      wpmCounter += Math.ceil(wpm / 50);
-      if (wpmCounter >= wpm) {
-        wpmCounter = wpm;
-        clearInterval(wpmInterval);
-      }
-      resultWpm.textContent = wpmCounter;
-    }, 20);
-    
-    // Animate accuracy counter
-    const accuracyInterval = setInterval(() => {
-      accuracyCounter += Math.ceil(accuracy / 50);
-      if (accuracyCounter >= accuracy) {
-        accuracyCounter = accuracy;
-        clearInterval(accuracyInterval);
-      }
-      resultAccuracy.textContent = `${accuracyCounter}%`;
-    }, 20);
-    
-    // Update other results
+    // Sonuçları güncelle
+    resultWpm.textContent = wpm;
+    resultAccuracy.textContent = `${accuracy}%`;
     resultCharacters.textContent = charIndex;
     resultErrors.textContent = mistakes;
     resultCorrectWords.textContent = correctWords;
-    resultWrongWords.textContent = wrongWords;
-    resultCorrectChars.textContent = correctChars;
-    
-    // Save score to the server
-    saveScore(wpm);
-    
-    // Format time
-    const formattedTime = formatTime(testMode === 'time' ? timeLimit : time);
+
+    // Zamanı biçimlendir
+    const formattedTime = formatTime(timeLimit - time);
     resultTimeUsed.textContent = formattedTime;
-    
-    // Show results screen
-    typingTextArea.style.display = 'none';
+
+    // Skoru kaydet
+    saveScore(wpm);
+
+    // Sonuç ekranını göster
+    typingArea.style.display = 'none';
     resultsScreen.style.display = 'block';
   }
 
-  // Function to format time (seconds to MM:SS)
+  // Zamanı biçimlendir (saniye -> MM:SS)
   function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
-  
-  // Function to save score to the server
+
+  // Skoru kaydet
   function saveScore(score) {
     fetch('/api/save-score', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         game_type: 'typing_speed',
         score: score
       })
     })
     .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
-    });
+    .then(data => console.log('Score saved:', data))
+    .catch(error => console.error('Error saving score:', error));
   }
-  
-  // Focus input field when clicking the text area
+
+  // Metin alanına tıklandığında giriş alanına odaklan
   typingText.addEventListener('click', function() {
     inputField.focus();
   });
-  
-  // Fix for mobile devices
-  if ('ontouchstart' in window) {
-    typingText.style.cursor = 'pointer';
-  }
 });
 </script>
 {% endblock %}
-
-<style>
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slideInUp {
-    from { 
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to { 
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  
-  @keyframes highlightChar {
-    0% { background-color: rgba(106, 90, 224, 0.3); }
-    100% { background-color: transparent; }
-  }
-  
-  /* Visual feedback for correct/incorrect typing */
-  .char.correct {
-    color: #6ab04c;
-    animation: highlightChar 0.3s ease-out;
-  }
-  
-  .char.incorrect {
-    color: #ff4757;
-    text-decoration: underline;
-    animation: shake 0.3s ease-in-out;
-  }
-  
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
-  }
-  
-  .char.active {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    animation: pulse 1s infinite;
-  }
-  
-  /* Results animations */
-  .typing-results {
-    animation: fadeIn 0.5s ease-out;
-  }
-  
-  .results-summary, .results-details, .results-actions {
-    animation: slideInUp 0.5s ease-out;
-    animation-fill-mode: both;
-  }
-  
-  .results-details {
-    animation-delay: 0.1s;
-  }
-  
-  .results-actions {
-    animation-delay: 0.2s;
-  }
-  
-  /* Improved button styles */
-  .btn {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .btn:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-  }
-  
-  .btn:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
-  }
-  
-  @keyframes ripple {
-    0% {
-      transform: scale(0, 0);
-      opacity: 0.5;
-    }
-    20% {
-      transform: scale(25, 25);
-      opacity: 0.3;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(40, 40);
-    }
-  }
-</style>
