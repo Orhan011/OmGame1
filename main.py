@@ -527,7 +527,7 @@ def initialize_database():
                         <li><strong>Yorgunken Oynamaktan Kaçının:</strong> Beyniniz en keskin olduğunda oynayın.</li>
                         <li><strong>Başarısızlıkları Analiz Edin:</strong> Hatalarınızdan öğrenin ve stratejinizi buna göre ayarlayın.</li>
                     </ol>
-<p>ZekaPark oyunlarında yüksek puan almak, sadece eğlenceli bir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
+<p>ZekaPark oyunlarında yüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
                     category="tip"
                 ),
@@ -753,9 +753,7 @@ def simon_says():
     return render_template('games/simonSays.html')
 
 # Kelime Avı Oyunu
-@app.route('/word_search')
-def word_search():
-    return render_template('games/wordSearch.html')
+# Kelime Avı oyunu kaldırıldı
 
 # Tetris Oyunu
 @app.route('/tetris')
@@ -1347,7 +1345,7 @@ def reset_password():
         elif len(password) < 8:
             flash('Şifre en az 8 karakter olmalıdır!')
         else:
-            # Şifreyi güncelle ve token'ı temizle
+                        # Şifreyi güncelle ve token'ı temizle
             user.password_hash = generate_password_hash(password)
             user.reset_token = None
             user.reset_token_expiry = None
@@ -1401,8 +1399,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'color_match': {'point_base': 55, 'score_multiplier': 0.7},
         'math_challenge': {'point_base': 70, 'score_multiplier': 0.6},
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
-        'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
-        'word_search': {'point_base': 70, 'score_multiplier': 0.6} # Kelime Avı için çarpanlar eklendi
+        'numberChain': {'point_base': 75, 'score_multiplier': 0.55}
     }
 
     # Oyun türüne göre çarpanları güncelle
@@ -1451,10 +1448,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'color_match': 1.5,  # 1.5 dakika
                 'math_challenge': 2.0,  # 2 dakika
                 'iq_test': 10.0,  # 10 dakika
-                'numberChain': 2.5,  # 2.5 dakika
-                'puzzle_slider': 2.0,  # 2 dakika
-                'puzzle_slider': 2.0,  # 2 dakika
-                'word_search': 3.0  # Kelime Avı için optimal süre eklendi
+                'numberChain': 2.5  # 2.5 dakika
             }
             optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
             if duration_minutes <= optimal_duration:
@@ -1487,9 +1481,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
                 'typing_speed': 200,  # Yazmada daha fazla hamle normal
                 'iq_test': 20,
                 'numberChain': 40,
-                'typing_speed': 200,  # Yazmada daha fazla hamle normal
-                'snake_game': 100,  # Yılan uzadıkça daha fazla hamle
-                'word_search': 30  # Kelime Avı için optimal hamle sayısı eklendi
+                'typing_speed': 200  # Yazmada daha fazla hamle normal
             }.get(game_type, 50)
 
             # Optimal hamlelerden daha fazla yapıldıysa puan düşer
@@ -1974,8 +1966,7 @@ def get_leaderboard_data(game_type):
         'wordle': 'Wordle',
         'chess': 'Satranç',
         'puzzle_slider': 'Resim Bulmaca',
-        'snake_game': 'Yılan Oyunu',
-        'word_search': 'Kelime Avı' # Kelime Avı eklendi
+        'snake_game': 'Yılan Oyunu'
     }
 
     return jsonify({
