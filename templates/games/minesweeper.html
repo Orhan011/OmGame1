@@ -660,17 +660,33 @@
     }
     
     // Event Listeners
-    newGameBtn.addEventListener('click', initGame);
-    restartBtn.addEventListener('click', initGame);
-    newGameModalBtn.addEventListener('click', () => {
-      resultModal.hide();
+    if (newGameBtn) {
+      newGameBtn.addEventListener('click', initGame);
+    }
+    
+    if (restartBtn) {
+      restartBtn.addEventListener('click', initGame);
+    }
+    
+    if (newGameModalBtn) {
+      newGameModalBtn.addEventListener('click', () => {
+        if (resultModal) {
+          resultModal.hide();
+        }
+        initGame();
+      });
+    }
+    
+    if (difficultySelect) {
+      difficultySelect.addEventListener('change', initGame);
+    }
+    
+    // İlk yükleme - sayfa yüklendikten sonra oyunu başlat
+    // Bu gecikme, tüm DOM elementlerinin tamamen yüklenmesini sağlar
+    setTimeout(() => {
       initGame();
-    });
-    
-    difficultySelect.addEventListener('change', initGame);
-    
-    // İlk yükleme
-    initGame();
+      console.log("Mayın tarlası oyunu başlatıldı");
+    }, 300);
   });
 </script>
 {% endblock %}
