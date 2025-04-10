@@ -475,23 +475,32 @@
 }
 
 .key-btn {
-  width: 20px;
-  height: 22px;
-  border: none;
-  background: rgba(60, 60, 80, 0.8);
-  color: white;
-  border-radius: 3px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+    width: 12px;
+    height: 14px;
+    border: none;
+    background: rgba(60, 60, 80, 0.8);
+    color: white;
+    border-radius: 1px;
+    font-size: 0.45rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .keyboard-row {
+    gap: 1px;
+  }
+
+  .virtual-keyboard {
+    width: 50%;
+    padding: 2px 1px;
+  }
 
 .key-btn:hover, .key-btn:active {
   background: rgba(80, 80, 120, 0.9);
