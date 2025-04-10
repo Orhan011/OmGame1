@@ -44,16 +44,6 @@
 
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="typing-section">
-      <div class="game-minimal-stats">
-        <div class="corner-stat left">
-          <div class="corner-stat-value" id="timer">60</div>
-          <div class="corner-stat-label">saniye</div>
-        </div>
-        <div class="corner-stat right">
-          <div class="corner-stat-value" id="error-count">0</div>
-          <div class="corner-stat-label">hata</div>
-        </div>
-      </div>
 
       <div id="text-display" class="text-display"></div>
 
@@ -207,49 +197,6 @@
 }
 
 /* Oyun Ekranı */
-.game-minimal-stats {
-  position: relative;
-  width: 100%;
-  height: 50px;
-  margin-bottom: 20px;
-}
-
-.corner-stat {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(30, 30, 60, 0.7);
-  border-radius: 8px;
-  padding: 8px 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  min-width: 80px;
-  z-index: 10;
-}
-
-.corner-stat.left {
-  left: 0;
-  top: 0;
-}
-
-.corner-stat.right {
-  right: 0;
-  top: 0;
-}
-
-.corner-stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--accent-color);
-}
-
-.corner-stat-label {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
 
 /* Sonuç Overlay Stili */
 .result-overlay {
@@ -573,10 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const textDisplay = document.getElementById('text-display');
   const typingInput = document.getElementById('typing-input');
 
-  const timerElement = document.getElementById('timer');
-  const wpmElement = document.getElementById('wpm');
-  const accuracyElement = document.getElementById('accuracy');
-  const errorCountElement = document.getElementById('error-count'); // Added error count element
+  // İstatistik elemanları kaldırıldı
 
   const resultWpm = document.getElementById('result-wpm');
   const resultAccuracy = document.getElementById('result-accuracy');
@@ -679,8 +623,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Timer'ı ayarla
     timeLeft = timeLimit;
-    timerElement.textContent = timeLeft;
-    errorCountElement.textContent = 0; // Initialize error count
 
     // Girdi alanını temizle ve odakla
     typingInput.value = '';
@@ -698,9 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
     totalTyped = 0;
     correctTyped = 0;
     errorCount = 0;
-    wpmElement.textContent = '0';
-    accuracyElement.textContent = '100%';
-    errorCountElement.textContent = '0'; // Reset error count
+    // İstatistik değerleri kaldırıldı
   }
 
   // Ekran gösterme
@@ -724,12 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
       timer = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
-          timerElement.textContent = timeLeft;
-
-          // Son 10 saniye uyarısı
-          if (timeLeft <= 10) {
-            timerElement.style.color = '#ff4757';
-          }
+          // İstatistik elemanları kaldırıldı
         } else {
           endTest();
         }
@@ -737,23 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // İstatistikleri güncelle
+  // İstatistikleri güncelle - İstatistik elemanları kaldırıldığı için boş fonksiyon
   function updateStats() {
-    // Geçen süre (dakika)
-    const elapsedTime = (timeLimit - timeLeft) / 60;
-
-    // WPM hesapla (1 kelime = 5 karakter)
-    if (elapsedTime > 0) {
-      const wpm = Math.round((correctTyped / 5) / elapsedTime);
-      wpmElement.textContent = wpm;
-    }
-
-    // Doğruluk oranı
-    if (totalTyped > 0) {
-      const accuracy = Math.floor((correctTyped / totalTyped) * 100);
-      accuracyElement.textContent = `${accuracy}%`;
-    }
-    errorCountElement.textContent = errorCount; // Update error count
+    // İstatistik güncellemesi kaldırıldı
   }
 
   // Testi bitir
