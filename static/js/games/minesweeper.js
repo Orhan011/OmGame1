@@ -601,25 +601,58 @@ document.addEventListener('DOMContentLoaded', function() {
         hintUsed: gameState.hintUsed
       };
       
-      // Skoru API'a gönder
-      fetch('/api/save-score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          game_type: 'minesweeper',
-          score: totalScore,
-          difficulty: gameState.difficulty,
-          playtime: gameState.timer,
-          game_stats: gameStats
-        })
-      })
+      // Kullanıcının giriş yapmış olup olmadığını kontrol et
+      fetch('/api/get-current-user', { method: 'GET' })
       .then(response => response.json())
-      .then(data => {
-        console.log('Skor başarıyla kaydedildi:', data);
+      .then(userData => {
+        if (userData && userData.id) {
+          // Kullanıcı giriş yapmış, skoru kaydedebiliriz
+          // Skoru API'a gönder
+          fetch('/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              game_type: 'minesweeper',
+              score: totalScore,
+              difficulty: gameState.difficulty,
+              playtime: gameState.timer,
+              game_stats: {
+                ...gameStats,
+                completed: true
+              }
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Skor başarıyla kaydedildi:', data);
+            
+            // Level atladı mı kontrol et
+            if (data.levelUp) {
+              // Seviye atlama kutlaması
+              showLevelUpCelebration(data.newLevel);
+            }
+          })
+          .catch(error => {
+            console.error('Skor kaydedilirken hata oluştu:', error);
+          });
+        } else {
+          console.log('Skor kaydedilmedi: Kullanıcı giriş yapmamış');
+          // Opsiyonel: Kullanıcıya giriş yapması için bilgi verebilirsiniz
+        }
       })
       .catch(error => {
-        console.error('Skor kaydedilirken hata oluştu:', error);
+        console.error('Kullanıcı durumu kontrol edilirken hata oluştu:', error);
       });
+      
+      // Seviye atlama kutlaması fonksiyonu
+      function showLevelUpCelebration(newLevel) {
+        // Bu kısmı site genelinde bir animasyon olarak ayarladık muhtemelen
+        if (typeof showLevelUpAnimation === 'function') {
+          showLevelUpAnimation(newLevel);
+        } else {
+          console.log('Tebrikler! Seviye atladınız. Yeni seviyeniz: ' + newLevel);
+        }
+      }
     }
     
     // Modalı göster

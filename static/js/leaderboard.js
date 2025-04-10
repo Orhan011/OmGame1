@@ -22,12 +22,15 @@ function loadLeaderboard(gameType = 'all') {
   fetch(apiUrl)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
       }
       return response.json();
     })
-    .then(scores => {
-      if (!scores || scores.length === 0) {
+    .then(data => {
+      // API yanıtı bir dizi olmalı ve en az bir eleman içermeli
+      const scores = Array.isArray(data) ? data : [];
+      
+      if (scores.length === 0) {
         leaderboardContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-trophy"></i>

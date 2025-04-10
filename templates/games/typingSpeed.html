@@ -573,18 +573,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru kaydet
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_type: 'typing_speed',
-        score: score,
-        difficulty: difficulty
-      })
-    })
+    // Kullanıcının giriş yapmış olup olmadığını kontrol et
+    fetch('/api/get-current-user', { method: 'GET' })
     .then(response => response.json())
-    .then(data => console.log('Score saved:', data))
-    .catch(error => console.error('Error saving score:', error));
+    .then(userData => {
+      if (userData && userData.id) {
+        // Kullanıcı giriş yapmış, skoru kaydedebiliriz
+        // Oyun istatistikleri hazırla
+        const gameStats = {
+          wpm: score,
+          accuracy: parseInt(resultAccuracy.textContent.replace('%', '')),
+          errors: parseInt(resultErrors.textContent),
+          completed: true
+        };
+
+        // Skoru API'a gönder
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'typing_speed',
+            score: score,
+            difficulty: difficulty,
+            playtime: timeLimit - timeLeft,
+            game_stats: gameStats
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Score saved:', data);
+          
+          // Level atladı mı kontrol et
+          if (data.levelUp) {
+            // Seviye atlama kutlaması
+            if (typeof showLevelUpAnimation === 'function') {
+              showLevelUpAnimation(data.newLevel);
+            } else {
+              console.log('Tebrikler! Seviye atladınız. Yeni seviyeniz: ' + data.newLevel);
+            }
+          }
+        })
+        .catch(error => console.error('Error saving score:', error));
+      } else {
+        console.log('Skor kaydedilmedi: Kullanıcı giriş yapmamış');
+      }
+    })
+    .catch(error => {
+      console.error('Kullanıcı durumu kontrol edilirken hata oluştu:', error);
+    });
   }
 
   // Yazma işlemini dinle

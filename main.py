@@ -2120,14 +2120,40 @@ def save_score():
             }
         })
 
-# Mevcut Kullanıcı API'si
+# Mevcut Kullanıcı API'si - hem /api/current-user hem de /api/get-current-user ile erişilebilir
 @app.route('/api/current-user')
+@app.route('/api/get-current-user')
 def get_current_user_api():
     """Mevcut kullanıcı kimliğini döndür (API)"""
-    if 'user_id' in session:
-        return jsonify({'user_id': session['user_id']})
-    else:
-        return jsonify({'user_id': None})
+    try:
+        if 'user_id' in session:
+            user_id = session['user_id']
+            user = User.query.get(user_id)
+            
+            if user:
+                return jsonify({
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'loggedIn': True
+                })
+        
+        # Kullanıcı giriş yapmamış veya kullanıcı bulunamadı
+        return jsonify({
+            'id': None,
+            'username': None,
+            'email': None,
+            'loggedIn': False
+        })
+    except Exception as e:
+        logger.error(f"Kullanıcı bilgilerini alırken hata oluştu: {str(e)}")
+        return jsonify({
+            'id': None,
+            'username': None,
+            'email': None,
+            'loggedIn': False,
+            'error': 'Bir hata oluştu'
+        }), 500
 
 # Skor Listeleme API'si
 @app.route('/api/scores/<game_type>')
