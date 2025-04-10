@@ -577,44 +577,139 @@ def init_db_route():
 
 def get_most_played_games(limit=4):
     """En çok oynanan oyunları sayısına göre döndürür."""
-    # Burada gerçek veritabanı verisi yerine sabit oyun listesi kullanılıyor
-    # İleriki aşamalarda, veritabanından en çok oynanan oyunları çeken 
-    # sorgu ile değiştirilebilir
-
-    # Şu an için en popüler 4 oyun (sıralama önemli değil)
-    games = [
-        {
+    # Oyun istatistiklerini analiz et
+    from sqlalchemy import func, desc
+    from datetime import datetime, timedelta
+    
+    # Son 24 saat içinde oynanan oyunları al
+    yesterday = datetime.now() - timedelta(days=1)
+    
+    # En çok oynanan oyunları bul
+    popular_games = Score.query.with_entities(
+        Score.game_type, 
+        func.count(Score.id).label('play_count')
+    ).filter(
+        Score.timestamp >= yesterday
+    ).group_by(
+        Score.game_type
+    ).order_by(
+        desc('play_count')
+    ).limit(limit).all()
+    
+    # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al
+    if len(popular_games) < limit:
+        popular_games = Score.query.with_entities(
+            Score.game_type, 
+            func.count(Score.id).label('play_count')
+        ).group_by(
+            Score.game_type
+        ).order_by(
+            desc('play_count')
+        ).limit(limit).all()
+    
+    # Oyun listesini oluştur
+    games = []
+    
+    # Oyun türü ve rota eşleştirmeleri
+    game_info = {
+        "word_puzzle": {
             "name": "Kelime Bulmaca",
-            "description": "5 harfli bir kelimeyi tahmin etmeye çalıştığınız bir kelime oyunu.",
+            "description": "Kelimeler ve sözcüklerle çalışarak dil becerilerinizi geliştirin.",
             "icon": "fas fa-font",
+            "route": "word_puzzle"
+        },
+        "wordle": {
+            "name": "Wordle",
+            "description": "5 harfli gizli kelimeyi 6 denemede bulmaya çalışın!",
+            "icon": "fas fa-keyboard",
             "route": "wordle"
         },
-        {
+        "memory_cards": {
             "name": "Hafıza Kartları",
-            "description": "Eşleşen kartları bulmak için görsel hafızanızı test edin.",
+            "description": "Eşleşen kartları bularak görsel hafıza ve odaklanma becerilerinizi geliştirin.",
             "icon": "fas fa-clone",
             "route": "memory_cards"
         },
-        {
+        "audio_memory": {
             "name": "Sesli Hafıza",
             "description": "Ses dizilerini hatırlayarak işitsel hafızanızı güçlendirin.",
             "icon": "fas fa-music",
             "route": "audio_memory"
         },
-        {
+        "2048": {
             "name": "2048",
             "description": "Sayıları kaydırarak aynı değere sahip kareleri birleştirin ve 2048'e ulaşın!",
             "icon": "fas fa-cubes",
             "route": "game_2048"
         },
-        {
+        "chess": {
             "name": "Satranç",
             "description": "Stratejik düşünme ve planlama becerilerinizi geliştirin.",
             "icon": "fas fa-chess",
             "route": "chess"
+        },
+        "tetris": {
+            "name": "Tetris",
+            "description": "Düşen blokları doğru yerleştirerek çizgileri tamamlayın.",
+            "icon": "fas fa-shapes",
+            "route": "tetris"
+        },
+        "snake": {
+            "name": "Yılan Oyunu",
+            "description": "Yılanı yönlendirerek en yüksek skoru elde etmeye çalışın.",
+            "icon": "fas fa-gamepad",
+            "route": "snake_game"
+        },
+        "minesweeper": {
+            "name": "Mayın Tarlası",
+            "description": "Mantık yürüterek mayınları işaretle ve tarlanı temizle!",
+            "icon": "fas fa-bomb",
+            "route": "minesweeper"
+        },
+        "sudoku": {
+            "name": "Sudoku",
+            "description": "Sayı bulmaca oyunu.",
+            "icon": "fas fa-th",
+            "route": "sudoku"
+        },
+        "math_challenge": {
+            "name": "Matematik Mücadelesi",
+            "description": "Hızlı düşünme ve matematiksel becerilerinizi test edin.",
+            "icon": "fas fa-calculator",
+            "route": "math_challenge"
+        },
+        "color_match": {
+            "name": "Renk Eşleştirme",
+            "description": "Kelimelerin anlamı ve rengi arasındaki uyumu kontrol ederek hızlı tepki verin.",
+            "icon": "fas fa-palette",
+            "route": "color_match_game"
         }
+    }
+    
+    # Varsayılan oyunlar (veri yoksa kullanılacak)
+    default_games = [
+        "wordle", "memory_cards", "audio_memory", "2048"
     ]
-    # Sadece istenen sayıda oyunu döndür (varsayılan olarak 4)
+    
+    # Popüler oyun verilerine göre oyun listesini oluştur
+    for game_type, count in popular_games:
+        if game_type in game_info:
+            games.append(game_info[game_type])
+    
+    # Eğer hala yeterli oyun yoksa, varsayılan oyunları ekle
+    if len(games) < limit:
+        for game_type in default_games:
+            if len(games) >= limit:
+                break
+            
+            # Bu oyun zaten listeye eklenmişse atla
+            if game_type in [g.get("route", "") for g in games]:
+                continue
+                
+            if game_type in game_info:
+                games.append(game_info[game_type])
+    
+    # Sadece istenen sayıda oyunu döndür
     return games[:limit]
 
 # Ana Sayfa
