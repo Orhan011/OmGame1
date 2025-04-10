@@ -64,64 +64,107 @@ function createScoreDisplay(scoreData) {
  *                            - üçüncü parametre ise opsiyonel bir onay callback'i
  */
 function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', gameStats = {}, callback) {
-    const scoreData = {
-        game_type: gameType,
-        score: score,
-        playtime: playtime,
-        difficulty: difficulty,
-        game_stats: gameStats
-    };
-
-    // Skoru API'ye gönder
-    fetch('/api/save-score', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(scoreData)
-    })
+    // Giriş yapılmış mı kontrol et
+    fetch('/api/get-current-user')
     .then(response => response.json())
-    .then(data => {
-        console.log('Score saved:', data);
-        
-        // Seviye yükseltme kontrolü
-        if (data.xp && data.xp.level_up) {
-            console.log(`Seviye yükseltme! Eski seviye: ${data.xp.old_level}, Yeni seviye: ${data.xp.level}`);
+    .then(userData => {
+        // Skor verilerini hazırla
+        const scoreData = {
+            game_type: gameType,
+            score: score,
+            playtime: playtime,
+            difficulty: difficulty,
+            game_stats: gameStats
+        };
+
+        // Skor verisinde sorun olup olmadığını kontrol et
+        if (!gameType || score === undefined || score === null) {
+            console.error('Invalid score data:', scoreData);
+            const errorHtml = `<div class="score-display error">
+                <h3>Hata!</h3>
+                <p>Geçersiz skor verisi. Lütfen tekrar deneyin.</p>
+            </div>`;
             
-            // Seviye yükseltme olduğunda oyun sayfasından çıkarken anasayfaya seviye parametreleriyle yönlendir
-            if (data.redirect_params) {
-                // Mevcut sayfayı kaydet
-                const currentPage = window.location.pathname;
+            if (typeof callback === 'function') {
+                callback(errorHtml);
+            }
+            return;
+        }
+
+        console.log(`Saving score for ${gameType}: ${score} points, difficulty: ${difficulty}`);
+
+        // Skoru API'ye gönder
+        fetch('/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(scoreData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Score saved:', data);
+            
+            // Kullanıcı giriş yapmamışsa ve API başarılı olduysa ziyaretçi olarak işlem yap
+            if ((!userData.loggedIn || !userData.id) && data.success) {
+                data.guest = true;
+            }
+            
+            // Seviye yükseltme kontrolü
+            if (data.xp && data.xp.level_up) {
+                console.log(`Seviye yükseltme! Eski seviye: ${data.xp.old_level}, Yeni seviye: ${data.xp.level}`);
                 
-                // Ana sayfa olmadığımızdan emin olalım
-                if (currentPage !== '/' && currentPage !== '/index') {
-                    // Oyun bitimini işle
-                    const scoreHtml = createScoreDisplay(data);
-                    if (typeof callback === 'function') {
-                        callback(scoreHtml, data, () => {
-                            // Callback tamamlandıktan sonra anasayfaya yönlendir (seviye bilgisiyle)
+                // Seviye yükseltme olduğunda oyun sayfasından çıkarken anasayfaya seviye parametreleriyle yönlendir
+                if (data.redirect_params) {
+                    // Mevcut sayfayı kaydet
+                    const currentPage = window.location.pathname;
+                    
+                    // Ana sayfa olmadığımızdan emin olalım
+                    if (currentPage !== '/' && currentPage !== '/index') {
+                        // Oyun bitimini işle
+                        const scoreHtml = createScoreDisplay(data);
+                        if (typeof callback === 'function') {
+                            callback(scoreHtml, data, () => {
+                                // Callback tamamlandıktan sonra anasayfaya yönlendir (seviye bilgisiyle)
+                                window.location.href = `/?levelUp=true&newLevel=${data.xp.level}`;
+                            });
+                        } else {
+                            // Anasayfaya yönlendir (seviye bilgisiyle)
                             window.location.href = `/?levelUp=true&newLevel=${data.xp.level}`;
-                        });
-                    } else {
-                        // Anasayfaya yönlendir (seviye bilgisiyle)
-                        window.location.href = `/?levelUp=true&newLevel=${data.xp.level}`;
+                        }
+                        return; // Yönlendirme başladı, işlemi sonlandır
                     }
-                    return; // Yönlendirme başladı, işlemi sonlandır
                 }
             }
-        }
-        
-        // Normal durum (seviye yükseltme yoksa)
-        const scoreHtml = createScoreDisplay(data);
-        if (typeof callback === 'function') {
-            callback(scoreHtml, data);
-        }
+            
+            // Normal durum (seviye yükseltme yoksa)
+            const scoreHtml = createScoreDisplay(data);
+            if (typeof callback === 'function') {
+                callback(scoreHtml, data);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving score:', error);
+            const errorHtml = `<div class="score-display error">
+                <h3>Hata!</h3>
+                <p>Skor kaydedilirken bir hata oluştu: ${error.message}</p>
+            </div>`;
+            
+            if (typeof callback === 'function') {
+                callback(errorHtml);
+            }
+        });
     })
     .catch(error => {
-        console.error('Error saving score:', error);
+        console.error('Error checking user status:', error);
         const errorHtml = `<div class="score-display error">
             <h3>Hata!</h3>
-            <p>Skor kaydedilirken bir hata oluştu.</p>
+            <p>Kullanıcı durumu kontrol edilirken bir hata oluştu.</p>
         </div>`;
         
         if (typeof callback === 'function') {

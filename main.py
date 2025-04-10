@@ -1864,7 +1864,11 @@ def check_daily_bonus(user_id):
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
+    """Oyun skorlarını kaydetme ve kullanıcı XP'sini güncelleme API'si"""
+    # Gelen veriyi al ve doğrula
     data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'message': 'Geçersiz JSON verisi!'})
 
     game_type = data.get('game_type')
     score = data.get('score')
@@ -1872,19 +1876,27 @@ def save_score():
     difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk medium
     game_stats = data.get('game_stats', {})  # Oyun istatistikleri
 
-    if not game_type or not score:
-        return jsonify({'success': False, 'message': 'Eksik veri!'})
-
+    # Verilerin doğruluğunu kontrol et
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
+        
+    if score is None:
+        return jsonify({'success': False, 'message': 'Skor değeri belirtilmedi!'})
+        
     try:
-        score = int(score)
-        playtime = int(playtime)
-    except:
-        return jsonify({'success': False, 'message': 'Geçersiz skor veya süre!'})
+        # Çok önemli: Bazen string veya float olarak gönderiliyor, int'e çevir
+        score = int(float(score))
+        playtime = int(float(playtime))
+        logger.debug(f"Skor dönüşümü: {score}, Süre dönüşümü: {playtime}")
+    except (ValueError, TypeError) as e:
+        logger.error(f"Skor veya süre dönüşüm hatası: {str(e)}, Değerler: score={score}, playtime={playtime}")
+        return jsonify({'success': False, 'message': 'Geçersiz skor veya süre değeri!'})
 
     # Çarpanları hesapla 
+    logger.debug(f"Çarpanlar hesaplanıyor: game_type={game_type}, difficulty={difficulty}")
     multipliers = calculate_multipliers(game_type, difficulty, game_stats)
+    logger.debug(f"Hesaplanan çarpanlar: {multipliers}")
 
-    # Artık sadece yeni puanlama sistemini kullanıyoruz
     # Performansa dayalı puanlama
     if multipliers.get('final_score'):
         # Yeni puanlama sisteminden gelen nihai puan
@@ -1895,10 +1907,9 @@ def save_score():
 
         # Puan bilgisini multipliers'a ekle
         multipliers['total_score'] = int(total_points)
+        logger.debug(f"Final skor hesaplaması: {final_score}")
     else:
-        # Eğer yeni sistem için gerekli veriler yoksa, basit bir hesaplama yap
-        # Ama rastgele değil, daha belirleyici bir formül kullan
-
+        # Temel puanlama sistemi
         # Zorluk seviyesine dayalı taban puan
         base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
 
@@ -1916,6 +1927,7 @@ def save_score():
         total_points = max(10, min(100, int(total_points)))
 
         multipliers['total_score'] = int(total_points)
+        logger.debug(f"Standart skor hesaplaması: base={base_points}, score={score_points}, time={duration_points}, total={total_points}")
 
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:
