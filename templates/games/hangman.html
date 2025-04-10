@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 {% block title %}Adam Asmaca - Zekapark{% endblock %}
 
@@ -273,7 +274,6 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-bottom: 170px; /* Added for mobile keyboard */
 }
 
 .hangman-layout {
@@ -722,11 +722,11 @@
   .hangman-game-wrapper {
     padding: 15px 10px;
   }
-
+  
   .game-header h1 {
     font-size: 1.5rem;
   }
-
+  
   .hangman-layout {
     flex-direction: column;
   }
@@ -739,7 +739,7 @@
     margin: 0 auto 15px;
     padding: 10px;
   }
-
+  
   #hangman-svg {
     width: 160px;
     height: 160px;
@@ -776,23 +776,23 @@
   .primary-button, .share-button {
     max-width: 100%;
   }
-
+  
   .difficulty-selector {
     flex-direction: column;
   }
-
+  
   .difficulty-options {
     width: 100%;
     justify-content: center;
   }
-
+  
   .used-letter {
     width: 25px;
     height: 25px;
     line-height: 25px;
     font-size: 0.8rem;
   }
-
+  
   .hint-button {
     width: 100%;
     max-width: 250px;
@@ -803,12 +803,12 @@
   .game-header h1 {
     font-size: 1.3rem;
   }
-
+  
   .badge {
     font-size: 0.7rem;
     padding: 3px 8px;
   }
-
+  
   .letter-box {
     width: 22px;
     height: 22px;
@@ -817,50 +817,42 @@
   }
 
   .key-btn {
-    width: 28px;
-    height: 36px;
-    font-size: 0.85rem;
-    border-radius: 4px;
+    width: 16px;
+    height: 18px;
+    font-size: 0.6rem;
+    border-radius: 2px;
   }
 
   .keyboard-row {
-    gap: 2px;
+    gap: 1px;
   }
-
+  
   .virtual-keyboard {
-    width: 95%;
-    padding: 6px 4px;
-    bottom: 0;
-    border-radius: 10px 10px 0 0;
-    position: fixed;
-  }
-
-  /* Klavye sabit olduğu için alt kısımda boşluk bırakalım */
-  .game-main-area {
-    padding-bottom: 170px;
+    width: 65%;
+    padding: 3px 2px;
   }
 
   .difficulty-btn {
     padding: 5px 10px;
     font-size: 0.8rem;
   }
-
+  
   .modal-header h2 {
     font-size: 1.5rem;
   }
-
+  
   .modal-content p {
     font-size: 0.9rem;
   }
-
+  
   #word-reveal {
     font-size: 1.1rem;
   }
-
+  
   .modal-stat-value {
     font-size: 1.3rem;
   }
-
+  
   .primary-button, .share-button {
     font-size: 0.9rem;
     padding: 10px 15px;
@@ -875,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const wordLists = {
     easy: [
       {word: "ELMA", category: "Meyve", hint: "Kırmızı veya yeşil olabilen çok yaygın bir meyve"},
-      {word: "MASA", category: "Mobilya", hint: "Üzerine eşya konulan düz yüz yüzeyli mobilya"},
+      {word: "MASA", category: "Mobilya", hint: "Üzerine eşya konulan düz yüzeyli mobilya"},
       {word: "KAPI", category: "Ev Eşyası", hint: "Bir odaya giriş sağlayan açılır kapanır parça"},
       {word: "KALEM", category: "Kırtasiye", hint: "Yazı yazmak için kullanılan araç"},
       {word: "KÖPEK", category: "Hayvan", hint: "En popüler evcil hayvanlardan biri"},
@@ -978,14 +970,14 @@ document.addEventListener('DOMContentLoaded', function() {
   difficultyButtons.forEach(button => {
     button.addEventListener('click', function() {
       if (gameOver) return;
-
+      
       // Aktif olan sınıfı kaldır ve yeni butona ekle
       difficultyButtons.forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
-
+      
       // Zorluk seviyesini güncelle
       currentDifficulty = this.getAttribute('data-difficulty');
-
+      
       // Yeni oyun başlat
       startNewGame();
     });
@@ -1004,13 +996,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // İpucu butonu
   hintButton.addEventListener('click', function() {
     if (gameOver || hintUsed) return;
-
+    
     // İpucunu göster
     hintText.textContent = currentHint;
     hintButton.disabled = true;
     hintButton.style.opacity = 0.5;
     hintUsed = true;
-
+    
     // İpucu kullanıldığında puandan düşürelim
     score -= 5;
   });
@@ -1024,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru paylaş
   shareScoreBtn.addEventListener('click', function() {
     const message = `Adam Asmaca oyununda ${score} puan kazandım! ${currentWord} kelimesini ${remainingAttempts} hak kaldığında buldum. #ZekaPark`;
-
+    
     // Mobil cihazlarda paylaşım yapılabilir
     if (navigator.share) {
       navigator.share({
