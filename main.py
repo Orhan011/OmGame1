@@ -837,6 +837,13 @@ def solitaire():
 
 # Minesweeper rotası artık routes.py dosyasında tanımlanmıştır
 
+@app.route('/games/minesweeper')
+@login_required
+def minesweeper():
+    """Mayın Tarlası: Klasik mantık oyunu
+    Gizli mayınları bulma ve işaretleme stratejisi ile mantıksal düşünme becerilerinizi geliştirin."""
+    return render_template('games/minesweeper.html')
+
 @app.route('/all-games')
 def all_games():
     return render_template('all_games.html')
