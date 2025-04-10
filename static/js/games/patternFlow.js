@@ -112,13 +112,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Oyun Başlatma
   function initGame() {
-    // Event Listeners
-    startButton.addEventListener('click', startGame);
-    pauseButton.addEventListener('click', togglePause);
-    resetButton.addEventListener('click', resetGame);
-    settingsButton.addEventListener('click', toggleSettings);
-    playAgainButton.addEventListener('click', resetGame);
-    shareButton.addEventListener('click', shareScore);
+    // Event Listeners - null kontrolü ile güvenli hale getir
+    if (startButton) startButton.addEventListener('click', startGame);
+    if (pauseButton) pauseButton.addEventListener('click', togglePause);
+    if (resetButton) resetButton.addEventListener('click', resetGame);
+    if (settingsButton) settingsButton.addEventListener('click', toggleSettings);
+    if (playAgainButton) playAgainButton.addEventListener('click', resetGame);
+    if (shareButton) shareButton.addEventListener('click', shareScore);
     
     // Oyun konteynerini hazırla
     prepareGameContainer();
@@ -812,7 +812,12 @@ document.addEventListener('DOMContentLoaded', function() {
       gameContainer.appendChild(settingsPanel);
       
       // Event listener'ları ayarla
-      document.getElementById('start-tutorial').addEventListener('click', closeTutorial);
+      const startTutorial = document.getElementById('start-tutorial');
+      if (startTutorial) {
+        startTutorial.addEventListener('click', closeTutorial);
+      } else {
+        console.error('Start tutorial button bulunamadı');
+      }
       document.getElementById('save-settings').addEventListener('click', saveSettings);
       document.getElementById('cancel-settings').addEventListener('click', () => {
         document.getElementById('settings-panel').classList.remove('active');
