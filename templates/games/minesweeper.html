@@ -1,24 +1,1660 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="text-center">
-    <h1 class="game-title mb-4">Bu oyun kaldırılmıştır</h1>
-    <p>Bu oyun sistemden kaldırılmıştır. Lütfen diğer oyunlarımızı deneyin.</p>
-    <a href="/all-games" class="btn btn-primary mt-3">Diğer Oyunları Keşfet</a>
+<div class="minesweeper-page">
+  <div class="mine-game-container">
+    <div class="game-header-section">
+      <div class="game-title">
+        <h1>Mayın Tarlası</h1>
+        <p class="game-subtitle">Mantık yürüterek mayınları işaretle ve tarlanı temizle!</p>
+      </div>
+      
+      <div class="game-controls-section">
+        <div class="game-stats">
+          <div class="stat-box mines-counter">
+            <i class="fas fa-bomb"></i>
+            <span id="mines-left">10</span>
+          </div>
+          <div class="stat-box timer">
+            <i class="fas fa-clock"></i>
+            <span id="timer">00:00</span>
+          </div>
+        </div>
+        
+        <div class="difficulty-selector">
+          <select id="difficulty-select" class="difficulty-select">
+            <option value="beginner">Kolay (9x9, 10 mayın)</option>
+            <option value="intermediate">Orta (16x16, 40 mayın)</option>
+            <option value="expert">Uzman (16x30, 99 mayın)</option>
+          </select>
+          <button id="new-game-btn" class="control-btn new-game">
+            <i class="fas fa-play"></i> Yeni Oyun
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-board-section">
+      <div id="mine-field-container">
+        <div class="board-background">
+          <div id="mine-field" class="mine-field">
+            <!-- JavaScript ile mayın tarlası burada oluşturulacak -->
+          </div>
+          <div class="board-shadow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-options-section">
+      <div class="options-row">
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="first-click-safe" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">İlk Tıklama Güvenli</span>
+        </div>
+        
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="highlight-suggestions" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">İpuçlarını Vurgula</span>
+        </div>
+      </div>
+      
+      <div class="help-buttons">
+        <button id="hint-btn" class="help-btn">
+          <i class="fas fa-lightbulb"></i> İpucu
+        </button>
+        <button id="help-btn" class="help-btn">
+          <i class="fas fa-question-circle"></i> Nasıl Oynanır?
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Yardım Paneli (varsayılan olarak gizli) -->
+  <div id="help-panel" class="help-panel hidden">
+    <div class="help-header">
+      <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
+      <button id="close-help-btn" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="help-content">
+      <div class="help-section">
+        <h4>Kontroller</h4>
+        <div class="control-instruction">
+          <div class="control-icon"><i class="fas fa-mouse-pointer"></i></div>
+          <div class="control-info">
+            <h5>Sol Tıklama</h5>
+            <p>Bir kareyi açar. Mayın yoksa, etrafındaki mayın sayısını gösterir.</p>
+          </div>
+        </div>
+        <div class="control-instruction">
+          <div class="control-icon"><i class="fas fa-flag"></i></div>
+          <div class="control-info">
+            <h5>Sağ Tıklama</h5>
+            <p>Mayın olduğunu düşündüğünüz kareyi işaretler.</p>
+          </div>
+        </div>
+        <div class="control-instruction">
+          <div class="control-icon"><i class="fas fa-mouse"></i></div>
+          <div class="control-info">
+            <h5>Çift/Orta Tıklama</h5>
+            <p>Açık bir sayı karesindeki işaretli mayın sayısı, gösterilen sayıya eşitse, etrafındaki işaretlenmemiş tüm kareleri açar.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="help-section">
+        <h4>Oyun Mantığı</h4>
+        <p>Her kare şu durumlardan birindedir:</p>
+        <ul>
+          <li>Kapalı (bilinmeyen)</li>
+          <li>Bayrakla işaretli (mayın olduğunu düşündüğünüz)</li>
+          <li>Açık ve sayı içeriyor (etrafındaki mayın sayısı)</li>
+          <li>Açık ve boş (etrafında mayın yok)</li>
+        </ul>
+        <p>Açılan sayılar, etraflarındaki 8 karede bulunan mayın sayısını gösterir. Bu ipuçlarını kullanarak mayınları mantıksal olarak bulabilirsiniz.</p>
+      </div>
+      
+      <div class="help-section">
+        <h4>Stratejiler</h4>
+        <ul>
+          <li>Sıfır gösterilen kareler güvenlidir ve etrafındaki tüm kareler otomatik açılır.</li>
+          <li>Sayının etrafında tam o kadar bayrak varsa, diğer tüm kareler güvenlidir.</li>
+          <li>Sayının etrafındaki bilinmeyen kare sayısı, gösterilen sayıya eşitse, hepsi mayındır.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sonuç Modalı -->
+<div class="modal fade" id="result-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">Tebrikler!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="win-message" class="result-message win">
+          <div class="result-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <h4>Mayın tarlasını başarıyla temizlediniz!</h4>
+          <p>Harika bir sonuç! Tüm mayınları doğru işaretlediniz.</p>
+        </div>
+        <div id="lose-message" class="result-message lose" style="display:none;">
+          <div class="result-icon">
+            <i class="fas fa-bomb"></i>
+          </div>
+          <h4>Boom! Mayına bastınız!</h4>
+          <p>Üzülme, bir dahaki sefere daha dikkatli ol!</p>
+        </div>
+        <div class="result-stats">
+          <div class="stat-item">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="result-time">00:00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Zorluk</div>
+            <div class="stat-value" id="result-difficulty">Kolay</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Mayınlar</div>
+            <div class="stat-value" id="result-mines">10</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="modal-btn primary" id="new-game-modal">Yeni Oyun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- İpucu Modalı -->
+<div class="modal fade" id="hint-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">İpucu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="hint-content">
+          <div class="hint-icon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <p id="hint-text">Burada bir ipucu göreceksiniz...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="modal-btn primary" id="show-hint-btn">Göster</button>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_css %}
 <style>
+  /* Ana Konteyner */
+  .minesweeper-page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    color: #333;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  }
+  
+  .mine-game-container {
+    width: 95%;
+    max-width: 1100px;
+    margin: 1rem auto;
+    padding: 0.5rem;
+  }
+  
+  /* Başlık ve Üst Kontrol Bölümü */
+  .game-header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+  }
+  
   .game-title {
-    color: #6a5ae0;
-    text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .game-title h1 {
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
+    color: #2c3e50;
     font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .game-subtitle {
+    font-size: 1rem;
+    color: #636e72;
+    margin-bottom: 1rem;
+  }
+  
+  .game-controls-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.6rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  .stat-box:hover {
+    transform: translateY(-2px);
+  }
+  
+  .stat-box i {
+    margin-right: 0.8rem;
+  }
+  
+  .mines-counter {
+    background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+    color: white;
+  }
+  
+  .timer {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+  }
+  
+  .difficulty-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .difficulty-select {
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: linear-gradient(135deg, #e0e0e0 0%, #d3d3d3 100%);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 230px;
+  }
+  
+  .difficulty-select:hover {
+    background: linear-gradient(135deg, #d3d3d3 0%, #c4c4c4 100%);
+  }
+  
+  .difficulty-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 163, 223, 0.5);
+  }
+  
+  .control-btn {
+    padding: 0.7rem 1.2rem;
+    border: none;
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .control-btn i {
+    margin-right: 0.5rem;
+  }
+  
+  .new-game {
+    background: linear-gradient(135deg, #5ba7f1 0%, #2c67ec 100%);
+    color: white;
+  }
+  
+  .new-game:hover {
+    background: linear-gradient(135deg, #4a97e9 0%, #1a56eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 103, 236, 0.3);
+  }
+  
+  /* Oyun Tahtası Bölümü */
+  .game-board-section {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #mine-field-container {
+    position: relative;
+    max-width: 100%;
+    overflow: auto;
+    padding: 0.5rem;
+  }
+  
+  .board-background {
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .board-shadow {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.05);
+    filter: blur(10px);
+    border-radius: 8px;
+  }
+  
+  .mine-field {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-gap: 1px;
+    background-color: #bbb;
+    border: 2px solid #999;
+    border-radius: 4px;
+    overflow: hidden;
+    user-select: none;
+  }
+  
+  /* Hücre stilleri */
+  .cell {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e6e6e6 0%, #d9d9d9 100%);
+    border: 2px solid;
+    border-color: #f0f0f0 #aaa #aaa #f0f0f0;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cell:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+  }
+  
+  .cell:hover:not(.revealed):not(.flagged):not(.question) {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e3e3e3 100%);
+    transform: scale(1.03);
+    z-index: 2;
+  }
+  
+  .cell:active:not(.revealed):not(.flagged):not(.question) {
+    transform: scale(0.98);
+  }
+  
+  .cell.revealed {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ccc;
+    font-weight: 600;
+  }
+  
+  /* Bayrak ve soru işareti */
+  .cell.flagged {
+    border-color: #f0f0f0 #aaa #aaa #f0f0f0;
+  }
+  
+  .cell.flagged i, .cell.question i {
+    font-size: 1rem;
+    animation: pop-in 0.2s ease-out;
+  }
+  
+  .cell.flagged i {
+    color: #e74c3c;
+  }
+  
+  .cell.question i {
+    color: #3498db;
+  }
+  
+  /* Patlayan mayın */
+  .cell.mine-exploded {
+    background: #e74c3c;
+    border-color: #c0392b;
+    animation: explode 0.5s ease-out;
+  }
+  
+  .cell.mine-exploded i {
+    color: #2c3e50;
+    animation: spin 0.5s ease-out;
+  }
+  
+  /* Sayı renkleri */
+  .cell.revealed[data-mines="1"] { color: #3498db; } /* Mavi */
+  .cell.revealed[data-mines="2"] { color: #2ecc71; } /* Yeşil */
+  .cell.revealed[data-mines="3"] { color: #e74c3c; } /* Kırmızı */
+  .cell.revealed[data-mines="4"] { color: #9b59b6; } /* Mor */
+  .cell.revealed[data-mines="5"] { color: #e67e22; } /* Turuncu */
+  .cell.revealed[data-mines="6"] { color: #16a085; } /* Yeşilimsi mavi */
+  .cell.revealed[data-mines="7"] { color: #2c3e50; } /* Koyu mavi */
+  .cell.revealed[data-mines="8"] { color: #7f8c8d; } /* Gri */
+  
+  /* Oyun Seçenekleri Bölümü */
+  .game-options-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+  }
+  
+  .options-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .option-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .option-label {
+    margin-left: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  /* Toggle Anahtarı */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .3s;
+    border-radius: 24px;
+  }
+  
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .toggle-slider {
+    background-color: #2196F3;
+  }
+  
+  input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+  }
+  
+  /* Yardım Butonları */
+  .help-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .help-btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e6e6e6 100%);
+    color: #2c3e50;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+  }
+  
+  .help-btn i {
+    margin-right: 0.5rem;
+  }
+  
+  .help-btn:hover {
+    background: linear-gradient(135deg, #e6e6e6 0%, #d7d7d7 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Yardım Paneli */
+  .help-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform 0.3s ease-out;
+    transform: translateX(0);
+  }
+  
+  .help-panel.hidden {
+    transform: translateX(100%);
+  }
+  
+  .help-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .help-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #2c3e50;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .close-btn:hover {
+    color: #343a40;
+  }
+  
+  .help-content {
+    padding: 1rem;
+  }
+  
+  .help-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .help-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+  }
+  
+  .control-instruction {
+    display: flex;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .control-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    background: #e9ecef;
+    color: #2c3e50;
+    font-size: 1.2rem;
+  }
+  
+  .control-info {
+    padding: 0.75rem;
+    flex: 1;
+  }
+  
+  .control-info h5 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: #2c3e50;
+  }
+  
+  .control-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .help-section ul {
+    padding-left: 1.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .help-section p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Modal Stilleri */
+  .modal-content {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+    border-bottom: none;
+    padding: 1.5rem;
+  }
+  
+  .modal-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+  
+  .btn-close {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .result-message {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .result-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    text-align: center;
+  }
+  
+  .win .result-icon {
+    background: linear-gradient(135deg, #fdcb6e 0%, #f8b64c 100%);
+    color: #ff9f1a;
+    box-shadow: 0 8px 20px rgba(250, 177, 160, 0.3);
+    animation: bounce 1s ease-out;
+  }
+  
+  .lose .result-icon {
+    background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+    color: white;
+    box-shadow: 0 8px 20px rgba(214, 48, 49, 0.3);
+    animation: shake 0.8s ease-out;
+  }
+  
+  .result-message h4 {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-message p {
+    color: #636e72;
+    margin-bottom: 0;
+  }
+  
+  .result-stats {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+    border-radius: 1rem;
+    padding: 1.2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .stat-item {
+    text-align: center;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+    color: #636e72;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+  
+  .modal-footer {
+    border-top: none;
+    padding: 0 1.5rem 1.5rem;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .modal-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  
+  .modal-btn.primary {
+    background: linear-gradient(135deg, #5ba7f1 0%, #2c67ec 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(44, 103, 236, 0.3);
+  }
+  
+  .modal-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(44, 103, 236, 0.35);
+  }
+  
+  .modal-btn.secondary {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+    color: #2c3e50;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .modal-btn.secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* İpucu Modalı */
+  .hint-content {
+    text-align: center;
+    padding: 1rem 0;
+  }
+  
+  .hint-icon {
+    font-size: 3rem;
+    color: #f9ca24;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 10px rgba(249, 202, 36, 0.3);
+    animation: pulse 1.5s infinite;
+  }
+  
+  #hint-text {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 0;
+  }
+  
+  /* Animasyonlar */
+  @keyframes pop-in {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes explode {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); }
+    60% { transform: translateY(-10px); }
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Mobil Uyumluluk */
+  @media (max-width: 768px) {
+    .game-title h1 {
+      font-size: 1.8rem;
+    }
+    
+    .game-subtitle {
+      font-size: 0.9rem;
+    }
+    
+    .stat-box {
+      min-width: 90px;
+      padding: 0.6rem 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .options-row {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .cell {
+      width: 30px;
+      height: 30px;
+      font-size: 1rem;
+    }
+    
+    .help-panel {
+      width: 280px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .game-title h1 {
+      font-size: 1.6rem;
+    }
+    
+    .game-stats {
+      gap: 1rem;
+    }
+    
+    .stat-box {
+      min-width: 80px;
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+    }
+    
+    .difficulty-select {
+      min-width: 100%;
+    }
+    
+    .control-btn {
+      padding: 0.6rem 1rem;
+    }
+    
+    .help-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .help-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .cell {
+      width: 28px;
+      height: 28px;
+      font-size: 0.9rem;
+    }
   }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun durumu
+    let gameState = {
+      width: 9,
+      height: 9,
+      mines: 10,
+      board: [],
+      firstClick: true,
+      gameOver: false,
+      minesMarked: 0,
+      cellsRevealed: 0,
+      timer: 0,
+      timerInterval: null,
+      difficulty: 'beginner',
+      hintUsed: false,
+      hints: []
+    };
+    
+    // DOM elementleri
+    const mineField = document.getElementById('mine-field');
+    const minesLeftDisplay = document.getElementById('mines-left');
+    const timerDisplay = document.getElementById('timer');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const firstClickSafe = document.getElementById('first-click-safe');
+    const highlightSuggestions = document.getElementById('highlight-suggestions');
+    const newGameBtn = document.getElementById('new-game-btn');
+    const helpBtn = document.getElementById('help-btn');
+    const hintBtn = document.getElementById('hint-btn');
+    const helpPanel = document.getElementById('help-panel');
+    const closeHelpBtn = document.getElementById('close-help-btn');
+    
+    // Modal elementleri
+    const resultModal = new bootstrap.Modal(document.getElementById('result-modal'));
+    const modalTitle = document.getElementById('modal-title');
+    const winMessage = document.getElementById('win-message');
+    const loseMessage = document.getElementById('lose-message');
+    const resultTime = document.getElementById('result-time');
+    const resultDifficulty = document.getElementById('result-difficulty');
+    const resultMines = document.getElementById('result-mines');
+    const newGameModalBtn = document.getElementById('new-game-modal');
+    
+    // İpucu modal elementleri
+    const hintModal = new bootstrap.Modal(document.getElementById('hint-modal'));
+    const hintText = document.getElementById('hint-text');
+    const showHintBtn = document.getElementById('show-hint-btn');
+    
+    // Yeni oyun başlat
+    function initGame() {
+      // Zorluk seviyesine göre ayarlamaları yap
+      setDifficultySettings();
+      
+      // Tahtayı sıfırla
+      gameState.board = [];
+      gameState.firstClick = true;
+      gameState.gameOver = false;
+      gameState.minesMarked = 0;
+      gameState.cellsRevealed = 0;
+      gameState.hintUsed = false;
+      gameState.hints = [];
+      
+      // Zamanlayıcıyı sıfırla
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+      gameState.timer = 0;
+      updateTimerDisplay();
+      
+      // Mayın sayacını güncelle
+      updateMineCounter();
+      
+      // Oyun tahtasını oluştur
+      createBoard();
+    }
+    
+    // Zorluk ayarlarını belirle
+    function setDifficultySettings() {
+      gameState.difficulty = difficultySelect.value;
+      
+      switch (gameState.difficulty) {
+        case 'beginner':
+          gameState.width = 9;
+          gameState.height = 9;
+          gameState.mines = 10;
+          break;
+        case 'intermediate':
+          gameState.width = 16;
+          gameState.height = 16;
+          gameState.mines = 40;
+          break;
+        case 'expert':
+          gameState.width = 30;
+          gameState.height = 16;
+          gameState.mines = 99;
+          break;
+      }
+      
+      // Grid kolonlarını ayarla
+      mineField.style.gridTemplateColumns = `repeat(${gameState.width}, 1fr)`;
+    }
+    
+    // Tahtayı oluştur
+    function createBoard() {
+      mineField.innerHTML = '';
+      
+      // Boş tahtayı oluştur
+      for (let y = 0; y < gameState.height; y++) {
+        let row = [];
+        for (let x = 0; x < gameState.width; x++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+          
+          // Sol tıklama - hücreyi aç
+          cell.addEventListener('click', (e) => {
+            if (gameState.gameOver) return;
+            revealCell(x, y);
+          });
+          
+          // Sağ tıklama - bayrak işaretle
+          cell.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (gameState.gameOver) return;
+            toggleFlag(x, y);
+          });
+          
+          // Çift tıklama - etraftaki hücreleri aç
+          cell.addEventListener('dblclick', (e) => {
+            if (gameState.gameOver) return;
+            chordCells(x, y);
+          });
+          
+          // Mobil cihazlar için uzun basma - bayrak işaretle
+          let pressTimer;
+          cell.addEventListener('touchstart', (e) => {
+            if (gameState.gameOver) return;
+            
+            pressTimer = setTimeout(() => {
+              toggleFlag(x, y);
+            }, 500);
+          });
+          
+          cell.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
+          });
+          
+          mineField.appendChild(cell);
+          
+          // Hücre durumu: { isMine: false, isRevealed: false, isFlagged: false, neighborMines: 0 }
+          row.push({
+            isMine: false,
+            isRevealed: false,
+            isFlagged: false,
+            isQuestion: false,
+            neighborMines: 0
+          });
+        }
+        gameState.board.push(row);
+      }
+    }
+    
+    // Mayınları yerleştir
+    function placeMines(clickX, clickY) {
+      let minesPlaced = 0;
+      
+      // İlk tıklanan hücre ve komşuları için güvenli alan oluştur
+      const safeArea = [];
+      if (firstClickSafe.checked) {
+        for (let y = Math.max(0, clickY - 1); y <= Math.min(gameState.height - 1, clickY + 1); y++) {
+          for (let x = Math.max(0, clickX - 1); x <= Math.min(gameState.width - 1, clickX + 1); x++) {
+            safeArea.push({x, y});
+          }
+        }
+      } else {
+        safeArea.push({x: clickX, y: clickY});
+      }
+      
+      // Mayınları rastgele yerleştir
+      while (minesPlaced < gameState.mines) {
+        const x = Math.floor(Math.random() * gameState.width);
+        const y = Math.floor(Math.random() * gameState.height);
+        
+        // Güvenli alanda mayın olmamalı
+        if (safeArea.some(pos => pos.x === x && pos.y === y)) {
+          continue;
+        }
+        
+        // Bu konumda zaten mayın var mı kontrol et
+        if (!gameState.board[y][x].isMine) {
+          gameState.board[y][x].isMine = true;
+          minesPlaced++;
+        }
+      }
+      
+      // Komşu mayın sayılarını hesapla
+      calculateNeighborMines();
+    }
+    
+    // Hücrenin komşu mayın sayısını hesapla
+    function calculateNeighborMines() {
+      for (let y = 0; y < gameState.height; y++) {
+        for (let x = 0; x < gameState.width; x++) {
+          if (gameState.board[y][x].isMine) continue;
+          
+          let count = 0;
+          
+          // Etraftaki 8 hücreyi kontrol et
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if (dx === 0 && dy === 0) continue;
+              
+              const nx = x + dx;
+              const ny = y + dy;
+              
+              if (nx >= 0 && nx < gameState.width && ny >= 0 && ny < gameState.height) {
+                if (gameState.board[ny][nx].isMine) {
+                  count++;
+                }
+              }
+            }
+          }
+          
+          gameState.board[y][x].neighborMines = count;
+        }
+      }
+    }
+    
+    // Hücreyi aç
+    function revealCell(x, y) {
+      // Bayrak işaretli ise açma
+      if (gameState.board[y][x].isFlagged || gameState.board[y][x].isQuestion) {
+        return;
+      }
+      
+      // Zaten açılmış ise bir şey yapma
+      if (gameState.board[y][x].isRevealed) {
+        return;
+      }
+      
+      // İlk tıklama ise mayınları yerleştir ve zamanlayıcıyı başlat
+      if (gameState.firstClick) {
+        placeMines(x, y);
+        gameState.firstClick = false;
+        startTimer();
+      }
+      
+      // Mayın ise oyun biter
+      if (gameState.board[y][x].isMine) {
+        gameOver(false);
+        
+        // Tıklanan mayını patlayan mayın olarak göster
+        const cell = getCellElement(x, y);
+        cell.classList.add('revealed', 'mine-exploded');
+        cell.innerHTML = '<i class="fas fa-bomb"></i>';
+        
+        return;
+      }
+      
+      // Hücreyi aç
+      gameState.board[y][x].isRevealed = true;
+      gameState.cellsRevealed++;
+      
+      const cell = getCellElement(x, y);
+      cell.classList.add('revealed');
+      
+      // Komşu mayın sayısını göster
+      const neighborMines = gameState.board[y][x].neighborMines;
+      if (neighborMines > 0) {
+        cell.textContent = neighborMines;
+        cell.dataset.mines = neighborMines;
+      }
+      
+      // Komşu mayını olmayan hücrelerin komşularını otomatik aç
+      if (neighborMines === 0) {
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            
+            const nx = x + dx;
+            const ny = y + dy;
+            
+            if (nx >= 0 && nx < gameState.width && ny >= 0 && ny < gameState.height) {
+              revealCell(nx, ny);
+            }
+          }
+        }
+      }
+      
+      // Öneriler varsa vurgula
+      if (highlightSuggestions.checked && !gameState.firstClick) {
+        highlightSafeCells();
+      }
+      
+      // Kazanma durumunu kontrol et
+      checkWinCondition();
+    }
+    
+    // Kazanma durumunu kontrol et
+    function checkWinCondition() {
+      const totalNonMineCells = gameState.width * gameState.height - gameState.mines;
+      
+      if (gameState.cellsRevealed === totalNonMineCells) {
+        gameOver(true);
+      }
+    }
+    
+    // Bayrak işaretini aç/kapat
+    function toggleFlag(x, y) {
+      // Açılmış hücrelere bayrak koyulamaz
+      if (gameState.board[y][x].isRevealed) {
+        return;
+      }
+      
+      const cell = getCellElement(x, y);
+      
+      if (!gameState.board[y][x].isFlagged && !gameState.board[y][x].isQuestion) {
+        // Bayrak koy
+        gameState.board[y][x].isFlagged = true;
+        cell.classList.add('flagged');
+        cell.innerHTML = '<i class="fas fa-flag"></i>';
+        gameState.minesMarked++;
+      } else if (gameState.board[y][x].isFlagged) {
+        // Soru işareti koy
+        gameState.board[y][x].isFlagged = false;
+        gameState.board[y][x].isQuestion = true;
+        cell.classList.remove('flagged');
+        cell.classList.add('question');
+        cell.innerHTML = '<i class="fas fa-question"></i>';
+        gameState.minesMarked--;
+      } else {
+        // İşareti kaldır
+        gameState.board[y][x].isQuestion = false;
+        cell.classList.remove('question');
+        cell.innerHTML = '';
+      }
+      
+      updateMineCounter();
+      
+      // Öneriler varsa vurgula
+      if (highlightSuggestions.checked && !gameState.firstClick) {
+        highlightSafeCells();
+      }
+    }
+    
+    // Güvenli hücreleri vurgula
+    function highlightSafeCells() {
+      // Önce tüm vurgulamaları temizle
+      const allCells = document.querySelectorAll('.cell');
+      allCells.forEach(cell => {
+        cell.classList.remove('highlight-safe');
+      });
+      
+      // Açık hücrelerde, çevrelerindeki bayrak sayısı komşu mayın sayısına eşitse
+      // kalan kapalı hücrelerin güvenli olduğunu vurgula
+      for (let y = 0; y < gameState.height; y++) {
+        for (let x = 0; x < gameState.width; x++) {
+          if (!gameState.board[y][x].isRevealed || gameState.board[y][x].neighborMines === 0) continue;
+          
+          let flaggedCount = 0;
+          let unknownCells = [];
+          
+          // Etraftaki bayrak ve bilinmeyen hücreleri say
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if (dx === 0 && dy === 0) continue;
+              
+              const nx = x + dx;
+              const ny = y + dy;
+              
+              if (nx >= 0 && nx < gameState.width && ny >= 0 && ny < gameState.height) {
+                if (gameState.board[ny][nx].isFlagged) {
+                  flaggedCount++;
+                } else if (!gameState.board[ny][nx].isRevealed) {
+                  unknownCells.push({x: nx, y: ny});
+                }
+              }
+            }
+          }
+          
+          // Bayraklar sayıya eşitse, kalan bilinmeyen hücreler güvenlidir
+          if (flaggedCount === gameState.board[y][x].neighborMines && unknownCells.length > 0) {
+            unknownCells.forEach(pos => {
+              const cell = getCellElement(pos.x, pos.y);
+              cell.classList.add('highlight-safe');
+              
+              // İpucu için potansiyel hamle ekle
+              if (!gameState.hints.some(hint => hint.x === pos.x && hint.y === pos.y)) {
+                gameState.hints.push({
+                  x: pos.x,
+                  y: pos.y,
+                  type: 'safe',
+                  message: `(${pos.x+1},${pos.y+1}) pozisyonundaki hücre güvenlidir, açabilirsiniz.`
+                });
+              }
+            });
+          }
+          
+          // Bilinmeyen sayısı, kalan mayın sayısına eşitse, hepsi mayındır
+          const remainingMines = gameState.board[y][x].neighborMines - flaggedCount;
+          if (remainingMines > 0 && unknownCells.length === remainingMines) {
+            unknownCells.forEach(pos => {
+              const cell = getCellElement(pos.x, pos.y);
+              cell.classList.add('highlight-mine');
+              
+              // İpucu için potansiyel hamle ekle
+              if (!gameState.hints.some(hint => hint.x === pos.x && hint.y === pos.y)) {
+                gameState.hints.push({
+                  x: pos.x,
+                  y: pos.y,
+                  type: 'mine',
+                  message: `(${pos.x+1},${pos.y+1}) pozisyonundaki hücre mayındır, bayrakla işaretleyebilirsiniz.`
+                });
+              }
+            });
+          }
+        }
+      }
+    }
+    
+    // Bir sayının etrafındaki hücreleri aç (çift tıklama)
+    function chordCells(x, y) {
+      // Hücrenin açılmış ve sayı olması gerekiyor
+      if (!gameState.board[y][x].isRevealed || gameState.board[y][x].neighborMines === 0) {
+        return;
+      }
+      
+      // Etraftaki bayrak sayısını hesapla
+      let flaggedCount = 0;
+      let cellsToReveal = [];
+      
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          
+          const nx = x + dx;
+          const ny = y + dy;
+          
+          if (nx >= 0 && nx < gameState.width && ny >= 0 && ny < gameState.height) {
+            if (gameState.board[ny][nx].isFlagged) {
+              flaggedCount++;
+            } else if (!gameState.board[ny][nx].isRevealed) {
+              cellsToReveal.push({x: nx, y: ny});
+            }
+          }
+        }
+      }
+      
+      // Bayraklar sayıya eşitse etraftaki hücreleri aç
+      if (flaggedCount === gameState.board[y][x].neighborMines) {
+        cellsToReveal.forEach(pos => {
+          revealCell(pos.x, pos.y);
+        });
+      }
+    }
+    
+    // İpucu göster
+    function showHint() {
+      if (gameState.firstClick) {
+        hintText.textContent = "Oyuna başlamak için herhangi bir hücreye tıklayın.";
+        hintModal.show();
+        return;
+      }
+      
+      if (gameState.hints.length === 0) {
+        hintText.textContent = "Şu anda verebileceğim bir ipucu yok. Biraz daha ilerlemeyi deneyin.";
+        hintModal.show();
+        return;
+      }
+      
+      // Rastgele bir ipucu seç
+      const randomHint = gameState.hints[Math.floor(Math.random() * gameState.hints.length)];
+      hintText.textContent = randomHint.message;
+      
+      // İpucunu göster butonu
+      showHintBtn.onclick = function() {
+        const cell = getCellElement(randomHint.x, randomHint.y);
+        cell.classList.add('highlight-hint');
+        
+        // 3 saniye sonra vurgulamayı kaldır
+        setTimeout(() => {
+          cell.classList.remove('highlight-hint');
+        }, 3000);
+        
+        hintModal.hide();
+      };
+      
+      hintModal.show();
+      gameState.hintUsed = true;
+    }
+    
+    // Oyun sonu
+    function gameOver(isWin) {
+      gameState.gameOver = true;
+      clearInterval(gameState.timerInterval);
+      
+      // Tüm mayınları ve yanlış bayrakları göster
+      if (!isWin) {
+        for (let y = 0; y < gameState.height; y++) {
+          for (let x = 0; x < gameState.width; x++) {
+            const cell = getCellElement(x, y);
+            
+            if (gameState.board[y][x].isMine && !gameState.board[y][x].isFlagged) {
+              // Açılmamış mayınları göster
+              cell.classList.add('revealed');
+              cell.innerHTML = '<i class="fas fa-bomb"></i>';
+            } else if (gameState.board[y][x].isFlagged && !gameState.board[y][x].isMine) {
+              // Yanlış bayrakları göster
+              cell.classList.add('revealed');
+              cell.innerHTML = '<i class="fas fa-times text-danger"></i>';
+            }
+          }
+        }
+      } else {
+        // Kazandıysa tüm mayınlara bayrak koy
+        for (let y = 0; y < gameState.height; y++) {
+          for (let x = 0; x < gameState.width; x++) {
+            if (gameState.board[y][x].isMine && !gameState.board[y][x].isFlagged) {
+              const cell = getCellElement(x, y);
+              cell.classList.add('flagged');
+              cell.innerHTML = '<i class="fas fa-flag"></i>';
+            }
+          }
+        }
+        gameState.minesMarked = gameState.mines;
+        updateMineCounter();
+      }
+      
+      // Sonuç ekranını göster
+      modalTitle.textContent = isWin ? 'Tebrikler!' : 'Oyun Bitti!';
+      winMessage.style.display = isWin ? 'block' : 'none';
+      loseMessage.style.display = isWin ? 'none' : 'block';
+      
+      // Sonuç istatistiklerini göster
+      resultTime.textContent = formatTime(gameState.timer);
+      
+      switch (gameState.difficulty) {
+        case 'beginner':
+          resultDifficulty.textContent = 'Kolay';
+          break;
+        case 'intermediate':
+          resultDifficulty.textContent = 'Orta';
+          break;
+        case 'expert':
+          resultDifficulty.textContent = 'Uzman';
+          break;
+      }
+      
+      resultMines.textContent = gameState.mines;
+      
+      // Modalı göster
+      resultModal.show();
+    }
+    
+    // Zamanlayıcıyı başlat
+    function startTimer() {
+      gameState.timerInterval = setInterval(() => {
+        gameState.timer++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+    
+    // Zamanlayıcıyı güncelle
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(gameState.timer);
+    }
+    
+    // Mayın sayacını güncelle
+    function updateMineCounter() {
+      const minesLeft = gameState.mines - gameState.minesMarked;
+      minesLeftDisplay.textContent = minesLeft;
+    }
+    
+    // Zamanı formatla
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      seconds = seconds % 60;
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Hücre elementini bul
+    function getCellElement(x, y) {
+      return document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+    }
+    
+    // Yardım panelini aç/kapat
+    function toggleHelpPanel() {
+      helpPanel.classList.toggle('hidden');
+    }
+    
+    // Event Listeners
+    newGameBtn.addEventListener('click', initGame);
+    newGameModalBtn.addEventListener('click', () => {
+      resultModal.hide();
+      initGame();
+    });
+    
+    difficultySelect.addEventListener('change', initGame);
+    
+    helpBtn.addEventListener('click', toggleHelpPanel);
+    closeHelpBtn.addEventListener('click', toggleHelpPanel);
+    
+    highlightSuggestions.addEventListener('change', () => {
+      if (highlightSuggestions.checked && !gameState.firstClick) {
+        highlightSafeCells();
+      } else {
+        // Vurgulamaları kaldır
+        const allCells = document.querySelectorAll('.cell');
+        allCells.forEach(cell => {
+          cell.classList.remove('highlight-safe', 'highlight-mine');
+        });
+      }
+    });
+    
+    hintBtn.addEventListener('click', showHint);
+    
+    // İpucu modu için CSS
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .highlight-safe {
+        position: relative;
+      }
+      
+      .highlight-safe:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(46, 204, 113, 0.5);
+        pointer-events: none;
+        animation: pulse 1.5s infinite;
+      }
+      
+      .highlight-mine {
+        position: relative;
+      }
+      
+      .highlight-mine:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(231, 76, 60, 0.5);
+        pointer-events: none;
+        animation: pulse 1.5s infinite;
+      }
+      
+      .highlight-hint {
+        position: relative;
+        z-index: 10;
+      }
+      
+      .highlight-hint:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(241, 196, 15, 0.7);
+        pointer-events: none;
+        animation: pulse 1.5s infinite;
+        z-index: -1;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // İlk yükleme
+    initGame();
+  });
+</script>
 {% endblock %}
 
 {% block extra_js %}
