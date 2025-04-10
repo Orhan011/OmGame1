@@ -714,6 +714,7 @@ def n_back():
 # 2048 Oyunu
 @app.route('/2048')
 def game_2048_redirect():
+    # Redirect to the proper /games/2048 route
     return redirect(url_for('game_2048'))
 
 @app.route('/games/2048')
@@ -723,7 +724,8 @@ def game_2048():
 # Wordle Oyunu
 @app.route('/wordle')
 def wordle_redirect():
-    return redirect(url_for('wordle', _external=False))
+    # Fix the redirect to go to the proper 'games/wordle' route
+    return redirect(url_for('wordle'))
 
 @app.route('/games/wordle')
 def wordle():
@@ -733,6 +735,7 @@ def wordle():
 # Satranç Oyunu
 @app.route('/chess')
 def chess_redirect():
+    # Redirect to the /games/chess route
     return redirect(url_for('chess'))
 
 @app.route('/games/chess')
@@ -759,6 +762,7 @@ def simon_says():
 @app.route('/tetris')
 def tetris_redirect():
     """Tetris oyununa yönlendirme"""
+    # Redirect to the proper /games/tetris route
     return redirect(url_for('tetris'))
 
 @app.route('/games/tetris')
@@ -790,7 +794,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Minesweeper rotası routes.py'da tanımlandı
+# Mayın Tarlası Oyunu
+@app.route('/games/minesweeper')
+def minesweeper():
+    """Mayın Tarlası: Mantık ve strateji oyunu
+    Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
+    return render_template('games/minesweeper.html')
 
 @app.route('/games/color-match')
 def color_match_game():
@@ -806,6 +815,7 @@ def math_challenge():
 
 @app.route('/snake')
 def snake_redirect():
+    # Redirect to the proper /games/snake route
     return redirect(url_for('snake_game'))
 
 @app.route('/games/snake')
@@ -847,7 +857,7 @@ def solitaire():
     Kartları uygun şekilde sıralayarak stratejik düşünme ve planlama becerilerinizi geliştirin."""
     return render_template('games/solitaire.html')
 
-# Minesweeper rotası artık routes.py dosyasında tanımlanmıştır
+# Minesweeper rotası yukarıda tanımlanmıştır
 
 @app.route('/all-games')
 def all_games():
