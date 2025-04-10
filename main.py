@@ -804,7 +804,13 @@ def snake_game():
 
 
 # Pattern Flow oyunu kaldırıldı
-# Tüm Oyunlar Sayfası
+# Modern Puzzle oyunu
+@app.route('/games/modern-puzzle')
+def modern_puzzle():
+    """Modern Puzzle: Görsel ve zihinsel bulmaca
+    Görsel dikkat ve mekansal becerileri geliştiren modern tasarımlı puzzle oyunu."""
+    return render_template('games/modern_puzzle.html')
+
 @app.route('/all-games')
 def all_games():
     return render_template('all_games.html')
