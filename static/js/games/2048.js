@@ -1203,7 +1203,32 @@ class ModernMergePuzzle {
         };
         
         // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
-        saveScoreAndDisplay('2048', this.score, playtime, difficulty, gameStats, updateScoreDisplay);
+        if (typeof saveScoreAndDisplay === 'function') {
+            saveScoreAndDisplay('2048', this.score, playtime, difficulty, gameStats, updateScoreDisplay);
+        } else {
+            console.error('saveScoreAndDisplay fonksiyonu bulunamadı');
+            // Alternatif olarak direkt API çağrısı yapabilirsiniz
+            fetch('/api/scores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    game_type: '2048',
+                    score: this.score,
+                    duration_seconds: playtime,
+                    difficulty: difficulty,
+                    game_stats: gameStats
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Score saved:", data);
+                updateScoreDisplay(`<div class="score-message">${data.success ? 'Skorunuz kaydedildi!' : data.message}</div>`, data);
+            })
+            .catch(error => {
+                console.error('Error saving score:', error);
+                updateScoreDisplay(`<div class="score-error">Skor kaydedilirken bir hata oluştu.</div>`, {success: false});
+            });
+        }
     },
     
     // Toplam blok sayısını hesapla
@@ -1236,7 +1261,16 @@ class ModernMergePuzzle {
 
 // Oyunu başlat
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.querySelector('.columns-grid') && document.querySelector('.block-source')) {
+    const columnsGrid = document.querySelector('.columns-grid');
+    const blockSource = document.querySelector('.block-source');
+    
+    if (columnsGrid && blockSource) {
+        console.log("2048 oyunu başlatılıyor...");
         const game = new ModernMergePuzzle();
+    } else {
+        console.error("2048 oyunu başlatılamadı: Gerekli DOM elementleri bulunamadı", {
+            columnsGrid: !!columnsGrid,
+            blockSource: !!blockSource
+        });
     }
 });
