@@ -33,7 +33,7 @@
       </div>
 
       <div id="typing-area" class="typing-area" style="display: none;">
-        <div class="typing-stats">
+        <div class="typing-stats horizontal-stats">
           <div class="stat-item">
             <div class="stat-label">Süre</div>
             <div class="stat-value" id="timer">60</div>
@@ -203,7 +203,41 @@
     overflow: hidden;
     margin-bottom: 15px;
   }
+  
+  .horizontal-stats {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px 10px;
+    height: 50px;
+    max-width: 100%;
+  }
 
+  .horizontal-stats .stat-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    text-align: left;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .horizontal-stats .stat-item:last-child {
+    border-right: none;
+  }
+
+  .horizontal-stats .stat-label {
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .horizontal-stats .stat-value {
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+  
   .stat-item {
     flex: 1;
     padding: 10px 15px;
@@ -404,6 +438,23 @@
 
     .typing-controls {
       flex-direction: column;
+    }
+    
+    .horizontal-stats {
+      height: auto;
+      padding: 5px;
+    }
+    
+    .horizontal-stats .stat-item {
+      padding: 5px 8px;
+    }
+    
+    .horizontal-stats .stat-label {
+      font-size: 0.7rem;
+    }
+    
+    .horizontal-stats .stat-value {
+      font-size: 1rem;
     }
   }
 </style>
