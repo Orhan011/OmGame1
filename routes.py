@@ -23,3 +23,5 @@ def send_welcome_email(email, username):
 
 # routes.py
 # Bu dosya artık kullanılmıyor, yönlendirmeler main.py içerisinde.
+# 2048 oyunu kaldırıldı
+# 2048 API endpoint'i kaldırıldı
