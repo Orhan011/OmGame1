@@ -44,20 +44,14 @@
 
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="typing-section">
-      <div class="game-stats">
-        <div class="stats-squares compact">
-          <div class="stats-square">
-            <div class="stat-label">Süre</div>
-            <div class="stat-value" id="timer">60</div>
-          </div>
-          <div class="stats-square">
-            <div class="stat-label">Yanlış Harf</div>
-            <div class="stat-value" id="error-count">0</div>
-          </div>
-          <div class="stats-square">
-            <div class="stat-label">Doğruluk</div>
-            <div class="stat-value" id="accuracy">100%</div>
-          </div>
+      <div class="game-minimal-stats">
+        <div class="corner-stat left">
+          <div class="corner-stat-value" id="timer">60</div>
+          <div class="corner-stat-label">saniye</div>
+        </div>
+        <div class="corner-stat right">
+          <div class="corner-stat-value" id="error-count">0</div>
+          <div class="corner-stat-label">hata</div>
         </div>
       </div>
 
@@ -77,42 +71,27 @@
       </div>
     </div>
 
-    <!-- Sonuç Ekranı -->
-    <div id="result-screen" class="typing-section">
-      <div class="result-content">
+    <!-- Sonuçlar doğrudan oyun ekranının içinde gösterilecek -->
+    <div id="result-overlay" class="result-overlay">
+      <div class="result-content-minimal">
         <h2><i class="fas fa-trophy"></i> Sonuçlarınız</h2>
-
-        <div class="result-summary">
-          <div class="result-item primary">
-            <div class="result-value" id="result-wpm">0</div>
-            <div class="result-label">Kelime/Dakika</div>
+        
+        <div class="result-summary-minimal">
+          <div class="result-minimal-row">
+            <span class="result-minimal-label">Kelime/Dakika:</span>
+            <span class="result-minimal-value" id="result-wpm">0</span>
           </div>
-          <div class="result-item primary">
-            <div class="result-value" id="result-accuracy">100%</div>
-            <div class="result-label">Doğruluk</div>
+          <div class="result-minimal-row">
+            <span class="result-minimal-label">Doğruluk:</span>
+            <span class="result-minimal-value" id="result-accuracy">100%</span>
           </div>
-        </div>
-
-        <div class="result-details">
-          <div class="detail-row">
-            <div class="detail-label">Toplam Karakter:</div>
-            <div class="detail-value" id="result-chars">0</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">Doğru Karakter:</div>
-            <div class="detail-value" id="result-correct">0</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">Hatalı Karakter:</div>
-            <div class="detail-value" id="result-errors">0</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-label">Kullanılan Süre:</div>
-            <div class="detail-value" id="result-time">0</div>
+          <div class="result-minimal-row">
+            <span class="result-minimal-label">Hatalı Karakter:</span>
+            <span class="result-minimal-value" id="result-errors">0</span>
           </div>
         </div>
-
-        <div class="result-actions">
+        
+        <div class="result-minimal-actions">
           <button id="try-again-btn" class="typing-btn primary-btn">
             <i class="fas fa-redo-alt"></i> Tekrar Dene
           </button>
@@ -228,71 +207,109 @@
 }
 
 /* Oyun Ekranı */
-.game-stats {
-  display: flex;
-  background: rgba(30, 30, 60, 0.5);
-  border-radius: 10px;
-  overflow: hidden;
+.game-minimal-stats {
+  position: relative;
+  width: 100%;
+  height: 50px;
   margin-bottom: 20px;
 }
 
-.stats-squares {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .stats-squares.compact {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 10px;
-    margin-bottom: 15px;
-    width: 100%;
-    overflow-x: auto;
-    padding: 5px 0;
-  }
+.corner-stat {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(30, 30, 60, 0.7);
+  border-radius: 8px;
+  padding: 8px 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 80px;
+  z-index: 10;
+}
 
-  .stats-square {
-    background: rgba(30, 30, 60, 0.7);
-    border-radius: 10px;
-    padding: 12px 15px;
-    width: 110px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-  }
-  
-  .stats-squares.compact .stats-square {
-    padding: 8px;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+.corner-stat.left {
+  left: 0;
+  top: 0;
+}
 
-  .stats-square:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    border-color: rgba(106, 90, 224, 0.3);
-  }
+.corner-stat.right {
+  right: 0;
+  top: 0;
+}
 
-  .stats-square .stat-label {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 5px;
-  }
+.corner-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
 
-  .stats-square .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
-  }
+.corner-stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Sonuç Overlay Stili */
+.result-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 40, 0.9);
+  z-index: 100;
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+}
+
+.result-content-minimal {
+  background: rgba(30, 30, 60, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(106, 90, 224, 0.3);
+  text-align: center;
+}
+
+.result-summary-minimal {
+  margin: 25px 0;
+}
+
+.result-minimal-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-minimal-row:last-child {
+  border-bottom: none;
+}
+
+.result-minimal-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  text-align: left;
+}
+
+.result-minimal-value {
+  font-weight: 600;
+  color: var(--accent-color);
+  font-size: 1.1rem;
+}
+
+.result-minimal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
 
 
 .text-display {
@@ -515,34 +532,27 @@
     flex-direction: column;
   }
 
-  .stats-squares {
-      flex-direction: row;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-    
-    .stats-squares.compact {
-      gap: 6px;
-    }
-
-    .stats-square {
-      padding: 8px 10px;
-      width: 90px;
-    }
-    
-    .stats-squares.compact .stats-square {
-      width: 70px;
-      height: 70px;
-      padding: 6px;
-    }
-
-    .stats-square .stat-label {
-      font-size: 0.7rem;
-    }
-
-    .stats-square .stat-value {
-      font-size: 1.2rem;
-    }
+  .corner-stat {
+    padding: 5px 10px;
+    min-width: 60px;
+  }
+  
+  .corner-stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .corner-stat-label {
+    font-size: 0.6rem;
+  }
+  
+  .result-content-minimal {
+    padding: 20px 15px;
+  }
+  
+  .result-minimal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 </style>
 
@@ -697,9 +707,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function showScreen(screen) {
     introScreen.classList.remove('active');
     gameScreen.classList.remove('active');
-    resultScreen.classList.remove('active');
 
     screen.classList.add('active');
+    
+    // Sonuç overlay'ını gizle (eğer görünüyorsa)
+    const resultOverlay = document.getElementById('result-overlay');
+    if (resultOverlay) {
+      resultOverlay.style.display = 'none';
+    }
   }
 
   // Zamanlayıcıyı başlat
@@ -754,19 +769,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sonuç ekranını güncelle
     resultWpm.textContent = wpm;
     resultAccuracy.textContent = `${accuracy}%`;
-    resultChars.textContent = totalTyped;
-    resultCorrect.textContent = correctTyped;
     resultErrors.textContent = errorCount;
-
-    // Kullanılan süreyi biçimlendir
-    const timeUsed = formatTime(timeLimit - timeLeft);
-    resultTime.textContent = timeUsed;
 
     // Skoru kaydet
     saveScore(wpm);
 
-    // Sonuç ekranını göster
-    showScreen(resultScreen);
+    // Sonuç overlay'ını göster
+    const resultOverlay = document.getElementById('result-overlay');
+    resultOverlay.style.display = 'flex';
+    
+    // Try Again butonuna event listener ekle
+    document.getElementById('try-again-btn').addEventListener('click', function() {
+      resultOverlay.style.display = 'none';
+      initTest();
+    });
   }
 
   // Zamanı biçimlendir
