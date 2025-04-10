@@ -790,7 +790,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Minesweeper artık routes.py'da tanımlandı
+# Minesweeper rotası routes.py'da tanımlandı
 
 @app.route('/games/color-match')
 def color_match_game():
