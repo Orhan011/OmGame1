@@ -10,9 +10,9 @@
       <p class="game-description">Görsel bulmaca oyunu</p>
     </div>
 
-    <div class="game-dashboard">
+    <div class="game-dashboard fullscreen-dashboard">
       <!-- Oyun alanı -->
-      <div class="game-area-panel">
+      <div class="game-area-panel fullwidth">
         <div class="game-container">
           <!-- Başlangıç ekranı -->
           <div id="start-screen" class="game-screen">
@@ -201,83 +201,8 @@
         </div>
       </div>
       
-      <!-- Sağ panel - İstatistikler ve İpuçları -->
-      <div class="game-info-panel">
-        <!-- Oyuncu istatistikleri -->
-        <div class="player-stats-panel">
-          <h3><i class="fas fa-chart-line"></i> İstatistikleriniz</h3>
-          
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-              <div class="stat-content">
-                <div class="stat-value" id="best-score">0</div>
-                <div class="stat-label">En Yüksek Skor</div>
-              </div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-puzzle-piece"></i></div>
-              <div class="stat-content">
-                <div class="stat-value" id="total-played">0</div>
-                <div class="stat-label">Toplam Oyun</div>
-              </div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-stopwatch"></i></div>
-              <div class="stat-content">
-                <div class="stat-value" id="best-time">00:00</div>
-                <div class="stat-label">En İyi Süre</div>
-              </div>
-            </div>
-            
-            <div class="stat-item">
-              <div class="stat-icon"><i class="fas fa-award"></i></div>
-              <div class="stat-content">
-                <div class="stat-value" id="highest-level">1</div>
-                <div class="stat-label">En Yüksek Seviye</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- İpuçları ve bilgiler -->
-        <div class="tips-panel">
-          <h3><i class="fas fa-lightbulb"></i> İpuçları</h3>
-          
-          <div class="tips-list">
-            <div class="tip-item">
-              <div class="tip-number">1</div>
-              <div class="tip-content">
-                <strong>Köşe parçalarını</strong> önce yerleştirin, ardından kenarları tamamlayın.
-              </div>
-            </div>
-            
-            <div class="tip-item">
-              <div class="tip-number">2</div>
-              <div class="tip-content">
-                <strong>Renk gruplarına</strong> dikkat edin, benzer renkli alanları birleştirin.
-              </div>
-            </div>
-            
-            <div class="tip-item">
-              <div class="tip-number">3</div>
-              <div class="tip-content">
-                <strong>Önizleme resmine</strong> bakarak genel kompozisyonu anlayın.
-              </div>
-            </div>
-            
-            <div class="tip-item">
-              <div class="tip-number">4</div>
-              <div class="tip-content">
-                <strong>Daha az hamle</strong> yaparsanız daha yüksek puan alırsınız.
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Menü Butonu -->
+      <!-- Menü Butonu -->
+      <div class="back-btn-container">
         <a href="{{ url_for('all_games') }}" class="back-to-menu-btn">
           <i class="fas fa-th-large"></i> TÜM OYUNLAR
         </a>
@@ -316,23 +241,24 @@
     font-size: 1rem;
   }
   
-  /* Dashboard layout */
-  .game-dashboard {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .game-area-panel {
-    flex: 1;
-    min-width: 320px;
-  }
-  
-  .game-info-panel {
-    width: 320px;
+  /* Full screen dashboard layout */
+  .game-dashboard.fullscreen-dashboard {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+  
+  .game-area-panel.fullwidth {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .back-btn-container {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
   
   /* Oyun Konteyner Stilleri */
