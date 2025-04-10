@@ -1,3 +1,4 @@
+
 {% extends 'layout.html' %}
 {% block title %}Adam Asmaca - Zekapark{% endblock %}
 
@@ -35,45 +36,14 @@
           <div id="word-container"></div>
         </div>
 
-        <div class="keyboard-container">
-          <div class="keyboard-row">
-            <button class="keyboard-key" data-key="q">Q</button>
-            <button class="keyboard-key" data-key="w">W</button>
-            <button class="keyboard-key" data-key="e">E</button>
-            <button class="keyboard-key" data-key="r">R</button>
-            <button class="keyboard-key" data-key="t">T</button>
-            <button class="keyboard-key" data-key="y">Y</button>
-            <button class="keyboard-key" data-key="u">U</button>
-            <button class="keyboard-key" data-key="i">I</button>
-            <button class="keyboard-key" data-key="o">O</button>
-            <button class="keyboard-key" data-key="p">P</button>
-          </div>
-          <div class="keyboard-row">
-            <button class="keyboard-key" data-key="a">A</button>
-            <button class="keyboard-key" data-key="s">S</button>
-            <button class="keyboard-key" data-key="d">D</button>
-            <button class="keyboard-key" data-key="f">F</button>
-            <button class="keyboard-key" data-key="g">G</button>
-            <button class="keyboard-key" data-key="h">H</button>
-            <button class="keyboard-key" data-key="j">J</button>
-            <button class="keyboard-key" data-key="k">K</button>
-            <button class="keyboard-key" data-key="l">L</button>
-          </div>
-          <div class="keyboard-row">
-            <button class="keyboard-key" data-key="z">Z</button>
-            <button class="keyboard-key" data-key="x">X</button>
-            <button class="keyboard-key" data-key="c">C</button>
-            <button class="keyboard-key" data-key="v">V</button>
-            <button class="keyboard-key" data-key="b">B</button>
-            <button class="keyboard-key" data-key="n">N</button>
-            <button class="keyboard-key" data-key="m">M</button>
-            <button class="keyboard-key" data-key="ö">Ö</button>
-            <button class="keyboard-key" data-key="ç">Ç</button>
-            <button class="keyboard-key" data-key="ş">Ş</button>
-            <button class="keyboard-key" data-key="ü">Ü</button>
-            <button class="keyboard-key" data-key="ı">I</button>
-            <button class="keyboard-key" data-key="ğ">Ğ</button>
-          </div>
+        <div class="mobile-input-container">
+          <input type="text" id="letter-input" maxlength="1" placeholder="Harf giriniz" autocomplete="off" autocorrect="off" autocapitalize="characters">
+          <button id="submit-letter" class="primary-button">Tahmin Et</button>
+        </div>
+        
+        <div class="used-letters-container">
+          <h3>Kullanılan Harfler</h3>
+          <div id="used-letters"></div>
         </div>
       </div>
       
@@ -109,8 +79,8 @@
           <h3>Nasıl Oynanır?</h3>
           <ul>
             <li>Tahmin etmeniz gereken gizli bir kelime var</li>
-            <li>Klavyeden bir harf seçerek tahmin yapın</li>
-            <li>Doğru tahminlerde harf yerine yerleşir</li>
+            <li>Kutuya bir harf girerek tahmin yapın</li>
+            <li>Doğru tahminlerde harf yerlerine yerleşir</li>
             <li>Yanlış tahminler için 6 hakkınız var</li>
             <li>Her yanlış tahminde adamın bir parçası çizilir</li>
             <li>Tüm kelimeyi bulmadan adam tamamlanırsa kaybedersiniz</li>
@@ -142,7 +112,7 @@
 </div>
 
 <style>
-/* Hangman Özel Stilleri */
+/* Hangman Modernize Edilmiş Stiller */
 .hangman-game-wrapper {
   max-width: 1200px;
   margin: 0 auto;
@@ -217,62 +187,82 @@
   border-color: transparent;
 }
 
-.keyboard-container {
+/* Mobil giriş stilleri */
+.mobile-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#letter-input {
+  flex-grow: 1;
+  height: 50px;
+  background: rgba(40, 40, 70, 0.5);
+  border: 2px solid rgba(106, 90, 224, 0.3);
+  border-radius: 10px;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 0 15px;
+  outline: none;
+}
+
+#letter-input:focus {
+  border-color: rgba(106, 90, 224, 0.7);
+  box-shadow: 0 0 15px rgba(106, 90, 224, 0.3);
+}
+
+#submit-letter {
+  height: 50px;
+  min-width: 120px;
+}
+
+/* Kullanılan harfler kutusu */
+.used-letters-container {
   background: rgba(20, 20, 35, 0.7);
   border-radius: 15px;
-  padding: 20px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 
               inset 0 0 15px rgba(106, 90, 224, 0.2);
   border: 1px solid rgba(106, 90, 224, 0.2);
 }
 
-.keyboard-row {
-  display: flex;
-  justify-content: center;
+.used-letters-container h3 {
+  margin-top: 0;
   margin-bottom: 10px;
-  flex-wrap: wrap;
-  gap: 5px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.keyboard-key {
-  min-width: 40px;
-  height: 45px;
-  background: rgba(50, 50, 80, 0.7);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+#used-letters {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
-  flex-grow: 1;
-  max-width: 50px;
+  gap: 8px;
 }
 
-.keyboard-key:hover {
-  background: rgba(70, 70, 110, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.used-letter {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.keyboard-key.disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.keyboard-key.correct {
+.used-letter.correct {
   background: rgba(40, 180, 70, 0.3);
-  border-color: rgba(40, 180, 70, 0.5);
+  border: 1px solid rgba(40, 180, 70, 0.5);
 }
 
-.keyboard-key.wrong {
+.used-letter.wrong {
   background: rgba(180, 40, 40, 0.3);
-  border-color: rgba(180, 40, 40, 0.5);
+  border: 1px solid rgba(180, 40, 40, 0.5);
 }
 
 .game-modal {
@@ -370,15 +360,17 @@
     font-size: 1.4rem;
   }
   
-  .keyboard-key {
-    min-width: 30px;
-    height: 40px;
-    font-size: 1rem;
-  }
-  
   .hangman-drawing-container svg {
     width: 250px;
     height: 250px;
+  }
+  
+  .mobile-input-container {
+    flex-direction: column;
+  }
+  
+  #submit-letter {
+    width: 100%;
   }
 }
 
@@ -389,13 +381,6 @@
     font-size: 1.2rem;
   }
   
-  .keyboard-key {
-    min-width: 25px;
-    height: 35px;
-    font-size: 0.9rem;
-    padding: 2px;
-  }
-  
   .hangman-drawing-container svg {
     width: 200px;
     height: 200px;
@@ -404,7 +389,7 @@
 </style>
 
 <script>
-// Adam Asmaca Oyunu JS
+// Adam Asmaca Oyunu JS - Modern Versiyon
 document.addEventListener('DOMContentLoaded', function() {
   // Kelime listesi - zorluk seviyesine göre
   const wordLists = {
@@ -457,7 +442,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // DOM elementleri
   const wordContainer = document.getElementById('word-container');
-  const keyboardKeys = document.querySelectorAll('.keyboard-key');
+  const letterInput = document.getElementById('letter-input');
+  const submitLetterBtn = document.getElementById('submit-letter');
+  const usedLettersContainer = document.getElementById('used-letters');
   const remainingAttemptsElement = document.getElementById('remaining-attempts');
   const scoreElement = document.getElementById('score');
   const difficultyElement = document.getElementById('difficulty');
@@ -488,37 +475,27 @@ document.addEventListener('DOMContentLoaded', function() {
     startNewGame();
   });
 
-  // Klavye tuşları için olay dinleyicileri
-  keyboardKeys.forEach(key => {
-    key.addEventListener('click', function() {
-      if (gameOver || this.classList.contains('disabled')) return;
-      
-      const letter = this.getAttribute('data-key').toUpperCase();
-      handleGuess(letter);
-    });
+  // Harf giriş alanını odakla
+  letterInput.addEventListener('focus', function() {
+    // Mobil klavyede büyük harf kullanımını teşvik et
+    this.setAttribute('inputmode', 'text');
   });
 
-  // Fiziksel klavye dinleyicisi
-  document.addEventListener('keydown', function(event) {
-    if (gameOver) return;
-    
-    // Türkçe harfler ve Latin alfabesi desteklenir
-    const validKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇĞİÖŞÜ';
-    const key = event.key.toUpperCase();
-    
-    if (validKeys.includes(key)) {
-      handleGuess(key);
-      
-      // İlgili klavye tuşunu görsel olarak tıkla
-      keyboardKeys.forEach(keyElement => {
-        if (keyElement.getAttribute('data-key').toUpperCase() === key) {
-          keyElement.classList.add('active');
-          setTimeout(() => {
-            keyElement.classList.remove('active');
-          }, 200);
-        }
-      });
+  // Tahmin gönderme düğmesi
+  submitLetterBtn.addEventListener('click', function() {
+    submitGuess();
+  });
+
+  // Enter tuşuyla da tahmin yapabilme
+  letterInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      submitGuess();
     }
+  });
+
+  // Harf giriş alanında otomatik büyük harfe çevirme
+  letterInput.addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
   });
 
   // Oyunu başlatan fonksiyon
@@ -542,16 +519,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // UI güncelle
     updateWordDisplay();
+    updateUsedLetters();
     updateUI();
     
     // Adam asmaca çizimini sıfırla
     resetHangman();
     
-    // Klavyeyi sıfırla
-    resetKeyboard();
-    
     // Kategoriyi göster
     categoryDisplay.textContent = currentCategory;
+    
+    // Input'u temizle ve odakla
+    letterInput.value = '';
+    letterInput.focus();
   }
 
   // Kelime gösterimini güncelle
@@ -579,19 +558,65 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Kullanılan harfleri göster
+  function updateUsedLetters() {
+    usedLettersContainer.innerHTML = '';
+    
+    // Alfabetik sıraya göre harfleri göster
+    const sortedLetters = [...guessedLetters].sort();
+    
+    sortedLetters.forEach(letter => {
+      const letterElement = document.createElement('span');
+      letterElement.className = 'used-letter';
+      letterElement.textContent = letter;
+      
+      if (currentWord.includes(letter)) {
+        letterElement.classList.add('correct');
+      } else {
+        letterElement.classList.add('wrong');
+      }
+      
+      usedLettersContainer.appendChild(letterElement);
+    });
+  }
+
+  // Tahmin gönderme fonksiyonu
+  function submitGuess() {
+    if (gameOver) return;
+    
+    const letter = letterInput.value.trim().toUpperCase();
+    
+    if (!letter || letter.length !== 1 || !/^[A-ZĞÜŞİÖÇ]$/.test(letter)) {
+      showMessage('Lütfen geçerli bir harf girin!', 'warning');
+      letterInput.value = '';
+      letterInput.focus();
+      return;
+    }
+    
+    handleGuess(letter);
+    
+    // Input'u temizle ve odakla
+    letterInput.value = '';
+    letterInput.focus();
+  }
+
   // Tahmin işleme
   function handleGuess(letter) {
-    if (guessedLetters.includes(letter) || gameOver) return;
+    if (guessedLetters.includes(letter) || gameOver) {
+      showMessage('Bu harfi zaten tahmin ettiniz!', 'warning');
+      return;
+    }
     
     guessedLetters.push(letter);
     
-    // Tuşları güncelle
-    updateKeyboard(letter);
+    // Kullanılan harfleri güncelle
+    updateUsedLetters();
     
     // Doğru tahmin mi?
     if (currentWord.includes(letter)) {
       // Doğru tahmin
       updateWordDisplay();
+      showMessage('Doğru tahmin!', 'success');
       
       // Skor güncelle
       score += 10;
@@ -605,6 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Yanlış tahmin
       remainingAttempts--;
       remainingAttemptsElement.textContent = remainingAttempts;
+      showMessage('Yanlış tahmin!', 'error');
       
       // Adam asmaca çizimini güncelle
       updateHangman();
@@ -614,28 +640,6 @@ document.addEventListener('DOMContentLoaded', function() {
         endGame(false);
       }
     }
-  }
-
-  // Klavyeyi güncelle
-  function updateKeyboard(letter) {
-    keyboardKeys.forEach(key => {
-      if (key.getAttribute('data-key').toUpperCase() === letter) {
-        key.classList.add('disabled');
-        
-        if (currentWord.includes(letter)) {
-          key.classList.add('correct');
-        } else {
-          key.classList.add('wrong');
-        }
-      }
-    });
-  }
-
-  // Klavyeyi sıfırla
-  function resetKeyboard() {
-    keyboardKeys.forEach(key => {
-      key.classList.remove('disabled', 'correct', 'wrong');
-    });
   }
 
   // Adam asmaca çizimini güncelle
@@ -688,22 +692,19 @@ document.addEventListener('DOMContentLoaded', function() {
     score = finalScoreValue;
     scoreElement.textContent = score;
     
-    // DOM elementlerinin var olduğundan emin ol
-    if (gameModal && finalScore) {
-      // Modalı göster
-      gameModal.classList.add('active');
-      finalScore.textContent = score;
-      
-      if (isWon) {
-        resultTitle.textContent = 'Tebrikler!';
-        resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
-      } else {
-        resultTitle.textContent = 'Oyun Bitti';
-        resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
-      }
-      
-      wordReveal.textContent = `Kelime: ${currentWord}`;
+    // Modalı göster
+    gameModal.classList.add('active');
+    finalScore.textContent = score;
+    
+    if (isWon) {
+      resultTitle.textContent = 'Tebrikler!';
+      resultMessage.textContent = 'Kelimeyi başarıyla buldunuz!';
+    } else {
+      resultTitle.textContent = 'Oyun Bitti';
+      resultMessage.textContent = 'Maalesef tüm haklarınızı kullandınız.';
     }
+    
+    wordReveal.textContent = `Kelime: ${currentWord}`;
     
     // Skoru kaydet
     saveScore();
@@ -728,9 +729,32 @@ document.addEventListener('DOMContentLoaded', function() {
     difficultyElement.textContent = displayText;
   }
 
+  // Mesaj gösterir
+  function showMessage(text, type = 'info') {
+    // Mesaj elementi daha önce tanımlanmadığı için oluşturalım
+    let messageContainer = document.getElementById('message-container');
+    
+    if (!messageContainer) {
+      messageContainer = document.createElement('div');
+      messageContainer.id = 'message-container';
+      messageContainer.className = 'message-container';
+      document.querySelector('.game-area-panel').prepend(messageContainer);
+    }
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = `game-message ${type}`;
+    messageElement.textContent = text;
+    
+    messageContainer.innerHTML = '';
+    messageContainer.appendChild(messageElement);
+    
+    setTimeout(() => {
+      messageElement.remove();
+    }, 3000);
+  }
+
   // Skoru kaydet
   function saveScore() {
-    // Oyun süresi ve diğer istatistikleri hesapla
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
