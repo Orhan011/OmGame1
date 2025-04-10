@@ -805,6 +805,42 @@ def snake_game():
 
 # Pattern Flow ve Modern Puzzle oyunları kaldırıldı
 
+# Sudoku
+@app.route('/games/sudoku')
+def sudoku():
+    """Sudoku: Sayı bulmaca oyunu
+    9x9 grid üzerinde her satır, sütun ve 3x3 karede 1-9 arasındaki tüm rakamları yerleştirerek
+    mantık ve problem çözme becerilerinizi geliştirin."""
+    return render_template('games/sudoku.html')
+
+# Tangram
+@app.route('/games/tangram')
+def tangram():
+    """Tangram: Geometrik bulmaca oyunu
+    Farklı geometrik şekilleri birleştirerek belirli formları oluşturun ve mekansal zekânızı geliştirin."""
+    return render_template('games/tangram.html')
+
+# Crossword
+@app.route('/games/crossword')
+def crossword():
+    """Bulmaca: Kelime bulmaca oyunu
+    İpuçlarına göre kelimeleri grid üzerinde yerleştirerek kelime haznenizi ve mantıksal düşünme becerilerinizi geliştirin."""
+    return render_template('games/crossword.html')
+
+# Solitaire
+@app.route('/games/solitaire')
+def solitaire():
+    """Solitaire: Klasik kart oyunu
+    Kartları uygun şekilde sıralayarak stratejik düşünme ve planlama becerilerinizi geliştirin."""
+    return render_template('games/solitaire.html')
+
+# Minesweeper
+@app.route('/games/minesweeper')
+def minesweeper():
+    """Mayın Tarlası: Klasik mantık oyunu
+    Gizli mayınları bulma ve işaretleme stratejisi ile mantıksal düşünme becerilerinizi geliştirin."""
+    return render_template('games/minesweeper.html')
+
 @app.route('/all-games')
 def all_games():
     return render_template('all_games.html')
