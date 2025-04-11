@@ -13,6 +13,30 @@
   max-width: 400px;
 }
 
+/* Mini skor dökümü - seviye tamamlandı mesajı için */
+.mini-breakdown {
+  background: rgba(20, 30, 70, 0.8);
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  max-width: 300px;
+}
+
+.mini-breakdown .score-detail {
+  padding: 4px 8px;
+  margin-bottom: 3px;
+}
+
+.mini-breakdown .detail-label,
+.mini-breakdown .detail-value {
+  font-size: 0.85rem;
+}
+
+.level-complete-message .score-breakdown {
+  border: 1px solid rgba(100, 120, 255, 0.3);
+}
+
 .breakdown-title {
   font-size: 1.1rem;
   color: #fff;
