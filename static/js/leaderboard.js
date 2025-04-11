@@ -1,4 +1,3 @@
-
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard();
@@ -76,7 +75,7 @@ function loadLeaderboard() {
             if (!avatarUrl.startsWith('/')) {
               avatarUrl = '/' + avatarUrl;
             }
-            
+
             // Farklı formatlardaki avatar url'lerini düzelt
             if (avatarUrl.startsWith('/uploads/')) {
               avatarUrl = '/static' + avatarUrl;
@@ -108,8 +107,8 @@ function loadLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
-                ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
+                <div class="player-name ${userNameColorClass}">${player.username ? (player.username.length > 15 ? player.username.substring(0, 15) + '...' : player.username) : 'İsimsiz Oyuncu'}</div>
+                ${player.rank ? `<div class="player-rank">${player.rank.length > 12 ? player.rank.substring(0, 12) + '...' : player.rank}</div>` : ''}
               </div>
             </div>
             <div class="score-cell">
@@ -199,7 +198,7 @@ function loadLevelLeaderboard() {
         const levelA = a.level || 1;
         const levelB = b.level || 1;
         if (levelB !== levelA) return levelB - levelA;
-        
+
         // Seviyeler eşitse, XP'ye göre sırala
         const xpA = a.total_xp || a.experience_points || 0;
         const xpB = b.total_xp || b.experience_points || 0;
@@ -250,7 +249,7 @@ function loadLevelLeaderboard() {
             if (!avatarUrl.startsWith('/')) {
               avatarUrl = '/' + avatarUrl;
             }
-            
+
             // Farklı formatlardaki avatar url'lerini düzelt
             if (avatarUrl.startsWith('/uploads/')) {
               avatarUrl = '/static' + avatarUrl;
@@ -297,11 +296,11 @@ function loadLevelLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${playerData.username}</div>
+                <div class="player-name ${userNameColorClass}">${playerData.username ? (playerData.username.length > 15 ? playerData.username.substring(0, 15) + '...' : playerData.username) : 'İsimsiz Oyuncu'}</div>
                 <div class="player-stats">
                   <span class="level-badge">XP: ${playerData.total_xp}</span>
                   ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}
-                  ${playerData.rank ? `<span class="rank-badge"><i class="fas fa-medal"></i> ${playerData.rank}</span>` : ''}
+                  ${playerData.rank ? `<span class="rank-badge"><i class="fas fa-medal"></i> ${playerData.rank.length > 12 ? playerData.rank.substring(0, 12) + '...' : playerData.rank}</span>` : ''}
                 </div>
                 ${progressBarHTML}
               </div>
