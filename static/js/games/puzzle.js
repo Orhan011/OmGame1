@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Seslerin ön yüklemesi
   const sounds = {
     pickup: new Audio('data:audio/wav;base64,UklGRiQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAEAAD+/wMA+v8IAA8ABgAIABkA9v/o//v/AgAFABQA/P/P/+3/AsAPAAQAyf+h/7T/2//9//H/vf+Z/7P/2P8DAA0A+/+9/8L/x//z/+//zv+//+7/8v/R/7r/qf/E/9X/AwAQAPL/xP/V/+z/6P/1//z/9//f/+X/7v8QAAEA7P/c/9f/vP/R//L/5/++/9D//f8hAAUA0f/a/9X/CQAMAPz/4//X/9//AQD2/x0A9v/3/wMAxf/n/wcAFgACAPP//P8GAAcAAgAHAAEADgAQAAwA+v/5/+L/8/8DABcA+P/6/+X/5P/s/+P/2P/P//j/7f/e/9H/5//1//P/7/8IAAQA+f8QAAwAKQAEAO//9f/l/wMA4//1/wAA3//0//D/BQAUAOv/8v/4/w4ABwAJABIA9v/6/+f/8v/t//n/6f8CAOv/9P/X/9//8//9/+v/4//n//n//f8aAAgABwADAAUA7v/O/9v/8f/2//j/7P/0//3/6//8/wsACgADAPL/6//4/+7/8v/r/+v/+f/5//b//v/9//7/AgACAAAA9v/t//f//v8GAPH/8P/0//T/+P/5//n//f8BAAIA/f/5//j/+f/7//3//v///wEA///9//z//f8AAAMAAQAAAP7//v8AAAEAAQAAAP7//v///wEAAQABAAAA//8AAAAAAAAAAAAAAAAAAAEAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
-    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
+    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
     complete: new Audio('data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQADAAD////////+//////7//v/////////+/////v////////////7////+//////////////7////9////+//5//j/+v/7//v//P/+//7///8AAP////8AAAAA/v///wAAAAD//wAA//8AAP//AQD+/wAAAAACAP//AQD9/wAA//8DAP//AgD8/wEA/v8DAP//AwD7/wEA/f8FAAIABAACAAEA/f8CAAUABQAFAPz/AAD//wMAAwAHAP//AgDy/wIAAQAHAAAA//8OAAoADgAHAAUAEgD//xIACwADAPD/AAD4//H/CAAEABIA7v/x/wYA7//7//X/7f/z/wcA8v/P//T/y/8cAP//LQAaAA0AFgAEAP//z/8MAPL/HQAdACwAEQD7/wQA4P8iAN//EAAtAAQAUQA0AP//8//u//r/5P/z/+j/3//H//b/6v8kAPD/8P8KAOf/FgD3/wEADQDu//j/3//3/w8A6f8PAOv/3v8YAOv/FwD9/wIAAwDv//H/7f8MAAAADwAfAAcAJgA5APj/KwAcAPL/CQASAOf/NQACAPb/9/8CAPL/AwD//xMATABBAEYAKwAWAP3/9P8FAOz/AgDm/wQA5v/W/9z/zf/p//7//v8IAAEABgAEAP7///8GAAQABgAEAP7/AAAGAP//AQAAAP7/AAABAP//AgD//wEAAAD+/wAAAQD//wEA//8BAP//AgAAAP//AAABAP7/AQAAAP//AgAAAP//AAABAP//AwD+/wEA/v8BAP//AgD//wEA//8BAP//AgD//wEAAAD//wEAAAD//wEA//8CAP//AgD//wEA//8BAAAA//8BAAAA//8BAP//AQD//wEA//8BAAAAAAD//wEA//8BAP//AQAAAP//AQAAAP//AQD//wEA//8BAAAAAAAAAAAAAQD//wEA/////wAA//8BAAAAAAD//wAAAAAAAAEA/////wAA//8=')
   };
 
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="100" cy="200" r="40" fill="#4cc9f0"/>
       <circle cx="200" cy="200" r="40" fill="#4d3ee3"/>
     </svg>`,
-    
+
     // Yeni Eklenen Görseller - Manzaralar ve Sanatsal Tasarımlar
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#2c3e50"/>
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Nehir -->
       <path d="M120,300 C150,250 180,230 170,180 C160,130 130,100 130,50 L150,50 C150,100 180,130 190,180 C200,230 170,250 180,300 Z" fill="#3498db"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#1e3c72"/>
       <!-- Deniz -->
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <path d="M20,210 Q35,200 50,210 Q65,220 80,210 Q95,200 110,210" stroke="#fff" fill="none" stroke-width="2"/>
       <path d="M220,230 Q235,220 250,230 Q265,240 280,230" stroke="#fff" fill="none" stroke-width="2"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#005C97"/>
       <!-- Gökyüzü gradyanı -->
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Orman -->
       <path d="M0,300 L0,220 C20,210 40,225 60,215 C80,205 100,220 120,210 C140,200 160,220 180,210 C200,200 220,215 240,205 C260,195 280,210 300,200 L300,300 Z" fill="#003300"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#FEE140"/>
       <!-- Arka plan gradient -->
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="180" cy="240" r="40" fill="rgba(255,255,255,0.5)"/>
       <circle cx="40" cy="200" r="25" fill="rgba(255,255,255,0.6)"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#3A1C71"/>
       <!-- Arkaplan gradient -->
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <line x1="0" y1="150" x2="70" y2="150" stroke="#fff" stroke-width="5"/>
       <line x1="230" y1="150" x2="300" y2="150" stroke="#fff" stroke-width="5"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#000000"/>
       <!-- Gece gökyüzü -->
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="250" cy="50" r="20" fill="#fff"/>
       <circle cx="240" cy="45" r="15" fill="#0D0221"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#111111"/>
       <!-- Uzay arka planı -->
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="80" cy="80" r="15" fill="#7f8c8d"/>
       <circle cx="85" cy="75" r="5" fill="#555555"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#f1c40f"/>
       <!-- Sarı Arka plan -->
@@ -278,20 +278,20 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Gülümseyen Ağız -->
       <path d="M100,180 Q150,220 200,180" stroke="#2c3e50" stroke-width="8" fill="none"/>
     </svg>`,
-    
+
     `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#2ecc71"/>
       <!-- Yeşil Arka plan -->
-      
+
       <!-- Ağaç gövdesi -->
       <rect x="130" y="150" width="40" height="100" fill="#8B4513"/>
-      
+
       <!-- Ağaç tacı -->
       <circle cx="150" cy="120" r="70" fill="#27ae60"/>
       <circle cx="110" cy="100" r="40" fill="#27ae60"/>
       <circle cx="190" cy="100" r="40" fill="#27ae60"/>
       <circle cx="150" cy="70" r="40" fill="#27ae60"/>
-      
+
       <!-- Çiçekler -->
       <circle cx="100" cy="80" r="10" fill="#e74c3c"/>
       <circle cx="130" cy="50" r="8" fill="#f1c40f"/>
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="185" cy="150" r="8" fill="#f1c40f"/>
       <circle cx="115" cy="150" r="9" fill="#e74c3c"/>
       <circle cx="90" cy="120" r="7" fill="#f1c40f"/>
-      
+
       <!-- Çimen -->
       <rect x="0" y="250" width="300" height="50" fill="#27ae60"/>
       <path d="M20,250 L30,230 L40,250" stroke="#27ae60" stroke-width="3" fill="none"/>
@@ -934,20 +934,78 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveScore() {
     // Zorluk seviyesini belirle
     const difficulty = gameState.difficulty.toLowerCase();
-    
+
+    // Gerçekçi puanlama hesaplama
+    const finalScore = calculateRealScore();
+
     // Oyun istatistiklerini hazırla
     const gameStats = {
       moves: gameState.moves,
-      time_remaining: gameState.timeRemaining,
+      wrong_moves: gameState.moves - gameState.correctPlacements,
+      time_spent: 300 - gameState.timeRemaining,
+      hints_used: gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0,
       level: gameState.level,
-      grid_size: gameState.grid.rows + 'x' + gameState.grid.cols
+      grid_size: gameState.grid.rows + 'x' + gameState.grid.cols,
+      completion_time: 300 - gameState.timeRemaining
     };
-    
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('puzzle', gameState.score, 300 - gameState.timeRemaining, difficulty, gameStats, function(html) {
+
+    // Merkezi puan sistemini kullan - hesaplanan yeni puanı gönder
+    saveScoreAndDisplay('puzzle', finalScore, 300 - gameState.timeRemaining, difficulty, gameStats, function(html) {
       // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
       console.log('Score saved successfully');
     });
+  }
+
+  // Gerçekçi puan hesaplama sistemi (10-100 arası)
+  function calculateRealScore() {
+    // Temel parametreler
+    const totalPieces = gameState.grid.rows * gameState.grid.cols;
+    const optimalMoves = totalPieces * 1.5; // Optimal hamle sayısı
+    const optimalTime = 60 + (totalPieces * 5); // Zorluk seviyesine göre optimal süre (saniye)
+    const timeSpent = 300 - gameState.timeRemaining; // Harcanan süre
+    const hintsUsed = gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0; // Kullanılan ipucu tahmini
+
+    // Temel puan - oyun zorluğuna göre
+    let baseScore;
+    if (gameState.difficulty === 'EASY') {
+      baseScore = 60;
+    } else if (gameState.difficulty === 'MEDIUM') {
+      baseScore = 75;
+    } else { // HARD
+      baseScore = 90;
+    }
+
+    // Hamle verimliliği puanı (maksimum 30 puan)
+    let moveEfficiencyScore = 30;
+    if (gameState.moves > optimalMoves) {
+      // Optimal hamle sayısını aşınca puanı azalt
+      moveEfficiencyScore = Math.max(0, moveEfficiencyScore - ((gameState.moves - optimalMoves) / optimalMoves) * 30);
+    }
+
+    // Zaman verimliliği puanı (maksimum 30 puan)
+    let timeEfficiencyScore = 30;
+    if (timeSpent > optimalTime) {
+      // Optimal süreyi aşınca puanı azalt
+      timeEfficiencyScore = Math.max(0, timeEfficiencyScore - ((timeSpent - optimalTime) / optimalTime) * 30);
+    }
+
+    // İpucu cezası (her ipucu 5 puan düşürür)
+    const hintPenalty = hintsUsed * 5;
+
+    // Yanlış hamlelerin cezası (maksimum 15 puan)
+    const wrongMoves = Math.max(0, gameState.moves - gameState.correctPlacements);
+    const wrongMovePenalty = Math.min(15, wrongMoves * 1.5);
+
+    // Toplam puanı hesapla
+    let finalScore = baseScore + moveEfficiencyScore + timeEfficiencyScore - hintPenalty - wrongMovePenalty;
+
+    // Puanı 10-100 aralığına sınırla
+    finalScore = Math.max(10, Math.min(100, Math.round(finalScore)));
+
+    // Sonuç ekranı için puanı kaydet
+    gameState.finalCalculatedScore = finalScore;
+
+    return finalScore;
   }
 
   /**
