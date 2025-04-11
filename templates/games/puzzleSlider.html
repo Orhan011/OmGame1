@@ -2,6 +2,10 @@
 
 {% block title %}Puzzle Slider - OmGame{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container">
@@ -953,22 +957,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru Kaydetme
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'puzzle_slider',
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Zorluk seviyesini belirle
+    let difficulty = 'easy';
+    if (boardSize === 4) difficulty = 'medium';
+    if (boardSize === 5) difficulty = 'hard';
+    
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      board_size: boardSize,
+      elapsed_time: seconds
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('puzzle_slider', score, seconds, difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
     });
   }
   

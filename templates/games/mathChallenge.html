@@ -3,6 +3,10 @@
 
 {% block title %}Matematik Mücadelesi - ZekaPark{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="modernized-game-container">
   <div class="modernized-game-section">
@@ -187,17 +191,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore(finalScore) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_type: 'math_challenge',
-        score: finalScore
-      })
-    })
-    .then(response => response.json())
-    .then(data => console.log('Score saved:', data))
-    .catch(error => console.error('Error saving score:', error));
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('math_challenge', finalScore, timeLeft, 'medium', { level: level }, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
+    });
   }
   
   // Düğme işleyicileri

@@ -2,6 +2,10 @@
 
 {% block title %}Renk Eşleştirme - OmGame{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container">
@@ -952,22 +956,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'color_match',
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      correct_answers: correctAnswers,
+      wrong_answers: wrongAnswers,
+      avg_reaction_time: avgReactionTime
+    };
+    
+    // Zorluk seviyesini belirle
+    let difficulty = 'easy';
+    if (difficultySpeed === 'medium') difficulty = 'medium';
+    if (difficultySpeed === 'fast') difficulty = 'hard';
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('color_match', score, gameTime - timeRemaining, difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
     });
   }
 
