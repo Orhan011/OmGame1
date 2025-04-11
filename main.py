@@ -1210,7 +1210,7 @@ def register():
         else:
             flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
             # E-posta gönderiminde hata olsa bile kullanıcı kaydını tamamla
-            
+
         # Otomatik giriş yap
         session['user_id'] = new_user.id
 
@@ -1336,7 +1336,7 @@ def profile_v2():
 
         user = User.query.get(session['user_id'])
 
-        if not user:
+        if notuser:
             logger.error(f"Kullanıcı bulunamadı: user_id={session['user_id']}")
             flash('Kullanıcı bilgilerinize erişilemedi. Lütfen tekrar giriş yapın.', 'danger')
             return redirect(url_for('logout'))
