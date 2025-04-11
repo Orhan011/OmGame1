@@ -21,18 +21,24 @@ function loadLeaderboard() {
   `;
 
   // Toplam skorları API'den al
-  fetch('/api/scores/aggregated')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+  Promise.all([
+    fetch('/api/scores/aggregated'),
+    fetch('/api/user/levels') // Seviye verilerini getirmek için yeni bir fetch çağrısı
+  ])
+    .then(([scoreResponse, levelResponse]) => {
+      if (!scoreResponse.ok) {
+        throw new Error(`Network response was not ok: ${scoreResponse.status} ${scoreResponse.statusText}`);
       }
-      return response.json();
+      if (!levelResponse.ok) {
+        throw new Error(`Network response was not ok: ${levelResponse.status} ${levelResponse.statusText}`);
+      }
+      return Promise.all([scoreResponse.json(), levelResponse.json()]);
     })
-    .then(data => {
+    .then(([scores, levelData]) => {
       // API yanıtı bir dizi olmalı ve en az bir eleman içermeli
-      const scores = Array.isArray(data) ? data : [];
+      const scoreData = Array.isArray(scores) ? scores : [];
 
-      if (scores.length === 0) {
+      if (scoreData.length === 0) {
         leaderboardContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-trophy"></i>
@@ -48,55 +54,67 @@ function loadLeaderboard() {
           <div class="leaderboard-header-row">
             <div class="rank-header">Sıra</div>
             <div class="player-header">Oyuncu</div>
+            <div class="level-header">Seviye</div>
             <div class="score-header">Toplam Puan</div>
           </div>
           <div class="leaderboard-body">
       `;
 
-      // Her bir skoru tabloya ekle
-      scores.forEach((player, index) => {
-        const rankClass = index < 3 ? `top-${index + 1}` : '';
-        const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+      // Kullanıcı seviyelerini ve puanlarını eşleştirmek için map oluştur
+      const userLevels = {};
+      if (levelData && levelData.levels) {
+        levelData.levels.forEach(item => {
+          userLevels[item.user_id] = item.level;
+        });
+      }
 
-        // Kullanıcı adı renk sınıfı
-        let userNameColorClass = '';
-        if (index === 0) userNameColorClass = 'first-place';
-        else if (index === 1) userNameColorClass = 'second-place';
-        else if (index === 2) userNameColorClass = 'third-place';
-        else if (index < 10) userNameColorClass = 'top-ten';
+      // Her kullanıcı için satır oluştur
+      scoreData.forEach((score, index) => {
+        // Avatar içeriği
+        let avatarContent = '';
 
-        // Avatar URL'ini kontrol et ve düzelt
-        let avatarUrl = player.avatar_url || '';
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
-          avatarUrl = '/' + avatarUrl;
+        // Kullanıcı avatar'ı varsa göster
+        if (score.avatar_url) {
+          avatarContent = `<img src="${score.avatar_url}" alt="${score.username}" class="player-avatar-img">`;
+        } else {
+          // Avatar yoksa kullanıcı adının ilk harfini göster
+          avatarContent = `<span class="avatar-content">${score.username.charAt(0).toUpperCase()}</span>`;
         }
 
-        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-        const isCurrentUser = player.is_current_user || false;
+        // İlk 3 için özel sınıf
+        const topClass = index < 3 ? `top-${index + 1}` : '';
+
+        // Sıra numarası
+        const rankNumber = index + 1;
+
+        // Mevcut kullanıcı ise özel sınıf ekle
+        const currentUserClass = score.is_current_user ? 'current-user' : '';
+
+        // Kullanıcının seviyesi (yoksa 1 göster)
+        const userLevel = userLevels[score.user_id] || 1;
 
         html += `
-          <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
+          <div class="player-row ${topClass} ${currentUserClass}" data-rank="${rankNumber}">
             <div class="rank-cell">
-              <div class="rank-number">${index + 1}</div>
+              <span class="rank-number">${rankNumber}</span>
             </div>
             <div class="player-cell">
               <div class="player-avatar">
-                ${crownHTML}
-                ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                   <span class="avatar-content" style="display:none">${initial}</span>` : 
-                  `<span class="avatar-content">${initial}</span>`
-                }
+                ${avatarContent}
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
-                ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
+                <div class="player-name">${score.username}</div>
+                <div class="player-rank">${score.rank || 'Oyuncu'}</div>
+              </div>
+            </div>
+            <div class="level-cell">
+              <div class="level-badge">
+                <i class="fas fa-star level-icon"></i>
+                <span class="level-number">${userLevel}</span>
               </div>
             </div>
             <div class="score-cell">
-              <div class="score-container">
-                <span class="score-value">${player.total_score || 0}</span>
-              </div>
+              <span class="score-value">${score.total_score.toLocaleString()}</span>
             </div>
           </div>
         `;
@@ -110,11 +128,11 @@ function loadLeaderboard() {
       leaderboardContainer.innerHTML = html;
     })
     .catch(error => {
-      console.error('Skor verileri yüklenirken hata:', error);
+      console.error('Skor veya seviye verileri yüklenirken hata:', error);
       leaderboardContainer.innerHTML = `
         <div class="error">
           <i class="fas fa-exclamation-triangle"></i>
-          <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+          <p>Skorlar veya seviyeler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
           <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
         </div>
       `;

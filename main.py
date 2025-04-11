@@ -2448,3 +2448,36 @@ def get_leaderboard_data(game_type):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+# Kullanıcı Seviyeleri API
+@app.route('/api/users/levels', methods=['POST'])
+def get_user_levels():
+    """Belirli kullanıcıların seviyelerini döndürür"""
+    try:
+        data = request.get_json()
+        if not data or 'user_ids' not in data:
+            return jsonify({'success': False, 'message': 'Kullanıcı ID listesi bulunamadı'}), 400
+        
+        user_ids = data['user_ids']
+        if not user_ids or not isinstance(user_ids, list):
+            return jsonify({'success': False, 'message': 'Geçersiz kullanıcı ID listesi'}), 400
+        
+        # Kullanıcıların XP'lerini ve hesaplanan seviyelerini al
+        user_levels = []
+        for user_id in user_ids:
+            user = User.query.get(user_id)
+            if user:
+                level = calculate_level(user.experience_points)
+                user_levels.append({
+                    'user_id': user.id,
+                    'level': level,
+                    'xp': user.experience_points
+                })
+        
+        return jsonify({
+            'success': True,
+            'levels': user_levels
+        })
+    except Exception as e:
+        logger.error(f"Kullanıcı seviyeleri alınırken hata: {str(e)}")
+        return jsonify({'success': False, 'message': 'İşlem sırasında bir hata oluştu'}), 500
