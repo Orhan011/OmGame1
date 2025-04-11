@@ -1,30 +1,12 @@
-
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
-  loadLeaderboard('all');
-  
-  // Kategori filtreleme butonlarını işle
-  const filterButtons = document.querySelectorAll('.game-filter-btn');
-  if (filterButtons) {
-    filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const gameType = this.dataset.game;
-        
-        // Aktif sınıfını kaldır ve bu butona ekle
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-        
-        // Seçilen oyun türüne göre liderlik tablosunu yükle
-        loadLeaderboard(gameType);
-      });
-    });
-  }
+  loadLeaderboard();
 });
 
 // Skor tablosunu yükleyen fonksiyon
-function loadLeaderboard(gameType = 'all') {
+function loadLeaderboard() {
   const leaderboardContainer = document.getElementById('leaderboardContainer');
-  
+
   if (!leaderboardContainer) {
     console.error('Liderlik tablosu konteyneri bulunamadı!');
     return;
@@ -38,11 +20,8 @@ function loadLeaderboard(gameType = 'all') {
     </div>
   `;
 
-  // API endpoint'i belirleme
-  const apiUrl = gameType === 'all' ? '/api/scores/aggregated' : `/api/scores/${gameType}`;
-
-  // Skorları API'den al
-  fetch(apiUrl)
+  // Toplam skorları API'den al
+  fetch('/api/scores/aggregated')
     .then(response => {
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
@@ -52,7 +31,7 @@ function loadLeaderboard(gameType = 'all') {
     .then(data => {
       // API yanıtı bir dizi olmalı ve en az bir eleman içermeli
       const scores = Array.isArray(data) ? data : [];
-      
+
       if (scores.length === 0) {
         leaderboardContainer.innerHTML = `
           <div class="empty-state">
@@ -91,9 +70,8 @@ function loadLeaderboard(gameType = 'all') {
         if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
           avatarUrl = '/' + avatarUrl;
         }
-        
+
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-        const scoreValue = gameType === 'all' ? player.total_score : player.score;
         const isCurrentUser = player.is_current_user || false;
 
         html += `
@@ -117,7 +95,7 @@ function loadLeaderboard(gameType = 'all') {
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${scoreValue || 0}</span>
+                <span class="score-value">${player.total_score || 0}</span>
               </div>
             </div>
           </div>
@@ -137,39 +115,8 @@ function loadLeaderboard(gameType = 'all') {
         <div class="error">
           <i class="fas fa-exclamation-triangle"></i>
           <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-          <button onclick="loadLeaderboard('${gameType}')" class="retry-button">Tekrar Dene</button>
+          <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
         </div>
       `;
     });
-}
-
-// Toplam skorları hesapla
-function calculateTotalScores(scoresData) {
-  const players = {};
-
-  // Tüm oyun kategorilerini döngüye alarak oyuncuların toplam puanlarını hesapla
-  Object.values(scoresData).forEach(gameScores => {
-    if (Array.isArray(gameScores)) {
-      gameScores.forEach(score => {
-        const playerId = score.user_id;
-        if (!players[playerId]) {
-          players[playerId] = {
-            user_id: playerId,
-            username: score.username,
-            rank: score.rank,
-            avatar_url: score.avatar_url, // Avatar URL'i ekliyoruz
-            total_score: 0,
-            is_current_user: score.is_current_user || false
-          };
-        }
-
-        // Skor değeri kontrol ediliyor ve toplama ekleniyor
-        const scoreValue = parseInt(score.score) || 0;
-        players[playerId].total_score += scoreValue;
-      });
-    }
-  });
-
-  // Oyuncuları diziye dönüştür ve puana göre sırala
-  return Object.values(players).sort((a, b) => b.total_score - a.total_score);
 }

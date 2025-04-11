@@ -842,48 +842,27 @@ document.addEventListener('DOMContentLoaded', function() {
       
       console.log("Wordle skoru kaydediliyor:", score);
       
-      // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
-      if (typeof window.saveScoreAndDisplay === 'function') {
-        try {
-          window.saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, function(scoreHtml, data) {
-            const scoreContainer = document.getElementById('game-score-container');
-            if (scoreContainer) {
-              scoreContainer.innerHTML = scoreHtml;
-            }
-          });
-        } catch (e) {
-          console.error("saveScoreAndDisplay fonksiyonu hatası:", e);
-          // Alternatif yöntemle devam et
-        }
+      // ScoreHandler'ı kullanarak skorları kaydet
+      if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
+        window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
       } else {
-        // Eğer saveScoreAndDisplay fonksiyonu yoksa, doğrudan ScoreHandler'ı kullan
-        if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
-          try {
-            window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
-          } catch (e) {
-            console.error("ScoreHandler.saveScore fonksiyonu hatası:", e);
-          }
-        } else {
-          console.log("Doğrudan API'ye skor gönderiliyor...");
-          
-          // Alternatif olarak doğrudan API'ye gönder
-          fetch('/api/save-score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              game_type: 'wordle',
-              score: score,
-              difficulty: difficulty,
-              playtime: playtime,
-              game_stats: gameStats
-            })
+        // Alternatif olarak doğrudan API'ye gönder
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'wordle',
+            score: score,
+            difficulty: difficulty,
+            playtime: playtime,
+            game_stats: gameStats
           })
-          .then(response => response.json())
-          .then(data => {
-            console.log("Skor başarıyla kaydedildi:", data);
-          })
-          .catch(err => console.error("Skor kaydetme hatası:", err));
-        }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Skor başarıyla kaydedildi:", data);
+        })
+        .catch(err => console.error("Skor kaydetme hatası:", err));
       }
     } catch (e) {
       console.error("saveScoreWithDetails fonksiyonunda hata:", e);

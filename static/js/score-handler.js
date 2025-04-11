@@ -4,9 +4,8 @@
  * Bu modül, oyunlarda kazanılan skorları API'ye göndermek için kullanılır
  */
 
-// Önceden tanımlanmış bir ScoreHandler varsa, onu kullanmaya devam et
-if (!window.ScoreHandler) {
-  window.ScoreHandler = {
+// ScoreHandler nesnesini global olarak tanımlıyoruz
+window.ScoreHandler = {
   /**
    * Oyun skorunu API'ye gönderir
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
