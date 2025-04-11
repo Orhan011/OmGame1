@@ -256,8 +256,49 @@ function loadArticleContent() {
 {% endif %}
 
 <!-- Ana JS dosyaları - lazy load kullanarak gecikmeli yükleme -->
-<script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+    <!-- Skor Yakalama ve Kaydetme Sistemi -->
+    <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
+    <script>
+      // Oyun bittikten sonra puanı yakalamaya çalış
+      document.addEventListener('DOMContentLoaded', function() {
+        // Oyun tamamlandı event listener'ı
+        document.addEventListener('gameCompleted', function(e) {
+          if (e.detail && e.detail.score !== undefined) {
+            const gameType = e.detail.gameType || window.location.pathname.split('/').pop().replace('.html', '');
+            const score = parseInt(e.detail.score);
+            const difficulty = e.detail.difficulty || localStorage.getItem('currentDifficulty') || 'medium';
+            const playtime = e.detail.playtime || 60;
+
+            // Skor kaydetme
+            ScoreHandler.saveScore(gameType, score, difficulty, playtime, e.detail.stats || {});
+          }
+        });
+
+        // Zorluk seviyesi butonlarının event listener'ları
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        difficultyBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const difficulty = this.getAttribute('data-difficulty');
+            localStorage.setItem('currentDifficulty', difficulty);
+
+            // Butonların active class'ını güncelle
+            difficultyBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+
+        // Sayfa yüklendiğinde önceki zorluk seviyesini seç
+        const savedDifficulty = localStorage.getItem('currentDifficulty') || 'medium';
+        const activeDifficultyBtn = document.querySelector(`.difficulty-btn[data-difficulty="${savedDifficulty}"]`);
+        if (activeDifficultyBtn) {
+          activeDifficultyBtn.click();
+        }
+      });
+    </script>
+
+    {% block scripts %}{% endblock %}
 
 <!-- Oyun sayfalarına özel JS dosyaları -->
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
@@ -268,7 +309,6 @@ function loadArticleContent() {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
 {% endif %}
 
-{% block scripts %}{% endblock %}
 
 <!-- iOS Swipe Navigasyon - Touch cihazlar için optimize edildi -->
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}" defer></script>

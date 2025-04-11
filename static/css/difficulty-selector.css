@@ -26,6 +26,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .difficulty-btn:hover {
@@ -38,6 +40,41 @@
   color: white;
   box-shadow: 0 4px 15px rgba(106, 90, 224, 0.4);
   border: none;
+}
+
+.difficulty-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.difficulty-btn:hover::before {
+  left: 100%;
+}
+
+
+.difficulty-btn[data-difficulty="easy"].active {
+  background: linear-gradient(45deg, #4CAF50, #8BC34A);
+}
+
+.difficulty-btn[data-difficulty="medium"].active {
+  background: linear-gradient(45deg, #2196F3, #03A9F4);
+}
+
+.difficulty-btn[data-difficulty="hard"].active {
+  background: linear-gradient(45deg, #FF9800, #FFC107);
+}
+
+.difficulty-btn[data-difficulty="expert"].active {
+  background: linear-gradient(45deg, #F44336, #FF5722);
 }
 
 /* İpucu butonu stilleri */
@@ -126,4 +163,9 @@
 
 .score-summary.guest .btn {
     margin-top: 5px;
+}
+
+/* Difficulty value storage */
+.difficulty-value {
+  display: none;
 }

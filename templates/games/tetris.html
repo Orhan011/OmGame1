@@ -880,6 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let rotateCount = 0;     // Döndürme sayısı
   let hardDropCount = 0;   // Sert düşürme sayısı
   let accuracy = 100;      // Doğruluk yüzdesi (tetris'te varsayılan olarak 100)
+  let totalPieces = 0;    // Toplam yerleştirilen parça sayısı
 
   let player = {
     matrix: null,
@@ -913,6 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
     linesCleared = 0; // Reset lines cleared
     tetrominosPlaced = 0; // Reset placed tetrominos
     baseDropInterval = 1000; // Reset base drop interval
+    totalPieces = 0;       // Reset total pieces
 
     // Reset oyun istatistikleri
     totalMoves = 0;
@@ -1209,22 +1211,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to save score to the server
   function saveGameScore() {
-    // Zorluk seviyesini belirle
-    let difficulty = "medium";
-    if (score > 5000) {
-      difficulty = "hard";
-    } else if (score > 2000) {
-      difficulty = "medium";
-    } else {
-      difficulty = "easy";
-    }
+    // Zorluk seviyesini belirle (şimdilik sabit, daha sonra ayarlanabilir)
+    const difficulty = "medium"; //localStorage.getItem('currentDifficulty') || 'medium';
 
     // Oyun istatistiklerini topla
     const gameStats = {
       level: level,
       lines_cleared: linesCleared,
       tetrominos_placed: tetrominosPlaced,
-      duration_seconds: Math.floor((Date.now() - gameStartTime) / 1000) || 60
+      duration_seconds: Math.floor((Date.now() - gameStartTime) / 1000) || 60,
+      totalPieces: totalPieces
     };
 
     fetch('/api/save-score', {
@@ -1495,6 +1491,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
     tetrominosPlaced++; // Increment placed tetrominos
+    totalPieces++;      // Increment total pieces
   }
 
   // Check for completed lines
@@ -1725,22 +1722,19 @@ function updateScore(points) {
 
 // Oyun bittiğinde puanı kaydet
 function saveGameScore() {
-  // Zorluk seviyesini belirle
-  let difficulty = "medium";
-  if (score > 5000) {
-    difficulty = "hard";
-  } else if (score > 2000) {
-    difficulty = "medium";
-  } else {
-    difficulty = "easy";
-  }
+  // Zorluk seviyesini belirle (şimdilik sabit, daha sonra ayarlanabilir)
+  const difficulty = "medium"; //localStorage.getItem('currentDifficulty') || 'medium';
+
+  // Oyun süresini hesapla
+  const gameDuration = Math.floor((Date.now() - gameStartTime) / 1000) || 60;
 
   // Oyun istatistiklerini topla
   const gameStats = {
     level: level,
     lines_cleared: linesCleared,
     tetrominos_placed: tetrominosPlaced,
-    duration_seconds: Math.floor((Date.now() - gameStartTime) / 1000) || 60
+    duration_seconds: gameDuration,
+    totalPieces: totalPieces
   };
 
   fetch('/api/save-score', {

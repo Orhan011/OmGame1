@@ -42,6 +42,9 @@ const ScoreHandler = {
       }
     }
     
+    // Oyun tipini standartlaştır
+    gameType = this.standardizeGameType(gameType);
+    
     // API isteği verileri
     const data = {
       game_type: gameType,
@@ -124,6 +127,105 @@ const ScoreHandler = {
       case "expert": return 4.0;
       default: return 1.0;
     }
+  },
+  
+  /**
+   * Oyun tipini standartlaştırır
+   * @param {string} gameType - Oyun türü
+   * @return {string} - Standartlaştırılmış oyun türü
+   */
+  standardizeGameType: function(gameType) {
+    // Oyun tiplerini standartlaştırma
+    const gameTypeMap = {
+      // Farklı yazımları standartlaştırma
+      'memory_match': 'memory_match',
+      'memoryMatch': 'memory_match',
+      'memory-match': 'memory_match',
+      'memoryCards': 'memory_match',
+      'memory-cards': 'memory_match',
+      
+      'wordPuzzle': 'word_puzzle',
+      'word-puzzle': 'word_puzzle',
+      'word_puzzle': 'word_puzzle',
+      
+      'numberSequence': 'number_sequence',
+      'number-sequence': 'number_sequence',
+      'number_sequence': 'number_sequence',
+      
+      'tetris': 'tetris',
+      
+      'wordle': 'wordle',
+      
+      'minesweeper': 'minesweeper',
+      'mine-sweeper': 'minesweeper',
+      'mine_sweeper': 'minesweeper',
+      
+      'hangman': 'hangman',
+      
+      'puzzle': 'puzzle',
+      
+      'sudoku': 'sudoku',
+      
+      'chess': 'chess',
+      
+      'colorMatch': 'color_match',
+      'color-match': 'color_match',
+      'color_match': 'color_match',
+      
+      'mathChallenge': 'math_challenge',
+      'math-challenge': 'math_challenge',
+      'math_challenge': 'math_challenge',
+      
+      'typingSpeed': 'typing_speed',
+      'typing-speed': 'typing_speed',
+      'typing_speed': 'typing_speed',
+      
+      'nBack': 'n_back',
+      'n-back': 'n_back',
+      'n_back': 'n_back',
+      
+      'audioMemory': 'audio_memory',
+      'audio-memory': 'audio_memory',
+      'audio_memory': 'audio_memory',
+      
+      'snake': 'snake_game',
+      'snake_game': 'snake_game',
+      'snake-game': 'snake_game',
+      
+      'puzzleSlider': 'puzzle_slider',
+      'puzzle-slider': 'puzzle_slider',
+      'puzzle_slider': 'puzzle_slider',
+      
+      'iqTest': 'iq_test',
+      'iq-test': 'iq_test',
+      'iq_test': 'iq_test',
+      
+      'simonSays': 'simon_says',
+      'simon-says': 'simon_says',
+      'simon_says': 'simon_says',
+      
+      'numberChain': 'number_chain',
+      'number-chain': 'number_chain',
+      'number_chain': 'number_chain',
+      
+      'labyrinth': 'labyrinth',
+      '3dLabyrinth': 'labyrinth',
+      '3d-labyrinth': 'labyrinth',
+      '3d_labyrinth': 'labyrinth',
+      
+      'tangram': 'tangram',
+      
+      'brainGym': 'brain_gym',
+      'brain-gym': 'brain_gym',
+      'brain_gym': 'brain_gym',
+      
+      'crossword': 'crossword',
+      
+      'solitaire': 'solitaire'
+    };
+    
+    // Eğer oyun tipi eşleşme tablosunda varsa standartlaştırılmış ismi döndür
+    return gameTypeMap[gameType] || gameType;
   }
 };
 
