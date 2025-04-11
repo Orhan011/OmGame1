@@ -1,0 +1,71 @@
+
+/* Zorluk seviyesi seçici stilleri */
+.difficulty-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.difficulty-selector span {
+  color: var(--secondary-text, #a8a8b3);
+  font-weight: 500;
+}
+
+.difficulty-btn {
+  padding: 6px 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--secondary-text, #b8b8c8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.difficulty-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.difficulty-btn.active {
+  background: linear-gradient(135deg, var(--primary-color, #6a5ae0), var(--secondary-color, #a579ff));
+  color: white;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.4);
+  border: none;
+}
+
+/* İpucu butonu stilleri */
+.hint-container {
+  margin-top: 15px;
+}
+
+#hint-button {
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: rgba(255, 217, 0, 0.2);
+  color: #ffcc00;
+  border: 1px solid rgba(255, 217, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#hint-button:hover {
+  background: rgba(255, 217, 0, 0.3);
+}
+
+/* Duyarlı tasarım ayarlamaları */
+@media (max-width: 768px) {
+  .difficulty-selector {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .difficulty-btn {
+    width: 80%;
+    margin: 2px 0;
+  }
+}

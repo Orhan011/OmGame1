@@ -9,7 +9,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center">Wordle</h1>
-  
+
   <div class="game-stats-container">
     <div class="game-stat-item">
       <i class="fas fa-trophy"></i>
@@ -209,7 +209,7 @@
     transition: all 0.3s ease;
     position: relative;
   }
-  
+
   .wordle-cell input {
     position: absolute;
     top: 0;
@@ -247,7 +247,7 @@
     border-color: rgba(100, 100, 150, 0.15);
     color: rgba(255, 255, 255, 0.5);
   }
-  
+
   .wordle-cell.current {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
@@ -290,7 +290,7 @@
     justify-content: center;
     gap: 10px;
   }
-  
+
   .control-buttons .btn {
     min-width: 100px;
     padding: 8px 15px;
@@ -344,10 +344,43 @@
       font-size: 1.3rem;
     }
   }
+
+  /* Difficulty Selector */
+  .difficulty-selector {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .difficulty-selector button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .difficulty-selector button.active {
+    background-color: #007bff;
+    color: white;
+  }
+
+  /* Hint Container */
+  .hint-container {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .hint-container button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 </style>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
 {% endblock %}

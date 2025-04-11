@@ -78,7 +78,7 @@
 
         <div class="tetris-board-container">
           <canvas id="tetris-canvas" width="300" height="600"></canvas>
-          
+
           <div id="tetris-overlay" class="tetris-overlay">
             <div class="tetris-overlay-content" id="pause-overlay" style="display: none;">
               <h2><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h2>
@@ -87,7 +87,7 @@
                 <i class="fas fa-play me-2"></i>Devam Et
               </button>
             </div>
-            
+
             <div class="tetris-overlay-content" id="game-start-overlay">
               <h2>Tetris</h2>
               <p>Klasik Tetris oyununa hoş geldiniz!</p>
@@ -96,14 +96,14 @@
                 <i class="fas fa-play me-2"></i>Oyuna Başla
               </button>
             </div>
-            
+
             <div class="tetris-overlay-content" id="game-over-overlay" style="display: none;">
               <h2><i class="fas fa-trophy me-2"></i>Oyun Bitti!</h2>
               <div class="tetris-final-score">
                 <div class="tetris-final-score-label">Final Skoru</div>
                 <div class="tetris-final-score-value" id="final-score">0</div>
               </div>
-              
+
               <!-- XP ve Seviye Bilgisi -->
               <div class="tetris-xp-info" style="display: none;">
                 <div class="tetris-xp-gain">
@@ -115,7 +115,7 @@
                   <div class="tetris-level-value" id="current-level">1</div>
                 </div>
               </div>
-              
+
               <!-- Misafir kullanıcı bilgilendirme -->
               <div id="guest-info" class="guest-info" style="display: none;">
                 <p class="guest-message"><i class="fas fa-info-circle me-2"></i>Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
@@ -128,7 +128,7 @@
                   </a>
                 </div>
               </div>
-              
+
               <button id="play-again" class="btn btn-primary btn-lg mt-3">
                 <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
               </button>
@@ -137,7 +137,7 @@
               </a>
             </div>
           </div>
-          
+
           <!-- Mobile touch controls -->
           <div class="touch-controls" id="touch-controls" style="display: none;">
             <button class="touch-control-btn" id="touch-left">
@@ -345,7 +345,7 @@
     font-weight: 700;
     color: var(--accent-color);
   }
-  
+
   /* XP Info styling */
   .tetris-xp-info {
     background: rgba(40, 40, 80, 0.5);
@@ -357,30 +357,30 @@
     gap: 12px;
     justify-content: space-between;
   }
-  
+
   .tetris-xp-gain, .tetris-level-info {
     flex: 1;
     min-width: 100px;
   }
-  
+
   .tetris-xp-gain-label, .tetris-level-label {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 5px;
   }
-  
+
   .tetris-xp-gain-value {
     font-size: 1.6rem;
     font-weight: 700;
     color: #ffc107; /* Gold color for XP */
   }
-  
+
   .tetris-level-value {
     font-size: 1.6rem;
     font-weight: 700;
     color: #8BC34A; /* Green color for level */
   }
-  
+
   /* Bonus details styling */
   .tetris-bonus-details {
     margin-top: 10px;
@@ -393,27 +393,27 @@
     border-radius: 8px;
     padding: 10px;
   }
-  
+
   .tetris-bonus-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .tetris-bonus-item span {
     color: rgba(255, 255, 255, 0.7);
   }
-  
+
   .tetris-bonus-item strong {
     font-weight: 600;
     color: #a890ff;
   }
-  
+
   /* Bonus types */
   .daily-bonus strong {
     color: #FFD54F; /* Amber color for daily bonus */
   }
-  
+
   .streak-bonus strong {
     color: #FF7043; /* Deep Orange for streak bonus */
   }
@@ -423,25 +423,25 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  
+
   @keyframes scaleUp {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
-  
+
   @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
-  
+
   @keyframes levelUpAnimation {
     0% { transform: translateY(20px); opacity: 0; }
     20% { transform: translateY(-10px); opacity: 1; }
     80% { transform: translateY(-10px); opacity: 1; }
     100% { transform: translateY(-30px); opacity: 0; }
   }
-  
+
   /* Misafir kullanıcı bilgilendirme */
   .guest-info {
     background: rgba(40, 40, 80, 0.5);
@@ -451,13 +451,13 @@
     transition: all 0.3s ease;
     border: 1px solid rgba(106, 90, 224, 0.3);
   }
-  
+
   .guest-message {
     color: #FFC107;
     font-size: 0.95rem;
     margin-bottom: 10px;
   }
-  
+
   .guest-message-api {
     color: #4CAF50;
     font-size: 0.9rem;
@@ -466,34 +466,34 @@
     border-radius: 8px;
     margin-top: 12px;
   }
-  
+
   .guest-buttons {
     display: flex;
     gap: 10px;
     justify-content: center;
     margin-top: 8px;
   }
-  
+
   /* Giriş vurgulama sınıfı */
   .highlight-login {
     background: rgba(106, 90, 224, 0.2);
     border: 2px solid rgba(106, 90, 224, 0.5);
     animation: pulse-border 1.5s infinite;
   }
-  
+
   /* Giriş butonları animasyonu */
   .animate-buttons .btn {
     animation: pulse-buttons 1.5s infinite;
     transform-origin: center;
   }
-  
+
   /* Buton animasyonu için keyframes */
   @keyframes pulse-buttons {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(106, 90, 224, 0.7); }
     100% { transform: scale(1); }
   }
-  
+
   /* Kenarlık animasyonu için keyframes */
   @keyframes pulse-border {
     0% { border-color: rgba(106, 90, 224, 0.3); }
@@ -520,29 +520,29 @@
   .tetris-overlay-content {
     animation: scaleUp 0.3s ease-out;
   }
-  
+
   /* Score value animation */
   .score-update {
     animation: pulse 0.3s ease-out;
   }
-  
+
   /* Tetris grid lines */
   .grid-line {
     position: absolute;
     background-color: rgba(200, 200, 255, 0.05);
     z-index: 1;
   }
-  
+
   .grid-horizontal {
     height: 1px;
     width: 100%;
   }
-  
+
   .grid-vertical {
     width: 1px;
     height: 100%;
   }
-  
+
   /* Controls enhancement */
   .tetris-key {
     background: rgba(106, 90, 224, 0.3);
@@ -555,7 +555,7 @@
     transition: all 0.2s ease;
     border: 1px solid rgba(106, 90, 224, 0.3);
   }
-  
+
   .tetris-key:hover {
     background: rgba(106, 90, 224, 0.6);
     transform: translateY(-2px);
@@ -567,82 +567,82 @@
     .game-container {
       padding: 10px;
     }
-    
+
     .game-header h1 {
       font-size: 1.5rem;
     }
-    
+
     .game-header .badge {
       font-size: 0.8rem;
     }
-    
+
     .game-description {
       font-size: 0.9rem;
     }
-    
+
     .tetris-layout {
       flex-direction: column-reverse;
       align-items: center;
       gap: 15px;
     }
-    
+
     .tetris-info-panel {
       width: 100%;
       max-width: 350px;
     }
-    
+
     .tetris-board-container {
       width: 80vw;
       max-width: 250px;
       height: 160vw;
       max-height: 500px;
     }
-    
+
     .tetris-score-panel, .tetris-next-piece, .tetris-controls, .tetris-help {
       padding: 12px;
     }
-    
+
     .tetris-score-label {
       font-size: 0.9rem;
     }
-    
+
     .tetris-score-value {
       font-size: 1.2rem;
     }
-    
+
     .tetris-next-label {
       font-size: 0.9rem;
     }
-    
+
     .tetris-help-title {
       font-size: 0.9rem;
     }
-    
+
     .tetris-help-items {
       grid-template-columns: 1fr 1fr 1fr;
     }
-    
+
     .tetris-help-item span {
       font-size: 0.8rem;
     }
-    
+
     .tetris-key {
       font-size: 0.75rem;
       padding: 3px 6px;
     }
-    
+
     .tetris-overlay-content h2 {
       font-size: 1.4rem;
     }
-    
+
     .tetris-overlay-content p {
       font-size: 0.85rem;
     }
-    
+
     .tetris-final-score-value {
       font-size: 2rem;
     }
-    
+
     /* Add touchscreen controls for mobile */
     .touch-controls {
       display: flex;
@@ -650,7 +650,7 @@
       gap: 12px;
       margin-top: 15px;
     }
-    
+
     .touch-control-btn {
       width: 50px;
       height: 50px;
@@ -664,37 +664,66 @@
       border: none;
       touch-action: manipulation;
     }
-    
+
     .touch-control-btn:active {
       background: rgba(106, 90, 224, 0.6);
       transform: scale(0.95);
     }
   }
-  
+
   /* Handle Landscape Mobile */
   @media (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
     .tetris-layout {
       flex-direction: row;
       align-items: flex-start;
     }
-    
+
     .tetris-info-panel {
       width: 40%;
       min-width: 200px;
     }
-    
+
     .tetris-board-container {
       width: 50vh;
       height: 90vh;
       max-height: 450px;
     }
-    
+
     .tetris-help-items {
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  /* Difficulty selector styles */
+  .difficulty-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .difficulty-selector span {
+    color: white;
+    font-weight: bold;
+  }
+
+  .difficulty-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .difficulty-btn.active {
+    background-color: #2196F3;
+  }
 </style>
 
+<!-- Skor kaydetme işlevi -->
+<script src="/static/js/score-handler.js"></script>
+
+<!-- Tetris oyunu için JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
@@ -704,23 +733,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const levelElement = document.getElementById('level');
   const linesElement = document.getElementById('lines');
   const finalScoreElement = document.getElementById('final-score');
-  
+
   // Oyun başlangıç zamanını kaydetmek için
   let gameStartTime;
-  
+
   // Canvas boyutlarını ayarla
   if (canvas) {
     canvas.width = 250;
     canvas.height = 500;
   }
-  
+
   const startButton = document.getElementById('start-button');
   const startGameButton = document.getElementById('start-game');
   const pauseGameButton = document.getElementById('pause-game');
   const resetGameButton = document.getElementById('reset-game');
   const resumeGameButton = document.getElementById('resume-game');
   const playAgainButton = document.getElementById('play-again');
-  
+
   const tetrisOverlay = document.getElementById('tetris-overlay');
   const gameStartOverlay = document.getElementById('game-start-overlay');
   const pauseOverlay = document.getElementById('pause-overlay');
@@ -731,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('Gerekli canvas elementleri bulunamadı!');
     return;
   }
-  
+
   // Game Constants
   const ROWS = 20;
   const COLS = 10;
@@ -801,36 +830,36 @@ document.addEventListener('DOMContentLoaded', function() {
       color: '#f00000' // Red
     }
   ];
-  
+
   // Resize canvas based on container size
   function resizeCanvas() {
     const container = document.querySelector('.tetris-board-container');
     if (!container) return;
-    
+
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    
+
     // Calculate block size based on container dimensions
     const blockSizeW = containerWidth / COLS;
     const blockSizeH = containerHeight / ROWS;
-    
+
     // Set canvas dimensions
     canvas.width = containerWidth;
     canvas.height = containerHeight;
-    
+
     // Update drawing scale
     ctx.scale(blockSizeW / BLOCK_SIZE, blockSizeH / BLOCK_SIZE);
-    
+
     // Redraw if game is in progress
     if (!gameOver && !paused) {
       drawBoard();
     }
   }
-  
+
   // Game variables
   const ctx = canvas.getContext('2d');
   const nextCtx = nextPieceCanvas.getContext('2d');
-  
+
   let board = createBoard();
   let animationId = null;
   let gameOver = false;
@@ -840,108 +869,111 @@ document.addEventListener('DOMContentLoaded', function() {
   let lines = 0;
   let dropInterval = 1000; // milliseconds
   let lastDropTime = 0;
-  
+  let linesCleared = 0; //Added to track lines cleared
+
+
   // İstatistikler için oyun verileri
   let totalMoves = 0;      // Toplam hamle sayısı
   let hintCount = 0;       // İpucu kullanma sayısı (tetris'te yok)
   let rotateCount = 0;     // Döndürme sayısı
   let hardDropCount = 0;   // Sert düşürme sayısı
   let accuracy = 100;      // Doğruluk yüzdesi (tetris'te varsayılan olarak 100)
-  
+
   let player = {
     matrix: null,
     pos: {x: 0, y: 0},
     color: ''
   };
-  
+
   let nextPiece = {
     matrix: null,
     color: ''
   };
-  
+
   // Create empty game board
   function createBoard() {
     return Array.from(
       {length: ROWS}, () => Array(COLS).fill(0)
     );
   }
-  
+
   // Initialize the game
   function init() {
     // Reset board
     board = createBoard();
-    
+
     // Reset game variables
     score = 0;
     level = 1;
     lines = 0;
     dropInterval = 1000;
     gameOver = false;
-    
+    linesCleared = 0; // Reset lines cleared
+
     // Reset oyun istatistikleri
     totalMoves = 0;
     hintCount = 0;
     rotateCount = 0;
     hardDropCount = 0;
     accuracy = 100;
-    
+
     // Update UI
     scoreElement.textContent = score;
     levelElement.textContent = level;
     linesElement.textContent = lines;
-    
+
     // Start with a new piece
     resetPlayer();
     getNextPiece();
-    
+
     // Hide overlays
     tetrisOverlay.style.display = 'flex';
     gameStartOverlay.style.display = 'block';
     pauseOverlay.style.display = 'none';
     gameOverOverlay.style.display = 'none';
-    
+
     // Update button states
     pauseGameButton.disabled = true;
-    
+
     // Draw board
     drawBoard();
   }
-  
+
   // Start the game
   function startGame() {
     // Play start sound
     const startSound = new Audio('/static/sounds/success.mp3');
     startSound.play().catch(e => console.log('Start sound playback prevented', e));
-    
+
     // Hide overlays
     tetrisOverlay.style.display = 'none';
-    
+
     // Oyun başlangıç zamanını kaydet
     gameStartTime = new Date();
-    
+
     // Start game loop
     lastDropTime = performance.now();
     if (animationId) {
       cancelAnimationFrame(animationId);
     }
     gameLoop();
-    
+
     // Update button states
     pauseGameButton.disabled = false;
   }
-  
+
   // Pause the game
   function pauseGame() {
     if (gameOver) return;
-    
+
     paused = true;
     cancelAnimationFrame(animationId);
-    
+
     // Show pause overlay
     tetrisOverlay.style.display = 'flex';
     pauseOverlay.style.display = 'block';
   }
-  
+
   // Resume the game
   function resumeGame() {
     paused = false;
@@ -949,33 +981,33 @@ document.addEventListener('DOMContentLoaded', function() {
     lastDropTime = performance.now();
     gameLoop();
   }
-  
+
   // Game loop
   function gameLoop(time = 0) {
     const deltaTime = time - lastDropTime;
-    
+
     if (deltaTime > dropInterval) {
       drop();
       lastDropTime = time;
     }
-    
+
     drawBoard();
     animationId = requestAnimationFrame(gameLoop);
   }
-  
+
   // Draw the board and current piece
   function drawBoard() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw board background
     ctx.fillStyle = 'rgba(20, 20, 40, 0.5)';
     ctx.fillRect(0, 0, COLS * BLOCK_SIZE, ROWS * BLOCK_SIZE);
-    
+
     // Draw grid lines
     ctx.strokeStyle = 'rgba(50, 50, 80, 0.5)';
     ctx.lineWidth = 1;
-    
+
     // Vertical lines
     for (let x = 0; x <= COLS; x++) {
       ctx.beginPath();
@@ -983,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.lineTo(x * BLOCK_SIZE, ROWS * BLOCK_SIZE);
       ctx.stroke();
     }
-    
+
     // Horizontal lines
     for (let y = 0; y <= ROWS; y++) {
       ctx.beginPath();
@@ -991,7 +1023,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.lineTo(COLS * BLOCK_SIZE, y * BLOCK_SIZE);
       ctx.stroke();
     }
-    
+
     // Draw board pieces
     board.forEach((row, y) => {
       row.forEach((value, x) => {
@@ -1002,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     });
-    
+
     // Draw current piece
     if (player.matrix) {
       player.matrix.forEach((row, y) => {
@@ -1013,24 +1045,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       });
     }
-    
+
     // Draw ghost piece (shadow of where piece will land)
     drawGhostPiece();
-    
+
     // Draw next piece preview
     drawNextPiece();
   }
-  
+
   // Draw a single block
   function drawBlock(x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    
+
     // Draw block border
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.lineWidth = 2;
     ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-    
+
     // Draw block highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.beginPath();
@@ -1039,7 +1071,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.lineTo(x * BLOCK_SIZE, (y + 1) * BLOCK_SIZE);
     ctx.fill();
   }
-  
+
   // Draw ghost piece (shadow of where piece will land)
   function drawGhostPiece() {
     // Create a copy of player position
@@ -1047,15 +1079,15 @@ document.addEventListener('DOMContentLoaded', function() {
       x: player.pos.x,
       y: player.pos.y
     };
-    
+
     // Move ghost down until collision
     while (!checkCollision(player.matrix, ghostPos)) {
       ghostPos.y++;
     }
-    
+
     // Move back up one
     ghostPos.y--;
-    
+
     // Draw ghost piece
     ctx.globalAlpha = 0.2;
     player.matrix.forEach((row, y) => {
@@ -1067,29 +1099,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     ctx.globalAlpha = 1;
   }
-  
+
   // Draw next piece preview
   function drawNextPiece() {
     if (!nextPiece.matrix) return;
-    
+
     // Clear next piece canvas
     nextCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
-    
+
     // Draw background
     nextCtx.fillStyle = 'rgba(20, 20, 40, 0.5)';
     nextCtx.fillRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
-    
+
     // Calculate offset to center the piece
     const blockSizeNext = Math.min(
       nextPieceCanvas.width / (nextPiece.matrix[0].length + 2),
       nextPieceCanvas.height / (nextPiece.matrix.length + 2)
     );
-    
+
     const offset = {
       x: (nextPieceCanvas.width - nextPiece.matrix[0].length * blockSizeNext) / 2 / blockSizeNext,
       y: (nextPieceCanvas.height - nextPiece.matrix.length * blockSizeNext) / 2 / blockSizeNext
     };
-    
+
     // Draw next piece
     nextPiece.matrix.forEach((row, y) => {
       row.forEach((value, x) => {
@@ -1102,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             blockSizeNext, 
             blockSizeNext
           );
-          
+
           // Draw block border
           nextCtx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
           nextCtx.lineWidth = 2;
@@ -1112,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             blockSizeNext, 
             blockSizeNext
           );
-          
+
           // Draw block highlight
           nextCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
           nextCtx.beginPath();
@@ -1124,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-  
+
   // Reset player with next piece
   function resetPlayer() {
     if (nextPiece.matrix) {
@@ -1136,11 +1168,11 @@ document.addEventListener('DOMContentLoaded', function() {
       player.matrix = SHAPES[pieceIndex].matrix;
       player.color = SHAPES[pieceIndex].color;
     }
-    
+
     // Set position at top-center
     player.pos.y = 0;
     player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);
-    
+
     // Check for game over
     if (checkCollision()) {
       endGame();
@@ -1157,19 +1189,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update final results
     finalScoreElement.textContent = score;
-    
+
     // Save score to the server
     saveScore(score);
-    
+
     // Show game over overlay with animation
     tetrisOverlay.style.display = 'flex';
     gameOverOverlay.style.display = 'block';
     gameOverOverlay.classList.add('animate-in');
-    
+
     // Update button states
     pauseGameButton.disabled = true;
   }
-  
+
   // Function to save score to the server
   function saveScore(score) {
     // Oyun süresini hesapla (saniye olarak) - varsayılan 180 saniye
@@ -1184,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (level > 3) {
       difficulty = 'medium';
     }
-    
+
     // Oyun istatistiklerini topla
     const gameStats = {
       duration_seconds: playtime,
@@ -1211,25 +1243,25 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
       console.log('Score saved:', data);
-      
+
       // Puan gösterimi kapatıldı
       const xpInfoElement = document.querySelector('.tetris-xp-info');
       const guestInfoElement = document.getElementById('guest-info');
-      
+
       // Tüm skor gösterim elementlerini gizle
       if (xpInfoElement) {
         xpInfoElement.style.display = 'none';
       }
-      
+
       if (guestInfoElement) {
         guestInfoElement.style.display = 'none';
       }
-      
+
       const finalScoreContainer = document.querySelector('.tetris-final-score');
       if (finalScoreContainer) {
         finalScoreContainer.style.display = 'none';
       }
-            
+
             bonusDetails.innerHTML = `
               <div class="tetris-bonus-item">
                 <span>Temel Puan:</span>
@@ -1251,56 +1283,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>` : ''}
               ${scoringSystemInfo}
             `;
-            
+
             // Element bulunmazsa ekleme yap
             if (!document.querySelector('.tetris-bonus-details')) {
               finalScoreContainer.appendChild(bonusDetails);
             }
-            
+
             // Toplam puanı güncelle
             finalScoreElement.textContent = data.points.total;
           }
-          
+
           // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
           xpInfoElement.style.display = 'block';
-          
+
           // XP kazanımı animasyonu
           xpGainElement.classList.add('score-update');
           setTimeout(() => {
             xpGainElement.classList.remove('score-update');
           }, 300);
-          
+
           // Seviye animasyonu
           currentLevelElement.classList.add('score-update');
           setTimeout(() => {
             currentLevelElement.classList.remove('score-update');
           }, 300);
-          
+
           // Eğer API'den özel bir mesaj geldiyse göster
           if (data.message) {
             const messageEl = document.createElement('div');
             messageEl.className = 'guest-message-api mt-2';
             messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
-            
+
             // Önceki mesaj varsa kaldır
             const oldMessage = document.querySelector('.guest-message-api');
             if (oldMessage) {
               oldMessage.remove();
             }
-            
+
             // Game over overlay'e ekle
             const gameOverOverlay = document.getElementById('game-over-overlay');
             if (gameOverOverlay) {
               gameOverOverlay.appendChild(messageEl);
             }
           }
-          
+
           // Eğer giriş yapılması gerekiyorsa vurgula
           if (data.login_required) {
             const guestInfo = document.getElementById('guest-info');
             if (guestInfo) {
               guestInfo.classList.add('highlight-login');
-              
+
               // Giriş butonlarını daha belirgin yap
               const loginButtons = guestInfo.querySelector('.guest-buttons');
               if (loginButtons) {
@@ -1315,25 +1347,25 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error saving score:', error);
     });
   }
-  
+
   // Get next piece
   function getNextPiece() {
     const pieceIndex = Math.floor(Math.random() * SHAPES.length);
     nextPiece.matrix = SHAPES[pieceIndex].matrix;
     nextPiece.color = SHAPES[pieceIndex].color;
   }
-  
+
   // Move piece down
   function drop() {
     player.pos.y++;
-    
+
     // Check for collision
     if (checkCollision()) {
       player.pos.y--;
       mergePiece();
       resetPlayer();
       getNextPiece();
-      
+
       // Check for line clears
       checkLines();
     } else {
@@ -1341,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', function() {
       totalMoves++;
     }
   }
-  
+
   // Hard drop piece
   function hardDrop() {
     let dropDistance = 0;
@@ -1349,24 +1381,24 @@ document.addEventListener('DOMContentLoaded', function() {
       player.pos.y++;
       dropDistance++;
     }
-    
+
     player.pos.y--;
     mergePiece();
     resetPlayer();
     getNextPiece();
-    
+
     // İstatistikleri güncelle
     hardDropCount++;
     totalMoves++;
-    
+
     // Check for line clears
     checkLines();
   }
-  
+
   // Move piece horizontally
   function move(dir) {
     player.pos.x += dir;
-    
+
     if (checkCollision()) {
       player.pos.x -= dir;
     } else {
@@ -1374,39 +1406,39 @@ document.addEventListener('DOMContentLoaded', function() {
       totalMoves++;
     }
   }
-  
+
   // Rotate piece
   function rotate() {
     const matrix = player.matrix;
     const N = matrix.length;
-    
+
     // Create rotated matrix
     const rotated = Array.from(
       {length: N}, () => Array(N).fill(0)
     );
-    
+
     // Perform rotation (90 degrees clockwise)
     for (let y = 0; y < N; y++) {
       for (let x = 0; x < N; x++) {
         rotated[x][N - 1 - y] = matrix[y][x];
       }
     }
-    
+
     // Save original matrix
     const originalMatrix = player.matrix;
-    
+
     // Try rotation
     player.matrix = rotated;
-    
+
     // If collision, try wall kick
     if (checkCollision()) {
       // Try moving left
       player.pos.x--;
-      
+
       // If still collision, try moving right
       if (checkCollision()) {
         player.pos.x += 2;
-        
+
         // If still collision, revert rotation
         if (checkCollision()) {
           player.pos.x--;
@@ -1427,11 +1459,11 @@ document.addEventListener('DOMContentLoaded', function() {
       totalMoves++;
     }
   }
-  
+
   // Check for collision
   function checkCollision(matrix = player.matrix, pos = player.pos) {
     if (!matrix) return false;
-    
+
     for (let y = 0; y < matrix.length; y++) {
       for (let x = 0; x < matrix[y].length; x++) {
         if (matrix[y][x] !== 0 &&
@@ -1442,10 +1474,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-    
+
     return false;
   }
-  
+
   // Merge piece with board
   function mergePiece() {
     player.matrix.forEach((row, y) => {
@@ -1459,77 +1491,77 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-  
+
   // Check for completed lines
   function checkLines() {
     let linesCleared = 0;
-    
+
     // Check each row from bottom to top
     for (let y = ROWS - 1; y >= 0; y--) {
       // Check if row is full
       if (board[y].every(value => value !== 0)) {
         // Remove row
         board.splice(y, 1);
-        
+
         // Add empty row at top
         board.unshift(Array(COLS).fill(0));
-        
+
         // Increment lines cleared
         linesCleared++;
-        
+
         // Check the same row again (since rows shifted down)
         y++;
       }
     }
-    
+
     // Update score and level if lines were cleared
     if (linesCleared > 0) {
       // Update lines
       lines += linesCleared;
       linesElement.textContent = lines;
-      
+
       // Calculate score
       // 100 for 1 line, 300 for 2 lines, 500 for 3 lines, 800 for 4 lines
       const linePoints = [0, 100, 300, 500, 800];
       score += linePoints[linesCleared] * level;
-      
+
       // Update score display
       scoreElement.textContent = score;
-      
+
       // Check for level up (every 10 lines)
       if (Math.floor(lines / 10) + 1 > level) {
         level = Math.floor(lines / 10) + 1;
         levelElement.textContent = level;
-        
+
         // Level up animation and sound
         const levelUpAnim = document.createElement('div');
         levelUpAnim.className = 'level-up-animation';
         levelUpAnim.textContent = 'LEVEL UP!';
         document.querySelector('.tetris-board-container').appendChild(levelUpAnim);
-        
+
         // Play level up sound
         const levelUpSound = new Audio('/static/sounds/level-up.mp3');
         levelUpSound.play().catch(e => console.log('Level up sound playback prevented', e));
-        
+
         // Remove animation after delay
         setTimeout(() => {
           levelUpAnim.remove();
         }, 2000);
-        
+
         // Increase speed
         dropInterval = Math.max(100, 1000 - (level - 1) * 100);
       }
-      
+
       // Play sound effect
       const audio = new Audio('/static/sounds/success.mp3');
       audio.play().catch(err => console.log('Ses çalma hatası:', err));
     }
   }
-  
+
   // Keyboard controls
   document.addEventListener('keydown', event => {
     if (gameOver || paused) return;
-    
+
     switch(event.key) {
       case 'ArrowLeft':
         move(-1);
@@ -1558,31 +1590,31 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
     }
   });
-  
+
   // Touch controls for mobile
   let touchStartX = null;
   let touchStartY = null;
-  
+
   canvas.addEventListener('touchstart', function(e) {
     if (gameOver || paused) return;
-    
+
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     e.preventDefault();
   }, { passive: false });
-  
+
   canvas.addEventListener('touchmove', function(e) {
     if (gameOver || paused || touchStartX === null) return;
-    
+
     const touchX = e.touches[0].clientX;
     const touchY = e.touches[0].clientY;
-    
+
     const diffX = touchX - touchStartX;
     const diffY = touchY - touchStartY;
-    
+
     // Require minimum movement to trigger action
     const minSwipe = 20;
-    
+
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipe) {
       // Horizontal swipe
       if (diffX > 0) {
@@ -1598,30 +1630,30 @@ document.addEventListener('DOMContentLoaded', function() {
       touchStartX = touchX;
       touchStartY = touchY;
     }
-    
+
     e.preventDefault();
   }, { passive: false });
-  
+
   canvas.addEventListener('touchend', function(e) {
     touchStartX = null;
     touchStartY = null;
   });
-  
+
   // Double tap to rotate
   let lastTap = 0;
   canvas.addEventListener('touchend', function(e) {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - lastTap;
-    
+
     if (tapLength < 300 && tapLength > 0) {
       // Double tap detected
       rotate();
       e.preventDefault();
     }
-    
+
     lastTap = currentTime;
   });
-  
+
   // Touch controls for mobile
   const touchControls = document.getElementById('touch-controls');
   const touchLeft = document.getElementById('touch-left');
@@ -1629,12 +1661,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const touchRotate = document.getElementById('touch-rotate');
   const touchDown = document.getElementById('touch-down');
   const touchDrop = document.getElementById('touch-drop');
-  
+
   // Show touch controls on mobile devices
   if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
     touchControls.style.display = 'flex';
   }
-  
+
   // Touch control event listeners
   if (touchLeft) {
     touchLeft.addEventListener('click', () => move(-1));
@@ -1651,7 +1683,7 @@ document.addEventListener('DOMContentLoaded', function() {
       clearLines();
     });
   }
-  
+
   // Button event listeners
   startButton.addEventListener('click', startGame);
   startGameButton.addEventListener('click', startGame);
@@ -1662,10 +1694,10 @@ document.addEventListener('DOMContentLoaded', function() {
     init();
     startGame();
   });
-  
+
   // Window resize event
   window.addEventListener('resize', resizeCanvas);
-  
+
   // Initialize game
   init();
   resizeCanvas();
