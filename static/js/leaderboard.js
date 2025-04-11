@@ -22,8 +22,8 @@ function loadLeaderboard() {
     </div>
   `;
 
-  // Toplam skorları API'den al
-  fetch('/api/scores/aggregated')
+  // Toplam skorları API'den al - Tüm kullanıcıları getirmek için limit parametresi ekle
+  fetch('/api/scores/aggregated?limit=1000')
     .then(response => {
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
@@ -157,17 +157,17 @@ function loadLevelLeaderboard() {
     </div>
   `;
 
-  // Seviye verilerini API'den al - birden fazla endpoint deneme
-  fetch('/api/users/levels')
+  // Seviye verilerini API'den al - birden fazla endpoint deneme - Tüm kullanıcıları getir
+  fetch('/api/users/levels?limit=1000')
     .then(response => {
       if (!response.ok) {
         // Eğer birincil API başarısız olursa alternatif API'yi dene
         console.log('İlk API başarısız, alternatif API deneniyor...');
-        return fetch('/api/scores/top-users').then(altResponse => {
+        return fetch('/api/scores/top-users?limit=1000').then(altResponse => {
           if (!altResponse.ok) {
             console.log('Alternatif API de başarısız oldu, son bir endpoint deneniyor...');
             // Son bir deneme daha yap
-            return fetch('/api/users/leaderboard?sort=level').then(lastResponse => {
+            return fetch('/api/users/leaderboard?sort=level&limit=1000').then(lastResponse => {
               if (!lastResponse.ok) {
                 throw new Error(`Hiçbir API yanıt vermedi: ${lastResponse.status}`);
               }
