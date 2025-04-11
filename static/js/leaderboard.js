@@ -1,5 +1,37 @@
 // Sayfa yüklendiğinde ve belirli aralıklarla skorları getir
+/**
+ * Kullanıcı skorlarını manuel olarak günceller
+ * @param {string} gameType - Oyun tipi (isteğe bağlı)
+ * @param {boolean} forceUpdate - Zorunlu güncelleme (isteğe bağlı)
+ */
+function updateScoreBoard(gameType = null, forceUpdate = false) {
+  console.log(`Skor tablosu güncelleniyor... ${gameType ? 'Oyun: ' + gameType : ''}`);
+  
+  loadLeaderboard();
+  loadLevelLeaderboard();
+  updateProfileScores();
+  
+  // Başarı mesajı
+  const updateMessage = document.createElement('div');
+  updateMessage.className = 'update-notification';
+  updateMessage.innerHTML = '<i class="fas fa-sync-alt"></i> Skor tablosu güncellendi!';
+  
+  document.body.appendChild(updateMessage);
+  
+  setTimeout(() => {
+    updateMessage.classList.add('show');
+    
+    setTimeout(() => {
+      updateMessage.classList.remove('show');
+      setTimeout(() => {
+        updateMessage.remove();
+      }, 500);
+    }, 2000);
+  }, 100);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Liderlik tablosu modülü yükleniyor...');
   loadLeaderboard();
   loadLevelLeaderboard();
 
@@ -9,6 +41,17 @@ document.addEventListener('DOMContentLoaded', function() {
     loadLevelLeaderboard();
     console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
+  
+  // Global güncelleme fonksiyonunu dışa aktar
+  window.updateScoreBoard = updateScoreBoard;
+  
+  // Liderlik tablosu güncelleme butonu varsa, tıklama olayını ekle
+  const refreshButtons = document.querySelectorAll('.refresh-leaderboard');
+  refreshButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      updateScoreBoard();
+    });
+  });
 });
 
 // Skor tablosunu yükleyen fonksiyon
@@ -151,25 +194,77 @@ function updateProfileScores() {
     console.log("Profil puanları güncelleniyor...");
     // Profil sayfasında toplam puan göstergesi varsa güncelle
     const totalScoreElement = document.getElementById('leaderboard-total-score');
+    const totalPointsElements = document.querySelectorAll('.total-points-value');
 
-    if (totalScoreElement) {
+    if (totalScoreElement || totalPointsElements.length > 0) {
       fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Sunucu yanıtı hatalı: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
           // Mevcut kullanıcının skorunu bul
           const currentUser = data.find(score => score.is_current_user);
 
           if (currentUser && currentUser.total_score) {
             console.log("Profil sayfası toplam puanı güncelleniyor:", currentUser.total_score);
-            totalScoreElement.innerHTML = currentUser.total_score;
-            totalScoreElement.classList.add('score-change');
-            setTimeout(() => {
-              totalScoreElement.classList.remove('score-change');
-            }, 1500);
+            
+            // Ana puan göstergesini güncelle
+            if (totalScoreElement) {
+              totalScoreElement.innerHTML = currentUser.total_score;
+              totalScoreElement.classList.add('score-change');
+              setTimeout(() => {
+                totalScoreElement.classList.remove('score-change');
+              }, 1500);
+            }
+            
+            // Tüm puan göstergelerini güncelle
+            totalPointsElements.forEach(element => {
+              element.textContent = currentUser.total_score;
+              element.classList.add('score-change');
+              setTimeout(() => {
+                element.classList.remove('score-change');
+              }, 1500);
+            });
           }
         })
         .catch(error => {
           console.error('Profil puanları güncellenirken hata:', error);
+          
+          // Hata durumunda alternatif API'yi dene
+          fetch('/api/scores/aggregated?nocache=' + new Date().getTime())
+            .then(response => response.json())
+            .then(scores => {
+              // Mevcut kullanıcının puanını bul
+              const currentUser = scores.find(score => score.is_current_user);
+              
+              if (currentUser && currentUser.total_score) {
+                console.log("Alternatif API'den puan güncelleniyor:", currentUser.total_score);
+                
+                // Ana puan göstergesini güncelle
+                if (totalScoreElement) {
+                  totalScoreElement.innerHTML = currentUser.total_score;
+                  totalScoreElement.classList.add('score-change');
+                  setTimeout(() => {
+                    totalScoreElement.classList.remove('score-change');
+                  }, 1500);
+                }
+                
+                // Tüm puan göstergelerini güncelle
+                totalPointsElements.forEach(element => {
+                  element.textContent = currentUser.total_score;
+                  element.classList.add('score-change');
+                  setTimeout(() => {
+                    element.classList.remove('score-change');
+                  }, 1500);
+                });
+              }
+            })
+            .catch(altError => {
+              console.error('Alternatif API de başarısız:', altError);
+            });
         });
     }
   }

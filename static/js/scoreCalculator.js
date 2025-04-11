@@ -1,36 +1,13 @@
+
 /**
- * Standart Puan Hesaplama Modülü
- * Tüm oyunlar için standartlaştırılmış puan hesaplama sistemi
+ * Standartlaştırılmış Skor Hesaplama Sistemi
+ * Farklı oyunlar için tutarlı puanlama sağlar
  */
-window.ScoreCalculator = {
+const ScoreCalculator = {
   /**
-   * Oyun puanlarını 10-100 arasında normalleştir
-   * @param {number} rawScore - Ham puan
-   * @param {number} minScore - Minimum olası puan
-   * @param {number} maxScore - Maksimum olası puan
-   * @param {number} scaleMin - Ölçeklendirilmiş min değer (varsayılan: 10)
-   * @param {number} scaleMax - Ölçeklendirilmiş max değer (varsayılan: 100)
-   * @returns {number} - 10-100 arasında ölçeklendirilmiş puan
-   */
-  normalize: function(rawScore, minScore, maxScore, scaleMin = 10, scaleMax = 100) {
-    // Sıfıra bölme hatası kontrolü
-    if (maxScore === minScore) return scaleMin;
-
-    // Negatif puan kontrolü
-    if (rawScore < minScore) rawScore = minScore;
-    if (rawScore > maxScore) rawScore = maxScore;
-
-    // Doğrusal ölçekleme formülü
-    const normalized = ((rawScore - minScore) / (maxScore - minScore)) * (scaleMax - scaleMin) + scaleMin;
-
-    // Tam sayıya yuvarla
-    return Math.round(normalized);
-  },
-
-  /**
-   * Standart puan hesaplama (tüm oyunlar için ortak)
+   * Oyun verilerine göre standartlaştırılmış puanı hesaplar
    * @param {Object} gameData - Oyun verileri
-   * @returns {Object} - Hesaplanmış puan detayları
+   * @returns {Object} Hesaplanan puan ve detaylar
    */
   calculate: function(gameData) {
     try {
@@ -50,113 +27,155 @@ window.ScoreCalculator = {
       const { 
         gameType,         // Oyun tipi (örn. 'puzzle', 'wordle', 'tetris', vb.)
         difficulty = 'medium', // Zorluk seviyesi (easy, medium, hard, expert)
-        score = 0,        // Oyun içi ham skor (varsa)
-        timeSpent = 0,    // Oyun süresi (saniye)
-        moves = 0,        // Oyundaki hamle sayısı
-        level = 1,        // Oyundaki seviye (varsa)
-        hintsUsed = 0,    // Kullanılan ipucu sayısı (varsa)
-        maxPossibleScore = 100 // Oyunun maksimum olası puanı (varsayılan: 100)
+        rawScore,         // Oyunun orijinal puanı
+        maxPossibleScore, // Mümkün olan maksimum puan
+        accuracy,         // Doğruluk oranı (0-1)
+        timeSpent,        // Harcanan süre (saniye)
+        expectedTime,     // Beklenen tamamlama süresi (saniye)
+        moves,            // Yapılan hamle sayısı
+        expectedMoves,    // Beklenen hamle sayısı
+        hintsUsed,        // Kullanılan ipucu sayısı
+        lives,            // Kalan can sayısı
+        maxLives,         // Maksimum can sayısı
+        combo,            // Elde edilen kombo 
+        level             // Oyun seviyesi
       } = gameData;
 
-      // Zorluk seviyesi çarpanı
-      const difficultyMultiplier = this.getDifficultyMultiplier(difficulty);
-
-      // Temel puan bileşenleri
-      const baseScore = 30; // Her oyun için sabit temel puan
-
-      // Bonus ve ceza hesaplamaları
-      const levelBonus = level ? Math.min(level * 2, 20) : 0;
+      // Temel puan hesaplaması (oyun tipine göre)
+      let baseScore = 50; // Varsayılan temel puan
+      
+      if (accuracy !== undefined && accuracy !== null) {
+        // Doğruluk temelli puanlama (örn. hedef vurma oyunları)
+        baseScore = Math.round(accuracy * 80);
+      } 
+      else if (rawScore !== undefined && maxPossibleScore !== undefined) {
+        // Raw skor temelli puanlama (örn. kelime oyunları)
+        if (maxPossibleScore > 0) {
+          baseScore = Math.round((rawScore / maxPossibleScore) * 80);
+        }
+      }
+      else if (lives !== undefined && maxLives !== undefined) {
+        // Can temelli puanlama (örn. platform oyunları)
+        if (maxLives > 0) {
+          baseScore = Math.round(40 + (lives / maxLives) * 40);
+        }
+      }
+      else if (moves !== undefined && expectedMoves !== undefined) {
+        // Hamle temelli puanlama (örn. bulmaca oyunları)
+        if (expectedMoves > 0) {
+          const moveEfficiency = Math.min(expectedMoves / moves, 2);
+          baseScore = Math.round(40 + moveEfficiency * 30);
+        }
+      }
+      else if (timeSpent !== undefined && expectedTime !== undefined) {
+        // Zaman temelli puanlama (örn. hız testleri)
+        if (expectedTime > 0) {
+          const timeEfficiency = Math.min(expectedTime / timeSpent, 2);
+          baseScore = Math.round(40 + timeEfficiency * 30);
+        }
+      }
+      else if (combo !== undefined) {
+        // Combo temelli puanlama (örn. ritim oyunları)
+        baseScore = Math.min(40 + combo * 2, 90);
+      }
+      else if (level !== undefined) {
+        // Seviye temelli puanlama
+        baseScore = Math.min(30 + level * 5, 90);
+      }
+      
+      // Zorluk çarpanı
+      const difficultyMultipliers = {
+        'easy': 0.8,
+        'medium': 1.0,
+        'hard': 1.5,
+        'expert': 2.0
+      };
+      
+      // Geçerli zorluk kontrolü
+      const difficultyMultiplier = difficultyMultipliers[difficulty] || 1.0;
+      
+      // İpucu cezası (varsa)
       const hintPenalty = hintsUsed ? Math.min(hintsUsed * 5, 30) : 0;
-
-      // Zaman bonusu (daha hızlı çözüm = daha yüksek puan)
-      let timeBonus = 0;
-      if (timeSpent > 0) {
-        // Zaman tipine göre hesapla (saniye veya milisaniye)
-        const seconds = timeSpent > 1000 ? timeSpent / 1000 : timeSpent;
-
-        if (seconds < 30) {
-          timeBonus = 40; // Çok hızlı
-        } else if (seconds < 60) {
-          timeBonus = 30; // Hızlı
-        } else if (seconds < 120) {
-          timeBonus = 20; // Normal
-        } else if (seconds < 300) {
-          timeBonus = 10; // Yavaş
-        } else {
-          timeBonus = 5;  // Çok yavaş
-        }
-      }
-
-      // Hamle bonusu (daha az hamle = daha yüksek puan)
-      let moveBonus = 0;
-      if (moves > 0) {
-        if (moves < 10) {
-          moveBonus = 20; // Çok az hamle
-        } else if (moves < 20) {
-          moveBonus = 15; // Az hamle
-        } else if (moves < 50) {
-          moveBonus = 10; // Normal hamle sayısı
-        } else {
-          moveBonus = 5;  // Çok hamle
-        }
-      }
-
-      // Toplam ham puanı hesapla
-      let rawTotal = baseScore + levelBonus + timeBonus + moveBonus - hintPenalty;
-
-      // Zorluk çarpanını uygula
-      rawTotal = Math.round(rawTotal * difficultyMultiplier);
-
-      // 10-100 arasına sınırla (tüm oyunlar için standart aralık)
-      const finalScore = Math.max(10, Math.min(100, rawTotal));
-
-      // Puan detaylarını oluştur
-      const breakdown = {
-        baseScore: baseScore,
-        levelBonus: levelBonus,
-        timeBonus: timeBonus,
-        moveBonus: moveBonus,
-        hintPenalty: hintPenalty,
-        difficultyMultiplier: difficultyMultiplier,
-        difficulty: difficulty,
-        rawTotal: rawTotal,
-        normalizedScore: finalScore
-      };
-
-      console.log(`Standartlaştırılmış ${gameType} puanı:`, {finalScore, breakdown});
-
+      
+      // Final puan hesaplaması
+      let finalScore = Math.round(baseScore * difficultyMultiplier) - hintPenalty;
+      
+      // Puanı 10-100 aralığında sınırla
+      finalScore = Math.max(10, Math.min(100, finalScore));
+      
+      // Hesaplama ayrıntılarını döndür
       return {
-        finalScore: finalScore,
-        breakdown: breakdown
+        finalScore,
+        breakdown: {
+          baseScore,
+          difficultyMultiplier,
+          difficulty,
+          hintPenalty: hintPenalty || 0,
+          gameType
+        }
       };
-    } catch (e) {
-      console.error("ScoreCalculator hatası:", e);
-      // Hata durumunda varsayılan puan döndür
+    } 
+    catch (error) {
+      console.error("Puan hesaplama hatası:", error);
+      
+      // Hata durumunda varsayılan değer
       return {
         finalScore: 50,
         breakdown: {
           baseScore: 30,
           difficultyMultiplier: 1.0,
           difficulty: 'medium',
-          error: true
+          error: true,
+          errorMessage: error.message
         }
       };
     }
   },
-
+  
   /**
-   * Zorluk seviyesine göre puan çarpanı döndürür
+   * Oyun tipine göre zorluk çarpanı döndürür
+   * @param {string} gameType - Oyun tipi
    * @param {string} difficulty - Zorluk seviyesi
-   * @return {number} - Puan çarpanı
+   * @returns {number} Zorluk çarpanı
    */
-  getDifficultyMultiplier: function(difficulty) {
-    const multipliers = {
-      "easy": 0.8,    // %20 daha az puan
-      "medium": 1.0,  // Normal puan
-      "hard": 1.5,    // %50 bonus
-      "expert": 2.0   // %100 bonus
+  getDifficultyMultiplier: function(gameType, difficulty) {
+    const difficultyMultipliers = {
+      'easy': 0.8,
+      'medium': 1.0,
+      'hard': 1.5,
+      'expert': 2.0
     };
-
-    return multipliers[difficulty] || 1.0;
+    
+    // Belirli oyunlar için özel çarpanlar
+    const gameSpecificMultipliers = {
+      'chess': {
+        'easy': 0.9,
+        'medium': 1.2,
+        'hard': 1.8,
+        'expert': 2.5
+      },
+      'tetris': {
+        'easy': 0.7,
+        'medium': 1.0,
+        'hard': 1.6,
+        'expert': 2.2
+      },
+      'wordle': {
+        'easy': 0.8,
+        'medium': 1.0,
+        'hard': 1.4,
+        'expert': 1.8
+      }
+    };
+    
+    // Oyuna özel çarpan varsa onu kullan, yoksa standart çarpanı döndür
+    if (gameSpecificMultipliers[gameType] && gameSpecificMultipliers[gameType][difficulty]) {
+      return gameSpecificMultipliers[gameType][difficulty];
+    }
+    
+    return difficultyMultipliers[difficulty] || 1.0;
   }
 };
+
+// Modülü global olarak kullanılabilir yap
+window.ScoreCalculator = ScoreCalculator;

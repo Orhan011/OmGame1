@@ -587,19 +587,43 @@ function showScoreScreen(htmlContent) {
  */
 function calculateAndDisplayScore(scoreParams, callback) {
   try {
+    console.log("Puan hesaplanıyor:", scoreParams);
+
+    // Gerekli parametreleri kontrol et
+    if (!scoreParams || !scoreParams.gameType) {
+      console.error("Geçersiz oyun parametreleri:", scoreParams);
+      throw new Error("Geçersiz oyun parametreleri");
+    }
+
     // ScoreCalculator modülü var mı kontrol et
-    if (!window.ScoreCalculator) {
-      console.error('ScoreCalculator modülü bulunamadı! Yedek hesaplama kullanılıyor.');
+    if (typeof window.ScoreCalculator === 'undefined' || !window.ScoreCalculator) {
+      console.warn('ScoreCalculator modülü bulunamadı! Manuel hesaplama kullanılıyor.');
 
-      // Basit bir hesaplama yap
-      const baseScore = 50;
-      const difficultyMultiplier = scoreParams.difficulty === 'easy' ? 0.8 : 
-                                 scoreParams.difficulty === 'hard' ? 1.5 : 
-                                 scoreParams.difficulty === 'expert' ? 2.0 : 1.0;
+      // Manuel hesaplama - Basit algoritma
+      let baseScore = 50;
 
+      // Oyun tipine göre temel puanı ayarla
+      if (scoreParams.rawScore && scoreParams.maxPossibleScore) {
+        const ratio = scoreParams.rawScore / scoreParams.maxPossibleScore;
+        baseScore = Math.round(ratio * 80);
+      } 
+      else if (scoreParams.accuracy !== undefined) {
+        baseScore = Math.round(scoreParams.accuracy * 80);
+      }
+      else if (scoreParams.score !== undefined) {
+        baseScore = Math.min(Math.max(scoreParams.score, 10), 100);
+      }
+
+      // Zorluk çarpanını belirle
+      const difficultyMultiplier = 
+        scoreParams.difficulty === 'easy' ? 0.8 : 
+        scoreParams.difficulty === 'hard' ? 1.5 : 
+        scoreParams.difficulty === 'expert' ? 2.0 : 1.0;
+
+      // Final puanı hesapla ve sınırlandır
       const finalScore = Math.max(10, Math.min(100, Math.round(baseScore * difficultyMultiplier)));
 
-      console.log("Yedek standartlaştırılmış puan:", finalScore);
+      console.log("Manuel hesaplanmış puan:", finalScore);
 
       // API'ye kaydet
       saveScoreAndDisplay(
@@ -609,7 +633,9 @@ function calculateAndDisplayScore(scoreParams, callback) {
         scoreParams.difficulty || 'medium',
         {
           ...scoreParams,
-          fallbackScore: true
+          manualCalculation: true,
+          baseScore: baseScore,
+          difficultyMultiplier: difficultyMultiplier
         },
         callback
       );
@@ -617,41 +643,74 @@ function calculateAndDisplayScore(scoreParams, callback) {
       return;
     }
 
-    // Skoru hesapla
-    const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
-    console.log("Standartlaştırılmış puan:", scoreDetails);
+    // ModernScoreCalculator ile hesapla
+    try {
+      const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+      console.log("ScoreCalculator ile hesaplanan puan:", scoreDetails);
 
-    // API'ye kaydet
-    saveScoreAndDisplay(
-      scoreParams.gameType,
-      scoreDetails.finalScore,
-      scoreParams.timeSpent || 60,
-      scoreParams.difficulty || 'medium',
-      {
-        ...scoreParams,
-        scoreDetails: scoreDetails.breakdown
-      },
-      callback
-    );
+      if (!scoreDetails || !scoreDetails.finalScore) {
+        throw new Error("Geçersiz puan hesaplaması");
+      }
+
+      // API'ye kaydet
+      saveScoreAndDisplay(
+        scoreParams.gameType,
+        scoreDetails.finalScore,
+        scoreParams.timeSpent || 60,
+        scoreParams.difficulty || 'medium',
+        {
+          ...scoreParams,
+          calculatedScore: true,
+          scoreBreakdown: scoreDetails.breakdown
+        },
+        callback
+      );
+    } catch (calculationError) {
+      console.error("ScoreCalculator hatası:", calculationError);
+      throw calculationError; // Yeniden fırlat
+    }
   } catch (error) {
-    console.error('Puan hesaplama hatası:', error);
+    console.error('Kritik puan hesaplama hatası:', error);
 
-    // Hata durumunda basit bir skor hesapla
-    const fallbackScore = Math.max(10, Math.min(100, Math.round(Math.random() * 50) + 40));
-    console.log("Hata nedeniyle yedek puan kullanılıyor:", fallbackScore);
+    // Hatadan kurtarma - basit bir puan ata
+    try {
+      // En basit puan hesaplama yöntemi
+      let emergencyScore = 50; // Varsayılan
 
-    saveScoreAndDisplay(
-      scoreParams.gameType, 
-      fallbackScore,
-      scoreParams.timeSpent || 60,
-      scoreParams.difficulty || 'medium',
-      {
-        ...scoreParams,
-        error: true,
-        errorMessage: error.message
-      },
-      callback
-    );
+      if (scoreParams) {
+        // Zorluk seviyesini dikkate al
+        const diffFactor = 
+          scoreParams.difficulty === 'easy' ? 0.8 : 
+          scoreParams.difficulty === 'hard' ? 1.2 : 
+          scoreParams.difficulty === 'expert' ? 1.5 : 1.0;
+
+        emergencyScore = Math.round(emergencyScore * diffFactor);
+
+        // Sınırlandır
+        emergencyScore = Math.max(10, Math.min(100, emergencyScore));
+      }
+
+      console.warn("Acil durum puanı kullanılıyor:", emergencyScore);
+
+      // Skoru kaydet
+      saveScoreAndDisplay(
+        (scoreParams && scoreParams.gameType) ? scoreParams.gameType : 'unknown_game',
+        emergencyScore,
+        (scoreParams && scoreParams.timeSpent) ? scoreParams.timeSpent : 60,
+        (scoreParams && scoreParams.difficulty) ? scoreParams.difficulty : 'medium',
+        {
+          ...(scoreParams || {}),
+          emergencyScore: true,
+          errorMessage: error.message
+        },
+        callback
+      );
+    } catch (finalError) {
+      console.error("Kritik kurtarma hatası:", finalError);
+      if (typeof callback === 'function') {
+        callback(''); // Boş dön
+      }
+    }
   }
 }
 
