@@ -1615,23 +1615,35 @@ def delete_account():
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
 
     user = User.query.get(session['user_id'])
+    if not user:
+        # Kullanıcı bulunamadıysa oturumu temizle ve hata mesajı döndür
+        session.pop('user_id', None)
+        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı. Oturumunuz sonlandırıldı.'})
+    
     password = request.form.get('password')
+    if not password:
+        return jsonify({'success': False, 'message': 'Şifre girilmedi!'})
 
     # Şifre doğrulama
     if not check_password_hash(user.password_hash, password):
         return jsonify({'success': False, 'message': 'Şifre doğrulaması başarısız!'})
 
-    # Kullanıcının skorlarını sil
-    Score.query.filter_by(user_id=user.id).delete()
+    try:
+        # Kullanıcının skorlarını sil
+        Score.query.filter_by(user_id=user.id).delete()
 
-    # Kullanıcıyı sil
-    db.session.delete(user)
-    db.session.commit()
+        # Kullanıcıyı sil
+        db.session.delete(user)
+        db.session.commit()
 
-    # Oturumu sonlandır
-    session.pop('user_id', None)
+        # Oturumu sonlandır
+        session.pop('user_id', None)
 
-    return jsonify({'success': True, 'message': 'Hesabınız başarıyla silindi!'})
+        return jsonify({'success': True, 'message': 'Hesabınız başarıyla silindi!'})
+    except Exception as e:
+        logger.error(f"Hesap silme hatası: {str(e)}")
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Hesap silinirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'})
 
 # Hesap Dondurma
 @app.route('/profile/suspend', methods=['POST'])
@@ -1641,7 +1653,15 @@ def suspend_account():
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
 
     user = User.query.get(session['user_id'])
+    if not user:
+        # Kullanıcı bulunamadıysa oturumu temizle ve hata mesajı döndür
+        session.pop('user_id', None)
+        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı. Oturumunuz sonlandırıldı.'})
+    
     password = request.form.get('password')
+    if not password:
+        return jsonify({'success': False, 'message': 'Şifre girilmedi!'})
+        
     duration = request.form.get('duration', '30')  # Varsayılan 30 gün
 
     # Şifre doğrulama
@@ -1656,15 +1676,20 @@ def suspend_account():
     except:
         duration = 30
 
-    # Hesabı dondur
-    user.account_status = 'suspended'
-    user.suspended_until = datetime.utcnow() + timedelta(days=duration)
-    db.session.commit()
+    try:
+        # Hesabı dondur
+        user.account_status = 'suspended'
+        user.suspended_until = datetime.utcnow() + timedelta(days=duration)
+        db.session.commit()
 
-    # Oturumu sonlandır
-    session.pop('user_id', None)
+        # Oturumu sonlandır
+        session.pop('user_id', None)
 
-    return jsonify({'success': True, 'message': f'Hesabınız {duration} gün boyunca donduruldu!'})
+        return jsonify({'success': True, 'message': f'Hesabınız {duration} gün boyunca donduruldu!'})
+    except Exception as e:
+        logger.error(f"Hesap dondurma hatası: {str(e)}")
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Hesap dondurulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'})
 
 # Şifremi Unuttum
 @app.route('/forgot-password', methods=['GET', 'POST'])
