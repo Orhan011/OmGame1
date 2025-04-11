@@ -7,6 +7,101 @@
 // ScoreHandler nesnesini global olarak tanımlıyoruz
 window.ScoreHandler = {
   /**
+   * Oyunu derecelendir
+   * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
+   * @param {number} rating - Derecelendirme (1-5 arası)
+   * @param {string} comment - Kullanıcı yorumu (opsiyonel)
+   * @return {Promise} - API yanıtını içeren Promise nesnesi
+   */
+  rateGame: function(gameType, rating, comment = "") {
+    // Oyun tipini standartlaştır
+    gameType = this.standardizeGameType(gameType);
+    
+    // Derecelendirme verisini hazırla
+    const data = {
+      game_type: gameType,
+      rating: rating,
+      comment: comment
+    };
+    
+    console.log(`Rating game ${gameType}: ${rating}/5 stars`);
+    
+    // API'ye POST isteği
+    return fetch('/api/rate-game', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("Game rated:", data);
+      return data;
+    })
+    .catch(error => {
+      console.error("Error rating game:", error);
+      return { success: false, message: "Error rating game" };
+    });
+  },
+  
+  /**
+   * Oyun derecelendirmelerini çek
+   * @param {string} gameType - Oyun türü
+   * @return {Promise} - API yanıtını içeren Promise nesnesi (derecelendirmeler)
+   */
+  getGameRatings: function(gameType) {
+    // Oyun tipini standartlaştır
+    gameType = this.standardizeGameType(gameType);
+    
+    return fetch(`/api/get-game-ratings/${gameType}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Game ratings retrieved:", data);
+        return data;
+      })
+      .catch(error => {
+        console.error("Error retrieving game ratings:", error);
+        return { success: false, message: "Error retrieving game ratings" };
+      });
+  },
+  
+  /**
+   * Kullanıcının derecelendirmesini çek
+   * @param {string} gameType - Oyun türü
+   * @return {Promise} - API yanıtını içeren Promise nesnesi (kullanıcı derecelendirmesi)
+   */
+  getUserRating: function(gameType) {
+    // Oyun tipini standartlaştır
+    gameType = this.standardizeGameType(gameType);
+    
+    return fetch(`/api/get-user-rating/${gameType}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("User rating retrieved:", data);
+        return data;
+      })
+      .catch(error => {
+        console.error("Error retrieving user rating:", error);
+        return { success: false, message: "Error retrieving user rating" };
+      });
+  },
+  /**
    * Oyun skorunu API'ye gönderir
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
    * @param {number} score - Oyunda kazanılan puan

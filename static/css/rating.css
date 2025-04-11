@@ -1,0 +1,300 @@
+/* Rating Container */
+.rating-container {
+  width: 100%;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Rating Title */
+.rating-title {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-bottom: 15px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Rating Stars */
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.rating-star {
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  padding: 0 5px;
+  transition: all 0.2s ease;
+}
+
+.rating-star:hover {
+  transform: scale(1.15);
+}
+
+.rating-star.active {
+  color: #FFD700; /* Altın sarısı yıldız rengi */
+}
+
+.rating-star.preview {
+  color: #FFD700;
+  opacity: 0.7;
+}
+
+/* Rating Comment */
+.rating-comment {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 15px;
+}
+
+.rating-comment textarea {
+  width: 100%;
+  background: rgba(30, 30, 60, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e0e0e0;
+  padding: 10px;
+  font-size: 0.9rem;
+  resize: none;
+  height: 80px;
+  transition: all 0.3s ease;
+}
+
+.rating-comment textarea:focus {
+  outline: none;
+  border-color: rgba(106, 90, 224, 0.5);
+  box-shadow: 0 0 5px rgba(106, 90, 224, 0.3);
+}
+
+/* Rating Submit */
+.rating-submit {
+  margin-top: 10px;
+}
+
+.rating-btn {
+  background: #6a5ae0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rating-btn:hover {
+  background: #8777e0;
+  transform: translateY(-2px);
+}
+
+.rating-btn:disabled {
+  background: #515151;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Rating Status Message */
+.rating-status {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.rating-status.success {
+  color: #2ecc71;
+}
+
+.rating-status.info {
+  color: #3498db;
+}
+
+.rating-status.warning {
+  color: #f39c12;
+}
+
+.rating-status.error {
+  color: #e74c3c;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .rating-star {
+    font-size: 1.6rem;
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-star {
+    font-size: 1.4rem;
+    padding: 0 3px;
+  }
+}
+
+/* Game Results Rating (Oyun sonuç ekranındaki derecelendirme) */
+.game-result-rating {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.game-result-rating .rating-title {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+}
+
+.game-result-rating .rating-stars {
+  margin: 10px 0;
+}
+
+/* Derecelendirme İstatistikleri */
+.rating-statistics {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+  background: rgba(30, 30, 60, 0.6);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.rating-statistics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.rating-statistics-header .avg-rating {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.rating-statistics-header .rating-count {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rating-label {
+  width: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.rating-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 10px;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: #6a5ae0;
+  border-radius: 4px;
+  min-width: 5px;
+}
+
+.rating-bar-value {
+  width: 30px;
+  text-align: right;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rating-star-icon {
+  color: #FFD700;
+  font-size: 0.9rem;
+}
+
+/* Latest Reviews */
+.latest-reviews {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.latest-reviews-header {
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.review-item {
+  background: rgba(30, 30, 60, 0.6);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.review-username {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.review-rating {
+  color: #FFD700;
+}
+
+.review-content {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.review-date {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+}
+
+/* Login Required */
+.login-rating-message {
+  text-align: center;
+  padding: 15px;
+  background: rgba(30, 30, 60, 0.6);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.login-rating-message p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+}
+
+.login-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #6a5ae0;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #8777e0;
+  transform: translateY(-2px);
+}

@@ -117,6 +117,9 @@
           </div>
         </div>
         
+        <!-- Derecelendirme bölümü -->
+        <div id="rating-container" class="rating-container mt-4"></div>
+        
         <div class="result-actions">
           <button id="save-result" class="btn btn-primary">SONUCU KAYDET</button>
           <button id="play-again" class="btn btn-outline">TEKRAR OYNA</button>
@@ -878,6 +881,11 @@ document.addEventListener('DOMContentLoaded', function() {
     correctAnswersDisplay.textContent = correctAnswers;
     wrongAnswersDisplay.textContent = wrongAnswers;
     totalTimeDisplay.textContent = `${totalTime} sn`;
+    
+    // Derecelendirme sistemini başlat
+    if (window.RatingHandler) {
+      window.RatingHandler.createGameResultRating('math_challenge', 'rating-container');
+    }
     
     // Show result screen
     showScreen(resultScreen);

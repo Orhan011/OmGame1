@@ -82,6 +82,22 @@ class Achievement(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class GameRating(db.Model):
+    __tablename__ = 'game_ratings'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # Oyun tipi (slug)
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 arası derecelendirme
+    comment = db.Column(db.Text)  # Kullanıcının yorumu (opsiyonel)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # İlişkiler
+    user = db.relationship('User', backref=db.backref('ratings', lazy=True))
+    
+    def __repr__(self):
+        return f'<GameRating {self.game_type}: {self.rating}/5 by User {self.user_id}>'
+
+
 class GameStat(db.Model):
     __tablename__ = 'game_stats'
     id = db.Column(db.Integer, primary_key=True)

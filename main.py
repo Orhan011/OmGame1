@@ -37,7 +37,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Veritabanı
-from models import db, User, Score, Article, Achievement, GameStat, AdminUser, Game, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog
+from models import db, User, Score, Article, Achievement, GameStat, AdminUser, Game, SiteSettings, Page, BlogPost, Category, MediaFile, AdminLog, GameRating
 
 # Veritabanını uygulama ile ilişkilendir
 db.init_app(app)
@@ -2162,6 +2162,184 @@ def save_score():
                 'game_type': game_type
             }
         })
+
+# Oyun derecelendirme API'si
+@app.route('/api/rate-game', methods=['POST'])
+def rate_game():
+    """Oyun derecelendirme API'si
+    
+    Kullanıcının bir oyuna 1-5 arası puan vermesini sağlar.
+    """
+    # Kullanıcı girişi kontrolü
+    if 'user_id' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'Derecelendirme yapmak için giriş yapmalısınız!',
+            'guest': True,
+            'login_required': True
+        })
+    
+    # Gelen veriyi al ve doğrula
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'message': 'Geçersiz JSON verisi!'})
+    
+    game_type = data.get('game_type')
+    rating = data.get('rating')
+    comment = data.get('comment', '')
+    
+    # Verilerin doğruluğunu kontrol et
+    if not game_type:
+        return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
+    
+    if rating is None:
+        return jsonify({'success': False, 'message': 'Derecelendirme değeri belirtilmedi!'})
+    
+    try:
+        # Derecelendirme değerini int'e çevir
+        rating = int(rating)
+        
+        # Derecelendirme 1-5 arasında olmalı
+        if rating < 1 or rating > 5:
+            return jsonify({'success': False, 'message': 'Derecelendirme 1-5 arasında olmalıdır!'})
+            
+    except (ValueError, TypeError) as e:
+        logger.error(f"Derecelendirme dönüşüm hatası: {str(e)}, Değer: rating={rating}")
+        return jsonify({'success': False, 'message': 'Geçersiz derecelendirme değeri!'})
+    
+    user_id = session['user_id']
+    
+    # Aynı kullanıcının aynı oyuna önceki derecelendirmesini kontrol et
+    existing_rating = GameRating.query.filter_by(user_id=user_id, game_type=game_type).first()
+    
+    if existing_rating:
+        # Varolan derecelendirmeyi güncelle
+        existing_rating.rating = rating
+        existing_rating.comment = comment
+        existing_rating.timestamp = datetime.utcnow()
+        db.session.commit()
+        action = "güncellendi"
+    else:
+        # Yeni derecelendirme oluştur
+        new_rating = GameRating(
+            user_id=user_id,
+            game_type=game_type,
+            rating=rating,
+            comment=comment
+        )
+        db.session.add(new_rating)
+        db.session.commit()
+        action = "eklendi"
+    
+    # Oyunun ortalama puanını güncelle (Game modeli varsa)
+    game = Game.query.filter_by(slug=game_type).first()
+    if game:
+        # Bu oyuna ait tüm derecelendirmeleri al
+        all_ratings = GameRating.query.filter_by(game_type=game_type).all()
+        
+        if all_ratings:
+            # Ortalama puanı hesapla
+            total_rating = sum(r.rating for r in all_ratings)
+            avg_rating = total_rating / len(all_ratings)
+            
+            # Ortalama puanı güncelle
+            game.avg_rating = avg_rating
+            db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': f'Derecelendirmeniz başarıyla {action}!',
+        'rating': rating,
+        'game_type': game_type
+    })
+
+# Oyun derecelendirmelerini getirme API'si
+@app.route('/api/get-game-ratings/<game_type>')
+def get_game_ratings(game_type):
+    """Bir oyuna ait tüm derecelendirmeleri getirir"""
+    try:
+        # Oyunun derecelendirmelerini getir
+        ratings = GameRating.query.filter_by(game_type=game_type).order_by(GameRating.timestamp.desc()).all()
+        
+        # Derecelendirme verisini düzenle
+        ratings_data = []
+        for rating in ratings:
+            # Kullanıcı bilgilerini al
+            user = User.query.get(rating.user_id)
+            username = user.username if user else "Bilinmeyen Kullanıcı"
+            
+            # Avatar URL'si
+            avatar_url = user.avatar_url if user and user.avatar_url else "/static/images/placeholder.jpg"
+            
+            # Derecelendirme verisini ekle
+            ratings_data.append({
+                'user': {
+                    'id': rating.user_id,
+                    'username': username,
+                    'avatar_url': avatar_url
+                },
+                'rating': rating.rating,
+                'comment': rating.comment,
+                'timestamp': rating.timestamp.strftime("%d.%m.%Y %H:%M")
+            })
+        
+        # Ortalama derecelendirmeyi hesapla
+        avg_rating = 0
+        if ratings:
+            avg_rating = sum(r.rating for r in ratings) / len(ratings)
+            
+        return jsonify({
+            'success': True,
+            'ratings': ratings_data,
+            'avg_rating': round(avg_rating, 1),
+            'count': len(ratings)
+        })
+        
+    except Exception as e:
+        logger.error(f"Derecelendirmeleri getirirken hata: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Derecelendirmeler getirilirken bir hata oluştu!',
+            'error': str(e)
+        }), 500
+
+# Kullanıcının bir oyuna verdiği derecelendirmeyi getir
+@app.route('/api/get-user-rating/<game_type>')
+def get_user_rating(game_type):
+    """Giriş yapmış kullanıcının belirli bir oyuna verdiği derecelendirmeyi getirir"""
+    if 'user_id' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'Derecelendirme bilgisi için giriş yapmalısınız!',
+            'guest': True
+        })
+    
+    try:
+        user_id = session['user_id']
+        
+        # Kullanıcının derecelendirmesini getir
+        rating = GameRating.query.filter_by(user_id=user_id, game_type=game_type).first()
+        
+        if rating:
+            return jsonify({
+                'success': True,
+                'has_rated': True,
+                'rating': rating.rating,
+                'comment': rating.comment,
+                'timestamp': rating.timestamp.strftime("%d.%m.%Y %H:%M")
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'has_rated': False
+            })
+            
+    except Exception as e:
+        logger.error(f"Kullanıcı derecelendirmesini getirirken hata: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Derecelendirme bilgisi getirilirken bir hata oluştu!'
+        }), 500
 
 # Mevcut Kullanıcı API'si - hem /api/current-user hem de /api/get-current-user ile erişilebilir
 @app.route('/api/current-user')
