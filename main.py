@@ -1334,43 +1334,57 @@ def profile_v2():
         flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
         return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
+    try:
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            # Kullanıcı bulunamadıysa session'ı temizle ve login sayfasına yönlendir
+            session.pop('user_id', None)
+            flash('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.', 'warning')
+            return redirect(url_for('login'))
 
-    # Kullanıcı istatistiklerini hesapla
-    scores = Score.query.filter_by(user_id=user.id).all()
+        # Kullanıcı istatistiklerini hesapla
+        scores = Score.query.filter_by(user_id=user.id).all()
 
-    total_games = len(scores)
-    highest_score = 0
-    if scores:
-        highest_score = max(score.score for score in scores)
+        total_games = len(scores)
+        highest_score = 0
+        if scores:
+            highest_score = max(score.score for score in scores)
 
-    # Oyun başına en yüksek skorlar
-    user_scores = {}
-    for score in scores:
-        if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
-            user_scores[score.game_type] = score.score
+        # Oyun başına en yüksek skorlar
+        user_scores = {}
+        for score in scores:
+            if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
+                user_scores[score.game_type] = score.score
 
-    # Kullanıcı seviyesini hesapla
-    current_level = calculate_level(user.experience_points)
+        # Kullanıcı seviyesini hesapla
+        current_level = calculate_level(user.experience_points)
 
-    # XP hesaplamaları
-    xp_for_current = xp_for_level(current_level)
-    xp_for_next = xp_for_level(current_level + 1)
-    xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
+        # XP hesaplamaları
+        xp_for_current = xp_for_level(current_level)
+        xp_for_next = xp_for_level(current_level + 1)
+        xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100 if (xp_for_next - xp_for_current) > 0 else 0
 
-    return render_template(
-        'profile_v2.html', 
-        user=user, 
-        scores=user_scores,
-        total_games=total_games,
-        highest_score=highest_score,
-        current_level=current_level,
-        xp_progress=xp_progress,
-        xp_for_current=xp_for_current,
-        xp_for_next=xp_for_next,
-        current_xp=user.experience_points,
-        xp_needed=xp_for_next - user.experience_points
-    )
+        return render_template(
+            'profile_v2.html', 
+            user=user, 
+            scores=user_scores,
+            total_games=total_games,
+            highest_score=highest_score,
+            current_level=current_level,
+            xp_progress=xp_progress,
+            xp_for_current=xp_for_current,
+            xp_for_next=xp_for_next,
+            current_xp=user.experience_points,
+            xp_needed=xp_for_next - user.experience_points
+        )
+    except Exception as e:
+        # Hata logla
+        logger.error(f"Profil sayfası yüklenirken hata oluştu: {str(e)}")
+        # Kullanıcıya hata mesajı göster
+        flash('Profil sayfası yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+        # Ana sayfaya yönlendir
+        return redirect(url_for('index'))
 
 # Profil Güncelleme
 @app.route('/profile/update', methods=['POST'])
