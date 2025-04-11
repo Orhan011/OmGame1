@@ -1315,7 +1315,14 @@ def iq_test():
 
 # Simon Says Oyunu
 @app.route('/simon_says')
+def simon_says_old():
+    """Eski rota - yönlendirme yapar"""
+    return redirect(url_for('simon_says'))
+
+@app.route('/games/simon-says')
 def simon_says():
+    """Simon Says: Hafıza ve konsantrasyon oyunu
+    Renkli düğmelerin yanma sırasını hatırlayarak hafızanızı güçlendirin."""
     return render_template('games/simonSays.html')
 
 # Kelime Avı Oyunu
