@@ -112,7 +112,6 @@ function loadArticleContent() {
 
 <!-- Derecelendirme sistemi için CSS ve JS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rating.css') }}">
-<script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
 </head>
 <body>
 <!-- Dinamik Arkaplan Efekti -->
@@ -264,7 +263,6 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
     <!-- Skor Yakalama ve Kaydetme Sistemi -->
-    <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
       document.addEventListener('DOMContentLoaded', function() {
@@ -311,6 +309,8 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
+<!-- Oyun sonuç ekranındaki rastgele puanları kaldırır -->
+<script src="{{ url_for('static', filename='js/scoreFixer.js') }}" defer></script>
 <!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
 {% endif %}
