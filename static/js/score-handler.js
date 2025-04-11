@@ -5,7 +5,8 @@
  */
 
 // Önceden tanımlanmış bir ScoreHandler varsa, onu kullanmaya devam et
-window.ScoreHandler = window.ScoreHandler || {
+if (!window.ScoreHandler) {
+  window.ScoreHandler = {
   /**
    * Oyun skorunu API'ye gönderir
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
@@ -228,7 +229,7 @@ window.ScoreHandler = window.ScoreHandler || {
     // Eğer oyun tipi eşleşme tablosunda varsa standartlaştırılmış ismi döndür
     return gameTypeMap[gameType] || gameType;
   }
-};
+}
 
 /**
  * Tüm oyunlar için skor kaydetme ve gösterme fonksiyonu
@@ -239,7 +240,8 @@ window.ScoreHandler = window.ScoreHandler || {
  * @param {Object} gameStats - Oyun istatistikleri
  * @param {Function} callback - Skor gösterimi sonrası çağrılacak callback (opsiyonel)
  */
-window.saveScoreAndDisplay = window.saveScoreAndDisplay || function(gameType, score, playtime, difficulty, gameStats = {}, callback) {
+if (!window.saveScoreAndDisplay) {
+  window.saveScoreAndDisplay = function(gameType, score, playtime, difficulty, gameStats = {}, callback) {
   try {
     // Zorluğun geçerli olduğundan emin ol
     const validDifficulties = ["easy", "medium", "hard", "expert"];
@@ -296,7 +298,7 @@ window.saveScoreAndDisplay = window.saveScoreAndDisplay || function(gameType, sc
   } catch (e) {
     console.error("Error in saveScoreAndDisplay:", e);
   }
-};
+}
 
 /**
  * Seviye atlama bildirimi gösterir

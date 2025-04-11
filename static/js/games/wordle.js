@@ -818,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function saveScoreWithDetails(score) {
     try {
       // Oyun durumu kontrolü
-      if (typeof gameState === 'undefined') {
+      if (typeof gameState === 'undefined' || !gameState) {
         console.error("gameState tanımlanmamış, skor kaydedilemedi");
         return;
       }
@@ -835,35 +835,50 @@ document.addEventListener('DOMContentLoaded', function() {
         difficulty = 'medium';
       }
       
-      // Oyun istatistiklerini topla
+      // Oyun istatistiklerini topla (hata kontrolü ile)
       const gameStats = {
         duration_seconds: playtime,
-        move_count: gameState.currentRow,
-        hint_count: 3 - gameState.hintsLeft,
-        guesses: gameState.currentRow,
+        move_count: gameState.currentRow || 0,
+        hint_count: gameState.hintsLeft !== undefined ? (3 - gameState.hintsLeft) : 0,
+        guesses: gameState.currentRow || 0,
         word_length: 5,
-        success: gameState.answer === gameState.guesses[gameState.currentRow-1]?.join('')
+        success: gameState.answer && 
+                gameState.guesses && 
+                gameState.currentRow > 0 && 
+                gameState.currentRow-1 < gameState.guesses.length && 
+                gameState.guesses[gameState.currentRow-1] ? 
+                  (gameState.answer === gameState.guesses[gameState.currentRow-1].join('')) : 
+                  false
       };
       
-      // Yeni skor gösterimi için callback fonksiyonu
-      const updateScoreDisplay = function(scoreHtml, data) {
-        const scoreContainer = document.getElementById('game-score-container');
-        if (scoreContainer) {
-          scoreContainer.innerHTML = scoreHtml;
-        }
-      };
+      // Skor 0'dan küçükse düzelt
+      if (score < 0) score = 0;
       
       console.log("Wordle skoru kaydediliyor:", score);
       
       // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
       if (typeof window.saveScoreAndDisplay === 'function') {
-        window.saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, updateScoreDisplay);
+        try {
+          window.saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, function(scoreHtml, data) {
+            const scoreContainer = document.getElementById('game-score-container');
+            if (scoreContainer) {
+              scoreContainer.innerHTML = scoreHtml;
+            }
+          });
+        } catch (e) {
+          console.error("saveScoreAndDisplay fonksiyonu hatası:", e);
+          // Alternatif yöntemle devam et
+        }
       } else {
         // Eğer saveScoreAndDisplay fonksiyonu yoksa, doğrudan ScoreHandler'ı kullan
         if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
-          window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
+          try {
+            window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
+          } catch (e) {
+            console.error("ScoreHandler.saveScore fonksiyonu hatası:", e);
+          }
         } else {
-          console.error("Skor kaydedilemedi: Skor kaydedici bulunamadı!");
+          console.log("Doğrudan API'ye skor gönderiliyor...");
           
           // Alternatif olarak doğrudan API'ye gönder
           fetch('/api/save-score', {
@@ -876,10 +891,32 @@ document.addEventListener('DOMContentLoaded', function() {
               playtime: playtime,
               game_stats: gameStats
             })
-          }).catch(err => console.error("Skor kaydetme hatası:", err));
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log("Skor başarıyla kaydedildi:", data);
+          })
+          .catch(err => console.error("Skor kaydetme hatası:", err));
         }
       }
     } catch (e) {
       console.error("saveScoreWithDetails fonksiyonunda hata:", e);
+      
+      // Hata durumunda basit API çağrısı dene
+      try {
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'wordle',
+            score: score || 0,
+            difficulty: 'medium',
+            playtime: 180,
+            game_stats: { success: false }
+          })
+        });
+      } catch (e) {
+        console.error("Acil durum skor kaydetme hatası:", e);
+      }
     }
   }
