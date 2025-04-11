@@ -79,7 +79,7 @@ def send_welcome_email(to_email, username):
                 <p>Merhaba {username},</p>
                 <p>OmGame'e kaydolduğunuz için teşekkür ederiz! Artık beyin geliştirici oyunlarımıza erişebilir, 
                    skorlarınızı takip edebilir ve liderlik tablolarında yerinizi alabilirsiniz.</p>
-                
+
                 <h3 style="color: #4a67e8;">OmGame'de Neler Yapabilirsiniz?</h3>
                 <ul>
                     <li>Farklı kategorilerde beyin geliştirici oyunlar oynayabilirsiniz</li>
@@ -87,11 +87,11 @@ def send_welcome_email(to_email, username):
                     <li>Diğer oyuncularla rekabet edebilirsiniz</li>
                     <li>Oynadıkça beyninizi geliştirebilirsiniz</li>
                 </ul>
-                
+
                 <p>Hemen giriş yapın ve oyunları keşfetmeye başlayın: <a href="https://omgame.replit.app">OmGame</a></p>
-                
+
                 <p>Herhangi bir sorunuz veya öneriniz varsa, bize bildirmekten çekinmeyin.</p>
-                
+
                 <p>İyi oyunlar,<br>OmGame Ekibi</p>
             </div>
         </body>
@@ -658,17 +658,17 @@ def get_most_played_games(limit=4):
     from sqlalchemy import func, desc
     from datetime import datetime, timedelta
     import logging
-    
+
     # Varsayılan oyunlar listesi (veritabanı hatası durumunda kullanılacak)
     popular_games = []
-    
+
     # Çıkarılacak oyun türleri
     excluded_games = ["2048", "memory_cards"]
-    
+
     try:
         # Son 24 saat içinde oynanan oyunları al
         yesterday = datetime.now() - timedelta(days=1)
-        
+
         # En çok oynanan oyunları bul (çıkarılacak oyunlar hariç)
         popular_games = Score.query.with_entities(
             Score.game_type, 
@@ -681,7 +681,7 @@ def get_most_played_games(limit=4):
         ).order_by(
             desc('play_count')
         ).limit(limit).all()
-        
+
         # Eğer son 24 saatte yeterli veri yoksa, tüm zamanların en popüler oyunlarını al (çıkarılacak oyunlar hariç)
         if len(popular_games) < limit:
             popular_games = Score.query.with_entities(
@@ -698,10 +698,10 @@ def get_most_played_games(limit=4):
         # Herhangi bir hata oluşursa logla ve boş liste döndür
         logging.error(f"Oyun istatistikleri alınırken hata oluştu: {str(e)}")
         popular_games = []
-    
+
     # Oyun listesini oluştur
     games = []
-    
+
     # Oyun türü ve rota eşleştirmeleri
     game_info = {
         "word_puzzle": {
@@ -771,30 +771,30 @@ def get_most_played_games(limit=4):
             "route": "hangman"
         }
     }
-    
+
     # Varsayılan oyunlar (veri yoksa kullanılacak)
     default_games = [
         "wordle", "audio_memory", "tetris", "hangman", "snake"
     ]
-    
+
     # Popüler oyun verilerine göre oyun listesini oluştur
     for game_type, count in popular_games:
         if game_type in game_info:
             games.append(game_info[game_type])
-    
+
     # Eğer hala yeterli oyun yoksa, varsayılan oyunları ekle
     if len(games) < limit:
         for game_type in default_games:
             if len(games) >= limit:
                 break
-            
+
             # Bu oyun zaten listeye eklenmişse atla
             if game_type in [g.get("route", "") for g in games]:
                 continue
-                
+
             if game_type in game_info:
                 games.append(game_info[game_type])
-    
+
     # Sadece istenen sayıda oyunu döndür
     return games[:limit]
 
@@ -809,7 +809,7 @@ def index():
         # Herhangi bir hata olursa logla ve varsayılan oyunları göster
         import logging
         logging.error(f"Ana sayfa yüklenirken hata oluştu: {str(e)}")
-        
+
         # Varsayılan oyunlar
         default_game_info = {
             "wordle": {
@@ -837,7 +837,7 @@ def index():
                 "route": "game_2048"
             }
         }
-        
+
         default_games = ["wordle", "memory_cards", "audio_memory", "2048"]
         most_played_games = [default_game_info[game] for game in default_games]
         return render_template('index.html', most_played_games=most_played_games)
@@ -886,7 +886,7 @@ def word_puzzle():
 @app.route('/games/memory-match')
 def memory_match():
     return render_template('games/memoryMatch.html')
-    
+
 # Memory Card Flip removed
 
 # 3D Labirent Oyunu
@@ -1012,7 +1012,7 @@ def login_required(f):
             flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
             return redirect(url_for('login', redirect=request.url))
         return f(*args, **kwargs)
-    return decorated_function
+    return login_required
 
 # Mayın Tarlası Oyunu
 @app.route('/games/minesweeper')
@@ -1033,7 +1033,7 @@ def math_challenge():
     """Matematik Mücadelesi: Sayısal beceri testi
     Hızlı düşünme ve matematiksel becerilerinizi test edin."""
     return render_template('games/mathChallenge_simplified.html')
-    
+
 # Breakout game removed
 
 @app.route('/snake')
@@ -1203,7 +1203,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Hoş geldin e-postası gönder
+        # Hoş geldiniz e-postası gönder
         send_welcome_email(email, username)
 
         # Otomatik giriş yap
@@ -1233,11 +1233,11 @@ def xp_for_level(level):
     """
     if level <= 1:
         return 0
-    
+
     total_xp = 0
     for i in range(1, level):
         total_xp += i * 100
-    
+
     return total_xp
 
 def calculate_level(xp):
@@ -1247,14 +1247,14 @@ def calculate_level(xp):
     """
     # Başlangıç seviyesinden başla
     level = 1
-    
+
     # Kullanıcı 0 XP ile başlıyor
     if xp <= 0:
         return level
-    
+
     # Maksimum seviye sınırı (performans için)
     max_check_level = 100
-    
+
     # İkili arama ile seviye bulma - daha hızlı hesaplama
     left, right = 1, max_check_level
     while left <= right:
@@ -1265,12 +1265,12 @@ def calculate_level(xp):
             right = mid - 1
         else:
             left = mid + 1
-    
+
     # Eğer ikili arama sonuç vermezse, doğrusal arama yap
     level = 1
     while level < max_check_level and xp >= xp_for_level(level + 1):
         level += 1
-        
+
     return level
 
 def get_user_scores():
@@ -1330,7 +1330,7 @@ def profile_v2():
             return redirect(url_for('login'))
 
         user = User.query.get(session['user_id'])
-        
+
         if not user:
             logger.error(f"Kullanıcı bulunamadı: user_id={session['user_id']}")
             flash('Kullanıcı bilgilerinize erişilemedi. Lütfen tekrar giriş yapın.', 'danger')
@@ -1339,7 +1339,7 @@ def profile_v2():
         # Kullanıcı istatistiklerini hesapla
         try:
             scores = Score.query.filter_by(user_id=user.id).all()
-            
+
             total_games = len(scores)
             highest_score = 0
             if scores:
@@ -1897,10 +1897,10 @@ def save_score():
     # Verilerin doğruluğunu kontrol et
     if not game_type:
         return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
-        
+
     if score is None:
         return jsonify({'success': False, 'message': 'Skor değeri belirtilmedi!'})
-        
+
     try:
         # Çok önemli: Bazen string veya float olarak gönderiliyor, int'e çevir
         score = int(float(score))
@@ -1987,10 +1987,10 @@ def save_score():
         # Geliştirilmiş XP hesaplama sistemi
         # Temel XP değeri (oyun türü ve zorluğa göre)
         xp_base = multipliers['xp_base']
-        
+
         # Oyun performansına bağlı XP (skor ne kadar yüksekse o kadar çok XP)
         xp_from_score = score * multipliers['xp_score_multiplier']
-        
+
         # Oyunda harcanan zamanına bağlı XP - her dakika için 5 XP, 
         # ama çok uzun oyunlarda azalan getiri
         playtime_minutes = playtime / 60
@@ -2000,7 +2000,7 @@ def save_score():
         else:
             # 5 dakikadan sonra azalan XP
             xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
-        
+
         # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
         difficulty_bonus = 1.0
         if difficulty == "easy":
@@ -2015,12 +2015,12 @@ def save_score():
         completion_bonus = 0
         if game_stats.get('completed', False):
             completion_bonus = int(xp_base * 0.3)  # Oyunu tamamlamak için %30 bonus
-            
+
         # Ard arda kazanma (streak) bonusu
         streak_xp_bonus = 0
         if hasattr(user, 'streak_count') and user.streak_count > 1:
             streak_xp_bonus = min(user.streak_count * 2, 30)  # Maksimum 30 XP bonus
-        
+
         # Toplam XP hesaplama
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus + completion_bonus + streak_xp_bonus)
 
@@ -2056,10 +2056,10 @@ def save_score():
         current_level_xp = xp_for_level(new_level)
         xp_progress = user.experience_points - current_level_xp
         xp_needed = next_level_xp - current_level_xp
-        
+
         # Seviye yükseltme oldu mu kontrol et
         level_up = new_level > old_level
-        
+
         # Ödül detayları
         rewards = {
             'base_points': int(base_points),
@@ -2121,14 +2121,14 @@ def save_score():
             difficulty_bonus = 2.5  # %150 bonus
         elif difficulty == "expert":
             difficulty_bonus = 4.0  # %300 bonus
-            
+
         # Oyun süresine göre hesaplama
         playtime_minutes = playtime / 60
         if playtime_minutes <= 5:
             xp_from_time = playtime_minutes * 5
         else:
             xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
-            
+
         # Misafir kullanıcıya göstermek için toplam XP - giriş yapınca alabilecekleri miktar
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus)
         total_points = base_points + score_points
@@ -2161,7 +2161,7 @@ def save_score():
 @app.route('/api/rate-game', methods=['POST'])
 def rate_game():
     """Oyun derecelendirme API'si
-    
+
     Kullanıcının bir oyuna 1-5 arası puan vermesini sağlar.
     """
     # Kullanıcı girişi kontrolü
@@ -2172,40 +2172,40 @@ def rate_game():
             'guest': True,
             'login_required': True
         })
-    
+
     # Gelen veriyi al ve doğrula
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'message': 'Geçersiz JSON verisi!'})
-    
+
     game_type = data.get('game_type')
     rating = data.get('rating')
     comment = data.get('comment', '')
-    
+
     # Verilerin doğruluğunu kontrol et
     if not game_type:
         return jsonify({'success': False, 'message': 'Oyun türü belirtilmedi!'})
-    
+
     if rating is None:
         return jsonify({'success': False, 'message': 'Derecelendirme değeri belirtilmedi!'})
-    
+
     try:
         # Derecelendirme değerini int'e çevir
         rating = int(rating)
-        
+
         # Derecelendirme 1-5 arasında olmalı
         if rating < 1 or rating > 5:
             return jsonify({'success': False, 'message': 'Derecelendirme 1-5 arasında olmalıdır!'})
-            
+
     except (ValueError, TypeError) as e:
         logger.error(f"Derecelendirme dönüşüm hatası: {str(e)}, Değer: rating={rating}")
         return jsonify({'success': False, 'message': 'Geçersiz derecelendirme değeri!'})
-    
+
     user_id = session['user_id']
-    
+
     # Aynı kullanıcının aynı oyuna önceki derecelendirmesini kontrol et
     existing_rating = GameRating.query.filter_by(user_id=user_id, game_type=game_type).first()
-    
+
     if existing_rating:
         # Varolan derecelendirmeyi güncelle
         existing_rating.rating = rating
@@ -2224,22 +2224,22 @@ def rate_game():
         db.session.add(new_rating)
         db.session.commit()
         action = "eklendi"
-    
+
     # Oyunun ortalama puanını güncelle (Game modeli varsa)
     game = Game.query.filter_by(slug=game_type).first()
     if game:
         # Bu oyuna ait tüm derecelendirmeleri al
         all_ratings = GameRating.query.filter_by(game_type=game_type).all()
-        
+
         if all_ratings:
             # Ortalama puanı hesapla
             total_rating = sum(r.rating for r in all_ratings)
             avg_rating = total_rating / len(all_ratings)
-            
+
             # Ortalama puanı güncelle
             game.avg_rating = avg_rating
             db.session.commit()
-    
+
     return jsonify({
         'success': True,
         'message': f'Derecelendirmeniz başarıyla {action}!',
@@ -2254,17 +2254,17 @@ def get_game_ratings(game_type):
     try:
         # Oyunun derecelendirmelerini getir
         ratings = GameRating.query.filter_by(game_type=game_type).order_by(GameRating.timestamp.desc()).all()
-        
+
         # Derecelendirme verisini düzenle
         ratings_data = []
         for rating in ratings:
             # Kullanıcı bilgilerini al
             user = User.query.get(rating.user_id)
             username = user.username if user else "Bilinmeyen Kullanıcı"
-            
+
             # Avatar URL'si
             avatar_url = user.avatar_url if user and user.avatar_url else "/static/images/placeholder.jpg"
-            
+
             # Derecelendirme verisini ekle
             ratings_data.append({
                 'user': {
@@ -2276,19 +2276,19 @@ def get_game_ratings(game_type):
                 'comment': rating.comment,
                 'timestamp': rating.timestamp.strftime("%d.%m.%Y %H:%M")
             })
-        
+
         # Ortalama derecelendirmeyi hesapla
         avg_rating = 0
         if ratings:
             avg_rating = sum(r.rating for r in ratings) / len(ratings)
-            
+
         return jsonify({
             'success': True,
             'ratings': ratings_data,
             'avg_rating': round(avg_rating, 1),
             'count': len(ratings)
         })
-        
+
     except Exception as e:
         logger.error(f"Derecelendirmeleri getirirken hata: {str(e)}")
         return jsonify({
@@ -2307,13 +2307,13 @@ def get_user_rating(game_type):
             'message': 'Derecelendirme bilgisi için giriş yapmalısınız!',
             'guest': True
         })
-    
+
     try:
         user_id = session['user_id']
-        
+
         # Kullanıcının derecelendirmesini getir
         rating = GameRating.query.filter_by(user_id=user_id, game_type=game_type).first()
-        
+
         if rating:
             return jsonify({
                 'success': True,
@@ -2327,7 +2327,7 @@ def get_user_rating(game_type):
                 'success': True,
                 'has_rated': False
             })
-            
+
     except Exception as e:
         logger.error(f"Kullanıcı derecelendirmesini getirirken hata: {str(e)}")
         return jsonify({
@@ -2344,7 +2344,7 @@ def get_current_user_api():
         if 'user_id' in session:
             user_id = session['user_id']
             user = User.query.get(user_id)
-            
+
             if user:
                 return jsonify({
                     'id': user.id,
@@ -2352,7 +2352,7 @@ def get_current_user_api():
                     'email': user.email,
                     'loggedIn': True
                 })
-        
+
         # Kullanıcı giriş yapmamış veya kullanıcı bulunamadı
         return jsonify({
             'id': None,
@@ -2594,32 +2594,32 @@ def get_users_levels():
     try:
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-        
+
         # En yüksek 10 seviyeye sahip kullanıcıları getir
         users = User.query.order_by(User.experience_points.desc()).limit(10).all()
-        
+
         result = []
-        
+
         for user in users:
             # Kullanıcının seviyesini hesapla
             level = calculate_level(user.experience_points)
-            
+
             # Bir sonraki seviyeye geçmek için gereken XP
             next_level_xp = xp_for_level(level + 1)
             current_level_xp = xp_for_level(level)
             xp_needed = next_level_xp - current_level_xp
-            
+
             # Şu anki ilerleme
             progress = user.experience_points - current_level_xp
-            
+
             # İlerleme yüzdesi
             progress_percent = int((progress / xp_needed) * 100) if xp_needed > 0 else 100
-            
+
             # Avatar URL'i düzelt
             avatar_url = user.avatar_url
             if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
                 avatar_url = '/' + avatar_url
-            
+
             result.append({
                 'username': user.username,
                 'level': level,
@@ -2631,7 +2631,7 @@ def get_users_levels():
                 'rank': user.rank,
                 'is_current_user': user.id == current_user_id
             })
-        
+
         return jsonify(result)
     except Exception as e:
         logging.error(f"Kullanıcı seviyeleri getirilirken hata oluştu: {str(e)}")
@@ -2644,21 +2644,21 @@ def get_top_users():
     try:
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-        
+
         # En yüksek toplam skora sahip 10 kullanıcıyı getir
         top_users = User.query.order_by(User.highest_score.desc()).limit(10).all()
-        
+
         result = []
-        
+
         for user in top_users:
             # Kullanıcının seviyesini hesapla
             level = calculate_level(user.experience_points)
-            
+
             # Avatar URL'i düzelt
             avatar_url = user.avatar_url
             if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
                 avatar_url = '/' + avatar_url
-            
+
             result.append({
                 'username': user.username,
                 'level': level,
@@ -2671,7 +2671,7 @@ def get_top_users():
                 'rank': user.rank,
                 'is_current_user': user.id == current_user_id
             })
-        
+
         return jsonify(result)
     except Exception as e:
         logging.error(f"En iyi kullanıcılar getirilirken hata oluştu: {str(e)}")
@@ -2718,10 +2718,10 @@ def get_users_leaderboard():
     try:
         # Sıralama parametresini al
         sort_by = request.args.get('sort', 'level')
-        
+
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
-        
+
         # Sıralamaya göre kullanıcıları getir
         if sort_by == 'level':
             # Seviyeye göre sırala (experience_points)
@@ -2729,29 +2729,29 @@ def get_users_leaderboard():
         else:
             # Toplam puana göre sırala (highest_score)
             users = User.query.order_by(User.highest_score.desc()).limit(10).all()
-        
+
         result = []
-        
+
         for user in users:
             # Kullanıcının seviyesini hesapla
             level = calculate_level(user.experience_points)
-            
+
             # Bir sonraki seviyeye geçmek için gereken XP
             next_level_xp = xp_for_level(level + 1)
             current_level_xp = xp_for_level(level)
             xp_needed = next_level_xp - current_level_xp
-            
+
             # Şu anki ilerleme
             progress = user.experience_points - current_level_xp
-            
+
             # İlerleme yüzdesi
             progress_percent = int((progress / xp_needed) * 100) if xp_needed > 0 else 100
-            
+
             # Avatar URL'i düzelt
             avatar_url = user.avatar_url
             if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
                 avatar_url = '/' + avatar_url
-            
+
             result.append({
                 'username': user.username,
                 'level': level,
@@ -2764,7 +2764,7 @@ def get_users_leaderboard():
                 'rank': user.rank,
                 'is_current_user': user.id == current_user_id
             })
-        
+
         return jsonify(result)
     except Exception as e:
         logging.error(f"Kullanıcılar liderlik tablosu getirilirken hata oluştu: {str(e)}")
