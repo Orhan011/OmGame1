@@ -112,7 +112,7 @@ def send_welcome_email(to_email, username):
             return True
         except Exception as email_error:
             logger.error(f"SMTP Sunucu Hatası: {str(email_error)}")
-            
+
             # Alternatif gönderim dene
             try:
                 server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -1223,11 +1223,11 @@ def register():
 
         # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
         logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
-        
+
         # E-posta gönderimi için asenkron olmayan bir yaklaşım kullanıyoruz
         # Gerçek bir üretim uygulamasında, bu işlemi bir kuyruk sistemi ile asenkron yapabilirsiniz
         email_sent = send_welcome_email(email, username)
-        
+
         if email_sent:
             flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderdik.', 'success')
             logger.info(f"Hoş geldiniz e-postası gönderildi: {email}")
@@ -1328,6 +1328,7 @@ def profile():
     scores = Score.query.filter_by(user_id=user.id).all()
 
     user_scores = {}
+```python
     for score in scores:
         if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
             user_scores[score.game_type] = score.score
@@ -1361,7 +1362,7 @@ def profile_v2():
 
         user = User.query.get(session['user_id'])
 
-        if notuser:
+        if not user:
             logger.error(f"Kullanıcı bulunamadı: user_id={session['user_id']}")
             flash('Kullanıcı bilgilerinize erişilemedi. Lütfen tekrar giriş yapın.', 'danger')
             return redirect(url_for('logout'))
@@ -1661,7 +1662,7 @@ def forgot_password():
             # E-posta gönder
             if send_verification_email(email, reset_code):
                 flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-                return redirect(url_for('reset_code', email=email))
+                return redirect(url_for('reset_code', email=email, _scheme='https', _external=True))
             else:
                 flash('E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
         else:
@@ -1684,7 +1685,7 @@ def reset_code():
 
         if user and user.reset_token_expiry > datetime.utcnow():
             # Kodu doğrula ve şifre sıfırlama sayfasına yönlendir
-            return redirect(url_for('reset_password', email=email, token=code))
+            return redirect(url_for('reset_password', email=email, token=code, _scheme='https', _external=True))
         else:
             flash('Geçersiz veya süresi dolmuş kod!', 'danger')
 
@@ -1719,7 +1720,7 @@ def reset_password():
             db.session.commit()
 
             flash('Şifreniz başarıyla sıfırlandı! Şimdi giriş yapabilirsiniz.', 'success')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', _scheme='https', _external=True))
 
     return render_template('reset_password.html', email=email, token=token)
 
@@ -2034,7 +2035,7 @@ def save_score():
         # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
         difficulty_bonus = 1.0
         if difficulty == "easy":
-            difficulty_bonus = 1.0  # Temel değer
+            difficulty_bonus = 1.0 # Temel değer
         elif difficulty == "medium":
             difficulty_bonus = 1.5  # %50 bonus
         elif difficulty == "hard":
