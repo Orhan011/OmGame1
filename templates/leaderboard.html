@@ -14,12 +14,30 @@
     <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
   </div>
 
-  <div class="leaderboard-container">
-    <!-- Skor tablosu -->
-    <div id="leaderboardContainer" class="leaderboard-card-container">
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Skorlar yükleniyor...</p>
+  <div class="row">
+    <!-- Skor Tablosu -->
+    <div class="col-12 mb-4">
+      <div class="leaderboard-title">Toplam Puan Sıralaması</div>
+      <div class="leaderboard-container">
+        <div id="leaderboardContainer" class="leaderboard-card-container">
+          <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Skorlar yükleniyor...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seviye Tablosu -->
+    <div class="col-12">
+      <div class="leaderboard-title">Kullanıcı Seviyeleri</div>
+      <div class="leaderboard-container">
+        <div id="levelLeaderboardContainer" class="leaderboard-card-container">
+          <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Seviye bilgileri yükleniyor...</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
