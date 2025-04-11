@@ -381,15 +381,13 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(completed = false) {
     gameActive = false;
     
-    // Sonuç ekranını hazırla
-    prepareResultScreen(completed);
-    
-    // UI güncelle
-    hideGameContainer();
-    showGameOverScreen();
-    
-    // Sonucu kaydet
+    // Skoru arka planda kaydet
     saveScore();
+    
+    // Kısa bir süre sonra ana sayfaya yönlendir
+    setTimeout(() => {
+      window.location.href = "/all_games";
+    }, 1500);
   }
   
   // Sonuç ekranını hazırla
@@ -483,22 +481,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Oyun türü için backend'de tanımlı ID
     const gameType = 'numberChain';
     
-    fetch('/save-score', {
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      max_sequence: maxSequenceReached,
+      correct_answers: correctAnswers, 
+      level_reached: currentLevel - 1,
+      difficulty: difficulty
+    };
+    
+    // Doğru API endpointine ve formatına göre gönder
+    fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         game_type: gameType,
-        score: score
+        score: score,
+        difficulty: difficulty,
+        playtime: totalPlayTime || 0,
+        game_stats: gameStats
       })
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Score saved:', data);
+      console.log('Sayı Zinciri skoru kaydedildi:', data);
     })
     .catch(error => {
-      console.error('Error saving score:', error);
+      console.error('Skor kaydedilirken hata oluştu:', error);
     });
   }
   

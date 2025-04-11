@@ -801,51 +801,55 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate final score with all factors
     const finalScoreValue = Math.round((score + Math.floor(timeBonus / 10) - movePenalty) * difficultyMultiplier);
     
-    // Update results display with animation
-    animateResultValue(finalScore, 0, finalScoreValue, 1500);
+    // Get game stats
+    const totalTime = timer;
     
-    // Format time for display
-    const minutes = Math.floor(timer / 60);
-    const seconds = timer % 60;
-    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // Zorluk seviyesini belirle
+    let difficulty = currentLevel; // 'easy', 'medium', veya 'hard'
     
-    finalTime.textContent = formattedTime;
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      duration_seconds: totalTime,
+      move_count: moves,
+      hint_count: initialHints - hintsLeft,
+      pairs_count: totalPairs,
+      theme: currentTheme
+    };
     
-    // Animate moves counter
-    animateResultValue(finalMoves, 0, moves, 1200);
+    // API'ye skoru kaydet (sonuç ekranı göstermeden)
+    saveScoreToAPI('memoryCards', finalScoreValue, totalTime, difficulty, gameStats);
     
-    // Calculate star rating
-    const moveEfficiency = perfectMoves / moves;
-    const timeEfficiency = 1 - (timer / (totalPairs * 10));
-    const overallRating = (moveEfficiency * 0.6 + timeEfficiency * 0.4) * 5;
-    
-    // Update star display with delay for sequential animations
+    // Kısa bir süre sonra ana sayfaya yönlendir
     setTimeout(() => {
-      updateStarRating(overallRating);
-    }, 600);
-    
-    // Hide game board
-    gameBoard.style.display = 'none';
-    
-    // Show confetti effect before showing results
-    createConfetti();
-    
-    // Show results with slight delay for better UX flow
-    setTimeout(() => {
-      gameResults.style.display = 'block';
-      
-      // Add animation to results card
-      gameResults.classList.add('animate__animated', 'animate__fadeIn');
-      setTimeout(() => gameResults.classList.remove('animate__animated', 'animate__fadeIn'), 1000);
-      
-      // Animate individual stat items sequentially
-      const statItems = document.querySelectorAll('.result-stat');
-      statItems.forEach((item, index) => {
-        setTimeout(() => {
-          item.classList.add('stat-appear');
-        }, 150 * index);
-      });
-    }, 500);
+      window.location.href = "/all_games";
+    }, 1500);
+  }
+  
+  /**
+   * Skoru API'ye kaydeder ve sonuç ekranı göstermez
+   */
+  function saveScoreToAPI(gameType, score, time, difficulty, gameStats) {
+    // API'ye post isteği gönder
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: gameType,
+        score: score,
+        difficulty: difficulty,
+        playtime: time,
+        game_stats: gameStats
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Skor kaydedildi:', data);
+    })
+    .catch(error => {
+      console.error('Skor kaydedilirken hata oluştu:', error);
+    });
   }
   
   /**
