@@ -56,150 +56,133 @@ def allowed_file(filename):
     """Dosya uzantısının izin verilen uzantılardan olup olmadığını kontrol eder."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def send_welcome_email(to_email, username):
+import threading
+
+def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
     """
-    Sends a welcome email to a newly registered user
-
-    Uses the configured Gmail account (omgameee@gmail.com) to send welcome emails
+    Arka planda e-posta gönderme işlemini gerçekleştirir.
+    Bu sayede kullanıcı e-posta gönderilmesini beklemek zorunda kalmaz.
     """
-    try:
-        from_email = "omgameee@gmail.com"
-        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-
-        msg = MIMEMultipart()
-        msg['From'] = f"OmGame <{from_email}>"
-        msg['To'] = to_email
-        msg['Subject'] = "OmGame - Hoş Geldiniz!"
-
-        body = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #4a67e8; text-align: center;">OmGame Dünyasına Hoş Geldiniz!</h2>
-                <p>Merhaba {username},</p>
-                <p>OmGame'e kaydolduğunuz için teşekkür ederiz! Artık beyin geliştirici oyunlarımıza erişebilir, 
-                   skorlarınızı takip edebilir ve liderlik tablolarında yerinizi alabilirsiniz.</p>
-
-                <h3 style="color: #4a67e8;">OmGame'de Neler Yapabilirsiniz?</h3>
-                <ul>
-                    <li>Farklı kategorilerde beyin geliştirici oyunlar oynayabilirsiniz</li>
-                    <li>Oyunlardaki performansınızla XP kazanarak seviye atlayabilirsiniz</li>
-                    <li>Diğer oyuncularla rekabet edebilirsiniz</li>
-                    <li>Oynadıkça beyninizi geliştirebilirsiniz</li>
-                </ul>
-
-                <p>Hemen giriş yapın ve oyunları keşfetmeye başlayın: <a href="https://omgame.replit.app">OmGame</a></p>
-
-                <p>Herhangi bir sorunuz veya öneriniz varsa, bize bildirmekten çekinmeyin.</p>
-
-                <p>İyi oyunlar,<br>OmGame Ekibi</p>
-            </div>
-        </body>
-        </html>
-        """
-
-        msg.attach(MIMEText(body, 'html'))
-
-        # Güvenli SSL bağlantısı ile e-posta gönderme (önerilen yöntem)
+    def send_email_task():
         try:
-            logger.info(f"SSL ile e-posta göndermeye çalışılıyor: {to_email}")
-            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-            server.login(from_email, password)
-            text = msg.as_string()
-            server.sendmail(from_email, to_email, text)
-            server.quit()
-            logger.info(f"SSL bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
-            return True
-        except Exception as ssl_error:
-            logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
+            from_email = "omgameee@gmail.com"
+            password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+
+            msg = MIMEMultipart()
+            msg['From'] = f"{from_name} <{from_email}>"
+            msg['To'] = to_email
+            msg['Subject'] = subject
+
+            msg.attach(MIMEText(html_body, 'html'))
             
-            # SSL başarısız olursa TLS ile deneyelim
+            # Önce SSL ile dene (daha güvenli)
             try:
-                logger.info(f"TLS ile e-posta göndermeye çalışılıyor: {to_email}")
-                server = smtplib.SMTP('smtp.gmail.com', 587)
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
+                logger.info(f"SSL ile e-posta göndermeye çalışılıyor: {to_email}")
+                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)  # Timeout arttırıldı
                 server.login(from_email, password)
                 text = msg.as_string()
                 server.sendmail(from_email, to_email, text)
                 server.quit()
-                logger.info(f"TLS bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
+                logger.info(f"SSL bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
                 return True
-            except Exception as tls_error:
-                logger.error(f"TLS SMTP Hatası: {str(tls_error)}")
-                return False
-    except Exception as e:
-        logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
-        return False
+            except Exception as ssl_error:
+                logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
+                
+                # SSL başarısız olursa TLS ile dene
+                try:
+                    logger.info(f"TLS ile e-posta göndermeye çalışılıyor: {to_email}")
+                    server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)  # Timeout arttırıldı
+                    server.ehlo()
+                    server.starttls()
+                    server.ehlo()
+                    server.login(from_email, password)
+                    text = msg.as_string()
+                    server.sendmail(from_email, to_email, text)
+                    server.quit()
+                    logger.info(f"TLS bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
+                    return True
+                except Exception as tls_error:
+                    logger.error(f"TLS SMTP Hatası: {str(tls_error)}")
+                    return False
+        except Exception as e:
+            logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
+            return False
+    
+    # E-posta gönderme işlemini arka planda başlat
+    email_thread = threading.Thread(target=send_email_task)
+    email_thread.daemon = True
+    email_thread.start()
+    
+    # İşlemi başlattığımız için True döndür
+    return True
+
+def send_welcome_email(to_email, username):
+    """
+    Sends a welcome email to a newly registered user.
+    Uses the configured Gmail account (omgameee@gmail.com) to send welcome emails.
+    Runs in background to avoid blocking the registration process.
+    """
+    subject = "OmGame - Hoş Geldiniz!"
+    
+    body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="color: #4a67e8; text-align: center;">OmGame Dünyasına Hoş Geldiniz!</h2>
+            <p>Merhaba {username},</p>
+            <p>OmGame'e kaydolduğunuz için teşekkür ederiz! Artık beyin geliştirici oyunlarımıza erişebilir, 
+               skorlarınızı takip edebilir ve liderlik tablolarında yerinizi alabilirsiniz.</p>
+
+            <h3 style="color: #4a67e8;">OmGame'de Neler Yapabilirsiniz?</h3>
+            <ul>
+                <li>Farklı kategorilerde beyin geliştirici oyunlar oynayabilirsiniz</li>
+                <li>Oyunlardaki performansınızla XP kazanarak seviye atlayabilirsiniz</li>
+                <li>Diğer oyuncularla rekabet edebilirsiniz</li>
+                <li>Oynadıkça beyninizi geliştirebilirsiniz</li>
+            </ul>
+
+            <p>Hemen giriş yapın ve oyunları keşfetmeye başlayın: <a href="https://omgame.replit.app">OmGame</a></p>
+
+            <p>Herhangi bir sorunuz veya öneriniz varsa, bize bildirmekten çekinmeyin.</p>
+
+            <p>İyi oyunlar,<br>OmGame Ekibi</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Arka planda e-posta gönder
+    return send_email_in_background(to_email, subject, body)
 
 def send_verification_email(to_email, verification_code):
     """
-    Sends a verification email with the provided code
-
-    Uses the configured Gmail account (omgameee@gmail.com) to send verification emails
+    Sends a verification email with the provided code.
+    
+    Uses the configured Gmail account (omgameee@gmail.com) to send verification emails.
+    Runs in background to avoid blocking the user's browser.
     """
-    try:
-        from_email = "omgameee@gmail.com"
-        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-
-        msg = MIMEMultipart()
-        msg['From'] = f"OmGame <{from_email}>"
-        msg['To'] = to_email
-        msg['Subject'] = "OmGame - E-posta Doğrulama Kodu"
-
-        body = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #4a67e8; text-align: center;">OmGame'e Hoş Geldiniz!</h2>
-                <p>Merhaba,</p>
-                <p>OmGame hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
-                <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
-                    <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
-                </div>
-                <p>Bu kod 30 dakika boyunca geçerlidir.</p>
-                <p>Eğer böyle bir talepte bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
-                <p>Teşekkürler,<br>OmGame Ekibi</p>
+    subject = "OmGame - E-posta Doğrulama Kodu"
+    
+    body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="color: #4a67e8; text-align: center;">OmGame'e Hoş Geldiniz!</h2>
+            <p>Merhaba,</p>
+            <p>OmGame hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
+            <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
+                <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
             </div>
-        </body>
-        </html>
-        """
-
-        msg.attach(MIMEText(body, 'html'))
-
-        # Güvenli SSL bağlantısı ile e-posta gönderme (önerilen yöntem)
-        try:
-            logger.info(f"SSL ile doğrulama e-postası göndermeye çalışılıyor: {to_email}")
-            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-            server.login(from_email, password)
-            text = msg.as_string()
-            server.sendmail(from_email, to_email, text)
-            server.quit()
-            logger.info(f"SSL bağlantısı ile doğrulama e-postası başarıyla gönderildi: {to_email}")
-            return True
-        except Exception as ssl_error:
-            logger.error(f"SSL SMTP Hatası (doğrulama e-postası): {str(ssl_error)}")
-            
-            # SSL başarısız olursa TLS ile deneyelim
-            try:
-                logger.info(f"TLS ile doğrulama e-postası göndermeye çalışılıyor: {to_email}")
-                server = smtplib.SMTP('smtp.gmail.com', 587)
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
-                server.login(from_email, password)
-                text = msg.as_string()
-                server.sendmail(from_email, to_email, text)
-                server.quit()
-                logger.info(f"TLS bağlantısı ile doğrulama e-postası başarıyla gönderildi: {to_email}")
-                return True
-            except Exception as tls_error:
-                logger.error(f"TLS SMTP Hatası (doğrulama e-postası): {str(tls_error)}")
-                return False
-    except Exception as e:
-        logger.error(f"Doğrulama e-postası gönderirken genel hata oluştu: {str(e)}")
-        return False
+            <p>Bu kod 30 dakika boyunca geçerlidir.</p>
+            <p>Eğer böyle bir talepte bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
+            <p>Teşekkürler,<br>OmGame Ekibi</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Arka planda e-posta gönder
+    return send_email_in_background(to_email, subject, body)
 
 def get_user_avatar(user_id):
     """
