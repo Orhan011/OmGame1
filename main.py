@@ -591,6 +591,52 @@ def initialize_database():
                     <h3>Neden Bilişsel Becerilerimizi Geliştirmeliyiz?</h3>
                     <p>Bilişsel becerilerimiz, günlük yaşamda bilgiyi işleme, anlama ve kullanma yeteneğimiz için temel oluşturur. Bu becerileri düzenli olarak geliştirmek şunları sağlar:</p>
                     <ul>
+                        <li><strong>Daha İyi Problem Çözme:</strong> Karmaşık sorunları daha kolay analiz etme ve çözüm üretme yeteneği</li>
+                        <li><strong>Artan Yaratıcılık:</strong> Yeni fikirler geliştirme ve alternatif çözümler bulma</li>
+                        <li><strong>İyileştirilmiş Öğrenme:</strong> Yeni bilgileri daha hızlı ve etkili şekilde özümseme</li>
+                        <li><strong>Daha Keskin Hafıza:</strong> Bilgileri daha iyi depolama ve hatırlama</li>
+                    </ul>
+                    <p>ZekaPark'taki oyunlar, bu becerileri eğlenceli ve interaktif bir şekilde geliştirmenize yardımcı olmak için tasarlanmıştır.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Beyin Egzersizleri ve Zihinsel Sağlık İlişkisi",
+                    content="""
+                    <h3>Beyin Egzersizleri Zihinsel Sağlığı Nasıl Etkiler?</h3>
+                    <p>Düzenli beyin egzersizleri yapmak sadece bilişsel becerileri geliştirmekle kalmaz, aynı zamanda genel zihinsel sağlığınıza da önemli katkılarda bulunur.</p>
+                    
+                    <h4>Beyin Egzersizlerinin Zihinsel Sağlık Faydaları:</h4>
+                    <ul>
+                        <li><strong>Stres Azaltma:</strong> Beyin oyunları oynamak, zihnin başka bir şeye odaklanmasını sağlayarak stres seviyelerini düşürebilir.</li>
+                        <li><strong>Depresyon ve Kaygı ile Mücadele:</strong> Düzenli zihinsel aktivite, bazı çalışmalarda depresyon ve kaygı belirtilerini azaltmaya yardımcı olmuştur.</li>
+                        <li><strong>Öz Yeterlilik Duygusu:</strong> Zorlayıcı bulmacaları çözmek ve oyunlarda ilerleme kaydetmek, başarı ve yeterlilik duygularını güçlendirir.</li>
+                        <li><strong>Beyin Yaşlanmasını Geciktirme:</strong> Bilişsel rezervi artırarak yaşa bağlı bilişsel gerilemeye karşı koruma sağlar.</li>
+                    </ul>
+                    
+                    <p>ZekaPark platformundaki oyunlar, sadece bilişsel becerilerinizi geliştirmek için değil, aynı zamanda günlük zihinsel sağlığınızı desteklemek için de mükemmel bir araçtır.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Düzenli Beyin Egzersizlerinin Uzun Vadeli Etkileri",
+                    content="""
+                    <h3>Uzun Vadeli Bilişsel Sağlık İçin Beyin Egzersizleri</h3>
+                    <p>Beyin egzersizlerinin düzenli olarak yapılması, zaman içinde birikimli faydalar sağlayabilir ve uzun vadeli bilişsel sağlığınız üzerinde önemli etkilere sahip olabilir.</p>
+                    
+                    <h4>Düzenli Egzersizlerin Uzun Vadeli Faydaları:</h4>
+                    <ul>
+                        <li><strong>Bilişsel Rezerv Oluşturma:</strong> Beyin egzersizleri, beyninizde yeni nöral bağlantılar oluşturarak "bilişsel rezerv" adı verilen bir kaynak oluşturur. Bu rezerv, yaşlanma veya hastalık durumunda beyninizin daha fazla dirençli olmasını sağlar.</li>
+                        <li><strong>Demans Riskini Azaltma:</strong> Çeşitli araştırmalar, zihinsel olarak aktif kalmanın Alzheimer ve diğer demans türleri riskini azaltabileceğini göstermektedir.</li>
+                        <li><strong>İşlevsel Bağımsızlığı Koruma:</strong> Güçlü bilişsel beceriler, yaşlandıkça günlük yaşam aktivitelerinizde bağımsızlığınızı korumanıza yardımcı olur.</li>
+                        <li><strong>Yaşam Kalitesini Artırma:</strong> Keskin bir zihin, yaşam boyu daha dolu ve tatmin edici deneyimler yaşamanızı sağlar.</li>
+                    </ul>
+                    
+                    <p>ZekaPark'ın sunduğu çeşitli oyunlar, farklı bilişsel becerileri hedefleyerek dengeli bir zihinsel antrenman sağlar, bu da uzun vadeli beyin sağlığınız için optimum faydalar sunar.</p>
+                    """,
+                    category="article"
+                ),>
+                    <ul>
                         <li>Daha iyi problem çözme yeteneği</li>
                         <li>Gelişmiş hafıza ve konsantrasyon</li>
                         <li>Daha hızlı bilgi işleme</li>
@@ -716,7 +762,69 @@ def initialize_database():
                         <li><strong>İş ve Akademik Performans:</strong> Daha hızlı öğrenme, daha iyi problem çözme ve gelişmiş kritik düşünme becerileri.</li>
                         <li><strong>Günlük Görevler:</strong> Alışveriş listesini hatırlama, randevulara zamanında gitme ve çoklu görevleri daha verimli yönetme.</li>
                         <li><strong>İletişim:</strong> Daha iyi dinleme, daha keskin sözel beceriler ve daha iyi sosyal ipuçları algılama.</li>
-                        <li><strong>Yaratıcılık:</strong> Daha geniş düşünme, farklı bakış açıları geliştirme ve daha yenilikçi çözümler bulma.</li>
+                        <li><strong>Yaratıcılık:</strong> Yenilikçi düşünme ve problem çözme yeteneğinde artış.</li>
+                    </ul>
+                    <p>ZekaPark'taki oyunlar, bu becerileri günlük yaşamınıza aktarmanıza yardımcı olmak için tasarlanmıştır.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Çocuklarda Bilişsel Gelişimi Destekleme Yöntemleri",
+                    content="""
+                    <h3>Çocukluk Döneminde Bilişsel Gelişimin Önemi</h3>
+                    <p>Çocukluk dönemi, beyin gelişiminin en hızlı olduğu ve bilişsel becerilerin temellerinin atıldığı kritik bir dönemdir. Çocuklarda bilişsel gelişimi desteklemek, onların gelecekteki akademik başarıları ve hayat becerileri için güçlü bir temel oluşturur.</p>
+                    
+                    <h4>Çocuklarda Bilişsel Gelişimi Desteklemek İçin Stratejiler:</h4>
+                    <ul>
+                        <li><strong>Yaşa Uygun Bilişsel Oyunlar:</strong> Çocuğunuzun yaşına ve gelişim düzeyine uygun bulmacalar, hafıza oyunları ve problem çözme aktiviteleri sunun.</li>
+                        <li><strong>Aktif Öğrenme Fırsatları:</strong> Çocuğunuzu pasif öğrenme yerine aktif keşif ve deneyime teşvik edin.</li>
+                        <li><strong>Açık Uçlu Sorular:</strong> "Evet" veya "hayır" ile cevaplanabilen sorular yerine, çocuğunuzu düşünmeye teşvik eden açık uçlu sorular sorun.</li>
+                        <li><strong>Okuma Alışkanlığı:</strong> Düzenli okuma zamanları oluşturun ve çocuğunuzun dil becerilerini, hayal gücünü ve eleştirel düşünme yeteneğini geliştirin.</li>
+                        <li><strong>Sanat ve Müzik:</strong> Sanatsal aktiviteler ve müzik eğitimi, beynin her iki yarımküresini de geliştirir ve yaratıcılığı besler.</li>
+                    </ul>
+                    
+                    <p>ZekaPark'taki çocuklara yönelik oyunlar, eğlenceli ve etkileşimli bir ortamda bu bilişsel becerileri geliştirmeye yardımcı olur.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Dil Öğrenme ve Bilişsel Gelişim İlişkisi",
+                    content="""
+                    <h3>Dil Öğrenmenin Beynimize Etkileri</h3>
+                    <p>Yeni bir dil öğrenmek, yalnızca iletişim becerinizi geliştirmekle kalmaz, aynı zamanda beyninizi de birçok yönden olumlu etkiler ve genel bilişsel gelişiminize katkıda bulunur.</p>
+                    
+                    <h4>Dil Öğrenmenin Bilişsel Faydaları:</h4>
+                    <ul>
+                        <li><strong>Gelişmiş Yürütücü İşlevler:</strong> Dil öğrenme, planlama, odaklanma, çoklu görev yapma ve dürtü kontrolü gibi yürütücü işlevleri güçlendirir.</li>
+                        <li><strong>Artan Beyaz Madde Yoğunluğu:</strong> Çalışmalar, dil öğrenenlerin beynindeki beyaz madde yoğunluğunun arttığını göstermiştir, bu da daha hızlı bilgi işleme anlamına gelir.</li>
+                        <li><strong>Daha İyi Bellek:</strong> Yeni kelimeler ve dilbilgisi kuralları öğrenmek, hem kısa hem de uzun vadeli belleği geliştirir.</li>
+                        <li><strong>Daha Güçlü Çoklu Perspektif Alma:</strong> Farklı diller, dünyayı farklı şekillerde kategorize eder, bu da daha esnek düşünme yeteneğini teşvik eder.</li>
+                        <li><strong>Yaşlanma Etkilerine Karşı Koruma:</strong> İkidillilik ve çokdillilik, bilişsel yaşlanmayı geciktirebilir ve demans riskini azaltabilir.</li>
+                    </ul>
+                    
+                    <p>ZekaPark'taki kelime temelli ve dil becerileriyle ilgili oyunlar, dil öğrenme sürecinizi destekleyebilir ve bu bilişsel faydaları elde etmenize yardımcı olabilir.</p>
+                    """,
+                    category="article"
+                ),
+                Article(
+                    title="Bilişsel Dayanıklılık ve Stres Yönetimi",
+                    content="""
+                    <h3>Zihinsel Gücümüzü Artırmak</h3>
+                    <p>Bilişsel dayanıklılık, zorluklar ve stres karşısında zihinsel işlevselliğimizi koruma ve uyum sağlama yeteneğimizdir. Bu yetenek geliştirilebilir ve stresli durumlarda daha etkili düşünmemize olanak tanır.</p>
+                    
+                    <h4>Bilişsel Dayanıklılığı Geliştirme Stratejileri:</h4>
+                    <ul>
+                        <li><strong>Zihinsel Zorluklar:</strong> Düzenli olarak bilişsel zorluklar ve bulmacalarla uğraşmak, beyninizi stres altında bile performans göstermeye hazırlar.</li>
+                        <li><strong>Mindfulness Meditasyonu:</strong> Düzenli meditasyon pratiği, stres tepkisini azaltır ve dikkati artırır.</li>
+                        <li><strong>Bilişsel Yeniden Çerçeveleme:</strong> Stresli durumları tehdit yerine meydan okuma olarak görmeyi öğrenmek.</li>
+                        <li><strong>Fiziksel Egzersiz:</strong> Düzenli fiziksel aktivite, stres hormonlarını azaltır ve beyin sağlığını destekler.</li>
+                        <li><strong>Yeterli Uyku:</strong> Kaliteli uyku, bilişsel işlevleri ve duygusal düzenlemeyi iyileştirir.</li>
+                    </ul>
+                    
+                    <p>ZekaPark'taki oyunlar, zamanla bilişsel esnekliğinizi ve dayanıklılığınızı artırmaya yardımcı olabilir, böylece günlük stresörlerle daha etkili bir şekilde başa çıkabilirsiniz.</p>
+                    """,
+                    category="article"
+                ),k:</strong> Daha geniş düşünme, farklı bakış açıları geliştirme ve daha yenilikçi çözümler bulma.</li>
                         <li><strong>Duygusal Zeka:</strong> Duyguları daha iyi tanıma, dürtüleri kontrol etme ve stresle başa çıkma yeteneği.</li>
                         <li><strong>Yaşla İlgili Gerilemeye Karşı Koruma:</strong> Bilişsel rezerv oluşturarak yaşlanmanın etkilerine karşı direnç geliştirme.</li>
                     </ul>
