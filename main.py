@@ -776,6 +776,70 @@ def initialize_database():
                     category="tip"
                 ),
                 Article(
+                    title="Sabah Rutinleriyle Zihinsel Performansı Artırma",
+                    content="""
+                    <h3>Güne Zihinsel Olarak Hazır Başlamak İçin İpuçları</h3>
+                    <p>Sabah rutininiz, günün geri kalanında beyin performansınızı önemli ölçüde etkileyebilir. İşte zihinsel netliği ve odaklanmayı artırmak için sabah rutini önerileri:</p>
+                    
+                    <ul>
+                        <li><strong>Tutarlı Uyku Programı:</strong> Her gün aynı saatte uyanmak, biyolojik saatinizi düzenler ve zihinsel netliği artırır.</li>
+                        <li><strong>Güneş Işığı:</strong> Uyandıktan sonra en az 10 dakika doğal güneş ışığına maruz kalmak, uyku hormonlarını baskılar ve dikkat hormonlarını artırır.</li>
+                        <li><strong>Sabah Egzersizi:</strong> Kısa bir yürüyüş veya 5-10 dakikalık hafif egzersiz, beyne oksijen akışını artırarak zihinsel berraklığı hızla yükseltir.</li>
+                        <li><strong>Soğuk Duş:</strong> Kısa bir soğuk duş veya yüzünüzü soğuk suyla yıkamak, beyin aktivitesini uyarır ve odaklanmayı artırır.</li>
+                        <li><strong>Meditasyon:</strong> 5-10 dakikalık sabah meditasyonu, gün boyu dikkat kontrolünü geliştirir ve stres seviyelerini düşürür.</li>
+                        <li><strong>Dengeli Kahvaltı:</strong> Protein, sağlıklı yağlar ve kompleks karbonhidratlar içeren bir kahvaltı, sabit enerji ve zihinsel performans sağlar.</li>
+                    </ul>
+                    
+                    <p>Bu sabah alışkanlıklarını ZekaPark'ta oyun oynamadan önce uygulamak, özellikle zorlu zihinsel oyunlarda daha iyi skorlar elde etmenize yardımcı olabilir.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Dikkat Dağınıklığını Yenme Stratejileri",
+                    content="""
+                    <h3>Daha İyi Odaklanmak İçin Pratik Yöntemler</h3>
+                    <p>Günümüzün dijital dünyasında dikkat dağınıklığı, bilişsel performansı önemli ölçüde düşürebilir. İşte dikkat sürenizi ve odaklanma kalitesini artırmak için bilimsel olarak kanıtlanmış stratejiler:</p>
+                    
+                    <ul>
+                        <li><strong>Pomodoro Tekniği:</strong> 25 dakika tam odaklanma, 5 dakika mola döngüsüyle çalışın. Dört döngü sonunda daha uzun bir mola verin.</li>
+                        <li><strong>Tek Görev Odaklı Çalışma:</strong> Multitasking, her iki görevi de daha kötü yapmanıza neden olur. Bir seferde tek bir işe odaklanın.</li>
+                        <li><strong>Bildirim Detoksu:</strong> Çalışırken telefon ve bilgisayar bildirimlerini kapatın veya sessiz moda alın.</li>
+                        <li><strong>Rahatsız Edilmeme Saatleri:</strong> Günde 1-2 saat "rahatsız edilmeme zamanı" belirleyin ve bunu çevrenizdekilerle paylaşın.</li>
+                        <li><strong>Düzenli Beyin Molaları:</strong> Her 90 dakikada bir, beyne dinlenme fırsatı vererek kısa molalar verin. Bu, uzun vadeli odaklanmayı artırır.</li>
+                        <li><strong>Ortam Düzenlemesi:</strong> Çalışma alanınızı dikkat dağıtıcı unsurlardan arındırın ve sadece gerekli araçları bulundurun.</li>
+                    </ul>
+                    
+                    <p>ZekaPark oyunlarını oynarken bu stratejileri uygulayarak daha iyi sonuçlar elde edebilir, puanlarınızı artırabilirsiniz. Özellikle bellek ve dikkat gerektiren oyunlarda bu tekniklerin önemli faydaları olacaktır.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Duygusal Zeka ve Bilişsel Performans İlişkisi",
+                    content="""
+                    <h3>Duygusal Zekanızı Geliştirerek Bilişsel Performansınızı Artırın</h3>
+                    <p>Duygusal zeka, duygularınızı tanıma, anlama ve yönetme yeteneğidir. Bu yetenek, sadece sosyal ilişkilerinizi değil, aynı zamanda zihinsel performansınızı da önemli ölçüde etkiler.</p>
+                    
+                    <h4>Duygusal zekanın bilişsel performansa katkısı:</h4>
+                    <ul>
+                        <li><strong>Stres Yönetimi:</strong> Duygularınızı etkili bir şekilde yönetmek, kortizol seviyelerini düşürür ve hipokampus ile prefrontal korteksin (hafıza ve karar verme merkezleri) daha iyi çalışmasını sağlar.</li>
+                        <li><strong>Duygusal Farkındalık:</strong> Hangi duyguların düşüncelerinizi etkilediğini anlamak, olumsuz düşünce kalıplarını kırmaya yardımcı olur.</li>
+                        <li><strong>Öz-motivasyon:</strong> İçsel motivasyonu artırmak, zorlu görevlerde daha uzun süre odaklanmayı sağlar.</li>
+                        <li><strong>Bilişsel Esneklik:</strong> Farklı duygusal perspektifleri anlama yeteneği, problem çözmede daha yaratıcı yaklaşımlar geliştirmenize olanak tanır.</li>
+                    </ul>
+                    
+                    <h4>Duygusal zekanızı geliştirmek için alıştırmalar:</h4>
+                    <ul>
+                        <li><strong>Duygu Günlüğü:</strong> Her gün hissettiğiniz duyguları ve bunların altında yatan nedenleri not edin.</li>
+                        <li><strong>Aktif Dinleme:</strong> Konuşurken tam dikkatinizi vererek ve yargılamadan dinlemeyi alışkanlık haline getirin.</li>
+                        <li><strong>Duygu Düzenleme:</strong> Olumsuz duygular hissettiğinizde bunları bastırmak yerine, "Bu duygu bana ne anlatmaya çalışıyor?" diye sorun.</li>
+                        <li><strong>Empati Pratiği:</strong> Her gün farklı bir kişinin bakış açısını anlamaya çalışın.</li>
+                    </ul>
+                    
+                    <p>ZekaPark'ta oyun oynarken duygusal zekanızın farkında olmak, özellikle baskı altında veya rekabetçi durumlarda daha iyi performans göstermenize yardımcı olacaktır.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
                     title="Oyun Oynarken Optimum Performans İçin Hazırlık",
                     content="""
                     <h3>Oyuna Başlamadan Önce En İyi Performans İçin İpuçları</h3>
