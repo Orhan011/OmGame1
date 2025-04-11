@@ -518,6 +518,37 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } else {
       // Kazandıysa tüm mayınlara bayrak koy
+      
+      // Skorları zorluk seviyesine göre hesapla ve kaydet
+      let score = 0;
+      let difficultyName = '';
+      
+      // Zorluk seviyesine göre puan ve isim belirle
+      switch (gameState.difficulty) {
+        case 'beginner':
+          score = Math.max(500, Math.floor(1000 - (gameState.timer * 2)));
+          difficultyName = 'easy';
+          break;
+        case 'intermediate':
+          score = Math.max(1000, Math.floor(2000 - (gameState.timer * 2)));
+          difficultyName = 'medium';
+          break;
+        case 'expert':
+          score = Math.max(1500, Math.floor(3000 - (gameState.timer * 1.5)));
+          difficultyName = 'hard';
+          break;
+      }
+      
+      // Skor kaydetme sistemini kullan
+      saveScoreAndDisplay('minesweeper', score, gameState.timer, difficultyName, {
+        mines: gameState.mines,
+        flags: gameState.minesMarked,
+        board_size: `${gameState.width}x${gameState.height}`,
+        hint_used: gameState.hintUsed
+      }, function(scoreDisplayHtml, data) {
+        // Skor sonucunu ekrana yerleştir
+        document.getElementById('score-display-container').innerHTML = scoreDisplayHtml;
+      });
       for (let y = 0; y < gameState.height; y++) {
         for (let x = 0; x < gameState.width; x++) {
           if (gameState.board[y][x].isMine && !gameState.board[y][x].isFlagged) {
@@ -553,113 +584,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     resultMines.textContent = gameState.mines;
     
-    // Puan bilgilerini gösterme - gizli tut
-    const scoreElements = document.querySelectorAll('.score-display, .game-score-container');
-    scoreElements.forEach(el => {
-      if (el) el.style.display = 'none';
-    });
-    
-    // Kazanılmışsa skoru kaydet
-    if (isWin) {
-      // Skoru hesapla - zorluk seviyesi, süre ve ipucu kullanımı faktörleri
-      let baseScore = 0;
-      switch (gameState.difficulty) {
-        case 'beginner':
-          baseScore = 100;
-          break;
-        case 'intermediate':
-          baseScore = 200;
-          break;
-        case 'expert':
-          baseScore = 400;
-          break;
-      }
-      
-      // Süre faktörü - zorluk seviyesine göre farklı süre limitleri
-      let timeLimit = 0;
-      switch (gameState.difficulty) {
-        case 'beginner':
-          timeLimit = 120; // 2 dakika
-          break;
-        case 'intermediate':
-          timeLimit = 300; // 5 dakika
-          break;
-        case 'expert':
-          timeLimit = 600; // 10 dakika
-          break;
-      }
-      
-      // Süre puanı: süre ne kadar azsa o kadar çok puan
-      let timeScore = Math.max(0, timeLimit - gameState.timer);
-      timeScore = Math.min(timeScore, timeLimit); // Çok hızlı tamamlanırsa da makul bir puan olsun
-      
-      // İpucu kullanımı cezası
-      const hintPenalty = gameState.hintUsed ? 0.8 : 1.0;
-      
-      // Toplam puanı hesapla
-      const totalScore = Math.round((baseScore + timeScore) * hintPenalty);
-      
-      // Oyun istatistikleri
-      const gameStats = {
-        timeSpent: gameState.timer,
-        difficultyLevel: gameState.difficulty,
-        mineCount: gameState.mines,
-        hintUsed: gameState.hintUsed
-      };
-      
-      // Kullanıcının giriş yapmış olup olmadığını kontrol et
-      fetch('/api/get-current-user', { method: 'GET' })
-      .then(response => response.json())
-      .then(userData => {
-        if (userData && userData.id) {
-          // Kullanıcı giriş yapmış, skoru kaydedebiliriz
-          // Skoru API'a gönder
-          fetch('/api/save-score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              game_type: 'minesweeper',
-              score: totalScore,
-              difficulty: gameState.difficulty,
-              playtime: gameState.timer,
-              game_stats: {
-                ...gameStats,
-                completed: true
-              }
-            })
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Skor başarıyla kaydedildi:', data);
-            
-            // Level atladı mı kontrol et
-            if (data.levelUp) {
-              // Seviye atlama kutlaması
-              showLevelUpCelebration(data.newLevel);
-            }
-          })
-          .catch(error => {
-            console.error('Skor kaydedilirken hata oluştu:', error);
-          });
-        } else {
-          console.log('Skor kaydedilmedi: Kullanıcı giriş yapmamış');
-          // Opsiyonel: Kullanıcıya giriş yapması için bilgi verebilirsiniz
-        }
-      })
-      .catch(error => {
-        console.error('Kullanıcı durumu kontrol edilirken hata oluştu:', error);
-      });
-      
-      // Seviye atlama kutlaması fonksiyonu
-      function showLevelUpCelebration(newLevel) {
-        // Bu kısmı site genelinde bir animasyon olarak ayarladık muhtemelen
-        if (typeof showLevelUpAnimation === 'function') {
-          showLevelUpAnimation(newLevel);
-        } else {
-          console.log('Tebrikler! Seviye atladınız. Yeni seviyeniz: ' + newLevel);
-        }
-      }
-    }
+    // Kazanma durumunda işlemlere devam et
+    // Eski skor kaydı kodu kaldırıldı, score-display.js kullanılıyor
     
     // Modalı göster
     resultModal.show();

@@ -168,6 +168,9 @@
             <div class="stat-value" id="result-mines">10</div>
           </div>
         </div>
+        
+        <!-- Skor Gösterimi (Score Display) -->
+        <div id="score-display-container" class="mt-4"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
@@ -204,8 +207,10 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/games/minesweeper.css">
+<link rel="stylesheet" href="/static/css/score-display.css">
 {% endblock %}
 
 {% block extra_js %}
+<script src="/static/js/score-display.js"></script>
 <script src="/static/js/games/minesweeper.js"></script>
 {% endblock %}

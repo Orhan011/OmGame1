@@ -205,6 +205,47 @@
   margin-right: 5px;
 }
 
+/* Zorluk Seviyesi Gösterimi */
+.difficulty-info {
+  margin: 10px auto;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e6e6e6;
+}
+
+.difficulty-easy {
+  border-left: 3px solid #62d142;
+}
+
+.difficulty-medium {
+  border-left: 3px solid #f9d423;
+}
+
+.difficulty-hard {
+  border-left: 3px solid #f76d3c;
+}
+
+.difficulty-expert {
+  border-left: 3px solid #ff3c49;
+  background-color: rgba(255, 60, 73, 0.2);
+}
+
+.difficulty-label {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.difficulty-multiplier {
+  font-size: 0.8rem;
+  color: #ffd700;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
 /* Sadece seviye yükseltme bildirimi gösterilirken kullanılan stil */
 .level-up-only {
   background-color: rgba(0, 0, 0, 0.7);

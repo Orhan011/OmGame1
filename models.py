@@ -43,10 +43,12 @@ class Score(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     game_type = db.Column(db.String(50), nullable=False)  # wordPuzzle, memoryMatch, numberSequence, 3dRotation
     score = db.Column(db.Integer, nullable=False)
+    difficulty = db.Column(db.String(20), default='medium')  # easy, medium, hard, expert
+    adjusted_score = db.Column(db.Integer)  # Zorluk seviyesine göre ayarlanmış skor
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f'<Score {self.game_type}: {self.score}>'
+        return f'<Score {self.game_type}: {self.score} (Difficulty: {self.difficulty})>'
 
 class Article(db.Model):
     __tablename__ = 'articles'  # Explicit table name

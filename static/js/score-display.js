@@ -7,13 +7,24 @@ function createScoreDisplay(scoreData) {
     // Rastgele puan gösterimini kaldırdık, sadece seviye yükseltme durumunda bildirim göster
     if (!scoreData || !scoreData.success) {
         if (scoreData && scoreData.guest) {
-            // Misafir kullanıcı için giriş mesajı
+            // Misafir kullanıcı için zorluk bilgisi
+            const scoreInfo = scoreData.score_info || {};
+            const difficulty = scoreInfo.difficulty || 'medium';
+            const difficultyText = formatDifficulty(difficulty);
+            const difficultyClass = difficulty.toLowerCase();
+            const difficultyMultiplier = getDifficultyMultiplier(difficulty);
+            
+            // Misafir kullanıcı için giriş mesajı (zorluk bilgisiyle)
             return `
                 <div class="score-result guest-result">
                     <div class="guest-message">
                         <i class="fas fa-user-lock"></i>
                         <h3>Misafir Kullanıcı</h3>
                         <p>${scoreData.message || "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın."}</p>
+                        <div class="difficulty-info difficulty-${difficultyClass}">
+                            <span class="difficulty-label">Zorluk: ${difficultyText}</span>
+                            <span class="difficulty-multiplier">(${difficultyMultiplier}x çarpan)</span>
+                        </div>
                         <div class="guest-actions">
                             <a href="/login" class="btn btn-primary">Giriş Yap</a>
                             <a href="/register" class="btn btn-outline-primary">Üye Ol</a>
@@ -27,14 +38,24 @@ function createScoreDisplay(scoreData) {
 
     // Skor verilerini al
     const xp = scoreData.xp || {};
+    const scoreInfo = scoreData.score_info || {};
+    const difficulty = scoreInfo.difficulty || 'medium';
+    const difficultyMultiplier = getDifficultyMultiplier(difficulty);
     
     // Sadece seviye yükseltme durumunda bildirim göster, diğer durumlarda hiçbir şey gösterme
     if (xp.level_up) {
+        const difficultyText = formatDifficulty(difficulty);
+        const difficultyClass = difficulty.toLowerCase();
+        
         return `
             <div class="score-result level-up-only">
                 <div class="level-up-notice">
                     <i class="fas fa-award"></i>
                     <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
+                </div>
+                <div class="difficulty-info difficulty-${difficultyClass}">
+                    <span class="difficulty-label">Zorluk: ${difficultyText}</span>
+                    <span class="difficulty-multiplier">(${difficultyMultiplier}x çarpan)</span>
                 </div>
             </div>
         `;
@@ -66,7 +87,17 @@ function formatGameName(gameType) {
         'snake_game': 'Yılan Oyunu',
         'puzzle_slider': 'Resim Bulmaca',
         'minesweeper': 'Mayın Tarlası',
-        'hangman': 'Adam Asmaca'
+        'hangman': 'Adam Asmaca',
+        'color_match': 'Renk Eşleştirme',
+        'math_challenge': 'Matematik Mücadelesi',
+        'typing_speed': 'Yazma Hızı',
+        'iq_test': 'IQ Test',
+        'tetris': 'Tetris',
+        'simon_says': 'Simon Diyor ki',
+        'sudoku': 'Sudoku',
+        'tangram': 'Tangram',
+        'crossword': 'Bulmaca',
+        'solitaire': 'Solitaire'
     };
     
     return gameNames[gameType] || gameType;
@@ -81,10 +112,27 @@ function formatDifficulty(difficulty) {
     const difficultyNames = {
         'easy': 'Kolay',
         'medium': 'Orta',
-        'hard': 'Zor'
+        'hard': 'Zor',
+        'expert': 'Uzman'
     };
     
     return difficultyNames[difficulty] || difficulty;
+}
+
+/**
+ * Zorluk seviyesine göre çarpanı döndürür
+ * @param {string} difficulty - Zorluk seviyesi
+ * @return {number} Zorluk çarpanı
+ */
+function getDifficultyMultiplier(difficulty) {
+    const multipliers = {
+        'easy': 1.0,   // Temel değer
+        'medium': 1.5, // %50 bonus
+        'hard': 2.5,   // %150 bonus
+        'expert': 4.0  // %300 bonus
+    };
+    
+    return multipliers[difficulty] || 1.0;
 }
 
 /**

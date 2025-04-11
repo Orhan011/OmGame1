@@ -2010,11 +2010,16 @@ def save_score():
         # Toplam XP hesaplama
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus + completion_bonus + streak_xp_bonus)
 
-        # Yeni skoru kaydet (orijinal oyun skorunu kullanarak)
+        # Yeni skoru kaydet (orijinal oyun skorunu ve zorluk seviyesini kullanarak)
+        # Zorluk seviyesine göre düzenlenmiş skoru hesapla
+        adjusted_score = int(score * multipliers['difficulty_multiplier'])
+
         new_score = Score(
             user_id=user_id,
             game_type=game_type,
-            score=score  # Orijinal oyun skorunu kaydediyoruz, liderlik tablosuna doğru yansıması için
+            score=score,  # Orijinal oyun skorunu kaydediyoruz
+            difficulty=difficulty,  # Zorluk seviyesini kaydediyoruz
+            adjusted_score=adjusted_score  # Zorluk seviyesine göre düzenlenmiş skoru kaydediyoruz
         )
 
         db.session.add(new_score)
@@ -2184,10 +2189,15 @@ def get_scores(game_type):
         current_user_id = session.get('user_id')
 
         # En yüksek skorları getir (her kullanıcı için en iyi skor)
+        # adjusted_score'un null olması durumunda orijinal skoru kullan
         subquery = db.session.query(
             Score.user_id,
             Score.game_type,
-            db.func.max(Score.score).label('max_score')
+            db.func.max(db.case(
+                [(Score.adjusted_score.isnot(None), Score.adjusted_score)],
+                else_=Score.score)
+            ).label('max_score'),
+            db.func.max(Score.score).label('original_score')
         ).filter(
             Score.game_type == game_type
         ).group_by(
@@ -2199,13 +2209,17 @@ def get_scores(game_type):
             Score,
             User.username,
             User.avatar_url,
-            User.rank
+            User.rank,
+            subquery.c.max_score.label('display_score')
         ).join(
             subquery,
             db.and_(
                 Score.user_id == subquery.c.user_id,
                 Score.game_type == subquery.c.game_type,
-                Score.score == subquery.c.max_score
+                db.or_(
+                    db.and_(Score.adjusted_score.isnot(None), Score.adjusted_score == subquery.c.max_score),
+                    db.and_(Score.adjusted_score.is_(None), Score.score == subquery.c.max_score)
+                )
             )
         ).join(
             User,
@@ -2217,7 +2231,7 @@ def get_scores(game_type):
         ).all()  # Tüm kullanıcıları getirmek için limit kaldırıldı
 
         result = []
-        for score, username, avatar_url, rank in scores:
+        for score, username, avatar_url, rank, display_score in scores:
             # Profil resminin URL'sini düzelt (static/ öneki kaldırılır)
             fixed_avatar_url = avatar_url
             if avatar_url and not avatar_url.startswith(('http://', 'https://')):
@@ -2233,7 +2247,9 @@ def get_scores(game_type):
             result.append({
                 'user_id': score.user_id,
                 'username': username,
-                'score': score.score,
+                'score': display_score,  # Zorluk seviyesi ayarlanmış skoru göster
+                'original_score': score.score,  # Orijinal skoru da gönder
+                'difficulty': score.difficulty,  # Zorluk seviyesini de gönder
                 'timestamp': score.timestamp.strftime('%Y-%m-%d %H:%M'),
                 'avatar_url': fixed_avatar_url,
                 'rank': rank,
