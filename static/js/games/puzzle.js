@@ -934,23 +934,83 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveScore() {
     // Zorluk seviyesini belirle
     const difficulty = gameState.difficulty.toLowerCase();
-
-    // Gerçekçi puanlama hesaplama
-    const finalScore = calculateRealScore();
-
-    // Oyun istatistiklerini hazırla
+    
+    // Toplam parça sayısı
+    const totalPieces = gameState.grid.rows * gameState.grid.cols;
+    // Harcanan süre
+    const timeSpent = 300 - gameState.timeRemaining;
+    // Optimal süre (zorluk seviyesine göre)
+    const optimalTime = 60 + (totalPieces * 5);
+    // Toplam ve doğru hamle sayısı
+    const totalMoves = gameState.moves;
+    const correctMoves = gameState.correctPlacements;
+    // Hatalı hamle sayısı
+    const wrongMoves = Math.max(0, totalMoves - correctMoves);
+    // Kullanılan ipucu sayısı tahmini
+    const hintsUsed = gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0;
+    
+    // Standardize edilmiş puan hesaplama sistemi için parametreler
+    const scoreParams = {
+      gameType: 'puzzle',
+      difficulty: difficulty,
+      timeSpent: timeSpent,
+      optimalTime: optimalTime,
+      totalMoves: totalMoves,
+      correctMoves: correctMoves,
+      hintsUsed: hintsUsed,
+      level: gameState.level,
+      maxLevel: 1, // Yapboz oyunu seviye içermiyor, tek seviyeli
+      gameSpecificStats: {
+        completed: gameState.correctPlacements === totalPieces,
+        pieces: totalPieces,
+        wrongMoves: wrongMoves,
+        bonusPoints: gameState.bonusPoints,
+        gridSize: gameState.grid.rows + 'x' + gameState.grid.cols
+      }
+    };
+    
+    // Puan hesaplama sistemini kullan
+    let scoreDetails = { finalScore: 0, breakdown: {} };
+    
+    // Eğer global ScoreCalculator mevcutsa kullan, değilse kendi hesaplamamızı yapalım
+    if (window.ScoreCalculator && typeof window.ScoreCalculator.calculate === 'function') {
+      scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+      console.log("Standartlaştırılmış yapboz puanı hesaplandı:", scoreDetails);
+    } else {
+      // Geriye dönük uyumluluk için eski puan hesaplamayı da tutalım
+      const finalScore = calculateRealScore();
+      scoreDetails.finalScore = finalScore;
+      console.log("Yapboz puanı hesaplandı (eski sistem):", finalScore);
+    }
+    
+    // Oyun istatistiklerini hazırla (geriye dönük uyumluluk için eski formatı koruyoruz)
     const gameStats = {
       moves: gameState.moves,
-      wrong_moves: gameState.moves - gameState.correctPlacements,
-      time_spent: 300 - gameState.timeRemaining,
-      hints_used: gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0,
+      wrong_moves: wrongMoves,
+      time_spent: timeSpent,
+      hints_used: hintsUsed,
       level: gameState.level,
       grid_size: gameState.grid.rows + 'x' + gameState.grid.cols,
-      completion_time: 300 - gameState.timeRemaining
+      completion_time: timeSpent,
+      scoreBreakdown: scoreDetails.breakdown
     };
 
-    // Merkezi puan sistemini kullan - hesaplanan yeni puanı gönder
-    saveScoreAndDisplay('puzzle', finalScore, 300 - gameState.timeRemaining, difficulty, gameStats, function(html) {
+    // Oyun tamamlandı eventi oluştur
+    const gameCompletedEvent = new CustomEvent('gameCompleted', {
+      detail: {
+        gameType: 'puzzle',
+        score: scoreDetails.finalScore,
+        difficulty: difficulty,
+        playtime: timeSpent,
+        stats: gameStats
+      }
+    });
+    
+    // Eventi dağıt
+    document.dispatchEvent(gameCompletedEvent);
+    
+    // Puan gösterimi ve kaydetme (geriye dönük uyumluluk için)
+    saveScoreAndDisplay('puzzle', scoreDetails.finalScore, timeSpent, difficulty, gameStats, function(html) {
       // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
       console.log('Score saved successfully');
     });
