@@ -949,11 +949,8 @@ document.addEventListener('DOMContentLoaded', () => {
       completion_time: 300 - gameState.timeRemaining
     };
 
-    // Merkezi puan sistemini kullan - hesaplanan yeni puanı gönder
-    saveScoreAndDisplay('puzzle', finalScore, 300 - gameState.timeRemaining, difficulty, gameStats, function(html) {
-      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
-      console.log('Score saved successfully');
-    });
+    // Puan sistemi kaldırıldı
+    console.log('Puan sistemi kaldırıldı - skorlar kaydedilmiyor');
   }
 
   // Gerçekçi puan hesaplama sistemi (10-100 arası)
@@ -1065,14 +1062,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Skoru panoya kopyalar
+   * Oyunu panoya kopyalar
    */
   function copyScore() {
-    const scoreText = `Yapboz Oyunu: ${gameState.score} puan, ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
+    const gameText = `Yapboz Oyunu: ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
 
-    navigator.clipboard.writeText(scoreText)
+    navigator.clipboard.writeText(gameText)
       .then(() => {
-        showAlert('Skor kopyalandı!', 'success');
+        showAlert('Oyun bilgisi kopyalandı!', 'success');
       })
       .catch(err => {
         console.error('Kopyalama hatası:', err);
@@ -1081,15 +1078,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Skoru paylaşır (Web Share API)
+   * Oyunu paylaşır (Web Share API)
    */
   function shareScore() {
-    const scoreText = `Yapboz Oyunu: ${gameState.score} puan, ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
+    const gameText = `Yapboz Oyunu: ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
 
     if (navigator.share) {
       navigator.share({
-        title: 'Beyin Geliştirme Oyunu Skorum',
-        text: scoreText,
+        title: 'Beyin Geliştirme Oyunu',
+        text: gameText,
         url: window.location.href
       })
       .then(() => console.log('Paylaşım başarılı'))

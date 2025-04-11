@@ -846,6 +846,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     };
     
-    // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
-    saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, updateScoreDisplay);
+    // Skor sistemi kaldırıldı - skorlar kaydedilmiyor
+    console.log('Puan sistemi kaldırıldı - skorlar kaydedilmiyor');
   }

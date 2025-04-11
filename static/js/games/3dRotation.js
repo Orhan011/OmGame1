@@ -354,8 +354,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     };
     
-    // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
-    saveScoreAndDisplay('3dRotation', score, totalSeconds, difficulty, gameStats, updateScoreDisplay);
+    // Puan sistemi kaldırıldı
+    console.log('Puan sistemi kaldırıldı - skorlar kaydedilmiyor');
     
     // Add play again button functionality
     document.getElementById('play-again').addEventListener('click', startGame);
