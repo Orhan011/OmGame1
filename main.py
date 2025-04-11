@@ -126,55 +126,11 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
 
 def send_welcome_email(to_email, username):
     """
-    Sends a welcome email to a newly registered user.
-    Uses the configured Gmail account (omgameee@gmail.com) to send welcome emails.
-    Runs in background to avoid blocking the registration process.
+    Hoş geldin e-posta özelliği kaldırıldı.
+    Bu fonksiyon artık e-posta göndermez, sadece başarılı bir şekilde tamamlandığını bildirir.
     """
-    subject = "OmGame - Hoş Geldiniz!"
-    
-    body = f"""
-    <html>
-    <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; margin: 0; padding: 0;">
-        <div style="max-width: 600px; margin: 20px auto; padding: 30px; background-color: #fff; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <img src="https://eae797d0-940a-45fb-bf27-2677e6195fa7-00-2yuu2ztp800x5.sisko.replit.dev/static/images/logo.png" alt="OmGame Logo" style="max-width: 200px; height: auto;">
-            </div>
-            
-            <h2 style="color: #6a5ae0; text-align: center; font-size: 28px; margin-bottom: 20px;">OmGame Dünyasına Hoş Geldiniz!</h2>
-            
-            <div style="background-color: #f0f3ff; border-left: 4px solid #6a5ae0; padding: 15px; margin-bottom: 25px; border-radius: 5px;">
-                <p style="margin: 0; font-size: 18px;">Merhaba <strong>{username}</strong>,</p>
-            </div>
-            
-            <p style="font-size: 16px; color: #444;">OmGame'e kaydolduğunuz için teşekkür ederiz! Beyin egzersizleri yaparak hem eğlenecek hem de zihinsel becerilerinizi geliştireceksiniz.</p>
-
-            <h3 style="color: #6a5ae0; font-size: 20px; margin-top: 30px;">OmGame'de Sizi Neler Bekliyor?</h3>
-            <ul style="background-color: #f9f9ff; padding: 20px 20px 20px 40px; border-radius: 10px; font-size: 16px;">
-                <li style="margin-bottom: 10px;">20+ beyin geliştirici oyun koleksiyonu</li>
-                <li style="margin-bottom: 10px;">Oynadıkça kazanacağınız XP ile seviye atlama sistemi</li>
-                <li style="margin-bottom: 10px;">Liderlik tablolarında yerinizi alarak rekabet</li>
-                <li style="margin-bottom: 10px;">Hafıza, dikkat, mantık gibi bilişsel becerilerinizi geliştirme fırsatı</li>
-                <li>Kişiselleştirilmiş profil ve başarı istatistikleri</li>
-            </ul>
-
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="https://omgame.replit.app" style="background-color: #6a5ae0; color: white; padding: 12px 30px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 16px;">HEMEN OYUNLARI KEŞFEDİN</a>
-            </div>
-
-            <p style="font-size: 16px; color: #444;">En iyi skorlara ulaşmak ve zihinsel becerilerinizi geliştirmek için düzenli olarak OmGame'i ziyaret etmeyi unutmayın!</p>
-
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px;">
-                <p>Herhangi bir sorunuz veya öneriniz varsa, <a href="mailto:omgameee@gmail.com" style="color: #6a5ae0; text-decoration: none;">omgameee@gmail.com</a> adresine e-posta gönderebilirsiniz.</p>
-                <p>İyi oyunlar dileriz!<br><strong>OmGame Ekibi</strong></p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    
-    # E-posta gönderme işlemini hemen başlat
-    logger.info(f"Hoş geldiniz e-postası gönderme işlemi başlatılıyor: {to_email}")
-    return send_email_in_background(to_email, subject, body)
+    logger.info(f"Hoş geldin e-postası özelliği devre dışı bırakıldı: {to_email}")
+    return True
 
 def send_verification_email(to_email, verification_code):
     """
@@ -1273,21 +1229,11 @@ def register():
                 flash('Kayıt sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
                 return redirect(url_for('register'))
 
-            # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
+            # Kullanıcı kaydı başarılı mesajı
             logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
             
-            # E-posta gönderim işlemini başlat ve bu işlemi beklemeden devam et
-            try:
-                # Direkt olarak e-posta gönderim işlemini başlat
-                # Bu işlev zaten arka planda çalışacak şekilde tasarlanmış
-                send_welcome_email(email, username)
-                
-                # Başarılı mesajını göster
-                flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderildi.', 'success')
-                logger.info(f"Hoş geldiniz e-postası gönderim işlemi başlatıldı: {email}")
-            except Exception as email_error:
-                logger.error(f"E-posta gönderme hatası: {str(email_error)}")
-                flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
+            # Başarılı mesajını göster
+            flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
 
             # Otomatik giriş yap
             try:
