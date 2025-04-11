@@ -472,4 +472,7 @@ const RatingHandler = (function() {
 })();
 
 // Global namespace'e ekle
-window.RatingHandler = RatingHandler;
+// Global erişime izin ver - ancak zaten tanımlanmadıysa
+if (!window.RatingHandler) {
+  window.RatingHandler = RatingHandler;
+}

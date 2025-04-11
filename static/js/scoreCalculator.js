@@ -143,5 +143,7 @@ const ScoreCalculator = {
   }
 };
 
-// Global erişim sağla
-window.ScoreCalculator = ScoreCalculator;
+// Global erişime izin ver - ancak zaten tanımlanmadıysa
+if (!window.ScoreCalculator) {
+  window.ScoreCalculator = ScoreCalculator;
+}
