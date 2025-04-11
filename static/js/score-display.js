@@ -377,54 +377,88 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
     });
 }
 
-// Oyun puanını göster
+// Oyun puanını göster - Standartlaştırılmış tek yöntem
 function showGamePoints(gameScore, details) {
   // Puanı her zaman 10-100 arasında sınırlandır
   const normalizedScore = Math.max(10, Math.min(100, gameScore || 0));
-  document.getElementById('gamePoints').textContent = normalizedScore;
+  
+  const pointsElement = document.getElementById('gamePoints');
+  if (pointsElement) {
+    pointsElement.textContent = normalizedScore;
+  }
 
-  if (details) {
-    const detailsElement = document.getElementById('scoreDetails');
-    if (detailsElement) {
-      detailsElement.innerHTML = '';
+  // Puan detaylarını göster (eğer mevcutsa)
+  const detailsElement = document.getElementById('scoreDetails');
+  if (detailsElement && details) {
+    detailsElement.innerHTML = '';
 
-      // Puan detaylarını göster
-      if (details.basePoints) {
-        const basePointsElement = document.createElement('div');
-        basePointsElement.className = 'score-detail';
-        basePointsElement.innerHTML = `<span>Temel Puan:</span><span>${details.basePoints}</span>`;
-        detailsElement.appendChild(basePointsElement);
-      }
-
-      // Diğer detayları da gösterebilirsiniz
-      if (details.bonusPoints) {
-        const bonusPointsElement = document.createElement('div');
-        bonusPointsElement.className = 'score-detail';
-        bonusPointsElement.innerHTML = `<span>Bonus:</span><span>+${details.bonusPoints}</span>`;
-        detailsElement.appendChild(bonusPointsElement);
-      }
-
-      if (details.difficultyMultiplier) {
-        const difficultyElement = document.createElement('div');
-        difficultyElement.className = 'score-detail';
-        difficultyElement.innerHTML = `<span>Zorluk Çarpanı:</span><span>x${details.difficultyMultiplier}</span>`;
-        detailsElement.appendChild(difficultyElement);
-      }
-
-      if (details.timePenalty) {
-        const timePenaltyElement = document.createElement('div');
-        timePenaltyElement.className = 'score-detail penalty';
-        timePenaltyElement.innerHTML = `<span>Zaman Cezası:</span><span>-${details.timePenalty}</span>`;
-        detailsElement.appendChild(timePenaltyElement);
-      }
-
-      // Normalizasyon açıklaması (isteğe bağlı)
-      if (gameScore !== normalizedScore) {
-        const normalizationElement = document.createElement('div');
-        normalizationElement.className = 'score-detail normalization';
-        normalizationElement.innerHTML = `<span>Standarlaştırılmış Puan:</span><span>${normalizedScore}</span>`;
-        detailsElement.appendChild(normalizationElement);
-      }
+    // Zorluk seviyesi
+    if (details.difficulty) {
+      const difficultyNames = {
+        "easy": "Kolay",
+        "medium": "Orta", 
+        "hard": "Zor",
+        "expert": "Uzman"
+      };
+      
+      const difficultyElement = document.createElement('div');
+      difficultyElement.className = 'score-detail';
+      difficultyElement.innerHTML = `<span>Zorluk:</span><span>${difficultyNames[details.difficulty] || details.difficulty}</span>`;
+      detailsElement.appendChild(difficultyElement);
     }
+
+    // Temel puan
+    if (details.basePoints !== undefined) {
+      const basePointsElement = document.createElement('div');
+      basePointsElement.className = 'score-detail';
+      basePointsElement.innerHTML = `<span>Temel Puan:</span><span>${details.basePoints}</span>`;
+      detailsElement.appendChild(basePointsElement);
+    }
+
+    // Zorluk çarpanı
+    if (details.difficultyMultiplier !== undefined) {
+      const difficultyElement = document.createElement('div');
+      difficultyElement.className = 'score-detail';
+      difficultyElement.innerHTML = `<span>Zorluk Çarpanı:</span><span>×${details.difficultyMultiplier}</span>`;
+      detailsElement.appendChild(difficultyElement);
+    }
+
+    // Seviye bonusu
+    if (details.levelBonus) {
+      const levelElement = document.createElement('div');
+      levelElement.className = 'score-detail';
+      levelElement.innerHTML = `<span>Seviye Bonusu:</span><span>+${details.levelBonus}</span>`;
+      detailsElement.appendChild(levelElement);
+    }
+
+    // Zaman bonusu
+    if (details.timeBonus) {
+      const timeElement = document.createElement('div');
+      timeElement.className = 'score-detail';
+      timeElement.innerHTML = `<span>Zaman Bonusu:</span><span>+${details.timeBonus}</span>`;
+      detailsElement.appendChild(timeElement);
+    }
+
+    // Hamle bonusu
+    if (details.moveBonus) {
+      const moveElement = document.createElement('div');
+      moveElement.className = 'score-detail';
+      moveElement.innerHTML = `<span>Hamle Bonusu:</span><span>+${details.moveBonus}</span>`;
+      detailsElement.appendChild(moveElement);
+    }
+
+    // İpucu cezası
+    if (details.hintPenalty) {
+      const hintElement = document.createElement('div');
+      hintElement.className = 'score-detail penalty';
+      hintElement.innerHTML = `<span>İpucu Cezası:</span><span>-${details.hintPenalty}</span>`;
+      detailsElement.appendChild(hintElement);
+    }
+
+    // Toplam puan (standartlaştırılmış)
+    const totalElement = document.createElement('div');
+    totalElement.className = 'score-detail total';
+    totalElement.innerHTML = `<span>Toplam Puan:</span><span>${normalizedScore}</span>`;
+    detailsElement.appendChild(totalElement);
   }
 }
