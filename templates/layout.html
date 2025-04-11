@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/score-breakdown.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/difficulty-selector.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rating.css') }}">
 
@@ -263,7 +264,8 @@ function loadArticleContent() {
 <!-- Ana JS dosyaları - lazy load kullanarak gecikmeli yükleme -->
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
-    <!-- Skor Yakalama ve Kaydetme Sistemi -->
+    <!-- Standartlaştırılmış Puanlama Sistemi -->
+    <script src="{{ url_for('static', filename='js/scoreCalculator.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
@@ -272,12 +274,37 @@ function loadArticleContent() {
         document.addEventListener('gameCompleted', function(e) {
           if (e.detail && e.detail.score !== undefined) {
             const gameType = e.detail.gameType || window.location.pathname.split('/').pop().replace('.html', '');
-            const score = parseInt(e.detail.score);
+            
+            // Yeni standardize edilmiş skor hesaplama sistemini kullan
+            const gameStats = e.detail.stats || {};
             const difficulty = e.detail.difficulty || localStorage.getItem('currentDifficulty') || 'medium';
             const playtime = e.detail.playtime || 60;
-
+            
+            // Skor parametrelerini oluştur
+            const scoreParams = {
+              gameType: gameType,
+              difficulty: difficulty,
+              timeSpent: playtime,
+              optimalTime: gameStats.optimalTime || 60,
+              totalMoves: gameStats.totalMoves || 0,
+              correctMoves: gameStats.correctMoves,
+              hintsUsed: gameStats.hintsUsed || 0,
+              level: gameStats.level || 1,
+              maxLevel: gameStats.maxLevel || 1,
+              gameSpecificStats: gameStats
+            };
+            
+            // Yeni puan hesaplama sistemini kullan (10-100 arası)
+            const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+            const finalScore = scoreDetails.finalScore;
+            
+            console.log(`New standardized score for ${gameType}: ${finalScore} points`);
+            
             // Skor kaydetme
-            ScoreHandler.saveScore(gameType, score, difficulty, playtime, e.detail.stats || {});
+            ScoreHandler.saveScore(gameType, finalScore, difficulty, playtime, {
+              ...gameStats,
+              scoreBreakdown: scoreDetails.breakdown
+            });
           }
         });
 
@@ -309,7 +336,7 @@ function loadArticleContent() {
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/scoreCalculator.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
 <!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>

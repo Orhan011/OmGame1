@@ -1,30 +1,83 @@
 /**
- * Yeni puan sistemine göre oyun sonunda gösterilecek sonuçları oluşturur
+ * Standartlaştırılmış puan sistemine göre oyun sonunda gösterilecek sonuçları oluşturur
  * @param {object} scoreData - API'den dönen puan verileri
  * @return {string} HTML içeriği
  */
 function createScoreDisplay(scoreData) {
-    // Rastgele puan gösterimini kaldırdık, sadece seviye yükseltme durumunda bildirim göster
+    // Misafir kullanıcı için özel mesaj
     if (!scoreData || !scoreData.success) {
         if (scoreData && scoreData.guest) {
             // Misafir kullanıcı için zorluk bilgisi
             const scoreInfo = scoreData.score_info || {};
+            const gameType = scoreInfo.game_type || '';
+            const gameName = formatGameName(gameType);
+            const totalScore = scoreInfo.total_score || scoreData.points?.total || 0;
             const difficulty = scoreInfo.difficulty || 'medium';
             const difficultyText = formatDifficulty(difficulty);
             const difficultyClass = difficulty.toLowerCase();
-            const difficultyMultiplier = getDifficultyMultiplier(difficulty);
             
-            // Misafir kullanıcı için giriş mesajı (zorluk bilgisiyle)
+            // Kullanıcıya ayrıntılı puan bilgisi göster
+            let scoreBreakdownHTML = '';
+            
+            // Eğer game_stats içinde scoreBreakdown varsa, detaylı puan göster
+            if (scoreData.game_stats && scoreData.game_stats.scoreBreakdown) {
+                const bd = scoreData.game_stats.scoreBreakdown;
+                
+                scoreBreakdownHTML = `
+                    <div class="score-breakdown">
+                        <h4 class="breakdown-title">Puan Detayları</h4>
+                        <div class="score-detail">
+                            <span class="detail-label">Temel Puan:</span>
+                            <span class="detail-value">+${bd.baseScore}</span>
+                        </div>
+                        <div class="score-detail">
+                            <span class="detail-label">Seviye Bonusu:</span>
+                            <span class="detail-value">+${bd.levelBonus}</span>
+                        </div>
+                        <div class="score-detail">
+                            <span class="detail-label">Zaman Bonusu:</span>
+                            <span class="detail-value">+${bd.timeBonus}</span>
+                        </div>
+                        <div class="score-detail">
+                            <span class="detail-label">Hamle Bonusu:</span>
+                            <span class="detail-value">+${bd.moveBonus}</span>
+                        </div>
+                        ${bd.hintPenalty > 0 ? `
+                        <div class="score-detail penalty">
+                            <span class="detail-label">İpucu Cezası:</span>
+                            <span class="detail-value">-${bd.hintPenalty}</span>
+                        </div>
+                        ` : ''}
+                        <div class="score-detail multiplier">
+                            <span class="detail-label">Zorluk Çarpanı:</span>
+                            <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
+                        </div>
+                        <div class="score-detail total">
+                            <span class="detail-label">Toplam Puan:</span>
+                            <span class="detail-value">${totalScore}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Misafir kullanıcı için giriş mesajı (zorluk bilgisiyle ve puan detaylarıyla)
             return `
                 <div class="score-result guest-result">
                     <div class="guest-message">
                         <i class="fas fa-user-lock"></i>
                         <h3>Misafir Kullanıcı</h3>
-                        <p>${scoreData.message || "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın."}</p>
-                        <div class="difficulty-info difficulty-${difficultyClass}">
-                            <span class="difficulty-label">Zorluk: ${difficultyText}</span>
-                            <span class="difficulty-multiplier">(${difficultyMultiplier}x çarpan)</span>
+                        <div class="score-summary">
+                            <div class="game-info">
+                                <span class="game-name">${gameName}</span>
+                                <span class="difficulty-badge difficulty-${difficultyClass}">${difficultyText}</span>
+                            </div>
+                            <div class="final-score">
+                                <span class="score-value">${totalScore}</span>
+                                <span class="score-label">puan</span>
+                            </div>
                         </div>
+                        ${scoreBreakdownHTML}
+                        <p class="guest-notice">${scoreData.message || "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın."}</p>
                         <div class="guest-actions">
                             <a href="/login" class="btn btn-primary">Giriş Yap</a>
                             <a href="/register" class="btn btn-outline-primary">Üye Ol</a>
@@ -36,33 +89,109 @@ function createScoreDisplay(scoreData) {
         return ''; // Hata durumunda boş döndür
     }
 
-    // Skor verilerini al
+    // Giriş yapmış kullanıcı için puanlama bilgileri
     const xp = scoreData.xp || {};
+    const points = scoreData.points || {};
     const scoreInfo = scoreData.score_info || {};
+    const gameType = scoreInfo.game_type || '';
+    const gameName = formatGameName(gameType);
+    const totalScore = scoreInfo.total_score || points.total || 0;
     const difficulty = scoreInfo.difficulty || 'medium';
-    const difficultyMultiplier = getDifficultyMultiplier(difficulty);
+    const difficultyText = formatDifficulty(difficulty);
+    const difficultyClass = difficulty.toLowerCase();
+    const gameStats = scoreData.game_stats || {};
     
-    // Sadece seviye yükseltme durumunda bildirim göster, diğer durumlarda hiçbir şey gösterme
-    if (xp.level_up) {
-        const difficultyText = formatDifficulty(difficulty);
-        const difficultyClass = difficulty.toLowerCase();
+    // Ayrıntılı puan dökümü oluştur
+    let scoreBreakdownHTML = '';
+    
+    // Eğer game_stats içinde scoreBreakdown varsa, detaylı puan göster
+    if (gameStats.scoreBreakdown) {
+        const bd = gameStats.scoreBreakdown;
         
-        return `
-            <div class="score-result level-up-only">
-                <div class="level-up-notice">
-                    <i class="fas fa-award"></i>
-                    <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
+        scoreBreakdownHTML = `
+            <div class="score-breakdown">
+                <h4 class="breakdown-title">Puan Detayları</h4>
+                <div class="score-detail">
+                    <span class="detail-label">Temel Puan:</span>
+                    <span class="detail-value">+${bd.baseScore}</span>
                 </div>
-                <div class="difficulty-info difficulty-${difficultyClass}">
-                    <span class="difficulty-label">Zorluk: ${difficultyText}</span>
-                    <span class="difficulty-multiplier">(${difficultyMultiplier}x çarpan)</span>
+                <div class="score-detail">
+                    <span class="detail-label">Seviye Bonusu:</span>
+                    <span class="detail-value">+${bd.levelBonus}</span>
+                </div>
+                <div class="score-detail">
+                    <span class="detail-label">Zaman Bonusu:</span>
+                    <span class="detail-value">+${bd.timeBonus}</span>
+                </div>
+                <div class="score-detail">
+                    <span class="detail-label">Hamle Bonusu:</span>
+                    <span class="detail-value">+${bd.moveBonus}</span>
+                </div>
+                ${bd.hintPenalty > 0 ? `
+                <div class="score-detail penalty">
+                    <span class="detail-label">İpucu Cezası:</span>
+                    <span class="detail-value">-${bd.hintPenalty}</span>
+                </div>
+                ` : ''}
+                <div class="score-detail multiplier">
+                    <span class="detail-label">Zorluk Çarpanı:</span>
+                    <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
+                </div>
+                <div class="score-detail total">
+                    <span class="detail-label">Toplam Puan:</span>
+                    <span class="detail-value">${totalScore}</span>
                 </div>
             </div>
         `;
     }
     
-    // Seviye yükseltme yoksa hiçbir şey gösterme
-    return '';
+    // Seviye yükseltme durumunda bildirim
+    if (xp.level_up) {
+        return `
+            <div class="score-result level-up">
+                <div class="level-up-notice">
+                    <i class="fas fa-award"></i>
+                    <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
+                </div>
+                <div class="score-summary">
+                    <div class="game-info">
+                        <span class="game-name">${gameName}</span>
+                        <span class="difficulty-badge difficulty-${difficultyClass}">${difficultyText}</span>
+                    </div>
+                    <div class="final-score">
+                        <span class="score-value">${totalScore}</span>
+                        <span class="score-label">puan</span>
+                    </div>
+                </div>
+                ${scoreBreakdownHTML}
+                <div class="xp-info">
+                    <span class="xp-label">Kazanılan XP:</span>
+                    <span class="xp-value">+${xp.gain || 0}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Normal puan gösterimi (seviye atlanmadıysa)
+    return `
+        <div class="score-result">
+            <div class="score-summary">
+                <div class="game-info">
+                    <span class="game-name">${gameName}</span>
+                    <span class="difficulty-badge difficulty-${difficultyClass}">${difficultyText}</span>
+                </div>
+                <div class="final-score">
+                    <span class="score-value">${totalScore}</span>
+                    <span class="score-label">puan</span>
+                </div>
+            </div>
+            ${scoreBreakdownHTML}
+            <div class="xp-info">
+                <span class="xp-label">Kazanılan XP:</span>
+                <span class="xp-value">+${xp.gain || 0}</span>
+            </div>
+        </div>
+    `;
 }
 
 /**
