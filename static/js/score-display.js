@@ -1,4 +1,3 @@
-
 /**
  * Oyun sonu skorlarını gösteren modül
  * Standartlaştırılmış puan sistemine göre oyun sonunda gösterilecek sonuçları oluşturur
@@ -130,7 +129,7 @@ function getGameIcon(gameType) {
  */
 function createScoreDisplay(scoreData) {
   console.log("Skor verileri:", scoreData);
-  
+
   // Misafir kullanıcı için özel mesaj
   if (!scoreData || !scoreData.success) {
     if (scoreData && scoreData.guest) {
@@ -197,14 +196,14 @@ function createScoreDisplay(scoreData) {
                 <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
               </div>
             </div>
-            
+
             <div class="score-circle">
               <div class="score-value">${totalScore}</div>
               <div class="score-label">puan</div>
             </div>
-            
+
             ${scoreBreakdownHTML}
-            
+
             <div class="guest-message">
               <i class="fas fa-user-lock"></i>
               <h3>Misafir Kullanıcı</h3>
@@ -214,7 +213,7 @@ function createScoreDisplay(scoreData) {
                 <a href="/register" class="action-button btn-secondary"><i class="fas fa-user-plus"></i> Üye Ol</a>
               </div>
             </div>
-            
+
             <div class="result-actions" style="margin-top: 20px;">
               <button class="action-button btn-secondary close-result"><i class="fas fa-times"></i> Kapat</button>
               <button class="action-button btn-primary replay-game"><i class="fas fa-redo"></i> Tekrar Oyna</button>
@@ -298,7 +297,7 @@ function createScoreDisplay(scoreData) {
             <i class="fas fa-award"></i>
             <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
           </div>
-          
+
           <div class="result-header">
             <h2>Tebrikler!</h2>
             <div class="game-info">
@@ -306,15 +305,15 @@ function createScoreDisplay(scoreData) {
               <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
             </div>
           </div>
-          
+
           <div class="score-circle">
             <div class="score-value">${totalScore}</div>
             <div class="score-label">puan</div>
           </div>
-          
+
           ${scoreBreakdownHTML}
           ${xpGainHTML}
-          
+
           <div class="result-actions">
             <button class="action-button btn-secondary close-result"><i class="fas fa-times"></i> Kapat</button>
             <button class="action-button btn-primary replay-game"><i class="fas fa-redo"></i> Tekrar Oyna</button>
@@ -335,15 +334,15 @@ function createScoreDisplay(scoreData) {
             <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
           </div>
         </div>
-        
+
         <div class="score-circle">
           <div class="score-value">${totalScore}</div>
           <div class="score-label">puan</div>
         </div>
-        
+
         ${scoreBreakdownHTML}
         ${xpGainHTML}
-        
+
         <div class="result-actions">
           <button class="action-button btn-secondary close-result"><i class="fas fa-times"></i> Kapat</button>
           <button class="action-button btn-primary replay-game"><i class="fas fa-redo"></i> Tekrar Oyna</button>
@@ -378,15 +377,15 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
   if (typeof score !== 'number') {
     score = parseInt(score) || 0;
   }
-  
+
   // Puanı 10-100 arasında sınırla
   score = Math.max(10, Math.min(100, score));
-  
+
   // Zorluk seviyesini standardize et
   if (!['easy', 'medium', 'hard', 'expert'].includes(difficulty)) {
     difficulty = 'medium';
   }
-  
+
   // Giriş yapılmış mı kontrol et
   fetch('/api/get-current-user')
   .then(response => response.json())
@@ -470,11 +469,11 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         adjustedScore: data.points?.total || score,
         xpGained: data.xp?.gain || 0
       });
-      
+
       if (typeof callback === 'function') {
         callback(scoreHtml, data);
       }
-      
+
       // Olay dinleyicileri ekle (kapat ve tekrar oyna butonları için)
       setTimeout(() => {
         // Kapat butonları
@@ -483,17 +482,29 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
             document.querySelector('.game-result-overlay').remove();
           });
         });
-        
+
         // Tekrar oyna butonları
         document.querySelectorAll('.replay-game').forEach(button => {
           button.addEventListener('click', () => {
             document.querySelector('.game-result-overlay').remove();
-            // Oyunu başlatan özel fonksiyon varsa çağır
+            // Özel restart fonksiyonu varsa çağır
             if (typeof window.restartGame === 'function') {
               window.restartGame();
             } else {
-              // Oyun sayfasını yeniden yükle
-              window.location.reload();
+              // Profil veya liderlik tablosu sayfasındaysa puanları yenile
+              if (window.location.pathname.includes('/profile') || window.location.pathname.includes('/leaderboard')) {
+                // Profil puanlarını güncelle
+                if (typeof updateProfileScores === 'function') {
+                  updateProfileScores();
+                }
+                // Liderlik tablosu puanlarını güncelle
+                if (typeof loadLeaderboard === 'function') {
+                  loadLeaderboard();
+                }
+              } else {
+                // Yoksa sayfayı yenile
+                window.location.reload();
+              }
             }
           });
         });
@@ -526,11 +537,11 @@ function showScoreScreen(htmlContent) {
   if (existingOverlay) {
     existingOverlay.remove();
   }
-  
+
   // HTML içeriğini ekle
   if (htmlContent) {
     document.body.insertAdjacentHTML('beforeend', htmlContent);
-    
+
     // Olay dinleyicilerini ekle
     setTimeout(() => {
       // Kapat butonları
@@ -539,17 +550,29 @@ function showScoreScreen(htmlContent) {
           document.querySelector('.game-result-overlay').remove();
         });
       });
-      
+
       // Tekrar oyna butonları
       document.querySelectorAll('.replay-game').forEach(button => {
         button.addEventListener('click', () => {
           document.querySelector('.game-result-overlay').remove();
-          // Oyunu başlatan özel fonksiyon varsa çağır
+          // Özel restart fonksiyonu varsa çağır
           if (typeof window.restartGame === 'function') {
             window.restartGame();
           } else {
-            // Oyun sayfasını yeniden yükle
-            window.location.reload();
+            // Profil veya liderlik tablosu sayfasındaysa puanları yenile
+            if (window.location.pathname.includes('/profile') || window.location.pathname.includes('/leaderboard')) {
+              // Profil puanlarını güncelle
+              if (typeof updateProfileScores === 'function') {
+                updateProfileScores();
+              }
+              // Liderlik tablosu puanlarını güncelle
+              if (typeof loadLeaderboard === 'function') {
+                loadLeaderboard();
+              }
+            } else {
+              // Yoksa sayfayı yenile
+              window.location.reload();
+            }
           }
         });
       });
@@ -567,17 +590,17 @@ function calculateAndDisplayScore(scoreParams, callback) {
     // ScoreCalculator modülü var mı kontrol et
     if (!window.ScoreCalculator) {
       console.error('ScoreCalculator modülü bulunamadı! Yedek hesaplama kullanılıyor.');
-      
+
       // Basit bir hesaplama yap
       const baseScore = 50;
       const difficultyMultiplier = scoreParams.difficulty === 'easy' ? 0.8 : 
                                  scoreParams.difficulty === 'hard' ? 1.5 : 
                                  scoreParams.difficulty === 'expert' ? 2.0 : 1.0;
-      
+
       const finalScore = Math.max(10, Math.min(100, Math.round(baseScore * difficultyMultiplier)));
-      
+
       console.log("Yedek standartlaştırılmış puan:", finalScore);
-      
+
       // API'ye kaydet
       saveScoreAndDisplay(
         scoreParams.gameType,
@@ -590,14 +613,14 @@ function calculateAndDisplayScore(scoreParams, callback) {
         },
         callback
       );
-      
+
       return;
     }
-    
+
     // Skoru hesapla
     const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
     console.log("Standartlaştırılmış puan:", scoreDetails);
-    
+
     // API'ye kaydet
     saveScoreAndDisplay(
       scoreParams.gameType,
@@ -612,11 +635,11 @@ function calculateAndDisplayScore(scoreParams, callback) {
     );
   } catch (error) {
     console.error('Puan hesaplama hatası:', error);
-    
+
     // Hata durumunda basit bir skor hesapla
     const fallbackScore = Math.max(10, Math.min(100, Math.round(Math.random() * 50) + 40));
     console.log("Hata nedeniyle yedek puan kullanılıyor:", fallbackScore);
-    
+
     saveScoreAndDisplay(
       scoreParams.gameType, 
       fallbackScore,
@@ -636,7 +659,7 @@ function calculateAndDisplayScore(scoreParams, callback) {
 function showGamePoints(gameScore, details) {
   // Puanı her zaman 10-100 arasında sınırlandır
   const normalizedScore = Math.max(10, Math.min(100, gameScore || 0));
-  
+
   const pointsElement = document.getElementById('gamePoints');
   if (pointsElement) {
     pointsElement.textContent = normalizedScore;
@@ -655,7 +678,7 @@ function showGamePoints(gameScore, details) {
         "hard": "Zor",
         "expert": "Uzman"
       };
-      
+
       const difficultyElement = document.createElement('div');
       difficultyElement.className = 'score-detail';
       difficultyElement.innerHTML = `<span>Zorluk:</span><span>${difficultyNames[details.difficulty] || details.difficulty}</span>`;

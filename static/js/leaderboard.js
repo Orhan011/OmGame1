@@ -1,9 +1,8 @@
-
 // Sayfa yüklendiğinde ve belirli aralıklarla skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard();
   loadLevelLeaderboard();
-  
+
   // Her 60 saniyede bir skor tablosunu otomatik yenile
   setInterval(function() {
     loadLeaderboard();
@@ -83,7 +82,7 @@ function loadLeaderboard() {
             if (!avatarUrl.startsWith('/')) {
               avatarUrl = '/' + avatarUrl;
             }
-            
+
             // Farklı formatlardaki avatar url'lerini düzelt
             if (avatarUrl.startsWith('/uploads/')) {
               avatarUrl = '/static' + avatarUrl;
@@ -147,6 +146,34 @@ function loadLeaderboard() {
     });
 }
 
+// Ana sayfadaki liderlik tablosu güncellendikten sonra çağrılır
+function updateProfileScores() {
+    console.log("Profil puanları güncelleniyor...");
+    // Profil sayfasında toplam puan göstergesi varsa güncelle
+    const totalScoreElement = document.getElementById('leaderboard-total-score');
+
+    if (totalScoreElement) {
+      fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+          // Mevcut kullanıcının skorunu bul
+          const currentUser = data.find(score => score.is_current_user);
+
+          if (currentUser && currentUser.total_score) {
+            console.log("Profil sayfası toplam puanı güncelleniyor:", currentUser.total_score);
+            totalScoreElement.innerHTML = currentUser.total_score;
+            totalScoreElement.classList.add('score-change');
+            setTimeout(() => {
+              totalScoreElement.classList.remove('score-change');
+            }, 1500);
+          }
+        })
+        .catch(error => {
+          console.error('Profil puanları güncellenirken hata:', error);
+        });
+    }
+  }
+
 // Seviye tablosunu yükleyen fonksiyon
 function loadLevelLeaderboard() {
   const levelLeaderboardContainer = document.getElementById('levelLeaderboardContainer');
@@ -206,7 +233,7 @@ function loadLevelLeaderboard() {
         const levelA = a.level || 1;
         const levelB = b.level || 1;
         if (levelB !== levelA) return levelB - levelA;
-        
+
         // Seviyeler eşitse, XP'ye göre sırala
         const xpA = a.total_xp || a.experience_points || 0;
         const xpB = b.total_xp || b.experience_points || 0;
@@ -257,7 +284,7 @@ function loadLevelLeaderboard() {
             if (!avatarUrl.startsWith('/')) {
               avatarUrl = '/' + avatarUrl;
             }
-            
+
             // Farklı formatlardaki avatar url'lerini düzelt
             if (avatarUrl.startsWith('/uploads/')) {
               avatarUrl = '/static' + avatarUrl;
@@ -329,6 +356,8 @@ function loadLevelLeaderboard() {
       `;
 
       levelLeaderboardContainer.innerHTML = html;
+      // Profil puanlarını da güncelle
+      updateProfileScores();
     })
     .catch(error => {
       console.error('Seviye verileri yüklenirken hata:', error);
