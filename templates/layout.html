@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
-<!-- Puan sistemi kaldırıldı -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 
 <!-- Sayfa Özel CSS Dosyaları - Sayfa tipine göre şartlı olarak yüklenir -->
 {% if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password', 'reset_code'] %}
@@ -259,7 +259,7 @@ function loadArticleContent() {
 <!-- Oyun sayfalarına özel JS dosyaları -->
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}" defer></script>
-<!-- Puan gösterimi kaldırıldı -->
+<script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
 <!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
 {% endif %}

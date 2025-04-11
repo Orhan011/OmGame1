@@ -373,7 +373,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalResponses = correctResponses + incorrectResponses;
     const accuracy = totalResponses > 0 ? correctResponses / totalResponses : 0;
     
-    // Puan hesaplama sistemi kaldırıldı
+    // Puanı hesapla
+    const basePoints = correctResponses * 20;
+    const nBonus = currentN * 50;
+    const accuracyBonus = Math.round(accuracy * 100);
+    const difficultyMultiplier = {
+      'EASY': 1,
+      'MEDIUM': 1.5,
+      'HARD': 2
+    }[difficulty];
+    
+    const sessionScore = Math.round((basePoints + nBonus + accuracyBonus) * difficultyMultiplier);
+    score += sessionScore;
     
     // Sonraki N seviyesini belirle
     const params = DIFFICULTIES[difficulty];
@@ -544,34 +555,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Puan kaydetme fonksiyonu kaldırıldı
+  // Skoru kaydet
   function saveScore() {
-    // Bu fonksiyon devre dışı bırakıldı - Puan sistemi platformdan kaldırıldı
-    console.log('Puan sistemi kaldırıldı');
-    return;
+    if (score <= 0) return;
+    
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      maxN: currentN,
+      correctResponses: correctResponses,
+      falsePositives: falsePositives,
+      falseNegatives: falseNegatives,
+      accuracy: calculateAccuracy()
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('n_back', score, elapsedTime, difficulty, gameStats, function(html) {
+      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+      console.log('Score saved successfully');
+    });
   }
   
-  // Sonucu kopyala
+  // Skoru kopyala
   function copyScore() {
-    const shareText = `N-Back Testinde ${currentN}-Back seviyesine ulaştım! Doğruluk: ${finalAccuracy.textContent}`;
+    const scoreText = `N-Back Testinde ${score} puan kazandım! Maksimum N: ${maxNReached}, Doğruluk: ${finalAccuracy.textContent}`;
     
-    navigator.clipboard.writeText(shareText)
+    navigator.clipboard.writeText(scoreText)
       .then(() => {
-        showAlert('Sonuç kopyalandı!', 'success');
+        showAlert('Skor kopyalandı!', 'success');
       })
       .catch(() => {
         showAlert('Kopyalama başarısız oldu', 'error');
       });
   }
   
-  // Sonucu paylaş
+  // Skoru paylaş
   function shareScore() {
-    const shareText = `N-Back Testinde ${currentN}-Back seviyesine ulaştım! Doğruluk: ${finalAccuracy.textContent}`;
+    const scoreText = `N-Back Testinde ${score} puan kazandım! Maksimum N: ${maxNReached}, Doğruluk: ${finalAccuracy.textContent}`;
     
     if (navigator.share) {
       navigator.share({
-        title: 'OmGame N-Back Sonucum',
-        text: shareText,
+        title: 'OmGame Skorumu Paylaş',
+        text: scoreText,
       })
       .catch((error) => console.log('Sharing failed', error));
     } else {

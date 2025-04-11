@@ -1133,8 +1133,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     };
     
-    // Puan sistemi kaldırıldı
-    console.log('Puan sistemi kaldırıldı - skorlar kaydedilmiyor');
+    // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
+    saveScoreAndDisplay('memoryCards', finalScoreValue, totalTime, difficulty, gameStats, updateScoreDisplay);
   }
   
   /**

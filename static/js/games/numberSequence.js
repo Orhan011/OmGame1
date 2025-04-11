@@ -936,8 +936,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get elapsed time (for timeRemaining games) or time spent (for others)
     const elapsedTime = Math.floor(gameState.solveTime / 1000) - Math.floor(gameState.timeRemaining / 1000);
     
-    // Puan sistemi kaldırıldı
-    console.log('Puan sistemi kaldırıldı - skorlar kaydedilmiyor');
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('number_sequence', gameState.score, elapsedTime, gameState.difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
+    });
   }
 
   // Utility functions

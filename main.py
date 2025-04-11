@@ -1864,23 +1864,11 @@ def check_daily_bonus(user_id):
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
-    """Oyun skorlarını kaydetme ve kullanıcı XP'sini güncelleme API'si - KALDIRILAN İŞLEV"""
-    # Bu API devre dışı bırakılmıştır - Puan sistemi platformdan kaldırıldı
-    logger.info("Puan kaydetme API'si çağrıldı, ancak bu işlev artık devre dışı bırakılmıştır.")
-    
-    # Her zaman basit başarılı yanıt döndür
-    return jsonify({
-        'success': True,
-        'message': 'Bu işlev devre dışı bırakılmıştır - Puan sistemi kaldırıldı'
-    })
-    
-    # Eski kod - artık kullanılmıyor
-    '''
+    """Oyun skorlarını kaydetme ve kullanıcı XP'sini güncelleme API'si"""
     # Gelen veriyi al ve doğrula
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'message': 'Geçersiz JSON verisi!'})
-    '''
 
     game_type = data.get('game_type')
     score = data.get('score')

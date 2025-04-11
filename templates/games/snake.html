@@ -3,7 +3,7 @@
 {% block title %}Yılan Oyunu - ZekaPark{% endblock %}
 
 {% block head %}
-<!-- Puan sistemi kaldırıldı -->
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -853,7 +853,8 @@ document.addEventListener('DOMContentLoaded', function() {
       localStorage.setItem('snakeHighScore', highScore);
     }
     
-    // Puan kaydetme kaldırıldı
+    // Save score
+    saveScore(score);
     
     // Show game over modal
     finalScoreEl.textContent = score;
@@ -864,12 +865,31 @@ document.addEventListener('DOMContentLoaded', function() {
     pauseBtn.disabled = true;
   }
   
-  // Puan kaydetme fonksiyonu kaldırıldı
+  // Function to save score to the server
   function saveScore(score) {
-    // Bu fonksiyon tamamen devre dışı bırakıldı
-    // Puan sistemi platformdan kaldırıldı
-    console.log('Puan kaydetme sistemi kaldırıldı');
-    return; 
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      length: snake.length,
+      level: level,
+      difficulty: difficulty,
+      walls_enabled: wallsEnabled,
+      speed_setting: speed
+    };
+    
+    // Get the total elapsed time in seconds (estimated from level and score)
+    const elapsedTime = level * 30; // rough estimate
+    
+    // Zorluk seviyesini merkezi sistem formatına çevir
+    const difficultyMapping = {
+      'normal': 'medium',
+      'hard': 'hard'
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('snake', score, elapsedTime, difficultyMapping[difficulty], gameStats, function(html) {
+      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+      console.log('Score saved successfully');
+    });
   }
   
   // Responsive canvas resizing
