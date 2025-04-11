@@ -923,3 +923,52 @@
     font-size: 1.1rem;
   }
 }
+
+/* Liderlik Tablosu Stilleri */
+
+/* Seviye Badge Renkleri */
+.level-container.level-advanced {
+  background: linear-gradient(45deg, #4a7def, #3b5fe1);
+  box-shadow: 0 4px 15px rgba(74, 125, 239, 0.3);
+}
+
+.level-container.level-expert {
+  background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+  box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+.level-container.level-master {
+  background: linear-gradient(45deg, #ff9800, #f57c00);
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.level-container.level-elite {
+  background: linear-gradient(45deg, #f44336, #d32f2f);
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
+  }
+}
+
+.rank-badge {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  margin-right: 5px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rank-badge i {
+  margin-right: 3px;
+  font-size: 0.7rem;
+}

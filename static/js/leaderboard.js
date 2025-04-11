@@ -140,14 +140,22 @@ function loadLevelLeaderboard() {
     </div>
   `;
 
-  // Seviye verilerini API'den al - alternatif endpoint kullan (API hatası durumunda)
+  // Seviye verilerini API'den al - birden fazla endpoint deneme
   fetch('/api/users/levels')
     .then(response => {
       if (!response.ok) {
         // Eğer birincil API başarısız olursa alternatif API'yi dene
+        console.log('İlk API başarısız, alternatif API deneniyor...');
         return fetch('/api/scores/top-users').then(altResponse => {
           if (!altResponse.ok) {
-            throw new Error(`Network response was not ok: ${altResponse.status}`);
+            console.log('Alternatif API de başarısız oldu, son bir endpoint deneniyor...');
+            // Son bir deneme daha yap
+            return fetch('/api/users/leaderboard?sort=level').then(lastResponse => {
+              if (!lastResponse.ok) {
+                throw new Error(`Hiçbir API yanıt vermedi: ${lastResponse.status}`);
+              }
+              return lastResponse.json();
+            });
           }
           return altResponse.json();
         });
@@ -168,6 +176,19 @@ function loadLevelLeaderboard() {
         return;
       }
 
+      // Kullanıcıları seviyelerine göre sırala (en yüksek seviye en üstte)
+      const sortedUsers = [...users].sort((a, b) => {
+        // Önce seviyeye göre sırala
+        const levelA = a.level || 1;
+        const levelB = b.level || 1;
+        if (levelB !== levelA) return levelB - levelA;
+        
+        // Seviyeler eşitse, XP'ye göre sırala
+        const xpA = a.total_xp || a.experience_points || 0;
+        const xpB = b.total_xp || b.experience_points || 0;
+        return xpB - xpA;
+      });
+
       // Seviye tablosu oluştur
       let html = `
         <div class="leaderboard-table">
@@ -180,7 +201,7 @@ function loadLevelLeaderboard() {
       `;
 
       // Her bir kullanıcıyı tabloya ekle
-      users.forEach((player, index) => {
+      sortedUsers.forEach((player, index) => {
         // Hata kontrolü - gerekli alanlar yoksa varsayılan değerler ata
         const playerData = {
           username: player.username || 'İsimsiz Oyuncu',
@@ -189,7 +210,8 @@ function loadLevelLeaderboard() {
           total_xp: player.total_xp || player.experience_points || 0,
           games_played: player.games_played || player.total_games_played || 0,
           progress_percent: player.progress_percent || 0,
-          is_current_user: player.is_current_user || false
+          is_current_user: player.is_current_user || false,
+          rank: player.rank || ''
         };
 
         const rankClass = index < 3 ? `top-${index + 1}` : '';
@@ -211,13 +233,20 @@ function loadLevelLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
         // Seviye ilerleme çubuğu
-        const progressPercent = playerData.progress_percent;
+        const progressPercent = playerData.progress_percent || 0;
         const progressBarHTML = `
           <div class="level-progress">
             <div class="progress-bar" style="width: ${progressPercent}%"></div>
             <span class="progress-text">${progressPercent}%</span>
           </div>
         `;
+
+        // Seviye rozeti ve başarı ikon renkleri
+        let levelBadgeClass = '';
+        if (playerData.level >= 10) levelBadgeClass = 'level-elite';
+        else if (playerData.level >= 7) levelBadgeClass = 'level-master';
+        else if (playerData.level >= 5) levelBadgeClass = 'level-expert';
+        else if (playerData.level >= 3) levelBadgeClass = 'level-advanced';
 
         html += `
           <div class="player-row ${rankClass} ${playerData.is_current_user ? 'current-user' : ''}">
@@ -238,12 +267,13 @@ function loadLevelLeaderboard() {
                 <div class="player-stats">
                   <span class="level-badge">XP: ${playerData.total_xp}</span>
                   ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}
+                  ${playerData.rank ? `<span class="rank-badge"><i class="fas fa-medal"></i> ${playerData.rank}</span>` : ''}
                 </div>
                 ${progressBarHTML}
               </div>
             </div>
             <div class="score-cell">
-              <div class="score-container level-container">
+              <div class="score-container level-container ${levelBadgeClass}">
                 <span class="score-value level-value">Seviye ${playerData.level}</span>
                 <div class="score-sparkles"></div>
               </div>
