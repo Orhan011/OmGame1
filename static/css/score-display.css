@@ -45,6 +45,30 @@
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 
+/* Yükleme Animasyonu */
+.loading-spinner {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #ffd700 !important;
+  margin-right: 0.25rem;
+  animation: spinner-border 1s linear infinite;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
+
+/* Skore değişimi animasyonu */
+.score-change {
+  animation: score-highlight 1.5s ease-in-out;
+}
+
+@keyframes score-highlight {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); color: #ffffff; }
+  100% { transform: scale(1); }
+}
+
 /* Cihaz boyutlarına göre uyarlamalar */
 @media (max-width: 768px) {
   .total-score-container {
