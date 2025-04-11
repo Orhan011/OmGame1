@@ -4,7 +4,8 @@
  * Bu modül, oyunlarda kazanılan skorları API'ye göndermek için kullanılır
  */
 
-const ScoreHandler = {
+// Önceden tanımlanmış bir ScoreHandler varsa, onu kullanmaya devam et
+window.ScoreHandler = window.ScoreHandler || {
   /**
    * Oyun skorunu API'ye gönderir
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
@@ -238,7 +239,7 @@ const ScoreHandler = {
  * @param {Object} gameStats - Oyun istatistikleri
  * @param {Function} callback - Skor gösterimi sonrası çağrılacak callback (opsiyonel)
  */
-function saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats = {}, callback) {
+window.saveScoreAndDisplay = window.saveScoreAndDisplay || function(gameType, score, playtime, difficulty, gameStats = {}, callback) {
   try {
     // Zorluğun geçerli olduğundan emin ol
     const validDifficulties = ["easy", "medium", "hard", "expert"];
@@ -247,7 +248,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats = 
     }
     
     // Skoru kaydet
-    ScoreHandler.saveScore(gameType, score, difficulty, playtime, gameStats)
+    window.ScoreHandler.saveScore(gameType, score, difficulty, playtime, gameStats)
       .then(data => {
         // Callback varsa çalıştır
         if (typeof callback === 'function') {
@@ -264,7 +265,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats = 
                 </div>
                 <div class="score-detail">
                   <span>Zorluk Çarpanı:</span>
-                  <span>x${data.points?.rewards?.difficulty_multiplier || ScoreHandler.getDifficultyMultiplier(difficulty)}</span>
+                  <span>x${data.points?.rewards?.difficulty_multiplier || window.ScoreHandler.getDifficultyMultiplier(difficulty)}</span>
                 </div>
                 <div class="score-detail total">
                   <span>Toplam:</span>
@@ -295,7 +296,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats = 
   } catch (e) {
     console.error("Error in saveScoreAndDisplay:", e);
   }
-}
+};
 
 /**
  * Seviye atlama bildirimi gösterir
@@ -389,7 +390,3 @@ function showLoginRequiredNotification() {
     }
   }
 }
-
-// Global nesne olarak tanımla
-window.ScoreHandler = ScoreHandler;
-window.saveScoreAndDisplay = saveScoreAndDisplay;

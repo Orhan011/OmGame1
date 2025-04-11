@@ -33,43 +33,55 @@ function calculateScore(isWin) {
 
 // Skoru liderlik tablosuna kaydet
 function saveScoreToLeaderboard(finalScore, isWin) {
-  // Zorluk seviyesini belirle (varsayılan: medium)
-  const difficulty = localStorage.getItem('currentDifficulty') || 'medium';
+  try {
+    // Zorluk seviyesini belirle (varsayılan: medium)
+    const difficulty = localStorage.getItem('currentDifficulty') || 'medium';
+    const playtime = Math.floor((Date.now() - gameStartTime) / 1000);
 
-  // Oyun istatistiklerini topla
-  const gameStats = {
-    word: currentWord,
-    word_length: currentWord.length,
-    success: isWin,
-    attempts_used: maxAttempts - remainingAttempts,
-    attempts_remaining: remainingAttempts
-  };
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      word: currentWord,
+      word_length: currentWord.length,
+      success: isWin,
+      attempts_used: maxAttempts - remainingAttempts,
+      attempts_remaining: remainingAttempts
+    };
 
-  // Skor kaydetme
-  if (window.ScoreHandler) {
-    window.ScoreHandler.saveScore('hangman', finalScore, difficulty, Math.floor((Date.now() - gameStartTime) / 1000), gameStats);
-  } else if (window.saveScoreAndDisplay) {
-    window.saveScoreAndDisplay('hangman', finalScore, Math.floor((Date.now() - gameStartTime) / 1000), difficulty, gameStats, function(scoreHtml) {
-      // Skor özeti göster (opsiyonel)
-      const scoreContainer = document.getElementById('score-container');
-      if (scoreContainer) {
-        scoreContainer.innerHTML = scoreHtml;
-      }
-    });
-  } else {
-    console.error("Skor kaydedici bulunamadı!");
-    // Alternatif olarak doğrudan API'ye gönder
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_type: 'hangman',
-        score: finalScore,
-        difficulty: difficulty,
-        playtime: Math.floor((Date.now() - gameStartTime) / 1000),
-        game_stats: gameStats
+    console.log(`Saving score for hangman: ${finalScore} points, difficulty: ${difficulty}`);
+    
+    // Skor kaydetme
+    if (typeof window.ScoreHandler !== 'undefined' && typeof window.ScoreHandler.saveScore === 'function') {
+      window.ScoreHandler.saveScore('hangman', finalScore, difficulty, playtime, gameStats);
+    } else if (typeof window.saveScoreAndDisplay === 'function') {
+      window.saveScoreAndDisplay('hangman', finalScore, playtime, difficulty, gameStats, function(scoreHtml) {
+        // Skor özeti göster (opsiyonel)
+        const scoreContainer = document.getElementById('score-container');
+        if (scoreContainer) {
+          scoreContainer.innerHTML = scoreHtml;
+        }
+      });
+    } else {
+      console.error("Skor kaydedici bulunamadı! API'ye doğrudan gönderiliyor...");
+      // Alternatif olarak doğrudan API'ye gönder
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_type: 'hangman',
+          score: finalScore,
+          difficulty: difficulty,
+          playtime: playtime,
+          game_stats: gameStats
+        })
       })
-    }).catch(err => console.error("Skor kaydetme hatası:", err));
+      .then(response => response.json())
+      .then(data => {
+        console.log("Score saved:", data);
+      })
+      .catch(err => console.error("Skor kaydetme hatası:", err));
+    }
+  } catch (e) {
+    console.error("Skor kaydetme işleminde hata:", e);
   }
 }
 
