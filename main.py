@@ -1203,13 +1203,18 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Hoş geldiniz e-postası gönder
-        send_welcome_email(email, username)
-
+        # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
+        email_sent = send_welcome_email(email, username)
+        if email_sent:
+            flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderdik.', 'success')
+        else:
+            flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
+            # E-posta gönderiminde hata olsa bile kullanıcı kaydını tamamla
+            
         # Otomatik giriş yap
         session['user_id'] = new_user.id
 
-        flash('Kayıt başarılı! Hoş geldiniz! E-posta adresinize bir hoş geldin mesajı gönderdik.', 'success')
+        flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
         return redirect(url_for('index'))
 
     return render_template('register.html')
