@@ -256,6 +256,7 @@ function loadArticleContent() {
 {% endif %}
 
 <!-- Ana JS dosyaları - lazy load kullanarak gecikmeli yükleme -->
+<script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
 <!-- Oyun sayfalarına özel JS dosyaları -->

@@ -870,10 +870,12 @@ document.addEventListener('DOMContentLoaded', function() {
   let dropInterval = 1000; // milliseconds
   let lastDropTime = 0;
   let linesCleared = 0; //Added to track lines cleared
+  let tetrominosPlaced = 0; //Added to track placed tetrominos
+  let baseDropInterval = 1000; // Added to store the base drop interval
 
 
   // İstatistikler için oyun verileri
-  let totalMoves = 0;      // Toplam hamle sayısı
+  let totalMoves = 0;      // Toplam hamlesayısı
   let hintCount = 0;       // İpucu kullanma sayısı (tetris'te yok)
   let rotateCount = 0;     // Döndürme sayısı
   let hardDropCount = 0;   // Sert düşürme sayısı
@@ -909,6 +911,8 @@ document.addEventListener('DOMContentLoaded', function() {
     dropInterval = 1000;
     gameOver = false;
     linesCleared = 0; // Reset lines cleared
+    tetrominosPlaced = 0; // Reset placed tetrominos
+    baseDropInterval = 1000; // Reset base drop interval
 
     // Reset oyun istatistikleri
     totalMoves = 0;
@@ -1191,7 +1195,7 @@ document.addEventListener('DOMContentLoaded', function() {
     finalScoreElement.textContent = score;
 
     // Save score to the server
-    saveScore(score);
+    saveGameScore(); // Call the new score saving function
 
     // Show game over overlay with animation
     tetrisOverlay.style.display = 'flex';
@@ -1202,29 +1206,25 @@ document.addEventListener('DOMContentLoaded', function() {
     pauseGameButton.disabled = true;
   }
 
-  // Function to save score to the server
-  function saveScore(score) {
-    // Oyun süresini hesapla (saniye olarak) - varsayılan 180 saniye
-    const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
 
-    // Zorluk seviyesini belirle (level'e göre)
-    let difficulty = 'easy';
-    if (level > 10) {
-      difficulty = 'expert';
-    } else if (level > 7) {
-      difficulty = 'hard';
-    } else if (level > 3) {
-      difficulty = 'medium';
+  // Function to save score to the server
+  function saveGameScore() {
+    // Zorluk seviyesini belirle
+    let difficulty = "medium";
+    if (score > 5000) {
+      difficulty = "hard";
+    } else if (score > 2000) {
+      difficulty = "medium";
+    } else {
+      difficulty = "easy";
     }
 
     // Oyun istatistiklerini topla
     const gameStats = {
-      duration_seconds: playtime,
-      move_count: totalMoves,
-      hint_count: hintCount,
-      rotate_count: rotateCount,
-      hard_drop_count: hardDropCount,
-      accuracy: accuracy
+      level: level,
+      lines_cleared: linesCleared,
+      tetrominos_placed: tetrominosPlaced,
+      duration_seconds: Math.floor((Date.now() - gameStartTime) / 1000) || 60
     };
 
     fetch('/api/save-score', {
@@ -1235,7 +1235,6 @@ document.addEventListener('DOMContentLoaded', function() {
       body: JSON.stringify({
         game_type: 'tetris',
         score: score,
-        playtime: playtime,
         difficulty: difficulty,
         game_stats: gameStats
       })
@@ -1259,86 +1258,91 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const finalScoreContainer = document.querySelector('.tetris-final-score');
       if (finalScoreContainer) {
-        finalScoreContainer.style.display = 'none';
+        finalScoreContainer.style.display = 'block'; // Show final score container
       }
 
-            bonusDetails.innerHTML = `
-              <div class="tetris-bonus-item">
-                <span>Temel Puan:</span>
-                <strong>${data.points.rewards.base_points}</strong>
-              </div>
-              <div class="tetris-bonus-item">
-                <span>Skor Bonusu:</span>
-                <strong>${Math.floor(data.points.rewards.score_points)}</strong>
-              </div>
-              ${data.points.rewards.daily_bonus > 0 ? `
-                <div class="tetris-bonus-item daily-bonus">
-                  <span>Günlük Bonus:</span>
-                  <strong>+${data.points.rewards.daily_bonus}</strong>
-                </div>` : ''}
-              ${data.points.rewards.streak_bonus > 0 ? `
-                <div class="tetris-bonus-item streak-bonus">
-                  <span>Seri Bonusu:</span>
-                  <strong>+${data.points.rewards.streak_bonus}</strong>
-                </div>` : ''}
-              ${scoringSystemInfo}
-            `;
+      const bonusDetails = document.createElement('div');
+      bonusDetails.className = 'tetris-bonus-details';
+      const scoringSystemInfo = data.scoring_system_info ? `<p>${data.scoring_system_info}</p>` : '';
 
-            // Element bulunmazsa ekleme yap
-            if (!document.querySelector('.tetris-bonus-details')) {
-              finalScoreContainer.appendChild(bonusDetails);
-            }
+      bonusDetails.innerHTML = `
+        <div class="tetris-bonus-item">
+          <span>Temel Puan:</span>
+          <strong>${data.points.rewards.base_points}</strong>
+        </div>
+        <div class="tetris-bonus-item">
+          <span>Skor Bonusu:</span>
+          <strong>${Math.floor(data.points.rewards.score_points)}</strong>
+        </div>
+        ${data.points.rewards.daily_bonus > 0 ? `
+          <div class="tetris-bonus-item daily-bonus">
+            <span>Günlük Bonus:</span>
+            <strong>+${data.points.rewards.daily_bonus}</strong>
+          </div>` : ''}
+        ${data.points.rewards.streak_bonus > 0 ? `
+          <div class="tetris-bonus-item streak-bonus">
+            <span>Seri Bonusu:</span>
+            <strong>+${data.points.rewards.streak_bonus}</strong>
+          </div>` : ''}
+        ${scoringSystemInfo}
+      `;
 
-            // Toplam puanı güncelle
-            finalScoreElement.textContent = data.points.total;
-          }
+      // Element bulunmazsa ekleme yap
+      if (!document.querySelector('.tetris-bonus-details')) {
+        finalScoreContainer.appendChild(bonusDetails);
+      }
 
-          // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
-          xpInfoElement.style.display = 'block';
+      // Toplam puanı güncelle
+      finalScoreElement.textContent = data.points.total;
 
-          // XP kazanımı animasyonu
-          xpGainElement.classList.add('score-update');
-          setTimeout(() => {
-            xpGainElement.classList.remove('score-update');
-          }, 300);
+      // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
+      xpInfoElement.style.display = 'block';
 
-          // Seviye animasyonu
-          currentLevelElement.classList.add('score-update');
-          setTimeout(() => {
-            currentLevelElement.classList.remove('score-update');
-          }, 300);
+      const xpGainElement = document.getElementById('xp-gain');
+      const currentLevelElement = document.getElementById('current-level');
 
-          // Eğer API'den özel bir mesaj geldiyse göster
-          if (data.message) {
-            const messageEl = document.createElement('div');
-            messageEl.className = 'guest-message-api mt-2';
-            messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
 
-            // Önceki mesaj varsa kaldır
-            const oldMessage = document.querySelector('.guest-message-api');
-            if (oldMessage) {
-              oldMessage.remove();
-            }
+      // XP kazanımı animasyonu
+      xpGainElement.classList.add('score-update');
+      setTimeout(() => {
+        xpGainElement.classList.remove('score-update');
+      }, 300);
 
-            // Game over overlay'e ekle
-            const gameOverOverlay = document.getElementById('game-over-overlay');
-            if (gameOverOverlay) {
-              gameOverOverlay.appendChild(messageEl);
-            }
-          }
+      // Seviye animasyonu
+      currentLevelElement.classList.add('score-update');
+      setTimeout(() => {
+        currentLevelElement.classList.remove('score-update');
+      }, 300);
 
-          // Eğer giriş yapılması gerekiyorsa vurgula
-          if (data.login_required) {
-            const guestInfo = document.getElementById('guest-info');
-            if (guestInfo) {
-              guestInfo.classList.add('highlight-login');
+      // Eğer API'den özel bir mesaj geldiyse göster
+      if (data.message) {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'guest-message-api mt-2';
+        messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
 
-              // Giriş butonlarını daha belirgin yap
-              const loginButtons = guestInfo.querySelector('.guest-buttons');
-              if (loginButtons) {
-                loginButtons.classList.add('animate-buttons');
-              }
-            }
+        // Önceki mesaj varsa kaldır
+        const oldMessage = document.querySelector('.guest-message-api');
+        if (oldMessage) {
+          oldMessage.remove();
+        }
+
+        // Game over overlay'e ekle
+        const gameOverOverlay = document.getElementById('game-over-overlay');
+        if (gameOverOverlay) {
+          gameOverOverlay.appendChild(messageEl);
+        }
+      }
+
+      // Eğer giriş yapılması gerekiyorsa vurgula
+      if (data.login_required) {
+        const guestInfo = document.getElementById('guest-info');
+        if (guestInfo) {
+          guestInfo.classList.add('highlight-login');
+
+          // Giriş butonlarını daha belirgin yap
+          const loginButtons = guestInfo.querySelector('.guest-buttons');
+          if (loginButtons) {
+            loginButtons.classList.add('animate-buttons');
           }
         }
       }
@@ -1490,6 +1494,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     });
+    tetrominosPlaced++; // Increment placed tetrominos
   }
 
   // Check for completed lines
@@ -1702,5 +1707,165 @@ document.addEventListener('DOMContentLoaded', function() {
   init();
   resizeCanvas();
 });
+
+function updateScore(points) {
+  score += points;
+  scoreElement.textContent = score;
+
+  // Her 1000 puanda seviye atlama
+  const newLevel = Math.floor(score / 1000) + 1;
+  if (newLevel > level) {
+    level = newLevel;
+    levelElement.textContent = level;
+
+    // Yeni seviyede hızı artır
+    dropInterval = Math.max(100, baseDropInterval - (level - 1) * 100);
+  }
+}
+
+// Oyun bittiğinde puanı kaydet
+function saveGameScore() {
+  // Zorluk seviyesini belirle
+  let difficulty = "medium";
+  if (score > 5000) {
+    difficulty = "hard";
+  } else if (score > 2000) {
+    difficulty = "medium";
+  } else {
+    difficulty = "easy";
+  }
+
+  // Oyun istatistiklerini topla
+  const gameStats = {
+    level: level,
+    lines_cleared: linesCleared,
+    tetrominos_placed: tetrominosPlaced,
+    duration_seconds: Math.floor((Date.now() - gameStartTime) / 1000) || 60
+  };
+
+  fetch('/api/save-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      game_type: 'tetris',
+      score: score,
+      difficulty: difficulty,
+      game_stats: gameStats
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Score saved:', data);
+
+    // Puan gösterimi kapatıldı
+    const xpInfoElement = document.querySelector('.tetris-xp-info');
+    const guestInfoElement = document.getElementById('guest-info');
+
+    // Tüm skor gösterim elementlerini gizle
+    if (xpInfoElement) {
+      xpInfoElement.style.display = 'none';
+    }
+
+    if (guestInfoElement) {
+      guestInfoElement.style.display = 'none';
+    }
+
+    const finalScoreContainer = document.querySelector('.tetris-final-score');
+    if (finalScoreContainer) {
+      finalScoreContainer.style.display = 'block'; // Show final score container
+    }
+
+    const bonusDetails = document.createElement('div');
+    bonusDetails.className = 'tetris-bonus-details';
+    const scoringSystemInfo = data.scoring_system_info ? `<p>${data.scoring_system_info}</p>` : '';
+
+    bonusDetails.innerHTML = `
+      <div class="tetris-bonus-item">
+        <span>Temel Puan:</span>
+        <strong>${data.points.rewards.base_points}</strong>
+      </div>
+      <div class="tetris-bonus-item">
+        <span>Skor Bonusu:</span>
+        <strong>${Math.floor(data.points.rewards.score_points)}</strong>
+      </div>
+      ${data.points.rewards.daily_bonus > 0 ? `
+        <div class="tetris-bonus-item daily-bonus">
+          <span>Günlük Bonus:</span>
+          <strong>+${data.points.rewards.daily_bonus}</strong>
+        </div>` : ''}
+      ${data.points.rewards.streak_bonus > 0 ? `
+        <div class="tetris-bonus-item streak-bonus">
+          <span>Seri Bonusu:</span>
+          <strong>+${data.points.rewards.streak_bonus}</strong>
+        </div>` : ''}
+      ${scoringSystemInfo}
+    `;
+
+    // Element bulunmazsa ekleme yap
+    if (!document.querySelector('.tetris-bonus-details')) {
+      finalScoreContainer.appendChild(bonusDetails);
+    }
+
+    // Toplam puanı güncelle
+    finalScoreElement.textContent = data.points.total;
+
+    // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
+    xpInfoElement.style.display = 'block';
+
+    const xpGainElement = document.getElementById('xp-gain');
+    const currentLevelElement = document.getElementById('current-level');
+
+
+    // XP kazanımı animasyonu
+    xpGainElement.classList.add('score-update');
+    setTimeout(() => {
+      xpGainElement.classList.remove('score-update');
+    }, 300);
+
+    // Seviye animasyonu
+    currentLevelElement.classList.add('score-update');
+    setTimeout(() => {
+      currentLevelElement.classList.remove('score-update');
+    }, 300);
+
+    // Eğer API'den özel bir mesaj geldiyse göster
+    if (data.message) {
+      const messageEl = document.createElement('div');
+      messageEl.className = 'guest-message-api mt-2';
+      messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
+
+      // Önceki mesaj varsa kaldır
+      const oldMessage = document.querySelector('.guest-message-api');
+      if (oldMessage) {
+        oldMessage.remove();
+      }
+
+      // Game over overlay'e ekle
+      const gameOverOverlay = document.getElementById('game-over-overlay');
+      if (gameOverOverlay) {
+        gameOverOverlay.appendChild(messageEl);
+      }
+    }
+
+    // Eğer giriş yapılması gerekiyorsa vurgula
+    if (data.login_required) {
+      const guestInfo = document.getElementById('guest-info');
+      if (guestInfo) {
+        guestInfo.classList.add('highlight-login');
+
+        // Giriş butonlarını daha belirgin yap
+        const loginButtons = guestInfo.querySelector('.guest-buttons');
+        if (loginButtons) {
+          loginButtons.classList.add('animate-buttons');
+        }
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error saving score:', error);
+  });
+}
 </script>
 {% endblock %}

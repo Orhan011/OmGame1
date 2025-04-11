@@ -838,14 +838,36 @@ document.addEventListener('DOMContentLoaded', function() {
       success: gameState.answer === gameState.guesses[gameState.currentRow-1]?.join('')
     };
     
-    // Yeni skor gösterimi için callback fonksiyonu - artık puan gösterimi yapılmıyor
+    // Yeni skor gösterimi için callback fonksiyonu
     const updateScoreDisplay = function(scoreHtml, data) {
       const scoreContainer = document.getElementById('game-score-container');
       if (scoreContainer) {
-        scoreContainer.innerHTML = ''; // Skor gösterimi kapatıldı
+        scoreContainer.innerHTML = scoreHtml;
       }
     };
     
     // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
-    saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, updateScoreDisplay);
+    if (window.saveScoreAndDisplay) {
+      window.saveScoreAndDisplay('wordle', score, playtime, difficulty, gameStats, updateScoreDisplay);
+    } else {
+      // Eğer saveScoreAndDisplay fonksiyonu yoksa, doğrudan ScoreHandler'ı kullan
+      if (window.ScoreHandler) {
+        window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
+      } else {
+        console.error("Skor kaydedilemedi: Skor kaydedici bulunamadı!");
+        
+        // Alternatif olarak doğrudan API'ye gönder
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'wordle',
+            score: score,
+            difficulty: difficulty,
+            playtime: playtime,
+            game_stats: gameStats
+          })
+        }).catch(err => console.error("Skor kaydetme hatası:", err));
+      }
+    }
   }

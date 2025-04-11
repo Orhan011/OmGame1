@@ -20,10 +20,26 @@ const ScoreHandler = {
       score = parseInt(score, 10) || 0;
     }
     
+    // Negatif puanlar 0 olarak ayarlanır
+    if (score < 0) score = 0;
+    
     // Zorluk seviyesi doğrulama
     const validDifficulties = ["easy", "medium", "hard", "expert"];
     if (!validDifficulties.includes(difficulty)) {
       difficulty = "medium"; // Varsayılan değer
+    }
+    
+    // Oyun tipi validasyonu ve düzeltme
+    if (!gameType) {
+      // Sayfanın URL'sinden oyun tipini tahmin etmeye çalış
+      const pathParts = window.location.pathname.split('/');
+      const possibleGameType = pathParts[pathParts.length - 1].replace('.html', '');
+      
+      if (possibleGameType && possibleGameType !== '') {
+        gameType = possibleGameType;
+      } else {
+        gameType = "unknown_game";
+      }
     }
     
     // API isteği verileri
@@ -62,7 +78,7 @@ const ScoreHandler = {
         }
         
         // Skor kaydedildi bildirimi göster
-        showScoreNotification(score, data.points.total, gameType);
+        showScoreNotification(score, data.points?.total || score, gameType);
         console.log("Score saved successfully");
         return data;
       } 
@@ -80,6 +96,17 @@ const ScoreHandler = {
     })
     .catch(error => {
       console.error("Error saving score:", error);
+      
+      // Hata olsa bile UI'da kullanıcıya bildir
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: 'Skor Kaydedilemedi',
+          text: 'Skorunuz kaydedilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+          icon: 'error',
+          confirmButtonText: 'Tamam'
+        });
+      }
+      
       return { success: false, message: "Error saving score" };
     });
   },
@@ -99,6 +126,74 @@ const ScoreHandler = {
     }
   }
 };
+
+/**
+ * Tüm oyunlar için skor kaydetme ve gösterme fonksiyonu
+ * @param {string} gameType - Oyun türü
+ * @param {number} score - Skor
+ * @param {number} playtime - Oynama süresi (saniye)
+ * @param {string} difficulty - Zorluk seviyesi
+ * @param {Object} gameStats - Oyun istatistikleri
+ * @param {Function} callback - Skor gösterimi sonrası çağrılacak callback (opsiyonel)
+ */
+function saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats = {}, callback) {
+  try {
+    // Zorluğun geçerli olduğundan emin ol
+    const validDifficulties = ["easy", "medium", "hard", "expert"];
+    if (!validDifficulties.includes(difficulty)) {
+      difficulty = "medium";
+    }
+    
+    // Skoru kaydet
+    ScoreHandler.saveScore(gameType, score, difficulty, playtime, gameStats)
+      .then(data => {
+        // Callback varsa çalıştır
+        if (typeof callback === 'function') {
+          let scoreHtml = '';
+          
+          // Skor özeti HTML'i oluştur
+          if (data.success) {
+            scoreHtml = `
+              <div class="score-summary">
+                <h3>Skor Özeti</h3>
+                <div class="score-detail">
+                  <span>Temel Puan:</span>
+                  <span>${data.points?.rewards?.base_points || score}</span>
+                </div>
+                <div class="score-detail">
+                  <span>Zorluk Çarpanı:</span>
+                  <span>x${data.points?.rewards?.difficulty_multiplier || ScoreHandler.getDifficultyMultiplier(difficulty)}</span>
+                </div>
+                <div class="score-detail total">
+                  <span>Toplam:</span>
+                  <span>${data.points?.total || score} puan</span>
+                </div>
+              </div>
+            `;
+          } else if (data.guest) {
+            scoreHtml = `
+              <div class="score-summary guest">
+                <h3>Giriş Yapmalısınız</h3>
+                <p>Skorunuzu kaydetmek ve liderlik tablosunda yer almak için giriş yapın.</p>
+                <a href="/login?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-primary">Giriş Yap</a>
+              </div>
+            `;
+          }
+          
+          callback(scoreHtml, data);
+        }
+      })
+      .catch(error => {
+        console.error("Score saving error:", error);
+        // Hata durumunda callback'i boş veri ile çağır
+        if (typeof callback === 'function') {
+          callback('', { success: false, error: error.message });
+        }
+      });
+  } catch (e) {
+    console.error("Error in saveScoreAndDisplay:", e);
+  }
+}
 
 /**
  * Seviye atlama bildirimi gösterir
@@ -134,20 +229,27 @@ function showScoreNotification(gameScore, totalPoints, gameType) {
     "puzzle": "Bulmaca",
     "minesweeper": "Mayın Tarlası",
     "memory_match": "Hafıza Eşleştirme",
+    "memoryMatch": "Hafıza Eşleştirme",
+    "memoryCards": "Hafıza Kartları",
     "hangman": "Adam Asmaca",
     "color_match": "Renk Eşleştirme",
+    "colorMatch": "Renk Eşleştirme",
     "audioMemory": "Sesli Hafıza",
     "typing_speed": "Yazma Hızı",
+    "typingSpeed": "Yazma Hızı",
     "math_challenge": "Matematik Mücadelesi",
+    "mathChallenge": "Matematik Mücadelesi",
     "2048": "2048",
     "numberChain": "Sayı Zinciri",
     "nBack": "N-Back",
     "wordPuzzle": "Kelime Bulmaca",
     "puzzle_slider": "Resim Bulmaca",
-    "memoryCards": "Hafıza Kartları",
+    "puzzleSlider": "Resim Bulmaca",
     "sudoku": "Sudoku",
     "numberSequence": "Sayı Dizisi",
-    "labyrinth": "3D Labirent"
+    "labyrinth": "3D Labirent",
+    "iqTest": "IQ Testi",
+    "simonSays": "Simon Diyor ki"
   };
   
   const gameName = gameNames[gameType] || gameType;
@@ -188,3 +290,4 @@ function showLoginRequiredNotification() {
 
 // Global nesne olarak tanımla
 window.ScoreHandler = ScoreHandler;
+window.saveScoreAndDisplay = saveScoreAndDisplay;
