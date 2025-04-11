@@ -1,8 +1,15 @@
 
-// Sayfa yüklendiğinde skorları getir
+// Sayfa yüklendiğinde ve belirli aralıklarla skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard();
   loadLevelLeaderboard();
+  
+  // Her 60 saniyede bir skor tablosunu otomatik yenile
+  setInterval(function() {
+    loadLeaderboard();
+    loadLevelLeaderboard();
+    console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
+  }, 60000);
 });
 
 // Skor tablosunu yükleyen fonksiyon
@@ -22,8 +29,8 @@ function loadLeaderboard() {
     </div>
   `;
 
-  // Toplam skorları API'den al - Tüm kullanıcıları getirmek için limit parametresi eklenmiş hali
-  fetch('/api/scores/aggregated?limit=1000')
+  // Toplam skorları API'den al - Cache önleme ve tüm kullanıcıları getirmek için parametreler
+  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
@@ -157,8 +164,8 @@ function loadLevelLeaderboard() {
     </div>
   `;
 
-  // Seviye verilerini API'den al - birden fazla endpoint deneme - Tüm kullanıcıları getir
-  fetch('/api/users/levels?limit=1000')
+  // Seviye verilerini API'den al - Cache önleme ve tüm kullanıcıları getirmek için parametreler
+  fetch('/api/users/levels?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         // Eğer birincil API başarısız olursa alternatif API'yi dene

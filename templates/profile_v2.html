@@ -54,9 +54,14 @@
           <!-- Puanı yüklemek için JavaScript -->
           <script>
             document.addEventListener('DOMContentLoaded', function() {
-              // Liderlik tablosu puanını getir
-              fetch('/api/leaderboard/all')
-                .then(response => response.json())
+              // Liderlik tablosu puanını getir - cache önleme ekle
+              fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error('Ağ yanıtı başarısız: ' + response.status);
+                  }
+                  return response.json();
+                })
                 .then(data => {
                   const currentUserId = {{ user.id }};
                   // Mevcut kullanıcının skorunu bul
@@ -66,16 +71,24 @@
                   const scoreElement = document.getElementById('leaderboard-total-score');
                   
                   if (userScore && userScore.total_score) {
-                    // Yükleme animasyonunu kaldır
-                    scoreElement.innerHTML = userScore.total_score;
+                    // Mevcut değeri al
+                    const currentScore = parseInt(scoreElement.textContent) || 0;
                     
-                    // Puan değişimi animasyonu ekle
-                    scoreElement.classList.add('score-change');
-                    
-                    // Animasyonu bir süre sonra kaldır (tekrarlama için)
-                    setTimeout(() => {
-                      scoreElement.classList.remove('score-change');
-                    }, 1500);
+                    // Yeni skor farklıysa güncelle
+                    if (currentScore !== userScore.total_score) {
+                      // Yükleme animasyonunu kaldır
+                      scoreElement.innerHTML = userScore.total_score;
+                      
+                      // Puan değişimi animasyonu ekle
+                      scoreElement.classList.add('score-change');
+                      
+                      // Animasyonu bir süre sonra kaldır (tekrarlama için)
+                      setTimeout(() => {
+                        scoreElement.classList.remove('score-change');
+                      }, 1500);
+                      
+                      console.log("Kullanıcı puanı güncellendi: " + userScore.total_score);
+                    }
                   } else {
                     scoreElement.textContent = '0';
                   }

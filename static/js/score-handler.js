@@ -439,10 +439,39 @@ if (!window.saveScoreAndDisplay) {
                 button.addEventListener('click', () => {
                   const overlay = document.querySelector('.game-result-overlay');
                   if (overlay) overlay.remove();
+
+                  // Profile sayfasındaysak veya liderlik tablosu sayfasındaysak, yenile
+                  if (window.location.pathname.includes('/profile') || 
+                      window.location.pathname.includes('/leaderboard')) {
+                    // Sayfayı yenile
+                    window.location.reload();
+                  }
                 });
               });
             }
           }, 100);
+
+          // Ana sayfada toplam puan göstergesi varsa güncelle
+          setTimeout(() => {
+            const leaderboardTotalScore = document.getElementById('leaderboard-total-score');
+            if (leaderboardTotalScore && data.points && data.points.total) {
+              // API'den yeni toplam puanı al
+              fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+                .then(response => response.json())
+                .then(leaderData => {
+                  // Mevcut kullanıcının güncel skorunu bul
+                  const currentUser = leaderData.find(score => score.is_current_user);
+                  if (currentUser && currentUser.total_score) {
+                    leaderboardTotalScore.innerHTML = currentUser.total_score;
+                    leaderboardTotalScore.classList.add('score-change');
+                    setTimeout(() => {
+                      leaderboardTotalScore.classList.remove('score-change');
+                    }, 1500);
+                  }
+                })
+                .catch(err => console.error('Toplam skor güncellenirken hata:', err));
+            }
+          }, 1000);
         }
       };
 
