@@ -102,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
     gameContainer.style.display = 'block';
     gameOverContainer.style.display = 'none';
 
+    // Oyun başlangıç zamanını kaydet
+    localStorage.setItem('wordleGameStartTime', Date.now());
+
     // Rastgele bir kelime seç
     const wordList = [
       "kalem", "kitap", "araba", "çiçek", "deniz", "güneş", "balık", "bulut", "orman", "nehir", 
@@ -129,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
       absent: new Set()
     };
     gameState.lastInputTime = 0;
+    gameState.score = 0; // Puanı sıfırla
 
     // Skorları güncelle
     updateScoreDisplay();
@@ -369,16 +373,18 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.currentRow++;
     gameState.currentCol = 0;
     
+    // Tahmin sayısını güncelle
+    guessesDisplay.textContent = `${gameState.currentRow}/6`;
+    
     // Oyun durumunu kontrol et
-    if (guess === gameState.answer) {
-      // Kazandı
+    const isWinner = guess === gameState.answer;
+    const isLastRow = gameState.currentRow >= 6;
+    
+    if (isWinner || isLastRow) {
+      // Animasyonlar tamamlandıktan sonra oyunu bitir
       setTimeout(() => {
-        endGame(true);
-      }, 1500);
-    } else if (gameState.currentRow >= 6) {
-      // Kaybetti
-      setTimeout(() => {
-        endGame(false);
+        // Kazandı veya kaybetti
+        endGame(isWinner);
       }, 1500);
     } else {
       // Bir sonraki satırı aktif et
@@ -386,9 +392,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setActiveCell(gameState.currentRow, 0);
       }, 1500);
     }
-    
-    // Tahmin sayısını güncelle
-    guessesDisplay.textContent = `${gameState.currentRow}/6`;
   }
 
   /**
@@ -583,6 +586,10 @@ document.addEventListener('DOMContentLoaded', function() {
    * Oyunu sonlandırır
    */
   function endGame(isWin) {
+    // Eğer oyun zaten bittiyse, tekrar işlem yapma
+    if (gameState.isGameOver) return;
+    
+    // Oyunu bitir
     gameState.isGameOver = true;
     
     // Tüm inputları devre dışı bırak
@@ -600,15 +607,16 @@ document.addEventListener('DOMContentLoaded', function() {
       const bonusPoints = remainingGuesses * 50;
       gameState.score += bonusPoints;
       playSound('gameWin');
+      
+      // Skoru veritabanına kaydet (kazanınca)
+      saveScoreWithDetails(gameState.score);
     } else {
       gameState.streak = 0;
       playSound('gameLose');
-    // Skoru veritabanına kaydet (kaybedince)
-    saveScoreWithDetails(gameState.score);
+      
+      // Skoru veritabanına kaydet (kaybedince)
+      saveScoreWithDetails(gameState.score);
     }
-    
-    // Skoru veritabanına kaydet (kazanınca)
-    saveScoreWithDetails(gameState.score);
     
     // Sonuç ekranını hazırla (puanlar gizlendi)
     if (finalScore) finalScore.style.display = 'none';
@@ -645,9 +653,6 @@ document.addEventListener('DOMContentLoaded', function() {
       resultMessage.textContent = `Üzgünüm, kelimeyi bulamadınız.`;
       updateRatingStars(0);
     }
-    
-    // Skoru kaydet (localStorage veya backend'e gönderilebilir)
-    saveScore();
     
     // Sonuç ekranını göster
     setTimeout(() => {
@@ -688,28 +693,9 @@ document.addEventListener('DOMContentLoaded', function() {
    * Geriye dönük uyumluluk için burada bırakıldı
    */
   function saveScore() {
-    // Skoru kaydetmek için yeni fonksiyonu çağır
-    try {
-      // Eğer hiç parametre verilmezse, gameState'den skoru al
-      if (arguments.length === 0) {
-        saveScoreWithDetails(gameState.score);
-      } 
-      // Eğer parametre verilirse (örn. endGame içinden), o skoru kullan
-      else {
-        saveScoreWithDetails(arguments[0]);
-      }
-    } catch (e) {
-      console.error("Skor kaydetme hatası:", e);
-      // Hata durumunda basit kaydetme yöntemiyle dene
-      fetch('/api/save-score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          game_type: 'wordle',
-          score: gameState.score
-        })
-      }).catch(err => console.error("Yedek skor kaydı hatası:", err));
-    }
+    // Çift kaydetmeyi önlemek için, endGame fonksiyonu içinde doğrudan saveScoreWithDetails çağrıldığından,
+    // bu fonksiyon artık aktif değil
+    console.log("saveScore fonksiyonu çağrıldı fakat artık kullanılmıyor.");
   }
 
   /**
