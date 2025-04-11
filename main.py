@@ -1330,47 +1330,67 @@ def profile():
 @app.route('/profile/v2')
 def profile_v2():
     """Yeni tasarımlı profil sayfası."""
-    if 'user_id' not in session:
-        flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
-        return redirect(url_for('login'))
+    try:
+        if 'user_id' not in session:
+            flash('Bu sayfayı görüntülemek için giriş yapmalısınız!', 'warning')
+            return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            logger.error(f"Kullanıcı bulunamadı: user_id={session['user_id']}")
+            flash('Kullanıcı bilgilerinize erişilemedi. Lütfen tekrar giriş yapın.', 'danger')
+            return redirect(url_for('logout'))
 
-    # Kullanıcı istatistiklerini hesapla
-    scores = Score.query.filter_by(user_id=user.id).all()
+        # Kullanıcı istatistiklerini hesapla
+        try:
+            scores = Score.query.filter_by(user_id=user.id).all()
+            
+            total_games = len(scores)
+            highest_score = 0
+            if scores:
+                highest_score = max(score.score for score in scores)
 
-    total_games = len(scores)
-    highest_score = 0
-    if scores:
-        highest_score = max(score.score for score in scores)
+            # Oyun başına en yüksek skorlar
+            user_scores = {}
+            for score in scores:
+                if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
+                    user_scores[score.game_type] = score.score
+        except Exception as e:
+            logger.error(f"Skor verileri alınırken hata: {str(e)}")
+            # Veri olmasa da devam et
+            scores = []
+            total_games = 0
+            highest_score = 0
+            user_scores = {}
 
-    # Oyun başına en yüksek skorlar
-    user_scores = {}
-    for score in scores:
-        if score.game_type not in user_scores or score.score > user_scores[score.game_type]:
-            user_scores[score.game_type] = score.score
+        # Kullanıcı seviyesini hesapla
+        current_level = calculate_level(user.experience_points)
 
-    # Kullanıcı seviyesini hesapla
-    current_level = calculate_level(user.experience_points)
+        # XP hesaplamaları
+        xp_for_current = xp_for_level(current_level)
+        xp_for_next = xp_for_level(current_level + 1)
+        try:
+            xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
+        except ZeroDivisionError:
+            xp_progress = 100  # Eğer mevcut ve sonraki seviye XP'si aynı ise %100 göster
 
-    # XP hesaplamaları
-    xp_for_current = xp_for_level(current_level)
-    xp_for_next = xp_for_level(current_level + 1)
-    xp_progress = ((user.experience_points - xp_for_current) / (xp_for_next - xp_for_current)) * 100
-
-    return render_template(
-        'profile_v2.html', 
-        user=user, 
-        scores=user_scores,
-        total_games=total_games,
-        highest_score=highest_score,
-        current_level=current_level,
-        xp_progress=xp_progress,
-        xp_for_current=xp_for_current,
-        xp_for_next=xp_for_next,
-        current_xp=user.experience_points,
-        xp_needed=xp_for_next - user.experience_points
-    )
+        return render_template(
+            'profile_v2.html', 
+            user=user, 
+            scores=user_scores,
+            total_games=total_games,
+            highest_score=highest_score,
+            current_level=current_level,
+            xp_progress=xp_progress,
+            xp_for_current=xp_for_current,
+            xp_for_next=xp_for_next,
+            current_xp=user.experience_points,
+            xp_needed=xp_for_next - user.experience_points
+        )
+    except Exception as e:
+        logger.error(f"Profil sayfası yüklenirken hata: {str(e)}")
+        return render_template('error.html', message="Profil sayfası yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.")
 
 # Profil Güncelleme
 @app.route('/profile/update', methods=['POST'])

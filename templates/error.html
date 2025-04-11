@@ -1,0 +1,23 @@
+
+{% extends 'layout.html' %}
+
+{% block title %}Hata - OmGame{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="glass-card text-center p-5">
+        <i class="fas fa-exclamation-triangle text-warning display-1 mb-4"></i>
+        <h1 class="text-danger mb-4">Bir Hata Oluştu</h1>
+        <p class="lead mb-4">{{ message }}</p>
+        <div class="mt-4">
+          <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-home me-2"></i>Ana Sayfaya Dön
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
