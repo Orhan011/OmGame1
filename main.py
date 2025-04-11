@@ -126,11 +126,210 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
 
 def send_welcome_email(to_email, username):
     """
-    Hoş geldin e-posta özelliği kaldırıldı.
-    Bu fonksiyon artık e-posta göndermez, sadece başarılı bir şekilde tamamlandığını bildirir.
+    Kayıt olan kullanıcıya modern ve hoş bir karşılama e-postası gönderir.
+    
+    Args:
+        to_email: Kullanıcının e-posta adresi
+        username: Kullanıcının adı
+        
+    Returns:
+        bool: E-posta gönderme işleminin başarılı olup olmadığı
     """
-    logger.info(f"Hoş geldin e-postası özelliği devre dışı bırakıldı: {to_email}")
-    return True
+    subject = "OmGame Dünyasına Hoş Geldiniz! 🎮"
+    
+    # Modern HTML e-posta tasarımı
+    html_body = f"""
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OmGame'e Hoş Geldiniz</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+            
+            body {{
+                font-family: 'Poppins', sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f5f7;
+                color: #333;
+                line-height: 1.6;
+            }}
+            
+            .container {{
+                max-width: 600px;
+                margin: 20px auto;
+                background: #ffffff;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            }}
+            
+            .header {{
+                background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                padding: 30px 0;
+                text-align: center;
+            }}
+            
+            .header img {{
+                width: 140px;
+                height: auto;
+            }}
+            
+            .content {{
+                padding: 30px 40px;
+            }}
+            
+            h1 {{
+                color: #224abe;
+                margin-top: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }}
+            
+            p {{
+                margin-bottom: 20px;
+                color: #555;
+                font-size: 16px;
+            }}
+            
+            .button {{
+                display: inline-block;
+                background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                color: white;
+                text-decoration: none;
+                padding: 12px 30px;
+                border-radius: 6px;
+                font-weight: 500;
+                margin: 15px 0;
+                text-align: center;
+                transition: transform 0.3s ease;
+            }}
+            
+            .button:hover {{
+                transform: translateY(-2px);
+            }}
+            
+            .features {{
+                display: flex;
+                flex-wrap: wrap;
+                margin: 25px 0;
+                justify-content: space-between;
+            }}
+            
+            .feature {{
+                flex-basis: 48%;
+                background-color: #f8f9fc;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                border-left: 3px solid #4e73df;
+            }}
+            
+            .feature h3 {{
+                margin-top: 0;
+                color: #224abe;
+                font-size: 16px;
+                font-weight: 600;
+            }}
+            
+            .feature p {{
+                margin-bottom: 0;
+                font-size: 14px;
+            }}
+            
+            .footer {{
+                background-color: #f8f9fc;
+                padding: 20px 40px;
+                text-align: center;
+                color: #666;
+                font-size: 14px;
+                border-top: 1px solid #eaeaea;
+            }}
+            
+            .social-links {{
+                margin-top: 15px;
+            }}
+            
+            .social-links a {{
+                display: inline-block;
+                margin: 0 8px;
+                color: #666;
+                font-size: 18px;
+                text-decoration: none;
+            }}
+            
+            @media (max-width: 480px) {{
+                .container {{
+                    margin: 10px;
+                    width: auto;
+                }}
+                
+                .content {{
+                    padding: 20px;
+                }}
+                
+                .feature {{
+                    flex-basis: 100%;
+                }}
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="https://omgame.repl.co/static/images/logo.png" alt="OmGame Logo">
+            </div>
+            
+            <div class="content">
+                <h1>Merhaba {username}!</h1>
+                <p>OmGame dünyasına hoş geldiniz! Artık aramıza katıldığınız için çok mutluyuz. OmGame'de zihinsel becerilerinizi geliştirebileceğiniz onlarca oyun, bilişsel yeteneklerinizi test eden zorlu görevler ve daha pek çok keyifli aktivite sizi bekliyor.</p>
+                
+                <a href="https://omgame.repl.co" class="button">Hemen Oynamaya Başla</a>
+                
+                <p>İşte OmGame'de seni bekleyen bazı özellikler:</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>Beyin Egzersizleri</h3>
+                        <p>Beyin jimnastiği yaparak zihinsel becerilerinizi güçlendirin.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>Hafıza Oyunları</h3>
+                        <p>Hafıza oyunlarıyla odaklanma ve hatırlama yeteneklerinizi geliştirin.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>Liderlik Tablosu</h3>
+                        <p>Diğer oyuncularla rekabet edin ve en yüksek skorları görün.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <h3>Rozet Sistemi</h3>
+                        <p>Başarılarınızı gösteren rozetler kazanın ve koleksiyonunuzu büyütün.</p>
+                    </div>
+                </div>
+                
+                <p>Herhangi bir sorunuz veya geri bildiriminiz için bize <a href="mailto:omgameee@gmail.com">omgameee@gmail.com</a> adresinden ulaşabilirsiniz.</p>
+                
+                <p>İyi oyunlar!</p>
+                <p><em>OmGame Ekibi</em></p>
+            </div>
+            
+            <div class="footer">
+                <p>© 2024 OmGame. Tüm hakları saklıdır.</p>
+                <p>Bu e-posta size kayıt olduğunuz için gönderilmiştir.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # E-postayı gönder
+    logger.info(f"'{username}' kullanıcısına hoş geldin e-postası gönderiliyor: {to_email}")
+    return send_email_in_background(to_email, subject, html_body)
 
 def send_verification_email(to_email, verification_code):
     """
@@ -1232,8 +1431,11 @@ def register():
             # Kullanıcı kaydı başarılı mesajı
             logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
             
+            # Hoş geldiniz e-postası gönder
+            send_welcome_email(email, username)
+            
             # Başarılı mesajını göster
-            flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
+            flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz! E-posta kutunuzu kontrol edin.', 'success')
 
             # Otomatik giriş yap
             try:
