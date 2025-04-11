@@ -67,7 +67,7 @@ def send_welcome_email(to_email, username):
         password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
 
         msg = MIMEMultipart()
-        msg['From'] = from_email
+        msg['From'] = f"OmGame <{from_email}>"
         msg['To'] = to_email
         msg['Subject'] = "OmGame - Hoş Geldiniz!"
 
@@ -100,15 +100,33 @@ def send_welcome_email(to_email, username):
 
         msg.attach(MIMEText(body, 'html'))
 
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(from_email, password)
-        text = msg.as_string()
-        server.sendmail(from_email, to_email, text)
-        server.quit()
-        return True
+        # Daha güvenilir bir e-posta gönderimi
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(from_email, password)
+            text = msg.as_string()
+            server.sendmail(from_email, to_email, text)
+            server.quit()
+            logger.info(f"Hoş geldiniz e-postası başarıyla gönderildi: {to_email}")
+            return True
+        except Exception as email_error:
+            logger.error(f"SMTP Sunucu Hatası: {str(email_error)}")
+            
+            # Alternatif gönderim dene
+            try:
+                server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                server.login(from_email, password)
+                text = msg.as_string()
+                server.sendmail(from_email, to_email, text)
+                server.quit()
+                logger.info(f"Alternatif yöntemle e-posta gönderildi: {to_email}")
+                return True
+            except Exception as ssl_error:
+                logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
+                return False
     except Exception as e:
-        print(f"E-posta gönderirken hata oluştu: {e}")
+        logger.error(f"E-posta gönderirken hata oluştu: {str(e)}")
         return False
 
 def send_verification_email(to_email, verification_code):
@@ -1204,18 +1222,25 @@ def register():
         db.session.commit()
 
         # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
+        logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
+        
+        # E-posta gönderimi için asenkron olmayan bir yaklaşım kullanıyoruz
+        # Gerçek bir üretim uygulamasında, bu işlemi bir kuyruk sistemi ile asenkron yapabilirsiniz
         email_sent = send_welcome_email(email, username)
+        
         if email_sent:
             flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderdik.', 'success')
+            logger.info(f"Hoş geldiniz e-postası gönderildi: {email}")
         else:
             flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
+            logger.warning(f"Hoş geldiniz e-postası gönderilemedi: {email}")
             # E-posta gönderiminde hata olsa bile kullanıcı kaydını tamamla
 
         # Otomatik giriş yap
         session['user_id'] = new_user.id
 
         flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('index', _external=True))
 
     return render_template('register.html')
 
