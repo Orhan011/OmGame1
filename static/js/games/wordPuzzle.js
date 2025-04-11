@@ -642,25 +642,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
     const wordsCount = solvedWords.length;
     
-    // İstatistikleri güncelle
-    finalScoreDisplay.textContent = score;
-    wordsFoundCount.textContent = wordsCount;
-    longestWordDisplay.textContent = longestSolvedWord || '-';
+    // Skoru arka planda kaydet
+    saveScoreToServer(completed, gameTime, wordsCount);
     
-    // Derecelendirmeyi güncelle
-    updateRatingDisplay();
-    
-    // Oyun sonu ekranını göster
+    // Oyunu sıfırla ve ana menüye dön
+    resetGame();
+  }
+  
+  // Skoru API'ye gönder (puan gösterim ekranı olmadan)
+  function saveScoreToServer(completed, gameTime, wordsCount) {
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        game_type: 'wordPuzzle',
+        score: score,
+        difficulty: 'medium',
+        playtime: gameTime,
+        game_stats: {
+          words_solved: wordsCount,
+          longest_word: longestSolvedWord || '',
+          completed: completed
+        }
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Kelime Bulmaca skoru kaydedildi:', data);
+      // Kullanıcıya sonuç sayfası gösterilmeden ana sayfaya yönlendir
+      window.location.href = '/all_games';
+    })
+    .catch(error => {
+      console.error('Skor kaydedilirken hata:', error);
+      window.location.href = '/all_games';
+    });
+  }
+  
+  // Oyunu sıfırla
+  function resetGame() {
+    // Oyun sonu ekranını gizle, ana ekranı göster
     gameContainer.style.display = 'none';
-    gameOverContainer.style.display = 'block';
-    
-    // Animasyon ekle
-    gameOverContainer.classList.add('fade-in');
-    
-    // Skoru kaydet
-    if (window.saveScore) {
-      window.saveScore('wordPuzzle', score);
-    }
+    gameOverContainer.style.display = 'none';
+    startScreen.style.display = 'block';
+    startBtn.style.display = 'block';
+  }
     
     // Yeniden oynama düğmesine olay dinleyici ekle
     const playAgainBtn = document.getElementById('play-again');
@@ -1164,16 +1191,13 @@ document.addEventListener('DOMContentLoaded', function() {
     playSound('gameOver');
     gameState.isPlaying = false;
     
-    // Sonuç ekranını hazırla
-    finalScore.textContent = gameState.score;
-    foundWordsCount.textContent = gameState.foundWords.length;
-    
-    // Sonuç ekranını göster
-    gameContainer.style.display = 'none';
-    resultScreen.style.display = 'block';
-    
-    // Skoru kaydet
+    // Skoru arka planda kaydet (puan gösterimi olmadan)
     saveScore();
+    
+    // Ana menüye dön
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 1000);
   }
   
   // Skoru sunucuya gönder

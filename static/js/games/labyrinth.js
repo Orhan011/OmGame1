@@ -533,18 +533,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kontrol dinleyicilerini kaldır
     removeControlListeners();
     
-    // Oyun sonu ekranını göster
-    gamePlay.classList.add('d-none');
-    gameOver.classList.remove('d-none');
-    
-    // Final skoru göster
-    finalScoreDisplay.textContent = totalScore;
-    
-    // Skoru kaydet
+    // Skoru arka planda kaydet, ekranda göstermeden
     saveScore();
     
     // Ses çal
     playSound('gameOver');
+    
+    // Oyun ekranını gizle ve ana menüye yönlendir
+    gamePlay.classList.add('d-none');
+    
+    // Kullanıcıyı tüm oyunlar sayfasına yönlendir
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 1000);
   }
   
   // Oyunu yeniden başlat
@@ -706,19 +707,26 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore() {
+    // Doğru API endpoint'i ve format
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        gameType: 'labyrinth',
-        score: totalScore
+        game_type: 'labyrinth',  // API'nin beklediği format: game_type
+        score: totalScore,
+        difficulty: difficulty,
+        playtime: difficultyToTime(difficulty, currentLevel) - timeLeft,
+        game_stats: {
+          level: currentLevel,
+          completed: gameActive === false
+        }
       })
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Skor kaydedildi:', data);
+      console.log('Labirent skoru kaydedildi:', data);
     })
     .catch(error => {
       console.error('Skor kaydedilirken hata oluştu:', error);
