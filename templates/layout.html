@@ -288,15 +288,21 @@ function loadArticleContent() {
               timeSpent: playtime,
               optimalTime: gameStats.optimalTime || 60,
               totalMoves: gameStats.totalMoves || 0,
-              correctMoves: gameStats.correctMoves,
+              correctMoves: gameStats.correctMoves || 0,
               hintsUsed: gameStats.hintsUsed || 0,
               level: gameStats.level || 1,
               maxLevel: gameStats.maxLevel || 1,
               gameSpecificStats: gameStats
             };
             
-            // Yeni puan hesaplama sistemini kullan (10-100 arası)
-            const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+            // Yeni displayGameScore API'si ile sonuç ekranını göster
+            if (typeof window.displayGameScore === 'function') {
+              window.displayGameScore(scoreParams);
+            } 
+            // Alternatif olarak, eğer eski sistem hala mevcutsa onu kullan
+            else if (typeof window.ScoreCalculator !== 'undefined' && typeof window.ScoreCalculator.calculate === 'function') {
+              // Yeni puan hesaplama sistemini kullan (10-100 arası)
+              const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
             const finalScore = scoreDetails.finalScore;
             
             console.log(`New standardized score for ${gameType}: ${finalScore} points`);

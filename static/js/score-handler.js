@@ -1,105 +1,10 @@
 /**
- * Tüm oyunlar için ortak skor kaydetme modülü
- * Bu modül, oyunlarda kazanılan skorları API'ye göndermek için kullanılır
+ * Tüm oyunlar için ortak skor kaydetme ve gösterme modülü
+ * Bu modül, oyunlarda kazanılan skorları hesaplamak, API'ye göndermek ve göstermek için kullanılır
  */
 
 // ScoreHandler nesnesini global olarak tanımlıyoruz
 window.ScoreHandler = {
-  /**
-   * Oyunu derecelendir
-   * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
-   * @param {number} rating - Derecelendirme (1-5 arası)
-   * @param {string} comment - Kullanıcı yorumu (opsiyonel)
-   * @return {Promise} - API yanıtını içeren Promise nesnesi
-   */
-  rateGame: function(gameType, rating, comment = "") {
-    // Oyun tipini standartlaştır
-    gameType = this.standardizeGameType(gameType);
-
-    // Derecelendirme verisini hazırla
-    const data = {
-      game_type: gameType,
-      rating: rating,
-      comment: comment
-    };
-
-    console.log(`Rating game ${gameType}: ${rating}/5 stars`);
-
-    // API'ye POST isteği
-    return fetch('/api/rate-game', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("Game rated:", data);
-      return data;
-    })
-    .catch(error => {
-      console.error("Error rating game:", error);
-      return { success: false, message: "Error rating game" };
-    });
-  },
-
-  /**
-   * Oyun derecelendirmelerini çek
-   * @param {string} gameType - Oyun türü
-   * @return {Promise} - API yanıtını içeren Promise nesnesi (derecelendirmeler)
-   */
-  getGameRatings: function(gameType) {
-    // Oyun tipini standartlaştır
-    gameType = this.standardizeGameType(gameType);
-
-    return fetch(`/api/get-game-ratings/${gameType}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Game ratings retrieved:", data);
-        return data;
-      })
-      .catch(error => {
-        console.error("Error retrieving game ratings:", error);
-        return { success: false, message: "Error retrieving game ratings" };
-      });
-  },
-
-  /**
-   * Kullanıcının derecelendirmesini çek
-   * @param {string} gameType - Oyun türü
-   * @return {Promise} - API yanıtını içeren Promise nesnesi (kullanıcı derecelendirmesi)
-   */
-  getUserRating: function(gameType) {
-    // Oyun tipini standartlaştır
-    gameType = this.standardizeGameType(gameType);
-
-    return fetch(`/api/get-user-rating/${gameType}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("User rating retrieved:", data);
-        return data;
-      })
-      .catch(error => {
-        console.error("Error retrieving user rating:", error);
-        return { success: false, message: "Error retrieving user rating" };
-      });
-  },
   /**
    * Oyun skorunu API'ye gönderir (standartlaştırılmış)
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
@@ -117,7 +22,7 @@ window.ScoreHandler = {
 
     // Standart skor aralığını uygula (10-100)
     score = Math.max(10, Math.min(100, score));
-    
+
     // Zorluk seviyesi validasyonu
     const validDifficulties = ["easy", "medium", "hard", "expert"];
     if (!validDifficulties.includes(difficulty)) {
@@ -129,13 +34,13 @@ window.ScoreHandler = {
       // URL'den oyun tipini çıkar
       const pathParts = window.location.pathname.split('/');
       const possibleGameType = pathParts[pathParts.length - 1].replace('.html', '');
-      
+
       gameType = (possibleGameType && possibleGameType !== '') ? possibleGameType : "unknown_game";
     }
 
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
-    
+
     // İstatistikleri doldur
     gameStats.timestamp = new Date().toISOString();
     gameStats.difficulty = gameStats.difficulty || difficulty;
@@ -171,19 +76,10 @@ window.ScoreHandler = {
 
       // Başarılı kaydetme
       if (data.success) {
-        // Seviye atlama kontrolü
-        if (data.xp && data.xp.level_up) {
-          showLevelUpNotification(data.xp.old_level, data.xp.level);
-        }
-
-        // Skor kaydedildi bildirimi göster
-        showScoreNotification(score, data.points?.total || score, gameType);
-        console.log("Score saved successfully");
         return data;
       } 
       // Misafir kullanıcı kontrolü
       else if (data.guest && data.login_required) {
-        showLoginRequiredNotification();
         console.log("Score saved successfully");
         return data;
       }
@@ -322,8 +218,146 @@ window.ScoreHandler = {
 
     // Eğer oyun tipi eşleşme tablosunda varsa standartlaştırılmış ismi döndür
     return gameTypeMap[gameType] || gameType;
+  },
+
+  /**
+   * Oyun sonuç ekranını oluştur ve göster
+   * @param {string} gameType - Oyun türü
+   * @param {number} score - Standartlaştırılmış puan (10-100 arası)
+   * @param {Object} scoreBreakdown - Puan detayları
+   */
+  showGameResult: function(gameType, score, scoreBreakdown = {}) {
+    // Oyun istatistiklerini oluştur
+    const gameStats = {
+      game_type: gameType,
+      score: score,
+      score_breakdown: scoreBreakdown
+    };
+
+    // Oyun tipini standartlaştır
+    gameType = this.standardizeGameType(gameType);
+
+    // Zorluk seviyesini belirle (varsayılan: medium)
+    const difficulty = scoreBreakdown.difficulty || "medium";
+
+    // Oyun süresini belirle
+    const playtime = scoreBreakdown.timeSpent || 60;
+
+    // Skor kaydedici fonksiyonu çağır
+    window.saveScoreAndDisplay(gameType, score, playtime, difficulty, gameStats, function(html, data) {
+      // HTML içeriği varsa ekranda göster
+      if (html) {
+        // Sayfaya ekle
+        document.body.insertAdjacentHTML('beforeend', html);
+
+        // Buton işlevlerini ekle
+        setTimeout(() => {
+          // Kapat butonu
+          const closeButtons = document.querySelectorAll('.close-result');
+          if (closeButtons) {
+            closeButtons.forEach(button => {
+              button.addEventListener('click', () => {
+                const overlay = document.querySelector('.game-result-overlay');
+                if (overlay) overlay.remove();
+              });
+            });
+          }
+
+          // Tekrar oyna butonu
+          const replayButtons = document.querySelectorAll('.replay-game');
+          if (replayButtons) {
+            replayButtons.forEach(button => {
+              button.addEventListener('click', () => {
+                const overlay = document.querySelector('.game-result-overlay');
+                if (overlay) overlay.remove();
+
+                // Özel restart fonksiyonu varsa çağır
+                if (typeof window.restartGame === 'function') {
+                  window.restartGame();
+                } else {
+                  // Yoksa sayfayı yenile
+                  window.location.reload();
+                }
+              });
+            });
+          }
+        }, 100);
+      }
+    });
   }
 };
+
+/**
+ * Tüm oyunlar için standartlaştırılmış puan hesaplama fonksiyonu
+ * @param {Object} gameParams - Oyun parametreleri
+ * @param {function} callback - Sonuç ile çağrılacak callback
+ */
+function calculateGameScore(gameParams, callback) {
+  // ScoreCalculator modülünün mevcut olup olmadığını kontrol et
+  if (!window.ScoreCalculator) {
+    console.error("ScoreCalculator hatası:", {});
+
+    // Yedek puan hesaplama (fallback)
+    const fallbackScore = Math.max(10, Math.min(100, Math.round(50 + Math.random() * 40)));
+
+    if (typeof callback === 'function') {
+      callback(fallbackScore, {
+        baseScore: 50,
+        difficultyMultiplier: 1.0,
+        difficulty: gameParams.difficulty || 'medium'
+      });
+    }
+
+    return fallbackScore;
+  }
+
+  try {
+    // ScoreCalculator ile puan hesapla
+    const scoreResult = window.ScoreCalculator.calculate(gameParams);
+    console.log("Standartlaştırılmış puan hesaplandı:", scoreResult);
+
+    // Sonuç geçerli mi kontrol et
+    if (scoreResult && typeof scoreResult.finalScore === 'number') {
+      // Callback'i çağır
+      if (typeof callback === 'function') {
+        callback(scoreResult.finalScore, scoreResult.breakdown);
+      }
+
+      return scoreResult.finalScore;
+    } else {
+      // Geçersiz sonuç, yedek puan hesapla
+      console.error("Geçersiz skor sonucu:", scoreResult);
+      const fallbackScore = Math.max(10, Math.min(100, Math.round(50 + Math.random() * 30)));
+
+      if (typeof callback === 'function') {
+        callback(fallbackScore, {
+          baseScore: 50,
+          difficultyMultiplier: 1.0,
+          difficulty: gameParams.difficulty || 'medium',
+          error: true
+        });
+      }
+
+      return fallbackScore;
+    }
+  } catch (error) {
+    console.error("Puan hesaplama hatası:", error);
+
+    // Hata durumunda yedek puan hesapla
+    const fallbackScore = Math.max(10, Math.min(100, Math.round(50 + Math.random() * 20)));
+
+    if (typeof callback === 'function') {
+      callback(fallbackScore, {
+        baseScore: 50,
+        difficultyMultiplier: 1.0,
+        difficulty: gameParams.difficulty || 'medium',
+        error: true
+      });
+    }
+
+    return fallbackScore;
+  }
+}
 
 /**
  * Tüm oyunlar için standartlaştırılmış skor kaydetme ve gösterme fonksiyonu
@@ -341,7 +375,7 @@ if (!window.saveScoreAndDisplay) {
     try {
       // Oyun puanını standartlaştır (10-100 arası)
       const finalScore = Math.max(10, Math.min(100, score));
-      
+
       // Oyun istatistiklerine puan detaylarını ekle
       if (!gameStats.score_details) {
         gameStats.score_details = {
@@ -350,60 +384,83 @@ if (!window.saveScoreAndDisplay) {
           difficulty: difficulty
         };
       }
-      
+
+      // Puan ekranını oluştur ve göster
+      const displayScoreAndCallback = function(data) {
+        // Skor özeti HTML'i oluştur
+        let scoreHtml = '';
+
+        if (typeof window.createScoreDisplay === 'function') {
+          scoreHtml = window.createScoreDisplay(data);
+        } else {
+          // Yedek basit HTML
+          if (data.success) {
+            scoreHtml = `
+              <div class="game-result-overlay">
+                <div class="game-result-container">
+                  <h2>Oyun Tamamlandı!</h2>
+                  <div class="score-value">${data.points?.total || finalScore} puan</div>
+                  <button class="close-button">Kapat</button>
+                </div>
+              </div>
+            `;
+          } else if (data.guest) {
+            scoreHtml = `
+              <div class="game-result-overlay">
+                <div class="game-result-container">
+                  <h2>Oyun Tamamlandı!</h2>
+                  <div class="score-value">${finalScore} puan</div>
+                  <p>Skorunuzu kaydetmek için giriş yapın.</p>
+                  <div class="button-group">
+                    <a href="/login" class="login-button">Giriş Yap</a>
+                    <button class="close-button">Kapat</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        // Callback varsa çalıştır
+        if (typeof callback === 'function') {
+          callback(scoreHtml, data);
+        } else if (scoreHtml) {
+          // Callback yoksa ve HTML varsa doğrudan göster
+          document.body.insertAdjacentHTML('beforeend', scoreHtml);
+
+          // Kapat butonu için olay dinleyicisi ekle
+          setTimeout(() => {
+            const closeButtons = document.querySelectorAll('.close-button, .close-result');
+            if (closeButtons) {
+              closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                  const overlay = document.querySelector('.game-result-overlay');
+                  if (overlay) overlay.remove();
+                });
+              });
+            }
+          }, 100);
+        }
+      };
+
       // Skoru kaydet
       window.ScoreHandler.saveScore(gameType, finalScore, difficulty, playtime, gameStats)
         .then(data => {
-          // Callback varsa çalıştır
-          if (typeof callback === 'function') {
-            let scoreHtml = '';
-
-            // Skor özeti HTML'i oluştur
-            if (data.success) {
-              scoreHtml = `
-                <div class="score-summary">
-                  <h3>Skor Özeti</h3>
-                  <div class="score-detail">
-                    <span>Oyun:</span>
-                    <span>${formatGameName(gameType)}</span>
-                  </div>
-                  <div class="score-detail">
-                    <span>Zorluk:</span>
-                    <span>${formatDifficulty(difficulty)}</span>
-                  </div>
-                  <div class="score-detail">
-                    <span>Temel Puan:</span>
-                    <span>${data.points?.rewards?.base_points || Math.round(finalScore * 0.8)}</span>
-                  </div>
-                  <div class="score-detail">
-                    <span>Zorluk Çarpanı:</span>
-                    <span>×${data.points?.rewards?.difficulty_multiplier || window.ScoreHandler.getDifficultyMultiplier(difficulty)}</span>
-                  </div>
-                  <div class="score-detail total">
-                    <span>Toplam Puan:</span>
-                    <span>${data.points?.total || finalScore}</span>
-                  </div>
-                </div>
-              `;
-            } else if (data.guest) {
-              scoreHtml = `
-                <div class="score-summary guest">
-                  <h3>Giriş Yapmalısınız</h3>
-                  <p>Skorunuzu kaydetmek ve liderlik tablosunda yer almak için giriş yapın.</p>
-                  <a href="/login?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-primary">Giriş Yap</a>
-                </div>
-              `;
-            }
-
-            callback(scoreHtml, data);
-          }
+          displayScoreAndCallback(data);
         })
         .catch(error => {
           console.error("Score saving error:", error);
-          // Hata durumunda callback'i boş veri ile çağır
-          if (typeof callback === 'function') {
-            callback('', { success: false, error: error.message });
-          }
+          // Hata durumunda yine göster
+          displayScoreAndCallback({ 
+            success: false, 
+            error: error.message,
+            points: { total: finalScore },
+            score_info: { 
+              total_score: finalScore,
+              game_type: gameType, 
+              difficulty: difficulty 
+            }
+          });
         });
     } catch (e) {
       console.error("Error in saveScoreAndDisplay:", e);
@@ -413,6 +470,34 @@ if (!window.saveScoreAndDisplay) {
     }
   };
 }
+
+// Sadece gerçek puan sistemine dayanarak puan gösterir
+if (!window.displayGameScore) {
+  window.displayGameScore = function(params, callback) {
+    // Oyun türünü belirle
+    const gameType = params.gameType || window.location.pathname.split('/').pop().replace('.html', '');
+
+    // ScoreCalculator kullanarak puanı hesapla
+    calculateGameScore(params, function(finalScore, breakdown) {
+      console.log(`Standartlaştırılmış puan: ${finalScore} (${gameType} oyunu için)`);
+
+      // ScoreHandler üzerinden sonuç ekranını göster
+      window.ScoreHandler.showGameResult(gameType, finalScore, {
+        ...breakdown,
+        difficulty: params.difficulty,
+        timeSpent: params.timeSpent
+      });
+
+      // Callback varsa çağır
+      if (typeof callback === 'function') {
+        callback(finalScore, breakdown);
+      }
+    });
+  };
+}
+
+// Global fonksiyonları dışa aktar
+window.calculateGameScore = calculateGameScore;
 
 /**
  * Oyun adını formatlar
