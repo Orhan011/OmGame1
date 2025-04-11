@@ -191,6 +191,11 @@ window.ScoreHandler = {
     .then(data => {
       console.log("Score saved:", data);
       
+      // API yanıtını global olay olarak yayınla (game-results-handler.js için)
+      document.dispatchEvent(new CustomEvent('scoreApiResponse', {
+        detail: { data: data }
+      }));
+      
       // Başarılı kaydetme
       if (data.success) {
         // Seviye atlama kontrolü
@@ -201,6 +206,12 @@ window.ScoreHandler = {
         // Skor kaydedildi bildirimi göster
         showScoreNotification(score, data.points?.total || score, gameType);
         console.log("Score saved successfully");
+        
+        // GameResultsHandler varsa istatistikleri güncelle
+        if (window.GameResultsHandler && typeof window.GameResultsHandler.updateScoreDisplay === 'function') {
+          window.GameResultsHandler.updateScoreDisplay(data.points?.total || score);
+        }
+        
         return data;
       } 
       // Misafir kullanıcı kontrolü
@@ -365,9 +376,23 @@ if (!window.saveScoreAndDisplay) {
       difficulty = "medium";
     }
     
+    // GameResultsHandler varsa, oyun sonucu istatistiklerini temizle
+    if (window.GameResultsHandler && typeof window.GameResultsHandler.cleanupResults === 'function') {
+      setTimeout(() => {
+        window.GameResultsHandler.cleanupResults();
+      }, 100);
+    }
+    
     // Skoru kaydet
     window.ScoreHandler.saveScore(gameType, score, difficulty, playtime, gameStats)
       .then(data => {
+        // GameResultsHandler varsa istatistikleri güncelle
+        if (window.GameResultsHandler && typeof window.GameResultsHandler.updateScoreDisplay === 'function') {
+          setTimeout(() => {
+            window.GameResultsHandler.updateScoreDisplay(data.points?.total || score);
+          }, 500);
+        }
+        
         // Callback varsa çalıştır
         if (typeof callback === 'function') {
           let scoreHtml = '';

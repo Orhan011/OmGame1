@@ -5,11 +5,12 @@
  * Rastgele puanların gösterilmesini engeller ve sadece gerçek puanları gösterir.
  */
 (function() {
-
   // DOM yüklendiğinde çalışacak
   document.addEventListener('DOMContentLoaded', function() {
     // Tüm oyun sonucu istatistik elementlerini bul
     initGameResults();
+    // Skor API yanıtını dinle
+    listenForScoreApiResponse();
   });
 
   /**
@@ -62,11 +63,123 @@
     ratingElements.forEach(element => {
       element.style.display = 'none';
     });
+
+    // Puan animasyonunu da düzeltelim
+    fixFinalScoreAnimations();
+  }
+
+  /**
+   * Final skor gösterimi ve animasyonlarını düzeltir
+   */
+  function fixFinalScoreAnimations() {
+    // Sayfadaki tüm final skor elementlerini bul
+    const finalScoreElements = document.querySelectorAll('#final-score, #finalScore, .final-score, .game-result-score');
+    
+    finalScoreElements.forEach(element => {
+      // Stil düzenlemeleri
+      if (element) {
+        element.style.fontSize = '3rem';
+        element.style.fontWeight = 'bold';
+        element.style.color = '#6a5ae0';
+        element.style.textShadow = '0 0 10px rgba(106, 90, 224, 0.5)';
+      }
+    });
+  }
+
+  /**
+   * Skor API yanıtını dinler ve gerçek skor değerlerini ekranda günceller
+   */
+  function listenForScoreApiResponse() {
+    // API yanıtı için özel bir event dinleyici ekle
+    document.addEventListener('scoreApiResponse', function(e) {
+      if (e.detail && e.detail.data) {
+        const data = e.detail.data;
+        
+        // Gerçek skoru al
+        const realScore = data.points?.total || data.score || 0;
+        
+        // Sayfadaki tüm skor gösterge elemanlarını güncelle
+        updateAllScoreDisplays(realScore);
+      }
+    });
+
+    // ScoreHandler fonksiyonunu genişlet - sunucudan gelen skorları yakalama
+    if (window.ScoreHandler) {
+      const origSaveScore = window.ScoreHandler.saveScore;
+      
+      // ScoreHandler'ın saveScore metodunu extend et
+      window.ScoreHandler.saveScore = function() {
+        // Orijinal metodu çağır
+        const result = origSaveScore.apply(this, arguments);
+        
+        // Yanıt promise'ini dinle ve skorları yakala
+        if (result && typeof result.then === 'function') {
+          result.then(data => {
+            if (data && data.success) {
+              // API yanıtını yayınla
+              document.dispatchEvent(new CustomEvent('scoreApiResponse', {
+                detail: { data: data }
+              }));
+            }
+          }).catch(error => {
+            console.error('Score API error:', error);
+          });
+        }
+        
+        return result;
+      };
+    }
+  }
+
+  /**
+   * Tüm skor gösterge elemanlarını gerçek skorla günceller
+   */
+  function updateAllScoreDisplays(score) {
+    // Sayfadaki tüm skor gösterge elemanlarını bul ve güncelle
+    const scoreElements = document.querySelectorAll('#final-score, #finalScore, .final-score, .game-result-score, [id$="-score"]');
+    
+    scoreElements.forEach(element => {
+      if (element) {
+        // Animasyonlu geçiş için mevcut değeri al
+        const currentValue = parseInt(element.textContent) || 0;
+        
+        // Animasyonlu geçiş efekti
+        animateScoreChange(element, currentValue, score);
+      }
+    });
+  }
+
+  /**
+   * Skorun animasyonlu geçişini sağlar
+   */
+  function animateScoreChange(element, startValue, endValue) {
+    const duration = 1000; // 1 saniye
+    const start = performance.now();
+    
+    function updateScore(timestamp) {
+      const elapsed = timestamp - start;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing fonksiyonu (yavaşlayan animasyon)
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      
+      // Skoru hesapla ve güncelle
+      const currentScore = Math.floor(startValue + (endValue - startValue) * easedProgress);
+      element.textContent = currentScore;
+      
+      // Animasyon tamamlanmadıysa devam et
+      if (progress < 1) {
+        requestAnimationFrame(updateScore);
+      }
+    }
+    
+    requestAnimationFrame(updateScore);
   }
 
   // Global fonksiyonlar
   window.GameResultsHandler = {
-    cleanupResults: initGameResults
+    cleanupResults: initGameResults,
+    updateScoreDisplay: updateAllScoreDisplays
   };
 
 })();
