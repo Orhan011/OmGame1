@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
     gameLose: new Audio('/static/sounds/game-over.mp3')
   };
 
-  // Oyun Durumu - global erişim için window nesnesine de atama yapıyoruz
-  window.gameState = {
+  // Oyun Durumu
+  let gameState = {
     answer: '',
     currentRow: 0,
     currentCol: 0,
@@ -608,26 +608,14 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.score += bonusPoints;
       playSound('gameWin');
       
-      // gameState'i global olarak da erişilebilir yap
-      window.gameState = gameState;
-      document.gameState = gameState;
-      
       // Skoru veritabanına kaydet (kazanınca)
-      setTimeout(() => {
-        saveScoreWithDetails(gameState.score);
-      }, 300);
+      saveScoreWithDetails(gameState.score);
     } else {
       gameState.streak = 0;
       playSound('gameLose');
       
-      // gameState'i global olarak da erişilebilir yap
-      window.gameState = gameState;
-      document.gameState = gameState;
-      
       // Skoru veritabanına kaydet (kaybedince)
-      setTimeout(() => {
-        saveScoreWithDetails(gameState.score);
-      }, 300);
+      saveScoreWithDetails(gameState.score);
     }
     
     // Sonuç ekranını hazırla (puanlar gizlendi)
@@ -815,42 +803,10 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function saveScoreWithDetails(score) {
     try {
-      // gameState değişkenine window üzerinden erişiyoruz
-      const gameStateRef = document.gameState || window.gameState;
-      
-      if (!gameStateRef) {
-        console.error("gameState erişilemedi, global skor kayıt yöntemi kullanılıyor");
-        
-        // Alternatif olarak basit verilerle skoru kaydet
-        const gameStartTime = new Date(localStorage.getItem('wordleGameStartTime') || Date.now());
-        const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
-        const difficulty = localStorage.getItem('currentDifficulty') || 'medium';
-        
-        // Skor 0'dan küçükse düzelt
-        if (score < 0) score = 0;
-        
-        // Doğrudan ScoreHandler'ı kullan
-        if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
-          window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, {
-            duration_seconds: playtime,
-            word_length: 5
-          });
-          return;
-        } else {
-          // API'ye doğrudan gönder
-          fetch('/api/save-score', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              game_type: 'wordle',
-              score: score,
-              difficulty: difficulty,
-              playtime: playtime,
-              game_stats: { duration_seconds: playtime, word_length: 5 }
-            })
-          });
-          return;
-        }
+      // Oyun durumu kontrolü
+      if (typeof gameState === 'undefined' || !gameState) {
+        console.error("gameState tanımlanmamış, skor kaydedilemedi");
+        return;
       }
       
       // Oyun istatistiklerini topla
@@ -858,31 +814,26 @@ document.addEventListener('DOMContentLoaded', function() {
       const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
       
       // Zorluk seviyesini belirle
-      let difficulty = localStorage.getItem('currentDifficulty') || 'medium';
-      if (!difficulty || difficulty === 'auto') {
+      let difficulty = 'easy';
+      if (gameState.currentRow <= 2) {
+        difficulty = 'hard';
+      } else if (gameState.currentRow <= 4) {
         difficulty = 'medium';
-        if (gameStateRef.currentRow <= 2) {
-          difficulty = 'hard';
-        } else if (gameStateRef.currentRow <= 4) {
-          difficulty = 'medium';
-        } else {
-          difficulty = 'easy';
-        }
       }
       
       // Oyun istatistiklerini topla (hata kontrolü ile)
       const gameStats = {
         duration_seconds: playtime,
-        move_count: gameStateRef.currentRow || 0,
-        hint_count: gameStateRef.hintsLeft !== undefined ? (3 - gameStateRef.hintsLeft) : 0,
-        guesses: gameStateRef.currentRow || 0,
+        move_count: gameState.currentRow || 0,
+        hint_count: gameState.hintsLeft !== undefined ? (3 - gameState.hintsLeft) : 0,
+        guesses: gameState.currentRow || 0,
         word_length: 5,
-        success: gameStateRef.answer && 
-                gameStateRef.guesses && 
-                gameStateRef.currentRow > 0 && 
-                gameStateRef.currentRow-1 < gameStateRef.guesses.length && 
-                gameStateRef.guesses[gameStateRef.currentRow-1] ? 
-                  (gameStateRef.answer === gameStateRef.guesses[gameStateRef.currentRow-1].join('')) : 
+        success: gameState.answer && 
+                gameState.guesses && 
+                gameState.currentRow > 0 && 
+                gameState.currentRow-1 < gameState.guesses.length && 
+                gameState.guesses[gameState.currentRow-1] ? 
+                  (gameState.answer === gameState.guesses[gameState.currentRow-1].join('')) : 
                   false
       };
       
@@ -903,9 +854,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
           console.error("saveScoreAndDisplay fonksiyonu hatası:", e);
           // Alternatif yöntemle devam et
-          if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
-            window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
-          }
         }
       } else {
         // Eğer saveScoreAndDisplay fonksiyonu yoksa, doğrudan ScoreHandler'ı kullan
@@ -914,12 +862,27 @@ document.addEventListener('DOMContentLoaded', function() {
             window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
           } catch (e) {
             console.error("ScoreHandler.saveScore fonksiyonu hatası:", e);
-            // Doğrudan API'ye gönder
-            sendScoreToApi('wordle', score, difficulty, playtime, gameStats);
           }
         } else {
           console.log("Doğrudan API'ye skor gönderiliyor...");
-          sendScoreToApi('wordle', score, difficulty, playtime, gameStats);
+          
+          // Alternatif olarak doğrudan API'ye gönder
+          fetch('/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              game_type: 'wordle',
+              score: score,
+              difficulty: difficulty,
+              playtime: playtime,
+              game_stats: gameStats
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log("Skor başarıyla kaydedildi:", data);
+          })
+          .catch(err => console.error("Skor kaydetme hatası:", err));
         }
       }
     } catch (e) {
@@ -927,31 +890,19 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Hata durumunda basit API çağrısı dene
       try {
-        sendScoreToApi('wordle', score || 0, 'medium', 180, { success: false });
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'wordle',
+            score: score || 0,
+            difficulty: 'medium',
+            playtime: 180,
+            game_stats: { success: false }
+          })
+        });
       } catch (e) {
         console.error("Acil durum skor kaydetme hatası:", e);
       }
     }
-  }
-  
-  /**
-   * Skoru doğrudan API'ye gönderen yardımcı fonksiyon
-   */
-  function sendScoreToApi(gameType, score, difficulty, playtime, gameStats) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_type: gameType,
-        score: score,
-        difficulty: difficulty,
-        playtime: playtime,
-        game_stats: gameStats
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Skor başarıyla kaydedildi:", data);
-    })
-    .catch(err => console.error("Skor kaydetme hatası:", err));
   }

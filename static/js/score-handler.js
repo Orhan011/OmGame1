@@ -47,29 +47,6 @@ if (!window.ScoreHandler) {
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
     
-    // Son skorları localStorage'a da kaydet (yedek olarak)
-    try {
-      const savedScores = JSON.parse(localStorage.getItem('zekapark_scores') || '{}');
-      if (!savedScores[gameType]) savedScores[gameType] = [];
-      
-      // Yeni skoru ekle
-      savedScores[gameType].push({
-        score: score,
-        difficulty: difficulty,
-        timestamp: new Date().toISOString(),
-        synced: false
-      });
-      
-      // Maksimum 10 skor sakla
-      if (savedScores[gameType].length > 10) {
-        savedScores[gameType] = savedScores[gameType].slice(-10);
-      }
-      
-      localStorage.setItem('zekapark_scores', JSON.stringify(savedScores));
-    } catch (e) {
-      console.error("LocalStorage kayıt hatası:", e);
-    }
-    
     // API isteği verileri
     const data = {
       game_type: gameType,

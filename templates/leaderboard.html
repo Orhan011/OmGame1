@@ -14,58 +14,13 @@
   </div>
 
   <div class="leaderboard-container">
-    <div class="game-filter">
-        <button class="game-filter-btn active" data-game="all">Tüm Oyunlar</button>
-        <button class="game-filter-btn" data-game="wordle">Wordle</button>
-        <button class="game-filter-btn" data-game="tetris">Tetris</button>
-        <button class="game-filter-btn" data-game="minesweeper">Mayın Tarlası</button>
-        <button class="game-filter-btn" data-game="memory_match">Hafıza Eşleştirme</button>
-        <button class="game-filter-btn" data-game="hangman">Adam Asmaca</button>
-        <button class="game-filter-btn" data-game="snake_game">Yılan</button>
-        <button class="game-filter-btn" data-game="sudoku">Sudoku</button>
-        <button class="game-filter-btn" data-game="puzzle">Bulmaca</button>
+    <!-- Skor tablosu -->
+    <div id="leaderboardContainer" class="leaderboard-card-container">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Skorlar yükleniyor...</p>
       </div>
-
-      <div id="leaderboardContainer" class="leaderboard-card-container">
-        <!-- Skorlar JavaScript ile doldurulacak -->
-        <div class="loading">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>Skorlar yükleniyor...</p>
-        </div>
-      </div>
-
-      <button class="refresh-leaderboard" id="refreshLeaderboard">
-        <i class="fas fa-sync-alt"></i> Tabloyu Yenile
-      </button>
-
-      <script>
-        // Yenileme butonu işlevselliği
-        document.addEventListener('DOMContentLoaded', function() {
-          const refreshBtn = document.getElementById('refreshLeaderboard');
-          if (refreshBtn) {
-            refreshBtn.addEventListener('click', function() {
-              // Aktif oyun türünü al
-              const activeGameBtn = document.querySelector('.game-filter-btn.active');
-              const gameType = activeGameBtn ? activeGameBtn.dataset.game : 'all';
-
-              // Önbelleği temizle
-              localStorage.removeItem(`leaderboard_cache_${gameType}`);
-              localStorage.removeItem(`leaderboard_cache_${gameType}_time`);
-
-              // Tabloyu yenile
-              if (typeof loadLeaderboard === 'function') {
-                loadLeaderboard(gameType);
-
-                // Butonu döndür
-                this.querySelector('i').style.animation = 'spin 1s linear';
-                setTimeout(() => {
-                  this.querySelector('i').style.animation = '';
-                }, 1000);
-              }
-            });
-          }
-        });
-      </script>
+    </div>
   </div>
 </div>
 

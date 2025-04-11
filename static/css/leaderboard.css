@@ -117,46 +117,6 @@
   overflow: hidden;
 }
 
-
-.local-score {
-  background: rgba(106, 90, 224, 0.05);
-  border-left: 3px solid rgba(106, 90, 224, 0.3);
-}
-
-.local-score-badge {
-  background: rgba(106, 90, 224, 0.2);
-  color: #9f8aff;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  display: inline-block;
-  margin-top: 5px;
-}
-
-/* Yenile butonu için stil */
-.refresh-leaderboard {
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 8px 16px;
-  margin: 10px auto;
-  display: block;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(106, 90, 224, 0.3);
-}
-
-.refresh-leaderboard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 15px rgba(106, 90, 224, 0.4);
-}
-
-.refresh-leaderboard i {
-  margin-right: 8px;
-}
-
 .player-row:hover {
   background: rgba(106, 90, 224, 0.1);
   transform: translateX(5px);
