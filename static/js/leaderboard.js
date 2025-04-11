@@ -22,7 +22,7 @@ function loadLeaderboard() {
     </div>
   `;
 
-  // Toplam skorları API'den al - Tüm kullanıcıları getirmek için limit parametresi ekle
+  // Toplam skorları API'den al - Tüm kullanıcıları getirmek için limit parametresi eklenmiş hali
   fetch('/api/scores/aggregated?limit=1000')
     .then(response => {
       if (!response.ok) {
