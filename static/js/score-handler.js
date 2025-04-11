@@ -1,4 +1,3 @@
-
 /**
  * Tüm oyunlar için ortak skor kaydetme modülü
  * Bu modül, oyunlarda kazanılan skorları API'ye göndermek için kullanılır
@@ -16,16 +15,16 @@ window.ScoreHandler = {
   rateGame: function(gameType, rating, comment = "") {
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
-    
+
     // Derecelendirme verisini hazırla
     const data = {
       game_type: gameType,
       rating: rating,
       comment: comment
     };
-    
+
     console.log(`Rating game ${gameType}: ${rating}/5 stars`);
-    
+
     // API'ye POST isteği
     return fetch('/api/rate-game', {
       method: 'POST',
@@ -49,7 +48,7 @@ window.ScoreHandler = {
       return { success: false, message: "Error rating game" };
     });
   },
-  
+
   /**
    * Oyun derecelendirmelerini çek
    * @param {string} gameType - Oyun türü
@@ -58,7 +57,7 @@ window.ScoreHandler = {
   getGameRatings: function(gameType) {
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
-    
+
     return fetch(`/api/get-game-ratings/${gameType}`)
       .then(response => {
         if (!response.ok) {
@@ -75,7 +74,7 @@ window.ScoreHandler = {
         return { success: false, message: "Error retrieving game ratings" };
       });
   },
-  
+
   /**
    * Kullanıcının derecelendirmesini çek
    * @param {string} gameType - Oyun türü
@@ -84,7 +83,7 @@ window.ScoreHandler = {
   getUserRating: function(gameType) {
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
-    
+
     return fetch(`/api/get-user-rating/${gameType}`)
       .then(response => {
         if (!response.ok) {
@@ -115,10 +114,10 @@ window.ScoreHandler = {
     if (typeof score !== 'number') {
       score = parseInt(score, 10) || 0;
     }
-    
+
     // Negatif puanlar 0 olarak ayarlanır
     if (score < 0) score = 0;
-    
+
     // Belirli oyunlar için puan sınırlaması (10-100 arası)
     const limitedScoreGames = [
       'word_puzzle', 'wordPuzzle', 
@@ -128,41 +127,41 @@ window.ScoreHandler = {
       'audio_memory', 'audioMemory', 
       'n_back', 'nBack'
     ];
-    
+
     if (limitedScoreGames.includes(this.standardizeGameType(gameType))) {
       // Puanı 10-100 arasında sınırla
       score = Math.max(10, Math.min(100, score));
       console.log(`Sınırlandırılmış puan: ${score} (${gameType} oyunu için)`);
     }
-    
+
     // Zorluk seviyesi doğrulama
     const validDifficulties = ["easy", "medium", "hard", "expert"];
     if (!validDifficulties.includes(difficulty)) {
       difficulty = "medium"; // Varsayılan değer
     }
-    
+
     // Oyun tipi validasyonu ve düzeltme
     if (!gameType) {
       // Sayfanın URL'sinden oyun tipini tahmin etmeye çalış
       const pathParts = window.location.pathname.split('/');
       const possibleGameType = pathParts[pathParts.length - 1].replace('.html', '');
-      
+
       if (possibleGameType && possibleGameType !== '') {
         gameType = possibleGameType;
       } else {
         gameType = "unknown_game";
       }
     }
-    
+
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
-    
+
     // Oyun istatistiklerine ek bilgiler
     gameStats.timestamp = new Date().toISOString();
     if (!gameStats.difficulty) {
       gameStats.difficulty = difficulty;
     }
-    
+
     // API isteği verileri
     const data = {
       game_type: gameType,
@@ -171,9 +170,9 @@ window.ScoreHandler = {
       playtime: playtime,
       game_stats: gameStats
     };
-    
+
     console.log(`Saving score for ${gameType}: ${score} points, difficulty: ${difficulty}`);
-    
+
     // API'ye POST isteği
     return fetch('/api/save-score', {
       method: 'POST',
@@ -190,14 +189,14 @@ window.ScoreHandler = {
     })
     .then(data => {
       console.log("Score saved:", data);
-      
+
       // Başarılı kaydetme
       if (data.success) {
         // Seviye atlama kontrolü
         if (data.xp && data.xp.level_up) {
           showLevelUpNotification(data.xp.old_level, data.xp.level);
         }
-        
+
         // Skor kaydedildi bildirimi göster
         showScoreNotification(score, data.points?.total || score, gameType);
         console.log("Score saved successfully");
@@ -217,7 +216,7 @@ window.ScoreHandler = {
     })
     .catch(error => {
       console.error("Error saving score:", error);
-      
+
       // Hata olsa bile UI'da kullanıcıya bildir
       if (typeof Swal !== 'undefined') {
         Swal.fire({
@@ -227,11 +226,11 @@ window.ScoreHandler = {
           confirmButtonText: 'Tamam'
         });
       }
-      
+
       return { success: false, message: "Error saving score" };
     });
   },
-  
+
   /**
    * Zorluk seviyesine göre puan çarpanı döndürür
    * @param {string} difficulty - Zorluk seviyesi
@@ -246,7 +245,7 @@ window.ScoreHandler = {
       default: return 1.0;
     }
   },
-  
+
   /**
    * Oyun tipini standartlaştırır
    * @param {string} gameType - Oyun türü
@@ -261,91 +260,91 @@ window.ScoreHandler = {
       'memory-match': 'memory_match',
       'memoryCards': 'memory_match',
       'memory-cards': 'memory_match',
-      
+
       'wordPuzzle': 'word_puzzle',
       'word-puzzle': 'word_puzzle',
       'word_puzzle': 'word_puzzle',
-      
+
       'numberSequence': 'number_sequence',
       'number-sequence': 'number_sequence',
       'number_sequence': 'number_sequence',
-      
+
       'tetris': 'tetris',
-      
+
       'wordle': 'wordle',
-      
+
       'minesweeper': 'minesweeper',
       'mine-sweeper': 'minesweeper',
       'mine_sweeper': 'minesweeper',
-      
+
       'hangman': 'hangman',
-      
+
       'puzzle': 'puzzle',
-      
+
       'sudoku': 'sudoku',
-      
+
       'chess': 'chess',
-      
+
       'colorMatch': 'color_match',
       'color-match': 'color_match',
       'color_match': 'color_match',
-      
+
       'mathChallenge': 'math_challenge',
       'math-challenge': 'math_challenge',
       'math_challenge': 'math_challenge',
-      
+
       'typingSpeed': 'typing_speed',
       'typing-speed': 'typing_speed',
       'typing_speed': 'typing_speed',
-      
+
       'nBack': 'n_back',
       'n-back': 'n_back',
       'n_back': 'n_back',
-      
+
       'audioMemory': 'audio_memory',
       'audio-memory': 'audio_memory',
       'audio_memory': 'audio_memory',
-      
+
       'snake': 'snake_game',
       'snake_game': 'snake_game',
       'snake-game': 'snake_game',
-      
+
       'puzzleSlider': 'puzzle_slider',
       'puzzle-slider': 'puzzle_slider',
       'puzzle_slider': 'puzzle_slider',
-      
+
       'iqTest': 'iq_test',
       'iq-test': 'iq_test',
       'iq_test': 'iq_test',
-      
+
       'simonSays': 'simon_says',
       'simon-says': 'simon_says',
       'simon_says': 'simon_says',
-      
+
       'numberChain': 'number_chain',
       'number-chain': 'number_chain',
       'number_chain': 'number_chain',
-      
+
       'labyrinth': 'labyrinth',
       '3dLabyrinth': 'labyrinth',
       '3d-labyrinth': 'labyrinth',
       '3d_labyrinth': 'labyrinth',
-      
+
       'tangram': 'tangram',
-      
+
       'brainGym': 'brain_gym',
       'brain-gym': 'brain_gym',
       'brain_gym': 'brain_gym',
-      
+
       'crossword': 'crossword',
-      
+
       'solitaire': 'solitaire'
     };
-    
+
     // Eğer oyun tipi eşleşme tablosunda varsa standartlaştırılmış ismi döndür
     return gameTypeMap[gameType] || gameType;
   }
-}
+};
 
 /**
  * Tüm oyunlar için skor kaydetme ve gösterme fonksiyonu
@@ -364,14 +363,14 @@ if (!window.saveScoreAndDisplay) {
     if (!validDifficulties.includes(difficulty)) {
       difficulty = "medium";
     }
-    
+
     // Skoru kaydet
     window.ScoreHandler.saveScore(gameType, score, difficulty, playtime, gameStats)
       .then(data => {
         // Callback varsa çalıştır
         if (typeof callback === 'function') {
           let scoreHtml = '';
-          
+
           // Skor özeti HTML'i oluştur
           if (data.success) {
             scoreHtml = `
@@ -400,7 +399,7 @@ if (!window.saveScoreAndDisplay) {
               </div>
             `;
           }
-          
+
           callback(scoreHtml, data);
         }
       })
@@ -473,9 +472,9 @@ function showScoreNotification(gameScore, totalPoints, gameType) {
     "iqTest": "IQ Testi",
     "simonSays": "Simon Diyor ki"
   };
-  
+
   const gameName = gameNames[gameType] || gameType;
-  
+
   if (typeof Swal !== 'undefined') {
     Swal.fire({
       title: 'Skor Kaydedildi!',

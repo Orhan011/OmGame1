@@ -476,3 +476,87 @@ const RatingHandler = (function() {
 if (!window.RatingHandler) {
   window.RatingHandler = RatingHandler;
 }
+// RatingHandler nesnesini oluşturmadan önce varlığını kontrol et
+if (!window.RatingHandler) {
+  window.RatingHandler = {
+    /**
+     * Oyunu derecelendir (1-5 arası)
+     * @param {string} gameType - Oyun türü 
+     * @param {number} rating - Derecelendirme (1-5 arası)
+     * @param {string} comment - Kullanıcı yorumu
+     * @param {function} callback - İşlem tamamlandığında çağrılacak callback
+     */
+    rateGame: function(gameType, rating, comment = "", callback) {
+      if (!gameType) {
+        console.error("Oyun türü belirtilmedi!");
+        return;
+      }
+      
+      if (rating < 1 || rating > 5) {
+        console.error("Geçersiz derecelendirme değeri! 1-5 arası olmalıdır.");
+        return;
+      }
+      
+      // API'ye istek gönder
+      fetch('/api/rate-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          game_type: gameType,
+          rating: rating,
+          comment: comment
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Derecelendirme başarıyla kaydedildi:", data);
+          if (typeof callback === 'function') callback(data);
+        } else {
+          console.error("Derecelendirme kaydedilirken hata:", data.message);
+          if (typeof callback === 'function') callback(data);
+        }
+      })
+      .catch(error => {
+        console.error("Derecelendirme API hatası:", error);
+        if (typeof callback === 'function') callback({success: false, error: error.message});
+      });
+    },
+    
+    /**
+     * Kullanıcının derecelendirmesini al
+     * @param {string} gameType - Oyun türü
+     * @param {function} callback - Sonuçlarla çağrılacak callback
+     */
+    getUserRating: function(gameType, callback) {
+      fetch(`/api/get-user-rating/${gameType}`)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof callback === 'function') callback(data);
+        })
+        .catch(error => {
+          console.error("Kullanıcı derecelendirmesi alınırken hata:", error);
+          if (typeof callback === 'function') callback({success: false, error: error.message});
+        });
+    },
+    
+    /**
+     * Oyunun tüm derecelendirmelerini al
+     * @param {string} gameType - Oyun türü
+     * @param {function} callback - Sonuçlarla çağrılacak callback
+     */
+    getGameRatings: function(gameType, callback) {
+      fetch(`/api/get-game-ratings/${gameType}`)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof callback === 'function') callback(data);
+        })
+        .catch(error => {
+          console.error("Oyun derecelendirmeleri alınırken hata:", error);
+          if (typeof callback === 'function') callback({success: false, error: error.message});
+        });
+    }
+  };
+}

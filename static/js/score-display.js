@@ -11,7 +11,7 @@ function createScoreDisplay(scoreData) {
             const scoreInfo = scoreData.score_info || {};
             const gameType = scoreInfo.game_type || '';
             const gameName = formatGameName(gameType);
-            const totalScore = scoreInfo.total_score || scoreData.points?.total || 0;
+            const totalScore = scoreInfo.total_score || (scoreData.points ? scoreData.points.total : 0);
             const difficulty = scoreInfo.difficulty || 'medium';
             const difficultyText = formatDifficulty(difficulty);
             const difficultyClass = difficulty.toLowerCase();
@@ -19,38 +19,36 @@ function createScoreDisplay(scoreData) {
             // Kullanıcıya ayrıntılı puan bilgisi göster
             let scoreBreakdownHTML = '';
             
-            // Eğer game_stats içinde scoreBreakdown varsa, detaylı puan göster
-            if (scoreData.game_stats && scoreData.game_stats.scoreBreakdown) {
-                const bd = scoreData.game_stats.scoreBreakdown;
+            // Ödül detaylarından puan dökümü oluştur
+            if (scoreData.points && scoreData.points.rewards) {
+                const rewards = scoreData.points.rewards;
                 
                 scoreBreakdownHTML = `
                     <div class="score-breakdown">
                         <h4 class="breakdown-title">Puan Detayları</h4>
                         <div class="score-detail">
                             <span class="detail-label">Temel Puan:</span>
-                            <span class="detail-value">+${bd.baseScore}</span>
+                            <span class="detail-value">+${rewards.base_points}</span>
                         </div>
                         <div class="score-detail">
-                            <span class="detail-label">Seviye Bonusu:</span>
-                            <span class="detail-value">+${bd.levelBonus}</span>
+                            <span class="detail-label">Skor Puanı:</span>
+                            <span class="detail-value">+${rewards.score_points}</span>
                         </div>
+                        ${rewards.daily_bonus > 0 ? `
                         <div class="score-detail">
-                            <span class="detail-label">Zaman Bonusu:</span>
-                            <span class="detail-value">+${bd.timeBonus}</span>
+                            <span class="detail-label">Günlük Bonus:</span>
+                            <span class="detail-value">+${rewards.daily_bonus}</span>
                         </div>
+                        ` : ''}
+                        ${rewards.streak_bonus > 0 ? `
                         <div class="score-detail">
-                            <span class="detail-label">Hamle Bonusu:</span>
-                            <span class="detail-value">+${bd.moveBonus}</span>
-                        </div>
-                        ${bd.hintPenalty > 0 ? `
-                        <div class="score-detail penalty">
-                            <span class="detail-label">İpucu Cezası:</span>
-                            <span class="detail-value">-${bd.hintPenalty}</span>
+                            <span class="detail-label">Seri Bonusu:</span>
+                            <span class="detail-value">+${rewards.streak_bonus}</span>
                         </div>
                         ` : ''}
                         <div class="score-detail multiplier">
                             <span class="detail-label">Zorluk Çarpanı:</span>
-                            <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
+                            <span class="detail-value">×${rewards.difficulty_multiplier.toFixed(1)}</span>
                         </div>
                         <div class="score-detail total">
                             <span class="detail-label">Toplam Puan:</span>
@@ -95,47 +93,44 @@ function createScoreDisplay(scoreData) {
     const scoreInfo = scoreData.score_info || {};
     const gameType = scoreInfo.game_type || '';
     const gameName = formatGameName(gameType);
-    const totalScore = scoreInfo.total_score || points.total || 0;
+    const totalScore = scoreInfo.total_score || (points.total ? points.total : 0);
     const difficulty = scoreInfo.difficulty || 'medium';
     const difficultyText = formatDifficulty(difficulty);
     const difficultyClass = difficulty.toLowerCase();
-    const gameStats = scoreData.game_stats || {};
     
     // Ayrıntılı puan dökümü oluştur
     let scoreBreakdownHTML = '';
     
-    // Eğer game_stats içinde scoreBreakdown varsa, detaylı puan göster
-    if (gameStats.scoreBreakdown) {
-        const bd = gameStats.scoreBreakdown;
+    // Ödül detaylarından puan dökümü oluştur
+    if (points.rewards) {
+        const rewards = points.rewards;
         
         scoreBreakdownHTML = `
             <div class="score-breakdown">
                 <h4 class="breakdown-title">Puan Detayları</h4>
                 <div class="score-detail">
                     <span class="detail-label">Temel Puan:</span>
-                    <span class="detail-value">+${bd.baseScore}</span>
+                    <span class="detail-value">+${rewards.base_points}</span>
                 </div>
                 <div class="score-detail">
-                    <span class="detail-label">Seviye Bonusu:</span>
-                    <span class="detail-value">+${bd.levelBonus}</span>
+                    <span class="detail-label">Skor Puanı:</span>
+                    <span class="detail-value">+${rewards.score_points}</span>
                 </div>
+                ${rewards.daily_bonus > 0 ? `
                 <div class="score-detail">
-                    <span class="detail-label">Zaman Bonusu:</span>
-                    <span class="detail-value">+${bd.timeBonus}</span>
+                    <span class="detail-label">Günlük Bonus:</span>
+                    <span class="detail-value">+${rewards.daily_bonus}</span>
                 </div>
+                ` : ''}
+                ${rewards.streak_bonus > 0 ? `
                 <div class="score-detail">
-                    <span class="detail-label">Hamle Bonusu:</span>
-                    <span class="detail-value">+${bd.moveBonus}</span>
-                </div>
-                ${bd.hintPenalty > 0 ? `
-                <div class="score-detail penalty">
-                    <span class="detail-label">İpucu Cezası:</span>
-                    <span class="detail-value">-${bd.hintPenalty}</span>
+                    <span class="detail-label">Seri Bonusu:</span>
+                    <span class="detail-value">+${rewards.streak_bonus}</span>
                 </div>
                 ` : ''}
                 <div class="score-detail multiplier">
                     <span class="detail-label">Zorluk Çarpanı:</span>
-                    <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
+                    <span class="detail-value">×${rewards.difficulty_multiplier.toFixed(1)}</span>
                 </div>
                 <div class="score-detail total">
                     <span class="detail-label">Toplam Puan:</span>
