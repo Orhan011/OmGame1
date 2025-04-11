@@ -2130,7 +2130,9 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'xp_base': 30,  # Temel XP
         'xp_score_multiplier': 0.25,  # Skor başına XP - arttırıldı
         'difficulty_multiplier': 1.0,  # Zorluk çarpanı
-        'final_score': None  # Hesaplanacak nihai skor
+        'final_score': None,  # Hesaplanacak nihai skor
+        'min_score': 10,  # Minimum skor sınırı
+        'max_score': 100  # Maksimum skor sınırı
     }
 
     # Oyun türüne göre özel çarpanlar
@@ -2400,6 +2402,9 @@ def save_score():
 
         # Toplam puanı hesapla
         total_points = base_points + score_points + daily_bonus + streak_bonus
+        
+        # Puan sınırlarını uygula (10-100 arası)
+        total_points = max(multipliers['min_score'], min(multipliers['max_score'], int(total_points)))
 
         # Geliştirilmiş XP hesaplama sistemi
         # Temel XP değeri (oyun türü ve zorluğa göre)
@@ -2444,6 +2449,9 @@ def save_score():
         # Yeni skoru kaydet (orijinal oyun skorunu ve zorluk seviyesini kullanarak)
         # Zorluk seviyesine göre düzenlenmiş skoru hesapla
         adjusted_score = int(score * multipliers['difficulty_multiplier'])
+        
+        # Ayarlanmış skor da aynı sınırlar içerisinde olmalı (10-100 arası)
+        adjusted_score = max(multipliers['min_score'], min(multipliers['max_score'], adjusted_score))
 
         new_score = Score(
             user_id=user_id,
@@ -2549,6 +2557,9 @@ def save_score():
         # Misafir kullanıcıya göstermek için toplam XP - giriş yapınca alabilecekleri miktar
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus)
         total_points = base_points + score_points
+        
+        # Misafir kullanıcılar için de puan sınırlarını uygula (10-100 arası)
+        total_points = max(multipliers['min_score'], min(multipliers['max_score'], int(total_points)))
 
         # Misafir kullanıcılara bilgi mesajı
         guest_message = "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun."
