@@ -382,6 +382,7 @@ function showGamePoints(gameScore, details) {
   // Puanı her zaman 10-100 arasında sınırlandır
   const normalizedScore = Math.max(10, Math.min(100, gameScore || 0));
   
+  // Skor elementini bul
   const pointsElement = document.getElementById('gamePoints');
   if (pointsElement) {
     pointsElement.textContent = normalizedScore;
@@ -390,8 +391,23 @@ function showGamePoints(gameScore, details) {
   // Puan detaylarını göster (eğer mevcutsa)
   const detailsElement = document.getElementById('scoreDetails');
   if (detailsElement && details) {
+    // İçeriği temizle
     detailsElement.innerHTML = '';
-
+    
+    // Modern skor kartı oluştur
+    const scoreCard = document.createElement('div');
+    scoreCard.className = 'modern-score-card';
+    
+    // Başlık ekle
+    const scoreHeader = document.createElement('div');
+    scoreHeader.className = 'score-header';
+    scoreHeader.innerHTML = '<h3>Puan Detayları</h3>';
+    scoreCard.appendChild(scoreHeader);
+    
+    // Puan içeriği
+    const scoreContent = document.createElement('div');
+    scoreContent.className = 'score-content';
+    
     // Zorluk seviyesi
     if (details.difficulty) {
       const difficultyNames = {
@@ -403,62 +419,102 @@ function showGamePoints(gameScore, details) {
       
       const difficultyElement = document.createElement('div');
       difficultyElement.className = 'score-detail';
-      difficultyElement.innerHTML = `<span>Zorluk:</span><span>${difficultyNames[details.difficulty] || details.difficulty}</span>`;
-      detailsElement.appendChild(difficultyElement);
+      difficultyElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-chart-line"></i> Zorluk:</span>
+        <span class="detail-value">${difficultyNames[details.difficulty] || details.difficulty}</span>
+      `;
+      scoreContent.appendChild(difficultyElement);
     }
 
     // Temel puan
     if (details.basePoints !== undefined) {
       const basePointsElement = document.createElement('div');
       basePointsElement.className = 'score-detail';
-      basePointsElement.innerHTML = `<span>Temel Puan:</span><span>${details.basePoints}</span>`;
-      detailsElement.appendChild(basePointsElement);
+      basePointsElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-tachometer-alt"></i> Temel Puan:</span>
+        <span class="detail-value">${details.basePoints}</span>
+      `;
+      scoreContent.appendChild(basePointsElement);
     }
 
     // Zorluk çarpanı
     if (details.difficultyMultiplier !== undefined) {
       const difficultyElement = document.createElement('div');
-      difficultyElement.className = 'score-detail';
-      difficultyElement.innerHTML = `<span>Zorluk Çarpanı:</span><span>×${details.difficultyMultiplier}</span>`;
-      detailsElement.appendChild(difficultyElement);
+      difficultyElement.className = 'score-detail multiplier';
+      difficultyElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-star"></i> Zorluk Çarpanı:</span>
+        <span class="detail-value">×${details.difficultyMultiplier}</span>
+      `;
+      scoreContent.appendChild(difficultyElement);
     }
 
     // Seviye bonusu
     if (details.levelBonus) {
       const levelElement = document.createElement('div');
-      levelElement.className = 'score-detail';
-      levelElement.innerHTML = `<span>Seviye Bonusu:</span><span>+${details.levelBonus}</span>`;
-      detailsElement.appendChild(levelElement);
+      levelElement.className = 'score-detail bonus';
+      levelElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-level-up-alt"></i> Seviye Bonusu:</span>
+        <span class="detail-value">+${details.levelBonus}</span>
+      `;
+      scoreContent.appendChild(levelElement);
     }
 
     // Zaman bonusu
     if (details.timeBonus) {
       const timeElement = document.createElement('div');
-      timeElement.className = 'score-detail';
-      timeElement.innerHTML = `<span>Zaman Bonusu:</span><span>+${details.timeBonus}</span>`;
-      detailsElement.appendChild(timeElement);
+      timeElement.className = 'score-detail bonus';
+      timeElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-clock"></i> Zaman Bonusu:</span>
+        <span class="detail-value">+${details.timeBonus}</span>
+      `;
+      scoreContent.appendChild(timeElement);
     }
 
     // Hamle bonusu
     if (details.moveBonus) {
       const moveElement = document.createElement('div');
-      moveElement.className = 'score-detail';
-      moveElement.innerHTML = `<span>Hamle Bonusu:</span><span>+${details.moveBonus}</span>`;
-      detailsElement.appendChild(moveElement);
+      moveElement.className = 'score-detail bonus';
+      moveElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-chess-knight"></i> Hamle Bonusu:</span>
+        <span class="detail-value">+${details.moveBonus}</span>
+      `;
+      scoreContent.appendChild(moveElement);
     }
 
     // İpucu cezası
     if (details.hintPenalty) {
       const hintElement = document.createElement('div');
       hintElement.className = 'score-detail penalty';
-      hintElement.innerHTML = `<span>İpucu Cezası:</span><span>-${details.hintPenalty}</span>`;
-      detailsElement.appendChild(hintElement);
+      hintElement.innerHTML = `
+        <span class="detail-label"><i class="fas fa-lightbulb"></i> İpucu Cezası:</span>
+        <span class="detail-value">-${details.hintPenalty}</span>
+      `;
+      scoreContent.appendChild(hintElement);
     }
+
+    // Ayırıcı çizgi ekle
+    const divider = document.createElement('div');
+    divider.className = 'score-divider';
+    scoreContent.appendChild(divider);
 
     // Toplam puan (standartlaştırılmış)
     const totalElement = document.createElement('div');
     totalElement.className = 'score-detail total';
-    totalElement.innerHTML = `<span>Toplam Puan:</span><span>${normalizedScore}</span>`;
-    detailsElement.appendChild(totalElement);
+    totalElement.innerHTML = `
+      <span class="detail-label"><i class="fas fa-trophy"></i> Toplam Puan:</span>
+      <span class="detail-value">${normalizedScore}</span>
+    `;
+    scoreContent.appendChild(totalElement);
+    
+    // Kartı tamamla ve detaylara ekle
+    scoreCard.appendChild(scoreContent);
+    detailsElement.appendChild(scoreCard);
+    
+    // Liderlik tablosu bağlantısı
+    const leaderboardLink = document.createElement('a');
+    leaderboardLink.href = '/leaderboard';
+    leaderboardLink.className = 'btn btn-primary leaderboard-link';
+    leaderboardLink.innerHTML = '<i class="fas fa-trophy"></i> Liderlik Tablosuna Git';
+    detailsElement.appendChild(leaderboardLink);
   }
 }
