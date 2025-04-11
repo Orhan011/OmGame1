@@ -674,6 +674,25 @@ def initialize_database():
                     category="article"
                 ),
                 Article(
+                    title="Dikkat Kontrolü ve Odaklanma Becerileri",
+                    content="""
+                    <h3>Dikkat Dağınıklığını Yenme ve Odaklanma Gücünüzü Artırma</h3>
+                    <p>Modern dünyada sürekli dikkat dağıtıcılarla karşı karşıyayız. Ancak dikkatimizi kontrol etme yeteneğimizi geliştirebiliriz.</p>
+                    
+                    <h4>Dikkat kontrolünü geliştirme teknikleri:</h4>
+                    <ul>
+                        <li><strong>Pomodoro Tekniği:</strong> 25 dakika tam odaklanma, 5 dakika mola vererek çalışın.</li>
+                        <li><strong>Tek Görev Odaklı Çalışma:</strong> Multitasking yerine, bir seferde tek göreve odaklanın.</li>
+                        <li><strong>Dikkat Dağıtıcıları Azaltın:</strong> Çalışma ortamınızı bildirimlerden ve gürültüden arındırın.</li>
+                        <li><strong>Mindfulness Meditasyonu:</strong> Düzenli meditasyon, dikkat kontrolü için beyni eğitir.</li>
+                        <li><strong>OmGame Dikkat Oyunları:</strong> Visual Attention ve Pattern Recognition gibi oyunlar, dikkat becerinizi güçlendirir.</li>
+                    </ul>
+                    
+                    <p>Bu teknikleri günlük yaşamınıza entegre ederek ve düzenli beyin egzersizleri yaparak, zamanla dikkat kontrolünüzü önemli ölçüde geliştirebilirsiniz.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
                     title="Daha İyi Konsantrasyon İçin İpuçları",
                     content="""
                     <ol>
@@ -719,6 +738,24 @@ def initialize_database():
                     <p>Bu teknikleri ZekaPark oyunlarında pratik ederek hafızanızı güçlendirebilirsiniz.</p>
                     """,
                     category="tip"
+                ),
+                Article(
+                    title="Nöroplastisite: Beynin Kendini Yenileme Gücü",
+                    content="""
+                    <h3>Beynin İnanılmaz Uyum Yeteneği</h3>
+                    <p>Nöroplastisite, beynin yaşam boyu değişme, uyum sağlama ve yeniden yapılanma yeteneğidir. Bu özellik, beyin egzersizlerinin neden bu kadar etkili olduğunu açıklar.</p>
+                    
+                    <h4>Nöroplastisitenin temel özellikleri:</h4>
+                    <ul>
+                        <li><strong>Yaşam Boyu Sürer:</strong> Beyin plastisitesi yaşlanmayla azalsa da hiçbir zaman tamamen kaybolmaz.</li>
+                        <li><strong>Kullan ya da Kaybet:</strong> Aktif olarak kullanılan beyin bölgeleri güçlenirken, kullanılmayanlar zayıflar.</li>
+                        <li><strong>Bağlantı Ağları:</strong> Tekrarlanan aktiviteler, nöronlar arasında daha güçlü bağlantılar oluşturur.</li>
+                        <li><strong>Çevresel Uyarılar:</strong> Zengin ve uyarıcı ortamlar, beyin plastisite süreçlerini destekler.</li>
+                    </ul>
+                    
+                    <p>OmGame'deki beyin egzersizleri, çeşitli bilişsel zorluklar sunarak, beyninizin farklı bölgelerini aktive eder ve nöroplastisite süreçlerini teşvik eder. Bu süreçler, bilişsel becerilerin geliştirilmesi ve korunması için temel oluşturur.</p>
+                    """,
+                    category="article"
                 ),
                 Article(
                     title="Zihinsel Dayanıklılık Geliştirme",
@@ -811,6 +848,44 @@ def initialize_database():
 <p>ZekaPark oyunlarındayüksek puan almak, sadece eğlencelibir rekabet değil, aynı zamanda bilişsel becerilerinizin gelişimine de bir işarettir.</p>
                     """,
                     category="tip"
+                ),
+                Article(
+                    title="Çalışma Hafızasını Güçlendirme Teknikleri",
+                    content="""
+                    <h3>Çalışma Hafızanızı Geliştirmek İçin Pratik Yöntemler</h3>
+                    <p>Çalışma hafızası, bilgileri geçici olarak tutup işleme yeteneğinizdir ve problem çözme, karar verme ve öğrenme için hayati önem taşır.</p>
+                    
+                    <h4>Çalışma hafızasını güçlendirme alıştırmaları:</h4>
+                    <ul>
+                        <li><strong>Geri Sayım Egzersizleri:</strong> 100'den geriye 7'şer sayarak gidin. Bu, hem konsantrasyon hem de çalışma hafızası için mükemmel bir egzersizdir.</li>
+                        <li><strong>Dual N-Back Oyunları:</strong> OmGame'deki N-Back oyunu, çalışma hafızasını geliştirmek için özel olarak tasarlanmıştır.</li>
+                        <li><strong>Akıldan Hesaplama:</strong> Günlük hesaplamaları hesap makinesi olmadan yapmaya çalışın.</li>
+                        <li><strong>Alışveriş Listesi Ezberleme:</strong> Alışveriş listenizi ezberlemeye çalışın ve markette ne kadar doğru hatırladığınızı kontrol edin.</li>
+                    </ul>
+                    
+                    <p>Günlük yaşamda bu teknikleri uygulayarak ve OmGame'deki hafıza oyunlarını düzenli oynayarak, çalışma hafızanızı kademeli olarak geliştirebilirsiniz.</p>
+                    """,
+                    category="tip"
+                ),
+                Article(
+                    title="Beyni Yaşlandıkça Sağlıklı Tutmak",
+                    content="""
+                    <h3>Bilişsel Sağlığı Yaş Aldıkça Koruma Yöntemleri</h3>
+                    <p>Yaşlanma kaçınılmaz olsa da, bilişsel gerilemeyi yavaşlatmak ve beyni sağlıklı tutmak için atılabilecek birçok adım vardır.</p>
+                    
+                    <h4>Bilişsel sağlık için uzun vadeli stratejiler:</h4>
+                    <ul>
+                        <li><strong>Düzenli Bilişsel Zorluklar:</strong> OmGame'deki beyin egzersizleri gibi yeni ve zorlayıcı aktiviteler, bilişsel rezerv oluşturmanıza yardımcı olur.</li>
+                        <li><strong>Sosyal Bağlantılar:</strong> Aktif bir sosyal yaşam, bilişsel gerileme riskini azaltır.</li>
+                        <li><strong>Fiziksel Aktivite:</strong> Düzenli egzersiz, beyin sağlığını destekleyen en güçlü faktörlerden biridir.</li>
+                        <li><strong>Sağlıklı Beslenme:</strong> Akdeniz tarzı diyet gibi beyin dostu beslenme düzenleri, bilişsel sağlığı destekler.</li>
+                        <li><strong>Kaliteli Uyku:</strong> Uyku sırasında beyin toksinlerden arınır ve hafıza konsolidasyonu gerçekleşir.</li>
+                        <li><strong>Stres Yönetimi:</strong> Kronik stres, beyin sağlığı için zararlıdır. Meditasyon ve nefes egzersizleri yardımcı olabilir.</li>
+                    </ul>
+                    
+                    <p>Bu stratejileri yaşam tarzınıza entegre ederek ve OmGame'deki beyin egzersizlerini düzenli olarak yaparak, yaşlandıkça bilişsel sağlığınızı koruyabilirsiniz.</p>
+                    """,
+                    category="article"
                 ),
                 Article(
                     title="Bilişsel Egzersizlere Yeni Başlayanlar İçin Rehber",
