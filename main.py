@@ -2593,6 +2593,96 @@ def get_leaderboard(game_type):
         logger.error(f"Liderlik tablosu verileri getirilirken hata oluştu ({game_type}): {str(e)}")
         return jsonify([]), 500
 
+# Kullanıcı Seviyeleri API'si
+@app.route('/api/users/levels')
+def get_users_levels():
+    """En yüksek seviyeli ilk 10 kullanıcıyı döndürür"""
+    try:
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
+        
+        # En yüksek 10 seviyeye sahip kullanıcıları getir
+        users = User.query.order_by(User.experience_points.desc()).limit(10).all()
+        
+        result = []
+        
+        for user in users:
+            # Kullanıcının seviyesini hesapla
+            level = calculate_level(user.experience_points)
+            
+            # Bir sonraki seviyeye geçmek için gereken XP
+            next_level_xp = xp_for_level(level + 1)
+            current_level_xp = xp_for_level(level)
+            xp_needed = next_level_xp - current_level_xp
+            
+            # Şu anki ilerleme
+            progress = user.experience_points - current_level_xp
+            
+            # İlerleme yüzdesi
+            progress_percent = int((progress / xp_needed) * 100) if xp_needed > 0 else 100
+            
+            # Avatar URL'i düzelt
+            avatar_url = user.avatar_url
+            if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
+                avatar_url = '/' + avatar_url
+            
+            result.append({
+                'username': user.username,
+                'level': level,
+                'experience_points': user.experience_points,
+                'total_xp': user.experience_points,
+                'progress_percent': progress_percent,
+                'games_played': user.total_games_played,
+                'avatar_url': avatar_url,
+                'rank': user.rank,
+                'is_current_user': user.id == current_user_id
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        logging.error(f"Kullanıcı seviyeleri getirilirken hata oluştu: {str(e)}")
+        return jsonify([]), 500
+
+# Alternatif Kullanıcılar API'si (Top Users)
+@app.route('/api/scores/top-users')
+def get_top_users():
+    """En yüksek skora sahip kullanıcıları döndürür"""
+    try:
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
+        
+        # En yüksek toplam skora sahip 10 kullanıcıyı getir
+        top_users = User.query.order_by(User.highest_score.desc()).limit(10).all()
+        
+        result = []
+        
+        for user in top_users:
+            # Kullanıcının seviyesini hesapla
+            level = calculate_level(user.experience_points)
+            
+            # Avatar URL'i düzelt
+            avatar_url = user.avatar_url
+            if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
+                avatar_url = '/' + avatar_url
+            
+            result.append({
+                'username': user.username,
+                'level': level,
+                'experience_points': user.experience_points,
+                'total_xp': user.experience_points,
+                'progress_percent': 0,  # İlerleme yüzdesini burada hesaplamıyoruz
+                'games_played': user.total_games_played,
+                'avatar_url': avatar_url,
+                'total_score': user.highest_score,
+                'rank': user.rank,
+                'is_current_user': user.id == current_user_id
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        logging.error(f"En iyi kullanıcılar getirilirken hata oluştu: {str(e)}")
+        return jsonify([]), 500
+
 # Skor Tablosu Verisi
 @app.route('/api/leaderboard-data/<game_type>')
 def get_leaderboard_data(game_type):
@@ -2623,6 +2713,68 @@ def get_leaderboard_data(game_type):
     })
 
 # Yardımcı fonksiyonlar
+
+# Kullanıcılar Liderlik Tablosu (Seviye veya Puan bazlı)
+@app.route('/api/users/leaderboard')
+def get_users_leaderboard():
+    """
+    Kullanıcıları seviye veya toplam puana göre sıralanmış şekilde döndürür
+    sort parametresi 'level' veya 'score' olabilir
+    """
+    try:
+        # Sıralama parametresini al
+        sort_by = request.args.get('sort', 'level')
+        
+        # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
+        current_user_id = session.get('user_id')
+        
+        # Sıralamaya göre kullanıcıları getir
+        if sort_by == 'level':
+            # Seviyeye göre sırala (experience_points)
+            users = User.query.order_by(User.experience_points.desc()).limit(10).all()
+        else:
+            # Toplam puana göre sırala (highest_score)
+            users = User.query.order_by(User.highest_score.desc()).limit(10).all()
+        
+        result = []
+        
+        for user in users:
+            # Kullanıcının seviyesini hesapla
+            level = calculate_level(user.experience_points)
+            
+            # Bir sonraki seviyeye geçmek için gereken XP
+            next_level_xp = xp_for_level(level + 1)
+            current_level_xp = xp_for_level(level)
+            xp_needed = next_level_xp - current_level_xp
+            
+            # Şu anki ilerleme
+            progress = user.experience_points - current_level_xp
+            
+            # İlerleme yüzdesi
+            progress_percent = int((progress / xp_needed) * 100) if xp_needed > 0 else 100
+            
+            # Avatar URL'i düzelt
+            avatar_url = user.avatar_url
+            if avatar_url and not avatar_url.startswith('http') and not avatar_url.startswith('/'):
+                avatar_url = '/' + avatar_url
+            
+            result.append({
+                'username': user.username,
+                'level': level,
+                'experience_points': user.experience_points,
+                'total_xp': user.experience_points,
+                'progress_percent': progress_percent,
+                'games_played': user.total_games_played,
+                'avatar_url': avatar_url,
+                'total_score': user.highest_score,
+                'rank': user.rank,
+                'is_current_user': user.id == current_user_id
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        logging.error(f"Kullanıcılar liderlik tablosu getirilirken hata oluştu: {str(e)}")
+        return jsonify([]), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
