@@ -414,6 +414,7 @@ if (!window.saveScoreAndDisplay) {
   } catch (e) {
     console.error("Error in saveScoreAndDisplay:", e);
   }
+  };
 }
 
 /**
