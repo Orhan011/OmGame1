@@ -87,19 +87,19 @@ function animatePad(pad) {
   if (!pad) return;
 
   pad.classList.add('active');
-  
+
   // Geliştirilmiş parlaklık efekti
   const glow = document.createElement('div');
   glow.className = 'pad-glow';
-  
+
   // Pad rengine göre parlaklık efekti 
   if (pad.dataset && pad.dataset.color) {
     glow.style.boxShadow = `0 0 20px ${pad.dataset.color}`;
     glow.style.backgroundColor = pad.dataset.color + '33'; // Rengi hafif transparan yap
   }
-  
+
   pad.appendChild(glow);
-  
+
   // Parçacık efekti
   createParticles(pad);
 
@@ -367,43 +367,21 @@ function gameOver() {
   gameStarted = false;
   updateStatusMessage('Oyun bitti! Tekrar denemek için "Başla" butonuna basın.');
 
-  // Geliştirilmiş bitiş animasyonu (patlama efekti kaldırıldı)
+  // Yumuşak parlama efekti ekleme
   soundPads.forEach(pad => {
     if (pad) {
       setTimeout(() => {
-        // Yumuşak solma efekti ekle
-        pad.classList.add('fade-out');
+        // Hafif parlama efekti ekle
+        pad.classList.add('gentle-glow');
         setTimeout(() => {
-          pad.classList.remove('fade-out');
-          // Yeniden görünür hale getir
-          pad.classList.add('fade-in');
-          setTimeout(() => {
-            pad.classList.remove('fade-in');
-          }, 500);
-        }, 600);
+          pad.classList.remove('gentle-glow');
+        }, 800);
       }, Math.random() * 300);
     }
   });
 
-  // Son efekt olarak dalga animasyonu
-  setTimeout(() => {
-    const wave = document.createElement('div');
-    wave.className = 'game-over-wave';
-    const gamePanel = document.querySelector('.game-panel');
-    if (gamePanel) {
-      gamePanel.appendChild(wave);
-      setTimeout(() => {
-        if (gamePanel.contains(wave)) {
-          gamePanel.removeChild(wave);
-        }
-      }, 1000);
-    }
-  }, 800);
-
   // Oyun skorunu arka planda kaydet (puan gösterimi olmadan)
   saveScore();
-
-  startBtn.textContent = 'Tekrar Başla';
 }
 
 // Skoru veritabanına kaydet
