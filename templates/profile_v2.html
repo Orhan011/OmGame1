@@ -33,6 +33,23 @@
             </div>
             <p class="level-text">{{ user.experience_points|int }} / {{ xp_for_next|int }} XP</p>
           </div>
+          
+          <!-- Toplam Oyun Puanı -->
+          <div class="total-score-container mt-3">
+            <div class="d-flex align-items-center">
+              <div class="score-icon me-2">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="score-details">
+                <p class="score-title mb-0">Toplam Puan</p>
+                {% set total_score = 0 %}
+                {% for game_type, score in get_user_scores().items() %}
+                  {% set total_score = total_score + score %}
+                {% endfor %}
+                <p class="total-score-value mb-0">{{ total_score }}</p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <!-- İstatistikler Kaldırıldı -->

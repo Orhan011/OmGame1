@@ -1435,6 +1435,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru kaydet
   function saveScore(finalScoreValue) {
+    // Doğru ve yanlış harfleri hesapla
+    // guessedLetters değişkeninden bu bilgiyi çıkaralım
+    const correctLetters = [];
+    const wrongLetters = [];
+    
+    // Hangi harfler doğru, hangi harfler yanlış
+    guessedLetters.forEach(letter => {
+      if (currentWord.includes(letter)) {
+        correctLetters.push(letter);
+      } else {
+        wrongLetters.push(letter);
+      }
+    });
+    
     // Oyun istatistiklerini hazırla
     const gameStats = {
       remainingAttempts: remainingAttempts,
@@ -1448,7 +1462,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Oyun süresini tahmin et (yaklaşık değer)
     // Her harf denemesi için ortalama 5 saniye
-    const estimatedPlaytime = (correctLetters.length + wrongLetters.length) * 5;
+    const estimatedPlaytime = guessedLetters.length * 5;
     
     // Merkezi puan sistemini kullan
     saveScoreAndDisplay('hangman', finalScoreValue, estimatedPlaytime, currentDifficulty, gameStats, function(html) {

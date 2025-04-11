@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-fixes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 
 <!-- Sayfa Özel CSS Dosyaları - Sayfa tipine göre şartlı olarak yüklenir -->
 {% if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password', 'reset_code'] %}
@@ -27,7 +28,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-responsive-modernizer.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/score-display.css') }}">
 {% endif %}
 
 {% if request.endpoint == 'leaderboard' %}
