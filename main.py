@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///beyin_egzersizi.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///beyin_egzersizi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
@@ -1167,89 +1167,124 @@ def tips():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        password_confirm = request.form.get('password_confirm')  # register.html'deki alan adı ile eşleşecek şekilde
-        terms = request.form.get('terms')
-
-        # Validasyon kontrolleri
-        if not username or not email or not password:
-            flash('Tüm alanlar doldurulmalıdır!', 'danger')
-            return redirect(url_for('register'))
-
-        if password != password_confirm:
-            flash('Şifreler eşleşmiyor!', 'danger')
-            return redirect(url_for('register'))
-
-        if not terms:
-            flash('Kullanım koşullarını kabul etmelisiniz!', 'danger')
-            return redirect(url_for('register'))
-
-        # Kullanıcı adı formatını kontrol et (sadece harf, rakam, tire ve alt çizgi)
-        if not re.match(r'^[a-zA-Z0-9_-]+$', username):
-            flash('Kullanıcı adı sadece harf, rakam, tire ve alt çizgi içerebilir!', 'danger')
-            return redirect(url_for('register'))
-
-        # Kullanıcı adı en az 3 karakter olmalı
-        if len(username) < 3:
-            flash('Kullanıcı adı en az 3 karakter olmalıdır!', 'danger')
-            return redirect(url_for('register'))
-
-        # Şifre en az 6 karakter olmalı
-        if len(password) < 6:
-            flash('Şifre en az 6 karakter olmalıdır!', 'danger')
-            return redirect(url_for('register'))
-
-        # E-posta formatını kontrol et
         try:
-            valid = validate_email(email)
-            email = valid.email
-        except EmailNotValidError:
-            flash('Geçersiz e-posta formatı!', 'danger')
-            return redirect(url_for('register'))
+            username = request.form.get('username')
+            email = request.form.get('email')
+            password = request.form.get('password')
+            password_confirm = request.form.get('password_confirm')  # register.html'deki alan adı ile eşleşecek şekilde
+            terms = request.form.get('terms')
 
-        # Kullanıcı veya e-posta zaten kayıtlı mı kontrol et
-        if User.query.filter_by(username=username).first():
-            flash('Bu kullanıcı adı zaten kullanılıyor!', 'danger')
-            return redirect(url_for('register'))
+            # Validasyon kontrolleri
+            if not username or not email or not password:
+                flash('Tüm alanlar doldurulmalıdır!', 'danger')
+                return redirect(url_for('register'))
 
-        if User.query.filter_by(email=email).first():
-            flash('Bu e-posta adresi zaten kullanılıyor!', 'danger')
-            return redirect(url_for('register'))
+            if password != password_confirm:
+                flash('Şifreler eşleşmiyor!', 'danger')
+                return redirect(url_for('register'))
 
-        # Yeni kullanıcı oluştur
-        hashed_password = generate_password_hash(password)
-        new_user = User(
-            username=username,
-            email=email,
-            password_hash=hashed_password
-        )
+            if not terms:
+                flash('Kullanım koşullarını kabul etmelisiniz!', 'danger')
+                return redirect(url_for('register'))
 
-        # Veritabanına kaydet
-        db.session.add(new_user)
-        db.session.commit()
+            # Kullanıcı adı formatını kontrol et (sadece harf, rakam, tire ve alt çizgi)
+            if not re.match(r'^[a-zA-Z0-9_-]+$', username):
+                flash('Kullanıcı adı sadece harf, rakam, tire ve alt çizgi içerebilir!', 'danger')
+                return redirect(url_for('register'))
 
-        # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
-        logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
-        
-        # E-posta gönderimi için asenkron olmayan bir yaklaşım kullanıyoruz
-        # Gerçek bir üretim uygulamasında, bu işlemi bir kuyruk sistemi ile asenkron yapabilirsiniz
-        email_sent = send_welcome_email(email, username)
-        
-        if email_sent:
-            flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderdik.', 'success')
-            logger.info(f"Hoş geldiniz e-postası gönderildi: {email}")
-        else:
-            flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
-            logger.warning(f"Hoş geldiniz e-postası gönderilemedi: {email}")
-            # E-posta gönderiminde hata olsa bile kullanıcı kaydını tamamla
+            # Kullanıcı adı en az 3 karakter olmalı
+            if len(username) < 3:
+                flash('Kullanıcı adı en az 3 karakter olmalıdır!', 'danger')
+                return redirect(url_for('register'))
 
-        # Otomatik giriş yap
-        session['user_id'] = new_user.id
+            # Şifre en az 6 karakter olmalı
+            if len(password) < 6:
+                flash('Şifre en az 6 karakter olmalıdır!', 'danger')
+                return redirect(url_for('register'))
 
-        flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
-        return redirect(url_for('index'))
+            # E-posta formatını kontrol et
+            try:
+                valid = validate_email(email)
+                email = valid.email
+            except EmailNotValidError:
+                flash('Geçersiz e-posta formatı!', 'danger')
+                return redirect(url_for('register'))
+
+            # Kullanıcı veya e-posta zaten kayıtlı mı kontrol et
+            existing_user = None
+            try:
+                existing_user = User.query.filter_by(username=username).first()
+            except Exception as e:
+                logger.error(f"Kullanıcı adı kontrolü sırasında hata: {str(e)}")
+                db.session.rollback()
+                
+            if existing_user:
+                flash('Bu kullanıcı adı zaten kullanılıyor!', 'danger')
+                return redirect(url_for('register'))
+
+            existing_email = None
+            try:
+                existing_email = User.query.filter_by(email=email).first()
+            except Exception as e:
+                logger.error(f"E-posta kontrolü sırasında hata: {str(e)}")
+                db.session.rollback()
+                
+            if existing_email:
+                flash('Bu e-posta adresi zaten kullanılıyor!', 'danger')
+                return redirect(url_for('register'))
+
+            # Yeni kullanıcı oluştur
+            hashed_password = generate_password_hash(password)
+            new_user = User(
+                username=username,
+                email=email,
+                password_hash=hashed_password
+            )
+
+            # Veritabanına kaydet
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+            except Exception as e:
+                logger.error(f"Kullanıcı kaydedilirken hata: {str(e)}")
+                db.session.rollback()
+                flash('Kayıt sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+                return redirect(url_for('register'))
+
+            # Hoş geldiniz e-postası gönder - her kayıt olana gönderilecek
+            logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
+            
+            # E-posta gönderimi için asenkron olmayan bir yaklaşım kullanıyoruz
+            try:
+                email_sent = send_welcome_email(email, username)
+                
+                if email_sent:
+                    flash('Hoş geldiniz! E-posta adresinize bir karşılama mesajı gönderdik.', 'success')
+                    logger.info(f"Hoş geldiniz e-postası gönderildi: {email}")
+                else:
+                    flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
+                    logger.warning(f"Hoş geldiniz e-postası gönderilemedi: {email}")
+            except Exception as email_error:
+                logger.error(f"E-posta gönderme hatası: {str(email_error)}")
+                flash('Kaydınız başarılı! Ancak karşılama e-postası gönderilirken bir hata oluştu.', 'warning')
+
+            # Otomatik giriş yap
+            try:
+                session['user_id'] = new_user.id
+                flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
+                return redirect(url_for('index'))
+            except Exception as session_error:
+                logger.error(f"Oturum başlatılırken hata: {str(session_error)}")
+                flash('Kayıt başarılı! Lütfen giriş yapın.', 'success')
+                return redirect(url_for('login'))
+                
+        except Exception as e:
+            logger.error(f"Kayıt işlemi sırasında beklenmeyen hata: {str(e)}")
+            db.session.rollback()
+            flash('Bir hata oluştu, lütfen daha sonra tekrar deneyin.', 'danger')
+            return render_template('register.html')
+
+    return render_template('register.html')
 
     return render_template('register.html')
 
