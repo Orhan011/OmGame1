@@ -3118,3 +3118,135 @@ def get_users_leaderboard():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+@app.route('/api/add-promo-articles', methods=['GET'])
+def add_promo_articles():
+    """Yeni promosyonel makaleler ekler"""
+    try:
+        # Yeni promosyonel makaleler
+        promo_articles = [
+            Article(
+                title="Özel Beyin Geliştirici Egzersiz Programları",
+                content="""
+                <h3>Kişiselleştirilmiş Beyin Egzersiz Programlarıyla Bilişsel Gelişiminizi Hızlandırın</h3>
+                <p>OmGame'in uzman ekibi tarafından hazırlanan özel beyin geliştirici egzersiz programları, farklı bilişsel becerileri hedefleyen sistematik bir yaklaşım sunar. Bu programlar, oyunlarımızdan en yüksek faydayı sağlamanıza yardımcı olur.</p>
+                
+                <h4>Program Özellikleri:</h4>
+                <ul>
+                    <li><strong>Seviye Bazlı İlerleme:</strong> Başlangıç, orta ve ileri seviye oyuncular için özel tasarlanmış programlar</li>
+                    <li><strong>Bilişsel Beceri Odaklı:</strong> Hafıza, dikkat, mantık ve yaratıcılık gibi belirli beceriler için özelleştirilmiş oyun setleri</li>
+                    <li><strong>Günlük Antrenman Planları:</strong> Optimal gelişim için haftalık çalışma programları</li>
+                    <li><strong>İlerleme Takibi:</strong> Bilişsel becerilerdeki gelişimi gösteren detaylı raporlar</li>
+                </ul>
+                
+                <p>Yakında tüm kullanıcılarımıza özel olarak hazırlanmış beyin egzersiz programlarımız sunulacak. İlk erişim hakkı kazanmak için profilinizi güncel tutun ve düzenli olarak oyunlarımızı oynamaya devam edin!</p>
+                
+                <h4>Neden Programlı Egzersiz?</h4>
+                <p>Bilimsel araştırmalar, programlı ve düzenli zihinsel egzersizlerin rastgele yapılan alıştırmalara göre çok daha etkili olduğunu gösteriyor. Özel programlarımız, beyninizin farklı bölgelerini dengeli bir şekilde çalıştırarak genel bilişsel performansınızı artırır.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="OmGame Elmas Üyelik Avantajları",
+                content="""
+                <h3>OmGame Elmas Üyelik ile Daha Fazla Beyin Gücü!</h3>
+                <p>OmGame Elmas üyelik, bilişsel gelişiminizi hızlandırmak ve oyun deneyiminizi zenginleştirmek isteyen kullanıcılarımız için tasarlanmış premium bir hizmettir.</p>
+                
+                <h4>Elmas Üyelik Ayrıcalıkları:</h4>
+                <ul>
+                    <li><strong>Özel Oyunlar:</strong> Sadece Elmas üyelerine açık olan gelişmiş oyunlara erişim</li>
+                    <li><strong>İpucu Bonusu:</strong> Tüm oyunlarda ek ipucu hakları</li>
+                    <li><strong>XP Çarpanı:</strong> Kazandığınız XP'lerde %50 bonus</li>
+                    <li><strong>Skor Detayları:</strong> Detaylı performans analizleri ve geliştirme önerileri</li>
+                    <li><strong>Rekabet Avantajı:</strong> Özel turnuvalara katılma hakkı</li>
+                    <li><strong>Reklamsız Deneyim:</strong> Tüm oyunlarda kesintisiz oyun deneyimi</li>
+                </ul>
+                
+                <p>Yakında kullanıma sunulacak olan OmGame Elmas üyelik hakkında daha fazla bilgi için bizi takip etmeye devam edin!</p>
+                
+                <h4>Üyelik seçenekleri:</h4>
+                <ul>
+                    <li><strong>Aylık Plan:</strong> Her ay yenilenen esnek üyelik</li>
+                    <li><strong>Yıllık Plan:</strong> %40 tasarruf sağlayan avantajlı paket</li>
+                    <li><strong>Ömür Boyu Üyelik:</strong> Tek seferlik ödeme ile süresiz premium deneyim</li>
+                </ul>
+                """,
+                category="article"
+            ),
+            Article(
+                title="OmGame Mobil Uygulama Geliyor!",
+                content="""
+                <h3>Her Yerde Beyin Egzersizi: OmGame Mobil Uygulaması Çok Yakında!</h3>
+                <p>Bilişsel becerilerinizi geliştirmek artık daha kolay olacak! OmGame'in mobil uygulaması, web platformumuzun tüm güçlü özelliklerini cebinize taşıyor.</p>
+                
+                <h4>Mobil Uygulamanın Özellikleri:</h4>
+                <ul>
+                    <li><strong>Tüm Favori Oyunlarınız:</strong> Web'deki tüm popüler oyunlar mobil uygulamada</li>
+                    <li><strong>Çevrimdışı Oynama:</strong> İnternet bağlantısı olmadan da egzersizlerinize devam edin</li>
+                    <li><strong>Bildirimler:</strong> Günlük egzersiz hatırlatıcıları ile rutin oluşturun</li>
+                    <li><strong>Mobil Optimizasyon:</strong> Dokunmatik ekranlar için özel tasarlanmış arayüz</li>
+                    <li><strong>Senkronizasyon:</strong> Web ve mobil arasında kesintisiz veri senkronizasyonu</li>
+                </ul>
+                
+                <p>iOS ve Android platformları için yakında yayınlanacak olan uygulamamızı hemen kullanmak için e-posta listemize kaydolun ve ilk indirenlere özel 1 aylık Elmas Üyelik kazanın!</p>
+                
+                <h4>Mobil Uygulamanın Avantajları:</h4>
+                <p>Araştırmalar, günde birkaç kez kısa süreli beyin egzersizleri yapmanın, tek seferde uzun süre egzersiz yapmaktan daha etkili olduğunu gösteriyor. Mobil uygulamamız, gün içinde boş zamanlarınızı değerlendirmenize olanak tanıyarak bilişsel gelişiminizi maksimuma çıkarır.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Beyin Gelişimi Odaklı Online Atölyeler",
+                content="""
+                <h3>OmGame Online Atölyeleri ile Beyin Gücünüzü Keşfedin</h3>
+                <p>Beyin gelişimi alanında uzman eğitmenlerimiz eşliğinde gerçekleşecek olan interaktif online atölyelerimiz, oyun deneyiminizi teorik bilgilerle desteklemenizi sağlar.</p>
+                
+                <h4>Atölye Konuları:</h4>
+                <ul>
+                    <li><strong>Beyin Nasıl Öğrenir?</strong> Nörobilim temelli öğrenme stratejileri</li>
+                    <li><strong>Hafıza Teknikleri:</strong> Unutkanlığı yenmenin bilimsel yolları</li>
+                    <li><strong>Odaklanma Sanatı:</strong> Dikkat dağınıklığını yenmek için pratik yöntemler</li>
+                    <li><strong>Yaratıcı Düşünme:</strong> Yaratıcılığınızı geliştirmenin bilimsel yolları</li>
+                    <li><strong>Stres Yönetimi:</strong> Bilişsel performansınızı etkileyen stresi yönetme teknikleri</li>
+                </ul>
+                
+                <p>Yakında başlayacak olan atölyelerimiz hakkında bilgi almak ve ön kayıt yaptırmak için hesabınıza giriş yapın ve bildirim tercihlerinizi güncelleyin.</p>
+                
+                <h4>Neden Katılmalısınız?</h4>
+                <p>Sadece oyun oynamak yerine, oyunların ardındaki bilimsel prensipleri anlamak, bilişsel gelişiminizi hızlandırır ve günlük yaşamınızda daha etkili stratejiler geliştirmenize yardımcı olur. Atölyelerimiz, OmGame oyunlarından maksimum faydayı elde etmenin anahtarıdır.</p>
+                """,
+                category="article"
+            ),
+            Article(
+                title="Bilişsel Sağlık İçin 30 Günlük Meydan Okuma",
+                content="""
+                <h3>30 Günde Daha Güçlü Bir Beyin: OmGame Meydan Okuması</h3>
+                <p>OmGame 30 Günlük Meydan Okuma programı, bilişsel becerilerinizi sistematik olarak geliştirmek için tasarlanmış, günlük görevlerden oluşan özel bir programdır.</p>
+                
+                <h4>Meydan Okumanın İçeriği:</h4>
+                <ul>
+                    <li><strong>Günlük Görevler:</strong> Her gün farklı bilişsel becerileri hedefleyen oyunlar</li>
+                    <li><strong>Zorluk Seviyesi:</strong> Gün geçtikçe kademeli olarak artan zorluk derecesi</li>
+                    <li><strong>İlerleme Takibi:</strong> Görsel grafiklerle performans gelişiminizi izleme</li>
+                    <li><strong>Topluluk Desteği:</strong> Aynı meydan okumayı yapan diğer kullanıcılarla motivasyon paylaşımı</li>
+                    <li><strong>Ödüller:</strong> Meydan okumayı tamamlayanlar için özel rozetler ve bonus XP</li>
+                </ul>
+                
+                <p>Yeni meydan okuma programımız yakında başlıyor! İlk katılımcılar arasında yer almak için şimdiden kaydolun ve özel bir başlangıç paketi kazanın.</p>
+                
+                <h4>Bilimsel Temeller:</h4>
+                <p>30 günlük düzenli beyin egzersizi, nöroplastisite süreçlerini hızlandırarak beyin yapısında kalıcı değişikliklere yol açar. Araştırmalar, bir ayda bile düzenli zihinsel aktivitenin bilişsel performansta %15-20 artış sağlayabileceğini gösteriyor.</p>
+                """,
+                category="article"
+            )
+        ]
+
+        # Veritabanına ekle
+        for article in promo_articles:
+            db.session.add(article)
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': f'{len(promo_articles)} yeni promosyonel makale başarıyla eklendi!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Hata oluştu: {str(e)}'})
