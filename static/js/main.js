@@ -22,6 +22,150 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Puan sisteminin çalıştığından emin olmak için kontrol
+  if (typeof window.ScoreCalculator === 'undefined') {
+    console.error("ScoreCalculator modülü yüklenemedi!");
+    // Basit yedek ScoreCalculator modülü oluştur
+    window.ScoreCalculator = {
+      calculate: function(params) {
+        const score = params.score || 50;
+        const difficulty = params.difficulty || 'medium';
+
+        // Zorluk çarpanı
+        let difficultyMultiplier = 1.0;
+        if (difficulty === 'easy') difficultyMultiplier = 0.8;
+        if (difficulty === 'medium') difficultyMultiplier = 1.0;
+        if (difficulty === 'hard') difficultyMultiplier = 1.5;
+        if (difficulty === 'expert') difficultyMultiplier = 2.0;
+
+        // Skor hesaplama - 10-100 arasında sınırlı
+        const finalScore = Math.max(10, Math.min(100, score * difficultyMultiplier));
+
+        return {
+          finalScore: Math.round(finalScore),
+          breakdown: {
+            baseScore: score,
+            difficultyMultiplier: difficultyMultiplier,
+            difficulty: difficulty
+          }
+        };
+      },
+
+      normalize: function(rawScore, minScore, maxScore, scaleMin = 10, scaleMax = 100) {
+        if (maxScore === minScore) return scaleMin;
+
+        const normalized = ((rawScore - minScore) / (maxScore - minScore)) * (scaleMax - scaleMin) + scaleMin;
+        return Math.round(normalized);
+      }
+    };
+  }
+
+  // Puan kaydetme fonksiyonu kontrol
+  if (typeof window.saveScoreAndDisplay === 'undefined') {
+    console.error("saveScoreAndDisplay fonksiyonu yüklenemedi!");
+    // Basit yedek fonksiyon oluştur
+    window.saveScoreAndDisplay = function(gameType, score, playtime, difficulty, gameStats, callback) {
+      console.log(`Puan kaydediliyor: ${gameType}, ${score}, ${difficulty}`);
+
+      // Puanı API'ye gönder
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          game_type: gameType,
+          score: Math.max(10, Math.min(100, score)),
+          playtime: playtime || 60,
+          difficulty: difficulty || 'medium',
+          game_stats: gameStats || {}
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Skor kaydedildi:", data);
+
+        // Callback varsa çağır
+        if (typeof callback === 'function') {
+          let scoreHtml = '';
+
+          // Basit bir puan gösterimi
+          if (data.success) {
+            scoreHtml = `
+              <div class="game-result-overlay">
+                <div class="game-result-container">
+                  <h2>Oyun Tamamlandı!</h2>
+                  <div class="score-value">${data.points?.total || score} puan</div>
+                  <button class="close-button">Kapat</button>
+                </div>
+              </div>
+            `;
+          }
+
+          callback(scoreHtml, data);
+        }
+      })
+      .catch(error => {
+        console.error("Skor kaydetme hatası:", error);
+        if (typeof callback === 'function') {
+          callback('', { success: false, error: error.message });
+        }
+      });
+    };
+  }
+
+  // Test puanı gönder - sadece geliştirme ortamında kullanılır
+  window.testScoreSystem = function(gameType = 'puzzle', score = 75, difficulty = 'medium') {
+    console.log(`Test puanı gönderiliyor: ${gameType}, ${score}, ${difficulty}`);
+    window.saveScoreAndDisplay(gameType, score, 60, difficulty, {}, function(html, data) {
+      console.log("Test sonucu:", data);
+      if (html) {
+        document.body.insertAdjacentHTML('beforeend', html);
+      }
+    });
+  };
+
+  // Oyun puanlarının kullanıcı profiline yansıtılmasını sağla
+  window.updateUserProfile = function() {
+    const profileStats = document.querySelector('.profile-stats');
+    if (profileStats) {
+      fetch('/api/user/stats')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Kullanıcı istatistiklerini güncelle
+          const statsHTML = `
+            <div class="stat">
+              <i class="fas fa-gamepad"></i>
+              <span>${data.total_games || 0}</span>
+              <label>Oynanan Oyun</label>
+            </div>
+            <div class="stat">
+              <i class="fas fa-star"></i>
+              <span>${data.experience_points || 0}</span>
+              <label>XP</label>
+            </div>
+            <div class="stat">
+              <i class="fas fa-trophy"></i>
+              <span>${data.highest_score || 0}</span>
+              <label>En Yüksek Puan</label>
+            </div>
+          `;
+
+          profileStats.innerHTML = statsHTML;
+        }
+      })
+      .catch(error => {
+        console.error("Profil güncelleme hatası:", error);
+      });
+    }
+  };
+
+  // Sayfa yüklendiğinde profil verilerini güncelle
+  if (window.location.pathname.includes('/profile')) {
+    window.updateUserProfile();
+  }
+
   // Save game score
   window.saveScore = function(gameType, score) {
     fetch('/api/save-score', {
@@ -90,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   };
+
 
   // Load leaderboard data
   window.loadLeaderboard = function(gameType, elementId) {
@@ -233,6 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
 // Profile Modal Lazy Loading
 document.addEventListener('DOMContentLoaded', function() {
   const profileButton = document.getElementById('profileButton');
@@ -255,25 +401,25 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
+
   // Navbar'da kullanıcı dropdown menüsünü mobil görünümde her zaman göster
   const adjustUserDropdown = function() {
     const navbarCollapse = document.querySelector('.navbar-collapse');
     const userDropdownContainer = document.querySelector('.navbar-nav.ms-auto.d-flex');
-    
+
     // Null kontrolü ekleyelim
     if (!userDropdownContainer) return;
-    
+
     if (window.innerWidth < 992) { // Bootstrap'ın lg breakpoint değeri
       userDropdownContainer.classList.add('mobile-visible');
     } else {
       userDropdownContainer.classList.remove('mobile-visible');
     }
   };
-  
+
   // İlk yüklemede ayarla
   setTimeout(adjustUserDropdown, 100); // DOMContentLoaded olayından sonra bir gecikme ekleyelim
-  
+
   // Ekran boyutu değiştiğinde ayarla
   window.addEventListener('resize', adjustUserDropdown);
 });
@@ -315,7 +461,7 @@ function toggleShortcutPanel(event) {
     panel.style.display = 'none';
   } else {
     panel.style.display = 'block';
-    
+
     // Panel dışına tıklandığında paneli kapat
     document.addEventListener('click', function closePanel(e) {
       if (!panel.contains(e.target) && e.target !== event.target) {

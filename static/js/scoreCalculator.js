@@ -1,4 +1,3 @@
-
 /**
  * Standart Puan Hesaplama Modülü
  * Tüm oyunlar için standartlaştırılmış puan hesaplama sistemi
@@ -48,20 +47,20 @@ window.ScoreCalculator = {
 
       // Zorluk seviyesi çarpanı
       const difficultyMultiplier = this.getDifficultyMultiplier(difficulty);
-      
+
       // Temel puan bileşenleri
       const baseScore = 30; // Her oyun için sabit temel puan
-      
+
       // Bonus ve ceza hesaplamaları
       const levelBonus = level ? Math.min(level * 2, 20) : 0;
       const hintPenalty = hintsUsed ? Math.min(hintsUsed * 5, 30) : 0;
-      
+
       // Zaman bonusu (daha hızlı çözüm = daha yüksek puan)
       let timeBonus = 0;
       if (timeSpent > 0) {
         // Zaman tipine göre hesapla (saniye veya milisaniye)
         const seconds = timeSpent > 1000 ? timeSpent / 1000 : timeSpent;
-        
+
         if (seconds < 30) {
           timeBonus = 40; // Çok hızlı
         } else if (seconds < 60) {
@@ -74,7 +73,7 @@ window.ScoreCalculator = {
           timeBonus = 5;  // Çok yavaş
         }
       }
-      
+
       // Hamle bonusu (daha az hamle = daha yüksek puan)
       let moveBonus = 0;
       if (moves > 0) {
@@ -88,16 +87,16 @@ window.ScoreCalculator = {
           moveBonus = 5;  // Çok hamle
         }
       }
-      
+
       // Toplam ham puanı hesapla
       let rawTotal = baseScore + levelBonus + timeBonus + moveBonus - hintPenalty;
-      
+
       // Zorluk çarpanını uygula
       rawTotal = Math.round(rawTotal * difficultyMultiplier);
-      
+
       // 10-100 arasına sınırla (tüm oyunlar için standart aralık)
       const finalScore = Math.max(10, Math.min(100, rawTotal));
-      
+
       // Puan detaylarını oluştur
       const breakdown = {
         baseScore: baseScore,
@@ -110,9 +109,9 @@ window.ScoreCalculator = {
         rawTotal: rawTotal,
         normalizedScore: finalScore
       };
-      
+
       console.log(`Standartlaştırılmış ${gameType} puanı:`, {finalScore, breakdown});
-      
+
       return {
         finalScore: finalScore,
         breakdown: breakdown
@@ -144,7 +143,7 @@ window.ScoreCalculator = {
       "hard": 1.5,    // %50 bonus
       "expert": 2.0   // %100 bonus
     };
-    
+
     return multipliers[difficulty] || 1.0;
   }
 };

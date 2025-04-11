@@ -374,6 +374,19 @@ function formatNumber(num) {
  *                            - üçüncü parametre ise opsiyonel bir onay callback'i
  */
 function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', gameStats = {}, callback) {
+  // Parametreleri kontrol et ve standardize et
+  if (typeof score !== 'number') {
+    score = parseInt(score) || 0;
+  }
+  
+  // Puanı 10-100 arasında sınırla
+  score = Math.max(10, Math.min(100, score));
+  
+  // Zorluk seviyesini standardize et
+  if (!['easy', 'medium', 'hard', 'expert'].includes(difficulty)) {
+    difficulty = 'medium';
+  }
+  
   // Giriş yapılmış mı kontrol et
   fetch('/api/get-current-user')
   .then(response => response.json())
@@ -409,6 +422,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
     })
     .then(response => {
       if (!response.ok) {
+        console.error(`Server responded with status: ${response.status}`);
         throw new Error(`Server responded with status: ${response.status}`);
       }
       return response.json();
@@ -450,6 +464,13 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
 
       // Normal durum (seviye yükseltme yoksa)
       const scoreHtml = createScoreDisplay(data);
+      console.log("Skor kaydedildi ve kullanıcı hesabına eklendi:", {
+        score: score,
+        gameType: gameType,
+        adjustedScore: data.points?.total || score,
+        xpGained: data.xp?.gain || 0
+      });
+      
       if (typeof callback === 'function') {
         callback(scoreHtml, data);
       }

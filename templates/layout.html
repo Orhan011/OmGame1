@@ -275,12 +275,12 @@ function loadArticleContent() {
         document.addEventListener('gameCompleted', function(e) {
           if (e.detail && e.detail.score !== undefined) {
             const gameType = e.detail.gameType || window.location.pathname.split('/').pop().replace('.html', '');
-            
+
             // Yeni standardize edilmiş skor hesaplama sistemini kullan
             const gameStats = e.detail.stats || {};
             const difficulty = e.detail.difficulty || localStorage.getItem('currentDifficulty') || 'medium';
             const playtime = e.detail.playtime || 60;
-            
+
             // Skor parametrelerini oluştur
             const scoreParams = {
               gameType: gameType,
@@ -294,7 +294,7 @@ function loadArticleContent() {
               maxLevel: gameStats.maxLevel || 1,
               gameSpecificStats: gameStats
             };
-            
+
             // Yeni displayGameScore API'si ile sonuç ekranını göster
             if (typeof window.displayGameScore === 'function') {
               window.displayGameScore(scoreParams);
@@ -304,9 +304,9 @@ function loadArticleContent() {
               // Yeni puan hesaplama sistemini kullan (10-100 arası)
               const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
             const finalScore = scoreDetails.finalScore;
-            
+
             console.log(`New standardized score for ${gameType}: ${finalScore} points`);
-            
+
             // Skor kaydetme
             ScoreHandler.saveScore(gameType, finalScore, difficulty, playtime, {
               ...gameStats,

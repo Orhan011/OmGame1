@@ -879,7 +879,9 @@
       
       Object.keys(scores).forEach(gameType => {
         if (scores[gameType]) {
-          totalPoints += scores[gameType].highest_score || 0;
+          // Standardize edilmiş skorları (adjusted_score) kullan
+          const gameScore = scores[gameType].adjusted_score || scores[gameType].highest_score || 0;
+          totalPoints += gameScore;
           playedGamesCount++;
         }
       });

@@ -4,7 +4,9 @@
  */
 
 // ScoreHandler nesnesini global olarak tanımlıyoruz
-window.ScoreHandler = {
+// Daha önce tanımlanmış olabilir, bu yüzden kontrol ediyoruz
+if (!window.ScoreHandler) {
+  window.ScoreHandler = {
   /**
    * Oyun skorunu API'ye gönderir (standartlaştırılmış)
    * @param {string} gameType - Oyun türü (örn. "wordle", "tetris", "chess" vb.)
@@ -286,6 +288,7 @@ window.ScoreHandler = {
     });
   }
 };
+}
 
 /**
  * Tüm oyunlar için standartlaştırılmış puan hesaplama fonksiyonu
