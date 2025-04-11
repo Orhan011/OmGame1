@@ -69,8 +69,25 @@ function loadLeaderboard() {
 
         // Avatar URL'ini kontrol et ve düzelt
         let avatarUrl = player.avatar_url || '';
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
-          avatarUrl = '/' + avatarUrl;
+        if (avatarUrl) {
+          // HTTP veya HTTPS ile başlamıyorsa
+          if (!avatarUrl.startsWith('http')) {
+            // Eğer / ile başlamıyorsa başına / ekle
+            if (!avatarUrl.startsWith('/')) {
+              avatarUrl = '/' + avatarUrl;
+            }
+            
+            // Farklı formatlardaki avatar url'lerini düzelt
+            if (avatarUrl.startsWith('/uploads/')) {
+              avatarUrl = '/static' + avatarUrl;
+            } else if (!avatarUrl.startsWith('/static/')) {
+              // Static içinde değilse ve uploads içinde değilse, 
+              // muhtemelen bir dosya adıdır, static/uploads/ dizinine ekle
+              if (!avatarUrl.startsWith('/static/uploads/')) {
+                avatarUrl = '/static/uploads' + avatarUrl;
+              }
+            }
+          }
         }
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
@@ -226,8 +243,25 @@ function loadLevelLeaderboard() {
 
         // Avatar URL'ini kontrol et ve düzelt
         let avatarUrl = playerData.avatar_url;
-        if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
-          avatarUrl = '/' + avatarUrl;
+        if (avatarUrl) {
+          // HTTP veya HTTPS ile başlamıyorsa
+          if (!avatarUrl.startsWith('http')) {
+            // Eğer / ile başlamıyorsa başına / ekle
+            if (!avatarUrl.startsWith('/')) {
+              avatarUrl = '/' + avatarUrl;
+            }
+            
+            // Farklı formatlardaki avatar url'lerini düzelt
+            if (avatarUrl.startsWith('/uploads/')) {
+              avatarUrl = '/static' + avatarUrl;
+            } else if (!avatarUrl.startsWith('/static/')) {
+              // Static içinde değilse ve uploads içinde değilse, 
+              // muhtemelen bir dosya adıdır, static/uploads/ dizinine ekle
+              if (!avatarUrl.startsWith('/static/uploads/')) {
+                avatarUrl = '/static/uploads' + avatarUrl;
+              }
+            }
+          }
         }
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
