@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const finalScoreEl = document.getElementById('final-score');
 
   // Game Settings
-  let speed = 150; // Milliseconds between updates
+  let speed = 250; // Milliseconds between updates - daha yavaş için artırıldı (150'den 250'ye)
   let difficulty = 'normal';
   let wallsEnabled = true;
   
@@ -466,9 +466,9 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', function() {
       const speedSetting = this.getAttribute('data-speed');
       
-      if (speedSetting === 'slow') speed = 200;
-      else if (speedSetting === 'medium') speed = 150;
-      else if (speedSetting === 'fast') speed = 100;
+      if (speedSetting === 'slow') speed = 300;    // Daha yavaş
+      else if (speedSetting === 'medium') speed = 250;  // Orta hız
+      else if (speedSetting === 'fast') speed = 200;    // Hızlı hız (yine de öncekinden daha yavaş)
       
       // Update UI
       speedBtns.forEach(b => b.classList.remove('active'));
