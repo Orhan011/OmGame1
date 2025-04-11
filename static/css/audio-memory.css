@@ -106,6 +106,25 @@ html, body {
   height: 100%;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
   z-index: 1;
+  border-radius: 20px;
+}
+
+.pad-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  opacity: 0;
+  z-index: 0;
+  animation: pad-glow 0.3s ease-out;
+}
+
+@keyframes pad-glow {
+  0% { transform: scale(0.9); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 0; }
 }
 
 .sound-pad:hover {
@@ -298,14 +317,44 @@ html, body {
   100% { transform: scale(1); }
 }
 
-.sound-pad.explode {
-  animation: explode 0.8s ease-in-out;
+/* Patlama efekti kaldırıldı, yerine daha yumuşak geçişler eklendi */
+.sound-pad.fade-out {
+  animation: fadeOut 0.6s ease-out;
 }
 
-@keyframes explode {
-  0% { transform: scale(1); opacity: 1; }
-  20% { transform: scale(1.2); opacity: 0.9; }
-  100% { transform: scale(0.5); opacity: 0; }
+.sound-pad.fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeOut {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+  100% { transform: scale(0.9); opacity: 0.3; box-shadow: 0 0 15px rgba(106, 90, 205, 0.9); }
+}
+
+@keyframes fadeIn {
+  0% { transform: scale(0.9); opacity: 0.3; box-shadow: 0 0 15px rgba(106, 90, 205, 0.9); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+}
+
+/* Oyun sonu dalga efekti */
+.game-over-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(106, 90, 205, 0.1);
+  box-shadow: 0 0 20px rgba(106, 90, 205, 0.3);
+  animation: wave-expand 1s ease-out forwards;
+  z-index: 5;
+  pointer-events: none;
+}
+
+@keyframes wave-expand {
+  0% { width: 10px; height: 10px; opacity: 0.1; }
+  100% { width: 300px; height: 300px; opacity: 0; }
 }
 
 .sound-pad.success-pulse {

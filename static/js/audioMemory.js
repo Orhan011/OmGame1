@@ -82,17 +82,32 @@ function playSound(note, duration = 0.5) {
   return { oscillator, gainNode };
 }
 
-// Pad efekt animasyonu
+// Pad efekt animasyonu - Geliştirilmiş
 function animatePad(pad) {
   if (!pad) return;
 
   pad.classList.add('active');
-
+  
+  // Geliştirilmiş parlaklık efekti
+  const glow = document.createElement('div');
+  glow.className = 'pad-glow';
+  
+  // Pad rengine göre parlaklık efekti 
+  if (pad.dataset && pad.dataset.color) {
+    glow.style.boxShadow = `0 0 20px ${pad.dataset.color}`;
+    glow.style.backgroundColor = pad.dataset.color + '33'; // Rengi hafif transparan yap
+  }
+  
+  pad.appendChild(glow);
+  
   // Parçacık efekti
   createParticles(pad);
 
   setTimeout(() => {
     pad.classList.remove('active');
+    if (pad.contains(glow)) {
+      pad.removeChild(glow);
+    }
   }, 300);
 }
 
@@ -352,14 +367,38 @@ function gameOver() {
   gameStarted = false;
   updateStatusMessage('Oyun bitti! Tekrar denemek için "Başla" butonuna basın.');
 
-  // Patlama efekti
+  // Geliştirilmiş bitiş animasyonu (patlama efekti kaldırıldı)
   soundPads.forEach(pad => {
     if (pad) {
       setTimeout(() => {
-        animatePad(pad);
-      }, Math.random() * 500);
+        // Yumuşak solma efekti ekle
+        pad.classList.add('fade-out');
+        setTimeout(() => {
+          pad.classList.remove('fade-out');
+          // Yeniden görünür hale getir
+          pad.classList.add('fade-in');
+          setTimeout(() => {
+            pad.classList.remove('fade-in');
+          }, 500);
+        }, 600);
+      }, Math.random() * 300);
     }
   });
+
+  // Son efekt olarak dalga animasyonu
+  setTimeout(() => {
+    const wave = document.createElement('div');
+    wave.className = 'game-over-wave';
+    const gamePanel = document.querySelector('.game-panel');
+    if (gamePanel) {
+      gamePanel.appendChild(wave);
+      setTimeout(() => {
+        if (gamePanel.contains(wave)) {
+          gamePanel.removeChild(wave);
+        }
+      }, 1000);
+    }
+  }, 800);
 
   // Oyun skorunu arka planda kaydet (puan gösterimi olmadan)
   saveScore();
