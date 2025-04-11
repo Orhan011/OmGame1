@@ -1224,27 +1224,13 @@ def logout():
 def xp_for_level(level):
     """
     Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar.
-    Yeni formül ile seviye başına gereken XP miktarı daha dengeli artıyor.
-    - Başlangıç seviyelerinde daha hızlı seviye atlama
-    - İleri seviyelerde zorluk kademeli olarak artıyor
-    - Başarı hissini artırmak için ilk 10 seviye daha kolay
+    Her seviye için sabit 100 XP gerekir.
+    - Basitleştirilmiş, anlaşılır bir seviye sistemi
+    - Her seviye için aynı miktar XP (100 puan)
+    - Kullanıcıların daha hızlı seviye atlamasını sağlar
     """
-    # Temel XP değeri (1. seviye için)
-    base_xp = 400
-    
-    # Düşük seviyelerde daha hızlı ilerleme için çarpan
-    if level <= 5:
-        # İlk 5 seviyede hızlı ilerleme
-        return int(base_xp * level * 1.2)
-    elif level <= 10:
-        # 6-10 seviyelerinde orta düzey ilerleme
-        return int(base_xp * 5 * 1.2 + base_xp * (level - 5) * 1.5)
-    elif level <= 20:
-        # 11-20 seviyelerinde biraz daha zorlaştırma
-        return int(base_xp * 5 * 1.2 + base_xp * 5 * 1.5 + base_xp * (level - 10) * 1.8)
-    else:
-        # 20+ seviyelerde daha zorlayıcı
-        return int(base_xp * 5 * 1.2 + base_xp * 5 * 1.5 + base_xp * 10 * 1.8 + base_xp * (level - 20) * 2.2)
+    # Her seviye için sabit 100 XP
+    return (level - 1) * 100
 
 def calculate_level(xp):
     """
