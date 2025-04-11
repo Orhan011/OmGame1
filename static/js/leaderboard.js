@@ -92,9 +92,6 @@ function loadLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const isCurrentUser = player.is_current_user || false;
 
-        // Puanlara maksimum 3 basamak gösterilecek
-        const formattedScore = (player.total_score || 0) > 999 ? '999+' : (player.total_score || 0);
-        
         html += `
           <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
             <div class="rank-cell">
@@ -110,13 +107,13 @@ function loadLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username ? (player.username.length > 8 ? player.username.substring(0, 8) + '...' : player.username) : 'İsimsiz'}</div>
-                ${player.rank ? `<div class="player-rank">${player.rank.length > 10 ? player.rank.substring(0, 10) + '...' : player.rank}</div>` : ''}
+                <div class="player-name ${userNameColorClass}">${player.username ? (player.username.length > 10 ? player.username.substring(0, 10) + '...' : player.username) : 'İsimsiz Oyuncu'}</div>
+                ${player.rank ? `<div class="player-rank">${player.rank.length > 12 ? player.rank.substring(0, 12) + '...' : player.rank}</div>` : ''}
               </div>
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${formattedScore}</span>
+                <span class="score-value">${player.total_score || 0}</span>
               </div>
             </div>
           </div>
@@ -284,9 +281,6 @@ function loadLevelLeaderboard() {
         else if (playerData.level >= 5) levelBadgeClass = 'level-expert';
         else if (playerData.level >= 3) levelBadgeClass = 'level-advanced';
 
-        // XP değerini formatlama
-        const formattedXP = playerData.total_xp > 999 ? Math.floor(playerData.total_xp/100)/10 + 'K' : playerData.total_xp;
-        
         html += `
           <div class="player-row ${rankClass} ${playerData.is_current_user ? 'current-user' : ''}">
             <div class="rank-cell">
@@ -302,18 +296,18 @@ function loadLevelLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${playerData.username ? (playerData.username.length > 8 ? playerData.username.substring(0, 8) + '...' : playerData.username) : 'İsimsiz'}</div>
+                <div class="player-name ${userNameColorClass}">${playerData.username ? (playerData.username.length > 10 ? playerData.username.substring(0, 10) + '...' : playerData.username) : 'İsimsiz Oyuncu'}</div>
                 <div class="player-stats">
-                  <span class="level-badge">XP: ${formattedXP}</span>
-                  ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played > 999 ? '999+' : playerData.games_played}</span>` : ''}
-                  ${playerData.rank ? `<span class="rank-badge"><i class="fas fa-medal"></i> ${playerData.rank.length > 10 ? playerData.rank.substring(0, 10) + '...' : playerData.rank}</span>` : ''}
+                  <span class="level-badge">XP: ${playerData.total_xp}</span>
+                  ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}
+                  ${playerData.rank ? `<span class="rank-badge"><i class="fas fa-medal"></i> ${playerData.rank.length > 12 ? playerData.rank.substring(0, 12) + '...' : playerData.rank}</span>` : ''}
                 </div>
                 ${progressBarHTML}
               </div>
             </div>
             <div class="score-cell">
               <div class="score-container level-container ${levelBadgeClass}">
-                <span class="score-value level-value">Sv ${playerData.level}</span>
+                <span class="score-value level-value">Seviye ${playerData.level}</span>
                 <div class="score-sparkles"></div>
               </div>
             </div>
