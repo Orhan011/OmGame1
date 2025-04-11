@@ -135,10 +135,7 @@
         <!-- Sekme Başlıkları -->
         <div class="profile-tab-container">
           <div class="tab-navigation">
-            <button class="tab-button active" data-tab="games">
-              <i class="fas fa-gamepad"></i> Oyunlar
-            </button>
-            <button class="tab-button" data-tab="security">
+            <button class="tab-button active" data-tab="security">
               <i class="fas fa-shield-alt"></i> Güvenlik
             </button>
             <button class="tab-button" data-tab="settings">
@@ -149,90 +146,9 @@
           
           <!-- Sekme İçerikleri -->
           <div class="tab-content-container">
-            <!-- Oyunlar Sekmesi -->
-            <div class="tab-content active" id="games-tab">
-              <h3 class="tab-title">Oyun Puanları</h3>
-              
-              <div class="games-container">
-                <!-- Toplam Oyun İstatistikleri -->
-                <div class="game-stats-header">
-                  <div class="row align-items-center">
-                    <div class="col-md-6">
-                      <div class="stats-card">
-                        <div class="stats-icon">
-                          <i class="fas fa-trophy"></i>
-                        </div>
-                        <div class="stats-info">
-                          <h4>Toplam Puan</h4>
-                          <div class="stats-value" id="total-game-points">
-                            <div class="spinner-border spinner-border-sm" role="status">
-                              <span class="visually-hidden">Yükleniyor...</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="stats-card">
-                        <div class="stats-icon">
-                          <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="stats-info">
-                          <h4>Oynanan Oyunlar</h4>
-                          <div class="stats-value" id="played-games-count">
-                            <div class="spinner-border spinner-border-sm" role="status">
-                              <span class="visually-hidden">Yükleniyor...</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Oyun Skorları Tablosu -->
-                <div class="game-scores-table mt-4">
-                  <h4 class="section-title">Tüm Oyun Skorları</h4>
-                  
-                  <div class="table-responsive">
-                    <table class="table game-table">
-                      <thead>
-                        <tr>
-                          <th>Oyun</th>
-                          <th>En Yüksek Puan</th>
-                          <th>Zorluk</th>
-                          <th>Son Oynanma</th>
-                          <th>Detay</th>
-                        </tr>
-                      </thead>
-                      <tbody id="game-scores-tbody">
-                        <tr>
-                          <td colspan="5" class="text-center">
-                            <div class="spinner-border" role="status">
-                              <span class="visually-hidden">Yükleniyor...</span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                
-                <!-- Oyuncu Gelişimi -->
-                <div class="player-progress mt-4">
-                  <h4 class="section-title">Gelişim Grafiği</h4>
-                  <div id="player-progress-chart" style="height: 300px;">
-                    <div class="placeholder-message">
-                      <i class="fas fa-chart-line mb-2"></i>
-                      <p>Oyun verileriniz grafikte gösterilecektir</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
             
             <!-- Güvenlik Sekmesi -->
-            <div class="tab-content" id="security-tab">
+            <div class="tab-content active" id="security-tab">
               <h3 class="tab-title">Hesap Güvenliği</h3>
               
               <div class="security-settings">
