@@ -135,7 +135,11 @@
   </div>
 </div>
 
-<script src="/static/js/games/labyrinth.js"></script>
+<!-- Skoring ve Oyun Script'leri -->
+<script src="{{ url_for('static', filename='js/scoreCalculator.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/games/labyrinth.js') }}"></script>
 
 <!-- CSS Stilleri -->
 <style>

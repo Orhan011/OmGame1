@@ -448,7 +448,25 @@ document.addEventListener('DOMContentLoaded', function() {
       };
       
       // Standardize edilmiş puanı hesapla
-      const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+      let scoreDetails = { finalScore: 0, breakdown: {} };
+      try {
+        scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+        console.log("Standartlaştırılmış labirent seviye puanı:", scoreDetails);
+      } catch (error) {
+        console.error("ScoreCalculator hatası:", error);
+        // Hata durumunda yedek puan hesaplama yöntemi - seviye bazlı puanlama
+        const levelBonus = currentLevel * 10;
+        const timeBonus = Math.max(0, Math.min(40, Math.floor(timeLeft / 5)));
+        scoreDetails.finalScore = 40 + levelBonus + timeBonus;
+        scoreDetails.breakdown = {
+          baseScore: 40,
+          levelBonus: levelBonus,
+          timeBonus: timeBonus,
+          moveBonus: 0,
+          hintPenalty: 0,
+          difficultyMultiplier: 1
+        };
+      }
       const levelPoints = scoreDetails.finalScore;
       
       // Puanı güncelle
@@ -788,7 +806,25 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Standardize edilmiş puanı hesapla
-    const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+    let scoreDetails = { finalScore: 0, breakdown: {} };
+    try {
+      scoreDetails = window.ScoreCalculator.calculate(scoreParams);
+      console.log("Standartlaştırılmış labirent oyun sonu puanı:", scoreDetails);
+    } catch (error) {
+      console.error("ScoreCalculator hatası:", error);
+      // Hata durumunda yedek puan hesaplama yöntemi - seviye bazlı puanlama
+      const levelBonus = currentLevel * 10;
+      const timeBonus = Math.max(0, Math.min(40, Math.floor(timeLeft / 5)));
+      scoreDetails.finalScore = 40 + levelBonus + timeBonus;
+      scoreDetails.breakdown = {
+        baseScore: 40,
+        levelBonus: levelBonus,
+        timeBonus: timeBonus,
+        moveBonus: 0,
+        hintPenalty: 0,
+        difficultyMultiplier: 1
+      };
+    }
     const finalScore = scoreDetails.finalScore;
     
     console.log(`Standardize edilmiş labirent puanı: ${finalScore}`);
