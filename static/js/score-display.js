@@ -4,8 +4,140 @@
  * @return {string} HTML içeriği
  */
 function createScoreDisplay(scoreData) {
-    // Boş HTML döndür - Puan gösterimi kapatıldı
-    return '';
+    if (!scoreData || !scoreData.success) {
+        if (scoreData && scoreData.guest) {
+            // Misafir kullanıcı için giriş mesajı
+            return `
+                <div class="score-result guest-result">
+                    <div class="guest-message">
+                        <i class="fas fa-user-lock"></i>
+                        <h3>Misafir Kullanıcı</h3>
+                        <p>${scoreData.message || "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın."}</p>
+                        <div class="guest-actions">
+                            <a href="/login" class="btn btn-primary">Giriş Yap</a>
+                            <a href="/register" class="btn btn-outline-primary">Üye Ol</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        return ''; // Hata durumunda boş döndür
+    }
+
+    // Skor verilerini al
+    const points = scoreData.points || {};
+    const xp = scoreData.xp || {};
+    const scoreInfo = scoreData.score_info || {};
+    
+    // Liderlik tablosuna ekleyeceğimiz skor bilgisi 
+    const gameScore = scoreInfo.game_type ? `<div class="score-game-type">
+        <span>Oyun: ${formatGameName(scoreInfo.game_type)}</span>
+        <span class="game-difficulty">${formatDifficulty(scoreInfo.difficulty)}</span>
+    </div>` : '';
+    
+    // Puan detayları 
+    let pointsHtml = '';
+    if (points.rewards) {
+        const rewards = points.rewards;
+        pointsHtml = `
+            <div class="score-details">
+                <h4>Skorunuz Liderlik Tablosuna Eklendi</h4>
+                <div class="total-score">
+                    <span class="score-label">Oyun Skoru:</span>
+                    <span class="score-value">${formatNumber(points.total)}</span>
+                </div>
+                ${gameScore}
+            </div>
+        `;
+    }
+    
+    // XP Kazanımı
+    let xpHtml = '';
+    if (xp.gain) {
+        const levelUpClass = xp.level_up ? 'level-up-active' : '';
+        const levelUpHtml = xp.level_up ? 
+            `<div class="level-up-notice">
+                <i class="fas fa-award"></i>
+                <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
+            </div>` : '';
+            
+        xpHtml = `
+            <div class="xp-container ${levelUpClass}">
+                <div class="xp-gain">
+                    <i class="fas fa-star"></i>
+                    <span>+${xp.gain} XP</span>
+                </div>
+                <div class="level-info">
+                    <span class="level-label">Seviye ${xp.level}</span>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: ${xp.progress_percent}%" 
+                            aria-valuenow="${xp.progress_percent}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="xp-progress">${xp.progress}/${xp.needed} XP</span>
+                </div>
+                ${levelUpHtml}
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="score-result">
+            ${pointsHtml}
+            ${xpHtml}
+        </div>
+    `;
+}
+
+/**
+ * Oyun adını formatlar
+ * @param {string} gameType - Oyun tipi
+ * @return {string} Formatlanmış oyun adı
+ */
+function formatGameName(gameType) {
+    const gameNames = {
+        'wordPuzzle': 'Kelime Bulmaca',
+        'memoryMatch': 'Hafıza Eşleştirme',
+        'numberSequence': 'Sayı Dizisi',
+        'memoryCards': 'Hafıza Kartları',
+        'numberChain': 'Sayı Zinciri',
+        'labyrinth': '3D Labirent',
+        'puzzle': 'Bulmaca',
+        'audioMemory': 'Sesli Hafıza',
+        'nBack': 'N-Back',
+        '2048': '2048',
+        'wordle': 'Wordle',
+        'chess': 'Satranç',
+        'snake_game': 'Yılan Oyunu',
+        'puzzle_slider': 'Resim Bulmaca',
+        'minesweeper': 'Mayın Tarlası',
+        'hangman': 'Adam Asmaca'
+    };
+    
+    return gameNames[gameType] || gameType;
+}
+
+/**
+ * Zorluk seviyesini formatlar
+ * @param {string} difficulty - Zorluk seviyesi 
+ * @return {string} Formatlanmış zorluk seviyesi
+ */
+function formatDifficulty(difficulty) {
+    const difficultyNames = {
+        'easy': 'Kolay',
+        'medium': 'Orta',
+        'hard': 'Zor'
+    };
+    
+    return difficultyNames[difficulty] || difficulty;
+}
+
+/**
+ * Sayıyı formatlar
+ * @param {number} num - Formatlanacak sayı
+ * @return {string} Formatlanmış sayı
+ */
+function formatNumber(num) {
+    return new Intl.NumberFormat('tr-TR').format(num);
 }
 
 /**

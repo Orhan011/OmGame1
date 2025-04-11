@@ -2005,11 +2005,11 @@ def save_score():
         # Toplam XP hesaplama
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus + completion_bonus + streak_xp_bonus)
 
-        # Yeni skoru kaydet (toplam puanı kullanarak)
+        # Yeni skoru kaydet (orijinal oyun skorunu kullanarak)
         new_score = Score(
             user_id=user_id,
             game_type=game_type,
-            score=int(total_points)  # Oyun puanı yerine hesaplanan toplam puanı kaydediyoruz
+            score=score  # Orijinal oyun skorunu kaydediyoruz, liderlik tablosuna doğru yansıması için
         )
 
         db.session.add(new_score)
