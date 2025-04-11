@@ -105,6 +105,29 @@
 
 .leaderboard-body {
   padding: 0.5rem;
+  max-height: 600px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(106, 90, 224, 0.5) rgba(30, 30, 50, 0.3);
+}
+
+/* Kaydırma çubuğu için stil */
+.leaderboard-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.leaderboard-body::-webkit-scrollbar-track {
+  background: rgba(30, 30, 50, 0.3);
+  border-radius: 10px;
+}
+
+.leaderboard-body::-webkit-scrollbar-thumb {
+  background-color: rgba(106, 90, 224, 0.5);
+  border-radius: 10px;
+}
+
+.leaderboard-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(106, 90, 224, 0.8);
 }
 
 .player-row {
