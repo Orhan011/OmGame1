@@ -340,49 +340,14 @@ if (!window.saveScoreAndDisplay) {
   window.saveScoreAndDisplay = function(gameType, score, playtime, difficulty = "medium", gameStats = {}, callback) {
     try {
       // Oyun puanını standartlaştır (10-100 arası)
-      let finalScore = score;
-      
-      // ScoreCalculator mevcutsa önce hesaplama yap
-      if (window.ScoreCalculator && typeof window.ScoreCalculator.calculate === 'function') {
-        try {
-          // İstatistikleri hazırla
-          const calculationData = {
-            gameType: gameType,
-            difficulty: difficulty,
-            score: score,
-            timeSpent: playtime,
-            moves: gameStats.moves || 0,
-            level: gameStats.level || 1,
-            hintsUsed: gameStats.hints_used || 0
-          };
-          
-          // Hesaplama yap
-          const calculatedScore = window.ScoreCalculator.calculate(calculationData);
-          
-          // Hesaplanan puanı kullan
-          finalScore = calculatedScore.finalScore;
-          
-          // Ayrıntıları istatistiklere ekle
-          gameStats.score_breakdown = calculatedScore.breakdown;
-          
-          console.log(`Standartlaştırılmış puan: ${finalScore} (${gameType} oyunu için)`);
-        } catch (calcError) {
-          console.error("Puan hesaplama hatası:", calcError);
-          // Hata durumunda manuel standartlaştırma yap (10-100 arası)
-          finalScore = Math.max(10, Math.min(100, score));
-        }
-      } else {
-        // Hesaplayıcı yoksa manuel standartlaştırma yap (10-100 arası)
-        finalScore = Math.max(10, Math.min(100, score));
-      }
+      const finalScore = Math.max(10, Math.min(100, score));
       
       // Oyun istatistiklerine puan detaylarını ekle
       if (!gameStats.score_details) {
         gameStats.score_details = {
           raw_score: score,
           standardized_score: finalScore,
-          difficulty: difficulty,
-          timestamp: new Date().toISOString()
+          difficulty: difficulty
         };
       }
       
@@ -395,148 +360,37 @@ if (!window.saveScoreAndDisplay) {
 
             // Skor özeti HTML'i oluştur
             if (data.success) {
-              // Skor detaylarını hazırla
-              const difficultyMultiplier = data.points?.rewards?.difficulty_multiplier || 
-                                            window.ScoreHandler.getDifficultyMultiplier(difficulty);
-              
-              // Skor detayları
-              const scoreDetails = {
-                difficulty: difficulty,
-                basePoints: data.points?.rewards?.base_points || Math.round(finalScore * 0.8),
-                difficultyMultiplier: difficultyMultiplier,
-                levelBonus: gameStats.score_breakdown?.levelBonus || 0,
-                timeBonus: gameStats.score_breakdown?.timeBonus || 0,
-                moveBonus: gameStats.score_breakdown?.moveBonus || 0,
-                hintPenalty: gameStats.score_breakdown?.hintPenalty || 0
-              };
-
-              // Modern sonuç ekranı HTML'i
               scoreHtml = `
-                <div class="modern-result-screen">
-                  <div class="result-header">
-                    <div class="result-icon">
-                      <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="result-title">
-                      <h2>Tebrikler!</h2>
-                      <p>${formatGameName(gameType)} oyununu tamamladınız</p>
-                    </div>
+                <div class="score-summary">
+                  <h3>Skor Özeti</h3>
+                  <div class="score-detail">
+                    <span>Oyun:</span>
+                    <span>${formatGameName(gameType)}</span>
                   </div>
-                  
-                  <div class="result-content">
-                    <div class="final-score-display">
-                      <div class="score-circle">
-                        <span class="score-value">${data.points?.total || finalScore}</span>
-                        <span class="score-label">PUAN</span>
-                      </div>
-                    </div>
-                    
-                    <div id="scoreDetails" class="score-details-container">
-                      <div class="modern-score-card">
-                        <div class="score-header">
-                          <h3>Puan Detayları</h3>
-                        </div>
-                        <div class="score-content">
-                          <div class="score-detail">
-                            <span class="detail-label"><i class="fas fa-gamepad"></i> Oyun:</span>
-                            <span class="detail-value">${formatGameName(gameType)}</span>
-                          </div>
-                          <div class="score-detail">
-                            <span class="detail-label"><i class="fas fa-chart-line"></i> Zorluk:</span>
-                            <span class="detail-value">${formatDifficulty(difficulty)}</span>
-                          </div>
-                          <div class="score-detail">
-                            <span class="detail-label"><i class="fas fa-tachometer-alt"></i> Temel Puan:</span>
-                            <span class="detail-value">${scoreDetails.basePoints}</span>
-                          </div>
-                          <div class="score-detail multiplier">
-                            <span class="detail-label"><i class="fas fa-star"></i> Zorluk Çarpanı:</span>
-                            <span class="detail-value">×${scoreDetails.difficultyMultiplier}</span>
-                          </div>
-                          ${scoreDetails.levelBonus ? `
-                          <div class="score-detail bonus">
-                            <span class="detail-label"><i class="fas fa-level-up-alt"></i> Seviye Bonusu:</span>
-                            <span class="detail-value">+${scoreDetails.levelBonus}</span>
-                          </div>
-                          ` : ''}
-                          ${scoreDetails.timeBonus ? `
-                          <div class="score-detail bonus">
-                            <span class="detail-label"><i class="fas fa-clock"></i> Zaman Bonusu:</span>
-                            <span class="detail-value">+${scoreDetails.timeBonus}</span>
-                          </div>
-                          ` : ''}
-                          ${scoreDetails.moveBonus ? `
-                          <div class="score-detail bonus">
-                            <span class="detail-label"><i class="fas fa-chess-knight"></i> Hamle Bonusu:</span>
-                            <span class="detail-value">+${scoreDetails.moveBonus}</span>
-                          </div>
-                          ` : ''}
-                          ${scoreDetails.hintPenalty ? `
-                          <div class="score-detail penalty">
-                            <span class="detail-label"><i class="fas fa-lightbulb"></i> İpucu Cezası:</span>
-                            <span class="detail-value">-${scoreDetails.hintPenalty}</span>
-                          </div>
-                          ` : ''}
-                          <div class="score-divider"></div>
-                          <div class="score-detail total">
-                            <span class="detail-label"><i class="fas fa-trophy"></i> Toplam Puan:</span>
-                            <span class="detail-value">${data.points?.total || finalScore}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div class="xp-info">
-                        <span class="xp-label"><i class="fas fa-medal"></i> Kazanılan XP:</span>
-                        <span class="xp-value">+${data.xp?.gain || 0}</span>
-                      </div>
-                    </div>
+                  <div class="score-detail">
+                    <span>Zorluk:</span>
+                    <span>${formatDifficulty(difficulty)}</span>
                   </div>
-                  
-                  <div class="result-actions">
-                    <button onclick="location.reload()" class="btn btn-primary btn-play-again">
-                      <i class="fas fa-redo"></i> Tekrar Oyna
-                    </button>
-                    <a href="/leaderboard" class="btn btn-outline-primary btn-leaderboard">
-                      <i class="fas fa-trophy"></i> Liderlik Tablosu
-                    </a>
+                  <div class="score-detail">
+                    <span>Temel Puan:</span>
+                    <span>${data.points?.rewards?.base_points || Math.round(finalScore * 0.8)}</span>
+                  </div>
+                  <div class="score-detail">
+                    <span>Zorluk Çarpanı:</span>
+                    <span>×${data.points?.rewards?.difficulty_multiplier || window.ScoreHandler.getDifficultyMultiplier(difficulty)}</span>
+                  </div>
+                  <div class="score-detail total">
+                    <span>Toplam Puan:</span>
+                    <span>${data.points?.total || finalScore}</span>
                   </div>
                 </div>
               `;
             } else if (data.guest) {
-              // Misafir kullanıcı ekranı
               scoreHtml = `
-                <div class="modern-result-screen guest-screen">
-                  <div class="result-header">
-                    <div class="result-icon">
-                      <i class="fas fa-user-lock"></i>
-                    </div>
-                    <div class="result-title">
-                      <h2>Misafir Modu</h2>
-                      <p>Skorunuz kaydedilmedi</p>
-                    </div>
-                  </div>
-                  
-                  <div class="result-content">
-                    <div class="final-score-display">
-                      <div class="score-circle">
-                        <span class="score-value">${finalScore}</span>
-                        <span class="score-label">PUAN</span>
-                      </div>
-                    </div>
-                    
-                    <div class="guest-message">
-                      <p>Skorlarınızı kaydetmek ve liderlik tablosunda yer almak için giriş yapın.</p>
-                    </div>
-                  </div>
-                  
-                  <div class="result-actions">
-                    <a href="/login?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-primary">
-                      <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                    </a>
-                    <a href="/register" class="btn btn-outline-primary">
-                      <i class="fas fa-user-plus"></i> Kayıt Ol
-                    </a>
-                  </div>
+                <div class="score-summary guest">
+                  <h3>Giriş Yapmalısınız</h3>
+                  <p>Skorunuzu kaydetmek ve liderlik tablosunda yer almak için giriş yapın.</p>
+                  <a href="/login?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-primary">Giriş Yap</a>
                 </div>
               `;
             }
