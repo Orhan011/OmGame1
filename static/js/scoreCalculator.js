@@ -1,148 +1,128 @@
-
 /**
- * Standardize Score Calculator Module
- * 
- * Bu modül, tüm oyunlar için 10-100 arası standart puan hesaplaması yapar.
- * Oyun süresi, doğru/yanlış hamle sayısı, ipucu kullanımı gibi faktörlere dayalı
- * tutarlı bir puanlama sistemi sağlar.
+ * Oyun puanı hesaplama yardımcı sınıfı
+ * Tüm oyunlar için standart puan hesaplama metotları içerir
  */
+window.ScoreCalculator = {
+  /**
+   * Oyun puanlarını 10-100 arasında normalleştir
+   * @param {number} rawScore - Ham puan
+   * @param {number} minScore - Minimum olası puan
+   * @param {number} maxScore - Maksimum olası puan
+   * @param {number} scaleMin - Ölçeklendirilmiş min değer (varsayılan: 10)
+   * @param {number} scaleMax - Ölçeklendirilmiş max değer (varsayılan: 100)
+   * @returns {number} - 10-100 arasında ölçeklendirilmiş puan
+   */
+  normalize: function(rawScore, minScore, maxScore, scaleMin = 10, scaleMax = 100) {
+    // Sıfıra bölme hatası kontrolü
+    if (maxScore === minScore) return scaleMin;
 
-// ScoreCalculator nesnesini oluşturmadan önce varlığını kontrol et
-if (!window.ScoreCalculator) {
-  window.ScoreCalculator = {
-    /**
-     * Tüm oyunlar için standart puan hesaplama fonksiyonu
-     * 
-     * @param {Object} params - Hesaplama parametreleri
-     * @param {string} params.gameType - Oyun türü
-     * @param {string} params.difficulty - Zorluk seviyesi ('easy', 'medium', 'hard')
-     * @param {number} params.timeSpent - Oyunda geçirilen süre (saniye)
-     * @param {number} params.optimalTime - Optimal tamamlama süresi (saniye)
-     * @param {number} params.totalMoves - Toplam hamle sayısı
-     * @param {number} params.correctMoves - Doğru hamle sayısı (default: totalMoves)
-     * @param {number} params.hintsUsed - Kullanılan ipucu sayısı
-     * @param {number} params.level - Oyun seviyesi (default: 1)
-     * @param {number} params.maxLevel - Maximum seviye (default: 1)
-     * @param {Object} params.gameSpecificStats - Oyuna özel istatistikler
-     * @returns {Object} - Hesaplanan puan detayları
-     */
-    calculate: function(params) {
-      // Varsayılan parametreleri ayarla
-      const gameType = params.gameType || 'unknown';
-      const difficulty = params.difficulty || 'medium';
-      const timeSpent = Math.max(1, params.timeSpent || 0);
-      const optimalTime = Math.max(1, params.optimalTime || 60);
-      const totalMoves = Math.max(1, params.totalMoves || 0);
-      const correctMoves = params.correctMoves !== undefined ? params.correctMoves : totalMoves;
-      const hintsUsed = params.hintsUsed || 0;
-      const level = params.level || 1;
-      const maxLevel = params.maxLevel || 1;
-      const gameSpecificStats = params.gameSpecificStats || {};
-      
+    // Negatif puan kontrolü
+    if (rawScore < minScore) rawScore = minScore;
+    if (rawScore > maxScore) rawScore = maxScore;
+
+    // Doğrusal ölçekleme formülü
+    const normalized = ((rawScore - minScore) / (maxScore - minScore)) * (scaleMax - scaleMin) + scaleMin;
+
+    // Tam sayıya yuvarla
+    return Math.round(normalized);
+  },
+
+  /**
+   * Standart puan hesaplama (oyunlar için)
+   * @param {Object} gameData - Oyun verileri
+   * @returns {Object} - Hesaplanmış puan detayları
+   */
+  calculate: function(gameData) {
+    try {
+      const { gameType, difficulty, score, timeSpent, moves, level, hintsUsed } = gameData;
+
+      // Varsayılan değerler
+      const difficultyMultiplier = this.getDifficultyMultiplier(difficulty || 'medium');
+      const baseScore = 30;
+      let finalScore = 0;
+
       // Zorluk seviyesi çarpanları
-      const difficultyMultipliers = {
-        'easy': 0.8,
-        'medium': 1.0,
-        'hard': 1.2
+      const breakdown = {
+        baseScore: baseScore,
+        levelBonus: level ? Math.min(level * 2, 20) : 0,
+        timeBonus: 0,
+        moveBonus: 0,
+        hintPenalty: hintsUsed ? Math.min(hintsUsed * 5, 30) : 0,
+        difficultyMultiplier: difficultyMultiplier
       };
-      
-      // Varsayılan çarpan
-      const difficultyMultiplier = difficultyMultipliers[difficulty] || 1.0;
-      
-      // Temel Puan (30 - 50 arası)
-      let baseScore = 30 + (difficulty === 'easy' ? 0 : (difficulty === 'medium' ? 10 : 20));
-      
-      // Seviye Bonusu (0 - 10 arası)
-      const levelRatio = maxLevel > 1 ? (level / maxLevel) : 1;
-      const levelBonus = Math.min(10, Math.round(10 * levelRatio));
-      
-      // Zaman Verimliliği (0 - 20 arası)
-      let timeEfficiency = 1;
-      if (timeSpent > 0 && optimalTime > 0) {
-        timeEfficiency = Math.min(2, optimalTime / timeSpent);
+
+      // Zaman bonusu (hızlı çözüm = daha çok puan)
+      if (timeSpent && timeSpent > 0) {
+        // Zaman tipine göre hesapla (saniye veya milisaniye)
+        const seconds = timeSpent > 1000 ? timeSpent / 1000 : timeSpent;
+
+        if (seconds < 30) {
+          breakdown.timeBonus = 40; // Çok hızlı
+        } else if (seconds < 60) {
+          breakdown.timeBonus = 30; // Hızlı
+        } else if (seconds < 120) {
+          breakdown.timeBonus = 20; // Normal
+        } else if (seconds < 300) {
+          breakdown.timeBonus = 10; // Yavaş
+        } else {
+          breakdown.timeBonus = 5; // Çok yavaş
+        }
       }
-      const timeBonus = Math.round(20 * timeEfficiency);
-      
-      // Hamle Verimliliği (0 - 20 arası)
-      let moveEfficiency = 1;
-      if (totalMoves > 0) {
-        moveEfficiency = Math.min(1, correctMoves / totalMoves);
+
+      // Hamle bonusu (daha az hamle = daha çok puan)
+      if (moves && moves > 0) {
+        if (moves < 10) {
+          breakdown.moveBonus = 20; // Çok az hamle
+        } else if (moves < 20) {
+          breakdown.moveBonus = 15; // Az hamle
+        } else if (moves < 50) {
+          breakdown.moveBonus = 10; // Normal
+        } else {
+          breakdown.moveBonus = 5; // Çok hamle
+        }
       }
-      const moveBonus = Math.round(20 * moveEfficiency);
-      
-      // İpucu Cezası (0 - 10 arası)
-      const hintPenalty = Math.min(10, hintsUsed * 2);
-      
-      // Toplan Puan Hesaplama
-      let finalScore = baseScore + levelBonus + timeBonus + moveBonus - hintPenalty;
-      
+
+      // Toplam puanı hesapla
+      let rawTotal = breakdown.baseScore + breakdown.levelBonus + 
+                    breakdown.timeBonus + breakdown.moveBonus - 
+                    breakdown.hintPenalty;
+
       // Zorluk çarpanı uygula
-      finalScore = Math.round(finalScore * difficultyMultiplier);
-      
-      // 10-100 aralığına sınırla
-      finalScore = Math.max(10, Math.min(100, finalScore));
-      
-      // Puan detaylarını döndür
+      rawTotal = Math.round(rawTotal * breakdown.difficultyMultiplier);
+
+      // 10-100 arasına sınırla
+      finalScore = Math.max(10, Math.min(100, rawTotal));
+
+      // Sonuç objesi
       return {
         finalScore: finalScore,
+        breakdown: breakdown
+      };
+    } catch (e) {
+      console.error("ScoreCalculator hatası:", e);
+      // Hata durumunda varsayılan puan döndür
+      return {
+        finalScore: 50,
         breakdown: {
-          baseScore: baseScore,
-          levelBonus: levelBonus,
-          timeBonus: timeBonus,
-          moveBonus: moveBonus,
-          hintPenalty: hintPenalty,
-          difficultyMultiplier: difficultyMultiplier
+          baseScore: 30,
+          error: true
         }
       };
-    },
-    
-    /**
-     * Puan detaylarını HTML formatında döndürür (gösterge panelleri için)
-     * 
-     * @param {Object} scoreDetails - calculate() fonksiyonundan dönen değer
-     * @returns {string} HTML formatında puan detayları
-     */
-    getScoreBreakdownHTML: function(scoreDetails) {
-      if (!scoreDetails || !scoreDetails.breakdown) {
-        return '<div class="score-detail">Puan detayları hesaplanamadı.</div>';
-      }
-      
-      const bd = scoreDetails.breakdown;
-      
-      return `
-        <div class="score-breakdown">
-          <div class="score-detail">
-            <span class="detail-label">Temel Puan:</span>
-            <span class="detail-value">+${bd.baseScore}</span>
-          </div>
-          <div class="score-detail">
-            <span class="detail-label">Seviye Bonusu:</span>
-            <span class="detail-value">+${bd.levelBonus}</span>
-          </div>
-          <div class="score-detail">
-            <span class="detail-label">Zaman Bonusu:</span>
-            <span class="detail-value">+${bd.timeBonus}</span>
-          </div>
-          <div class="score-detail">
-            <span class="detail-label">Hamle Bonusu:</span>
-            <span class="detail-value">+${bd.moveBonus}</span>
-          </div>
-          ${bd.hintPenalty > 0 ? `
-          <div class="score-detail penalty">
-            <span class="detail-label">İpucu Cezası:</span>
-            <span class="detail-value">-${bd.hintPenalty}</span>
-          </div>
-          ` : ''}
-          <div class="score-detail multiplier">
-            <span class="detail-label">Zorluk Çarpanı:</span>
-            <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
-          </div>
-          <div class="score-detail total">
-            <span class="detail-label">Toplam Puan:</span>
-            <span class="detail-value">${scoreDetails.finalScore}</span>
-          </div>
-        </div>
-      `;
     }
-  };
-}
+  },
+
+  /**
+   * Zorluk seviyesine göre puan çarpanı döndürür
+   * @param {string} difficulty - Zorluk seviyesi
+   * @return {number} - Puan çarpanı
+   */
+  getDifficultyMultiplier: function(difficulty) {
+    switch(difficulty) {
+      case "easy": return 0.8;
+      case "medium": return 1.0;
+      case "hard": return 1.5;
+      case "expert": return 2.0;
+      default: return 1.0;
+    }
+  }
+};

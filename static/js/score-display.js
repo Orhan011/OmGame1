@@ -15,14 +15,14 @@ function createScoreDisplay(scoreData) {
             const difficulty = scoreInfo.difficulty || 'medium';
             const difficultyText = formatDifficulty(difficulty);
             const difficultyClass = difficulty.toLowerCase();
-            
+
             // Kullanıcıya ayrıntılı puan bilgisi göster
             let scoreBreakdownHTML = '';
-            
+
             // Ödül detaylarından puan dökümü oluştur
             if (scoreData.points && scoreData.points.rewards) {
                 const rewards = scoreData.points.rewards;
-                
+
                 scoreBreakdownHTML = `
                     <div class="score-breakdown">
                         <h4 class="breakdown-title">Puan Detayları</h4>
@@ -57,7 +57,7 @@ function createScoreDisplay(scoreData) {
                     </div>
                 `;
             }
-            
+
             // Misafir kullanıcı için giriş mesajı (zorluk bilgisiyle ve puan detaylarıyla)
             return `
                 <div class="score-result guest-result">
@@ -97,14 +97,14 @@ function createScoreDisplay(scoreData) {
     const difficulty = scoreInfo.difficulty || 'medium';
     const difficultyText = formatDifficulty(difficulty);
     const difficultyClass = difficulty.toLowerCase();
-    
+
     // Ayrıntılı puan dökümü oluştur
     let scoreBreakdownHTML = '';
-    
+
     // Ödül detaylarından puan dökümü oluştur
     if (points.rewards) {
         const rewards = points.rewards;
-        
+
         scoreBreakdownHTML = `
             <div class="score-breakdown">
                 <h4 class="breakdown-title">Puan Detayları</h4>
@@ -139,7 +139,7 @@ function createScoreDisplay(scoreData) {
             </div>
         `;
     }
-    
+
     // Seviye yükseltme durumunda bildirim
     if (xp.level_up) {
         return `
@@ -166,7 +166,7 @@ function createScoreDisplay(scoreData) {
             </div>
         `;
     }
-    
+
     // Normal puan gösterimi (seviye atlanmadıysa)
     return `
         <div class="score-result">
@@ -223,7 +223,7 @@ function formatGameName(gameType) {
         'crossword': 'Bulmaca',
         'solitaire': 'Solitaire'
     };
-    
+
     return gameNames[gameType] || gameType;
 }
 
@@ -239,7 +239,7 @@ function formatDifficulty(difficulty) {
         'hard': 'Zor',
         'expert': 'Uzman'
     };
-    
+
     return difficultyNames[difficulty] || difficulty;
 }
 
@@ -255,7 +255,7 @@ function getDifficultyMultiplier(difficulty) {
         'hard': 2.5,   // %150 bonus
         'expert': 4.0  // %300 bonus
     };
-    
+
     return multipliers[difficulty] || 1.0;
 }
 
@@ -296,7 +296,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         // Skor verisinde sorun olup olmadığını kontrol et
         if (!gameType || score === undefined || score === null) {
             console.error('Invalid score data:', scoreData);
-            
+
             if (typeof callback === 'function') {
                 callback(''); // Boş içerik döndür
             }
@@ -321,21 +321,21 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         })
         .then(data => {
             console.log('Score saved:', data);
-            
+
             // Kullanıcı giriş yapmamışsa ve API başarılı olduysa ziyaretçi olarak işlem yap
             if ((!userData.loggedIn || !userData.id) && data.success) {
                 data.guest = true;
             }
-            
+
             // Seviye yükseltme kontrolü
             if (data.xp && data.xp.level_up) {
                 console.log(`Seviye yükseltme! Eski seviye: ${data.xp.old_level}, Yeni seviye: ${data.xp.level}`);
-                
+
                 // Seviye yükseltme olduğunda oyun sayfasından çıkarken anasayfaya seviye parametreleriyle yönlendir
                 if (data.redirect_params) {
                     // Mevcut sayfayı kaydet
                     const currentPage = window.location.pathname;
-                    
+
                     // Ana sayfa olmadığımızdan emin olalım
                     if (currentPage !== '/' && currentPage !== '/index') {
                         // Oyun bitimini işle
@@ -353,7 +353,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
                     }
                 }
             }
-            
+
             // Normal durum (seviye yükseltme yoksa)
             const scoreHtml = createScoreDisplay(data);
             if (typeof callback === 'function') {
@@ -362,7 +362,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         })
         .catch(error => {
             console.error('Error saving score:', error);
-            
+
             if (typeof callback === 'function') {
                 callback(''); // Boş içerik döndür
             }
@@ -370,9 +370,61 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
     })
     .catch(error => {
         console.error('Error checking user status:', error);
-        
+
         if (typeof callback === 'function') {
             callback(''); // Boş içerik döndür
         }
     });
+}
+
+// Oyun puanını göster
+function showGamePoints(gameScore, details) {
+  // Puanı her zaman 10-100 arasında sınırlandır
+  const normalizedScore = Math.max(10, Math.min(100, gameScore || 0));
+  document.getElementById('gamePoints').textContent = normalizedScore;
+
+  if (details) {
+    const detailsElement = document.getElementById('scoreDetails');
+    if (detailsElement) {
+      detailsElement.innerHTML = '';
+
+      // Puan detaylarını göster
+      if (details.basePoints) {
+        const basePointsElement = document.createElement('div');
+        basePointsElement.className = 'score-detail';
+        basePointsElement.innerHTML = `<span>Temel Puan:</span><span>${details.basePoints}</span>`;
+        detailsElement.appendChild(basePointsElement);
+      }
+
+      // Diğer detayları da gösterebilirsiniz
+      if (details.bonusPoints) {
+        const bonusPointsElement = document.createElement('div');
+        bonusPointsElement.className = 'score-detail';
+        bonusPointsElement.innerHTML = `<span>Bonus:</span><span>+${details.bonusPoints}</span>`;
+        detailsElement.appendChild(bonusPointsElement);
+      }
+
+      if (details.difficultyMultiplier) {
+        const difficultyElement = document.createElement('div');
+        difficultyElement.className = 'score-detail';
+        difficultyElement.innerHTML = `<span>Zorluk Çarpanı:</span><span>x${details.difficultyMultiplier}</span>`;
+        detailsElement.appendChild(difficultyElement);
+      }
+
+      if (details.timePenalty) {
+        const timePenaltyElement = document.createElement('div');
+        timePenaltyElement.className = 'score-detail penalty';
+        timePenaltyElement.innerHTML = `<span>Zaman Cezası:</span><span>-${details.timePenalty}</span>`;
+        detailsElement.appendChild(timePenaltyElement);
+      }
+
+      // Normalizasyon açıklaması (isteğe bağlı)
+      if (gameScore !== normalizedScore) {
+        const normalizationElement = document.createElement('div');
+        normalizationElement.className = 'score-detail normalization';
+        normalizationElement.innerHTML = `<span>Standarlaştırılmış Puan:</span><span>${normalizedScore}</span>`;
+        detailsElement.appendChild(normalizationElement);
+      }
+    }
+  }
 }

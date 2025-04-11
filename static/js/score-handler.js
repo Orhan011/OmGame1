@@ -118,21 +118,10 @@ window.ScoreHandler = {
     // Negatif puanlar 0 olarak ayarlanır
     if (score < 0) score = 0;
 
-    // Belirli oyunlar için puan sınırlaması (10-100 arası)
-    const limitedScoreGames = [
-      'word_puzzle', 'wordPuzzle', 
-      'labyrinth', '3dLabyrinth', 
-      'number_sequence', 'numberSequence', 
-      'number_chain', 'numberChain', 
-      'audio_memory', 'audioMemory', 
-      'n_back', 'nBack'
-    ];
-
-    if (limitedScoreGames.includes(this.standardizeGameType(gameType))) {
-      // Puanı 10-100 arasında sınırla
-      score = Math.max(10, Math.min(100, score));
-      console.log(`Sınırlandırılmış puan: ${score} (${gameType} oyunu için)`);
-    }
+    // TÜM oyunlar için puan sınırlaması (10-100 arası)
+    // Puanı 10-100 arasında sınırla
+    score = Math.max(10, Math.min(100, score));
+    console.log(`Standartlaştırılmış puan: ${score} (${gameType} oyunu için)`);
 
     // Zorluk seviyesi doğrulama
     const validDifficulties = ["easy", "medium", "hard", "expert"];
