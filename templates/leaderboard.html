@@ -1,4 +1,3 @@
-
 {% extends "layout.html" %}
 
 {% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
@@ -27,7 +26,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Seviye Tablosu -->
     <div class="col-12">
       <div class="leaderboard-title">Kullanıcı Seviyeleri</div>
@@ -37,6 +36,12 @@
             <i class="fas fa-spinner fa-spin"></i>
             <p>Seviye bilgileri yükleniyor...</p>
           </div>
+          <noscript>
+            <div class="error">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Seviye bilgilerini görmek için JavaScript'i etkinleştirin.</p>
+            </div>
+          </noscript>
         </div>
       </div>
     </div>

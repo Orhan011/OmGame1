@@ -140,16 +140,22 @@ function loadLevelLeaderboard() {
     </div>
   `;
 
-  // Seviye verilerini API'den al
+  // Seviye verilerini API'den al - alternatif endpoint kullan (API hatası durumunda)
   fetch('/api/users/levels')
     .then(response => {
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        // Eğer birincil API başarısız olursa alternatif API'yi dene
+        return fetch('/api/scores/top-users').then(altResponse => {
+          if (!altResponse.ok) {
+            throw new Error(`Network response was not ok: ${altResponse.status}`);
+          }
+          return altResponse.json();
+        });
       }
       return response.json();
     })
     .then(data => {
-      // API yanıtı bir dizi olmalı ve en az bir eleman içermeli
+      // API yanıtı bir dizi olmalı
       const users = Array.isArray(data) ? data : [];
 
       if (users.length === 0) {
@@ -175,8 +181,19 @@ function loadLevelLeaderboard() {
 
       // Her bir kullanıcıyı tabloya ekle
       users.forEach((player, index) => {
+        // Hata kontrolü - gerekli alanlar yoksa varsayılan değerler ata
+        const playerData = {
+          username: player.username || 'İsimsiz Oyuncu',
+          avatar_url: player.avatar_url || '',
+          level: player.level || 1,
+          total_xp: player.total_xp || player.experience_points || 0,
+          games_played: player.games_played || player.total_games_played || 0,
+          progress_percent: player.progress_percent || 0,
+          is_current_user: player.is_current_user || false
+        };
+
         const rankClass = index < 3 ? `top-${index + 1}` : '';
-        const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+        const initial = playerData.username.charAt(0).toUpperCase();
 
         // Kullanıcı adı renk sınıfı
         let userNameColorClass = '';
@@ -186,16 +203,15 @@ function loadLevelLeaderboard() {
         else if (index < 10) userNameColorClass = 'top-ten';
 
         // Avatar URL'ini kontrol et ve düzelt
-        let avatarUrl = player.avatar_url || '';
+        let avatarUrl = playerData.avatar_url;
         if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
           avatarUrl = '/' + avatarUrl;
         }
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-        const isCurrentUser = player.is_current_user || false;
 
         // Seviye ilerleme çubuğu
-        const progressPercent = player.progress_percent || 0;
+        const progressPercent = playerData.progress_percent;
         const progressBarHTML = `
           <div class="level-progress">
             <div class="progress-bar" style="width: ${progressPercent}%"></div>
@@ -204,7 +220,7 @@ function loadLevelLeaderboard() {
         `;
 
         html += `
-          <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
+          <div class="player-row ${rankClass} ${playerData.is_current_user ? 'current-user' : ''}">
             <div class="rank-cell">
               <div class="rank-number">${index + 1}</div>
             </div>
@@ -212,23 +228,23 @@ function loadLevelLeaderboard() {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
+                <div class="player-name ${userNameColorClass}">${playerData.username}</div>
                 <div class="player-stats">
-                  <span class="level-badge">XP: ${player.total_xp || 0}</span>
-                  ${player.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${player.games_played}</span>` : ''}
+                  <span class="level-badge">XP: ${playerData.total_xp}</span>
+                  ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}
                 </div>
                 ${progressBarHTML}
               </div>
             </div>
             <div class="score-cell">
               <div class="score-container level-container">
-                <span class="score-value level-value">Seviye ${player.level || 1}</span>
+                <span class="score-value level-value">Seviye ${playerData.level}</span>
                 <div class="score-sparkles"></div>
               </div>
             </div>
