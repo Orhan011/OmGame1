@@ -100,33 +100,37 @@ def send_welcome_email(to_email, username):
 
         msg.attach(MIMEText(body, 'html'))
 
-        # Daha güvenilir bir e-posta gönderimi
+        # Güvenli SSL bağlantısı ile e-posta gönderme (önerilen yöntem)
         try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
+            logger.info(f"SSL ile e-posta göndermeye çalışılıyor: {to_email}")
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
             server.login(from_email, password)
             text = msg.as_string()
             server.sendmail(from_email, to_email, text)
             server.quit()
-            logger.info(f"Hoş geldiniz e-postası başarıyla gönderildi: {to_email}")
+            logger.info(f"SSL bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
             return True
-        except Exception as email_error:
-            logger.error(f"SMTP Sunucu Hatası: {str(email_error)}")
+        except Exception as ssl_error:
+            logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
             
-            # Alternatif gönderim dene
+            # SSL başarısız olursa TLS ile deneyelim
             try:
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                logger.info(f"TLS ile e-posta göndermeye çalışılıyor: {to_email}")
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
                 server.login(from_email, password)
                 text = msg.as_string()
                 server.sendmail(from_email, to_email, text)
                 server.quit()
-                logger.info(f"Alternatif yöntemle e-posta gönderildi: {to_email}")
+                logger.info(f"TLS bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
                 return True
-            except Exception as ssl_error:
-                logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
+            except Exception as tls_error:
+                logger.error(f"TLS SMTP Hatası: {str(tls_error)}")
                 return False
     except Exception as e:
-        logger.error(f"E-posta gönderirken hata oluştu: {str(e)}")
+        logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
         return False
 
 def send_verification_email(to_email, verification_code):
@@ -140,7 +144,7 @@ def send_verification_email(to_email, verification_code):
         password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
 
         msg = MIMEMultipart()
-        msg['From'] = from_email
+        msg['From'] = f"OmGame <{from_email}>"
         msg['To'] = to_email
         msg['Subject'] = "OmGame - E-posta Doğrulama Kodu"
 
@@ -164,15 +168,37 @@ def send_verification_email(to_email, verification_code):
 
         msg.attach(MIMEText(body, 'html'))
 
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(from_email, password)
-        text = msg.as_string()
-        server.sendmail(from_email, to_email, text)
-        server.quit()
-        return True
+        # Güvenli SSL bağlantısı ile e-posta gönderme (önerilen yöntem)
+        try:
+            logger.info(f"SSL ile doğrulama e-postası göndermeye çalışılıyor: {to_email}")
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            server.login(from_email, password)
+            text = msg.as_string()
+            server.sendmail(from_email, to_email, text)
+            server.quit()
+            logger.info(f"SSL bağlantısı ile doğrulama e-postası başarıyla gönderildi: {to_email}")
+            return True
+        except Exception as ssl_error:
+            logger.error(f"SSL SMTP Hatası (doğrulama e-postası): {str(ssl_error)}")
+            
+            # SSL başarısız olursa TLS ile deneyelim
+            try:
+                logger.info(f"TLS ile doğrulama e-postası göndermeye çalışılıyor: {to_email}")
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(from_email, password)
+                text = msg.as_string()
+                server.sendmail(from_email, to_email, text)
+                server.quit()
+                logger.info(f"TLS bağlantısı ile doğrulama e-postası başarıyla gönderildi: {to_email}")
+                return True
+            except Exception as tls_error:
+                logger.error(f"TLS SMTP Hatası (doğrulama e-postası): {str(tls_error)}")
+                return False
     except Exception as e:
-        logger.error(f"E-posta gönderme hatası: {str(e)}")
+        logger.error(f"Doğrulama e-postası gönderirken genel hata oluştu: {str(e)}")
         return False
 
 def get_user_avatar(user_id):
@@ -1240,7 +1266,7 @@ def register():
         session['user_id'] = new_user.id
 
         flash('Kayıt başarılı! OmGame dünyasına hoş geldiniz!', 'success')
-        return redirect(url_for('index', _external=True))
+        return redirect(url_for('index'))
 
     return render_template('register.html')
 
@@ -1361,7 +1387,7 @@ def profile_v2():
 
         user = User.query.get(session['user_id'])
 
-        if notuser:
+        if not user:
             logger.error(f"Kullanıcı bulunamadı: user_id={session['user_id']}")
             flash('Kullanıcı bilgilerinize erişilemedi. Lütfen tekrar giriş yapın.', 'danger')
             return redirect(url_for('logout'))
