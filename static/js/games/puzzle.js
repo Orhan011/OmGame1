@@ -932,22 +932,21 @@ document.addEventListener('DOMContentLoaded', () => {
    * Oyun puanını hesaplar ve API'ye kaydeder
    */
   function saveScore() {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        gameType: 'puzzle',
-        score: gameState.score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Zorluk seviyesini belirle
+    const difficulty = gameState.difficulty.toLowerCase();
+    
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      moves: gameState.moves,
+      time_remaining: gameState.timeRemaining,
+      level: gameState.level,
+      grid_size: gameState.grid.rows + 'x' + gameState.grid.cols
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('puzzle', gameState.score, 300 - gameState.timeRemaining, difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
     });
   }
 

@@ -925,32 +925,21 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function saveScore() {
-    // Save score to backend
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        gameType: 'numberSequence',
-        score: gameState.score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        console.log('Score saved successfully!');
-        // Could add some visual feedback here if needed
-      } else {
-        console.log('Failed to save score:', data.message);
-        // Handle error, maybe show login prompt
-        if (data.message === 'Login required') {
-          // Could show a login prompt
-        }
-      }
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      level: gameState.level,
+      wrong_attempts: gameState.wrongAttempts,
+      used_hint: gameState.usedHint,
+      pattern_type: gameState.currentPattern
+    };
+    
+    // Get elapsed time (for timeRemaining games) or time spent (for others)
+    const elapsedTime = Math.floor(gameState.solveTime / 1000) - Math.floor(gameState.timeRemaining / 1000);
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('number_sequence', gameState.score, elapsedTime, gameState.difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
     });
   }
 

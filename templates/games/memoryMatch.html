@@ -3,6 +3,10 @@
 
 {% block title %}Hafıza Eşleştirme - ZekaPark{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container">
@@ -680,23 +684,17 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save score to the server
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'memory_match',
-        score: score,
-        difficulty: difficulty
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      total_pairs: totalPairs,
+      elapsed_time: seconds,
+      matches: matches
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('memory_match', score, seconds, difficulty, gameStats, function(html) {
+      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+      console.log('Score saved successfully');
     });
   }
 });

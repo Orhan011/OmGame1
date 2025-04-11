@@ -3,6 +3,7 @@
 
 {% block head_extra %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -1434,29 +1435,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru kaydet
   function saveScore(finalScoreValue) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        game_type: 'hangman',
-        score: finalScoreValue,
-        difficulty: currentDifficulty,
-        playtime: 0,
-        game_stats: {
-          remainingAttempts: remainingAttempts,
-          wordLength: currentWord.length,
-          hintUsed: hintUsed
-        }
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      remainingAttempts: remainingAttempts,
+      wordLength: currentWord.length,
+      category: currentCategory,
+      hintUsed: hintUsed,
+      word: currentWord,
+      correctLetters: correctLetters.length,
+      wrongLetters: wrongLetters.length
+    };
+    
+    // Oyun süresini tahmin et (yaklaşık değer)
+    // Her harf denemesi için ortalama 5 saniye
+    const estimatedPlaytime = (correctLetters.length + wrongLetters.length) * 5;
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('hangman', finalScoreValue, estimatedPlaytime, currentDifficulty, gameStats, function(html) {
+      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+      console.log('Score saved successfully');
     });
   }
 });

@@ -2,6 +2,10 @@
 
 {% block title %}Yılan Oyunu - ZekaPark{% endblock %}
 
+{% block head %}
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="page-container">
   <div class="game-container">
@@ -863,22 +867,28 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Function to save score to the server
   function saveScore(score) {
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'snake',
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      length: snake.length,
+      level: level,
+      difficulty: difficulty,
+      walls_enabled: wallsEnabled,
+      speed_setting: speed
+    };
+    
+    // Get the total elapsed time in seconds (estimated from level and score)
+    const elapsedTime = level * 30; // rough estimate
+    
+    // Zorluk seviyesini merkezi sistem formatına çevir
+    const difficultyMapping = {
+      'normal': 'medium',
+      'hard': 'hard'
+    };
+    
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('snake', score, elapsedTime, difficultyMapping[difficulty], gameStats, function(html) {
+      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+      console.log('Score saved successfully');
     });
   }
   

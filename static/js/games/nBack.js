@@ -559,25 +559,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function saveScore() {
     if (score <= 0) return;
     
-    // Oyun türü için backend'de tanımlı ID
-    const gameType = 'nBack';
+    // Oyun istatistiklerini hazırla
+    const gameStats = {
+      maxN: currentN,
+      correctResponses: correctResponses,
+      falsePositives: falsePositives,
+      falseNegatives: falseNegatives,
+      accuracy: calculateAccuracy()
+    };
     
-    fetch('/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: gameType,
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Score saved:', data);
-    })
-    .catch(error => {
-      console.error('Error saving score:', error);
+    // Merkezi puan sistemini kullan
+    saveScoreAndDisplay('n_back', score, elapsedTime, difficulty, gameStats, function(html) {
+      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+      console.log('Score saved successfully');
     });
   }
   
