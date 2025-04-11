@@ -336,7 +336,6 @@ function loadArticleContent() {
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/scoreCalculator.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
 <!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
