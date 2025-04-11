@@ -638,6 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru API'ye gönder (puan gösterim ekranı olmadan)
   function saveScoreToServer(completed, gameTime, wordsCount) {
+    // Skorun 10-100 arasında olduğundan emin ol
+    const limitedScore = Math.max(10, Math.min(100, score));
+    
     fetch('/api/save-score', {
       method: 'POST',
       headers: {
@@ -645,13 +648,14 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({
         game_type: 'wordPuzzle',
-        score: score,
+        score: limitedScore,
         difficulty: 'medium',
         playtime: gameTime,
         game_stats: {
           words_solved: wordsCount,
           longest_word: longestSolvedWord || '',
-          completed: completed
+          completed: completed,
+          original_score: score
         }
       })
     })
