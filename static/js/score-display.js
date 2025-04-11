@@ -4,6 +4,7 @@
  * @return {string} HTML içeriği
  */
 function createScoreDisplay(scoreData) {
+    // Rastgele puan gösterimini kaldırdık, sadece seviye yükseltme durumunda bildirim göster
     if (!scoreData || !scoreData.success) {
         if (scoreData && scoreData.guest) {
             // Misafir kullanıcı için giriş mesajı
@@ -25,67 +26,22 @@ function createScoreDisplay(scoreData) {
     }
 
     // Skor verilerini al
-    const points = scoreData.points || {};
     const xp = scoreData.xp || {};
-    const scoreInfo = scoreData.score_info || {};
     
-    // Liderlik tablosuna ekleyeceğimiz skor bilgisi 
-    const gameScore = scoreInfo.game_type ? `<div class="score-game-type">
-        <span>Oyun: ${formatGameName(scoreInfo.game_type)}</span>
-        <span class="game-difficulty">${formatDifficulty(scoreInfo.difficulty)}</span>
-    </div>` : '';
-    
-    // Puan detayları 
-    let pointsHtml = '';
-    if (points.rewards) {
-        const rewards = points.rewards;
-        pointsHtml = `
-            <div class="score-details">
-                <h4>Skorunuz Liderlik Tablosuna Eklendi</h4>
-                <div class="total-score">
-                    <span class="score-label">Oyun Skoru:</span>
-                    <span class="score-value">${formatNumber(points.total)}</span>
+    // Sadece seviye yükseltme durumunda bildirim göster, diğer durumlarda hiçbir şey gösterme
+    if (xp.level_up) {
+        return `
+            <div class="score-result level-up-only">
+                <div class="level-up-notice">
+                    <i class="fas fa-award"></i>
+                    <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
                 </div>
-                ${gameScore}
             </div>
         `;
     }
     
-    // XP Kazanımı
-    let xpHtml = '';
-    if (xp.gain) {
-        const levelUpClass = xp.level_up ? 'level-up-active' : '';
-        const levelUpHtml = xp.level_up ? 
-            `<div class="level-up-notice">
-                <i class="fas fa-award"></i>
-                <span>Seviye Atladınız! Yeni Seviyeniz: ${xp.level}</span>
-            </div>` : '';
-            
-        xpHtml = `
-            <div class="xp-container ${levelUpClass}">
-                <div class="xp-gain">
-                    <i class="fas fa-star"></i>
-                    <span>+${xp.gain} XP</span>
-                </div>
-                <div class="level-info">
-                    <span class="level-label">Seviye ${xp.level}</span>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: ${xp.progress_percent}%" 
-                            aria-valuenow="${xp.progress_percent}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <span class="xp-progress">${xp.progress}/${xp.needed} XP</span>
-                </div>
-                ${levelUpHtml}
-            </div>
-        `;
-    }
-    
-    return `
-        <div class="score-result">
-            ${pointsHtml}
-            ${xpHtml}
-        </div>
-    `;
+    // Seviye yükseltme yoksa hiçbir şey gösterme
+    return '';
 }
 
 /**
