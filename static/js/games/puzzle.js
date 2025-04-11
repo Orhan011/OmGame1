@@ -969,18 +969,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
     
-    // Puan hesaplama sistemini kullan
+    // Standardize edilmiş puan hesaplama sistemini kullan
     let scoreDetails = { finalScore: 0, breakdown: {} };
     
-    // Eğer global ScoreCalculator mevcutsa kullan, değilse kendi hesaplamamızı yapalım
-    if (window.ScoreCalculator && typeof window.ScoreCalculator.calculate === 'function') {
+    try {
+      // ScoreCalculator modülünü kullanarak puanı hesapla
       scoreDetails = window.ScoreCalculator.calculate(scoreParams);
       console.log("Standartlaştırılmış yapboz puanı hesaplandı:", scoreDetails);
-    } else {
-      // Geriye dönük uyumluluk için eski puan hesaplamayı da tutalım
+      
+      // Puan detaylarını kaydet
+      gameState.standardizedScore = scoreDetails.finalScore;
+      gameState.scoreBreakdown = scoreDetails.breakdown;
+      
+    } catch (error) {
+      console.error("ScoreCalculator hatası:", error);
+      // Hata durumunda yedek puan hesaplama yöntemini kullan
       const finalScore = calculateRealScore();
       scoreDetails.finalScore = finalScore;
-      console.log("Yapboz puanı hesaplandı (eski sistem):", finalScore);
+      console.log("Yapboz puanı hesaplandı (yedek sistem):", finalScore);
     }
     
     // Oyun istatistiklerini hazırla (geriye dönük uyumluluk için eski formatı koruyoruz)
