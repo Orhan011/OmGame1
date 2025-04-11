@@ -3,7 +3,7 @@
 
 {% block head_extra %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+<!-- Puan sistemi kaldırıldı -->
 {% endblock %}
 
 {% block content %}
@@ -125,10 +125,7 @@
         <p id="result-message"></p>
         <p id="word-reveal"></p>
         <div class="modal-stats">
-          <div class="modal-stat">
-            <span class="modal-stat-label">Skor:</span>
-            <span id="final-score" class="modal-stat-value">0</span>
-          </div>
+          <!-- Puan gösterimi kaldırıldı -->
           <div class="modal-stat">
             <span class="modal-stat-label">Kalan Hak:</span>
             <span id="final-attempts" class="modal-stat-value">0</span>
@@ -138,9 +135,7 @@
           <button id="play-again-btn" class="primary-button">
             <i class="fas fa-play"></i> Tekrar Oyna
           </button>
-          <button id="share-score-btn" class="share-button">
-            <i class="fas fa-share-alt"></i> Skoru Paylaş
-          </button>
+          <!-- Puan paylaşım butonu kaldırıldı -->
         </div>
       </div>
     </div>
@@ -1099,7 +1094,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentHint = "";
   let guessedLetters = [];
   let remainingAttempts = 6;
-  let score = 0;
+  // Puan sistemi kaldırıldı
   let gameOver = false;
   let currentDifficulty = "medium";
   let hintUsed = false;
@@ -1163,8 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
     hintButton.style.opacity = 0.5;
     hintUsed = true;
 
-    // İpucu kullanıldığında puandan düşürelim
-    score -= 5;
+    // İpucu kullanıldı (puan sistemi kaldırıldı)
   });
 
   // Tekrar oynama düğmesi
@@ -1173,21 +1167,21 @@ document.addEventListener('DOMContentLoaded', function() {
     startNewGame();
   });
 
-  // Skoru paylaş
+  // Oyunu paylaş
   shareScoreBtn.addEventListener('click', function() {
-    const message = `Adam Asmaca oyununda ${score} puan kazandım! ${currentWord} kelimesini ${remainingAttempts} hak kaldığında buldum. #ZekaPark`;
+    const message = `Adam Asmaca oyununu oynadım! "${currentWord}" kelimesini ${remainingAttempts} hak kaldığında buldum. #ZekaPark`;
 
     // Mobil cihazlarda paylaşım yapılabilir
     if (navigator.share) {
       navigator.share({
-        title: 'ZekaPark Adam Asmaca Skorum',
+        title: 'ZekaPark Adam Asmaca',
         text: message
       });
     } else {
       // Panoya kopyala
       navigator.clipboard.writeText(message)
         .then(() => {
-          alert('Skor mesajı panoya kopyalandı!');
+          alert('Mesaj panoya kopyalandı!');
         })
         .catch(err => {
           console.error('Panoya kopyalanırken hata oluştu: ', err);
@@ -1212,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
     guessedLetters = [];
     remainingAttempts = 6;
     gameOver = false;
-    score = 0;
+    // Puan sistemi kaldırıldı
     hintUsed = false;
 
     // İpucu sıfırla
@@ -1313,14 +1307,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Doğru tahmin
       updateWordDisplay();
 
-      // Zorluk seviyesine göre skor ekle
-      if (currentDifficulty === 'easy') {
-        score += 5;
-      } else if (currentDifficulty === 'medium') {
-        score += 10;
-      } else {
-        score += 15;
-      }
+      // Puan sistemi kaldırıldı
 
       // Sanal klavyeyi güncelle
       updateVirtualKeyboard(letter, true);
@@ -1393,30 +1380,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWon) {
     gameOver = true;
 
-    // Skor hesapla
-    let finalScoreValue = score;
-    if (isWon) {
-      // Kalan haklara göre bonus
-      finalScoreValue += remainingAttempts * 15;
-
-      // Zorluk seviyesine göre bonus
-      if (currentDifficulty === 'hard') {
-        finalScoreValue *= 2;
-      } else if (currentDifficulty === 'medium') {
-        finalScoreValue *= 1.5;
-      }
-
-      // İpucu kullanılmadıysa bonus
-      if (!hintUsed) {
-        finalScoreValue += 20;
-      }
-
-      finalScoreValue = Math.floor(finalScoreValue);
-    }
+    // Puan hesaplama sistemi kaldırıldı
 
     // Modalı göster
     gameModal.classList.add('active');
-    finalScore.textContent = finalScoreValue;
+    finalScore.textContent = '---'; // Puan sistemi kaldırıldı
     finalAttempts.textContent = remainingAttempts;
 
     if (isWon) {
@@ -1429,47 +1397,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     wordReveal.textContent = `Kelime: ${currentWord}`;
 
-    // Skoru kaydet
-    saveScore(finalScoreValue);
+    // Skor kaydetme kaldırıldı
   }
 
-  // Skoru kaydet
-  function saveScore(finalScoreValue) {
-    // Doğru ve yanlış harfleri hesapla
-    // guessedLetters değişkeninden bu bilgiyi çıkaralım
-    const correctLetters = [];
-    const wrongLetters = [];
-    
-    // Hangi harfler doğru, hangi harfler yanlış
-    guessedLetters.forEach(letter => {
-      if (currentWord.includes(letter)) {
-        correctLetters.push(letter);
-      } else {
-        wrongLetters.push(letter);
-      }
-    });
-    
-    // Oyun istatistiklerini hazırla
-    const gameStats = {
-      remainingAttempts: remainingAttempts,
-      wordLength: currentWord.length,
-      category: currentCategory,
-      hintUsed: hintUsed,
-      word: currentWord,
-      correctLetters: correctLetters.length,
-      wrongLetters: wrongLetters.length
-    };
-    
-    // Oyun süresini tahmin et (yaklaşık değer)
-    // Her harf denemesi için ortalama 5 saniye
-    const estimatedPlaytime = guessedLetters.length * 5;
-    
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('hangman', finalScoreValue, estimatedPlaytime, currentDifficulty, gameStats, function(html) {
-      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
-      console.log('Score saved successfully');
-    });
-  }
+  // Skor kaydetme fonksiyonu kaldırıldı
+  /* 
+   * Bu fonksiyon tamamen devre dışı bırakıldı.
+   * Puan sistemi platformdan kaldırıldı.
+   */
 });
 </script>
 {% endblock %}

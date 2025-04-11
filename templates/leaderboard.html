@@ -9,20 +9,95 @@
 {% block content %}
 <div class="container py-4">
   <div class="leaderboard-header">
-    <h1>Liderlik Tablosu</h1>
-    <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
+    <h1>Oyun Merkezi</h1>
+    <p>ZekaPark'ta oyuncuların oynadığı oyunları ve oyun istatistiklerini görüntüleyebilirsiniz. Farklı oyunlar keşfedin ve zekânızı geliştirin.</p>
   </div>
 
-  <div class="leaderboard-container">
-    <!-- Skor tablosu -->
-    <div id="leaderboardContainer" class="leaderboard-card-container">
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Skorlar yükleniyor...</p>
+  <div class="game-center-info">
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-gamepad"></i>
+      </div>
+      <div class="info-content">
+        <h3>Puan Sistemi Kaldırıldı</h3>
+        <p>ZekaPark platformunda puan ve skor sistemi artık bulunmamaktadır. Oyunları herhangi bir puan kaygısı olmadan, tamamen kendi zevkiniz için oynayabilirsiniz.</p>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-brain"></i>
+      </div>
+      <div class="info-content">
+        <h3>Oyun Deneyimine Odaklanın</h3>
+        <p>Oyunlarımız, bilişsel becerileri geliştirmek ve eğlenmek amacıyla tasarlanmıştır. İlerlemenizi takip etmek yerine, oyun deneyiminizin tadını çıkarın.</p>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-th-large"></i>
+      </div>
+      <div class="info-content">
+        <h3>Tüm Oyunları Keşfedin</h3>
+        <p>Platformumuzda bulunan onlarca oyunu keşfedin ve yeteneklerinizi geliştirin.</p>
+        <a href="{{ url_for('all_games') }}" class="btn btn-outline-primary">Tüm Oyunlar <i class="fas fa-arrow-right ml-2"></i></a>
       </div>
     </div>
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+<style>
+  .game-center-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+  }
+  
+  .info-card {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .info-icon {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .info-content h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: white;
+  }
+  
+  .info-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  
+  .info-content .btn {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .game-center-info {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 {% endblock %}

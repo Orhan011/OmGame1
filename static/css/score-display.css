@@ -1,87 +1,14 @@
-/* Skor gösterimi için stil dosyası */
+/* 
+ * Puan sistemi tamamen kaldırıldı
+ * Bu CSS dosyası referans amaçlı korunuyor, hiçbir işlevi yok
+ *
+ * Tüm puan gösterimi stilleri devre dışı bırakıldı
+ */
 
-/* Toplam skor konteyner stil */
-.total-score-container {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  padding: 10px 15px;
-  margin-top: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.total-score-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Skor ikonu stil */
-.score-icon {
-  color: #ffd700;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 215, 0, 0.2);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-/* Skor başlık stil */
-.score-title {
-  color: #e6e6e6;
-  font-size: 0.85rem;
-  margin-bottom: 2px;
-  font-weight: 500;
-}
-
-/* Toplam skor değeri stil */
-.total-score-value {
-  color: #ffd700;
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 0;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-}
-
-/* Yükleme Animasyonu */
-.loading-spinner {
-  width: 1.2rem;
-  height: 1.2rem;
-  color: #ffd700 !important;
-  margin-right: 0.25rem;
-  animation: spinner-border 1s linear infinite;
-}
-
-@keyframes spinner-border {
-  to { transform: rotate(360deg); }
-}
-
-/* Skore değişimi animasyonu */
-.score-change {
-  animation: score-highlight 1.5s ease-in-out;
-}
-
-@keyframes score-highlight {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); color: #ffffff; }
-  100% { transform: scale(1); }
-}
-
-/* Cihaz boyutlarına göre uyarlamalar */
-@media (max-width: 768px) {
-  .total-score-container {
-    padding: 8px 12px;
-  }
-  
-  .score-icon {
-    font-size: 1.2rem;
-    width: 35px;
-    height: 35px;
-  }
-  
-  .total-score-value {
-    font-size: 1.2rem;
-  }
-}
+/* Skor gösterimi için stil sınıfları - devre dışı bırakıldı
+.total-score-container {}
+.score-icon {}
+.score-title {}
+.total-score-value {}
+.score-change {}
+*/
