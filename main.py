@@ -2270,11 +2270,13 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         # Zorluk seviyesi katsayısını uygula
         adjusted_score = raw_score * multipliers['difficulty_multiplier']
 
-        # Sınırları uygula (10-100 arası)
+        # Sınırları uygula (10-100 arası) - TÜM oyunlar için zorunlu sınır
         final_score = max(10, min(100, int(adjusted_score)))
 
         # Nihai puanı ayarla
         multipliers['final_score'] = final_score
+        
+        logger.debug(f"TÜM oyunlar için 10-100 arası skor sınırı uygulandı: {final_score}")
 
     return multipliers
 
@@ -2360,8 +2362,9 @@ def save_score():
         # Toplam puanı hesapla
         total_points = base_points + score_points + duration_points
 
-        # Sınırları uygula (10-100 arası)
+        # Sınırları uygula (10-100 arası) - Her zaman aynı sınırlar
         total_points = max(10, min(100, int(total_points)))
+        logger.debug(f"Standart skor sınırları uygulandı (10-100): {total_points}")
 
         multipliers['total_score'] = int(total_points)
         logger.debug(f"Standart skor hesaplaması: base={base_points}, score={score_points}, time={duration_points}, total={total_points}")
