@@ -599,6 +599,11 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
     
+    // Oyun bitiş zamanını hesapla
+    const gameEndTime = Date.now();
+    const gameStartTime = localStorage.getItem('wordleGameStartTime') || gameEndTime;
+    const playtime = Math.floor((gameEndTime - parseInt(gameStartTime)) / 1000);
+    
     // Seri ve puan hesaplamaları
     if (isWin) {
       gameState.streak++;
@@ -607,15 +612,56 @@ document.addEventListener('DOMContentLoaded', function() {
       const bonusPoints = remainingGuesses * 50;
       gameState.score += bonusPoints;
       playSound('gameWin');
-      
-      // Skoru veritabanına kaydet (kazanınca)
-      saveScoreWithDetails(gameState.score);
     } else {
       gameState.streak = 0;
       playSound('gameLose');
-      
-      // Skoru veritabanına kaydet (kaybedince)
-      saveScoreWithDetails(gameState.score);
+    }
+    
+    // Zorluk seviyesini hesapla
+    let difficulty = 'medium'; // Varsayılan zorluk
+    if (localStorage.getItem('currentDifficulty')) {
+      difficulty = localStorage.getItem('currentDifficulty');
+    } else if (gameState.currentRow <= 2) {
+      difficulty = 'hard';
+    } else if (gameState.currentRow <= 4) {
+      difficulty = 'medium';
+    } else {
+      difficulty = 'easy';
+    }
+    
+    // Oyun istatistikleri
+    const gameStats = {
+      word: gameState.answer,
+      word_length: gameState.answer.length,
+      success: isWin,
+      attempts_used: gameState.currentRow,
+      attempts_remaining: isWin ? (6 - gameState.currentRow) : 0,
+      hints_used: 3 - gameState.hintsLeft,
+      game_completed: true
+    };
+    
+    // ScoreHandler'ı kullanarak skoru kaydet
+    if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
+      console.log("Wordle skoru kaydediliyor:", gameState.score, difficulty, playtime, gameStats);
+      window.ScoreHandler.saveScore('wordle', gameState.score, difficulty, playtime, gameStats);
+    } else {
+      // Alternatif olarak direkt API çağrısı
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_type: 'wordle',
+          score: gameState.score,
+          difficulty: difficulty,
+          playtime: playtime,
+          game_stats: gameStats
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Skor başarıyla kaydedildi:", data);
+      })
+      .catch(err => console.error("Skor kaydetme hatası:", err));
     }
     
     // Sonuç ekranını hazırla (puanlar gizlendi)

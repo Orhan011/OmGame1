@@ -46,6 +46,12 @@ window.ScoreHandler = {
     // Oyun tipini standartlaştır
     gameType = this.standardizeGameType(gameType);
     
+    // Oyun istatistiklerine ek bilgiler
+    gameStats.timestamp = new Date().toISOString();
+    if (!gameStats.difficulty) {
+      gameStats.difficulty = difficulty;
+    }
+    
     // API isteği verileri
     const data = {
       game_type: gameType,
