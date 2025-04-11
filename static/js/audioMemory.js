@@ -356,7 +356,43 @@ function gameOver() {
     }
   });
 
+  // Oyun skorunu arka planda kaydet (puan gösterimi olmadan)
+  saveScore();
+
   startBtn.textContent = 'Tekrar Başla';
+}
+
+// Skoru veritabanına kaydet
+function saveScore() {
+  // Oyun istatistiklerini hazırla
+  const gameStats = {
+    max_level: level,
+    pattern_length: gamePattern.length,
+    difficulty: currentDifficulty,
+    mode: currentMode,
+    visible_pads: visiblePads
+  };
+  
+  // Skoru API'ye gönder (puan gösterim ekranı olmadan)
+  fetch('/api/save-score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      game_type: 'audio_memory',
+      score: score,
+      difficulty: currentDifficulty,
+      playtime: 0, // Oyun süresi kaydedilmiyor
+      game_stats: gameStats
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Sesli Hafıza skoru kaydedildi:', data);
+    // Puan gösterim ekranı kaldırıldı
+  })
+  .catch(error => {
+    console.error('Skor kaydederken hata:', error);
+  });
 }
 
 // Durum mesajını güncelle

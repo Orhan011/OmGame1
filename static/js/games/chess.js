@@ -698,9 +698,62 @@ document.addEventListener('DOMContentLoaded', () => {
     disableBoardInteraction();
     stopTimer();
 
+    // Calculate score based on remaining time, captured pieces, and game outcome
+    calculateAndSaveScore();
+
     // Re-enable difficulty selection for next game
     document.querySelectorAll('input[name="difficulty"]').forEach(option => {
       option.disabled = false;
     });
+  }
+
+  // Skoru hesapla ve arka planda kaydet (puan gösterim ekranı olmadan)
+  function calculateAndSaveScore() {
+    // Oyunun temel sonucunu belirle
+    let gameResult = '';
+    let score = 0;
+    
+    if (game.in_checkmate()) {
+      // Şah mat oldu
+      gameResult = game.turn() === 'w' ? 'black_win' : 'white_win';
+      score = game.turn() === userColor ? 0 : 1000; // Kazanan veya kaybeden
+    } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition() || game.insufficient_material()) {
+      // Beraberlik durumları
+      gameResult = 'draw';
+      score = 500; // Beraberlik için orta seviye puan
+    }
+    
+    // Eğer oyun tamamlanmışsa skor kaydet
+    if (gameResult) {
+      // Oyun istatistiklerini oluştur
+      const gameStats = {
+        game_result: gameResult,
+        move_count: game.history().length,
+        difficulty: aiDifficulty,
+        remaining_time: userColor === 'w' ? whiteTimeRemaining : blackTimeRemaining
+      };
+      
+      // Skoru arka planda kaydet, kullanıcıya gösterme
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          game_type: 'chess',
+          score: score,
+          difficulty: aiDifficulty,
+          playtime: INITIAL_TIME - (userColor === 'w' ? whiteTimeRemaining : blackTimeRemaining),
+          game_stats: gameStats
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Satranç skoru kaydedildi:", data);
+      })
+      .catch(error => {
+        console.error("Satranç skoru kaydedilirken hata:", error);
+      });
+    }
   }
 });
