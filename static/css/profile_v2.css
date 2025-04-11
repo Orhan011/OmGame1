@@ -1,2 +1,242 @@
+/* Profile v2 CSS */
 
-/* Bu dosya silinmiştir */
+/* Oyun Puanları Tablosu Stilleri */
+.game-stats-header {
+  margin-bottom: 2rem;
+}
+
+.stats-card {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-3px);
+}
+
+.stats-icon {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 8px rgba(106, 90, 224, 0.3);
+}
+
+.stats-info h4 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.stats-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Oyun Tablosu */
+.game-table {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  overflow: hidden;
+  color: var(--text-primary);
+}
+
+.game-table thead {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.game-table th {
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.game-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.game-name {
+  display: flex;
+  align-items: center;
+}
+
+.game-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin-right: 12px;
+  color: var(--accent-color);
+  font-size: 1rem;
+}
+
+.game-score .score-value {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.difficulty-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.difficulty-badge.easy {
+  background-color: #4caf50;
+}
+
+.difficulty-badge.medium {
+  background-color: #2196f3;
+}
+
+.difficulty-badge.hard {
+  background-color: #ff9800;
+}
+
+.difficulty-badge.expert {
+  background-color: #f44336;
+}
+
+.game-table .btn-outline-primary {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.no-data {
+  padding: 3rem !important;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.no-data i {
+  font-size: 2.5rem;
+  color: var(--accent-color);
+  opacity: 0.5;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.player-progress {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.player-progress .placeholder-message {
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.player-progress .placeholder-message i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--accent-color);
+  opacity: 0.5;
+}
+
+/* Tab Navigation Stilleri */
+.profile-tab-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  color: var(--accent-color);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 3px 3px 0 0;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  height: 3px;
+  background: var(--accent-color);
+  transition: left 0.3s ease, width 0.3s ease;
+  border-radius: 3px 3px 0 0;
+}
+
+.tab-content-container {
+  position: relative;
+}
+
+.tab-content {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+  opacity: 1;
+}

@@ -135,7 +135,9 @@
         <!-- Sekme Başlıkları -->
         <div class="profile-tab-container">
           <div class="tab-navigation">
-            
+            <button class="tab-button active" data-tab="games">
+              <i class="fas fa-gamepad"></i> Oyunlar
+            </button>
             <button class="tab-button" data-tab="security">
               <i class="fas fa-shield-alt"></i> Güvenlik
             </button>
@@ -147,7 +149,87 @@
           
           <!-- Sekme İçerikleri -->
           <div class="tab-content-container">
-            <!-- Başarılar ve İstatistikler Sekmeleri Kaldırıldı -->
+            <!-- Oyunlar Sekmesi -->
+            <div class="tab-content active" id="games-tab">
+              <h3 class="tab-title">Oyun Puanları</h3>
+              
+              <div class="games-container">
+                <!-- Toplam Oyun İstatistikleri -->
+                <div class="game-stats-header">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <div class="stats-card">
+                        <div class="stats-icon">
+                          <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stats-info">
+                          <h4>Toplam Puan</h4>
+                          <div class="stats-value" id="total-game-points">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                              <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="stats-card">
+                        <div class="stats-icon">
+                          <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="stats-info">
+                          <h4>Oynanan Oyunlar</h4>
+                          <div class="stats-value" id="played-games-count">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                              <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Oyun Skorları Tablosu -->
+                <div class="game-scores-table mt-4">
+                  <h4 class="section-title">Tüm Oyun Skorları</h4>
+                  
+                  <div class="table-responsive">
+                    <table class="table game-table">
+                      <thead>
+                        <tr>
+                          <th>Oyun</th>
+                          <th>En Yüksek Puan</th>
+                          <th>Zorluk</th>
+                          <th>Son Oynanma</th>
+                          <th>Detay</th>
+                        </tr>
+                      </thead>
+                      <tbody id="game-scores-tbody">
+                        <tr>
+                          <td colspan="5" class="text-center">
+                            <div class="spinner-border" role="status">
+                              <span class="visually-hidden">Yükleniyor...</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Oyuncu Gelişimi -->
+                <div class="player-progress mt-4">
+                  <h4 class="section-title">Gelişim Grafiği</h4>
+                  <div id="player-progress-chart" style="height: 300px;">
+                    <div class="placeholder-message">
+                      <i class="fas fa-chart-line mb-2"></i>
+                      <p>Oyun verileriniz grafikte gösterilecektir</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             <!-- Güvenlik Sekmesi -->
             <div class="tab-content" id="security-tab">
@@ -659,6 +741,234 @@
         document.getElementById('notification-form').submit();
       });
     });
+  });
+  
+  // Oyun skorlarını görüntülemek için JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyunların Türkçe isimleri
+    const gameNames = {
+      "wordle": "Wordle",
+      "tetris": "Tetris",
+      "chess": "Satranç",
+      "snake_game": "Yılan Oyunu",
+      "puzzle": "Bulmaca",
+      "minesweeper": "Mayın Tarlası",
+      "memory_match": "Hafıza Eşleştirme",
+      "memoryCards": "Hafıza Kartları",
+      "hangman": "Adam Asmaca",
+      "color_match": "Renk Eşleştirme",
+      "audioMemory": "Sesli Hafıza",
+      "typing_speed": "Yazma Hızı",
+      "math_challenge": "Matematik Mücadelesi",
+      "2048": "2048",
+      "numberChain": "Sayı Zinciri",
+      "nBack": "N-Back",
+      "wordPuzzle": "Kelime Bulmaca",
+      "puzzle_slider": "Resim Bulmaca",
+      "sudoku": "Sudoku",
+      "numberSequence": "Sayı Dizisi",
+      "labyrinth": "3D Labirent",
+      "iqTest": "IQ Testi",
+      "simonSays": "Simon Diyor ki"
+    };
+    
+    // Zorluk seviyelerinin Türkçe karşılıkları
+    const difficultyNames = {
+      "easy": "Kolay",
+      "medium": "Orta",
+      "hard": "Zor",
+      "expert": "Uzman"
+    };
+    
+    // Tüm skorları getir
+    function getAllScores() {
+      fetch('/api/aggregated-scores')
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.success) {
+            displayScores(data.scores);
+            updateScoreStats(data.scores);
+          } else {
+            // Hata durumunda boş göster
+            displayNoScores();
+          }
+        })
+        .catch(error => {
+          console.error('Skorlar alınırken hata oluştu:', error);
+          displayNoScores();
+        });
+    }
+    
+    // Skorları tabloda göster
+    function displayScores(scores) {
+      const tbody = document.getElementById('game-scores-tbody');
+      
+      // Tabloyu temizle
+      tbody.innerHTML = '';
+      
+      if (!scores || Object.keys(scores).length === 0) {
+        displayNoScores();
+        return;
+      }
+      
+      // Her oyun için skoru listele
+      Object.keys(scores).forEach(gameType => {
+        const gameScore = scores[gameType];
+        
+        if (!gameScore) return; // Veri yoksa atla
+        
+        const row = document.createElement('tr');
+        
+        // Oyun adı
+        const nameCell = document.createElement('td');
+        nameCell.className = 'game-name';
+        
+        const gameIcon = document.createElement('span');
+        gameIcon.className = 'game-icon';
+        gameIcon.innerHTML = getGameIcon(gameType);
+        
+        const gameName = document.createElement('span');
+        gameName.textContent = gameNames[gameType] || gameType;
+        
+        nameCell.appendChild(gameIcon);
+        nameCell.appendChild(gameName);
+        
+        // En yüksek puan
+        const scoreCell = document.createElement('td');
+        scoreCell.className = 'game-score';
+        scoreCell.innerHTML = `<span class="score-value">${gameScore.highest_score}</span>`;
+        
+        // Zorluk seviyesi
+        const difficultyCell = document.createElement('td');
+        const difficulty = gameScore.difficulty || 'medium';
+        difficultyCell.innerHTML = `<span class="difficulty-badge ${difficulty}">${difficultyNames[difficulty] || difficulty}</span>`;
+        
+        // Son oynanma tarihi
+        const lastPlayedCell = document.createElement('td');
+        lastPlayedCell.textContent = formatDate(gameScore.last_played);
+        
+        // Detay butonu
+        const detailCell = document.createElement('td');
+        const detailButton = document.createElement('button');
+        detailButton.className = 'btn btn-sm btn-outline-primary';
+        detailButton.innerHTML = '<i class="fas fa-chart-line"></i>';
+        detailButton.setAttribute('data-game-type', gameType);
+        detailButton.onclick = function() {
+          showGameDetails(gameType);
+        };
+        
+        detailCell.appendChild(detailButton);
+        
+        // Tüm hücreleri satıra ekle
+        row.appendChild(nameCell);
+        row.appendChild(scoreCell);
+        row.appendChild(difficultyCell);
+        row.appendChild(lastPlayedCell);
+        row.appendChild(detailCell);
+        
+        // Satırı tabloya ekle
+        tbody.appendChild(row);
+      });
+    }
+    
+    // Skor istatistiklerini güncelle
+    function updateScoreStats(scores) {
+      // Toplam puan hesapla
+      let totalPoints = 0;
+      let playedGamesCount = 0;
+      
+      Object.keys(scores).forEach(gameType => {
+        if (scores[gameType]) {
+          totalPoints += scores[gameType].highest_score || 0;
+          playedGamesCount++;
+        }
+      });
+      
+      // İstatistikleri göster
+      document.getElementById('total-game-points').textContent = totalPoints;
+      document.getElementById('played-games-count').textContent = playedGamesCount;
+    }
+    
+    // Skor yoksa mesaj göster
+    function displayNoScores() {
+      const tbody = document.getElementById('game-scores-tbody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center no-data">
+            <i class="fas fa-gamepad mb-2"></i>
+            <p>Henüz oyun skorunuz bulunmuyor</p>
+            <a href="/all_games" class="btn btn-primary btn-sm mt-2">Oyunları Keşfet</a>
+          </td>
+        </tr>
+      `;
+      
+      // İstatistikleri sıfırla
+      document.getElementById('total-game-points').textContent = '0';
+      document.getElementById('played-games-count').textContent = '0';
+    }
+    
+    // Oyun ikonunu getir
+    function getGameIcon(gameType) {
+      const icons = {
+        "wordle": '<i class="fas fa-font"></i>',
+        "tetris": '<i class="fas fa-th-large"></i>',
+        "chess": '<i class="fas fa-chess"></i>',
+        "snake_game": '<i class="fas fa-project-diagram"></i>',
+        "puzzle": '<i class="fas fa-puzzle-piece"></i>',
+        "minesweeper": '<i class="fas fa-bomb"></i>',
+        "memory_match": '<i class="fas fa-th"></i>',
+        "memoryCards": '<i class="fas fa-clone"></i>',
+        "hangman": '<i class="fas fa-male"></i>',
+        "color_match": '<i class="fas fa-palette"></i>',
+        "audioMemory": '<i class="fas fa-music"></i>',
+        "typing_speed": '<i class="fas fa-keyboard"></i>',
+        "math_challenge": '<i class="fas fa-calculator"></i>',
+        "2048": '<i class="fas fa-sort-numeric-up"></i>',
+        "numberChain": '<i class="fas fa-link"></i>',
+        "nBack": '<i class="fas fa-brain"></i>',
+        "wordPuzzle": '<i class="fas fa-spell-check"></i>',
+        "puzzle_slider": '<i class="fas fa-th"></i>',
+        "sudoku": '<i class="fas fa-table"></i>',
+        "numberSequence": '<i class="fas fa-list-ol"></i>',
+        "labyrinth": '<i class="fas fa-cubes"></i>',
+        "iqTest": '<i class="fas fa-lightbulb"></i>',
+        "simonSays": '<i class="fas fa-gamepad"></i>'
+      };
+      
+      return icons[gameType] || '<i class="fas fa-gamepad"></i>';
+    }
+    
+    // Tarihi formatla
+    function formatDate(dateString) {
+      if (!dateString) return 'Bilinmiyor';
+      
+      const date = new Date(dateString);
+      
+      // Geçersiz tarih kontrolü
+      if (isNaN(date.getTime())) return 'Bilinmiyor';
+      
+      return date.toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    
+    // Oyun detaylarını göster
+    function showGameDetails(gameType) {
+      // Bu fonksiyon, gelecekte oyun detaylarının gösterilmesi için kullanılabilir
+      alert(`${gameNames[gameType] || gameType} detayları yakında burada gösterilecek!`);
+      
+      // Burada olabilecek işlemler:
+      // 1. Modal açılabilir
+      // 2. Detaylı istatistikler yüklenebilir
+      // 3. Gelişim grafiği gösterilebilir
+    }
+    
+    // İlk yüklemede skorları getir
+    getAllScores();
   });
 </script>
 {% endblock %}
