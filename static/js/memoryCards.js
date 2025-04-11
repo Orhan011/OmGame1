@@ -18,24 +18,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const hintBtn = document.getElementById('hintBtn');
   const playAgainBtn = document.getElementById('playAgainBtn');
   const saveScoreBtn = document.getElementById('saveScoreBtn');
-  
+
   // Game display elements
   const progressBar = document.getElementById('progressBar');
   const progressPercent = document.getElementById('progressPercent');
   const currentThemeDisplay = document.getElementById('currentTheme');
   const hintCounter = document.querySelector('.hint-counter');
-  
+
   // Result elements
   const finalScore = document.getElementById('finalScore');
   const finalTime = document.getElementById('finalTime');
   const finalMoves = document.getElementById('finalMoves');
   const performanceStars = document.getElementById('performanceStars');
   const performanceText = document.getElementById('performanceText');
-  
+
   // Level buttons
   const levelButtons = document.querySelectorAll('.level-btn:not(.theme-btn)');
   const themeButtons = document.querySelectorAll('.theme-btn');
-  
+
   // Game state variables
   let cards = [];
   let flippedCards = [];
@@ -52,14 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentTheme = 'animals';
   let rows = 3; // Default rows
   let cols = 4; // Default columns
-  
+
   // Game configuration
   const levelConfig = {
     easy: { rows: 3, cols: 4, timeBonus: 500, movePenalty: 2 },
     medium: { rows: 3, cols: 6, timeBonus: 750, movePenalty: 1 },
     hard: { rows: 3, cols: 10, timeBonus: 1000, movePenalty: 0.5 }
   };
-  
+
   // Theme configuration with emojis
   const themes = {
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🦋', '🐝', '🐙', '🦑', '🦈', '🐊', '🦓', '🦒', '🦔', '🐘', '🦍', '🐆', '🦬', '🦥', '🐦', '🦅'],
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
     emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨'],
     shapes: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🔺', '🔻', '💠', '🔷', '🔶', '🔹', '🔸', '♠️', '♥️', '♦️', '♣️', '🎴', '🃏', '🀄', '🎭', '🎯', '🎲', '🎮', '🎰', '🧩', '🎪', '🎨', '🎺']
   };
-  
+
   // Audio effects - inicializasyonu daha güvenli hale getirmek için boş objeler oluşturalım
   const sounds = {};
-  
+
   /**
    * Initialize game sounds with placeholder paths, files will be created later
    */
@@ -83,20 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
       gameComplete: '/static/sounds/success.mp3',
       hint: '/static/sounds/click.mp3'
     };
-    
+
     // Her bir ses dosyasını yükleme ve hata kontrolü
     Object.keys(soundFiles).forEach(soundName => {
       try {
         // Güvenli bir şekilde ses nesnesi oluşturalım
         sounds[soundName] = new Audio(soundFiles[soundName]);
-        
+
         // Ses yüklenemezse
         sounds[soundName].onerror = function() {
           console.log(`${soundName} ses dosyası yüklenemedi`);
           // Basitleştirilmiş boş ses dosyası
           this.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
         };
-        
+
         // Ses seviyesini ayarla
         sounds[soundName].volume = 0.5;
       } catch (e) {
@@ -112,11 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
         };
       }
     });
-    
+
     // Ses yükleme durumunu kontrol et
     console.log('Ses dosyaları yüklendi');
   }
-  
+
   /**
    * Play a sound effect if sound is enabled
    * @param {string} soundName - The name of the sound to play
@@ -129,17 +129,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`${soundName} ses dosyası bulunamadı`);
         return;
       }
-      
+
       // Ses nesnesinin çalınabilirlik kontrolü
       if (typeof sounds[soundName].play === 'function') {
         // Ses dosyasını başa sar
         if (sounds[soundName].currentTime) {
           sounds[soundName].currentTime = 0;
         }
-        
+
         // Asenkron ses çalma ve hata yönetimi
         const playPromise = sounds[soundName].play();
-        
+
         // Play işlemi başarısız olursa sessizce devam et
         if (playPromise !== undefined) {
           playPromise.catch(() => {
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Ses çalma işlemi başarısız, oyuna devam ediliyor');
     }
   }
-  
+
   /**
    * Initialize the game
    */
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     updateHintDisplay();
   }
-  
+
   /**
    * Set up all event listeners
    */
@@ -171,23 +171,23 @@ document.addEventListener('DOMContentLoaded', function() {
       // Add ripple effect to button click
       const ripple = document.createElement('span');
       ripple.classList.add('ripple-effect');
-      
+
       const rect = this.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       ripple.style.left = `${x}px`;
       ripple.style.top = `${y}px`;
-      
+
       this.appendChild(ripple);
-      
+
       // Remove ripple after animation completes
       setTimeout(() => ripple.remove(), 600);
-      
+
       // Start the game
       startGame();
     });
-    
+
     // Level selection with transition animation
     levelButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -195,87 +195,87 @@ document.addEventListener('DOMContentLoaded', function() {
           btn.classList.remove('active');
           btn.style.transform = 'scale(1)';
         });
-        
+
         button.classList.add('active');
         button.style.transform = 'scale(1.05)';
         setTimeout(() => button.style.transform = 'scale(1)', 300);
-        
+
         currentLevel = button.dataset.level;
         rows = levelConfig[currentLevel].rows;
         cols = levelConfig[currentLevel].cols;
       });
     });
-    
+
     // Theme selection with highlight effect
     themeButtons.forEach(button => {
       button.addEventListener('click', () => {
         themeButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        
+
         // Add pulse animation to selected theme
         button.classList.add('theme-pulse');
         setTimeout(() => button.classList.remove('theme-pulse'), 700);
-        
+
         currentTheme = button.dataset.theme;
         currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
       });
     });
-    
+
     // Game controls
     pauseGameBtn.addEventListener('click', togglePause);
     resumeBtn.addEventListener('click', togglePause);
     soundToggleBtn.addEventListener('click', toggleSound);
     hintBtn.addEventListener('click', useHint);
-    
+
     // Result actions
     playAgainBtn.addEventListener('click', resetGame);
     saveScoreBtn.addEventListener('click', saveScore);
   }
-  
+
   /**
    * Start the game
    */
   function startGame() {
     console.log('Oyun başlatılıyor...');
-    
+
     try {
       // Arayüz elemanlarını kontrol edelim
       if (!gameIntro || !gameBoard || !memoryGrid) {
         console.error('Game elements missing, checking and recovering...');
-        
+
         // Eksik elementleri tekrar seçelim
         gameIntro = document.getElementById('gameIntro') || gameIntro;
         gameBoard = document.getElementById('gameBoard') || gameBoard;
         gameResults = document.getElementById('gameResults') || gameResults;
         memoryGrid = document.getElementById('memoryGrid') || memoryGrid;
       }
-      
+
       // Gerekli DOM elementleri varmı kontrol edelim
       if (!memoryGrid) {
         throw new Error('Memory grid element not found!');
       }
-      
+
       // Hide intro, show game board
       if (gameIntro) gameIntro.style.display = 'none';
       if (gameResults) gameResults.style.display = 'none';
       if (gameBoard) gameBoard.style.display = 'block';
-      
+
       // Reset game state
       resetGameState();
-      
+
       // Generate cards
       generateCards();
-      
+
       console.log('Kartlar oluşturuldu, timer başlatılıyor...');
-      
+
       // Start timer
       startTimer();
-      
+
       // Update theme display
       if (currentThemeDisplay) {
         currentThemeDisplay.textContent = capitalizeFirstLetter(currentTheme);
       }
-      
+
       // Show game board with animation
       if (gameBoard) {
         gameBoard.classList.add('animate__animated', 'animate__fadeIn');
@@ -285,24 +285,24 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }, 1000);
       }
-      
+
       console.log('Oyun başarıyla başlatıldı!');
     } catch (e) {
       console.error('Oyun başlatma hatası:', e);
       alert('Oyun başlatılırken bir hata oluştu. Lütfen sayfayı yenileyin.');
     }
   }
-  
+
   /**
    * Generate memory cards based on current settings
    */
   function generateCards() {
     // Clear previous cards
     memoryGrid.innerHTML = '';
-    
+
     // Apply grid styles based on difficulty level
     memoryGrid.className = 'memory-grid';
-    
+
     // Add difficulty-specific grid class
     if (currentLevel === 'easy') {
       memoryGrid.classList.add('grid-easy');
@@ -311,13 +311,13 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (currentLevel === 'hard') {
       memoryGrid.classList.add('grid-hard');
     }
-    
+
     // Determine number of pairs needed
     totalPairs = (rows * cols) / 2;
-    
+
     // Get symbols for current theme
     const themeSymbols = themes[currentTheme];
-    
+
     // Create pairs array
     const pairs = [];
     for (let i = 0; i < totalPairs; i++) {
@@ -326,10 +326,10 @@ document.addEventListener('DOMContentLoaded', function() {
       pairs.push(themeSymbols[symbolIndex]);
       pairs.push(themeSymbols[symbolIndex]);
     }
-    
+
     // Shuffle the pairs
     const shuffledPairs = shuffleArray(pairs);
-    
+
     // Create card elements
     cards = [];
     shuffledPairs.forEach((symbol, index) => {
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
       cards.push(card);
     });
   }
-  
+
   /**
    * Create a single card element
    * @param {number} id - Card unique identifier
@@ -350,23 +350,23 @@ document.addEventListener('DOMContentLoaded', function() {
     card.className = 'memory-card';
     card.dataset.id = id;
     card.dataset.symbol = symbol;
-    
+
     const frontFace = document.createElement('div');
     frontFace.className = 'memory-card__front';
     frontFace.textContent = symbol;
-    
+
     const backFace = document.createElement('div');
     backFace.className = 'memory-card__back';
-    
+
     card.appendChild(frontFace);
     card.appendChild(backFace);
-    
+
     // Add click event
     card.addEventListener('click', flipCard);
-    
+
     return card;
   }
-  
+
   /**
    * Handle card flip
    * @param {Event} e - Click event
@@ -374,39 +374,39 @@ document.addEventListener('DOMContentLoaded', function() {
   function flipCard(e) {
     // Ignore if game is paused
     if (gamePaused) return;
-    
+
     const card = e.currentTarget;
-    
+
     // Ignore if the card is already flipped or matched
     if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
-    
+
     // Ignore if two cards are already flipped
     if (flippedCards.length === 2) return;
-    
+
     // Play flip sound
     playSound('flip');
-    
+
     // Flip the card
     card.classList.add('flipped');
     flippedCards.push(card);
-    
+
     // Check for match if two cards are flipped
     if (flippedCards.length === 2) {
       moves++;
       checkForMatch();
     }
   }
-  
+
   /**
    * Check if the two flipped cards match
    */
   function checkForMatch() {
     const [firstCard, secondCard] = flippedCards;
-    
+
     // Get symbols from cards
     const firstSymbol = firstCard.dataset.symbol;
     const secondSymbol = secondCard.dataset.symbol;
-    
+
     // Check if symbols match
     if (firstSymbol === secondSymbol) {
       handleMatch(firstCard, secondCard);
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
       handleMismatch(firstCard, secondCard);
     }
   }
-  
+
   /**
    * Handle matching cards
    * @param {HTMLElement} firstCard - First card element
@@ -424,52 +424,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mark cards as matched
     firstCard.classList.add('matched', 'match-animation');
     secondCard.classList.add('matched', 'match-animation');
-    
+
     // Create visual particle effect for matched cards
     createMatchParticles(firstCard);
     createMatchParticles(secondCard);
-    
+
     // Play match sound
     playSound('match');
-    
+
     // Calculate points with enhanced bonus system
     const basePoints = 10;
     const timeBonus = Math.max(0, levelConfig[currentLevel].timeBonus - timer);
     const streak = getMatchStreak(); // Arka arkaya eşleşme yaparsa bonus verilebilir
     const streakMultiplier = streak > 1 ? (streak * 0.5) : 1;
     const pointsEarned = Math.round((basePoints + Math.floor(timeBonus / 10)) * streakMultiplier);
-    
+
     // Update score
     score += pointsEarned;
-    
+
     // Show success message with streak info if applicable
     if (streak > 1) {
       showAlert(`+${pointsEarned} Puan! 🔥 ${streak}x Kombo!`, 'success');
     } else {
       showAlert(`+${pointsEarned} Puan! 🎉`, 'success');
     }
-    
+
     // Increase matched pairs
     matchedPairs++;
-    
+
     // Update progress with animated effect
     updateProgress(true);
-    
+
     // Reset flipped cards
     flippedCards = [];
-    
+
     // Check if game is complete
     if (matchedPairs === totalPairs) {
       setTimeout(endGame, 1200);
     }
-    
+
     // Remove animation class after animation completes
     setTimeout(() => {
       firstCard.classList.remove('match-animation');
       secondCard.classList.remove('match-animation');
     }, 800);
   }
-  
+
   /**
    * Create particle effect for matched cards
    * @param {HTMLElement} card - Card element
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rect = card.getBoundingClientRect();
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
-    
+
     // Create particle container if it doesn't exist
     let particleContainer = document.getElementById('particleContainer');
     if (!particleContainer) {
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
       particleContainer.style.zIndex = '9999';
       document.body.appendChild(particleContainer);
     }
-    
+
     // Create particles
     const particleCount = 12;
     for (let i = 0; i < particleCount; i++) {
@@ -508,45 +508,45 @@ document.addEventListener('DOMContentLoaded', function() {
       particle.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.5)';
       particle.style.top = `${cardCenterY}px`;
       particle.style.left = `${cardCenterX}px`;
-      
+
       // Random speed and direction
       const angle = (Math.random() * Math.PI * 2);
       const speed = 2 + Math.random() * 4;
       const vx = Math.cos(angle) * speed;
       const vy = Math.sin(angle) * speed;
-      
+
       // Add to container
       particleContainer.appendChild(particle);
-      
+
       // Animate
       let posX = cardCenterX;
       let posY = cardCenterY;
       let opacity = 1;
       let scale = 1;
-      
+
       const animate = () => {
         if (opacity <= 0) {
           particle.remove();
           return;
         }
-        
+
         posX += vx;
         posY += vy;
         opacity -= 0.02;
         scale += 0.02;
-        
+
         particle.style.left = `${posX}px`;
         particle.style.top = `${posY}px`;
         particle.style.opacity = opacity;
         particle.style.transform = `scale(${scale})`;
-        
+
         requestAnimationFrame(animate);
       };
-      
+
       requestAnimationFrame(animate);
     }
   }
-  
+
   /**
    * Get current match streak
    * @returns {number} - Current streak count
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Or maintain a streak counter that resets on mismatches
     return Math.floor(Math.random() * 3) + 1; // Random streak for demonstration
   }
-  
+
   /**
    * Handle mismatched cards
    * @param {HTMLElement} firstCard - First card element
@@ -567,16 +567,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add no-match animation class
     firstCard.classList.add('no-match');
     secondCard.classList.add('no-match');
-    
+
     // Play no match sound
     playSound('noMatch');
-    
+
     // Apply move penalty
     const movePenalty = levelConfig[currentLevel].movePenalty;
     if (movePenalty > 0) {
       score = Math.max(0, score - movePenalty);
     }
-    
+
     // Flip cards back after a delay
     setTimeout(() => {
       firstCard.classList.remove('flipped', 'no-match');
@@ -584,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
       flippedCards = [];
     }, 1000);
   }
-  
+
   /**
    * Show an alert message
    * @param {string} message - Message to display
@@ -592,39 +592,39 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function showAlert(message, type = 'info') {
     const alerts = document.getElementById('gameAlerts');
-    
+
     // Create alert element
     const alert = document.createElement('div');
     alert.className = `memory-alert-message ${type}`;
     alert.textContent = message;
-    
+
     // Add to alerts container
     alerts.appendChild(alert);
-    
+
     // Remove after delay
     setTimeout(() => {
       alert.classList.add('fade-out');
       setTimeout(() => alert.remove(), 500);
     }, 2000);
   }
-  
+
   /**
    * Update the progress bar with animation
    * @param {boolean} animated - Whether to animate the progress update
    */
   function updateProgress(animated = false) {
     const progress = (matchedPairs / totalPairs) * 100;
-    
+
     if (animated) {
       // Animate the progress bar with a smooth transition
       progressBar.style.transition = 'width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      
+
       // Create a pulse effect
       progressBar.classList.add('progress-pulse');
       setTimeout(() => {
         progressBar.classList.remove('progress-pulse');
       }, 700);
-      
+
       // Add percentage counter animation
       let currentPercent = parseInt(progressPercent.textContent) || 0;
       const targetPercent = Math.round(progress);
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const stepTime = 20; // ms
       const steps = duration / stepTime;
       const increment = (targetPercent - currentPercent) / steps;
-      
+
       let step = 0;
       const updateCounter = () => {
         step++;
@@ -641,23 +641,23 @@ document.addEventListener('DOMContentLoaded', function() {
           currentPercent = targetPercent;
         }
         progressPercent.textContent = `${Math.round(currentPercent)}%`;
-        
+
         if (step < steps) {
           requestAnimationFrame(updateCounter);
         }
       };
-      
+
       requestAnimationFrame(updateCounter);
     }
-    
+
     // Update the progress bar width
     progressBar.style.width = `${progress}%`;
-    
+
     // If not animated, just update the text directly
     if (!animated) {
       progressPercent.textContent = `${Math.round(progress)}%`;
     }
-    
+
     // Add milestone celebration for progress
     if (Math.round(progress) === 50 && matchedPairs > 1) {
       showAlert('Yarısını tamamladınız! Devam edin! 🚀', 'info');
@@ -665,14 +665,14 @@ document.addEventListener('DOMContentLoaded', function() {
       showAlert('Son düzlüğe girdiniz! 🏁', 'info');
     }
   }
-  
+
   /**
    * Start the game timer
    */
   function startTimer() {
     timer = 0;
     updateTimerDisplay();
-    
+
     timerInterval = setInterval(() => {
       if (!gamePaused) {
         timer++;
@@ -680,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 1000);
   }
-  
+
   /**
    * Update the timer display
    */
@@ -690,26 +690,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const seconds = timer % 60;
     // timerDisplay reference removed since we don't display it anymore
   }
-  
+
   /**
    * Toggle game pause state
    */
   function togglePause() {
     gamePaused = !gamePaused;
-    
+
     if (gamePaused) {
       pauseOverlay.style.display = 'flex';
     } else {
       pauseOverlay.style.display = 'none';
     }
   }
-  
+
   /**
    * Toggle sound on/off
    */
   function toggleSound() {
     soundEnabled = !soundEnabled;
-    
+
     const soundIcon = soundToggleBtn.querySelector('i');
     if (soundEnabled) {
       soundIcon.className = 'bi bi-volume-up-fill';
@@ -717,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
       soundIcon.className = 'bi bi-volume-mute-fill';
     }
   }
-  
+
   /**
    * Use a hint to reveal a pair briefly
    */
@@ -725,11 +725,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hintsLeft <= 0 || gamePaused || matchedPairs === totalPairs) {
       return;
     }
-    
+
     // Find an unmatched pair
     const unmatchedCards = cards.filter(card => !card.classList.contains('matched'));
     if (unmatchedCards.length === 0) return;
-    
+
     // Group by symbols
     const cardsBySymbol = {};
     unmatchedCards.forEach(card => {
@@ -739,31 +739,31 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       cardsBySymbol[symbol].push(card);
     });
-    
+
     // Find a symbol with exactly 2 cards (a complete pair)
     const availablePairs = Object.values(cardsBySymbol).filter(group => group.length === 2);
-    
+
     if (availablePairs.length === 0) return;
-    
+
     // Select a random pair
     const selectedPair = availablePairs[Math.floor(Math.random() * availablePairs.length)];
-    
+
     // Highlight the pair briefly
     selectedPair.forEach(card => card.classList.add('hint'));
-    
+
     // Play hint sound
     playSound('hint');
-    
+
     // Decrease available hints
     hintsLeft--;
     updateHintDisplay();
-    
+
     // Remove highlight after a delay
     setTimeout(() => {
       selectedPair.forEach(card => card.classList.remove('hint'));
     }, 1500);
   }
-  
+
   /**
    * Update the hint counter display
    */
@@ -775,56 +775,58 @@ document.addEventListener('DOMContentLoaded', function() {
       hintBtn.classList.remove('disabled');
     }
   }
-  
+
+  /**
+   * Calculate the final score based on time and moves
+   * @returns {number} The final score
+   */
+  function calculateScore() {
+    const baseScore = 500; // Base score
+    const timeBonus = Math.max(0, levelConfig[currentLevel].timeBonus - timer) * 2; // Bonus for faster completion
+    const movesPenalty = Math.max(0, moves - totalPairs * 2) * 10; // Penalty for extra moves
+
+    return Math.max(0, baseScore + timeBonus - movesPenalty);
+  }
+
+
   /**
    * End the game and show results
    */
   function endGame() {
     // Stop the timer
     clearInterval(timerInterval);
-    
+
     // Play completion sound
     playSound('gameComplete');
-    
+
     // Show celebration message
     showAlert('Tebrikler! Oyunu tamamladınız! 🎉', 'success');
-    
-    // Calculate final score with bonus factors
-    const timeBonus = Math.max(0, 1000 - timer);
-    const perfectMoves = totalPairs * 2;
-    const movePenalty = Math.max(0, moves - perfectMoves);
-    
-    // Create difficulty bonus
-    const difficultyMultiplier = currentLevel === 'easy' ? 1 : 
-                               currentLevel === 'medium' ? 1.5 : 2;
-    
-    // Calculate final score with all factors
-    const finalScoreValue = Math.round((score + Math.floor(timeBonus / 10) - movePenalty) * difficultyMultiplier);
-    
+
+    // Calculate final score
+    const finalScoreValue = calculateScore();
+
     // Get game stats
     const totalTime = timer;
-    
-    // Zorluk seviyesini belirle
-    let difficulty = currentLevel; // 'easy', 'medium', veya 'hard'
-    
+    const difficulty = currentLevel;
+
     // Oyun istatistiklerini topla
     const gameStats = {
       duration_seconds: totalTime,
       move_count: moves,
-      hint_count: initialHints - hintsLeft,
+      hint_count: 3 - hintsLeft,
       pairs_count: totalPairs,
       theme: currentTheme
     };
-    
+
     // API'ye skoru kaydet (sonuç ekranı göstermeden)
     saveScoreToAPI('memoryCards', finalScoreValue, totalTime, difficulty, gameStats);
-    
+
     // Kısa bir süre sonra ana sayfaya yönlendir
     setTimeout(() => {
       window.location.href = "/all_games";
     }, 1500);
   }
-  
+
   /**
    * Skoru API'ye kaydeder ve sonuç ekranı göstermez
    */
@@ -851,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Skor kaydedilirken hata oluştu:', error);
     });
   }
-  
+
   /**
    * Animate numerical value from start to end
    * @param {HTMLElement} element - Element to update
@@ -863,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const range = end - start;
     const increment = range / 30; // 30 steps
     const stepTime = Math.abs(Math.floor(duration / 30));
-    
+
     let current = start;
     const timer = setInterval(() => {
       current += increment;
@@ -875,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, stepTime);
   }
-  
+
   /**
    * Create confetti effect for game completion
    */
@@ -891,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
     confettiContainer.style.pointerEvents = 'none';
     confettiContainer.style.zIndex = '9998';
     document.body.appendChild(confettiContainer);
-    
+
     // Create confetti pieces
     const colors = [
       'rgba(99, 102, 241, 0.9)',  // Primary
@@ -900,17 +902,17 @@ document.addEventListener('DOMContentLoaded', function() {
       'rgba(245, 158, 11, 0.9)',  // Warning
       'rgba(255, 255, 255, 0.9)'  // White
     ];
-    
+
     const confettiCount = 100;
-    
+
     for (let i = 0; i < confettiCount; i++) {
       const confetti = document.createElement('div');
       const color = colors[Math.floor(Math.random() * colors.length)];
-      
+
       // Randomize confetti properties
       const size = Math.random() * 10 + 5;
       const isRect = Math.random() > 0.5;
-      
+
       confetti.style.position = 'absolute';
       confetti.style.width = `${size}px`;
       confetti.style.height = isRect ? `${size * 0.4}px` : `${size}px`;
@@ -918,66 +920,66 @@ document.addEventListener('DOMContentLoaded', function() {
       confetti.style.borderRadius = isRect ? '0px' : '50%';
       confetti.style.top = '-50px';
       confetti.style.left = `${Math.random() * 100}%`;
-      
+
       // Add to container
       confettiContainer.appendChild(confetti);
-      
+
       // Animation variables
       const speed = 3 + Math.random() * 5;
       const rotation = Math.random() * 360;
       const rotationSpeed = (Math.random() - 0.5) * 10;
       const horizontalSwing = 50 + Math.random() * 100;
       const delay = Math.random() * 2; // seconds
-      
+
       // Apply animation
       confetti.style.animation = `confetti-fall ${speed}s linear ${delay}s forwards`;
-      
+
       // Custom animation
       let verticalPosition = -50;
       let horizontalPosition = parseFloat(confetti.style.left);
       let currentRotation = rotation;
       let opacity = 1;
-      
+
       const animateConfetti = () => {
         verticalPosition += speed / 2;
         const progress = verticalPosition / window.innerHeight;
-        
+
         // Horizontal swing using sine wave
         const swingOffset = Math.sin(progress * Math.PI * 2) * horizontalSwing / 5;
         horizontalPosition = parseFloat(confetti.style.left) + swingOffset;
-        
+
         // Update rotation
         currentRotation += rotationSpeed;
-        
+
         // Update opacity for fade out at end
         if (progress > 0.7) {
           opacity = 1 - ((progress - 0.7) / 0.3);
         }
-        
+
         // Apply styles
         confetti.style.transform = `translateY(${verticalPosition}px) translateX(${swingOffset}px) rotate(${currentRotation}deg)`;
         confetti.style.opacity = opacity;
-        
+
         // Continue animation until offscreen or faded out
         if (verticalPosition < window.innerHeight + 100 && opacity > 0) {
           requestAnimationFrame(animateConfetti);
         } else {
           confetti.remove();
-          
+
           // Remove container if all confetti are gone
           if (confettiContainer.children.length === 0) {
             confettiContainer.remove();
           }
         }
       };
-      
+
       // Start after delay
       setTimeout(() => {
         requestAnimationFrame(animateConfetti);
       }, delay * 1000);
     }
   }
-  
+
   /**
    * Update the star rating display
    * @param {number} rating - Rating from 0-5
@@ -985,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateStarRating(rating) {
     // Round to nearest half star
     const roundedRating = Math.round(rating * 2) / 2;
-    
+
     // Update stars
     const stars = performanceStars.querySelectorAll('i');
     stars.forEach((star, index) => {
@@ -997,7 +999,7 @@ document.addEventListener('DOMContentLoaded', function() {
         star.className = 'bi bi-star';
       }
     });
-    
+
     // Update performance text
     if (roundedRating >= 4.5) {
       performanceText.textContent = 'Mükemmel! 🏆';
@@ -1011,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', function() {
       performanceText.textContent = 'Gelişim Gösteriyorsun 💪';
     }
   }
-  
+
   /**
    * Reset the game state
    */
@@ -1024,25 +1026,25 @@ document.addEventListener('DOMContentLoaded', function() {
     score = 0;
     hintsLeft = 3;
     timer = 0;
-    
+
     // Clear timer
     if (timerInterval) {
       clearInterval(timerInterval);
       timerInterval = null;
     }
-    
+
     // Reset displays - only progress bar since stats display is removed
     progressBar.style.width = '0%';
     progressPercent.textContent = '0%';
-    
+
     // Reset game state
     gamePaused = false;
     pauseOverlay.style.display = 'none';
-    
+
     // Update hint display
     updateHintDisplay();
   }
-  
+
   /**
    * Reset and restart the game
    */
@@ -1050,38 +1052,32 @@ document.addEventListener('DOMContentLoaded', function() {
     gameResults.style.display = 'none';
     startGame();
   }
-  
+
   /**
    * Save the player's score to the database
    */
   function saveScore() {
     // Disable button to prevent multiple submissions
     saveScoreBtn.disabled = true;
-    
+
     // Get final score from display
-    const finalScoreValue = parseInt(finalScore.textContent);
+    const finalScoreValue = calculateScore();
     const totalTime = timer; // Oyun süresi
     const totalMoves = moves; // Toplam hamle sayısı
-    
+
     // Zorluk seviyesini belirle
-    let difficulty = 'medium';
-    if (currentDifficulty === 'easy') {
-      difficulty = 'easy';
-    } else if (currentDifficulty === 'hard') {
-      difficulty = 'hard';
-    } else if (currentDifficulty === 'expert') {
-      difficulty = 'expert';
-    }
-    
+    let difficulty = currentLevel;
+
+
     // Oyun istatistiklerini topla
     const gameStats = {
       duration_seconds: totalTime,
       move_count: totalMoves,
-      hint_count: initialHints - hintsLeft,
+      hint_count: 3 - hintsLeft,
       pairs_count: totalPairs,
       theme: currentTheme
     };
-    
+
     // Yeni skor gösterimi için container oluştur
     if (!document.getElementById('game-score-container')) {
       const scoreContainer = document.createElement('div');
@@ -1094,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <p>Skorunuz hesaplanıyor...</p>
         </div>
       `;
-      
+
       // Yerleştirme - mevcut sonuç istatistiklerinden sonra ekle
       const resultsStats = document.querySelector('.results-stats');
       if (resultsStats) {
@@ -1102,14 +1098,14 @@ document.addEventListener('DOMContentLoaded', function() {
         resultsStats.parentNode.insertBefore(scoreContainer, resultsStats.nextSibling);
       }
     }
-    
+
     // Callback fonksiyonu - skor HTML'ini gösterir
     const updateScoreDisplay = function(scoreHtml, data) {
       const scoreContainer = document.getElementById('game-score-container');
       if (scoreContainer) {
         scoreContainer.innerHTML = scoreHtml;
       }
-      
+
       if (data && data.success) {
         showAlert('Skorunuz başarıyla kaydedildi!', 'success');
         saveScoreBtn.textContent = '✓ Kaydedildi';
@@ -1121,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveScoreBtn.classList.remove('btn-primary');
         saveScoreBtn.classList.add('btn-warning');
         saveScoreBtn.disabled = false;
-        
+
         // Butonu giriş sayfasına yönlendirme işlevine güncelleyin
         saveScoreBtn.removeEventListener('click', saveScore);
         saveScoreBtn.addEventListener('click', function() {
@@ -1132,11 +1128,11 @@ document.addEventListener('DOMContentLoaded', function() {
         saveScoreBtn.disabled = false;
       }
     };
-    
+
     // Ortak skoru kaydetme ve gösterme fonksiyonunu kullan
     saveScoreAndDisplay('memoryCards', finalScoreValue, totalTime, difficulty, gameStats, updateScoreDisplay);
   }
-  
+
   /**
    * Utility function to shuffle an array using Fisher-Yates algorithm
    * @param {Array} array - Array to shuffle
@@ -1150,7 +1146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return newArray;
   }
-  
+
   /**
    * Utility function to capitalize first letter of a string
    * @param {string} str - String to capitalize
@@ -1159,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
-  
+
   // Initialize the game
   init();
 });
