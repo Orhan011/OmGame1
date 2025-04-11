@@ -112,11 +112,9 @@ function loadArticleContent() {
 
 <!-- Derecelendirme sistemi için CSS ve JS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rating.css') }}">
+<script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
 </head>
 <body>
-<!-- Skor Kontrol Sistemi - Tüm oyunlarda gerçek skorları görüntüler -->
-<div id="scoreControlSystem" style="display:none" 
-     data-min-score="10" data-max-score="100" data-enforce-limits="true"></div>
 <!-- Dinamik Arkaplan Efekti -->
 <!-- Arka plandaki şekiller kaldırıldı -->
 
@@ -266,6 +264,7 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
     <!-- Skor Yakalama ve Kaydetme Sistemi -->
+    <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
       document.addEventListener('DOMContentLoaded', function() {
@@ -309,10 +308,9 @@ function loadArticleContent() {
 <!-- Oyun sayfalarına özel JS dosyaları -->
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <script src="{{ url_for('static', filename='js/game-responsive-modernizer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
-<!-- Tüm oyunlarda rastgele puanları tamamen kaldıran ve 10-100 arası sınırlama uygulayan kesin skor yöneticisi -->
-<script src="{{ url_for('static', filename='js/strict-score-handler.js') }}" defer></script>
 <!-- Confetti.js - Sadece skor/seviye sayfalarında kullanılır -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js" defer></script>
 {% endif %}
