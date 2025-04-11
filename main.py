@@ -1697,8 +1697,8 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'point_base': 50,  # Temel puan
         'score_multiplier': 0.5,  # Skor çarpanı
         'xp_base': 30,  # Temel XP
-        'xp_score_multiplier': 0.1,  # Skor başına XP
-        '`difficulty_multiplier': 1.0,  # Zorluk çarpanı
+        'xp_score_multiplier': 0.25,  # Skor başına XP - arttırıldı
+        'difficulty_multiplier': 1.0,  # Zorluk çarpanı
         'final_score': None  # Hesaplanacak nihai skor
     }
 
@@ -1732,16 +1732,20 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
     if game_type in game_multipliers:
         multipliers.update(game_multipliers[game_type])
 
-    # Zorluk seviyesine göre çarpanı ayarla
+    # Zorluk seviyesine göre çarpanı ayarla - daha belirgin farklar yaratılıyor
     if difficulty:
         if difficulty == 'easy':
-            multipliers['difficulty_multiplier'] = 0.8
+            multipliers['difficulty_multiplier'] = 1.0  # Kolay seviye temel puan
+            multipliers['xp_base'] = 20  # Kolay seviye temel XP
         elif difficulty == 'medium':
-            multipliers['difficulty_multiplier'] = 1.0
+            multipliers['difficulty_multiplier'] = 1.5  # Orta seviye %50 daha fazla puan
+            multipliers['xp_base'] = 30  # Orta seviye temel XP
         elif difficulty == 'hard':
-            multipliers['difficulty_multiplier'] = 1.5
+            multipliers['difficulty_multiplier'] = 2.5  # Zor seviye %150 daha fazla puan
+            multipliers['xp_base'] = 45  # Zor seviye temel XP
         elif difficulty == 'expert':
-            multipliers['difficulty_multiplier'] = 2.0
+            multipliers['difficulty_multiplier'] = 4.0  # Uzman seviye %300 daha fazla puan
+            multipliers['xp_base'] = 70  # Uzman seviye temel XP
 
     # Eğer oyun istatistikleri verildiyse, daha gerçekçi bir puan hesapla
     if game_stats:
@@ -1983,15 +1987,16 @@ def save_score():
             # 5 dakikadan sonra azalan XP
             xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
         
-        # Zorluk seviyesine göre ek XP bonusu
+        # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
         difficulty_bonus = 1.0
-        if difficulty == 'easy':
-            difficulty_bonus = 0.8
-        elif difficulty == 'medium':
-            difficulty_bonus = 1.0
-        elif difficulty == 'hard':
-            difficulty_bonus = 1.5
-            
+        if difficulty == "easy":
+            difficulty_bonus = 1.0  # Temel değer
+        elif difficulty == "medium":
+            difficulty_bonus = 1.5  # %50 bonus
+        elif difficulty == "hard":
+            difficulty_bonus = 2.5  # %150 bonus
+        elif difficulty == "expert":
+            difficulty_bonus = 4.0  # %300 bonus
         # Tamamlama başarısına göre bonus
         completion_bonus = 0
         if game_stats.get('completed', False):
@@ -2087,15 +2092,16 @@ def save_score():
         # Geliştirilmiş XP hesaplama sistemi (misafir kullanıcılar için)
         xp_base = multipliers['xp_base']
         xp_from_score = score * multipliers['xp_score_multiplier']
-        
-        # Zorluk seviyesine göre ek XP bonusu
+        # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
         difficulty_bonus = 1.0
-        if difficulty == 'easy':
-            difficulty_bonus = 0.8
-        elif difficulty == 'medium':
-            difficulty_bonus = 1.0
-        elif difficulty == 'hard':
-            difficulty_bonus = 1.5
+        if difficulty == "easy":
+            difficulty_bonus = 1.0  # Temel değer
+        elif difficulty == "medium":
+            difficulty_bonus = 1.5  # %50 bonus
+        elif difficulty == "hard":
+            difficulty_bonus = 2.5  # %150 bonus
+        elif difficulty == "expert":
+            difficulty_bonus = 4.0  # %300 bonus
             
         # Oyun süresine göre hesaplama
         playtime_minutes = playtime / 60
