@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
@@ -5,13 +6,24 @@
   <h1 class="articles-title text-center mb-4">Beyin Gelişimi Makaleleri</h1>
   
   <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="game-instructions mb-5 p-4 rounded shadow-sm">
+    <div class="col-lg-9">
+      <div class="game-instructions mb-5 p-4 rounded shadow-sm animate__animated animate__fadeIn">
         <p class="lead text-center">Beyin işlevi, bilişsel gelişim ve beyin eğitimi oyunlarımızın arkasındaki bilim hakkındaki bilgilendirici makaleler koleksiyonumuzu keşfedin.</p>
+        
+        <div class="article-categories mt-4">
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <button class="category-filter-btn active" data-category="all">Tümü</button>
+            <button class="category-filter-btn" data-category="brain-science">Beyin Bilimi</button>
+            <button class="category-filter-btn" data-category="cognitive">Bilişsel Gelişim</button>
+            <button class="category-filter-btn" data-category="research">Yeni Araştırmalar</button>
+            <button class="category-filter-btn" data-category="practical">Pratik Uygulamalar</button>
+          </div>
+        </div>
       </div>
       
+      <!-- Veritabanından gelen makaleler -->
       {% for article in articles %}
-      <div class="article-container mb-5 animate__animated animate__fadeIn">
+      <div class="article-container mb-5 animate__animated animate__fadeIn" data-categories="{{ article.categories|default('all') }}">
         <h2 class="article-title">{{ article.title }}</h2>
         <div class="article-content">
           {{ article.content|safe }}
@@ -20,7 +32,163 @@
       </div>
       {% endfor %}
       
-      <div class="card bg-dark text-center mt-5 p-4 shadow">
+      <!-- Statik olarak eklenmiş yeni makaleler -->
+      <div class="article-container mb-5 animate__animated animate__fadeIn" data-categories="brain-science research">
+        <span class="category-tag">Beyin Bilimi</span>
+        <h2 class="article-title">Nöroplastisite: Beynin Kendini Yenileme Gücü</h2>
+        <div class="article-content">
+          <h3>Beyin Esnekliğinin Bilimi</h3>
+          <p>Nöroplastisite, beynin tüm yaşam boyunca kendini yeniden düzenleme, bağlantılar kurma ve yeni bilgilere adapte olma yeteneğidir. Bu yetenek sayesinde beynimiz sürekli olarak değişir ve gelişir.</p>
+          
+          <p>Yirminci yüzyılın başlarında bilim insanları, beyindeki temel yapıların ve bağlantıların yaşamın erken dönemlerinde oluştuğunu ve sonrasında değişmediğini düşünüyordu. Ancak modern araştırmalar, beynin hayat boyu dinamik bir şekilde değişebildiğini ve yeni nöral yolaklar oluşturabildiğini göstermiştir.</p>
+          
+          <h3>Nöroplastisitenin Türleri</h3>
+          <p>Bilişsel bilimde iki tür nöroplastisite tanımlanmıştır:</p>
+          
+          <ul>
+            <li><strong>Yapısal Plastisite:</strong> Beynin fiziksel yapısındaki değişiklikleri içerir. Yeni nöronların oluşumu (nörogenez), sinapsların güçlenmesi veya zayıflaması ve nöral yolakların yeniden organize edilmesini kapsar.</li>
+            <li><strong>Fonksiyonel Plastisite:</strong> Beynin hasar görmüş alanlarını telafi etmek için kendini nasıl yeniden organize ettiğiyle ilgilidir. Örneğin, bir inme sonrasında belirli beyin bölgeleri hasarlanırsa, sağlam kalan bölgeler zamanla bu işlevleri üstlenebilir.</li>
+          </ul>
+          
+          <h3>Beyin Eğitimi ve Nöroplastisite</h3>
+          <p>Nöroplastisite, beyin eğitimi oyunlarının ve zihinsel aktivitelerin etkililiğinin altında yatan temel mekanizmadır. Yeni beceriler öğrendiğimizde, problem çözdüğümüzde veya bilişsel zorluklarla karşılaştığımızda, beynimiz yeni sinaptik bağlantılar oluşturur ve mevcut olanları güçlendirir.</p>
+          
+          <p>Yakın tarihli bir araştırma, düzenli olarak zorlayıcı zihinsel aktivitelere katılan bireylerin bilişsel rezervlerini artırdıklarını ve bilişsel yaşlanmanın etkilerini geciktirebildiklerini göstermiştir. Bilişsel rezerv, beynin nörolojik hasara veya yaşlanmaya rağmen etkili bir şekilde çalışma kapasitesidir.</p>
+          
+          <h3>Nöroplastisiteyi Destekleyen Faktörler</h3>
+          <p>Bilimsel araştırmalar, aşağıdaki faktörlerin beyin plastisitesini olumlu etkilediğini göstermiştir:</p>
+          
+          <ul>
+            <li><strong>Fiziksel Egzersiz:</strong> Düzenli aerobik egzersiz, beyinde BDNF (Beyin Kaynaklı Nörotrofik Faktör) seviyelerini artırır, bu da nöron sağlığı ve yeni bağlantıların oluşumu için kritik öneme sahiptir.</li>
+            <li><strong>Yeni Deneyimler:</strong> Rutinlerin dışına çıkmak ve yeni beceriler öğrenmek, beyinde yeni nöral yolaklar oluşturur.</li>
+            <li><strong>Sosyal Etkileşim:</strong> Aktif sosyal hayat, beynin çeşitli bölgelerini uyarır ve nöroplastisiteyi destekler.</li>
+            <li><strong>Yeterli Uyku:</strong> Derin uyku sırasında beyin, gün içinde öğrenilen bilgileri konsolide eder ve sinapslarda yapısal değişiklikler gerçekleşir.</li>
+            <li><strong>Dengeli Beslenme:</strong> Omega-3 yağ asitleri, antioksidanlar ve çeşitli vitaminler beyin sağlığı ve plastisitesi için önemlidir.</li>
+          </ul>
+          
+          <p>ZekaPark oyunları, nöroplastisiteyi desteklemek için tasarlanmış bilişsel zorluklar sunarak, beynin uyarlanabilirliğini ve öğrenme kapasitesini güçlendirmeyi amaçlar. Düzenli oynanan beyin eğitimi oyunları, nöral ağların güçlenmesine ve bilişsel performansın artmasına yardımcı olabilir.</p>
+        </div>
+        <p class="article-meta">Yayınlanma: 10.06.2024</p>
+      </div>
+      
+      <div class="article-container mb-5 animate__animated animate__fadeIn" data-categories="cognitive practical">
+        <span class="category-tag">Bilişsel Gelişim</span>
+        <h2 class="article-title">Çalışma Belleği: Günlük Performansın Gizli Kahramanı</h2>
+        <div class="article-content">
+          <h3>Çalışma Belleği Nedir?</h3>
+          <p>Çalışma belleği, bilgiyi geçici olarak depolayan ve manipüle eden bilişsel sistemdir. Günlük görevleri yerine getirmek için sürekli kullandığımız bu sistem, telefon numaralarını kısa süreliğine hatırlamaktan karmaşık problem çözmeye kadar birçok bilişsel işlevi destekler.</p>
+          
+          <p>Psikolog Alan Baddeley tarafından geliştirilen çalışma belleği modeli, dört bileşenden oluşur:</p>
+          
+          <ul>
+            <li><strong>Fonolojik Döngü:</strong> Sesli bilgileri kısa süreli depolayan sistem. Yeni bir kelime öğrenirken veya bir telefon numarasını hatırlarken kullanılır.</li>
+            <li><strong>Görsel-Mekansal Taslak:</strong> Görsel ve mekansal bilgileri işleyen sistem. Bir haritada yön bulmak veya bir nesnenin zihinsel rotasyonunu gerçekleştirmek gibi görevlerde aktiftir.</li>
+            <li><strong>Episodik Tampon:</strong> Farklı bilgi türlerini entegre eden ve uzun süreli bellek ile bağlantı kuran sistem.</li>
+            <li><strong>Merkezi Yönetici:</strong> Diğer bileşenleri koordine eden, bilgi akışını düzenleyen ve dikkat dağıtıcı unsurları filtreleme görevi gören sistem.</li>
+          </ul>
+          
+          <h3>Çalışma Belleği Niçin Önemlidir?</h3>
+          <p>Çalışma belleği kapasitesi, akademik başarıdan profesyonel performansa kadar birçok alanda başarının güçlü bir belirleyicisidir. Araştırmalar, yüksek çalışma belleği kapasitesine sahip bireylerin:</p>
+          
+          <ul>
+            <li>Daha iyi problem çözme becerileri gösterdiğini</li>
+            <li>Yeni bilgileri daha hızlı öğrenebildiğini</li>
+            <li>Dikkat dağıtıcı unsurlara karşı daha dirençli olduğunu</li>
+            <li>Kompleks görevleri daha etkili şekilde yönetebildiğini</li>
+            <li>Dil öğreniminde daha başarılı olduğunu</li>
+          </ul>
+          
+          <h3>Çalışma Belleğini Geliştirmek Mümkün mü?</h3>
+          <p>Bilimsel araştırmalar, çalışma belleği kapasitesinin hedefli egzersizlerle geliştirilebileceğini göstermektedir. Beyin plastisitesi sayesinde, düzenli pratik ile çalışma belleği performansı artırılabilir.</p>
+          
+          <p>Etkili çalışma belleği egzersizleri şunları içerir:</p>
+          
+          <ul>
+            <li><strong>N-back Görevleri:</strong> Bu görevlerde, bir dizi uyaran sunulur ve kişinin belirli bir sayı (n) kadar önceki uyaranı hatırlaması istenir. Bu tip görevler, bilginin aktif olarak tutulmasını ve güncellenmesini gerektirir.</li>
+            <li><strong>Dual-task Eğitimi:</strong> Aynı anda iki farklı görevin yürütülmesini gerektiren egzersizler, bilişsel kaynakların daha etkili dağıtılmasını sağlar.</li>
+            <li><strong>Karmaşık Span Görevleri:</strong> Bilgi işleme ve depolama görevlerini birleştiren bu egzersizler, bir problem çözerken aynı anda bilgileri akılda tutmayı gerektirir.</li>
+            <li><strong>Tersine Sayı Dizisi Hatırlama:</strong> Sunulan bir dizi sayıyı ters sırada hatırlama egzersizleri, hem depolama hem de bilgiyi manipüle etme becerilerini geliştirir.</li>
+          </ul>
+          
+          <h3>ZekaPark'ta Çalışma Belleği Geliştirme</h3>
+          <p>ZekaPark platformunda yer alan birçok oyun, çalışma belleği kapasitesini geliştirmek üzere tasarlanmıştır:</p>
+          
+          <ul>
+            <li><strong>N-Back Oyunu:</strong> Çalışma belleğini doğrudan hedefleyen, bilişsel nörobilimde kanıtlanmış bir egzersiz.</li>
+            <li><strong>Hafıza Kartları:</strong> Görsel-mekansal belleği ve bilgilerin eşleştirilmesini çalıştırır.</li>
+            <li><strong>Sayı Dizileri:</strong> Fonolojik döngüyü ve sayısal bilgilerin işlenmesini geliştirir.</li>
+            <li><strong>Sesli Hafıza:</strong> İşitsel bellek kapasitesini ve ses kalıplarını tanıma yeteneğini artırır.</li>
+          </ul>
+          
+          <p>Çalışma belleğini geliştirmeye yönelik oyunları düzenli olarak oynamak, günlük yaşamdaki bilişsel performansınızı artırabilir ve zihinsel çevikliğinizi geliştirebilir. Bu oyunlardan en fazla faydayı sağlamak için, zorluk seviyesini kademeli olarak artırmak ve çeşitli bilişsel becerileri çalıştıran farklı oyunlar oynamak önemlidir.</p>
+        </div>
+        <p class="article-meta">Yayınlanma: 15.06.2024</p>
+      </div>
+      
+      <div class="article-container mb-5 animate__animated animate__fadeIn" data-categories="research practical">
+        <span class="category-tag">Yeni Araştırmalar</span>
+        <h2 class="article-title">Bilişsel Eğitim ve Dijital Oyunlar: Güncel Araştırma Bulguları</h2>
+        <div class="article-content">
+          <h3>Dijital Bilişsel Eğitimin Etkisi</h3>
+          <p>Son on yılda, dijital bilişsel eğitim programlarının etkililiği konusunda çok sayıda bilimsel araştırma yapılmıştır. Bu araştırmalar, beyin eğitimi oyunlarının belirli koşullar altında ve düzenli kullanıldığında, bilişsel becerileri geliştirme potansiyeline sahip olduğunu göstermektedir.</p>
+          
+          <p>2020 yılında yayınlanan kapsamlı bir meta-analiz çalışması, dijital bilişsel eğitim programlarının özellikle şu alanlarda olumlu etkiler gösterdiğini ortaya koymuştur:</p>
+          
+          <ul>
+            <li>İşlem hızı (26 çalışma, ortalama etki büyüklüğü d = 0.35)</li>
+            <li>Çalışma belleği (31 çalışma, ortalama etki büyüklüğü d = 0.24)</li>
+            <li>Yürütücü işlevler (18 çalışma, ortalama etki büyüklüğü d = 0.20)</li>
+            <li>Dikkat kontrolü (22 çalışma, ortalama etki büyüklüğü d = 0.26)</li>
+          </ul>
+          
+          <h3>Transfer Etkisi: Laboratuvardan Gerçek Hayata</h3>
+          <p>Bilişsel eğitim araştırmalarındaki en önemli soru, oyunlarda kazanılan becerilerin günlük yaşama transfer edilip edilemediğidir. Bu konuda yapılan araştırmalar karışık sonuçlar vermektedir.</p>
+          
+          <p>Yakın transfer (benzer görevlere aktarım) genellikle gözlemlenirken, uzak transfer (farklı bilişsel alanlara veya günlük yaşam becerilerine aktarım) konusunda bulgular daha sınırlıdır. Ancak yeni araştırmalar, şu faktörlerin transfer etkisini artırabileceğini göstermektedir:</p>
+          
+          <ul>
+            <li><strong>Eğitim Süresi ve Yoğunluğu:</strong> Haftada en az 3 gün, 20-30 dakikalık seanslar ve en az 8 haftalık programlar daha etkili transfer sağlar.</li>
+            <li><strong>Adaptif Zorluk:</strong> Kullanıcının performansına göre zorluk seviyesini otomatik olarak ayarlayan programlar daha etkilidir.</li>
+            <li><strong>Çeşitlilik:</strong> Tek bir bilişsel beceriye odaklanmak yerine, çeşitli bilişsel becerileri çalıştıran programlar daha geniş transfer etkisi gösterir.</li>
+            <li><strong>Motivasyon ve Angajman:</strong> Katılımcıların motivasyonunu yüksek tutan, oyunlaştırma öğeleri içeren programlar daha etkilidir.</li>
+          </ul>
+          
+          <h3>Yaş Gruplarına Göre Etkinlik</h3>
+          <p>Bilişsel eğitim programlarının etkinliği yaş gruplarına göre farklılık göstermektedir:</p>
+          
+          <p><strong>Çocuklar ve Ergenler:</strong> Gelişim dönemindeki beynin plastisitesi nedeniyle, genç katılımcılar genellikle dijital bilişsel eğitimden daha fazla fayda görür. Özellikle dikkat eksikliği ve öğrenme güçlüğü olan çocuklarda olumlu sonuçlar elde edilmiştir.</p>
+          
+          <p><strong>Yetişkinler:</strong> Çalışan profesyoneller arasında yapılan araştırmalar, düzenli bilişsel eğitimin iş performansındaki dikkat, çoklu görev yönetimi ve problem çözme becerilerini geliştirebildiğini göstermektedir.</p>
+          
+          <p><strong>Yaşlı Yetişkinler:</strong> 65 yaş üstü bireylerde yapılan çalışmalar, bilişsel eğitimin yaşa bağlı bilişsel gerilemeyi yavaşlatabileceğini ve bağımsız yaşam becerilerini korumaya yardımcı olabileceğini göstermektedir. Özellikle işlem hızı ve çalışma belleği eğitiminin etkileri daha belirgindir.</p>
+          
+          <h3>Beyin Görüntüleme Çalışmaları</h3>
+          <p>Fonksiyonel manyetik rezonans görüntüleme (fMRI) ve elektroensefalografi (EEG) kullanılan son çalışmalar, bilişsel eğitim sonrasında beyinde ölçülebilir değişiklikler olduğunu göstermektedir:</p>
+          
+          <ul>
+            <li>Prefrontal korteks ve parietal lob aktivasyonunda artış</li>
+            <li>Beyaz madde bütünlüğünde iyileşme</li>
+            <li>Nöral ağ bağlantılılığında artış</li>
+            <li>Beyin aktivitesinde daha verimli kalıplar</li>
+          </ul>
+          
+          <h3>Etkili Bilişsel Eğitim İçin Öneriler</h3>
+          <p>Bilimsel araştırma bulgularına dayanarak, ZekaPark kullanıcılarına şu önerilerde bulunabiliriz:</p>
+          
+          <ul>
+            <li>Haftada en az 3-4 gün, 20-30 dakikalık düzenli pratik yapın</li>
+            <li>Kendinizi zorlayan ama motive eden zorluk seviyelerinde çalışın</li>
+            <li>Tek bir oyun yerine, farklı bilişsel becerileri hedefleyen çeşitli oyunlar oynayın</li>
+            <li>İlerlemenizi takip edin ve zamanla performansınızdaki değişimleri gözlemleyin</li>
+            <li>Bilişsel eğitimi fiziksel egzersiz, sağlıklı beslenme ve kaliteli uyku gibi beyin sağlığını destekleyen diğer alışkanlıklarla birleştirin</li>
+          </ul>
+          
+          <p>ZekaPark, güncel bilimsel araştırmalara dayanarak sürekli olarak oyunlarını ve öğrenme algoritimlerini güncellemektedir. Amacımız, kullanıcılarımıza eğlenceli bir deneyimin yanı sıra, bilimsel olarak etkili bilişsel eğitim fırsatları sunmaktır.</p>
+        </div>
+        <p class="article-meta">Yayınlanma: 20.06.2024</p>
+      </div>
+      
+      <div class="card bg-dark text-center mt-5 p-4 shadow animate__animated animate__fadeIn">
         <div class="card-body">
           <h3 class="card-title">Beyin Gelişiminizi Destekleyin</h3>
           <p class="card-text">Öğrendiğiniz bilgileri pratik etmek için oyunlarımızı deneyin ve becerilerinizi geliştirin!</p>
@@ -47,8 +215,86 @@
     articles.forEach((article, index) => {
       setTimeout(() => {
         article.classList.add('show');
-      }, index * 100);
+      }, index * 150);
+    });
+    
+    // Kategori filtreleme
+    const filterBtns = document.querySelectorAll('.category-filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Aktif sınıfı kaldır
+        filterBtns.forEach(b => b.classList.remove('active'));
+        // Tıklanan düğmeye aktif sınıfı ekle
+        this.classList.add('active');
+        
+        const selectedCategory = this.getAttribute('data-category');
+        
+        // Makaleleri filtrele
+        articles.forEach(article => {
+          const categories = article.getAttribute('data-categories') || 'all';
+          if (selectedCategory === 'all' || categories.includes(selectedCategory)) {
+            article.style.display = 'block';
+            // Animasyon efektini yeniden uygula
+            article.classList.remove('show');
+            setTimeout(() => {
+              article.classList.add('show');
+            }, 10);
+          } else {
+            article.style.display = 'none';
+          }
+        });
+      });
     });
   });
 </script>
+
+<style>
+  /* Article page specific styles */
+  .category-filter-btn {
+    border: none;
+    background-color: rgba(40, 40, 80, 0.5);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 15px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .category-filter-btn:hover {
+    background-color: rgba(60, 60, 120, 0.7);
+    transform: translateY(-2px);
+  }
+  
+  .category-filter-btn.active {
+    background: linear-gradient(135deg, rgba(120, 104, 230, 0.7), rgba(255, 77, 107, 0.7));
+    box-shadow: 0 4px 12px rgba(120, 104, 230, 0.3);
+    border-color: rgba(120, 104, 230, 0.5);
+  }
+  
+  .article-container {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  
+  .article-container.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .category-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, rgba(120, 104, 230, 0.2), rgba(255, 77, 107, 0.2));
+    color: var(--accent-color);
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(120, 104, 230, 0.3);
+  }
+</style>
 {% endblock %}
