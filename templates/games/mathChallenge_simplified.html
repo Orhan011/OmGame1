@@ -730,7 +730,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  saveResultBtn.addEventListener('click', saveResult);
+  saveResultBtn.addEventListener('click', () => {
+    try {
+      saveResult();
+    } catch (error) {
+      console.error("Error saving result:", error);
+      alert("Sonuç kaydedilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+    }
+  });
   playAgainBtn.addEventListener('click', function() {
     showScreen(startScreen);
   });
@@ -883,8 +890,19 @@ document.addEventListener('DOMContentLoaded', function() {
     totalTimeDisplay.textContent = `${totalTime} sn`;
     
     // Derecelendirme sistemini başlat
-    if (window.RatingHandler) {
-      window.RatingHandler.createGameResultRating('math_challenge', 'rating-container');
+    try {
+      if (window.RatingHandler) {
+        window.RatingHandler.createGameResultRating('math_challenge', 'rating-container');
+      } else {
+        console.warn("RatingHandler is not available");
+        // Rating-container'ı görünür yap ama boş olarak
+        const ratingContainer = document.getElementById('rating-container');
+        if (ratingContainer) {
+          ratingContainer.innerHTML = '<p>Derecelendirme sistemi şu anda kullanılamıyor.</p>';
+        }
+      }
+    } catch (error) {
+      console.error("Error initializing rating system:", error);
     }
     
     // Show result screen
@@ -902,31 +920,57 @@ document.addEventListener('DOMContentLoaded', function() {
       time_played: totalTime
     };
     
-    // Post score to backend
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        game_type: 'math_challenge',
-        score: score,
-        difficulty: currentLevel <= 3 ? 'easy' : (currentLevel <= 6 ? 'medium' : 'hard'),
-        playtime: totalTime,
-        game_stats: gameStats
+    // Zorluk seviyesini belirle
+    const difficulty = currentLevel <= 3 ? 'easy' : (currentLevel <= 6 ? 'medium' : 'hard');
+    
+    // ScoreHandler ile skoru kaydet
+    if (window.ScoreHandler) {
+      console.log("Saving score for math_challenge:", score, "points, difficulty:", difficulty);
+      window.ScoreHandler.saveScore('math_challenge', score, difficulty, totalTime, gameStats)
+        .then(data => {
+          console.log("Score saved successfully:", data);
+          
+          if (data.success) {
+            saveResultBtn.disabled = true;
+            saveResultBtn.textContent = 'SONUÇ KAYDEDİLDİ';
+            
+            // Seviye artışı göster (eğer varsa)
+            if (data.xp && data.xp.level_up) {
+              // Level up bildirimi zaten ScoreHandler içinde gösteriliyor
+              console.log("Level up detected:", data.xp.old_level, "to", data.xp.level);
+            }
+          }
+        })
+        .catch(error => {
+          console.error("Error saving score:", error);
+        });
+    } else {
+      // ScoreHandler yoksa doğrudan API'ye istek at
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          game_type: 'math_challenge',
+          score: score,
+          difficulty: difficulty,
+          playtime: totalTime,
+          game_stats: gameStats
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Score saved:", data);
-      if (data.success) {
-        saveResultBtn.disabled = true;
-        saveResultBtn.textContent = 'SONUÇ KAYDEDİLDİ';
-      }
-    })
-    .catch(error => {
-      console.error("Error saving score:", error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        console.log("Score saved:", data);
+        if (data.success) {
+          saveResultBtn.disabled = true;
+          saveResultBtn.textContent = 'SONUÇ KAYDEDİLDİ';
+        }
+      })
+      .catch(error => {
+        console.error("Error saving score:", error);
+      });
+    }
   }
   
   // Helper Functions
