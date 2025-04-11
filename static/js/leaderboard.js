@@ -107,7 +107,7 @@ function loadLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username ? (player.username.length > 15 ? player.username.substring(0, 15) + '...' : player.username) : 'İsimsiz Oyuncu'}</div>
+                <div class="player-name ${userNameColorClass}">${player.username ? (player.username.length > 10 ? player.username.substring(0, 10) + '...' : player.username) : 'İsimsiz Oyuncu'}</div>
                 ${player.rank ? `<div class="player-rank">${player.rank.length > 12 ? player.rank.substring(0, 12) + '...' : player.rank}</div>` : ''}
               </div>
             </div>
@@ -296,7 +296,7 @@ function loadLevelLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${playerData.username ? (playerData.username.length > 15 ? playerData.username.substring(0, 15) + '...' : playerData.username) : 'İsimsiz Oyuncu'}</div>
+                <div class="player-name ${userNameColorClass}">${playerData.username ? (playerData.username.length > 10 ? playerData.username.substring(0, 10) + '...' : playerData.username) : 'İsimsiz Oyuncu'}</div>
                 <div class="player-stats">
                   <span class="level-badge">XP: ${playerData.total_xp}</span>
                   ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}

@@ -998,3 +998,272 @@
   margin-right: 3px;
   font-size: 0.7rem;
 }
+.score-value.level-value {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.score-value.level-value {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Loading and empty states */
+.loading, .empty-state, .error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 16px;
+  margin-top: 2rem;
+}
+
+.loading i, .empty-state i, .error i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #6a5ae0;
+}
+
+.error i {
+  color: #ff5252;
+}
+
+.loading p, .empty-state p, .error p {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+}
+
+.loading i {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Avatar ve taç stilleri */
+.player-avatar {
+  position: relative;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.crown {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: gold;
+  font-size: 18px;
+  z-index: 10;
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* Kullanıcı adı renkleri */
+.first-place {
+  color: gold !important;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  font-weight: 700;
+}
+
+.second-place {
+  color: silver !important;
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+  font-weight: 700;
+}
+
+.third-place {
+  color: #cd7f32 !important; /* Bronz renk */
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+  font-weight: 700;
+}
+
+.top-ten {
+  color: #6a5ae0 !important; /* Mor tonu */
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .leaderboard-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .leaderboard-header p {
+    font-size: 1rem;
+  }
+
+  .rank-block {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+
+  .player-avatar {
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+  }
+
+  .avatar-content {
+    font-size: 1.1rem;
+  }
+
+  .player-name {
+    font-size: 1rem;
+  }
+
+  .score-container {
+    padding: 6px 12px;
+  }
+
+  .score-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .leaderboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .leaderboard-table-container {
+    padding: 5px;
+  }
+
+  .row-content {
+    padding: 5px 0;
+  }
+
+  .rank-block {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+
+  .avatar-content {
+    font-size: 0.9rem;
+  }
+
+  .player-name {
+    font-size: 0.9rem;
+  }
+
+  .score-block {
+    width: 90px;
+  }
+
+  .score-container {
+    padding: 4px 10px;
+  }
+
+  .score-value {
+    font-size: 0.9rem;}
+}
+
+@media (max-width: 576px) {
+  .player-row {
+    grid-template-columns: 60px 1fr 100px;
+    padding: 0.8rem 1rem;
+  }
+
+  .leaderboard-header-row {
+    grid-template-columns: 60px 1fr 100px;
+    padding: 0.8rem 1rem;
+  }
+
+  .player-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .player-cell {
+    gap: 0.8rem;
+  }
+
+  .rank-cell {
+    width: 40px;
+    font-size: 1.2rem;
+  }
+
+  .player-name {
+    font-size: 1rem;
+  }
+
+  .score-value {
+    font-size: 1.1rem;
+  }
+}
+
+/* Liderlik Tablosu Stilleri */
+
+/* Seviye Badge Renkleri */
+.level-container.level-advanced {
+  background: linear-gradient(45deg, #4a7def, #3b5fe1);
+  box-shadow: 0 4px 15px rgba(74, 125, 239, 0.3);
+}
+
+.level-container.level-expert {
+  background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+  box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+.level-container.level-master {
+  background: linear-gradient(45deg, #ff9800, #f57c00);
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.level-container.level-elite {
+  background: linear-gradient(45deg, #f44336, #d32f2f);
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
+  }
+}
+
+.rank-badge {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  margin-right: 5px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rank-badge i {
+  margin-right: 3px;
+  font-size: 0.7rem;
+}
