@@ -1431,7 +1431,7 @@ def register():
             # Kullanıcı kaydı başarılı mesajı
             logger.info(f"Yeni kullanıcı kaydedildi: {username} ({email})")
             
-            # Hoş geldiniz e-postası gönder
+            # Her durumda hoş geldiniz e-postası gönder (hesap silindikten sonra bile)
             send_welcome_email(email, username)
             
             # Başarılı mesajını göster
@@ -1818,6 +1818,9 @@ def delete_account():
     try:
         # Kullanıcının skorlarını sil
         Score.query.filter_by(user_id=user.id).delete()
+        
+        # Kullanıcının derecelendirmelerini sil
+        GameRating.query.filter_by(user_id=user.id).delete()
 
         # Kullanıcıyı sil
         db.session.delete(user)
