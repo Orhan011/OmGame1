@@ -1,3 +1,4 @@
+
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard();
@@ -83,6 +84,44 @@ function loadLeaderboard() {
             <div class="player-cell">
               <div class="player-avatar">
                 ${crownHTML}
+                ${avatarUrl ? 
+                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                   <span class="avatar-content" style="display:none">${initial}</span>` : 
+                  `<span class="avatar-content">${initial}</span>`
+                }
+              </div>
+              <div class="player-info">
+                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
+                ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
+              </div>
+            </div>
+            <div class="score-cell">
+              <div class="score-container">
+                <span class="score-value">${player.total_score || 0}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+
+      leaderboardContainer.innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Skor verileri yüklenirken hata:', error);
+      leaderboardContainer.innerHTML = `
+        <div class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+          <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
+        </div>
+      `;
+    });
+}
 
 // Seviye tablosunu yükleyen fonksiyon
 function loadLevelLeaderboard() {
@@ -211,45 +250,6 @@ function loadLevelLeaderboard() {
           <i class="fas fa-exclamation-triangle"></i>
           <p>Seviye bilgileri yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
           <button onclick="loadLevelLeaderboard()" class="retry-button">Tekrar Dene</button>
-        </div>
-      `;
-    });
-}
-
-                ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                   <span class="avatar-content" style="display:none">${initial}</span>` : 
-                  `<span class="avatar-content">${initial}</span>`
-                }
-              </div>
-              <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
-                ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
-              </div>
-            </div>
-            <div class="score-cell">
-              <div class="score-container">
-                <span class="score-value">${player.total_score || 0}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      html += `
-          </div>
-        </div>
-      `;
-
-      leaderboardContainer.innerHTML = html;
-    })
-    .catch(error => {
-      console.error('Skor verileri yüklenirken hata:', error);
-      leaderboardContainer.innerHTML = `
-        <div class="error">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-          <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
         </div>
       `;
     });
