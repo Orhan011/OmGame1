@@ -57,7 +57,7 @@ if (!window.ScoreHandler) {
       game_stats: gameStats
     };
 
-    console.log(`Saving score for ${gameType}: ${score} points, difficulty: ${difficulty}`);
+    console.log(`Puanlar kaydediliyor: ${gameType}: ${score} puan, zorluk: ${difficulty}`);
 
     // API'ye POST isteği
     return fetch('/api/save-score', {

@@ -402,7 +402,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
 
     // Skor verisinde sorun olup olmadığını kontrol et
     if (!gameType || score === undefined || score === null) {
-      console.error('Invalid score data:', scoreData);
+      console.error('Geçersiz skor verisi:', scoreData);
 
       if (typeof callback === 'function') {
         callback(''); // Boş içerik döndür
@@ -410,7 +410,7 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
       return;
     }
 
-    console.log(`Saving score for ${gameType}: ${score} points, difficulty: ${difficulty}`);
+    console.log(`Kullanıcı profiline puan kaydediliyor: ${gameType}: ${score} puan, zorluk: ${difficulty}`);
 
     // Skoru API'ye gönder
     fetch('/api/save-score', {
@@ -566,7 +566,31 @@ function calculateAndDisplayScore(scoreParams, callback) {
   try {
     // ScoreCalculator modülü var mı kontrol et
     if (!window.ScoreCalculator) {
-      console.error('ScoreCalculator modülü bulunamadı!');
+      console.error('ScoreCalculator modülü bulunamadı! Yedek hesaplama kullanılıyor.');
+      
+      // Basit bir hesaplama yap
+      const baseScore = 50;
+      const difficultyMultiplier = scoreParams.difficulty === 'easy' ? 0.8 : 
+                                 scoreParams.difficulty === 'hard' ? 1.5 : 
+                                 scoreParams.difficulty === 'expert' ? 2.0 : 1.0;
+      
+      const finalScore = Math.max(10, Math.min(100, Math.round(baseScore * difficultyMultiplier)));
+      
+      console.log("Yedek standartlaştırılmış puan:", finalScore);
+      
+      // API'ye kaydet
+      saveScoreAndDisplay(
+        scoreParams.gameType,
+        finalScore,
+        scoreParams.timeSpent || 60,
+        scoreParams.difficulty || 'medium',
+        {
+          ...scoreParams,
+          fallbackScore: true
+        },
+        callback
+      );
+      
       return;
     }
     
@@ -591,12 +615,18 @@ function calculateAndDisplayScore(scoreParams, callback) {
     
     // Hata durumunda basit bir skor hesapla
     const fallbackScore = Math.max(10, Math.min(100, Math.round(Math.random() * 50) + 40));
+    console.log("Hata nedeniyle yedek puan kullanılıyor:", fallbackScore);
+    
     saveScoreAndDisplay(
       scoreParams.gameType, 
       fallbackScore,
       scoreParams.timeSpent || 60,
       scoreParams.difficulty || 'medium',
-      scoreParams,
+      {
+        ...scoreParams,
+        error: true,
+        errorMessage: error.message
+      },
       callback
     );
   }

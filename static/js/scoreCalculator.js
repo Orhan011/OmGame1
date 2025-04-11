@@ -34,6 +34,19 @@ window.ScoreCalculator = {
    */
   calculate: function(gameData) {
     try {
+      if (!gameData) {
+        console.error("Geçersiz oyun verisi!");
+        return {
+          finalScore: 50,
+          breakdown: {
+            baseScore: 30,
+            difficultyMultiplier: 1.0,
+            difficulty: 'medium',
+            error: true
+          }
+        };
+      }
+      
       const { 
         gameType,         // Oyun tipi (örn. 'puzzle', 'wordle', 'tetris', vb.)
         difficulty = 'medium', // Zorluk seviyesi (easy, medium, hard, expert)
