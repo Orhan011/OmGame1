@@ -2550,7 +2550,7 @@ def get_aggregated_scores():
             User.id == aggregated.c.user_id
         ).order_by(
             aggregated.c.total_score.desc()
-        ).all()  # Tüm kullanıcıları göstermek için limit kaldırıldı
+        ).limit(10).all()  # En yüksek 10 kullanıcı
 
         scores = []
         for user_id, username, avatar_url, rank, total_score in result:
