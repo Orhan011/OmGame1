@@ -1224,13 +1224,21 @@ def logout():
 def xp_for_level(level):
     """
     Belirli bir seviyeye ulaşmak için gereken toplam XP değerini hesaplar.
-    Her seviye için sabit 100 XP gerekir.
-    - Basitleştirilmiş, anlaşılır bir seviye sistemi
-    - Her seviye için aynı miktar XP (100 puan)
-    - Kullanıcıların daha hızlı seviye atlamasını sağlar
+    Her seviye yükseldikçe gereken XP miktarı artar.
+    - 1. seviye: 100 XP
+    - 2. seviye: 300 XP toplam (100 + 200)
+    - 3. seviye: 600 XP toplam (300 + 300)
+    - 4. seviye: 1000 XP toplam (600 + 400)
+    - Her seviye için gereken XP, seviye sayısı × 100 olarak artar
     """
-    # Her seviye için sabit 100 XP
-    return (level - 1) * 100
+    if level <= 1:
+        return 0
+    
+    total_xp = 0
+    for i in range(1, level):
+        total_xp += i * 100
+    
+    return total_xp
 
 def calculate_level(xp):
     """
