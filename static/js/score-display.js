@@ -4,52 +4,8 @@
  * @return {string} HTML içeriği
  */
 function createScoreDisplay(scoreData) {
-    // Eğer veri yoksa
-    if (!scoreData) {
-        return `<div class="score-display">
-            <h3>Puan verisi alınamadı!</h3>
-            <p>Lütfen tekrar deneyin veya yöneticiyle iletişime geçin.</p>
-        </div>`;
-    }
-
-    // Kullanıcı giriş yapmamışsa
-    if (scoreData.guest) {
-        return `<div class="score-display guest-score">
-            <h3>Skorunuz Kaydedilmedi!</h3>
-            <p>Puan: <strong>${scoreData.points.total}</strong></p>
-            <div class="score-breakdown">
-                <p>Taban Puan: ${scoreData.points.rewards.base_points}</p>
-                <p>Oyun Puanı: ${scoreData.points.rewards.score_points}</p>
-                <p>Zorluk Çarpanı: ${scoreData.points.rewards.difficulty_multiplier}x</p>
-            </div>
-            <p class="login-message">Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun.</p>
-        </div>`;
-    }
-
-    // Kullanıcı giriş yapmış
-    return `<div class="score-display user-score">
-        <h3>Tebrikler!</h3>
-        <p class="total-score">Puan: <strong>${scoreData.points.total}</strong></p>
-        
-        <div class="score-breakdown">
-            <p>Taban Puan: ${scoreData.points.rewards.base_points}</p>
-            <p>Oyun Puanı: ${scoreData.points.rewards.score_points}</p>
-            ${scoreData.points.rewards.daily_bonus > 0 ? 
-                `<p>Günlük Bonus: +${scoreData.points.rewards.daily_bonus}</p>` : ''}
-            ${scoreData.points.rewards.streak_bonus > 0 ? 
-                `<p>Streak Bonus: +${scoreData.points.rewards.streak_bonus}</p>` : ''}
-            <p>Zorluk Çarpanı: ${scoreData.points.rewards.difficulty_multiplier}x</p>
-        </div>
-        
-        <div class="xp-display">
-            <p>Kazanılan XP: <strong>+${scoreData.xp.gain}</strong></p>
-            <p>Seviye: ${scoreData.xp.level}</p>
-            <div class="xp-progress-container">
-                <div class="xp-progress-bar" style="width: ${scoreData.xp.progress_percent}%;"></div>
-            </div>
-            <p class="xp-progress-text">${scoreData.xp.progress}/${scoreData.xp.needed} XP</p>
-        </div>
-    </div>`;
+    // Boş HTML döndür - Puan gösterimi kapatıldı
+    return '';
 }
 
 /**
@@ -80,13 +36,9 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         // Skor verisinde sorun olup olmadığını kontrol et
         if (!gameType || score === undefined || score === null) {
             console.error('Invalid score data:', scoreData);
-            const errorHtml = `<div class="score-display error">
-                <h3>Hata!</h3>
-                <p>Geçersiz skor verisi. Lütfen tekrar deneyin.</p>
-            </div>`;
             
             if (typeof callback === 'function') {
-                callback(errorHtml);
+                callback(''); // Boş içerik döndür
             }
             return;
         }
@@ -150,25 +102,17 @@ function saveScoreAndDisplay(gameType, score, playtime, difficulty = 'medium', g
         })
         .catch(error => {
             console.error('Error saving score:', error);
-            const errorHtml = `<div class="score-display error">
-                <h3>Hata!</h3>
-                <p>Skor kaydedilirken bir hata oluştu: ${error.message}</p>
-            </div>`;
             
             if (typeof callback === 'function') {
-                callback(errorHtml);
+                callback(''); // Boş içerik döndür
             }
         });
     })
     .catch(error => {
         console.error('Error checking user status:', error);
-        const errorHtml = `<div class="score-display error">
-            <h3>Hata!</h3>
-            <p>Kullanıcı durumu kontrol edilirken bir hata oluştu.</p>
-        </div>`;
         
         if (typeof callback === 'function') {
-            callback(errorHtml);
+            callback(''); // Boş içerik döndür
         }
     });
 }

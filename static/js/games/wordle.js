@@ -572,11 +572,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /**
-   * Puan göstergesini günceller
+   * Puan göstergesini günceller - artık puan gösterimi yapılmıyor
    */
   function updateScoreDisplay() {
-    if (scoreDisplay) scoreDisplay.textContent = gameState.score;
-    if (streakDisplay) streakDisplay.textContent = gameState.streak;
+    // Puan gösterimi kapatıldı
     if (guessesDisplay) guessesDisplay.textContent = `${gameState.currentRow}/6`;
   }
 
@@ -611,10 +610,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Skoru veritabanına kaydet (kazanınca)
     saveScoreWithDetails(gameState.score);
     
-    // Sonuç ekranını hazırla
-    finalScore.textContent = gameState.score;
+    // Sonuç ekranını hazırla (puanlar gizlendi)
+    if (finalScore) finalScore.style.display = 'none';
     attemptsCount.textContent = `${gameState.currentRow}/6`;
-    finalStreak.textContent = gameState.streak;
+    if (finalStreak) finalStreak.style.display = 'none';
     answerReveal.textContent = gameState.answer;
     
     if (isWin) {
@@ -839,11 +838,11 @@ document.addEventListener('DOMContentLoaded', function() {
       success: gameState.answer === gameState.guesses[gameState.currentRow-1]?.join('')
     };
     
-    // Yeni skor gösterimi için callback fonksiyonu
+    // Yeni skor gösterimi için callback fonksiyonu - artık puan gösterimi yapılmıyor
     const updateScoreDisplay = function(scoreHtml, data) {
       const scoreContainer = document.getElementById('game-score-container');
       if (scoreContainer) {
-        scoreContainer.innerHTML = scoreHtml;
+        scoreContainer.innerHTML = ''; // Skor gösterimi kapatıldı
       }
     };
     

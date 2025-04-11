@@ -1212,51 +1212,23 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       console.log('Score saved:', data);
       
-      // Yeni puan ve XP verilerini göster
-      if (data.success) {
-        const xpGainElement = document.getElementById('xp-gain');
-        const currentLevelElement = document.getElementById('current-level');
-        const xpInfoElement = document.querySelector('.tetris-xp-info');
-        const guestInfoElement = document.getElementById('guest-info');
-        
-        // Misafir kullanıcı kontrolü
-        if (data.guest) {
-          // Misafir kullanıcı bilgilerini göster
-          if (guestInfoElement) {
-            guestInfoElement.style.display = 'block';
-          }
-        }
-        
-        if (xpGainElement && currentLevelElement && xpInfoElement) {
-          // XP verilerini güncelle
-          xpGainElement.textContent = data.xp.gain;
-          currentLevelElement.textContent = data.xp.level || 1;
-          
-          // Bonus puanlarını ve detayları göster
-          const finalScoreContainer = document.querySelector('.tetris-final-score');
-          if (finalScoreContainer) {
-            // Diğer veriler için yeni elementler oluştur
-            // Puan detayları
-            const bonusDetails = document.createElement('div');
-            bonusDetails.className = 'tetris-bonus-details';
-            
-            // Yeni puanlama sistem bilgisi
-            let scoringSystemInfo = '';
-            if (data.score_info && data.score_info.total_score) {
-              scoringSystemInfo = `
-                <div class="tetris-scoring-systems">
-                  <div class="tetris-scoring-title">Puanlama Detayları:</div>
-                  <div class="tetris-bonus-item">
-                    <span>Oyun Skoru:</span>
-                    <strong>${score}</strong>
-                  </div>
-                  <div class="tetris-bonus-item">
-                    <span>Performans Puanı:</span>
-                    <strong>${data.score_info.total_score}</strong>
-                  </div>
-                </div>
-              `;
-            }
+      // Puan gösterimi kapatıldı
+      const xpInfoElement = document.querySelector('.tetris-xp-info');
+      const guestInfoElement = document.getElementById('guest-info');
+      
+      // Tüm skor gösterim elementlerini gizle
+      if (xpInfoElement) {
+        xpInfoElement.style.display = 'none';
+      }
+      
+      if (guestInfoElement) {
+        guestInfoElement.style.display = 'none';
+      }
+      
+      const finalScoreContainer = document.querySelector('.tetris-final-score');
+      if (finalScoreContainer) {
+        finalScoreContainer.style.display = 'none';
+      }
             
             bonusDetails.innerHTML = `
               <div class="tetris-bonus-item">

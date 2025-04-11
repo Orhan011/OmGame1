@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
     winMessage.style.display = isWin ? 'block' : 'none';
     loseMessage.style.display = isWin ? 'none' : 'block';
     
-    // Sonuç istatistiklerini göster
+    // Sonuç istatistiklerini göster (puan bilgileri gizlendi)
     resultTime.textContent = formatTime(gameState.timer);
     
     switch (gameState.difficulty) {
@@ -552,6 +552,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     resultMines.textContent = gameState.mines;
+    
+    // Puan bilgilerini gösterme - gizli tut
+    const scoreElements = document.querySelectorAll('.score-display, .game-score-container');
+    scoreElements.forEach(el => {
+      if (el) el.style.display = 'none';
+    });
     
     // Kazanılmışsa skoru kaydet
     if (isWin) {

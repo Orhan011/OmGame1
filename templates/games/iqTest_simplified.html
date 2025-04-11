@@ -71,11 +71,12 @@
         </div>
       </div>
       
-      <!-- Sonuç ekranı -->
+      <!-- Sonuç ekranı - Puan gösterimi kaldırıldı -->
       <div id="result-screen" class="test-screen">
         <h2>Test Tamamlandı!</h2>
         
-        <div class="iq-score">
+        <!-- Puan gösterimi gizlendi -->
+        <div class="iq-score" style="display: none;">
           <div class="score-ring">
             <span id="iq-score">120</span>
           </div>
@@ -666,8 +667,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const correctCount = calculateCorrectAnswers();
     const iqScore = calculateIQScore(correctCount);
     
-    // Update result screen
-    iqScoreEl.textContent = iqScore;
+    // Update result screen (puan gösterimi kapatıldı)
+    iqScoreEl.textContent = iqScore; // Öğe gizli olsa da değeri güncel tutalım
     correctAnswersEl.textContent = `${correctCount}/${totalQuestions}`;
     
     // Calculate completion time
@@ -764,7 +765,10 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("Score saved:", data);
       if (data.success) {
         saveResultBtn.disabled = true;
-        saveResultBtn.textContent = 'SONUÇ KAYDEDİLDİ';
+        saveResultBtn.textContent = 'KAYDEDİLDİ';
+        
+        // Seviye atlama mesajını gösterme (silindi)
+        // Puan gösterim kaldırıldı
       }
     })
     .catch(error => {
