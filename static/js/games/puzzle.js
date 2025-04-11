@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Seslerin ön yüklemesi
   const sounds = {
     pickup: new Audio('data:audio/wav;base64,UklGRiQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAEAAD+/wMA+v8IAA8ABgAIABkA9v/o//v/AgAFABQA/P/P/+3/AsAPAAQAyf+h/7T/2//9//H/vf+Z/7P/2P8DAA0A+/+9/8L/x//z/+//zv+//+7/8v/R/7r/qf/E/9X/AwAQAPL/xP/V/+z/6P/1//z/9//f/+X/7v8QAAEA7P/c/9f/vP/R//L/5/++/9D//f8hAAUA0f/a/9X/CQAMAPz/4//X/9//AQD2/x0A9v/3/wMAxf/n/wcAFgACAPP//P8GAAcAAgAHAAEADgAQAAwA+v/5/+L/8/8DABcA+P/6/+X/5P/s/+P/2P/P//j/7f/e/9H/5//1//P/7/8IAAQA+f8QAAwAKQAEAO//9f/l/wMA4//1/wAA3//0//D/BQAUAOv/8v/4/w4ABwAJABIA9v/6/+f/8v/t//n/6f8CAOv/9P/X/9//8//9/+v/4//n//n//f8aAAgABwADAAUA7v/O/9v/8f/2//j/7P/0//3/6//8/wsACgADAPL/6//4/+7/8v/r/+v/+f/5//b//v/9//7/AgACAAAA9v/t//f//v8GAPH/8P/0//T/+P/5//n//f8BAAIA/f/5//j/+f/7//3//v///wEA///9//z//f8AAAMAAQAAAP7//v8AAAEAAQAAAP7//v///wEAAQABAAAA//8AAAAAAAAAAAAAAAAAAAEAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
-    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
+    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
     complete: new Audio('data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQADAAD////////+//////7//v/////////+/////v////////////7////+//////////////7////9////+//5//j/+v/7//v//P/+//7///8AAP////8AAAAA/v///wAAAAD//wAA//8AAP//AQD+/wAAAAACAP//AQD9/wAA//8DAP//AgD8/wEA/v8DAP//AwD7/wEA/f8FAAIABAACAAEA/f8CAAUABQAFAPz/AAD//wMAAwAHAP//AgDy/wIAAQAHAAAA//8OAAoADgAHAAUAEgD//xIACwADAPD/AAD4//H/CAAEABIA7v/x/wYA7//7//X/7f/z/wcA8v/P//T/y/8cAP//LQAaAA0AFgAEAP//z/8MAPL/HQAdACwAEQD7/wQA4P8iAN//EAAtAAQAUQA0AP//8//u//r/5P/z/+j/3//H//b/6v8kAPD/8P8KAOf/FgD3/wEADQDu//j/3//3/w8A6f8PAOv/3v8YAOv/FwD9/wIAAwDv//H/7f8MAAAADwAfAAcAJgA5APj/KwAcAPL/CQASAOf/NQACAPb/9/8CAPL/AwD//xMATABBAEYAKwAWAP3/9P8FAOz/AgDm/wQA5v/W/9z/zf/p//7//v8IAAEABgAEAP7///8GAAQABgAEAP7/AAAGAP//AQAAAP7/AAABAP//AgD//wEAAAD+/wAAAQD//wEA//8BAP//AgAAAP//AAABAP7/AQAAAP//AgAAAP//AAABAP//AwD+/wEA/v8BAP//AgD//wEA//8BAP//AgD//wEAAAD//wEAAAD//wEA//8CAP//AgD//wEA//8BAAAA//8BAAAA//8BAP//AQD//wEA//8BAAAAAAD//wEA//8BAP//AQAAAP//AQAAAP//AQD//wEA//8BAAAAAAAAAAAAAQD//wEA/////wAA//8BAAAAAAD//wAAAAAAAAEA/////wAA//8=')
   };
 
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <circle cx="85" cy="75" r="5" fill="#555555"/>
     </svg>`,
 
-    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    `<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http`://www.w3.org/2000/svg">
       <rect x="0" y="0" width="300" height="300" fill="#f1c40f"/>
       <!-- Sarı Arka plan -->
       <!-- Emoji Yüz -->
@@ -956,51 +956,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Gerçekçi puan hesaplama sistemi (10-100 arası)
+  /**
+   * Gerçekçi puan hesaplama sistemi (10-100 arası)
+   */
   function calculateRealScore() {
-    // Temel parametreler
+    // Yapılan hamle ve süreye göre basit bir puan hesaplaması
     const totalPieces = gameState.grid.rows * gameState.grid.cols;
-    const optimalMoves = totalPieces * 1.5; // Optimal hamle sayısı
-    const optimalTime = 60 + (totalPieces * 5); // Zorluk seviyesine göre optimal süre (saniye)
-    const timeSpent = 300 - gameState.timeRemaining; // Harcanan süre
-    const hintsUsed = gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0; // Kullanılan ipucu tahmini
+    const timeSpent = 300 - gameState.timeRemaining;
 
-    // Temel puan - oyun zorluğuna göre
-    let baseScore;
-    if (gameState.difficulty === 'EASY') {
-      baseScore = 60;
-    } else if (gameState.difficulty === 'MEDIUM') {
-      baseScore = 75;
-    } else { // HARD
-      baseScore = 90;
+    // Zorluk seviyesine göre basit bir çarpan
+    let difficultyMultiplier = 1;
+    if (gameState.difficulty === 'MEDIUM') {
+      difficultyMultiplier = 1.5;
+    } else if (gameState.difficulty === 'HARD') {
+      difficultyMultiplier = 2;
     }
 
-    // Hamle verimliliği puanı (maksimum 30 puan)
-    let moveEfficiencyScore = 30;
-    if (gameState.moves > optimalMoves) {
-      // Optimal hamle sayısını aşınca puanı azalt
-      moveEfficiencyScore = Math.max(0, moveEfficiencyScore - ((gameState.moves - optimalMoves) / optimalMoves) * 30);
-    }
-
-    // Zaman verimliliği puanı (maksimum 30 puan)
-    let timeEfficiencyScore = 30;
-    if (timeSpent > optimalTime) {
-      // Optimal süreyi aşınca puanı azalt
-      timeEfficiencyScore = Math.max(0, timeEfficiencyScore - ((timeSpent - optimalTime) / optimalTime) * 30);
-    }
-
-    // İpucu cezası (her ipucu 5 puan düşürür)
-    const hintPenalty = hintsUsed * 5;
-
-    // Yanlış hamlelerin cezası (maksimum 15 puan)
-    const wrongMoves = Math.max(0, gameState.moves - gameState.correctPlacements);
-    const wrongMovePenalty = Math.min(15, wrongMoves * 1.5);
-
-    // Toplam puanı hesapla
-    let finalScore = baseScore + moveEfficiencyScore + timeEfficiencyScore - hintPenalty - wrongMovePenalty;
-
-    // Puanı 10-100 aralığına sınırla
-    finalScore = Math.max(10, Math.min(100, Math.round(finalScore)));
+    // Temel puan hesaplama
+    let finalScore = Math.max(10, Math.min(100, Math.round(80 * difficultyMultiplier)));
 
     // Sonuç ekranı için puanı kaydet
     gameState.finalCalculatedScore = finalScore;
