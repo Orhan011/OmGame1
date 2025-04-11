@@ -2113,8 +2113,7 @@ def reset_password():
 # Oyun zorluğuna göre puan ve XP çarpanı hesaplama fonksiyonu
 def calculate_multipliers(game_type, difficulty=None, game_stats=None):
     """
-    Oyun türüne, zorluğuna ve oyun istatistiklerine göre puan ve XP çarpanlarını hesaplar.
-    Tüm oyunlar için standardize edilmiş 10-100 arası puan sistemi uygular.
+    Oyun türüne, zorluğuna ve oyun istatistiklerine göre puan ve XP çarpanlarını hesaplar
 
     Args:
         game_type (str): Oyun türü
@@ -2131,9 +2130,7 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'xp_base': 30,  # Temel XP
         'xp_score_multiplier': 0.25,  # Skor başına XP - arttırıldı
         'difficulty_multiplier': 1.0,  # Zorluk çarpanı
-        'final_score': None,  # Hesaplanacak nihai skor
-        'min_score': 10,  # Minimum skor sınırı (HİÇBİR OYUN BU DEĞERİN ALTINA İNEMEZ)
-        'max_score': 100  # Maksimum skor sınırı (HİÇBİR OYUN BU DEĞERİN ÜZERİNE ÇIKAMAZ)
+        'final_score': None  # Hesaplanacak nihai skor
     }
 
     # Oyun türüne göre özel çarpanlar
@@ -2271,13 +2268,11 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         # Zorluk seviyesi katsayısını uygula
         adjusted_score = raw_score * multipliers['difficulty_multiplier']
 
-        # Sınırları uygula (10-100 arası) - TÜM oyunlar için zorunlu sınır
+        # Sınırları uygula (10-100 arası)
         final_score = max(10, min(100, int(adjusted_score)))
 
         # Nihai puanı ayarla
         multipliers['final_score'] = final_score
-        
-        logger.debug(f"TÜM oyunlar için 10-100 arası skor sınırı uygulandı: {final_score}")
 
     return multipliers
 
@@ -2363,9 +2358,8 @@ def save_score():
         # Toplam puanı hesapla
         total_points = base_points + score_points + duration_points
 
-        # Sınırları uygula (10-100 arası) - Her zaman katı sınırlar
-        total_points = max(multipliers['min_score'], min(multipliers['max_score'], int(total_points)))
-        logger.debug(f"Katı skor sınırları uygulandı ({multipliers['min_score']}-{multipliers['max_score']}): {total_points}")
+        # Sınırları uygula (10-100 arası)
+        total_points = max(10, min(100, int(total_points)))
 
         multipliers['total_score'] = int(total_points)
         logger.debug(f"Standart skor hesaplaması: base={base_points}, score={score_points}, time={duration_points}, total={total_points}")
@@ -2406,9 +2400,6 @@ def save_score():
 
         # Toplam puanı hesapla
         total_points = base_points + score_points + daily_bonus + streak_bonus
-        
-        # Puan sınırlarını uygula (10-100 arası)
-        total_points = max(multipliers['min_score'], min(multipliers['max_score'], int(total_points)))
 
         # Geliştirilmiş XP hesaplama sistemi
         # Temel XP değeri (oyun türü ve zorluğa göre)
@@ -2453,9 +2444,6 @@ def save_score():
         # Yeni skoru kaydet (orijinal oyun skorunu ve zorluk seviyesini kullanarak)
         # Zorluk seviyesine göre düzenlenmiş skoru hesapla
         adjusted_score = int(score * multipliers['difficulty_multiplier'])
-        
-        # Ayarlanmış skor da aynı sınırlar içerisinde olmalı (10-100 arası)
-        adjusted_score = max(multipliers['min_score'], min(multipliers['max_score'], adjusted_score))
 
         new_score = Score(
             user_id=user_id,
@@ -2561,10 +2549,6 @@ def save_score():
         # Misafir kullanıcıya göstermek için toplam XP - giriş yapınca alabilecekleri miktar
         xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus)
         total_points = base_points + score_points
-        
-        # Misafir kullanıcılar için de katı puan sınırlarını uygula (10-100 arası) 
-        total_points = max(multipliers['min_score'], min(multipliers['max_score'], int(total_points)))
-        logger.debug(f"Misafir kullanıcı için katı skor sınırları uygulandı ({multipliers['min_score']}-{multipliers['max_score']}): {total_points}")
 
         # Misafir kullanıcılara bilgi mesajı
         guest_message = "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun."
