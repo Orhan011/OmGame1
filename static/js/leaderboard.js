@@ -78,18 +78,19 @@ function loadLeaderboard() {
   console.log('Liderlik tablosu verileri getiriliyor...');
   
   // İlk olarak doğrudan kullanıcı verilerini getir
-  fetch('/api/users/all?limit=1000&nocache=' + new Date().getTime())
+  // Doğrudan aggregated scores API'yi kullan - toplam puanları almak için en uygun olanı
+  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
-        console.log('Kullanıcı API başarısız, skor API deneniyor...');
-        return fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime());
+        console.log('Toplam puanlar API başarısız, alternatif API deneniyor...');
+        return fetch('/api/users/top?limit=1000&nocache=' + new Date().getTime());
       }
       return response;
     })
     .then(response => {
       if (!response.ok) {
         console.log('İkinci API de başarısız, son API deneniyor...');
-        return fetch('/api/leaderboard/all?nocache=' + new Date().getTime());
+        return fetch('/api/current-user');
       }
       return response;
     })
@@ -110,21 +111,27 @@ function loadLeaderboard() {
         // Tüm olası puan alanlarını kontrol et
         let scoreValue = 0;
         
+        // Öncelikle total_score değerini kontrol et (User modelindeki toplam puan değeri)
         if (player.total_score !== undefined && player.total_score !== null) {
-          scoreValue = player.total_score;
-        } else if (player.score !== undefined && player.score !== null) {
-          scoreValue = player.score;
+          scoreValue = parseInt(player.total_score);
+        } 
+        // Eğer total_score yoksa diğer alanlara bak
+        else if (player.score !== undefined && player.score !== null) {
+          scoreValue = parseInt(player.score);
         } else if (player.points !== undefined && player.points !== null) {
-          scoreValue = player.points;
+          scoreValue = parseInt(player.points);
         } else if (player.experience_points !== undefined && player.experience_points !== null) {
           // Deneyim puanları da gösterilebilir
-          scoreValue = player.experience_points;
+          scoreValue = parseInt(player.experience_points);
         }
         
         // Sayısal değer kontrolü
         if (isNaN(scoreValue) || scoreValue === null) {
           scoreValue = 0;
         }
+        
+        // Debug bilgisi
+        console.log(`Oyuncu ${player.username || 'İsimsiz'} puanı: ${scoreValue}`);
         
         return {
           ...player,
@@ -318,23 +325,30 @@ function createLeaderboardHtml(players) {
     // Tüm olası puan alanlarını kontrol et
     let scoreValue = 0;
     
+    // Eğer daha önce hesaplanmış bir skor varsa onu kullan
     if (player.calculated_score !== undefined) {
-      scoreValue = player.calculated_score;
-    } else if (player.total_score !== undefined && player.total_score !== null) {
-      scoreValue = player.total_score;
-    } else if (player.score !== undefined && player.score !== null) {
-      scoreValue = player.score;
+      scoreValue = parseInt(player.calculated_score);
+    } 
+    // Öncelikle total_score değerini kontrol et (User modelindeki toplam puan değeri)
+    else if (player.total_score !== undefined && player.total_score !== null) {
+      scoreValue = parseInt(player.total_score);
+    } 
+    // Eğer total_score yoksa diğer alanlara bak
+    else if (player.score !== undefined && player.score !== null) {
+      scoreValue = parseInt(player.score);
     } else if (player.points !== undefined && player.points !== null) {
-      scoreValue = player.points;
+      scoreValue = parseInt(player.points);
     } else if (player.experience_points !== undefined && player.experience_points !== null) {
       // Deneyim puanları da gösterilebilir
-      scoreValue = player.experience_points;
+      scoreValue = parseInt(player.experience_points);
     }
     
-    // Sayısal değer kontrolü
+    // Sayısal değer kontrolü ve düzeltme
     if (isNaN(scoreValue) || scoreValue === null) {
       scoreValue = 0;
     }
+    
+    console.log(`createLeaderboardHtml: Oyuncu ${player.username || 'İsimsiz'} puanı: ${scoreValue}`);
     
     return {
       ...player,
@@ -421,7 +435,8 @@ function updateProfileScores() {
     const totalPointsElements = document.querySelectorAll('.total-points-value');
 
     if (totalScoreElement || totalPointsElements.length > 0) {
-      fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+      // Doğrudan aggregated scores API'yi kullan (daha tutarlı veri için)
+      fetch('/api/scores/aggregated?nocache=' + new Date().getTime())
         .then(response => {
           if (!response.ok) {
             throw new Error(`Sunucu yanıtı hatalı: ${response.status}`);
