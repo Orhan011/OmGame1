@@ -101,7 +101,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
         from email.mime.text import MIMEText
         
         from_email = "omgameee@gmail.com"
-        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+        password = "nevq zfmo lzvg nxkl"  # Yeni app şifresi (uygulama şifresi)
         
         # E-posta mesajını oluştur
         smtp_msg = MIMEMultipart()
@@ -150,10 +150,8 @@ def send_verification_email(to_email, verification_code, html_message=None):
         bool: E-posta gönderme işleminin başarılı olup olmadığı
     """
     try:
-        # ÖNEMLI: Bu kodu her zaman konsolda göster, böylece kullanıcı
-        # e-postalar çalışmasa bile kodu görebilir
-        print(f"ÖNEMLİ - DOĞRULAMA KODU: {verification_code} - E-posta: {to_email}")
-        logger.info(f"Doğrulama kodu gönderiliyor: {to_email}, Kod: {verification_code}")
+        # Sadece sistem loglarına yaz, kullanıcıya gösterme
+        logger.info(f"Doğrulama kodu gönderiliyor: {to_email}")
         
         # Eğer özel mesaj belirtilmediyse, default şablonu kullan
         if not html_message:
@@ -196,20 +194,16 @@ def send_verification_email(to_email, verification_code, html_message=None):
             # Fallback: SMTP ile e-posta gönder
             try:
                 send_email_in_background(to_email, "OmGame - Şifre Sıfırlama Doğrulama Kodu", html_message)
+                return True
             except Exception as smtp_error:
                 logger.error(f"SMTP ile e-posta gönderimi de başarısız: {str(smtp_error)}")
-            
-            # E-posta gönderim hatası olsa bile, kod zaten konsola yazıldı
-            # Her durumda başarılı kabul edilebilir
-            return True
+                # E-posta gönderimi başarısız
+                return False
     
     except Exception as e:
         logger.error(f"Doğrulama e-postası gönderme hatası: {str(e)}")
-        # Hatanın detayını konsola da yazdır
-        print(f"E-POSTA HATASI: {str(e)}")
-        print(f"ÖNEMLİ: Doğrulama kodunuz: {verification_code}")
-        # Her durumda başarılı döndür, çünkü kod konsola yazdırıldı
-        return True
+        # Hatanın detayını loglara yazdır ama ekranda gösterme
+        return False
 
 
 def send_welcome_email(to_email, username):
@@ -1323,10 +1317,10 @@ def forgot_password():
             # Log mesajı ekle
             logger.info(f"{email} için şifre sıfırlama kodu oluşturuldu: {reset_code}")
         
-        # Her durumda kodu konsola yazdır
-        print(f"ŞİFRE SIFIRLAMA KODU: {reset_code} - E-posta: {email}")
+        # Sadece sistem loglarına yaz, konsola değil (sadece debug amaçlı)
+        logger.info(f"ŞİFRE SIFIRLAMA KODU (sadece loglarda): {reset_code} - E-posta: {email}")
         
-        # E-posta göndermeye çalış (başarısız olsa bile kodla devam edilecek)
+        # E-posta gönderme işlemi
         email_sent = False
         try:
             email_sent = send_verification_email(email, reset_code)
@@ -1334,13 +1328,13 @@ def forgot_password():
             logger.error(f"E-posta gönderme hatası: {str(e)}")
             email_sent = False
         
-        # Kodu session'da sakla ve ekranda göster
+        # Kodu session'da sakla ama ekranda gösterme
         session['verification_code_display'] = reset_code
         
         if email_sent:
-            flash(f'Doğrulama kodunuz e-posta olarak gönderildi ve burada da görüntüleniyor: {reset_code}', 'success')
+            flash('Doğrulama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
         else:
-            flash(f'E-posta gönderilemedi, ancak doğrulama kodunuz: {reset_code}', 'warning')
+            flash('E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'error')
             
         return redirect(url_for('reset_code', email=email))
 
@@ -1444,7 +1438,7 @@ def reset_code():
                 if user.reset_token_expiry and user.reset_token_expiry < datetime.utcnow():
                     flash('Doğrulama kodunun süresi dolmuş. Lütfen yeni bir kod talep edin.', 'danger')
                 else:
-                    flash('Geçersiz doğrulama kodu! Lütfen ekranda görünen veya e-postanıza gönderilen kodu doğru girdiğinizden emin olun.', 'danger')
+                    flash('Geçersiz doğrulama kodu! Lütfen e-postanıza gönderilen kodu doğru girdiğinizden emin olun.', 'danger')
                 
                 return render_template('reset_code.html', email=email)
                 
