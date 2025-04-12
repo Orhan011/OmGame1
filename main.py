@@ -26,11 +26,6 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
 app.secret_key = os.environ.get("SESSION_SECRET", "beyin_egzersizi_gizli_anahtar")
 
-# Password reset blueprint'ini içe aktar
-from password_reset import password_reset
-# Blueprint'i kaydet
-app.register_blueprint(password_reset)
-
 # Yükleme klasörü ayarları
 UPLOAD_FOLDER = 'static/uploads/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

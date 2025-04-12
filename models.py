@@ -26,7 +26,6 @@ class User(db.Model):
     account_status = db.Column(db.String(20), default='active')
     reset_token = db.Column(db.String(100))
     reset_token_expiry = db.Column(db.DateTime)
-    reset_verification_code = db.Column(db.String(10))  # Şifre sıfırlama doğrulama kodu
     suspended_until = db.Column(db.DateTime)
     # Oyun ve bonus istatistikleri
     streak_count = db.Column(db.Integer, default=0)  # Ardışık oynama günü sayısı
