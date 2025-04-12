@@ -82,15 +82,21 @@ function updateDisplays(responseData = null) {
       updateUserDataDisplay(responseData);
     }
     
-    // Profil puanlarını güncelle (mevcutsa)
-    if (typeof updateProfileScores === 'function') {
-      console.log('Profil puanları güncelleniyor...');
+    // Profil puanlarını güncelle (LeaderboardManager veya global fonksiyon ile)
+    if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.updateProfileScores === 'function') {
+      console.log('Profil puanları güncelleniyor... (LeaderboardManager ile)');
+      window.LeaderboardManager.updateProfileScores();
+    } else if (typeof updateProfileScores === 'function') {
+      console.log('Profil puanları güncelleniyor... (global fonksiyon ile)');
       updateProfileScores();
     }
     
-    // Liderlik tablosunu güncelle (mevcutsa)
-    if (typeof loadLeaderboard === 'function') {
-      console.log('Liderlik tablosu güncelleniyor...');
+    // Liderlik tablosunu güncelle (LeaderboardManager veya global fonksiyon ile)
+    if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.loadLeaderboard === 'function') {
+      console.log('Liderlik tablosu güncelleniyor... (LeaderboardManager ile)');
+      window.LeaderboardManager.loadLeaderboard();
+    } else if (typeof loadLeaderboard === 'function') {
+      console.log('Liderlik tablosu güncelleniyor... (global fonksiyon ile)');
       loadLeaderboard();
     }
     
@@ -384,3 +390,21 @@ window.validateScore = validateScore;
 window.testScoreAPI = testScoreAPI;
 window.calculateStandardizedScore = calculateStandardizedScore;
 window.calculateAndSaveScore = calculateAndSaveScore;
+
+// ScoreHandler nesnesi - tüm operasyonlar için daha modern bir API
+window.ScoreHandler = {
+  saveScore,
+  updateDisplays,
+  validateDifficulty,
+  validateScore,
+  testScoreAPI,
+  calculateStandardizedScore,
+  calculateAndSaveScore,
+  updateProfileScores: function() {
+    if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.updateProfileScores === 'function') {
+      window.LeaderboardManager.updateProfileScores();
+    } else if (typeof updateProfileScores === 'function') {
+      updateProfileScores();
+    }
+  }
+};
