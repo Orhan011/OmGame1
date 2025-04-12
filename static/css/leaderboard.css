@@ -141,8 +141,10 @@
 }
 
 .player-row:hover {
-  background: rgba(106, 90, 224, 0.1);
-  transform: translateX(5px);
+  background: rgba(106, 90, 224, 0.15);
+  transform: translateX(5px) scale(1.02);
+  z-index: 2;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .rank-cell {
@@ -626,39 +628,114 @@
   color: transparent;
 }
 
+/* Modernleştirilmiş seviye göstergesi */
+.level-stats-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.level-number-indicator {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 10px rgba(106, 90, 224, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.xp-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .level-progress {
-  width: 90%;
+  width: 100%;
   height: 6px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  margin-top: 5px;
+  border-radius: 10px;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, #6a5ae0, #9f8aff);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px rgba(106, 90, 224, 0.5);
 }
 
-.progress-text {
-  position: absolute;
-  right: 5px;
-  top: -10px;
-  font-size: 0.6rem;
-  color: #8a8aa3;
+.xp-text {
+  font-size: 0.7rem;
+  color: #9f8aff;
+  margin-top: 3px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Seviye renklerine göre seviye numarası stilleri */
+.level-container.level-advanced .level-number-indicator {
+  background: linear-gradient(45deg, #4a7def, #3b5fe1);
+  box-shadow: 0 2px 10px rgba(74, 125, 239, 0.5);
+}
+
+.level-container.level-expert .level-number-indicator {
+  background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+  box-shadow: 0 2px 10px rgba(156, 39, 176, 0.5);
+}
+
+.level-container.level-master .level-number-indicator {
+  background: linear-gradient(45deg, #ff9800, #f57c00);
+  box-shadow: 0 2px 10px rgba(255, 152, 0, 0.5);
+}
+
+.level-container.level-elite .level-number-indicator {
+  background: linear-gradient(45deg, #f44336, #d32f2f);
+  box-shadow: 0 2px 10px rgba(244, 67, 54, 0.5);
+  animation: glow 2s infinite alternate;
 }
 
 .level-container {
   background: rgba(106, 90, 224, 0.2);
   border: 1px solid rgba(106, 90, 224, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+}
+
+.level-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.3);
 }
 
 .level-value {
   font-weight: 700;
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.level-value::before {
+  content: "\f19d"; /* Mezuniyet şapkası ikonu */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 0.9rem;
 }
 
 .row {

@@ -395,12 +395,21 @@ function loadLevelLeaderboard() {
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
-        // Seviye ilerleme çubuğu
+        // Seviye ve XP ilerleme göstergesi
         const progressPercent = playerData.progress_percent || 0;
+        const currentXP = playerData.total_xp || 0;
+        const levelDisplay = playerData.level || 1;
+        
+        // Modernleştirilmiş ilerleme göstergesi
         const progressBarHTML = `
-          <div class="level-progress">
-            <div class="progress-bar" style="width: ${progressPercent}%"></div>
-            <span class="progress-text">${progressPercent}%</span>
+          <div class="level-stats-container">
+            <div class="level-number-indicator">${levelDisplay}</div>
+            <div class="xp-stats">
+              <div class="level-progress">
+                <div class="progress-bar" style="width: ${progressPercent}%"></div>
+              </div>
+              <span class="xp-text">${currentXP} XP</span>
+            </div>
           </div>
         `;
 
