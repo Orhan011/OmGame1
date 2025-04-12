@@ -60,86 +60,90 @@ import threading
 
 def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
     """
-    Arka planda e-posta gönderme işlemini gerçekleştirir.
-    Bu sayede kullanıcı e-posta gönderilmesini beklemek zorunda kalmaz.
+    E-posta gönderme işlemini gerçekleştirir.
+    Flask-Mail entegrasyonu ile e-posta gönderimi.
     """
-    def send_email_task():
-        try:
-            # Gmail SMTP ayarları
-            from_email = "omgameee@gmail.com"
-            password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-
-            # Doğrulama kodu loglanıyor
-            if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
-                import re
-                code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
-                if code_match:
-                    verification_code = code_match.group(1)
-                    logger.info(f"Gönderilen Doğrulama Kodu: {verification_code}")
-            
-            # E-posta oluştur
-            msg = MIMEMultipart()
-            msg['From'] = f"{from_name} <{from_email}>"
-            msg['To'] = to_email
-            msg['Subject'] = subject
-            
-            # HTML içeriğini ekle
-            msg.attach(MIMEText(html_body, 'html'))
-            
-            # SMTP bağlantısı ve gönderim - SSL kullanarak
+    try:
+        # Flask-Mail kullanarak e-posta gönderimi
+        from app import mail
+        from flask_mail import Message
+        
+        # Doğrulama kodu loglanıyor
+        if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+            import re
+            code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
+            if code_match:
+                verification_code = code_match.group(1)
+                logger.info(f"Gönderilen Doğrulama Kodu: {verification_code}")
+                # Konsola da yazdır
+                print(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
+        
+        # E-posta mesajını oluştur
+        msg = Message(
+            subject=subject,
+            recipients=[to_email],
+            html=html_body,
+            sender=(from_name, "omgameee@gmail.com")
+        )
+        
+        # E-postayı gönder
+        def send_message_task():
             try:
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-                server.login(from_email, password)
-                text = msg.as_string()
-                server.sendmail(from_email, to_email, text)
-                server.quit()
+                mail.send(msg)
                 logger.info(f"E-posta başarıyla gönderildi: {to_email}")
                 return True
-            except smtplib.SMTPException as smtp_error:
-                logger.error(f"SMTP hatası: {str(smtp_error)}")
-                # SSL başarısız olursa TLS ile deneyelim
+            except Exception as e:
+                logger.error(f"Flask-Mail ile e-posta gönderirken hata: {str(e)}")
+                
+                # Alternatif yöntem - doğrudan SMTP
                 try:
-                    server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
-                    server.starttls()
+                    # Gmail SMTP ayarları
+                    import smtplib
+                    from email.mime.multipart import MIMEMultipart
+                    from email.mime.text import MIMEText
+                    
+                    from_email = "omgameee@gmail.com"
+                    password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+                    
+                    smtp_msg = MIMEMultipart()
+                    smtp_msg['From'] = f"{from_name} <{from_email}>"
+                    smtp_msg['To'] = to_email
+                    smtp_msg['Subject'] = subject
+                    smtp_msg.attach(MIMEText(html_body, 'html'))
+                    
+                    server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
                     server.login(from_email, password)
-                    text = msg.as_string()
+                    text = smtp_msg.as_string()
                     server.sendmail(from_email, to_email, text)
                     server.quit()
-                    logger.info(f"E-posta TLS ile başarıyla gönderildi: {to_email}")
+                    logger.info(f"Alternatif yöntemle e-posta başarıyla gönderildi: {to_email}")
                     return True
-                except smtplib.SMTPException as tls_error:
-                    logger.error(f"TLS SMTP hatası: {str(tls_error)}")
+                except Exception as smtp_e:
+                    logger.error(f"Alternatif SMTP ile de e-posta gönderilemedi: {str(smtp_e)}")
                     return False
-        except Exception as e:
-            logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
-            return False
-    
-    # Doğrulama kodunu doğrudan logla (yedek olarak)
-    if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
-        import re
-        code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
-        if code_match:
-            verification_code = code_match.group(1)
-            print(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
-            logger.info(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
-    
-    try:
-        # Direkt senkron olarak göndermeyi deneyelim (e-posta gönderimi kritik olduğundan)
-        result = send_email_task()
-        if result:
-            return True
-            
-        # Senkron gönderim başarısız olursa arka planda deneyelim
-        email_thread = threading.Thread(target=send_email_task)
-        email_thread.daemon = True
-        email_thread.start()
-        logger.info(f"E-posta gönderme thread'i başlatıldı: {to_email}")
+        
+        # Direkt senkron olarak gönder
+        send_result = send_message_task()
+        
+        # Başarısız olursa, arka planda tekrar dene
+        if not send_result:
+            # Thread ile tekrar dene
+            email_thread = threading.Thread(target=send_message_task)
+            email_thread.daemon = True
+            email_thread.start()
+            logger.info(f"E-posta gönderme thread'i başlatıldı: {to_email}")
+        
         return True
-    except Exception as thread_error:
-        logger.error(f"E-posta gönderme hatası: {str(thread_error)}")
+        
+    except Exception as e:
+        logger.error(f"E-posta gönderme işlemi sırasında hata: {str(e)}")
         # En azından kodu konsola yazdır
         if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
-            print(f"E-POSTA GÖNDERİLEMEDİ! E-posta: {to_email}")
+            import re
+            code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
+            if code_match:
+                verification_code = code_match.group(1)
+                print(f"E-POSTA GÖNDERİLEMEDİ! Kod: {verification_code}, E-posta: {to_email}")
         return False
 
 def send_welcome_email(to_email, username):

@@ -34,14 +34,16 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     }
 }
 
-# E-posta yapılandırması
+# E-posta yapılandırması - Gmail SMTP ayarları
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465  # SSL bağlantısı için 465 portu kullanılıyor
-app.config['MAIL_USE_SSL'] = True  # TLS yerine SSL kullanarak daha güvenli bağlantı
-app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True  # SSL kullanarak daha güvenli bağlantı
+app.config['MAIL_USE_TLS'] = False  # SSL kullanıldığında TLS kapalı olmalı
 app.config['MAIL_USERNAME'] = 'omgameee@gmail.com'  # OmGame email adresi
-app.config['MAIL_PASSWORD'] = 'ithkbmqvkzuwosjv'  # App şifresi
+app.config['MAIL_PASSWORD'] = 'ithkbmqvkzuwosjv'  # App şifresi (uygulama şifresi)
 app.config['MAIL_DEFAULT_SENDER'] = ('OmGame', 'omgameee@gmail.com')
+app.config['MAIL_MAX_EMAILS'] = 10  # Bir bağlantıda gönderilebilecek maksimum e-posta sayısı
+app.config['MAIL_ASCII_ATTACHMENTS'] = False  # UTF-8 destekli ekler için
 app.config['MAIL_DEBUG'] = True  # Mail gönderim hatalarını detaylı görmek için
 app.config['MAIL_SUPPRESS_SEND'] = False  # Test modunda mail gönderimini devre dışı bırakmak için
 
