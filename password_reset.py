@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import random
 import string
 import logging
+import os
 
 from models import db, User
 
@@ -175,8 +176,8 @@ def forgot_password():
                 from email.mime.text import MIMEText
                 
                 from_email = "omgameee@gmail.com"
-                # Güncellenmiş uygulama şifresi - Gmail için özel olarak oluşturulmuş bir şifre olmalıdır
-                password = "dmzp lnwm mcjc qifu"  # Uygulama şifresi
+                # Çevresel değişkenden alınan Gmail uygulama şifresi
+                password = os.environ.get('GMAIL_APP_PASSWORD', '')  # Uygulama şifresi - None gelirse boş string kullan
                 from_name = "OmGame"
                 
                 # E-posta mesajını oluştur

@@ -113,7 +113,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         from email.mime.text import MIMEText
         
         from_email = "omgameee@gmail.com"
-        password = "dmzp lnwm mcjc qifu"  # Güncellenmiş uygulama şifresi
+        password = os.environ.get('GMAIL_APP_PASSWORD')  # Çevresel değişkenden alınan Gmail uygulama şifresi
         
         # E-posta mesajını oluştur
         smtp_msg = MIMEMultipart()
