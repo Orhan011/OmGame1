@@ -1,122 +1,70 @@
-
 /**
- * Gelişmiş iOS Tarzı Swipe Navigasyon - CSS
- * Gerçek iOS benzeri gösterimi ve fizik animasyonlarıyla
+ * iOS Tarzı Swipe Navigasyon - CSS
+ * Tam iOS benzeri animasyonlarla
  */
 
-/* Sayfa temel konteyner stilleri */
+/* Body stili */
 body {
   overflow-x: hidden;
   position: relative;
   width: 100%;
   touch-action: pan-y;
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   transform: translateZ(0);
-  -webkit-transform: translateZ(0);
   will-change: transform;
   transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
-  background-color: #f2f2f7; /* iOS arka plan rengi */
 }
 
-/* Ana sayfa konteyner katmanı */
-.swipe-page-container {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  z-index: 10;
-  background-color: inherit;
-  transform: translateX(0);
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Kenar gölgesi */
-.swipe-shadow-overlay {
+/* Gölge overlay - iOS kenar gölgesi */
+.shadow-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 10px;
   height: 100%;
-  z-index: 15;
-  box-shadow: inset 8px 0 15px -8px rgba(0, 0, 0, 0.7);
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
   opacity: 0;
+  z-index: 9999;
   pointer-events: none;
-}
-
-/* Arka plan kaplaması */
-.swipe-background-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
-  z-index: 5;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Önceki sayfa önizlemesi */
-.previous-page-preview {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: inherit;
-  transform: translateX(-30%);
-  z-index: 1;
   display: none;
-  overflow: hidden;
+  transition: opacity 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
 }
 
-/* Önizleme başlık alanı */
-.preview-header {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  height: 50px;
-  background: rgba(248, 248, 248, 0.9);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* Ana sayfa container'ı */
+.page-container {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* Geri simge göstergesi */
-.back-indicator {
-  margin-right: 8px;
+/* IOS Benzeri Sayfa Geçişleri */
+.page-transition-enter {
+  transform: translateX(100%);
 }
 
-/* Önizleme başlık metni */
-.preview-title {
-  font-size: 17px;
-  font-weight: 500;
-  color: #007AFF;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.page-transition-enter-active {
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
 }
 
-/* Önizleme içerik alanı */
-.preview-content {
-  background-color: rgba(250, 250, 250, 0.7);
-  height: calc(100% - 50px);
-  opacity: 0.7;
+.page-transition-exit {
+  transform: translateX(0);
 }
 
-/* Geri butonu stili */
+.page-transition-exit-active {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.4, 1);
+}
+
+/* Geri buton stili */
 .back-button {
   display: inline-flex;
   align-items: center;
   color: #007aff; /* iOS mavi rengi */
-  font-weight: normal;
   cursor: pointer;
-  padding: 8px 12px;
-  font-size: 17px;
   user-select: none;
+  font-weight: 400;
+  padding: 8px 10px;
 }
 
 .back-button:before {
@@ -132,49 +80,19 @@ body {
   top: 1px;
 }
 
-.back-button:active {
-  opacity: 0.7;
+/* iOS stili yükleme göstergesi */
+.ios-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0,122,255,0.2);
+  border-top-color: rgba(0,122,255,1);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
 }
 
-/* Sayfa geçiş animasyonları */
-.page-transition-enter {
-  transform: translateX(100%);
-}
-
-.page-transition-enter-active {
-  transform: translateX(0);
-  transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.4, 1);
-}
-
-.page-transition-exit {
-  transform: translateX(0);
-}
-
-.page-transition-exit-active {
-  transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.4, 1);
-}
-
-/* Azaltılmış hareket tercihleri için erişilebilirlik */
-@media (prefers-reduced-motion: reduce) {
-  .swipe-page-container,
-  .previous-page-preview,
-  .swipe-shadow-overlay,
-  .swipe-background-overlay,
-  .page-transition-enter-active,
-  .page-transition-exit-active {
-    transition-duration: 0.1s !important;
-  }
-}
-
-/* Farklı ekran boyutları için duyarlı ayarlamalar */
-@media (max-width: 768px) {
-  .preview-header {
-    padding: 12px;
-    height: 45px;
-  }
-  
-  .preview-title {
-    font-size: 16px;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
