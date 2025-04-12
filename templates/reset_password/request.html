@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Şifremi Unuttum | OmGame{% endblock %}
+
+{% block styles %}
+<style>
+    .password-reset-container {
+        max-width: 480px;
+        margin: 60px auto;
+        padding: 30px;
+        border-radius: 12px;
+        background-color: var(--bg-card);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .password-reset-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .password-reset-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+    }
+
+    .password-reset-header p {
+        color: var(--text-secondary);
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .password-reset-form {
+        margin-top: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        background-color: var(--bg-input);
+        color: var(--text-primary);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
+        outline: none;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: linear-gradient(135deg, #6b46c1 0%, #8a63d2 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+    }
+
+    .reset-links {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .reset-links a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .reset-links a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .icon-envelope {
+        margin-right: 8px;
+        color: var(--primary);
+        vertical-align: middle;
+    }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .alert-danger {
+        background-color: #FEF2F2;
+        border: 1px solid #FCA5A5;
+        color: #B91C1C;
+    }
+
+    .alert-success {
+        background-color: #F0FDF4;
+        border: 1px solid #86EFAC;
+        color: #15803D;
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+        .password-reset-container {
+            margin: 30px 15px;
+            padding: 20px;
+        }
+
+        .password-reset-header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="password-reset-container">
+    <div class="password-reset-header">
+        <h1>Şifremi Unuttum</h1>
+        <p>E-posta adresinizi girin, size 4 haneli bir doğrulama kodu göndereceğiz.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form class="password-reset-form" action="{{ url_for('reset_password.send_reset_code') }}" method="post">
+        <div class="form-group">
+            <label for="email">E-posta Adresi</label>
+            <input type="email" class="form-control" id="email" name="email" required placeholder="ornek@mail.com">
+        </div>
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-envelope icon-envelope"></i> Doğrulama Kodu Gönder
+        </button>
+    </form>
+
+    <div class="reset-links">
+        <p>Hatırladınız mı? <a href="{{ url_for('login') }}">Giriş Yap</a></p>
+    </div>
+</div>
+{% endblock %}
