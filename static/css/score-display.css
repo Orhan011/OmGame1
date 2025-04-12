@@ -8,30 +8,6 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-
-/* Seviye numarası göstergesi için pulsating animasyon */
-@keyframes levelPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.level-number-indicator {
-  animation: levelPulse 2s infinite ease-in-out;
-}
-
-/* Skor değişim animasyonu - daha dikkat çekici */
-@keyframes scoreChangeEnhanced {
-  0% { transform: scale(1); color: inherit; }
-  30% { transform: scale(1.2); color: #4CAF50; }
-  70% { transform: scale(1.2); color: #4CAF50; }
-  100% { transform: scale(1); color: inherit; }
-}
-
-.score-change {
-  animation: scoreChangeEnhanced 1.5s ease;
-}
-
   padding: 12px 20px;
   background: linear-gradient(135deg, #6a5ae0, #9f8aff);
   color: white;
