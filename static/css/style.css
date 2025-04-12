@@ -1,3 +1,30 @@
+
+/* Puan gösterimlerini gizlemek için eklenen stiller */
+.score-value, 
+.score-container, 
+.score-display, 
+.score-badge, 
+.mini-score, 
+.score-cell,
+.result-stat:has(.result-stat-label:contains("Puan")),
+.result-stat:has(.result-stat-label:contains("Skor")),
+.game-achievement,
+.rating-stars,
+.rating-text,
+.results-rating,
+.score-notification,
+.detail-item:has(.detail-label:contains("Puan")),
+.detail-item:has(.detail-label:contains("Skor")) {
+  display: none !important;
+}
+
+/* Oyun sonuç ekranlarında puan bilgilerini gizle */
+.score-summary,
+.score-detail,
+.player-row .score-cell {
+  display: none !important;
+}
+
 /* Profil Butonu - Orta Hizalama */
 .user-profile-corner {
   position: absolute;
