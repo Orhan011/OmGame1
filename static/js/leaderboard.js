@@ -71,8 +71,16 @@ function loadLeaderboard() {
     </div>
   `;
 
-  // Toplam skorları API'den al - Cache önleme ve tüm kullanıcıları getirmek için parametreler
-  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
+  // Skorları almak için alternatif API kullanımı
+  fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+    .then(response => {
+      if (!response.ok) {
+        // İlk API başarısız olursa alternatifi dene
+        console.log('İlk API başarısız, alternatif API deneniyor...');
+        return fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime());
+      }
+      return response;
+    })
     .then(response => {
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
@@ -80,8 +88,9 @@ function loadLeaderboard() {
       return response.json();
     })
     .then(data => {
-      // API yanıtı bir dizi olmalı ve en az bir eleman içermeli
+      // API yanıtı bir dizi olmalı
       const scores = Array.isArray(data) ? data : [];
+      console.log("Skorlar alındı:", scores.length);
 
       if (scores.length === 0) {
         leaderboardContainer.innerHTML = `
@@ -142,6 +151,11 @@ function loadLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const isCurrentUser = player.is_current_user || false;
 
+        // Puanı doğru şekilde göster - farklı API yanıt formatlarını kontrol et
+        const totalScore = player.total_score !== undefined ? player.total_score : 
+                          (player.score !== undefined ? player.score : 
+                          (player.points !== undefined ? player.points : 0));
+
         html += `
           <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
             <div class="rank-cell">
@@ -163,7 +177,7 @@ function loadLeaderboard() {
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${player.total_score || 0}</span>
+                <span class="score-value">${totalScore}</span>
               </div>
             </div>
           </div>
@@ -178,7 +192,7 @@ function loadLeaderboard() {
       leaderboardContainer.innerHTML = html;
     })
     .catch(error => {
-      console.error('Skor verileri yüklenirken hata:', error);
+      console.error('Skorlar alınırken hata oluştu:', error);
       leaderboardContainer.innerHTML = `
         <div class="error">
           <i class="fas fa-exclamation-triangle"></i>
