@@ -263,6 +263,14 @@
   margin: 1.5rem 0;
 }
 
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .remember-me {
   display: flex;
   align-items: center;
@@ -276,7 +284,7 @@
   height: 1rem;
 }
 
-.forgot-password {
+.forgot-password a {
   color: #8C66FF;
   text-decoration: none;
   font-size: 0.9rem;
@@ -284,7 +292,7 @@
   transition: all 0.3s ease;
 }
 
-.forgot-password:hover {
+.forgot-password a:hover {
   color: #6A5AE0;
   text-decoration: underline;
 }
