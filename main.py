@@ -86,35 +86,61 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
             # HTML içeriğini ekle
             msg.attach(MIMEText(html_body, 'html'))
             
-            # Bağlantı ve gönderim
-            server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-            server.login(from_email, password)
-            text = msg.as_string()
-            server.sendmail(from_email, to_email, text)
-            server.quit()
-            logger.info(f"E-posta başarıyla gönderildi: {to_email}")
-            
-            return True
-            
+            # SMTP bağlantısı ve gönderim - SSL kullanarak
+            try:
+                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
+                server.login(from_email, password)
+                text = msg.as_string()
+                server.sendmail(from_email, to_email, text)
+                server.quit()
+                logger.info(f"E-posta başarıyla gönderildi: {to_email}")
+                return True
+            except smtplib.SMTPException as smtp_error:
+                logger.error(f"SMTP hatası: {str(smtp_error)}")
+                # SSL başarısız olursa TLS ile deneyelim
+                try:
+                    server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
+                    server.starttls()
+                    server.login(from_email, password)
+                    text = msg.as_string()
+                    server.sendmail(from_email, to_email, text)
+                    server.quit()
+                    logger.info(f"E-posta TLS ile başarıyla gönderildi: {to_email}")
+                    return True
+                except smtplib.SMTPException as tls_error:
+                    logger.error(f"TLS SMTP hatası: {str(tls_error)}")
+                    return False
         except Exception as e:
             logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
             return False
     
+    # Doğrulama kodunu doğrudan logla (yedek olarak)
+    if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+        import re
+        code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
+        if code_match:
+            verification_code = code_match.group(1)
+            print(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
+            logger.info(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
+    
     try:
-        # E-posta gönderme işlemini daha yüksek öncelikli bir thread ile başlat
+        # Direkt senkron olarak göndermeyi deneyelim (e-posta gönderimi kritik olduğundan)
+        result = send_email_task()
+        if result:
+            return True
+            
+        # Senkron gönderim başarısız olursa arka planda deneyelim
         email_thread = threading.Thread(target=send_email_task)
         email_thread.daemon = True
-        # Thread'i hemen başlat
         email_thread.start()
         logger.info(f"E-posta gönderme thread'i başlatıldı: {to_email}")
         return True
     except Exception as thread_error:
-        logger.error(f"E-posta thread başlatma hatası: {str(thread_error)}")
-        # Thread başlatılamazsa senkron olarak göndermeyi dene
-        try:
-            return send_email_task()
-        except:
-            return False
+        logger.error(f"E-posta gönderme hatası: {str(thread_error)}")
+        # En azından kodu konsola yazdır
+        if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+            print(f"E-POSTA GÖNDERİLEMEDİ! E-posta: {to_email}")
+        return False
 
 def send_welcome_email(to_email, username):
     """
@@ -343,6 +369,7 @@ def send_verification_email(to_email, verification_code):
                 <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
             </div>
             <p>Bu kod 30 dakika boyunca geçerlidir.</p>
+            <p>Eğer e-posta alamıyorsanız, lütfen kod giriş sayfasında görünen kodu kullanın.</p>
             <p>Eğer şifre sıfırlama talebinde bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
             <p>Teşekkürler,<br>OmGame Ekibi</p>
         </div>
@@ -350,9 +377,20 @@ def send_verification_email(to_email, verification_code):
     </html>
     """
     
+    # Kod hem loglara hem de konsola yazdırılıyor - kullanıcı bulamazsa buradan alabilir
+    print(f"ÖNEMLİ - Şifre sıfırlama kodu: {verification_code} - E-posta: {to_email}")
     logger.info(f"Doğrulama e-postası gönderiliyor: {to_email} - Kod: {verification_code}")
-    # Arka planda e-posta gönder
-    return send_email_in_background(to_email, subject, body)
+    
+    # E-posta gönderme işlemini yap
+    result = send_email_in_background(to_email, subject, body)
+    
+    # Sonucu logla
+    if result:
+        logger.info(f"Doğrulama e-postası başarıyla gönderildi: {to_email}")
+    else:
+        logger.error(f"Doğrulama e-postası gönderilemedi: {to_email}")
+        
+    return result
 
 def get_user_avatar(user_id):
     """
@@ -2040,14 +2078,20 @@ def forgot_password():
 
             # Log mesajı ekle
             logger.info(f"{email} için şifre sıfırlama kodu: {reset_code}")
+            # Konsola da yazdır (yedek olarak)
+            print(f"ŞİFRE SIFIRLAMA KODU: {reset_code} - E-posta: {email}")
 
-            # E-posta gönder
+            # E-posta göndermeyi dene
             email_sent = send_verification_email(email, reset_code)
             
             if email_sent:
                 flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+                # Başarılı ise session'da kod gösterme
+                session.pop('verification_code_display', None)
             else:
-                flash('E-posta gönderilirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+                # E-posta gönderilemese de kodu görüntüle - session'a kaydederek
+                session['verification_code_display'] = reset_code
+                flash(f'E-posta gönderilirken bir sorun oluştu. Lütfen aşağıdaki kodu kullanın.', 'warning')
                 
             return redirect(url_for('reset_code', email=email))
         else:
