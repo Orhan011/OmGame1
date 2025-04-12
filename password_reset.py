@@ -7,6 +7,7 @@ import logging
 import os
 
 from models import db, User
+from main import app  # Ana uygulama değişkenini import et
 
 # Blueprint tanımlaması
 password_reset = Blueprint('password_reset', __name__)
@@ -179,12 +180,8 @@ def forgot_password():
                 verification_code=verification_code
             )
             
-            # Geliştirme modunda doğrulama kodunu her zaman göster
-            print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {email} ###")
-            logger.info(f"E-posta: {email}, Doğrulama kodu: {verification_code}")
-            
-            # Kodu ekranda da göster (geliştirme amaçlı)
-            flash(f'Doğrulama kodu: {verification_code} (Test modu)', 'info')
+            # Sadece loglama amaçlı kaydet (sunucu loglarında görünecek, kullanıcıya gösterilmeyecek)
+            logger.info(f"E-posta: {email}, Doğrulama kodu gönderildi")
             
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
             return redirect(url_for('password_reset.reset_code', email=email))
