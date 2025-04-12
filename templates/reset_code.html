@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Şifre Sıfırlama Kodu</title>
+  <title>Doğrulama Kodu - OmGame</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Doğrulama kodu alanı için iyileştirilmiş stiller */
     .verification-code-container {
       display: flex;
       flex-direction: column;
@@ -83,7 +82,6 @@
       color: #94a3b8;
     }
 
-    /* Animasyon efektleri */
     @keyframes pulse {
       0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
@@ -100,7 +98,6 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* Mobil için iyileştirmeler */
     @media (max-width: 640px) {
       .code-input {
         width: 2.8rem;
@@ -114,13 +111,16 @@
     }
 
     .verification-display {
-        font-size: 26px;
-        font-weight: bold;
-        letter-spacing: 5px;
-        background: #f0f0f0;
-        padding: 5px 15px;
-        border-radius: 5px;
-        display: inline-block;
+      font-size: 26px;
+      font-weight: bold;
+      letter-spacing: 5px;
+      background: rgba(249, 250, 251, 0.1);
+      padding: 10px 15px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
@@ -132,7 +132,7 @@
 
         <div class="auth-header">
           <h2>Doğrulama Kodu</h2>
-          <p class="auth-subtitle">E-postanıza gönderilen 4 haneli kodu giriniz</p>
+          <p class="auth-subtitle">E-posta adresinize gönderilen 4 haneli kodu giriniz</p>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -149,6 +149,7 @@
 
         <form action="{{ url_for('reset_code') }}" method="POST" class="auth-form" id="verification-form">
           <input type="hidden" name="email" value="{{ email }}" id="email-input">
+          <input type="hidden" name="verification_code" id="verification_code" value="">
 
           <div class="verification-code-container">
             <div class="verification-code">
@@ -164,10 +165,10 @@
             </p>
 
             {% if session.get('verification_code_display') %}
-                <div class="alert alert-info mt-2" role="alert">
-                    <strong>E-posta gönderiminde sorun oluştu, kodu buradan kullanabilirsiniz:</strong>
-                    <div class="verification-display mt-1">{{ session.get('verification_code_display') }}</div>
-                </div>
+              <div class="alert alert-info mt-2" role="alert">
+                <strong>E-posta gönderiminde sorun oluştu, kodu buradan kullanabilirsiniz:</strong>
+                <div class="verification-display mt-1">{{ session.get('verification_code_display') }}</div>
+              </div>
             {% endif %}
 
             <div class="verification-timer">
@@ -195,13 +196,13 @@
   </div>
 
   <script>
-    // Kod girişleri için otomatik ilerleme ve stil iyileştirmeleri
     document.addEventListener('DOMContentLoaded', function() {
       const codeInputs = document.querySelectorAll('.code-input');
       const form = document.querySelector('.auth-form');
       const resendLink = document.getElementById('resendLink');
       const timerElement = document.getElementById('timer');
       const emailInput = document.getElementById('email-input');
+      const verificationCodeInput = document.getElementById('verification_code');
 
       // Sayaç için değişkenler
       let secondsLeft = 120; // 2 dakika
@@ -337,7 +338,11 @@
             } else {
               // Son input doldurulduğunda
               this.blur();
-              checkAllFilled();
+              updateVerificationCode();
+              // Eğer tüm kodlar doldurulmuşsa formu gönder
+              if (checkAllFilled()) {
+                setTimeout(() => form.submit(), 300);
+              }
             }
           } else {
             this.classList.remove('filled');
@@ -378,49 +383,43 @@
           // Son doldurulan alana odaklan veya formu gönder
           if (pastedText.length >= codeInputs.length) {
             codeInputs[codeInputs.length - 1].focus();
-            checkAllFilled();
+            updateVerificationCode();
+            if (checkAllFilled()) {
+              setTimeout(() => form.submit(), 300);
+            }
           } else if (pastedText.length > 0) {
             codeInputs[pastedText.length].focus();
           }
         });
       });
 
+      // Tüm alanlar dolduruldu mu kontrol et ve verification_code inputunu güncelle
+      function updateVerificationCode() {
+        let code = '';
+        codeInputs.forEach(input => {
+          code += input.value;
+        });
+        verificationCodeInput.value = code;
+      }
+
       // Tüm alanlar dolduruldu mu kontrol et
       function checkAllFilled() {
         let allFilled = true;
-        let code = '';
-
         codeInputs.forEach(input => {
           if (!input.value) {
             allFilled = false;
           }
-          code += input.value;
         });
-
-        if (allFilled) {
-          // Otomatik gönderimi etkinleştirmek için yorum satırını kaldırabilirsiniz
-          // setTimeout(() => form.submit(), 500);
-        }
-
-        return code;
+        return allFilled;
       }
 
       // Form gönderimi
       form.addEventListener('submit', function(e) {
         e.preventDefault();
+        updateVerificationCode();
 
         // Tüm kod kutularını kontrol et
-        const code = checkAllFilled();
-
-        if (code.length === 4) {
-          // Gizli bir input oluştur
-          const hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = 'verification_code';
-          hiddenInput.value = code;
-          this.appendChild(hiddenInput);
-
-          // Formu gönder
+        if (verificationCodeInput.value.length === 4) {
           this.submit();
         } else {
           // Eksik kod uyarısı
@@ -429,184 +428,5 @@
       });
     });
   </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doğrulama Kodu - OmGame</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/auth.css">
-    <style>
-        .code-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .code-input {
-            width: 3rem;
-            height: 3.5rem;
-            margin: 0 0.5rem;
-            font-size: 2rem;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            text-align: center;
-            font-weight: bold;
-        }
-        .code-display {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-            font-size: 24px;
-            letter-spacing: 4px;
-            font-weight: bold;
-            border: 1px solid #ddd;
-        }
-        .hidden-input {
-            opacity: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow-lg mt-5">
-                    <div class="card-header bg-primary text-white text-center py-3">
-                        <h4>Doğrulama Kodu</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
-                        
-                        <div class="text-center mb-4">
-                            <img src="/static/images/logo.svg" alt="OmGame Logo" height="60">
-                        </div>
-                        
-                        <p class="text-center mb-4">
-                            E-posta adresinize gönderdiğimiz 4 haneli doğrulama kodunu girin.
-                        </p>
-                        
-                        {% if 'verification_code_display' in session %}
-                        <div class="code-display">
-                            {{ session['verification_code_display'] }}
-                        </div>
-                        <p class="text-center small text-muted">
-                            E-posta gönderimi sırasında bir sorun oluştu. Lütfen yukarıdaki kodu kullanın.
-                        </p>
-                        {% endif %}
-                        
-                        <form method="POST" action="{{ url_for('reset_code') }}">
-                            <input type="hidden" name="email" value="{{ email }}">
-                            <input type="hidden" name="verification_code" id="verification_code" value="">
-                            
-                            <div class="code-container">
-                                <input type="text" class="code-input" name="code1" maxlength="1" autofocus>
-                                <input type="text" class="code-input" name="code2" maxlength="1">
-                                <input type="text" class="code-input" name="code3" maxlength="1">
-                                <input type="text" class="code-input" name="code4" maxlength="1">
-                            </div>
-
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary">Doğrulama Kodunu Doğrula</button>
-                            </div>
-                        </form>
-                        
-                        <div class="text-center mt-3">
-                            <p>Kod almadınız mı? <a href="{{ url_for('forgot_password') }}">Tekrar Gönder</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript for input handling -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('.code-input');
-            const form = document.querySelector('form');
-            const hiddenInput = document.getElementById('verification_code');
-            
-            // Auto-focus next input after entering a digit
-            inputs.forEach((input, index) => {
-                input.addEventListener('keyup', function(e) {
-                    if (e.key === "Backspace" || e.key === "Delete") {
-                        if (index > 0 && input.value === '') {
-                            inputs[index - 1].focus();
-                        }
-                    } else {
-                        if (input.value.length === 1 && index < inputs.length - 1) {
-                            inputs[index + 1].focus();
-                        }
-                    }
-                    
-                    // Update hidden input with all values
-                    updateHiddenInput();
-                });
-                
-                input.addEventListener('input', function() {
-                    // Keep only numbers
-                    input.value = input.value.replace(/[^0-9]/g, '');
-                    
-                    // Auto move to next input
-                    if (input.value.length === 1 && index < inputs.length - 1) {
-                        inputs[index + 1].focus();
-                    }
-                    
-                    // Update hidden input
-                    updateHiddenInput();
-                });
-            });
-            
-            // Handle paste event
-            document.addEventListener('paste', function(e) {
-                const clipboardData = e.clipboardData || window.clipboardData;
-                const pastedText = clipboardData.getData('Text').trim();
-                
-                // If pasted text is numeric and the right length
-                if (/^\d+$/.test(pastedText) && pastedText.length >= 4) {
-                    // Distribute digits to inputs
-                    for (let i = 0; i < inputs.length && i < pastedText.length; i++) {
-                        inputs[i].value = pastedText[i];
-                    }
-                    
-                    // Update hidden input
-                    updateHiddenInput();
-                    
-                    // Focus last input
-                    inputs[Math.min(pastedText.length, inputs.length) - 1].focus();
-                    
-                    e.preventDefault();
-                }
-            });
-            
-            function updateHiddenInput() {
-                let code = '';
-                inputs.forEach(input => {
-                    code += input.value;
-                });
-                hiddenInput.value = code;
-                
-                // Auto-submit if all digits are entered
-                if (code.length === 4 && /^\d{4}$/.test(code)) {
-                    setTimeout(() => form.submit(), 500);
-                }
-            }
-        });
-    </script>
 </body>
 </html>
