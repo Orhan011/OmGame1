@@ -250,6 +250,13 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.2);
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.player-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.4);
+  border: 2px solid rgba(106, 90, 224, 0.6);
 }
 
 .top-1 .player-avatar {

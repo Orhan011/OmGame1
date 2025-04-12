@@ -337,7 +337,26 @@ function loadArticleContent() {
       });
     </script>
 
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // User avatars in various places can link to user profiles
+      const userAvatars = document.querySelectorAll('.player-avatar, .avatar-image');
+      userAvatars.forEach(avatar => {
+        if (!avatar.hasAttribute('onclick') && avatar.closest('[data-user-id]')) {
+          const userId = avatar.closest('[data-user-id]').dataset.userId;
+          if (userId) {
+            avatar.style.cursor = 'pointer';
+            avatar.setAttribute('title', 'Kullanıcı profilini görüntüle');
+            avatar.addEventListener('click', function() {
+              window.location.href = `/profile/${userId}`;
+            });
+          }
+        }
+      });
+    });
+  </script>
+    {% endblock %}
 
 <!-- Oyun sayfalarına özel JS dosyaları -->
 {% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}

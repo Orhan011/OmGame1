@@ -1,0 +1,210 @@
+
+{% extends 'layout.html' %}
+
+{% block title %}{{ user.username }} Profili{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+  <div class="profile-header glass-effect">
+    <div class="profile-cover">
+      <div class="profile-avatar-container">
+        {% if user.avatar_url %}
+        <img src="{{ url_for('static', filename=user.avatar_url) }}" alt="{{ user.username }}" class="profile-avatar" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'; this.classList.add('error');">
+        {% else %}
+        <div class="profile-avatar-placeholder">{{ user.username[0]|upper }}</div>
+        {% endif %}
+        <div class="profile-status online"></div>
+      </div>
+      <div class="profile-info">
+        <h1 class="profile-name">{{ user.username }}</h1>
+        <p class="profile-title">{{ user.rank if user.rank else 'Oyuncu' }}</p>
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ user_level }}</span>
+            <span class="stat-label">Seviye</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ user.total_games_played }}</span>
+            <span class="stat-label">Oyun</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ user.highest_score }}</span>
+            <span class="stat-label">En Yüksek Puan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seviye İlerleme Çubuğu -->
+    <div class="level-progress-container">
+      <div class="level-badge">{{ user_level }}</div>
+      <div class="level-progress-bar">
+        <div class="level-progress" style="width: {{ xp_progress }}%;"></div>
+      </div>
+      <span class="level-text">Sonraki seviyeye {{ xp_needed }} XP kaldı ({{ user.experience_points }}/{{ next_level_xp }} XP)</span>
+    </div>
+  </div>
+  
+  <div class="profile-content">
+    <!-- Hızlı İstatistikler -->
+    <div class="glass-effect quick-stats">
+      <h2 class="section-title"><i class="fas fa-chart-line"></i> Oyun İstatistikleri</h2>
+      <div class="stats-bubbles row">
+        <div class="col-md-3 col-sm-6 mb-4">
+          <div class="stat-bubble">
+            <div class="stat-icon">
+              <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="stat-value">{{ user.total_games_played }}</div>
+            <div class="stat-label">Toplam Oyun</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+          <div class="stat-bubble">
+            <div class="stat-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-value">{{ user.highest_score }}</div>
+            <div class="stat-label">En Yüksek Puan</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+          <div class="stat-bubble">
+            <div class="stat-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="stat-value">{{ user.experience_points }}</div>
+            <div class="stat-label">Toplam XP</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+          <div class="stat-bubble">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-value">{{ user_level }}</div>
+            <div class="stat-label">Seviye</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Son Aktivite -->
+    <div class="glass-effect recent-activity">
+      <h2 class="section-title"><i class="fas fa-history"></i> Son Aktiviteler</h2>
+      <div class="activity-bubbles row">
+        {% if recent_scores %}
+          {% for score in recent_scores %}
+          <div class="col-md-4 col-sm-6 mb-4">
+            <div class="activity-bubble">
+              <div class="activity-icon">
+                <i class="fas fa-gamepad"></i>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">{{ game_names.get(score.game_type, score.game_type) }}</div>
+                <div class="activity-time">{{ score.timestamp.strftime('%d %B %Y, %H:%M') }}</div>
+                <div class="activity-score">{{ score.score }} puan</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="empty-state">
+              <i class="fas fa-hourglass-end"></i>
+              <p>Henüz aktivite kaydı bulunmuyor.</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- En Yüksek Puanlar -->
+    <div class="glass-effect best-scores">
+      <h2 class="section-title"><i class="fas fa-medal"></i> En Yüksek Puanlar</h2>
+      {% if scores %}
+        <div class="table-responsive">
+          <table class="table table-dark table-hover">
+            <thead>
+              <tr>
+                <th>Oyun</th>
+                <th>Puan</th>
+                <th>Zorluk</th>
+                <th>Tarih</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game_type, score in scores.items() %}
+              <tr>
+                <td>{{ game_names.get(game_type, game_type) }}</td>
+                <td>{{ score }}</td>
+                <td>
+                  <span class="badge 
+                    {% if score.difficulty == 'easy' %}bg-success{% elif score.difficulty == 'medium' %}bg-primary{% elif score.difficulty == 'hard' %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ {'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor', 'expert': 'Uzman'}.get(score.difficulty, 'Orta') }}
+                  </span>
+                </td>
+                <td>{{ score.timestamp.strftime('%d.%m.%Y') if score.timestamp else '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-trophy"></i>
+          <p>Henüz puan kaydı bulunmuyor.</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Kişisel Bilgiler (Varsa) -->
+    {% if user.full_name or user.bio or user.location %}
+    <div class="glass-effect personal-info">
+      <h2 class="section-title"><i class="fas fa-user"></i> Kişisel Bilgiler</h2>
+      {% if user.full_name %}
+        <div class="info-item">
+          <i class="fas fa-id-card"></i>
+          <span>{{ user.full_name }}</span>
+        </div>
+      {% endif %}
+      
+      {% if user.location %}
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ user.location }}</span>
+        </div>
+      {% endif %}
+      
+      {% if user.bio %}
+        <div class="bio-container">
+          <p class="bio-content">{{ user.bio }}</p>
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // İlerleme çubuğu animasyonu
+    setTimeout(() => {
+      const progressBar = document.querySelector('.level-progress');
+      if (progressBar) {
+        progressBar.style.transition = 'width 1s ease-in-out';
+        progressBar.style.width = '{{ xp_progress }}%';
+      }
+    }, 300);
+  });
+</script>
+{% endblock %}
