@@ -30,17 +30,6 @@ function updateScoreBoard(gameType = null, forceUpdate = false) {
   }, 100);
 }
 
-// Profil sayfasına güvenli yönlendirme fonksiyonu
-function redirectToProfile(userId) {
-  if (!userId) {
-    console.error('Kullanıcı ID bulunamadı!');
-    return;
-  }
-  
-  // Sayfa geçişi - location.href'ten daha güvenli
-  window.location = '/profile/' + userId;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Liderlik tablosu modülü yükleniyor...');
   loadLeaderboard();
@@ -55,67 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Global güncelleme fonksiyonunu dışa aktar
   window.updateScoreBoard = updateScoreBoard;
-  
-  // Tüm oyuncu fotoğraflarına tıklama özelliği ekle
-  setTimeout(function() {
-    const playerAvatars = document.querySelectorAll('.player-avatar');
-    playerAvatars.forEach(avatar => {
-      // Hali hazırda bir onclick olayı varsa kontrol et
-      if (!avatar.getAttribute('onclick')) {
-        // En yakın veri içeren ebeveyn elementi bul
-        const playerRow = avatar.closest('.player-row');
-        if (playerRow) {
-          // Player ID'si için veri attributeu ekle
-          const playerCell = playerRow.querySelector('.player-cell');
-          const playerInfo = playerCell ? playerCell.querySelector('.player-info') : null;
-          const playerName = playerInfo ? playerInfo.querySelector('.player-name') : null;
-          
-          if (playerName && playerName.textContent) {
-            // Elementin içindeki kullanıcı bilgisini kullanarak profil sayfasına yönlendir
-            avatar.style.cursor = 'pointer';
-            avatar.title = "Kullanıcı profilini görüntüle";
-            
-            // Tüm tabloları tarayarak kullanıcıyı bul ve ID'sini al
-            const userId = findUserIdByUsername(playerName.textContent.trim());
-            if (userId) {
-              // Güvenli yönlendirme fonksiyonunu kullan
-              avatar.setAttribute('onclick', `redirectToProfile(${userId})`);
-            }
-          }
-        }
-      }
-    });
-  }, 1000);
-  
-  // Kullanıcı adına göre ID bulma yardımcı fonksiyonu
-  function findUserIdByUsername(username) {
-    // Varsayılan ID (bulunamazsa kullanılacak)
-    let userId = null;
-    
-    // Tüm tablolarda arama yap
-    const playerRows = document.querySelectorAll('.player-row');
-    for (const row of playerRows) {
-      const playerName = row.querySelector('.player-name');
-      if (playerName && playerName.textContent.trim() === username) {
-        // Bu satırda data-user-id attribute'ü var mı kontrol et
-        if (row.hasAttribute('data-user-id')) {
-          return row.getAttribute('data-user-id');
-        }
-        
-        // Onclick özelliğinden ID'yi çıkarmaya çalış
-        const avatarWithClick = row.querySelector('[onclick*="/profile/"]');
-        if (avatarWithClick) {
-          const onclickAttr = avatarWithClick.getAttribute('onclick');
-          const match = onclickAttr.match(/\/profile\/(\d+)/);
-          if (match && match[1]) {
-            return match[1];
-          }
-        }
-      }
-    }
-    
-    return userId;
-  }
   
   // Liderlik tablosu güncelleme butonu varsa, tıklama olayını ekle
   const refreshButtons = document.querySelectorAll('.refresh-leaderboard');
@@ -220,7 +148,7 @@ function loadLeaderboard() {
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar" onclick="redirectToProfile(${player.user_id})" style="cursor: pointer;" title="Kullanıcı profilini görüntüle">
+              <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
                   `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -489,7 +417,7 @@ function loadLevelLeaderboard() {
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar" onclick="redirectToProfile(${player.user_id || player.id})" style="cursor: pointer;" title="Kullanıcı profilini görüntüle">
+              <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
                   `<img src="${avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
