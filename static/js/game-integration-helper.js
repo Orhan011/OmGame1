@@ -1,185 +1,145 @@
-
 /**
- * Oyun entegrasyon yardımcı işlevleri
- * Bu dosya, oyunlar için ortak yardımcı işlevleri içerir
+ * Oyun puan sistemini entegre etmeyi kolaylaştıran yardımcı fonksiyonlar
+ * @module GameIntegrationHelper
+ * @version 1.0.0
  */
 
-// HTML UI Modernizer sınıflarını yükle
-function loadGameModernizer() {
-  if (typeof GameModernizer === 'undefined') {
-    console.log('GameModernizer yükleniyor...');
-    
-    const script = document.createElement('script');
-    script.src = '/static/js/game-modernizer.js';
-    document.head.appendChild(script);
-    
-    const responsiveScript = document.createElement('script');
-    responsiveScript.src = '/static/js/game-responsive-modernizer.js';
-    document.head.appendChild(responsiveScript);
-    
-    console.log('GameModernizer yüklendi');
-  }
-}
-
-// Zorluk seçici eklemek için yardımcı fonksiyon
-function addDifficultySelector(containerId, defaultDifficulty = 'medium', callback = null) {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error(`'${containerId}' ID'li konteyner bulunamadı`);
-    return;
-  }
-  
-  // Zorluk seçici HTML'i
-  const html = `
-    <div class="difficulty-selector">
-      <button class="difficulty-btn easy ${defaultDifficulty === 'easy' ? 'selected' : ''}" data-difficulty="easy">
-        <i class="fas fa-baby"></i>
-        <span>Kolay</span>
-      </button>
-      <button class="difficulty-btn medium ${defaultDifficulty === 'medium' ? 'selected' : ''}" data-difficulty="medium">
-        <i class="fas fa-check"></i>
-        <span>Orta</span>
-      </button>
-      <button class="difficulty-btn hard ${defaultDifficulty === 'hard' ? 'selected' : ''}" data-difficulty="hard">
-        <i class="fas fa-fire"></i>
-        <span>Zor</span>
-      </button>
-      <button class="difficulty-btn expert ${defaultDifficulty === 'expert' ? 'selected' : ''}" data-difficulty="expert">
-        <i class="fas fa-crown"></i>
-        <span>Uzman</span>
-      </button>
-    </div>
-  `;
-  
-  // HTML'i ekle
-  container.innerHTML = html;
-  
-  // CSS dosyasını ekle (eğer yüklü değilse)
-  if (!document.querySelector('link[href*="difficulty-selector.css"]')) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/static/css/difficulty-selector.css';
-    document.head.appendChild(link);
-  }
-  
-  // Düğmelere tıklama olayları ekle
-  const buttons = container.querySelectorAll('.difficulty-btn');
-  
-  buttons.forEach(button => {
-    button.addEventListener('click', function() {
-      // Seçili sınıfını kaldır
-      buttons.forEach(btn => btn.classList.remove('selected'));
-      
-      // Bu düğmeyi seçili yap
-      this.classList.add('selected');
-      
-      // Seçilen zorluk değerini al
-      const difficulty = this.getAttribute('data-difficulty');
-      
-      // Callback fonksiyonu varsa çağır
-      if (typeof callback === 'function') {
-        callback(difficulty);
-      }
-    });
-  });
-  
-  // Seçilen zorluk değerini döndüren yardımcı fonksiyon
-  container.getSelectedDifficulty = function() {
-    const selectedButton = container.querySelector('.difficulty-btn.selected');
-    return selectedButton ? selectedButton.getAttribute('data-difficulty') : defaultDifficulty;
-  };
-  
-  return container;
-}
-
-// Ses efektleri yürütücüsü - ortak kullanım için
-class SoundPlayer {
-  constructor() {
-    this.sounds = {};
-    this.muted = false;
-    this.volume = 0.5; // Varsayılan ses düzeyi
-  }
-  
-  // Ses yükle
-  loadSound(name, path) {
-    this.sounds[name] = new Audio(path);
-    this.sounds[name].volume = this.volume;
-    return this;
-  }
-  
-  // Ses çal
-  play(name) {
-    if (this.muted || !this.sounds[name]) return this;
-    
-    // Sesi durdur ve baştan başlat
-    this.sounds[name].pause();
-    this.sounds[name].currentTime = 0;
-    
-    // Sesi oynat
-    const playPromise = this.sounds[name].play();
-    
-    // Oynatma hatalarını yönet
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.warn(`Ses oynatma hatası (${name}):`, error);
-      });
+/**
+ * Belirtilen script dosyasının yüklü olup olmadığını kontrol eder ve yüklü değilse yükler
+ * @param {string} scriptUrl - Yüklenecek script dosyasının URL'si
+ * @returns {Promise} Script yükleme işlemi
+ */
+function ensureScriptLoaded(scriptUrl) {
+  return new Promise((resolve, reject) => {
+    if (!scriptUrl) {
+      reject('Script URL belirtilmedi!');
+      return;
     }
-    
-    return this;
-  }
-  
-  // Ses düzeyini ayarla (0.0 - 1.0)
-  setVolume(level) {
-    this.volume = Math.max(0, Math.min(1, level));
-    
-    // Tüm seslerin düzeyini güncelle
-    Object.values(this.sounds).forEach(sound => {
-      sound.volume = this.volume;
+
+    // Script zaten yüklü mü kontrol et
+    const existingScript = document.querySelector(`script[src="${scriptUrl}"]`);
+    if (existingScript) {
+      resolve(existingScript);
+      return;
+    }
+
+    // Script yüklü değilse yükle
+    const script = document.createElement('script');
+    script.src = scriptUrl;
+    script.async = true;
+
+    script.onload = () => {
+      console.log(`Script başarıyla yüklendi: ${scriptUrl}`);
+      resolve(script);
+    };
+
+    script.onerror = (error) => {
+      console.error(`Script yüklenirken hata oluştu: ${scriptUrl}`, error);
+      reject(error);
+    };
+
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Bir oyun için puan sistemi entegrasyonu oluşturur ve başlatır
+ * @param {string} gameType - Oyun türü (wordle, tetris, puzzle vb.)
+ * @param {Object} gameInstance - Oyun örneği
+ * @param {Object} options - Ek seçenekler
+ * @returns {GameScoreIntegration} Puan entegrasyonu örneği
+ */
+function integrateGameScore(gameType, gameInstance = {}, options = {}) {
+  console.log(`${gameType} oyunu için puan entegrasyonu başlatılıyor...`);
+
+  // Gerekli script dosyalarını sıralı şekilde yükle
+  const loadScripts = async () => {
+    try {
+      await ensureScriptLoaded('static/js/scoreCalculator.js');
+      await ensureScriptLoaded('static/js/score-handler.js');
+      await ensureScriptLoaded('static/js/score-display.js');
+      await ensureScriptLoaded('static/js/game-score-integration.js');
+      console.log('Tüm puan sistemi scriptleri başarıyla yüklendi');
+      return true;
+    } catch (error) {
+      console.error('Puan sistemi scriptleri yüklenirken hata oluştu:', error);
+      return false;
+    }
+  };
+
+  return loadScripts().then(scriptsLoaded => {
+    if (!scriptsLoaded) {
+      console.error('Script yükleme hatası nedeniyle puan entegrasyonu başlatılamadı');
+      return null;
+    }
+
+    if (typeof window.GameScoreIntegration !== 'function') {
+      console.error('GameScoreIntegration sınıfı bulunamadı');
+      return null;
+    }
+
+    // Zorluk seviyesini al (HTML'de varsa)
+    const difficultySelector = document.querySelector('.difficulty-selector .selected');
+    const difficulty = difficultySelector ? 
+                    difficultySelector.getAttribute('data-difficulty') : 
+                    (options.difficulty || 'medium');
+
+    console.log(`Oyun zorluk seviyesi: ${difficulty}`);
+
+    // Oyun tipi, zorluk ve diğer parametrelerle bir puan entegrasyonu oluştur
+    const scoreIntegration = new window.GameScoreIntegration({
+      gameType: gameType,
+      difficulty: difficulty,
+      maxScore: options.maxScore || 100,
+      optimalMoves: options.optimalMoves || null,
+      optimalTime: options.optimalTime || null,
+      expectedTime: options.expectedTime || null
     });
-    
-    return this;
-  }
-  
-  // Sesi kapat/aç
-  toggleMute() {
-    this.muted = !this.muted;
-    return this.muted;
-  }
-  
-  // Sesi kapat
-  mute() {
-    this.muted = true;
-    return this;
-  }
-  
-  // Sesi aç
-  unmute() {
-    this.muted = false;
-    return this;
-  }
+
+    // Eğer bir oyun örneği varsa, ona puan sistemi metodlarını ekle
+    if (gameInstance) {
+      gameInstance.scoreSystem = scoreIntegration;
+
+      // Oyun API'si üzerinden puan sistemi fonksiyonlarına erişim sağla
+      if (!gameInstance.updateScore) {
+        gameInstance.updateScore = (score) => scoreIntegration.updateScore(score);
+      }
+
+      if (!gameInstance.saveScore) {
+        gameInstance.saveScore = (callback) => scoreIntegration.saveScore(callback);
+      }
+
+      if (!gameInstance.endGame) {
+        gameInstance.endGame = (finalScore, callback) => scoreIntegration.endGame(finalScore, callback);
+      }
+    }
+
+    console.log(`${gameType} oyunu için puan entegrasyonu tamamlandı`);
+    return scoreIntegration;
+  });
 }
 
-// Standart oyun sesleri yükleyen yardımcı fonksiyon
-function loadGameSounds() {
-  const soundPlayer = new SoundPlayer();
-  
-  // Temel oyun sesleri
-  soundPlayer
-    .loadSound('click', '/static/sounds/click.mp3')
-    .loadSound('correct', '/static/sounds/correct.mp3')
-    .loadSound('wrong', '/static/sounds/wrong.mp3')
-    .loadSound('success', '/static/sounds/success.mp3')
-    .loadSound('hint', '/static/sounds/hint.mp3')
-    .loadSound('gameOver', '/static/sounds/game-over.mp3')
-    .loadSound('gameComplete', '/static/sounds/game-complete.mp3');
-  
-  return soundPlayer;
-}
+// Global erişim için window nesnesine ekle
+window.ensureScriptLoaded = ensureScriptLoaded;
+window.integrateGameScore = integrateGameScore;
 
-// Global nesneler
-window.GameHelper = {
-  loadGameModernizer,
-  addDifficultySelector,
-  loadGameSounds,
-  SoundPlayer
-};
+// Sayfa yüklendiğinde gerekli script'leri yükle
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Sayfa yüklendi, puan sistemi script dosyaları yükleniyor...');
+
+  // Puan sistemi script dosyalarını sıralı yükle
+  ensureScriptLoaded('static/js/scoreCalculator.js')
+    .then(() => ensureScriptLoaded('static/js/score-handler.js'))
+    .then(() => ensureScriptLoaded('static/js/score-display.js'))
+    .then(() => ensureScriptLoaded('static/js/game-score-integration.js'))
+    .then(() => {
+      console.log('Puan sistemi script dosyaları başarıyla yüklendi.');
+
+      // GameScoreIntegration dosyası başarıyla yüklendiğinde bunu bildir
+      const event = new CustomEvent('score-system-ready');
+      document.dispatchEvent(event);
+    })
+    .catch(error => {
+      console.error('Puan sistemi script dosyaları yüklenirken hata oluştu:', error);
+    });
+});
