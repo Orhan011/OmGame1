@@ -1,25 +1,78 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Şifremi Unuttum</title>
+  <title>Doğrulama Kodu</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .code-input-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .code-input {
+      width: 50px;
+      height: 60px;
+      font-size: 24px;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-weight: bold;
+    }
+    
+    .code-input:focus {
+      border-color: #4a67e8;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(74, 103, 232, 0.3);
+    }
+    
+    .email-display {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .email-display span {
+      font-weight: 500;
+      color: #fff;
+    }
+    
+    .email-display .change-btn {
+      color: #4a67e8;
+      font-size: 14px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .email-display .change-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body class="auth-only-body">
   <div class="fullscreen-auth">
     <div class="auth-container">
       <div class="auth-card glass-card">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="auth-logo-small">
-
+        
         <div class="auth-header">
-          <h2>Şifremi Unuttum</h2>
-          <p class="auth-subtitle">E-posta adresinize doğrulama kodu göndereceğiz</p>
+          <h2>Doğrulama Kodu</h2>
+          <p class="auth-subtitle">E-posta adresinize gönderilen 4 haneli kodu girin</p>
         </div>
-
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
@@ -31,29 +84,62 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
-
-        <form action="{{ url_for('forgot_password') }}" method="POST" class="auth-form">
-          <div class="form-group floating-label">
-            <div class="input-icon-wrapper">
-              <i class="fas fa-envelope input-icon"></i>
-              <input type="email" id="email" name="email" class="form-control" placeholder=" " required>
-              <label for="email">E-posta Adresiniz</label>
-            </div>
+        
+        <div class="email-display">
+          <span><i class="fas fa-envelope me-2"></i> {{ email }}</span>
+          <a href="{{ url_for('forgot_password') }}" class="change-btn">Değiştir</a>
+        </div>
+        
+        <form action="{{ url_for('reset_code', email=email) }}" method="POST" class="auth-form">
+          <input type="hidden" name="email" value="{{ email }}">
+          
+          <div class="code-input-container">
+            <input type="text" name="code1" class="code-input" maxlength="1" pattern="[0-9]" required autofocus>
+            <input type="text" name="code2" class="code-input" maxlength="1" pattern="[0-9]" required>
+            <input type="text" name="code3" class="code-input" maxlength="1" pattern="[0-9]" required>
+            <input type="text" name="code4" class="code-input" maxlength="1" pattern="[0-9]" required>
           </div>
-
+          
           <button type="submit" class="btn btn-primary btn-block btn-animated">
-            <span class="btn-text">Sıfırlama Kodu Gönder</span>
-            <i class="fas fa-paper-plane btn-icon"></i>
+            <span class="btn-text">Doğrula</span>
+            <i class="fas fa-check-circle btn-icon"></i>
           </button>
         </form>
-
+        
         <div class="auth-links">
-          <a href="{{ url_for('login') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön
+          <a href="{{ url_for('forgot_password') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Yeni Kod İste
           </a>
         </div>
       </div>
     </div>
   </div>
+  
+  <script>
+    // Kod giriş alanları için otomatik ilerleme
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('.code-input');
+      
+      inputs.forEach((input, index) => {
+        // Bir karakter girildiğinde sonraki alana geç
+        input.addEventListener('input', function() {
+          if (this.value.length === 1) {
+            if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            } else {
+              this.blur(); // Son input dolduğunda fokus kaldır
+            }
+          }
+        });
+        
+        // Backspace tuşuna basıldığında önceki alana geç
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+            inputs[index - 1].focus();
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>
