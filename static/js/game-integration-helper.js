@@ -738,7 +738,9 @@ function calculateGameScore(params) {
     correctAnswers = 0,
     totalQuestions = 0,
     hintsUsed = 0,
-    gameType = ''
+    gameType = '',
+    moves = 0,
+    optimalMoves = 0
   } = params;
   
   // Zorluk seviyesi katsayısı
@@ -769,6 +771,13 @@ function calculateGameScore(params) {
     accuracyMultiplier = accuracy * 0.5 + 0.5; // Minimum 0.5 çarpan
   }
   
+  // Hamle verimliliği
+  let moveEfficiencyMultiplier = 1.0;
+  if (moves > 0 && optimalMoves > 0) {
+    // Eğer hamle sayısı optimal sayıdan azsa bonus ver, fazlaysa ceza
+    moveEfficiencyMultiplier = Math.max(0.6, Math.min(1.3, optimalMoves / moves));
+  }
+  
   // İpuçları kullanımı cezası
   const hintPenalty = Math.max(0, 1 - (hintsUsed * 0.1)); // Her ipucu %10 puan düşürür
   
@@ -785,6 +794,11 @@ function calculateGameScore(params) {
       // Doğruluk odaklı
       gameTypeMultiplier = accuracyMultiplier * 1.2;
       break;
+    case 'puzzle':
+    case 'memoryMatch':
+      // Hamle verimliliği önemli
+      gameTypeMultiplier = moveEfficiencyMultiplier * 1.2;
+      break;
     default:
       gameTypeMultiplier = 1.0;
   }
@@ -793,15 +807,25 @@ function calculateGameScore(params) {
   let baseScore = score;
   
   // Puan hesaplama
-  let finalScore = baseScore * difficultyMultiplier * timeMultiplier * accuracyMultiplier * hintPenalty * gameTypeMultiplier;
+  let finalScore = baseScore * difficultyMultiplier * timeMultiplier * accuracyMultiplier * hintPenalty * gameTypeMultiplier * moveEfficiencyMultiplier;
   
   // 0-100 arasına dönüştür - her oyun için farklı ölçekleme olabilir
   const gameTypeNormalization = {
-    'tetris': 200, // Tetris'te 200 puan mükemmel puan
-    'wordle': 6,   // Wordle'da 6 deneme hakkı
-    'memoryCards': 20, // Hafıza kartlarında 20 hamle
-    'chess': 1000,  // Satranç puanı
-    'default': 100  // Varsayılan
+    'tetris': 200,      // Tetris'te 200 puan mükemmel puan
+    'wordle': 6,        // Wordle'da 6 deneme hakkı
+    'memoryCards': 20,  // Hafıza kartlarında 20 hamle
+    'puzzle': 500,      // Yapboz için 500 puan maksimum
+    'snake': 50,        // Yılan oyunu için 50 elma
+    'minesweeper': 300, // Mayın tarlası için 300 puan
+    'hangman': 100,     // Adam asmaca için 100 puan
+    'numberSequence': 500, // Sayı dizisi için 500 puan
+    'numberChain': 300, // Sayı zinciri için 300 puan
+    'nBack': 200,       // N-Back için 200 puan
+    'patternRecognition': 200, // Örüntü tanıma için 200 puan
+    'wordPuzzle': 200,  // Kelime bulmaca için 200 puan 
+    'labyrinth': 200,   // Labirent için 200 puan
+    'chess': 1000,      // Satranç puanı
+    'default': 100      // Varsayılan
   };
   
   const maxScoreForGame = gameTypeNormalization[gameType] || gameTypeNormalization.default;
@@ -811,6 +835,88 @@ function calculateGameScore(params) {
   
   // Tam sayıya yuvarla
   return Math.round(finalScore);
+}
+
+// Oyun sonucunu gösterme yardımcı fonksiyonu
+function showGameScoreResult(gameType, score, gameStats = {}, options = {}) {
+  const {
+    difficulty = 'medium',
+    timeSpent = 0,
+    maxTime = 0,
+    correctAnswers = 0,
+    totalQuestions = 0,
+    hintsUsed = 0,
+    moves = 0,
+    optimalMoves = 0
+  } = gameStats;
+  
+  // Puanı hesapla
+  const calculatedScore = calculateGameScore({
+    score,
+    difficulty,
+    timeSpent,
+    maxTime,
+    correctAnswers,
+    totalQuestions,
+    hintsUsed,
+    gameType,
+    moves,
+    optimalMoves
+  });
+  
+  // Oyun istatistiklerini hazırla
+  const stats = {
+    ...gameStats,
+    timeBonus: maxTime > 0 ? Math.max(0, 1 - (timeSpent / maxTime)) : 0,
+    accuracy: totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 100,
+    normalized_score: calculatedScore
+  };
+  
+  // Puan kaydetme fonksiyonu
+  if (window.saveScoreToLeaderboard) {
+    window.saveScoreToLeaderboard(gameType, calculatedScore, timeSpent, difficulty, stats)
+      .then(data => {
+        console.log("Puan kaydedildi:", data);
+        
+        // Kullanıcıya bildirim göster
+        showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
+      })
+      .catch(error => {
+        console.error("Puan kaydedilirken hata:", error);
+        showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
+      });
+  } else if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
+    window.ScoreHandler.saveScore(gameType, calculatedScore, difficulty, timeSpent, stats)
+      .then(() => {
+        showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
+      })
+      .catch(error => {
+        console.error("Puan kaydedilirken hata:", error);
+        showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
+      });
+  } else {
+    // ScoreHandler yoksa sadece bildirimi göster
+    showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
+    
+    // Son çare olarak doğrudan API'ye istek gönder
+    try {
+      fetch('/api/save-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_type: gameType,
+          score: calculatedScore,
+          difficulty: difficulty,
+          playtime: timeSpent,
+          game_stats: stats
+        })
+      });
+    } catch (e) {
+      console.error("API isteği sırasında hata:", e);
+    }
+  }
+  
+  return calculatedScore;
 }
 
 // Oyun sonucunu gösterme yardımcı fonksiyonu

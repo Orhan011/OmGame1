@@ -617,28 +617,93 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Oyunu bitirir
    */
-  function endGame(completed = false) {
-    isGameActive = false;
-
+  function endGame(completed) {
     // Zamanlayıcıyı durdur
-    if (timerInterval) {
-      clearInterval(timerInterval);
+    clearInterval(timerInterval);
+
+    // Oyun durumunu güncelle
+    gameState.isPlaying = false;
+
+    // Oyun istatistiklerini oluştur
+    const gameTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
+    const wordsCount = gameState.solvedWords.length;
+
+    // Diğer istatistikler
+    const gameStats = {
+      words_solved: wordsCount,
+      total_words: gameState.puzzlePieces ? gameState.puzzlePieces.length : 0,
+      hints_used: 3 - gameState.hintsLeft,
+      time_spent: gameTime,
+      completed: completed,
+      longest_word: gameState.longestSolvedWord || ''
+    };
+
+    // Zorluk seviyesini belirle
+    let difficulty = 'medium'; // Varsayılan
+
+    // Standardize edilmiş puan hesaplama
+    if (window.ScoreCalculator) {
+      // ScoreCalculator ile hesapla
+      const scoreResult = window.ScoreCalculator.calculate({
+        gameType: 'wordPuzzle',
+        score: wordsCount * 100, // Her kelime 100 puan
+        difficulty: difficulty,
+        timeSpent: gameTime,
+        correctAnswers: wordsCount,
+        totalQuestions: gameState.puzzlePieces ? gameState.puzzlePieces.length : wordsCount,
+        hintsUsed: 3 - gameState.hintsLeft,
+        gameSpecificStats: gameStats
+      });
+
+      // Standardize edilmiş puanı kaydet
+      saveScoreToServer(completed, gameTime, wordsCount, scoreResult.finalScore, difficulty, gameStats);
+    } else {
+      // Normal puanı hesapla
+      const finalScore = wordsCount * 100; // Her kelime 100 puan
+      saveScoreToServer(completed, gameTime, wordsCount, finalScore, difficulty, gameStats);
     }
-
-    // İstatistikleri hesapla
-    const gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
-    const wordsCount = solvedWords.length;
-
-    // Skoru arka planda kaydet
-    saveScoreToServer(completed, gameTime, wordsCount);
 
     // Oyunu sıfırla ve ana menüye dön
     resetGame();
   }
 
   // Skoru API'ye gönder (puan gösterim ekranı olmadan)
-  function saveScoreToServer(completed, gameTime, wordsCount) {
-    // Skoru kaydetmeden sadece ana sayfaya yönlendir
+  function saveScoreToServer(completed, gameTime, wordsCount, finalScore, difficulty, gameStats) {
+    try {
+      // İsteğe göre loglama
+      console.log(`Saving score for wordPuzzle: ${finalScore} points, difficulty: ${difficulty}`);
+
+      // ScoreHandler mevcutsa kullan
+      if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
+        window.ScoreHandler.saveScore('wordPuzzle', finalScore, difficulty, gameTime, gameStats);
+      } else if (window.saveScoreAndDisplay && typeof window.saveScoreAndDisplay === 'function') {
+        window.saveScoreAndDisplay('wordPuzzle', finalScore, gameTime, difficulty, gameStats, function() {
+          // Skor gösterimi kaldırıldı
+        });
+      } else {
+        // Alternatif olarak doğrudan API'ye gönder
+        fetch('/api/save-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_type: 'wordPuzzle',
+            score: finalScore,
+            difficulty: difficulty,
+            playtime: gameTime,
+            game_stats: gameStats
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Score saved:", data);
+        })
+        .catch(err => console.error("Skor kaydetme hatası:", err));
+      }
+    } catch (e) {
+      console.error("Skor kaydetme işleminde hata:", e);
+    }
+
+    // Skoru göstermeden ana sayfaya yönlendir
     setTimeout(() => {
       window.location.href = '/all_games';
     }, 500);
