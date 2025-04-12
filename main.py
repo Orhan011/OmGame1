@@ -137,12 +137,35 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         
         # SMTP sunucusuna bağlan ve e-postayı gönder
         logger.info(f"SMTP sunucusuna bağlanılıyor: smtp.gmail.com:465")
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-        server.login(from_email, password)
-        # Türkçe karakterler için UTF-8 kodlaması kullan
-        text = smtp_msg.as_string().encode('utf-8')
-        server.sendmail(from_email, to_email, text)
-        server.quit()
+        try:
+            # SSL bağlantısı dene (debug modda)
+            logger.info(f"SMTP SSL bağlantısı kuruluyor...")
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
+            server.set_debuglevel(1)  # Debug mode
+            logger.info(f"SMTP giriş yapılıyor: {from_email}")
+            server.login(from_email, password)
+            logger.info(f"SMTP login başarılı")
+            # Türkçe karakterler için UTF-8 kodlaması kullan
+            text = smtp_msg.as_string().encode('utf-8')
+            logger.info(f"Mesaj gönderiliyor: {from_email} -> {to_email}")
+            server.sendmail(from_email, to_email, text)
+            server.quit()
+            logger.info(f"SMTP SSL bağlantısı ile e-posta gönderildi")
+        except Exception as ssl_error:
+            logger.warning(f"SSL ile bağlantı hatası, TLS denenecek: {str(ssl_error)}")
+            # SSL başarısız olursa TLS bağlantısı dene
+            try:
+                server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
+                server.starttls()
+                server.login(from_email, password)
+                # Türkçe karakterler için UTF-8 kodlaması kullan
+                text = smtp_msg.as_string().encode('utf-8')
+                server.sendmail(from_email, to_email, text)
+                server.quit()
+                logger.info(f"SMTP TLS bağlantısı ile e-posta gönderildi")
+            except Exception as tls_error:
+                logger.error(f"TLS ile bağlantı hatası: {str(tls_error)}")
+                raise  # Hatayı yeniden yükselt
         
         logger.info(f"E-posta başarıyla gönderildi: {to_email}")
         return True
