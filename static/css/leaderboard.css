@@ -141,8 +141,11 @@
 }
 
 .player-row:hover {
-  background: rgba(106, 90, 224, 0.1);
-  transform: translateX(5px);
+  background: rgba(106, 90, 224, 0.15);
+  transform: translateX(5px) scale(1.02);
+  z-index: 2;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .rank-cell {
@@ -626,39 +629,78 @@
   color: transparent;
 }
 
-.level-progress {
-  width: 90%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  margin-top: 5px;
-  position: relative;
-  overflow: hidden;
+/* Modernleştirilmiş seviye göstergesi */
+.level-stats-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
 }
 
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #6a5ae0, #9f8aff);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+.level-number-indicator {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 2px 10px rgba(106, 90, 224, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
 }
 
-.progress-text {
-  position: absolute;
-  right: 5px;
-  top: -10px;
-  font-size: 0.6rem;
-  color: #8a8aa3;
+.xp-stats {
+  display: flex;
+  align-items: center;
+}
+
+.xp-text {
+  font-size: 0.8rem;
+  color: #9f8aff;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .level-container {
   background: rgba(106, 90, 224, 0.2);
   border: 1px solid rgba(106, 90, 224, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+}
+
+.level-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.3);
 }
 
 .level-value {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.level-value::before {
+  content: "\f19d"; /* Mezuniyet şapkası ikonu */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 0.9rem;
 }
 
 .row {
@@ -949,7 +991,7 @@
 
 /* Liderlik Tablosu Stilleri */
 
-/* Seviye Badge Renkleri */
+/* Seviye Badge Renkleri - Modernleştirilmiş */
 .level-container.level-advanced {
   background: linear-gradient(45deg, #4a7def, #3b5fe1);
   box-shadow: 0 4px 15px rgba(74, 125, 239, 0.3);
@@ -969,6 +1011,34 @@
   background: linear-gradient(45deg, #f44336, #d32f2f);
   box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
   animation: glow 2s infinite alternate;
+}
+
+/* Seviye numarası göstergeleri için farklı renkler */
+.level-number-indicator.level-advanced {
+  background: linear-gradient(135deg, #4a7def, #3b5fe1);
+  box-shadow: 0 2px 10px rgba(74, 125, 239, 0.5);
+}
+
+.level-number-indicator.level-expert {
+  background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+  box-shadow: 0 2px 10px rgba(156, 39, 176, 0.5);
+}
+
+.level-number-indicator.level-master {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  box-shadow: 0 2px 10px rgba(255, 152, 0, 0.5);
+}
+
+.level-number-indicator.level-elite {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  box-shadow: 0 2px 10px rgba(244, 67, 54, 0.5);
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); }
+  50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(244, 67, 54, 0.7); }
+  100% { transform: scale(1); box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); }
 }
 
 @keyframes glow {
