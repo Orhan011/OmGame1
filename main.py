@@ -104,10 +104,9 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         except Exception as e:
             logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
     
-    # Doğrulama kodunu her zaman konsola yazdır (geliştirme/test amacıyla)
+    # Sadece loglama (adminler için gizli loglarda)
     if verification_code:
-        print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {to_email} ###")
-        logger.info(f"Doğrulama Kodu (gönderilecek): {verification_code} - E-posta: {to_email}")
+        logger.debug(f"Doğrulama Kodu (gönderilecek): {verification_code} - E-posta: {to_email}")
     
     # SMTP ile e-posta gönderimi deneme
     try:
@@ -124,10 +123,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
             logger.error("GMAIL_APP_PASSWORD çevresel değişkeni ayarlanmamış!")
             print("### UYARI: GMAIL_APP_PASSWORD çevresel değişkeni ayarlanmamış! ###")
             
-            # Test/Geliştirme modunda olduğumuz için, doğrulama kodunu yazdırıp devam et
-            if verification_code:
-                print(f"### TEST MODU AKTIF - DOĞRULAMA KODU: {verification_code} ###")
-                return True
+            # GMAIL_APP_PASSWORD ayarlanmamışsa gerçek hata döndür
             return False
         
         # E-posta mesajını oluştur
@@ -164,9 +160,9 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
             print("### Gmail hesabınız için bir uygulama şifresi oluşturmalı ve Replit Secrets bölümünden GMAIL_APP_PASSWORD değişkenine eklemelisiniz ###")
             print("### 1. Google hesabınıza gidin, 2. Güvenlik > 2 Adımlı Doğrulama > Uygulama Şifreleri ###")
         
-        # Test/Geliştirme modunda olduğumuz için, hataya rağmen doğrulama kodunu göster ve başarılı dön
-        if verification_code:
-            logger.warning(f"E-posta gönderme başarısız, ancak test modunda olduğumuz için işlem başarılı kabul edildi")
+        # E-posta gönderimi başarısız, hata döndür
+        logger.error("E-posta gönderimi başarısız oldu")
+        return Falseşarılı kabul edildi")
             print(f"### TEST MODU AKTIF - E-POSTA GÖNDERME BAŞARISIZ OLSA DA DOĞRULAMA KODU: {verification_code} ###")
             return True
             
