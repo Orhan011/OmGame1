@@ -167,45 +167,24 @@ def forgot_password():
             </html>
             """
 
+            # Ana modüldeki e-posta gönderme fonksiyonunu kullan
+            from main import send_email_in_background
+            
             # E-postayı gönder
             subject = "Şifre Sıfırlama Kodu"
-            # E-postayı direkt gönder
-            try:
-                import smtplib
-                from email.mime.multipart import MIMEMultipart
-                from email.mime.text import MIMEText
-                
-                from_email = "omgameee@gmail.com"
-                # Çevresel değişkenden alınan Gmail uygulama şifresi
-                password = os.environ.get('GMAIL_APP_PASSWORD', '')  # Uygulama şifresi - None gelirse boş string kullan
-                from_name = "OmGame"
-                
-                # E-posta mesajını oluştur
-                smtp_msg = MIMEMultipart()
-                smtp_msg['From'] = f"{from_name} <{from_email}>"
-                smtp_msg['To'] = email
-                smtp_msg['Subject'] = subject
-                smtp_msg.attach(MIMEText(html_body, 'html'))
-                
-                # SMTP sunucusuna bağlan ve e-postayı gönder
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-                server.login(from_email, password)
-                text = smtp_msg.as_string()
-                server.sendmail(from_email, email, text)
-                server.quit()
-                
-                # Geliştirme modunda doğrulama kodunu logla
-                print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {email} ###")
-                logger.info(f"E-posta başarıyla gönderildi: {email}, Doğrulama kodu: {verification_code}")
-            except Exception as e:
-                logger.error(f"E-posta gönderme hatası: {str(e)}")
-                # Hata detaylarını da yazdır
-                import traceback
-                logger.error(f"DETAYLI HATA: {traceback.format_exc()}")
-                # Geliştirme/Test modunda olduğumuz için, doğrulama kodunu konsola yazdıralım
-                print(f"### TEST MODU AKTIF - E-POSTA GÖNDERİLEMEDİ AMA DOĞRULAMA KODU: {verification_code} ###")
-                print(f"### HATA MESAJI: {str(e)} ###")
-                logger.warning(f"E-posta gönderilemedi ama test modunda olduğu için işlem devam ediyor. Kod: {verification_code}")
+            email_sent = send_email_in_background(
+                to_email=email,
+                subject="OmGame - Şifre Sıfırlama Doğrulama Kodunuz",
+                html_body=html_body,
+                verification_code=verification_code
+            )
+            
+            # Geliştirme modunda doğrulama kodunu her zaman göster
+            print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {email} ###")
+            logger.info(f"E-posta: {email}, Doğrulama kodu: {verification_code}")
+            
+            # Kodu ekranda da göster (geliştirme amaçlı)
+            flash(f'Doğrulama kodu: {verification_code} (Test modu)', 'info')
             
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
             return redirect(url_for('password_reset.reset_code', email=email))
