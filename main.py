@@ -3395,5 +3395,14 @@ def get_users_leaderboard():
 # Blueprint'i kaydet
 # Password reset blueprint removed
 
+@app.route('/education-games')
+def education_games():
+    """Eğitim, eğlence ve oyun sayfası"""
+    # Şu an için boş bir oyun listesi oluştur
+    games = []
+    
+    # Sayfa template'ini döndür
+    return render_template('education_games.html', games=games)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
