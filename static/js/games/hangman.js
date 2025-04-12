@@ -47,12 +47,27 @@ function saveScoreToLeaderboard(finalScore, isWin) {
       attempts_remaining: remainingAttempts
     };
 
-    console.log(`Saving score for hangman: ${finalScore} points, difficulty: ${difficulty}`);
+    console.log(`Kullanıcı profiline puan kaydediliyor: hangman: ${finalScore} puan, zorluk: ${difficulty}`);
     
-    // Skor kaydetme
-    if (typeof window.ScoreHandler !== 'undefined' && typeof window.ScoreHandler.saveScore === 'function') {
-      window.ScoreHandler.saveScore('hangman', finalScore, difficulty, playtime, gameStats);
-    } else if (typeof window.saveScoreAndDisplay === 'function') {
+    // Skor kaydetme (üç farklı API seçeneği kontrol et)
+    if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.saveScoreToLeaderboard === 'function') {
+      // Yeni API kullan (leaderboard-fix.js)
+      window.LeaderboardManager.saveScoreToLeaderboard('hangman', finalScore, playtime, difficulty, gameStats)
+        .then(data => {
+          console.log("Puan kaydedildi:", data);
+          // Skor verileri
+          console.log("Skor verileri:", data);
+        })
+        .catch(error => console.error("Puan kaydedilirken hata:", error));
+    }
+    // Alternatif olarak ScoreHandler API'sini kullan
+    else if (typeof window.ScoreHandler !== 'undefined' && typeof window.ScoreHandler.saveScore === 'function') {
+      // Score-handler.js modülünü kullan
+      window.ScoreHandler.saveScore('hangman', finalScore, playtime, difficulty, gameStats);
+    } 
+    // Alternatif olarak global saveScoreAndDisplay fonksiyonunu kullan
+    else if (typeof window.saveScoreAndDisplay === 'function') {
+      // Standart skor gösterme fonksiyonu
       window.saveScoreAndDisplay('hangman', finalScore, playtime, difficulty, gameStats, function(scoreHtml) {
         // Skor özeti göster (opsiyonel)
         const scoreContainer = document.getElementById('score-container');
@@ -62,7 +77,7 @@ function saveScoreToLeaderboard(finalScore, isWin) {
       });
     } else {
       console.error("Skor kaydedici bulunamadı! API'ye doğrudan gönderiliyor...");
-      // Alternatif olarak doğrudan API'ye gönder
+      // Son çare olarak doğrudan API'ye gönder
       fetch('/api/save-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +91,7 @@ function saveScoreToLeaderboard(finalScore, isWin) {
       })
       .then(response => response.json())
       .then(data => {
-        console.log("Score saved:", data);
+        console.log("Score saved successfully");
       })
       .catch(err => console.error("Skor kaydetme hatası:", err));
     }
