@@ -1,16 +1,53 @@
 
 /**
- * Oyun puan entegrasyonu için yardımcı fonksiyonlar
- * Bu modül, oyunlara puan sistemini kolayca entegre etmek için yardımcı fonksiyonlar sağlar
+ * Oyun puan sistemini entegre etmeyi kolaylaştıran yardımcı fonksiyonlar
+ * @module GameIntegrationHelper
  * @version 1.0.0
  */
 
 /**
- * Oyuna puan sistemi entegrasyonu ekler
- * @param {string} gameType - Oyun tipi (wordle, puzzle, memoryCards vb.)
- * @param {Object} gameInstance - Oyun örneği veya oyun verilerini içeren nesne
+ * Belirtilen script dosyasının yüklü olup olmadığını kontrol eder ve yüklü değilse yükler
+ * @param {string} scriptUrl - Yüklenecek script dosyasının URL'si
+ * @returns {Promise} Script yükleme işlemi
+ */
+function ensureScriptLoaded(scriptUrl) {
+  return new Promise((resolve, reject) => {
+    if (!scriptUrl) {
+      reject('Script URL belirtilmedi!');
+      return;
+    }
+
+    // Script zaten yüklü mü kontrol et
+    const existingScript = document.querySelector(`script[src="${scriptUrl}"]`);
+    if (existingScript) {
+      resolve(existingScript);
+      return;
+    }
+
+    // Script yüklü değilse yükle
+    const script = document.createElement('script');
+    script.src = scriptUrl;
+    script.async = true;
+    
+    script.onload = () => {
+      resolve(script);
+    };
+    
+    script.onerror = (error) => {
+      console.error(`Script yüklenirken hata oluştu: ${scriptUrl}`, error);
+      reject(error);
+    };
+    
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Bir oyun için puan sistemi entegrasyonu oluşturur ve başlatır
+ * @param {string} gameType - Oyun türü (wordle, tetris, puzzle vb.)
+ * @param {Object} gameInstance - Oyun örneği
  * @param {Object} options - Ek seçenekler
- * @returns {Object} GameScoreIntegration örneği
+ * @returns {GameScoreIntegration} Puan entegrasyonu örneği
  */
 function integrateGameScore(gameType, gameInstance = {}, options = {}) {
   // Gerekli script dosyalarını kontrol et ve yükle
@@ -34,70 +71,28 @@ function integrateGameScore(gameType, gameInstance = {}, options = {}) {
     optimalTime: options.optimalTime || null,
     expectedTime: options.expectedTime || null
   });
-
-  // GameScore örneğini oyun nesnesine bağla
+  
+  // Eğer bir oyun örneği varsa, ona puan sistemi metodlarını ekle
   if (gameInstance) {
-    gameInstance.scoreIntegration = scoreIntegration;
+    gameInstance.scoreSystem = scoreIntegration;
     
-    // Oyunun restart metodu varsa, onu genişlet
-    if (typeof gameInstance.restart === 'function') {
-      const originalRestart = gameInstance.restart;
-      gameInstance.restart = function(...args) {
-        // Önce orijinal restart fonksiyonunu çağır
-        originalRestart.apply(this, args);
-        // Sonra puan entegrasyonunu da yeniden başlat
-        this.scoreIntegration.restart();
-      };
+    // Oyun API'si üzerinden puan sistemi fonksiyonlarına erişim sağla
+    if (!gameInstance.updateScore) {
+      gameInstance.updateScore = (score) => scoreIntegration.updateScore(score);
+    }
+    
+    if (!gameInstance.saveScore) {
+      gameInstance.saveScore = (callback) => scoreIntegration.saveScore(callback);
+    }
+    
+    if (!gameInstance.endGame) {
+      gameInstance.endGame = (finalScore, callback) => scoreIntegration.endGame(finalScore, callback);
     }
   }
-
+  
   return scoreIntegration;
 }
 
-/**
- * Script dosyasının yüklü olduğundan emin olur
- * @param {string} src - Script dosyasının yolu
- */
-function ensureScriptLoaded(src) {
-  if (!document.querySelector(`script[src="${src}"]`)) {
-    const script = document.createElement('script');
-    script.src = src;
-    script.async = false;
-    document.head.appendChild(script);
-  }
-}
-
-/**
- * Doğruluk oranını hesaplar
- * @param {number} correct - Doğru sayısı
- * @param {number} total - Toplam sayı
- * @returns {number} Doğruluk oranı (0-1 arası)
- */
-function calculateAccuracy(correct, total) {
-  if (!total) return 0;
-  return Math.max(0, Math.min(1, correct / total));
-}
-
-/**
- * Zorluk seviyesini izler ve değişikliklerini takip eder
- * @param {Object} scoreIntegration - GameScoreIntegration örneği
- */
-function setupDifficultyListener(scoreIntegration) {
-  if (!scoreIntegration) return;
-  
-  const difficultyButtons = document.querySelectorAll('.difficulty-selector .difficulty-option');
-  
-  difficultyButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const difficulty = this.getAttribute('data-difficulty');
-      if (difficulty) {
-        scoreIntegration.setDifficulty(difficulty);
-      }
-    });
-  });
-}
-
 // Global erişim için window nesnesine ekle
+window.ensureScriptLoaded = ensureScriptLoaded;
 window.integrateGameScore = integrateGameScore;
-window.setupDifficultyListener = setupDifficultyListener;
-window.calculateAccuracy = calculateAccuracy;
