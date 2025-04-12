@@ -42,15 +42,21 @@ from models import db, User, Score, Article, Achievement, GameStat, AdminUser, G
 # Veritabanını uygulama ile ilişkilendir
 db.init_app(app)
 
-# Admin panel blueprint'ini içe aktar
+# Blueprint'leri içe aktar
 from admin import admin_bp
-# Admin blueprint'ini kaydet
+from password_reset import password_reset
+
+# Blueprint'leri kaydet
 app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(password_reset, url_prefix='/password')
 
 # Veritabanı tabloları oluştur
 with app.app_context():
-    db.create_all()
-    logger.info("Database tables created successfully")
+    try:
+        db.create_all()
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Database creation error: {e}")
 
 def allowed_file(filename):
     """Dosya uzantısının izin verilen uzantılardan olup olmadığını kontrol eder."""
