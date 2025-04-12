@@ -13,7 +13,7 @@ import secrets
 import threading
 
 from models import db, User
-from main import send_verification_email
+from mail_service import send_verification_email
 
 # Blueprint tanımlaması
 auth = Blueprint('auth', __name__)
