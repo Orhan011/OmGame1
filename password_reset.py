@@ -175,7 +175,8 @@ def forgot_password():
                 from email.mime.text import MIMEText
                 
                 from_email = "omgameee@gmail.com"
-                password = "nevq zfmo lzvg nxkl"  # Uygulama şifresi
+                # Güncellenmiş uygulama şifresi - Gmail için özel olarak oluşturulmuş bir şifre olmalıdır
+                password = "dmzp lnwm mcjc qifu"  # Uygulama şifresi
                 from_name = "OmGame"
                 
                 # E-posta mesajını oluştur
