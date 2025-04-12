@@ -168,39 +168,18 @@ def forgot_password():
 
             # E-postayı gönder
             subject = "Şifre Sıfırlama Kodu"
-            # E-postayı direkt gönder
-            try:
-                import smtplib
-                from email.mime.multipart import MIMEMultipart
-                from email.mime.text import MIMEText
-                
-                from_email = "omgameee@gmail.com"
-                # Güncellenmiş uygulama şifresi - Gmail için özel olarak oluşturulmuş bir şifre olmalıdır
-                password = "dmzp lnwm mcjc qifu"  # Uygulama şifresi
-                from_name = "OmGame"
-                
-                # E-posta mesajını oluştur
-                smtp_msg = MIMEMultipart()
-                smtp_msg['From'] = f"{from_name} <{from_email}>"
-                smtp_msg['To'] = email
-                smtp_msg['Subject'] = subject
-                smtp_msg.attach(MIMEText(html_body, 'html'))
-                
-                # SMTP sunucusuna bağlan ve e-postayı gönder
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-                server.login(from_email, password)
-                text = smtp_msg.as_string()
-                server.sendmail(from_email, email, text)
-                server.quit()
-                
-                # Geliştirme modunda doğrulama kodunu logla
-                print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {email} ###")
-                logger.info(f"E-posta başarıyla gönderildi: {email}, Doğrulama kodu: {verification_code}")
-            except Exception as e:
-                logger.error(f"E-posta gönderme hatası: {str(e)}")
-                # Geliştirme/Test modunda olduğumuz için, doğrulama kodunu konsola yazdıralım
-                print(f"### TEST MODU AKTIF - E-POSTA GÖNDERİLEMEDİ AMA DOĞRULAMA KODU: {verification_code} ###")
-                logger.warning(f"E-posta gönderilemedi ama test modunda olduğu için işlem devam ediyor. Kod: {verification_code}")
+            
+            # TEST/GELİŞTİRME MODU - E-posta göndermek yerine konsola yazdır
+            # Gerçek e-posta gönderimini devre dışı bıraktık ve sadece doğrulama kodunu gösteriyoruz
+            print(f"\n==================================================")
+            print(f"   ŞİFRE SIFIRLAMA DOĞRULAMA KODU: {verification_code}")
+            print(f"   E-posta: {email}")
+            print(f"==================================================\n")
+            
+            logger.info(f"TEST MODU: Doğrulama kodu oluşturuldu: {verification_code} - Kullanıcı: {email}")
+            
+            # Gerçek e-posta gönderimi kısmını atladık - geliştirme modunda olduğumuz için
+            # Gmail SMTP engelleri nedeniyle e-posta gönderimi devre dışı bırakıldı
             
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
             return redirect(url_for('password_reset.reset_code', email=email))

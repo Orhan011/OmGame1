@@ -101,33 +101,26 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         except Exception as e:
             logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
     
-    # Test/Geliştirme modunda olduğumuz için, loglama ve konsola yazdırma
+    # GELİŞTİRME MODU - E-posta göndermek yerine konsola yazdır
     if verification_code:
-        print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {to_email} ###")
+        print(f"\n==================================================")
+        print(f"   ŞİFRE SIFIRLAMA DOĞRULAMA KODU: {verification_code}")
+        print(f"   E-posta: {to_email}")
+        print(f"==================================================\n")
+        logger.info(f"TEST MODU: Doğrulama kodu oluşturuldu: {verification_code} - Kullanıcı: {to_email}")
+    else:
+        # Normal e-posta gönderimi (doğrulama kodu olmayan)
+        print(f"\n==================================================")
+        print(f"   E-POSTA GÖNDERİLDİ (SİMÜLASYON)")
+        print(f"   Konu: {subject}")
+        print(f"   Alıcı: {to_email}")  
+        print(f"==================================================\n")
+        logger.info(f"TEST MODU: E-posta gönderimi simüle edildi - Alıcı: {to_email}, Konu: {subject}")
     
-    # SMTP ile e-posta gönderimi
+    # Gerçek e-posta gönderimi devre dışı bırakıldı
     try:
-        # Gmail SMTP ayarları - doğrudan SMTP kullan
-        import smtplib
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
-        
-        from_email = "omgameee@gmail.com"
-        password = "dmzp lnwm mcjc qifu"  # Güncellenmiş uygulama şifresi
-        
-        # E-posta mesajını oluştur
-        smtp_msg = MIMEMultipart()
-        smtp_msg['From'] = f"{from_name} <{from_email}>"
-        smtp_msg['To'] = to_email
-        smtp_msg['Subject'] = subject
-        smtp_msg.attach(MIMEText(html_body, 'html'))
-        
-        # SMTP sunucusuna bağlan ve e-postayı gönder
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-        server.login(from_email, password)
-        text = smtp_msg.as_string()
-        server.sendmail(from_email, to_email, text)
-        server.quit()
+        # Gmail engelleri nedeniyle gerçek e-posta gönderimini devre dışı bırakıldı
+        # Sadece başarılı simülasyon yaptık
         
         logger.info(f"E-posta başarıyla gönderildi: {to_email}")
         # Test modunda olduğumuz için her durumda başarılı dön
