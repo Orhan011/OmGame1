@@ -74,13 +74,10 @@ def forgot_password():
             send_verification_email(email, reset_code)
         except Exception as e:
             logger.error(f"E-posta gönderme hatası: {str(e)}")
-            print(f"E-POSTA GÖNDERİLEMEDİ! KODUNUZU EKRANDA GÖREBİLİRSİNİZ: {reset_code}")
         
         # Kodu session'da sakla ve ekranda göster
         session['verification_code_display'] = reset_code
-        
-        # Gmail sorunları nedeniyle doğrulama kodunu ekranda açıkça göster
-        flash(f'Doğrulama kodunuz: {reset_code} - Lütfen bu kodu bir sonraki adımda kullanın', 'success')
+        flash(f'Doğrulama kodunuz: {reset_code}', 'success')
             
         return redirect(url_for('auth.reset_code', email=email))
 
