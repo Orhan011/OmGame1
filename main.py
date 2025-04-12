@@ -58,42 +58,36 @@ def allowed_file(filename):
 
 import threading
 
-def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
+def send_email_in_background(to_email, subject, html_body, from_name="OmGame", verification_code=None):
     """
     E-posta gönderme işlemini gerçekleştirir.
     Doğrudan SMTP kullanarak e-posta gönderimi.
     
-    NOT: Gmail ile ilgili kimlik doğrulama sorunları nedeniyle, 
-    doğrulama kodları artık e-postayla gönderilmiyor. Bunun yerine doğrudan 
-    kullanıcı arayüzünde gösteriliyor.
+    Args:
+        to_email (str): Gönderilecek e-posta adresi
+        subject (str): E-posta konusu
+        html_body (str): E-posta içeriği (HTML)
+        from_name (str, optional): Gönderen adı. Varsayılan: "OmGame"
+        verification_code (str, optional): Doğrulama kodu. Belirtilmezse içerikten otomatik çıkarılmaya çalışılır.
     """
     # İşlem başlangıcını logla
     logger.info(f"E-posta gönderme işlemi başlatıldı: {to_email}, Konu: {subject}")
     
-    # Doğrulama kodu varsa logla ve çıkar
-    verification_code = None
-    if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+    # Doğrulama kodu verilmediyse ve bu bir şifre sıfırlama e-postası ise, HTML içeriğinden kodu çıkar
+    if not verification_code and ("Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject):
         try:
             import re
             # Verification code'u çıkart (hem h3 etiketindeki hem de verification-code class'ındaki)
-            code_match = re.search(r'<h3[^>]*>(\d+)</h3>|class="verification-code"[^>]*>(\d+)<', html_body)
+            code_match = re.search(r'verification-code">(\d+)<|<h3[^>]*>(\d+)</h3>', html_body)
             if code_match:
                 # İki gruptan hangisinde eşleşme varsa onu al
                 verification_code = code_match.group(1) if code_match.group(1) else code_match.group(2)
-                logger.info(f"Doğrulama Kodu: {verification_code} - E-posta: {to_email}")
-                # Konsola da yazdır - kullanıcının görmesi için kritik
-                print(f"ÖNEMLİ - DOĞRULAMA KODU: {verification_code} - E-posta: {to_email}")
-                
-                # Doğrulama kodunu içeren e-postaları göndermeyi deneme 
-                # (Gmail kimlik doğrulama sorunları nedeniyle)
-                if verification_code:
-                    # E-posta göndermeden başarılı kabul et, kod zaten ekranda gösterilecek
-                    return True
-                
+                # Sadece logla, konsola yazdırma
+                logger.info(f"Doğrulama Kodu (sadece loglarda): {verification_code} - E-posta: {to_email}")
         except Exception as e:
             logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
     
-    # Normal e-postalar için SMTP ile gönderim dene
+    # SMTP ile e-posta gönderimi
     try:
         # Gmail SMTP ayarları - doğrudan SMTP kullan
         import smtplib
@@ -123,17 +117,10 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
     except Exception as e:
         logger.error(f"E-posta gönderme işlemi sırasında hata: {str(e)}")
         
-        # Doğrulama kodu e-postası ise ve kod çıkarılabilmişse
-        if verification_code:
-            print(f"E-POSTA GÖNDERİLEMEDİ! Kod: {verification_code}, E-posta: {to_email}")
-            print(f"Kullanıcı, ekranda gösterilen kodu kullanarak devam edebilir.")
-            # Doğrulama kodu e-postaları için SMTP hatası olsa bile başarılı kabul et
-            return True
-            
         # Gmail uygulama şifresiyle ilgili bir hata olabilir
         if "Application-specific password required" in str(e) or "Invalid credentials" in str(e):
             logger.critical("Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
-            print("ÖNEMLİ HATA: Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
+            logger.error("ÖNEMLİ HATA: Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
             
         return False
 
@@ -174,31 +161,19 @@ def send_verification_email(to_email, verification_code, html_message=None):
             </html>
             """
         
+        # Direkt SMTP kullanarak e-posta gönder
         try:
-            # Flask-Mail kullanarak e-posta gönderim dene
-            from app import mail
-            from flask_mail import Message
-            
-            msg = Message(
-                subject="OmGame - Şifre Sıfırlama Doğrulama Kodu",
-                recipients=[to_email],
-                html=html_message,
-                sender=("OmGame", "omgameee@gmail.com")
-            )
-            mail.send(msg)
-            logger.info(f"Flask-Mail ile e-posta başarıyla gönderildi: {to_email}")
-            return True
-        except Exception as mail_error:
-            logger.error(f"Flask-Mail ile e-posta gönderimi başarısız: {str(mail_error)}")
-            
-            # Fallback: SMTP ile e-posta gönder
-            try:
-                send_email_in_background(to_email, "OmGame - Şifre Sıfırlama Doğrulama Kodu", html_message)
+            # Bu fonksiyon log mesajı da yazdırıyor
+            result = send_email_in_background(to_email, "OmGame - Şifre Sıfırlama Doğrulama Kodu", html_message, verification_code=verification_code)
+            if result:
+                logger.info(f"SMTP ile e-posta başarıyla gönderildi: {to_email}")
                 return True
-            except Exception as smtp_error:
-                logger.error(f"SMTP ile e-posta gönderimi de başarısız: {str(smtp_error)}")
-                # E-posta gönderimi başarısız
+            else:
+                logger.error(f"SMTP ile e-posta gönderimi başarısız")
                 return False
+        except Exception as e:
+            logger.error(f"E-posta gönderimi sırasında hata: {str(e)}")
+            return False
     
     except Exception as e:
         logger.error(f"Doğrulama e-postası gönderme hatası: {str(e)}")
