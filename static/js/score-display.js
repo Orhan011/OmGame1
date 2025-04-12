@@ -791,3 +791,287 @@ window.createScoreDisplay = createScoreDisplay;
 window.formatGameName = formatGameName;
 window.formatDifficulty = formatDifficulty;
 window.getGameIcon = getGameIcon;
+/**
+ * Oyun skorlarını görsel olarak gösteren modül
+ * @version 1.5.0
+ */
+
+// Skor kartı gösterim sınıfı
+class ScoreDisplay {
+  /**
+   * Yeni bir skor gösterimi oluşturur
+   * @param {string} selector - Skor kartının ekleneceği DOM elemanı seçicisi
+   */
+  constructor(selector = 'body') {
+    this.container = document.querySelector(selector);
+    this.visible = false;
+    this.currentScore = null;
+  }
+  
+  /**
+   * Skor kartını görüntüler
+   * @param {string} html - Skor kartı HTML içeriği
+   * @param {Object} data - Skor verileri
+   */
+  show(html, data = {}) {
+    try {
+      if (!html) {
+        console.error('Skor ekranı HTML içeriği belirtilmedi');
+        return;
+      }
+      
+      this.currentScore = data;
+      
+      // Daha önce açık bir skor ekranı varsa kaldır
+      this.hide();
+      
+      // HTML içeriğini ekle
+      document.body.insertAdjacentHTML('beforeend', html);
+      
+      // Ekranı görünür yap
+      setTimeout(() => {
+        const overlay = document.querySelector('.game-result-overlay');
+        if (overlay) {
+          overlay.style.display = 'flex';
+          overlay.style.opacity = '1';
+          overlay.style.visibility = 'visible';
+          this.visible = true;
+          
+          console.log('Skor ekranı başarıyla gösterildi');
+          
+          // Etkinlik dinleyicileri ekle
+          this.addEventListeners(overlay, data);
+        } else {
+          console.error('Skor ekranı DOM\'a eklendi ama bulunamadı!');
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Skor ekranı gösterilirken hata:', error);
+    }
+  }
+  
+  /**
+   * Açık skor kartını kapatır
+   */
+  hide() {
+    const overlay = document.querySelector('.game-result-overlay');
+    
+    if (overlay) {
+      overlay.style.opacity = '0';
+      
+      setTimeout(() => {
+        overlay.remove();
+        this.visible = false;
+      }, 300);
+    }
+  }
+  
+  /**
+   * Skor ekranı için etkinlik dinleyicileri ekler
+   * @param {HTMLElement} overlay - Skor kartı overlay elemanı
+   * @param {Object} data - Skor verileri
+   * @private
+   */
+  addEventListeners(overlay, data = {}) {
+    try {
+      // Kapat düğmesi
+      const closeBtn = overlay.querySelector('.game-result-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => this.hide());
+      }
+      
+      // Yeniden oyna düğmesi
+      const replayBtn = overlay.querySelector('.game-result-replay');
+      if (replayBtn) {
+        replayBtn.addEventListener('click', () => {
+          location.reload();
+        });
+      }
+      
+      // Ana sayfa düğmesi
+      const homeBtn = overlay.querySelector('.game-result-home');
+      if (homeBtn) {
+        homeBtn.addEventListener('click', () => {
+          window.location.href = '/';
+        });
+      }
+      
+      // Liderlik tablosu düğmesi
+      const leaderboardBtn = overlay.querySelector('.game-result-leaderboard');
+      if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', () => {
+          window.location.href = '/leaderboard?game=' + (data.game_type || '');
+        });
+      }
+      
+      // Paylaş düğmesi
+      const shareBtn = overlay.querySelector('.game-result-share');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+          if (navigator.share) {
+            navigator.share({
+              title: 'Oyun Skorumu Gör!',
+              text: `${data.game_name || 'Oyun'} skorumu gör: ${data.score} puan!`,
+              url: window.location.href,
+            })
+            .catch((error) => console.log('Paylaşım hatası:', error));
+          } else {
+            alert('Skorun: ' + data.score + ' puan!');
+          }
+        });
+      }
+      
+      // Kopyala düğmesi
+      const copyScoreBtn = overlay.querySelector('.game-result-copy');
+      if (copyScoreBtn) {
+        copyScoreBtn.addEventListener('click', () => {
+          const scoreText = `${data.game_name || 'Oyun'} skorumu gör: ${data.score} puan!`;
+          
+          navigator.clipboard.writeText(scoreText)
+            .then(() => {
+              const originalText = copyScoreBtn.textContent;
+              copyScoreBtn.textContent = 'Kopyalandı!';
+              
+              setTimeout(() => {
+                copyScoreBtn.textContent = originalText;
+              }, 2000);
+            })
+            .catch(err => {
+              console.error('Panoya kopyalama hatası:', err);
+            });
+        });
+      }
+      
+      console.log('Skor ekranı etkinlik dinleyicileri eklendi');
+    } catch (error) {
+      console.error('Etkinlik dinleyicileri eklenirken hata:', error);
+    }
+  }
+  
+  /**
+   * Özel bir oyun sonu mesajı oluşturur
+   * @param {Object} options - Mesaj seçenekleri
+   * @returns {string} Oluşturulan HTML
+   */
+  createCustomMessage(options = {}) {
+    const {
+      title = 'Oyun Tamamlandı',
+      message = 'Tebrikler!',
+      score = 0,
+      buttons = [
+        { label: 'Tekrar Oyna', icon: 'redo', action: 'reload' },
+        { label: 'Ana Sayfa', icon: 'home', action: 'home' }
+      ]
+    } = options;
+    
+    // Butonları oluştur
+    let buttonsHtml = '';
+    
+    for (const button of buttons) {
+      buttonsHtml += `
+        <button class="game-result-${button.action}" data-action="${button.action}">
+          <i class="fas fa-${button.icon}"></i> ${button.label}
+        </button>
+      `;
+    }
+    
+    // HTML oluştur
+    return `
+      <div class="game-result-overlay">
+        <div class="game-result-container">
+          <button class="game-result-close"><i class="fas fa-times"></i></button>
+          
+          <div class="game-result-header">
+            <h2>${title}</h2>
+          </div>
+          
+          <div class="game-result-score">
+            <div class="score-circle">
+              <span class="score-value">${score}</span>
+              <span class="score-label">puan</span>
+            </div>
+          </div>
+          
+          <div class="game-result-text">
+            <p>${message}</p>
+          </div>
+          
+          <div class="game-result-actions">
+            ${buttonsHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Zorluk seçici dinleyicisi
+function setupDifficultyListener(scoreSystem) {
+  if (!scoreSystem) {
+    console.error('Zorluk dinleyicisi kurulamadı: Skor sistemi eksik');
+    return;
+  }
+  
+  // Zorluk seçicileri
+  const difficultyButtons = document.querySelectorAll('.difficulty-selector .difficulty-btn');
+  
+  difficultyButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Seçili sınıfını kaldır
+      document.querySelectorAll('.difficulty-selector .difficulty-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      
+      // Bu düğmeyi seçili yap
+      this.classList.add('selected');
+      
+      // Zorluk seviyesini al
+      const difficulty = this.getAttribute('data-difficulty');
+      
+      // Skor sistemine bildir
+      if (scoreSystem && typeof scoreSystem.setDifficulty === 'function') {
+        scoreSystem.setDifficulty(difficulty);
+        console.log(`Zorluk seviyesi güncellendi: ${difficulty}`);
+      }
+    });
+  });
+  
+  console.log('Zorluk dinleyicisi kuruldu');
+}
+
+// Oyun istatistiklerini animasyonlu görüntüleme
+function animateStats(container, data = {}) {
+  const statElements = container.querySelectorAll('.stat-value');
+  
+  statElements.forEach(element => {
+    const targetValue = parseInt(element.getAttribute('data-value'));
+    
+    if (!isNaN(targetValue)) {
+      // Sayısal değerleri animasyonla göster
+      let startValue = 0;
+      const duration = 1000; // 1 saniye
+      const increment = targetValue / (duration / 16);
+      
+      const animate = () => {
+        startValue += increment;
+        
+        if (startValue >= targetValue) {
+          element.textContent = targetValue;
+        } else {
+          element.textContent = Math.floor(startValue);
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      animate();
+    }
+  });
+}
+
+// Singleton skor gösterici örneği
+const scoreDisplay = new ScoreDisplay();
+
+// Globale ekle
+window.scoreDisplay = scoreDisplay;
+window.setupDifficultyListener = setupDifficultyListener;
+window.animateStats = animateStats;

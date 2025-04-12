@@ -1,4 +1,3 @@
-
 /**
  * Oyun puan sistemini entegre etmeyi kolaylaştıran yardımcı fonksiyonlar
  * @module GameIntegrationHelper
@@ -28,17 +27,17 @@ function ensureScriptLoaded(scriptUrl) {
     const script = document.createElement('script');
     script.src = scriptUrl;
     script.async = true;
-    
+
     script.onload = () => {
       console.log(`Script başarıyla yüklendi: ${scriptUrl}`);
       resolve(script);
     };
-    
+
     script.onerror = (error) => {
       console.error(`Script yüklenirken hata oluştu: ${scriptUrl}`, error);
       reject(error);
     };
-    
+
     document.head.appendChild(script);
   });
 }
@@ -52,7 +51,7 @@ function ensureScriptLoaded(scriptUrl) {
  */
 function integrateGameScore(gameType, gameInstance = {}, options = {}) {
   console.log(`${gameType} oyunu için puan entegrasyonu başlatılıyor...`);
-  
+
   // Gerekli script dosyalarını sıralı şekilde yükle
   const loadScripts = async () => {
     try {
@@ -68,49 +67,55 @@ function integrateGameScore(gameType, gameInstance = {}, options = {}) {
     }
   };
 
-  // Zorluk seviyesini al (HTML'de varsa)
-  const difficultySelector = document.querySelector('.difficulty-selector .selected');
-  const difficulty = difficultySelector ? 
+  return loadScripts().then(scriptsLoaded => {
+    if (!scriptsLoaded) {
+      console.error('Script yükleme hatası nedeniyle puan entegrasyonu başlatılamadı');
+      return null;
+    }
+
+    if (typeof window.GameScoreIntegration !== 'function') {
+      console.error('GameScoreIntegration sınıfı bulunamadı');
+      return null;
+    }
+
+    // Zorluk seviyesini al (HTML'de varsa)
+    const difficultySelector = document.querySelector('.difficulty-selector .selected');
+    const difficulty = difficultySelector ? 
                     difficultySelector.getAttribute('data-difficulty') : 
                     (options.difficulty || 'medium');
-  
-  loadScripts().then(scriptsLoaded => {
-    if (scriptsLoaded && typeof window.GameScoreIntegration === 'function') {
-      console.log('GameScoreIntegration yüklendi, entegrasyon başlatılıyor');
-      
-      // Oyun tipi, zorluk ve diğer parametrelerle bir puan entegrasyonu oluştur
-      const scoreIntegration = new window.GameScoreIntegration({
-        gameType: gameType,
-        difficulty: difficulty,
-        maxScore: options.maxScore || 100,
-        optimalMoves: options.optimalMoves || null,
-        optimalTime: options.optimalTime || null,
-        expectedTime: options.expectedTime || null
-      });
-      
-      // Eğer bir oyun örneği varsa, ona puan sistemi metodlarını ekle
-      if (gameInstance) {
-        gameInstance.scoreSystem = scoreIntegration;
-        
-        // Oyun API'si üzerinden puan sistemi fonksiyonlarına erişim sağla
-        if (!gameInstance.updateScore) {
-          gameInstance.updateScore = (score) => scoreIntegration.updateScore(score);
-        }
-        
-        if (!gameInstance.saveScore) {
-          gameInstance.saveScore = (callback) => scoreIntegration.saveScore(callback);
-        }
-        
-        if (!gameInstance.endGame) {
-          gameInstance.endGame = (finalScore, callback) => scoreIntegration.endGame(finalScore, callback);
-        }
+
+    console.log(`Oyun zorluk seviyesi: ${difficulty}`);
+
+    // Oyun tipi, zorluk ve diğer parametrelerle bir puan entegrasyonu oluştur
+    const scoreIntegration = new window.GameScoreIntegration({
+      gameType: gameType,
+      difficulty: difficulty,
+      maxScore: options.maxScore || 100,
+      optimalMoves: options.optimalMoves || null,
+      optimalTime: options.optimalTime || null,
+      expectedTime: options.expectedTime || null
+    });
+
+    // Eğer bir oyun örneği varsa, ona puan sistemi metodlarını ekle
+    if (gameInstance) {
+      gameInstance.scoreSystem = scoreIntegration;
+
+      // Oyun API'si üzerinden puan sistemi fonksiyonlarına erişim sağla
+      if (!gameInstance.updateScore) {
+        gameInstance.updateScore = (score) => scoreIntegration.updateScore(score);
       }
-      
-      console.log(`${gameType} oyunu için puan entegrasyonu tamamlandı`);
-      return scoreIntegration;
-    } else {
-      console.error('Puan sistemi entegrasyonu başarısız: GameScoreIntegration yüklenemedi');
+
+      if (!gameInstance.saveScore) {
+        gameInstance.saveScore = (callback) => scoreIntegration.saveScore(callback);
+      }
+
+      if (!gameInstance.endGame) {
+        gameInstance.endGame = (finalScore, callback) => scoreIntegration.endGame(finalScore, callback);
+      }
     }
+
+    console.log(`${gameType} oyunu için puan entegrasyonu tamamlandı`);
+    return scoreIntegration;
   });
 }
 
@@ -121,7 +126,7 @@ window.integrateGameScore = integrateGameScore;
 // Sayfa yüklendiğinde gerekli script'leri yükle
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Sayfa yüklendi, puan sistemi script dosyaları yükleniyor...');
-  
+
   // Puan sistemi script dosyalarını sıralı yükle
   ensureScriptLoaded('static/js/scoreCalculator.js')
     .then(() => ensureScriptLoaded('static/js/score-handler.js'))
@@ -129,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(() => ensureScriptLoaded('static/js/game-score-integration.js'))
     .then(() => {
       console.log('Puan sistemi script dosyaları başarıyla yüklendi.');
-      
+
       // GameScoreIntegration dosyası başarıyla yüklendiğinde bunu bildir
       const event = new CustomEvent('score-system-ready');
       document.dispatchEvent(event);

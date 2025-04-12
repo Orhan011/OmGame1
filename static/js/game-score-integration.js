@@ -2,7 +2,7 @@
 /**
  * Tüm oyunlar için puan sistemi entegrasyonu
  * Bu modül, oyunların puanlarını hesaplamak ve kaydetmek için ortak bir arayüz sağlar
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 // Oyun puanlama sisteminin hazır olup olmadığını kontrol et
