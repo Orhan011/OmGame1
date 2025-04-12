@@ -968,9 +968,9 @@ document.addEventListener('DOMContentLoaded', function() {
       elapsed_time: seconds
     };
     
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('puzzle_slider', score, seconds, difficulty, gameStats, function(html) {
-      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+    // Merkezi puan sistemini kullan (gösterim olmadan)
+    saveScoreAndDisplay('puzzle_slider', score, seconds, difficulty, gameStats, function() {
+      // Skor gösterimi tamamen kaldırıldı
       console.log('Score saved successfully');
     });
   }

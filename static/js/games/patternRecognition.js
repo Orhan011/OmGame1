@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     isActive: false,
     isPaused: false,
     isSoundEnabled: true,
-    score: 0,
+    score: 0, // Puan gösterimi kaldırıldı
     level: 1,
     maxLevel: 1,
     timeRemaining: 120,

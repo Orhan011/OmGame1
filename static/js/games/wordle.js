@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const playAgainBtn = document.getElementById('play-again');
   const wordleGrid = document.getElementById('wordle-grid');
   const messageContainer = document.getElementById('message-container');
-  const scoreDisplay = document.getElementById('score-display');
   const guessesDisplay = document.getElementById('guesses-display');
   const streakDisplay = document.getElementById('streak-display');
   const finalScore = document.getElementById('final-score');
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
     currentCol: 0,
     guesses: Array(6).fill().map(() => Array(5).fill('')),
     isGameOver: false,
-    score: 0,
     streak: 0,
     hintsLeft: 3,
     soundEnabled: true,
@@ -77,11 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Skoru paylaş/kopyala butonları
   copyScoreBtn.addEventListener('click', copyScore);
   shareScoreBtn.addEventListener('click', shareScore);
-  
+
   // Tuş basımı dinle
   document.addEventListener('keydown', function(e) {
     if (gameState.isGameOver || gameContainer.style.display === 'none') return;
-    
+
     if (e.key === 'Enter') {
       submitGuess();
     } else if (e.key === 'Backspace') {
@@ -115,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
       "daire", "fırın", "telaş", "badem", "kiraz", "elmas", "yakut", "fidan", "dolap", "safir",
       "damla", "emoji", "huzur", "jeton", "atlas", "çelik", "bakır", "demir", "tahıl", "kömür"
     ];
-    
+
     const randomIndex = Math.floor(Math.random() * wordList.length);
     gameState.answer = wordList[randomIndex].toUpperCase();
     console.log("Cevap: " + gameState.answer); // Geliştirme için, prodüksiyonda kaldırılmalı
@@ -135,14 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
     gameState.score = 0; // Puanı sıfırla
 
     // Skorları güncelle
-    updateScoreDisplay();
+    //updateScoreDisplay();
 
     // İpucu sayacını güncelle
     hintCount.textContent = gameState.hintsLeft;
 
     // Grid oluştur
     createWordleGrid();
-    
+
     // İlk hücreyi aktif et
     setActiveCell(0, 0);
 
@@ -159,18 +157,18 @@ document.addEventListener('DOMContentLoaded', function() {
   function createWordleGrid() {
     wordleGrid.innerHTML = '';
     cellInputs = [];
-    
+
     for (let row = 0; row < 6; row++) {
       const rowDiv = document.createElement('div');
       rowDiv.className = 'wordle-row';
       rowDiv.dataset.row = row;
-      
+
       for (let col = 0; col < 5; col++) {
         const cell = document.createElement('div');
         cell.className = 'wordle-cell';
         cell.dataset.row = row;
         cell.dataset.col = col;
-        
+
         // Her hücre için bir input oluştur
         const input = document.createElement('input');
         input.maxLength = 1;
@@ -180,13 +178,13 @@ document.addEventListener('DOMContentLoaded', function() {
         input.spellcheck = false;
         input.dataset.row = row;
         input.dataset.col = col;
-        
+
         // Input dinleyicileri
         input.addEventListener('input', function(e) {
           const char = e.target.value.toUpperCase();
           if (/^[A-ZĞÜŞİÖÇ]$/.test(char)) {
             addLetter(char);
-            
+
             // Bir sonraki input'a odaklan (varsa)
             if (gameState.currentCol < 5) {
               const nextRow = gameState.currentRow;
@@ -197,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = '';
           }
         });
-        
+
         input.addEventListener('keydown', function(e) {
           if (e.key === 'Backspace') {
             if (e.target.value === '') {
@@ -227,25 +225,25 @@ document.addEventListener('DOMContentLoaded', function() {
             submitGuess();
           }
         });
-        
+
         input.addEventListener('focus', function() {
           const row = parseInt(this.dataset.row);
           const col = parseInt(this.dataset.col);
-          
+
           // Sadece aktif satırdaki inputlara izin ver
           if (row === gameState.currentRow) {
             setActiveCell(row, col);
           }
         });
-        
+
         cell.appendChild(input);
         rowDiv.appendChild(cell);
-        
+
         // Input referanslarını sakla
         if (!cellInputs[row]) cellInputs[row] = [];
         cellInputs[row][col] = input;
       }
-      
+
       wordleGrid.appendChild(rowDiv);
     }
   }
@@ -258,18 +256,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (activeCell) {
       activeCell.parentElement.classList.remove('current');
     }
-    
+
     // Yeni aktif hücreyi ayarla
     const selectedCell = cellInputs[row][col];
     if (selectedCell) {
       activeCell = selectedCell;
       selectedCell.parentElement.classList.add('current');
-      
+
       // Input'a odaklan
       setTimeout(() => {
         selectedCell.focus();
       }, 0);
-      
+
       // Oyun durumunu güncelle
       gameState.currentRow = row;
       gameState.currentCol = col;
@@ -281,19 +279,19 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function addLetter(letter) {
     if (gameState.isGameOver) return;
-    
+
     // Çift işlem kontrolü
     const now = Date.now();
     if (now - gameState.lastInputTime < gameState.debounceTime) {
       return;
     }
     gameState.lastInputTime = now;
-    
+
     if (gameState.currentCol < 5) {
       gameState.guesses[gameState.currentRow][gameState.currentCol] = letter;
       updateGrid();
       gameState.currentCol++;
-      
+
       // Aktif hücreyi güncelle
       if (gameState.currentCol < 5) {
         setActiveCell(gameState.currentRow, gameState.currentCol);
@@ -306,19 +304,19 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function deleteLetter() {
     if (gameState.isGameOver) return;
-    
+
     // Çift işlem kontrolü
     const now = Date.now();
     if (now - gameState.lastInputTime < gameState.debounceTime) {
       return;
     }
     gameState.lastInputTime = now;
-    
+
     if (gameState.currentCol > 0) {
       gameState.currentCol--;
       gameState.guesses[gameState.currentRow][gameState.currentCol] = '';
       updateGrid();
-      
+
       // Aktif hücreyi güncelle
       setActiveCell(gameState.currentRow, gameState.currentCol);
     }
@@ -329,57 +327,57 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function submitGuess() {
     if (gameState.isGameOver) return;
-    
+
     // Çift işlem kontrolü
     const now = Date.now();
     if (now - gameState.lastInputTime < gameState.debounceTime) {
       return;
     }
     gameState.lastInputTime = now;
-    
+
     if (gameState.currentCol < 5) {
       showMessage('Yetersiz harf! 5 harfli bir kelime girin.', 'warning');
       shakeRow(gameState.currentRow);
       return;
     }
-    
+
     const guess = gameState.guesses[gameState.currentRow].join('');
-    
+
     // Kelime kontrolü (gerçek uygulamada kelime listesinden kontrol edilir)
     // Basitlik için şimdilik atlıyoruz, istenirse eklenir
-    
+
     // Satırı tamamlanmış olarak işaretle
     const row = document.querySelector(`.wordle-row[data-row="${gameState.currentRow}"]`);
     if (row) {
       row.classList.add('played');
-      
+
       // Bu satırdaki inputları devre dışı bırak
       const inputs = row.querySelectorAll('input');
       inputs.forEach(input => {
         input.disabled = true;
       });
     }
-    
+
     // Tahmin sonuçlarını kontrol et
     const result = checkGuess(guess);
-    
+
     // Sonuçları görsel olarak göster
     animateResults(result);
-    
+
     // Skorları güncelle
     updateScore(result);
-    
+
     // Bir sonraki satıra geç
     gameState.currentRow++;
     gameState.currentCol = 0;
-    
+
     // Tahmin sayısını güncelle
     guessesDisplay.textContent = `${gameState.currentRow}/6`;
-    
+
     // Oyun durumunu kontrol et
     const isWinner = guess === gameState.answer;
     const isLastRow = gameState.currentRow >= 6;
-    
+
     if (isWinner || isLastRow) {
       // Animasyonlar tamamlandıktan sonra oyunu bitir
       setTimeout(() => {
@@ -401,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const result = Array(5).fill('absent');
     const answerLetters = gameState.answer.split('');
     const guessLetters = guess.split('');
-    
+
     // İlk olarak doğru yerdeki harfleri kontrol et
     for (let i = 0; i < 5; i++) {
       if (guessLetters[i] === answerLetters[i]) {
@@ -410,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.usedLetters.correct.add(guessLetters[i]);
       }
     }
-    
+
     // Sonra doğru harf yanlış yerde olanları kontrol et
     for (let i = 0; i < 5; i++) {
       if (result[i] === 'absent') {
@@ -424,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-    
+
     return result;
   }
 
@@ -434,14 +432,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function animateResults(result) {
     const row = gameState.currentRow;
     const cells = document.querySelectorAll(`.wordle-cell[data-row="${row}"]`);
-    
+
     cells.forEach((cell, index) => {
       setTimeout(() => {
         cell.classList.add('flip');
-        
+
         setTimeout(() => {
           cell.classList.add(result[index]);
-          
+
           // Tüm hücreler tamamlandıysa doğru/yanlış sesi çal
           if (index === 4) {
             if (result.every(r => r === 'correct')) {
@@ -462,12 +460,12 @@ document.addEventListener('DOMContentLoaded', function() {
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 5; col++) {
         const value = gameState.guesses[row][col];
-        
+
         // Input değerini güncelle
         if (cellInputs[row] && cellInputs[row][col]) {
           cellInputs[row][col].value = value;
         }
-        
+
         // Hücre durumunu güncelle
         const cell = document.querySelector(`.wordle-cell[data-row="${row}"][data-col="${col}"]`);
         if (cell) {
@@ -488,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rowElement = document.querySelector(`.wordle-row[data-row="${row}"]`);
     if (rowElement) {
       rowElement.classList.add('shake');
-      
+
       setTimeout(() => {
         rowElement.classList.remove('shake');
       }, 500);
@@ -503,15 +501,15 @@ document.addEventListener('DOMContentLoaded', function() {
       showMessage('İpucu hakkınız kalmadı!', 'error');
       return;
     }
-    
+
     if (gameState.isGameOver) {
       return;
     }
-    
+
     // İpucu hakkını azalt
     gameState.hintsLeft--;
     hintCount.textContent = gameState.hintsLeft;
-    
+
     // Henüz açılmamış bir harfi aç
     let emptyPositions = [];
     for (let i = 0; i < 5; i++) {
@@ -521,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
         emptyPositions.push(i);
       }
     }
-    
+
     // Boş pozisyon yoksa (yani satır zaten doluysa), mesaj göster
     if (emptyPositions.length === 0) {
       showMessage('Bu satırda ipucu verecek boş harf yok!', 'warning');
@@ -530,16 +528,16 @@ document.addEventListener('DOMContentLoaded', function() {
       hintCount.textContent = gameState.hintsLeft;
       return;
     }
-    
+
     // Rastgele bir boş pozisyon seç
     const randomPosition = emptyPositions[Math.floor(Math.random() * emptyPositions.length)];
-    
+
     // Doğru harfi göster
     gameState.guesses[gameState.currentRow][randomPosition] = gameState.answer[randomPosition];
-    
+
     // Izgarayı güncelle
     updateGrid();
-    
+
     // Sütun indeksini güncelle
     if (gameState.currentCol <= randomPosition) {
       gameState.currentCol = randomPosition + 1;
@@ -547,10 +545,10 @@ document.addEventListener('DOMContentLoaded', function() {
         setActiveCell(gameState.currentRow, gameState.currentCol);
       }
     }
-    
+
     // İpucu sesini çal
     playSound('hint');
-    
+
     // Kullanıcıya bilgi mesajı göster
     showMessage('İpucu verildi!', 'info');
   }
@@ -562,16 +560,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Doğru ve var olan harf sayısını hesapla
     const correctCount = result.filter(r => r === 'correct').length;
     const presentCount = result.filter(r => r === 'present').length;
-    
+
     // Tahminin başarı puanını hesapla
     const rowBonus = (6 - gameState.currentRow) * 10; // Erken tahmin için bonus
     const letterScore = (correctCount * 20) + (presentCount * 5);
-    
+
     const guessScore = letterScore + rowBonus;
     gameState.score += guessScore;
-    
+
     // Ekranı güncelle
-    updateScoreDisplay();
+    //updateScoreDisplay();
   }
 
   /**
@@ -588,22 +586,22 @@ document.addEventListener('DOMContentLoaded', function() {
   function endGame(isWin) {
     // Eğer oyun zaten bittiyse, tekrar işlem yapma
     if (gameState.isGameOver) return;
-    
+
     // Oyunu bitir
     gameState.isGameOver = true;
-    
+
     // Tüm inputları devre dışı bırak
     cellInputs.forEach(row => {
       row.forEach(input => {
         input.disabled = true;
       });
     });
-    
+
     // Oyun bitiş zamanını hesapla
     const gameEndTime = Date.now();
     const gameStartTime = localStorage.getItem('wordleGameStartTime') || gameEndTime;
     const playtime = Math.floor((gameEndTime - parseInt(gameStartTime)) / 1000);
-    
+
     // Seri ve puan hesaplamaları
     if (isWin) {
       gameState.streak++;
@@ -616,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
       gameState.streak = 0;
       playSound('gameLose');
     }
-    
+
     // Zorluk seviyesini hesapla
     let difficulty = 'medium'; // Varsayılan zorluk
     if (localStorage.getItem('currentDifficulty')) {
@@ -628,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       difficulty = 'easy';
     }
-    
+
     // Oyun istatistikleri
     const gameStats = {
       word: gameState.answer,
@@ -639,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
       hints_used: 3 - gameState.hintsLeft,
       game_completed: true
     };
-    
+
     // ScoreHandler'ı kullanarak skoru kaydet
     if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
       console.log("Wordle skoru kaydediliyor:", gameState.score, difficulty, playtime, gameStats);
@@ -663,17 +661,17 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(err => console.error("Skor kaydetme hatası:", err));
     }
-    
+
     // Sonuç ekranını hazırla (puanlar gizlendi)
     if (finalScore) finalScore.style.display = 'none';
     attemptsCount.textContent = `${gameState.currentRow}/6`;
     if (finalStreak) finalStreak.style.display = 'none';
     answerReveal.textContent = gameState.answer;
-    
+
     if (isWin) {
       let performanceMessage = '';
       const attemptsUsed = gameState.currentRow;
-      
+
       if (attemptsUsed === 1) {
         performanceMessage = 'İnanılmaz! İlk tahminde buldunuz!';
         updateRatingStars(5);
@@ -693,13 +691,13 @@ document.addEventListener('DOMContentLoaded', function() {
         performanceMessage = 'Son şansınızda buldunuz!';
         updateRatingStars(1);
       }
-      
+
       resultMessage.textContent = performanceMessage;
     } else {
       resultMessage.textContent = `Üzgünüm, kelimeyi bulamadınız.`;
       updateRatingStars(0);
     }
-    
+
     // Sonuç ekranını göster
     setTimeout(() => {
       gameContainer.style.display = 'none';
@@ -713,7 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateRatingStars(rating) {
     const stars = document.querySelectorAll('.rating-stars i');
     const ratingText = document.getElementById('rating-text');
-    
+
     stars.forEach((star, index) => {
       if (index < rating) {
         star.className = 'fas fa-star';
@@ -721,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         star.className = 'far fa-star';
       }
     });
-    
+
     const ratingMessages = [
       'Daha iyisini yapabilirsin!',
       'Fena değil!',
@@ -730,7 +728,7 @@ document.addEventListener('DOMContentLoaded', function() {
       'Mükemmel!',
       'İnanılmaz!'
     ];
-    
+
     ratingText.textContent = ratingMessages[Math.min(rating, 5)];
   }
 
@@ -751,10 +749,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageElement = document.createElement('div');
     messageElement.className = `game-message ${type}`;
     messageElement.textContent = text;
-    
+
     messageContainer.innerHTML = '';
     messageContainer.appendChild(messageElement);
-    
+
     setTimeout(() => {
       messageElement.remove();
     }, 3000);
@@ -765,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function toggleSound() {
     gameState.soundEnabled = !gameState.soundEnabled;
-    
+
     if (gameState.soundEnabled) {
       soundToggle.classList.add('active');
       soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
@@ -780,7 +778,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function playSound(soundName) {
     if (!gameState.soundEnabled) return;
-    
+
     const sound = sounds[soundName];
     if (sound) {
       sound.currentTime = 0;
@@ -805,9 +803,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const scoreText = `🎮 Wordle Puanım: ${gameState.score} 🎮\n`;
     const guessText = `Tahminler: ${gameState.currentRow}/6\n`;
     const streakText = `Seri: ${gameState.streak}`;
-    
+
     const fullText = `${scoreText}${guessText}${streakText}\n\nZekaPark'ta sen de oyna: https://zekapark.app`;
-    
+
     try {
       navigator.clipboard.writeText(fullText);
       showMessage('Skor panoya kopyalandı!', 'success');
@@ -824,9 +822,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const scoreText = `🎮 Wordle Puanım: ${gameState.score} 🎮\n`;
     const guessText = `Tahminler: ${gameState.currentRow}/6\n`;
     const streakText = `Seri: ${gameState.streak}`;
-    
+
     const shareText = `${scoreText}${guessText}${streakText}\n\nZekaPark'ta sen de oyna: https://zekapark.app`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'ZekaPark Wordle Skorum',
@@ -854,11 +852,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("gameState tanımlanmamış, skor kaydedilemedi");
         return;
       }
-      
+
       // Oyun istatistiklerini topla
       const gameStartTime = new Date(localStorage.getItem('wordleGameStartTime') || Date.now());
       const playtime = Math.floor((new Date() - gameStartTime) / 1000) || 180;
-      
+
       // Zorluk seviyesini belirle
       let difficulty = 'easy';
       if (gameState.currentRow <= 2) {
@@ -866,7 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else if (gameState.currentRow <= 4) {
         difficulty = 'medium';
       }
-      
+
       // Oyun istatistiklerini topla (hata kontrolü ile)
       const gameStats = {
         duration_seconds: playtime,
@@ -882,12 +880,12 @@ document.addEventListener('DOMContentLoaded', function() {
                   (gameState.answer === gameState.guesses[gameState.currentRow-1].join('')) : 
                   false
       };
-      
+
       // Skor 0'dan küçükse düzelt
       if (score < 0) score = 0;
-      
+
       console.log("Wordle skoru kaydediliyor:", score);
-      
+
       // ScoreHandler'ı kullanarak skorları kaydet
       if (window.ScoreHandler && typeof window.ScoreHandler.saveScore === 'function') {
         window.ScoreHandler.saveScore('wordle', score, difficulty, playtime, gameStats);
@@ -912,7 +910,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     } catch (e) {
       console.error("saveScoreWithDetails fonksiyonunda hata:", e);
-      
+
       // Hata durumunda basit API çağrısı dene
       try {
         fetch('/api/save-score', {

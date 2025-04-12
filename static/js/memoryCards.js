@@ -1099,13 +1099,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    // Callback fonksiyonu - skor HTML'ini gösterir
+    // Callback fonksiyonu - skor gösterimi kaldırıldı
     const updateScoreDisplay = function(scoreHtml, data) {
-      const scoreContainer = document.getElementById('game-score-container');
-      if (scoreContainer) {
-        scoreContainer.innerHTML = scoreHtml;
-      }
-
       if (data && data.success) {
         showAlert('Skorunuz başarıyla kaydedildi!', 'success');
         saveScoreBtn.textContent = '✓ Kaydedildi';

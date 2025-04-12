@@ -48,7 +48,7 @@ function saveScoreToLeaderboard(finalScore, isWin) {
     };
 
     console.log(`Kullanıcı profiline puan kaydediliyor: hangman: ${finalScore} puan, zorluk: ${difficulty}`);
-    
+
     // Skor kaydetme (üç farklı API seçeneği kontrol et)
     if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.saveScoreToLeaderboard === 'function') {
       // Yeni API kullan (leaderboard-fix.js)
@@ -68,12 +68,8 @@ function saveScoreToLeaderboard(finalScore, isWin) {
     // Alternatif olarak global saveScoreAndDisplay fonksiyonunu kullan
     else if (typeof window.saveScoreAndDisplay === 'function') {
       // Standart skor gösterme fonksiyonu
-      window.saveScoreAndDisplay('hangman', finalScore, playtime, difficulty, gameStats, function(scoreHtml) {
-        // Skor özeti göster (opsiyonel)
-        const scoreContainer = document.getElementById('score-container');
-        if (scoreContainer) {
-          scoreContainer.innerHTML = scoreHtml;
-        }
+      window.saveScoreAndDisplay('hangman', finalScore, playtime, difficulty, gameStats, function() {
+        // Skor gösterimi kaldırıldı
       });
     } else {
       console.error("Skor kaydedici bulunamadı! API'ye doğrudan gönderiliyor...");

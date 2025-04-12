@@ -539,15 +539,14 @@ document.addEventListener('DOMContentLoaded', function() {
           break;
       }
       
-      // Skor kaydetme sistemini kullan
+      // Skor kaydetme sistemini kullan (gösterim olmadan)
       saveScoreAndDisplay('minesweeper', score, gameState.timer, difficultyName, {
         mines: gameState.mines,
         flags: gameState.minesMarked,
         board_size: `${gameState.width}x${gameState.height}`,
         hint_used: gameState.hintUsed
-      }, function(scoreDisplayHtml, data) {
-        // Skor sonucunu ekrana yerleştir
-        document.getElementById('score-display-container').innerHTML = scoreDisplayHtml;
+      }, function() {
+        // Skor gösterimi kaldırıldı
       });
       for (let y = 0; y < gameState.height; y++) {
         for (let x = 0; x < gameState.width; x++) {

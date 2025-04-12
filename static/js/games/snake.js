@@ -29,16 +29,12 @@ function saveScoreToLeaderboard(finalScore) {
 
     console.log(`Saving score for snake_game: ${finalScore} points, difficulty: ${difficulty}`);
     
-    // Skor kaydetme
+    // Skor kaydetme (gösterim olmadan)
     if (typeof window.ScoreHandler !== 'undefined' && typeof window.ScoreHandler.saveScore === 'function') {
       window.ScoreHandler.saveScore('snake_game', finalScore, difficulty, gameStats.duration_seconds, gameStats);
     } else if (typeof window.saveScoreAndDisplay === 'function') {
-      window.saveScoreAndDisplay('snake_game', finalScore, gameStats.duration_seconds, difficulty, gameStats, function(scoreHtml) {
-        // Skor özeti göster (opsiyonel)
-        const scoreContainer = document.getElementById('score-container');
-        if (scoreContainer) {
-          scoreContainer.innerHTML = scoreHtml;
-        }
+      window.saveScoreAndDisplay('snake_game', finalScore, gameStats.duration_seconds, difficulty, gameStats, function() {
+        // Skor gösterimi kaldırıldı
       });
     } else {
       console.error("Skor kaydedici bulunamadı! API'ye doğrudan gönderiliyor...");

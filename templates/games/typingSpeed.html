@@ -70,17 +70,9 @@
         <h2><i class="fas fa-trophy"></i> Sonuçlarınız</h2>
 
         <div class="result-summary-minimal">
+          <!-- Sadeleştirilmiş sonuç gösterimi -->
           <div class="result-minimal-row">
-            <span class="result-minimal-label">Kelime/Dakika:</span>
-            <span class="result-minimal-value" id="result-wpm">0</span>
-          </div>
-          <div class="result-minimal-row">
-            <span class="result-minimal-label">Doğruluk:</span>
-            <span class="result-minimal-value" id="result-accuracy">100%</span>
-          </div>
-          <div class="result-minimal-row">
-            <span class="result-minimal-label">Hatalı Karakter:</span>
-            <span class="result-minimal-value" id="result-errors">0</span>
+            <span class="result-minimal-label">Oyun Tamamlandı</span>
           </div>
         </div>
 
@@ -584,11 +576,11 @@ document.addEventListener('DOMContentLoaded', function() {
       errors: parseInt(resultErrors.textContent),
       completed: true
     };
-    
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('typing_speed', score, timeLimit - timeLeft, difficulty, gameStats, function(html) {
-      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
+
+    // Merkezi puan sistemini kullan (sonuç gösterimi olmadan)
+    saveScoreAndDisplay('typing_speed', score, timeLimit - timeLeft, difficulty, gameStats, function() {
       console.log('Score saved successfully');
+      // Skor gösterimi kaldırıldı
     });
   }
 

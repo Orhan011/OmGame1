@@ -191,9 +191,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore(finalScore) {
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('math_challenge', finalScore, timeLeft, 'medium', { level: level }, function(html) {
-      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
+    // Merkezi puan sistemini kullan (gösterim olmadan)
+    saveScoreAndDisplay('math_challenge', finalScore, timeLeft, 'medium', { level: level }, function() {
+      // Skor gösterimi tamamen kaldırıldı
       console.log('Score saved successfully');
     });
   }
