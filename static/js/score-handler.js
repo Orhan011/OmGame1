@@ -60,8 +60,8 @@ function saveScore(gameType, score, playtime, difficulty = 'medium', gameStats =
   .then(data => {
     console.log('Puan başarıyla kaydedildi:', data);
     
-    // Liderlik tablosunu ve profil puanlarını güncelle
-    updateDisplays();
+    // Liderlik tablosunu ve profil puanlarını API yanıtı ile güncelle
+    updateDisplays(data);
     
     return data;
   })
@@ -73,9 +73,15 @@ function saveScore(gameType, score, playtime, difficulty = 'medium', gameStats =
 
 /**
  * Kullanıcı ara yüzlerini günceller (liderlik tablosu, profil)
+ * @param {Object} responseData - API yanıtı (isteğe bağlı)
  */
-function updateDisplays() {
+function updateDisplays(responseData = null) {
   try {
+    // Kullanıcı verileri varsa bunları güncelle
+    if (responseData && responseData.xp) {
+      updateUserDataDisplay(responseData);
+    }
+    
     // Profil puanlarını güncelle (mevcutsa)
     if (typeof updateProfileScores === 'function') {
       console.log('Profil puanları güncelleniyor...');
@@ -96,6 +102,105 @@ function updateDisplays() {
   } catch (error) {
     console.error('Görünüm güncellemeleri sırasında hata:', error);
   }
+}
+
+/**
+ * Arayüzdeki kullanıcı verilerini günceller
+ * @param {Object} data - API yanıtı
+ */
+function updateUserDataDisplay(data) {
+  console.log('Kullanıcı verileri güncelleniyor:', data);
+  
+  try {
+    // XP seviyesi ve ilerleme çubuğu
+    const xpElements = document.querySelectorAll('.user-xp, .user-level, .xp-text');
+    const xpBars = document.querySelectorAll('.xp-progress, .xp-bar');
+    
+    if (data.xp) {
+      // XP metni güncelleme
+      xpElements.forEach(el => {
+        if (el.classList.contains('user-level')) {
+          el.textContent = data.xp.level || 1;
+        } else if (el.classList.contains('xp-text')) {
+          el.textContent = `${data.xp.progress || 0}/${data.xp.needed || 100} XP`;
+        } else {
+          el.textContent = data.xp.total || 0;
+        }
+      });
+      
+      // XP barı güncelleme
+      xpBars.forEach(bar => {
+        const percent = data.xp.progress_percent || 0;
+        bar.style.width = `${percent}%`;
+        
+        // Özel veri özniteliği varsa güncelle
+        if (bar.dataset.percent !== undefined) {
+          bar.dataset.percent = percent;
+        }
+      });
+      
+      // Seviye atlama durumunda özel gösterim
+      if (data.xp.level_up) {
+        showLevelUpNotification(data.xp.level, data.xp.old_level);
+      }
+    }
+    
+    // Toplam skor güncelleme
+    if (data.points && data.points.total) {
+      const scoreElements = document.querySelectorAll('.user-score, .total-points');
+      scoreElements.forEach(el => {
+        el.textContent = data.points.total;
+      });
+    }
+    
+    console.log('Kullanıcı verileri başarıyla güncellendi');
+  } catch (error) {
+    console.error('Kullanıcı verileri güncellenirken hata:', error);
+  }
+}
+
+/**
+ * Seviye atlama bildirimi gösterir
+ * @param {number} newLevel - Yeni seviye
+ * @param {number} oldLevel - Eski seviye
+ */
+function showLevelUpNotification(newLevel, oldLevel) {
+  // Ses efekti çal
+  try {
+    const levelUpSound = new Audio('/static/sounds/level-up.mp3');
+    levelUpSound.play();
+  } catch (e) {
+    console.warn('Ses efekti oynatılamadı:', e);
+  }
+  
+  // Bildirim oluştur
+  const notification = document.createElement('div');
+  notification.className = 'level-up-notification';
+  notification.innerHTML = `
+    <div class="level-up-content">
+      <h3>Seviye Atladın!</h3>
+      <div class="level-badges">
+        <span class="old-level">${oldLevel}</span>
+        <span class="level-arrow">→</span>
+        <span class="new-level">${newLevel}</span>
+      </div>
+      <p>Tebrikler! Daha fazla beceri ve ödek açtın.</p>
+    </div>
+  `;
+  
+  // DOM'a ekle
+  document.body.appendChild(notification);
+  
+  // Animasyon için küçük bir gecikme
+  setTimeout(() => {
+    notification.classList.add('show');
+    
+    // 5 saniye sonra kaldır
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 500);
+    }, 5000);
+  }, 100);
 }
 
 /**

@@ -207,8 +207,6 @@ class GameScoreIntegration {
       completed: this.completed
     };
   }
-
-  }
   
   /**
    * Zorluk seviyesini günceller
@@ -244,35 +242,18 @@ class GameScoreIntegration {
         this.endTime = Date.now();
       }
       
-      // Toplam oyun süresini hesapla (saniye)
-      const timeSpent = Math.round((this.endTime - this.startTime) / 1000);
-      
-      // Tamamlanma yüzdesini hesapla (tamamlanmış ise 1, değilse 0.5)
-      const completionPercentage = this.completed ? 1.0 : 0.5;
-      
-      // Puan hesaplama için veri hazırla
-      const gameData = {
-        gameType: this.gameType,
-        difficulty: this.difficulty,
-        timeSpent: timeSpent,
-        expectedTime: this.expectedTime,
-        optimalTime: this.optimalTime,
-        moves: this.moves,
-        optimalMoves: this.optimalMoves,
-        hintsUsed: this.hintsUsed,
-        accuracy: this.accuracy,
-        completionPercentage: completionPercentage,
-        score: this.score,
-        maxScore: this.maxScore,
-        combo: this.combo,
-        completed: this.completed
-      };
+      // Oyun verilerini hazırla
+      const gameData = this.getGameData();
       
       console.log(`Oyun verileri hesaplanıyor:`, gameData);
       
       // Standart puan hesaplama ve görüntüleme
       window.calculateAndDisplayScore(gameData, (scoreHtml, data) => {
-        console.log("Score saved successfully");
+        console.log("Skor başarıyla kaydedildi, kulanıcı verilerine yükleniyor...");
+        
+        // DOM'da göster ve etkinlik dinleyicileri ekle
+        this.displayScoreInDom(scoreHtml, data);
+        
         if (typeof callback === 'function') {
           callback(scoreHtml, data);
         }
@@ -284,6 +265,95 @@ class GameScoreIntegration {
       });
     } catch (error) {
       console.error("Puan hesaplama hatası:", error);
+    }
+  }
+  
+  /**
+   * Skor ekranını DOM'a yerleştirir ve gösterir
+   * @param {string} scoreHtml - Skor ekranı HTML içeriği
+   * @param {Object} data - Skor verileri
+   * @private
+   */
+  displayScoreInDom(scoreHtml, data) {
+    if (!scoreHtml || scoreHtml.trim() === '') {
+      console.error('Skor görüntüsü oluşturulamadı!');
+      return;
+    }
+    
+    console.log('Skor ekranı oluşturuldu, DOM\'a ekleniyor...');
+    
+    // Daha önce açık bir skor ekranı varsa kaldır
+    const existingOverlay = document.querySelector('.game-result-overlay');
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+    
+    // HTML içeriğini ekle
+    document.body.insertAdjacentHTML('beforeend', scoreHtml);
+    
+    // Ekranı görünür yap
+    setTimeout(() => {
+      const overlay = document.querySelector('.game-result-overlay');
+      if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        overlay.style.visibility = 'visible';
+        console.log('Skor ekranı başarıyla gösterildi');
+        
+        // Etkinlik dinleyicileri ekle
+        this.addScoreScreenEventListeners(data);
+      } else {
+        console.error('Skor ekranı DOM\'a eklendi ama bulunamadı!');
+      }
+    }, 100);
+  }
+  
+  /**
+   * Skor ekranı etkinlik dinleyicilerini ekler
+   * @param {Object} scoreData - Skor verileri
+   * @private
+   */
+  addScoreScreenEventListeners(scoreData) {
+    try {
+      // Kapat düğmesi
+      const closeBtn = document.querySelector('.game-result-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+          const overlay = document.querySelector('.game-result-overlay');
+          if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+          }
+        });
+      }
+      
+      // Yeniden oyna düğmesi
+      const replayBtn = document.querySelector('.game-result-replay');
+      if (replayBtn) {
+        replayBtn.addEventListener('click', function() {
+          location.reload();
+        });
+      }
+      
+      // Ana sayfa düğmesi
+      const homeBtn = document.querySelector('.game-result-home');
+      if (homeBtn) {
+        homeBtn.addEventListener('click', function() {
+          window.location.href = '/';
+        });
+      }
+      
+      // Liderlik tablosu düğmesi
+      const leaderboardBtn = document.querySelector('.game-result-leaderboard');
+      if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', function() {
+          window.location.href = '/leaderboard?game=' + (scoreData.game_type || '');
+        });
+      }
+      
+      console.log('Skor ekranı etkinlik dinleyicileri eklendi');
+    } catch (error) {
+      console.error('Etkinlik dinleyicileri eklenirken hata:', error);
     }
   }
   
