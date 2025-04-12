@@ -198,12 +198,30 @@ def reset_code():
     Doğrulama kodu sayfası - kullanıcı e-posta ile gönderilen kodu girer
     """
     try:
-        email = request.args.get('email', '')
+        # E-posta adresini farklı kaynaklardan almayı dene
+        email = request.form.get('email') or request.args.get('email', '')
+        
+        # E-posta adresi boş ise, session'dan almayı dene
+        if not email:
+            email = session.get('reset_email', '')
+            logger.warning(f"E-posta form veya URL'de bulunamadı, session'dan alındı: {email}")
+        
+        logger.info(f"Doğrulama sayfası çağrıldı: method={request.method}, email={email}")
+        
         if request.method == 'POST':
             verification_code = request.form.get('verification_code', '')
+            # Debug logu ekle
+            logger.info(f"Doğrulama kodu girişi: email={email}, code={verification_code}, tüm form: {request.form}")
+            
+            if not email:
+                logger.error("E-posta adresi bulunamadı!")
+                flash('E-posta adresi bulunamadı. Lütfen şifre sıfırlama işlemini baştan başlatın.', 'danger')
+                return redirect(url_for('password_reset.forgot_password'))
+            
             user = User.query.filter_by(email=email).first()
 
             if not user:
+                logger.error(f"Kullanıcı bulunamadı hatası: email={email}")
                 flash('Kullanıcı bulunamadı.', 'danger')
                 return redirect(url_for('password_reset.forgot_password'))
 
@@ -257,9 +275,33 @@ def reset_password():
         # Parametreleri logla (debug)
         logger.info(f"Reset Password: email={email}, token={token}, session={session.get('reset_verified')}")
         
+        # Önce sadece e-posta ile kullanıcıyı bul
+        user = User.query.filter_by(email=email).first()
+        
+        # Kullanıcı bulunamadı mı?
+        if not user:
+            logger.error(f"Şifre sıfırlamada kullanıcı bulunamadı: {email}")
+            flash('Kullanıcı bulunamadı.', 'danger')
+            return redirect(url_for('password_reset.forgot_password'))
+        
+        # Oturum doğrulaması veya token doğrulaması
+        is_verified = False
+        
+        # Session kontrolü
+        if session.get('reset_verified') and session.get('reset_email') == email:
+            is_verified = True
+            logger.info(f"Oturum üzerinden doğrulandı: {email}")
+            
         # Token kontrolü
-        user = User.query.filter_by(email=email, reset_token=token).first()
-        if not user and token:
+        elif token and user.reset_token == token:
+            is_verified = True
+            logger.info(f"Token üzerinden doğrulandı: {email}, token: {token}")
+            
+        elif not token or not user.reset_token:
+            logger.error(f"Token eksik veya bulunamadı: URL token={token}, User token={user.reset_token}")
+        
+        # Doğrulama başarısız
+        if not is_verified:
             flash('Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı.', 'danger')
             return redirect(url_for('password_reset.forgot_password'))
         
@@ -280,11 +322,7 @@ def reset_password():
                 flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
                 return render_template('reset_password.html', email=email)
             
-            # Kullanıcıyı bul ve şifresini güncelle
-            user = User.query.filter_by(email=email).first()
-            if not user:
-                flash('Kullanıcı bulunamadı.', 'danger')
-                return redirect(url_for('password_reset.forgot_password'))
+            # Kullanıcı doğrulaması zaten yapıldı, tekrar kontrol etmeye gerek yok
             
             # Şifreyi güncelle
             user.password_hash = generate_password_hash(password)
@@ -304,4 +342,6 @@ def reset_password():
         logger.error(f"Hata: {e}")
         flash('Bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
         
-    return render_template('reset_password.html')
+    # Şifre sıfırlama sayfasına hem email hem token bilgilerini gönder
+    # Formda hidden input olarak kullanılacak
+    return render_template('reset_password.html', email=email, token=token)
