@@ -300,7 +300,6 @@ function loadLeaderboard() {
             });
         });
     });
-}
     
 // Liderlik tablosu HTML'ini oluşturan yardımcı fonksiyon
 function createLeaderboardHtml(players) {
