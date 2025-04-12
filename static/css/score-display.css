@@ -188,47 +188,65 @@
 }
 
 .score-circle {
-  display: none; /* Puan dairesini gizle */
+  display: none !important; /* Puan dairesini gizle */
 }
 
 .score-value {
-  display: none; /* Puan değerini gizle */
+  display: none !important; /* Puan değerini gizle */
 }
 
 .score-label {
-  display: none; /* Puan etiketini gizle */
+  display: none !important; /* Puan etiketini gizle */
 }
 
 .score-breakdown {
-  display: none; /* Puan dökümünü gizle */
+  display: none !important; /* Puan dökümünü gizle */
 }
 
 .breakdown-title {
-  display: none; /* Puan dökümü başlığını gizle */
+  display: none !important; /* Puan dökümü başlığını gizle */
 }
 
 .score-detail {
-  display: none; /* Puan detaylarını gizle */
+  display: none !important; /* Puan detaylarını gizle */
 }
 
 .detail-label {
-  display: none; /* Detay etiketlerini gizle */
+  display: none !important; /* Detay etiketlerini gizle */
 }
 
 .detail-value {
-  display: none; /* Detay değerlerini gizle */
+  display: none !important; /* Detay değerlerini gizle */
 }
 
 .xp-info {
-  display: none; /* XP bilgisini gizle */
+  display: none !important; /* XP bilgisini gizle */
 }
 
 .xp-label {
-  display: none; /* XP etiketini gizle */
+  display: none !important; /* XP etiketini gizle */
 }
 
 .xp-value {
-  display: none; /* XP değerini gizle */
+  display: none !important; /* XP değerini gizle */
+}
+
+/* Ana oyun ekranındaki puan göstergelerini gizle */
+[id*="score"], [id*="point"], [id*="puan"], [class*="score"], [class*="point"], [class*="puan"],
+[id*="Score"], [id*="Point"], [id*="Puan"], [class*="Score"], [class*="Point"], [class*="Puan"] {
+  display: none !important;
+}
+
+/* Özel oyun elemanlarındaki puan göstergelerini gizle */
+.toplam-puan, .puan, .total-score, .game-score, .player-score, .user-score,
+[id="gamePoints"], [class="gamePoints"], [id="scoreDisplay"], [class="scoreDisplay"],
+[id="scoreContainer"], [class="scoreContainer"] {
+  display: none !important;
+}
+
+/* Gizlenecek diğer puan göstergeleri */
+.level-stat-value {
+  display: none !important;
 }
 
 .result-actions {

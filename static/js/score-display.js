@@ -596,20 +596,35 @@ function calculateAndDisplayScore(scoreParams, callback) {
   }
 }
 
-// Oyun puanını gizle - Kullanıcıya puan gösterilmeyecek
+// Oyun puanını tamamen gizle - Kullanıcıya puan kesinlikle gösterilmeyecek
 function showGamePoints(gameScore, details) {
-  // Puan elementlerini gizle veya boşalt
-  const pointsElement = document.getElementById('gamePoints');
-  if (pointsElement) {
-    pointsElement.style.display = 'none'; // Puanı gösterme
-  }
-
-  // Puan detaylarını gizle
-  const detailsElement = document.getElementById('scoreDetails');
-  if (detailsElement) {
-    detailsElement.innerHTML = ''; // Puan detaylarını temizle
-    detailsElement.style.display = 'none'; // Detayları gösterme
-  }
+  // Sayfa içindeki tüm puan göstergelerini gizle
+  const hideElements = [
+    'gamePoints', 'scoreDisplay', 'scoreDetails', 'scoreInfo', 'gameScore', 
+    'pointsDisplay', 'totalScore', 'userScore', 'playerScore', 'finalScore',
+    'score-display', 'score-value', 'score-container', 'points', 'score',
+    'scoreBreakdown', 'levelPoints', 'gamePoints', 'totalPoints'
+  ];
+  
+  // Her bir olası puan elementini bul ve gizle
+  hideElements.forEach(id => {
+    const elements = document.querySelectorAll(`#${id}, .${id}, [data-score], [data-points]`);
+    elements.forEach(el => {
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    });
+  });
+  
+  // Sayfa yüklendikten sonra da çalıştır
+  setTimeout(() => {
+    // Tüm puan içerebilecek elementleri seç ve gizle
+    const scoreElements = document.querySelectorAll('[id*="score"], [id*="point"], [id*="puan"], [class*="score"], [class*="point"], [class*="puan"]');
+    scoreElements.forEach(el => {
+      el.style.display = 'none';
+    });
+  }, 500);
 }
 
 // Global olarak erişilebilir fonksiyonları dışa aktar
