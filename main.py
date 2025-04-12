@@ -61,78 +61,50 @@ import threading
 def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
     """
     E-posta gönderme işlemini gerçekleştirir.
-    Flask-Mail entegrasyonu ile e-posta gönderimi.
+    Doğrudan SMTP kullanarak e-posta gönderimi.
     """
-    try:
-        # Flask-Mail kullanarak e-posta gönderimi
-        from app import mail
-        from flask_mail import Message
-        
-        # Doğrulama kodu loglanıyor
-        if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+    # İşlem başlangıcını logla
+    logger.info(f"E-posta gönderme işlemi başlatıldı: {to_email}, Konu: {subject}")
+    
+    # Doğrulama kodu varsa logla
+    if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
+        try:
             import re
-            code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
+            # Verification code'u çıkart (hem h3 etiketindeki hem de verification-code class'ındaki)
+            code_match = re.search(r'<h3[^>]*>(\d+)</h3>|class="verification-code"[^>]*>(\d+)<', html_body)
             if code_match:
-                verification_code = code_match.group(1)
+                # İki gruptan hangisinde eşleşme varsa onu al
+                verification_code = code_match.group(1) if code_match.group(1) else code_match.group(2)
                 logger.info(f"Gönderilen Doğrulama Kodu: {verification_code}")
-                # Konsola da yazdır
+                # Konsola da yazdır - test için kritik
                 print(f"ÖNEMLİ - Gönderilen Doğrulama Kodu: {verification_code}")
+        except Exception as e:
+            logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
+    
+    try:
+        # Gmail SMTP ayarları - doğrudan SMTP kullan
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+        
+        from_email = "omgameee@gmail.com"
+        password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
         
         # E-posta mesajını oluştur
-        msg = Message(
-            subject=subject,
-            recipients=[to_email],
-            html=html_body,
-            sender=(from_name, "omgameee@gmail.com")
-        )
+        smtp_msg = MIMEMultipart()
+        smtp_msg['From'] = f"{from_name} <{from_email}>"
+        smtp_msg['To'] = to_email
+        smtp_msg['Subject'] = subject
+        smtp_msg.attach(MIMEText(html_body, 'html'))
         
-        # E-postayı gönder
-        def send_message_task():
-            try:
-                mail.send(msg)
-                logger.info(f"E-posta başarıyla gönderildi: {to_email}")
-                return True
-            except Exception as e:
-                logger.error(f"Flask-Mail ile e-posta gönderirken hata: {str(e)}")
-                
-                # Alternatif yöntem - doğrudan SMTP
-                try:
-                    # Gmail SMTP ayarları
-                    import smtplib
-                    from email.mime.multipart import MIMEMultipart
-                    from email.mime.text import MIMEText
-                    
-                    from_email = "omgameee@gmail.com"
-                    password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-                    
-                    smtp_msg = MIMEMultipart()
-                    smtp_msg['From'] = f"{from_name} <{from_email}>"
-                    smtp_msg['To'] = to_email
-                    smtp_msg['Subject'] = subject
-                    smtp_msg.attach(MIMEText(html_body, 'html'))
-                    
-                    server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
-                    server.login(from_email, password)
-                    text = smtp_msg.as_string()
-                    server.sendmail(from_email, to_email, text)
-                    server.quit()
-                    logger.info(f"Alternatif yöntemle e-posta başarıyla gönderildi: {to_email}")
-                    return True
-                except Exception as smtp_e:
-                    logger.error(f"Alternatif SMTP ile de e-posta gönderilemedi: {str(smtp_e)}")
-                    return False
+        # SMTP sunucusuna bağlan ve e-postayı gönder
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
+        server.login(from_email, password)
+        text = smtp_msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
         
-        # Direkt senkron olarak gönder
-        send_result = send_message_task()
-        
-        # Başarısız olursa, arka planda tekrar dene
-        if not send_result:
-            # Thread ile tekrar dene
-            email_thread = threading.Thread(target=send_message_task)
-            email_thread.daemon = True
-            email_thread.start()
-            logger.info(f"E-posta gönderme thread'i başlatıldı: {to_email}")
-        
+        logger.info(f"E-posta başarıyla gönderildi: {to_email}")
         return True
         
     except Exception as e:
@@ -140,10 +112,16 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
         # En azından kodu konsola yazdır
         if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
             import re
-            code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
+            code_match = re.search(r'<h3[^>]*>(\d+)</h3>|class="verification-code"[^>]*>(\d+)<', html_body)
             if code_match:
-                verification_code = code_match.group(1)
+                verification_code = code_match.group(1) if code_match.group(1) else code_match.group(2)
                 print(f"E-POSTA GÖNDERİLEMEDİ! Kod: {verification_code}, E-posta: {to_email}")
+        
+        # Gmail uygulama şifresiyle ilgili bir hata olabilir
+        if "Application-specific password required" in str(e) or "Invalid credentials" in str(e):
+            logger.critical("Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
+            print("ÖNEMLİ HATA: Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
+        
         return False
 
 def send_welcome_email(to_email, username):
@@ -362,7 +340,7 @@ def send_verification_email(to_email, verification_code):
     """
     subject = "OmGame - Şifre Sıfırlama Kodu"
     
-    # Daha modern ve güvenli bir e-posta şablonu
+    # Daha basit ve işlevsel bir e-posta şablonu
     body = f"""
     <!DOCTYPE html>
     <html>
@@ -371,9 +349,8 @@ def send_verification_email(to_email, verification_code):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>OmGame Şifre Sıfırlama Kodu</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
             body {{
-                font-family: 'Poppins', Arial, sans-serif;
+                font-family: Arial, Helvetica, sans-serif;
                 line-height: 1.6;
                 color: #333333;
                 background-color: #f4f5f7;
@@ -389,13 +366,13 @@ def send_verification_email(to_email, verification_code):
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             }}
             .header {{
-                background: linear-gradient(135deg, #4568dc, #5e62b0);
+                background: #4568dc;
                 padding: 30px;
                 text-align: center;
             }}
-            .header img {{
-                width: 120px;
-                height: auto;
+            .header h1 {{
+                color: white;
+                margin: 0;
             }}
             .content {{
                 padding: 30px;
@@ -415,68 +392,20 @@ def send_verification_email(to_email, verification_code):
                 color: #3d4852;
                 margin: 0;
             }}
-            .expiry-info {{
-                margin-top: 10px;
-                font-size: 14px;
-                color: #606f7b;
-            }}
-            .security-notice {{
-                margin-top: 25px;
-                padding: 15px;
-                border-radius: 8px;
-                background-color: #fcf8e3;
-                border-left: 4px solid #f0ad4e;
-                color: #8a6d3b;
-                font-size: 14px;
-            }}
-            .security-notice strong {{
-                display: block;
-                margin-bottom: 5px;
-            }}
-            .button {{
-                display: inline-block;
-                background: linear-gradient(135deg, #4568dc, #5e62b0);
-                color: white;
-                text-decoration: none;
-                padding: 12px 25px;
-                border-radius: 6px;
-                font-weight: 500;
-                text-align: center;
-                margin-top: 20px;
-                transition: transform 0.3s ease;
-            }}
-            .button:hover {{
-                transform: translateY(-2px);
-            }}
             .footer {{
                 text-align: center;
-                padding: 20px 30px;
+                padding: 20px;
                 background-color: #f8f9fa;
                 font-size: 13px;
                 color: #606f7b;
                 border-top: 1px solid #e9ecef;
-            }}
-            @media only screen and (max-width: 600px) {{
-                .container {{
-                    margin: 20px 10px;
-                }}
-                .header {{
-                    padding: 20px;
-                }}
-                .content {{
-                    padding: 20px;
-                }}
-                .verification-code {{
-                    font-size: 24px;
-                    letter-spacing: 4px;
-                }}
             }}
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <img src="https://omgame.repl.co/static/images/logo.png" alt="OmGame Logo">
+                <h1>OmGame</h1>
             </div>
             <div class="content">
                 <h2>Şifre Sıfırlama Talebi</h2>
@@ -484,49 +413,26 @@ def send_verification_email(to_email, verification_code):
                 <p>OmGame hesabınız için bir şifre sıfırlama talebi aldık. Şifre sıfırlama işlemine devam etmek için aşağıdaki doğrulama kodunu kullanın:</p>
                 
                 <div class="code-container">
-                    <h3 class="verification-code">{verification_code}</h3>
-                    <p class="expiry-info">Bu kod 30 dakika boyunca geçerlidir.</p>
+                    <div class="verification-code">{verification_code}</div>
+                    <p>Bu kod 30 dakika boyunca geçerlidir.</p>
                 </div>
                 
                 <p>Eğer şifre sıfırlama talebinde bulunmadıysanız, endişelenmeyin. Hiçbir işlem yapmanız gerekmez.</p>
-                
-                <div class="security-notice">
-                    <strong>Güvenlik Uyarısı</strong>
-                    <p>OmGame asla sizden şifrenizi e-posta yoluyla paylaşmanızı istemez. Bu doğrulama kodu sadece şifre sıfırlama işlemi için kullanılır.</p>
-                </div>
-                
-                <p>Hesabınız ve oyun deneyiminizle ilgili herhangi bir sorunuz varsa, lütfen bizimle iletişime geçmekten çekinmeyin.</p>
                 
                 <p>Saygılarımızla,<br>OmGame Ekibi</p>
             </div>
             <div class="footer">
                 <p>&copy; 2024 OmGame. Tüm hakları saklıdır.</p>
-                <p>Bu e-posta, OmGame şifre sıfırlama sistemi tarafından otomatik olarak gönderilmiştir.</p>
             </div>
         </div>
     </body>
     </html>
     """
     
-    # Kod hem loglara hem de konsola yazdırılıyor - kullanıcı bulamazsa buradan alabilir
-    # Ama güvenlik için kodu tam olarak gösterme
-    masked_code = verification_code[:2] + '*' * (len(verification_code) - 3) + verification_code[-1]
-    
-    print(f"ÖNEMLİ - Şifre sıfırlama kodu gönderildi: {masked_code} - E-posta: {to_email}")
-    logger.info(f"Doğrulama e-postası gönderiliyor: {to_email} - Maskelenmiş Kod: {masked_code}")
-    
-    # Güvenlik için tam kodu sadece debug modunda logla
-    if app.debug:
-        logger.debug(f"DEBUG: Tam sıfırlama kodu: {verification_code} (Bu sadece geliştirme modunda görüntülenir)")
-    
-    # IP ve tarayıcı bilgisini de loglayabiliriz
-    try:
-        ip_address = request.remote_addr
-        user_agent = request.headers.get('User-Agent', 'Unknown')
-        logger.info(f"Şifre sıfırlama isteği: IP={ip_address}, UA={user_agent[:50]}...")
-    except:
-        # request bağlamı dışında çağrılmış olabilir
-        pass
+    # Kod hem loglara hem de konsola yazdırılıyor
+    # ÖNEMLİ: Kodu açıkça göster (test/debug için)
+    print(f"ÖNEMLİ - Şifre sıfırlama kodu: {verification_code} - E-posta: {to_email}")
+    logger.info(f"Doğrulama e-postası gönderiliyor: {to_email} - Kod: {verification_code}")
     
     # E-posta gönderme işlemini yap
     result = send_email_in_background(to_email, subject, body)
