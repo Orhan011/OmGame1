@@ -77,13 +77,6 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
                     verification_code = code_match.group(1)
                     logger.info(f"Gönderilen Doğrulama Kodu: {verification_code}")
             
-            # Test modunda - gerçek e-posta göndermek yerine sadece log
-            logger.info(f"E-posta gönderme simülasyonu: Alıcı: {to_email}, Konu: {subject}")
-            
-            # Geliştirme ortamında gerçek e-posta göndermek istiyorsanız, 
-            # aşağıdaki yorum satırlarını kaldırın
-            
-            """
             # E-posta oluştur
             msg = MIMEMultipart()
             msg['From'] = f"{from_name} <{from_email}>"
@@ -100,9 +93,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
             server.sendmail(from_email, to_email, text)
             server.quit()
             logger.info(f"E-posta başarıyla gönderildi: {to_email}")
-            """
             
-            # Test ortamında başarılı kabul et
             return True
             
         except Exception as e:
@@ -2039,7 +2030,7 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
 
         if user:
-            # 4 haneli rastgele kod oluştur (test için basit kod değil)
+            # 4 haneli rastgele kod oluştur
             reset_code = str(random.randint(1000, 9999))
             
             # Token ve son kullanma tarihi kaydet
@@ -2047,19 +2038,17 @@ def forgot_password():
             user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
             db.session.commit()
 
-            # Log mesajı ekle (test için)
-            logger.info(f"TEST MODU: {email} için şifre sıfırlama kodu: {reset_code}")
+            # Log mesajı ekle
+            logger.info(f"{email} için şifre sıfırlama kodu: {reset_code}")
 
-            # E-posta gönderme simülasyonu
-            send_verification_email(email, reset_code)
+            # E-posta gönder
+            email_sent = send_verification_email(email, reset_code)
             
-            # Her durumda başarılı mesajı göster
-            flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-            
-            # Test modu için kodu göster - sadece geliştirme ortamında
-            # Gerçek uygulamada bu kısmı kaldırın
-            flash(f'Test modu: Şifre sıfırlama kodu: {reset_code}', 'info')
-            
+            if email_sent:
+                flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
+            else:
+                flash('E-posta gönderilirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+                
             return redirect(url_for('reset_code', email=email))
         else:
             # Kullanıcı bulunamadı
