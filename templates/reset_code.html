@@ -60,6 +60,51 @@
     .email-display .change-btn:hover {
       text-decoration: underline;
     }
+    
+    .verification-code-box {
+      background-color: #4a67e8;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(74, 103, 232, 0.4);
+      animation: pulse-border 2s infinite;
+    }
+    
+    @keyframes pulse-border {
+      0% {
+        box-shadow: 0 0 0 0 rgba(74, 103, 232, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(74, 103, 232, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(74, 103, 232, 0);
+      }
+    }
+    
+    .verification-code-box .code-title {
+      display: block;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 10px;
+    }
+    
+    .verification-code-box .code-number {
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 5px;
+      color: white;
+      display: block;
+    }
+    
+    .verification-code-box .code-tip {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body class="auth-only-body">
@@ -70,7 +115,7 @@
         
         <div class="auth-header">
           <h2>Doğrulama Kodu</h2>
-          <p class="auth-subtitle">E-posta adresinize gönderilen 4 haneli kodu girin</p>
+          <p class="auth-subtitle">Aşağıda görüntülenen 4 haneli kodu girin</p>
         </div>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -89,6 +134,14 @@
           <span><i class="fas fa-envelope me-2"></i> {{ email }}</span>
           <a href="{{ url_for('forgot_password') }}" class="change-btn">Değiştir</a>
         </div>
+        
+        {% if session.get('verification_code_display') %}
+        <div class="verification-code-box">
+          <span class="code-title">DOĞRULAMA KODUNUZ:</span>
+          <span class="code-number">{{ session.get('verification_code_display') }}</span>
+          <span class="code-tip">Bu kodu aşağıdaki alanlara giriniz</span>
+        </div>
+        {% endif %}
         
         <form action="{{ url_for('reset_code', email=email) }}" method="POST" class="auth-form">
           <input type="hidden" name="email" value="{{ email }}">
@@ -119,6 +172,33 @@
     // Kod giriş alanları için otomatik ilerleme
     document.addEventListener('DOMContentLoaded', function() {
       const inputs = document.querySelectorAll('.code-input');
+      
+      // Session'da saklanan doğrulama kodu kutusu ve değeri
+      const codeBox = document.querySelector('.verification-code-box');
+      const codeNumber = document.querySelector('.code-number');
+      
+      // Eğer doğrulama kodu ekranda görünüyorsa
+      if (codeBox && codeNumber && codeNumber.textContent.length >= 4) {
+        // Kodu kutuya otomatik doldurma fonksiyonu
+        function fillCodeInputsAutomatically() {
+          const code = codeNumber.textContent.trim();
+          
+          if (code.length >= 4) {
+            // Her bir kodu kutulara doldur
+            for (let i = 0; i < 4; i++) {
+              if (inputs[i]) {
+                inputs[i].value = code[i] || '';
+              }
+            }
+          }
+        }
+        
+        // Sayfada doğrulama kodu göründüğünde kutulara otomatik doldur
+        setTimeout(fillCodeInputsAutomatically, 500);
+        
+        // Doğrulama kodu kutusuna tıklandığında da doldur
+        codeBox.addEventListener('click', fillCodeInputsAutomatically);
+      }
       
       inputs.forEach((input, index) => {
         // Bir karakter girildiğinde sonraki alana geç
