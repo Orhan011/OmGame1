@@ -79,7 +79,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
     # İşlem başlangıcını logla
     logger.info(f"E-posta gönderme işlemi başlatıldı: {to_email}, Konu: {subject}")
     
-    # Doğrulama kodunu belirle
+    # Doğrulama kodunu belirle (içerikten çıkarma gerekirse)
     if not verification_code:
         # HTML içeriğinden doğrulama kodunu çıkarmaya çalış
         try:
@@ -104,12 +104,11 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         except Exception as e:
             logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
     
-    # Doğrulama kodunu her zaman konsola yazdır (geliştirme/test amacıyla)
+    # Sadece loglama için doğrulama kodu bilgisi (kullanıcıya gösterilmiyor)
     if verification_code:
-        print(f"### DOĞRULAMA KODU: {verification_code} - E-posta: {to_email} ###")
-        logger.info(f"Doğrulama Kodu (gönderilecek): {verification_code} - E-posta: {to_email}")
+        logger.info(f"E-posta gönderimi - Doğrulama Kodu: {verification_code}, Alıcı: {to_email}")
     
-    # SMTP ile e-posta gönderimi deneme
+    # SMTP ile e-posta gönderimi
     try:
         # Gmail SMTP ayarları - doğrudan SMTP kullan
         import smtplib
@@ -119,15 +118,9 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         from_email = "omgameee@gmail.com"
         password = os.environ.get('GMAIL_APP_PASSWORD', '')  # Çevresel değişkenden alınan Gmail uygulama şifresi
         
-        # Eğer şifre yoksa uyarı ver
+        # Eğer şifre yoksa uyarı ver ve başarısız dön
         if not password:
             logger.error("GMAIL_APP_PASSWORD çevresel değişkeni ayarlanmamış!")
-            print("### UYARI: GMAIL_APP_PASSWORD çevresel değişkeni ayarlanmamış! ###")
-            
-            # Test/Geliştirme modunda olduğumuz için, doğrulama kodunu yazdırıp devam et
-            if verification_code:
-                print(f"### TEST MODU AKTIF - DOĞRULAMA KODU: {verification_code} ###")
-                return True
             return False
         
         # E-posta mesajını oluştur
@@ -151,24 +144,13 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
     except Exception as e:
         logger.error(f"E-posta gönderme işlemi sırasında hata: {str(e)}")
         
-        # Traceback detaylarını yazdır
+        # Hata detaylarını logla
         import traceback
-        logger.error(f"DETAYLI HATA: {traceback.format_exc()}")
-        print(f"### E-POSTA GÖNDERME HATA MESAJI: {str(e)} ###")
-        print(f"### GMAIL APP PASSWORD: {'VAR' if os.environ.get('GMAIL_APP_PASSWORD') else 'YOK'} ###")
+        logger.error(f"E-posta gönderim hatası detayları: {traceback.format_exc()}")
         
         # Gmail uygulama şifresiyle ilgili bir hata olabilir
         if "Application-specific password required" in str(e) or "Invalid credentials" in str(e):
             logger.critical("Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
-            print("### ÖNEMLİ HATA: Gmail uygulama şifresi geçersiz veya süresi dolmuş! ###")
-            print("### Gmail hesabınız için bir uygulama şifresi oluşturmalı ve Replit Secrets bölümünden GMAIL_APP_PASSWORD değişkenine eklemelisiniz ###")
-            print("### 1. Google hesabınıza gidin, 2. Güvenlik > 2 Adımlı Doğrulama > Uygulama Şifreleri ###")
-        
-        # Test/Geliştirme modunda olduğumuz için, hataya rağmen doğrulama kodunu göster ve başarılı dön
-        if verification_code:
-            logger.warning(f"E-posta gönderme başarısız, ancak test modunda olduğumuz için işlem başarılı kabul edildi")
-            print(f"### TEST MODU AKTIF - E-POSTA GÖNDERME BAŞARISIZ OLSA DA DOĞRULAMA KODU: {verification_code} ###")
-            return True
             
         return False
 
