@@ -1389,9 +1389,7 @@ def forgot_password():
                 verification_code=verification_code
             )
             
-            # Eğer e-posta gönderildiyse veya test modundaysak
-            # Doğrulama kodunu her zaman ekranda göster (test ve geliştirme amaçlı)
-            flash(f'Doğrulama kodu: {verification_code} (Test modu: Bu mesaj sadece geliştirme sırasında görünür)', 'info')
+            # E-posta gönderildi mesajı
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
             return redirect(url_for('reset_code', email=email))
 
