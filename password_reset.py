@@ -242,12 +242,26 @@ def reset_password():
     Şifre sıfırlama sayfası - kullanıcı yeni şifresini belirler
     """
     try:
-        # Session'ı kontrol et
-        if not session.get('reset_verified') or not session.get('reset_email'):
-            flash('Şifre sıfırlama işlemi için önce doğrulama kodunu girmelisiniz.', 'danger')
+        # URL'den parametreleri al
+        email = request.args.get('email') or request.form.get('email')
+        token = request.args.get('token') or request.form.get('token')
+        
+        # Şifre sıfırlama sayfasına doğrudan erişimi engelle
+        if not email or not token:
+            # Session'ı kontrol et (eski yöntem desteği için)
+            if not session.get('reset_verified') or not session.get('reset_email'):
+                flash('Şifre sıfırlama işlemi için önce doğrulama kodunu girmelisiniz.', 'danger')
+                return redirect(url_for('password_reset.forgot_password'))
+            email = session.get('reset_email')
+        
+        # Parametreleri logla (debug)
+        logger.info(f"Reset Password: email={email}, token={token}, session={session.get('reset_verified')}")
+        
+        # Token kontrolü
+        user = User.query.filter_by(email=email, reset_token=token).first()
+        if not user and token:
+            flash('Geçersiz veya süresi dolmuş şifre sıfırlama bağlantısı.', 'danger')
             return redirect(url_for('password_reset.forgot_password'))
-
-        email = session.get('reset_email')
         
         if request.method == 'POST':
             password = request.form.get('password')

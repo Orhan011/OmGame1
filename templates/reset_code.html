@@ -138,7 +138,7 @@
           {% endif %}
         {% endwith %}
         
-        <form action="{{ url_for('reset_code') }}" method="POST" class="auth-form" id="verification-form">
+        <form action="{{ url_for('password_reset.reset_code') }}" method="POST" class="auth-form" id="verification-form">
           <input type="hidden" name="email" value="{{ email }}" id="email-input">
           
           <div class="verification-code-container">
@@ -229,7 +229,7 @@
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kod gönderiliyor...';
         
         // AJAX ile kodu tekrar gönder
-        fetch("{{ url_for('forgot_password') }}", {
+        fetch("{{ url_for('password_reset.forgot_password') }}", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
