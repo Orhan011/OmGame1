@@ -374,88 +374,24 @@ function updateProfileScores() {
   }
 }
 
-// Global skorları kaydetme yardımcı fonksiyonu
+// Global skorları kaydetme yardımcı fonksiyonu (devre dışı bırakıldı)
 window.saveScoreToLeaderboard = function(gameType, score, playTime, difficulty = 'medium', gameStats = {}) {
-  console.log(`${gameType} oyunu için puan kaydediliyor: ${score}`);
-  
-  // Puan hesaplama parametreleri
-  const calculatedScore = calculateGameScore(gameType, score, playTime, difficulty, gameStats);
-  console.log(`Hesaplanan puan: ${calculatedScore}`);
-  
-  return fetch('/api/save-score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      game_type: gameType,
-      score: calculatedScore, // Hesaplanan puanı gönder
-      original_score: score, // Orijinal skoru da sakla
-      playtime: playTime,
-      difficulty: difficulty,
-      game_stats: gameStats
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      console.log("Skor başarıyla kaydedildi:", data);
-      // Kullanıcıya puanını göster
-      showScoreNotification(calculatedScore, data.total_score);
-      // Liderlik tablosunu güncelle
-      updateScoreBoard(gameType);
-      return {...data, calculated_score: calculatedScore};
-    } else {
-      console.error("Skor kaydedilirken hata oluştu:", data.message);
-      throw new Error(data.message);
-    }
+  console.log("Puan kayıt sistemi devre dışı bırakıldı.");
+  return new Promise((resolve) => {
+    resolve({ success: true, message: "Puan sistemi devre dışı" });
   });
 };
 
-// Oyun puanını hesaplama fonksiyonu
+// Oyun puanını hesaplama fonksiyonu (devre dışı bırakıldı)
 function calculateGameScore(gameType, score, playTime, difficulty, gameStats = {}) {
-  // Zorluk seviyesi katsayısı
-  const difficultyMultiplier = {
-    'easy': 0.8,
-    'medium': 1.0,
-    'hard': 1.3,
-    'expert': 1.6
-  }[difficulty] || 1.0;
-  
-  // Oyun tipine göre baz puan hesaplama
-  let baseScore = score;
-  
-  // Oynama süresi faktörü (oyun tipine bağlı olarak değişebilir)
-  const timeFactorMultiplier = gameStats.timeBonus || 1.0;
-  
-  // Doğruluk oranı (eğer varsa)
-  const accuracyMultiplier = gameStats.accuracy ? (gameStats.accuracy / 100 * 0.5 + 0.5) : 1.0;
-  
-  // Final puan hesaplama
-  let finalScore = Math.round(baseScore * difficultyMultiplier * timeFactorMultiplier * accuracyMultiplier);
-  
-  // Puanı 0-100 arasında sınırla
-  finalScore = Math.min(100, Math.max(0, finalScore));
-  
-  return finalScore;
+  // Puan hesaplama devre dışı
+  return 0;
 }
 
-// Kullanıcıya puan bildirimini gösterme
+// Kullanıcıya puan bildirimini gösterme (devre dışı bırakıldı)
 function showScoreNotification(gameScore, totalScore) {
-  if (typeof GameHelper !== 'undefined' && GameHelper.showNotification) {
-    GameHelper.showNotification(
-      `<div class="score-notification">
-        <div>Bu oyun puanınız: <strong>${gameScore}/100</strong></div>
-        <div>Toplam puanınız: <strong>${totalScore}</strong></div>
-      </div>`,
-      { 
-        type: 'success', 
-        duration: 5000,
-        position: 'top-center'
-      }
-    );
-  } else {
-    // GameHelper yoksa basit alert göster
-    console.log(`Oyun puanı: ${gameScore}/100, Toplam puan: ${totalScore}`);
-  }
+  // Puan bildirimi devre dışı
+  console.log("Puan bildirimi devre dışı bırakıldı.");
 }
 
 // Global nesne olarak dışa aktar

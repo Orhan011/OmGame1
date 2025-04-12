@@ -728,141 +728,18 @@ function getUserId() {
   });
 }
 
-// Oyun puanı hesaplama yardımcı fonksiyonu
+// Oyun puanı hesaplama yardımcı fonksiyonu (devre dışı bırakıldı)
 function calculateGameScore(params) {
-  const {
-    score = 0,
-    difficulty = 'medium',
-    timeSpent = 0,
-    maxTime = 0,
-    correctAnswers = 0,
-    totalQuestions = 0,
-    hintsUsed = 0,
-    gameType = ''
-  } = params;
-  
-  // Zorluk seviyesi katsayısı
-  const difficultyMultiplier = {
-    'easy': 0.8,
-    'medium': 1.0,
-    'hard': 1.3,
-    'expert': 1.6
-  }[difficulty] || 1.0;
-  
-  // Zaman katsayısı - eğer hızlı tamamlandıysa bonus puan
-  let timeMultiplier = 1.0;
-  if (maxTime > 0 && timeSpent > 0) {
-    // Zamanın yarısından önce tamamlandıysa bonus
-    if (timeSpent < maxTime / 2) {
-      timeMultiplier = 1.2;
-    } 
-    // Zamanın tamamına yakın sürede tamamlandıysa düşük çarpan
-    else if (timeSpent > maxTime * 0.8) {
-      timeMultiplier = 0.9;
-    }
-  }
-  
-  // Doğruluk oranı
-  let accuracyMultiplier = 1.0;
-  if (totalQuestions > 0) {
-    const accuracy = correctAnswers / totalQuestions;
-    accuracyMultiplier = accuracy * 0.5 + 0.5; // Minimum 0.5 çarpan
-  }
-  
-  // İpuçları kullanımı cezası
-  const hintPenalty = Math.max(0, 1 - (hintsUsed * 0.1)); // Her ipucu %10 puan düşürür
-  
-  // Oyun tipine özel ayarlamalar
-  let gameTypeMultiplier = 1.0;
-  switch (gameType) {
-    case 'tetris':
-    case 'snake':
-      // Süre bazlı oyunlarda uzun süre oynamak iyi
-      gameTypeMultiplier = 1.0 + (timeSpent / 300) * 0.5; // Her 5 dakika için %50 bonus
-      break;
-    case 'wordle':
-    case 'memoryCards':
-      // Doğruluk odaklı
-      gameTypeMultiplier = accuracyMultiplier * 1.2;
-      break;
-    default:
-      gameTypeMultiplier = 1.0;
-  }
-  
-  // Temel puanı hesapla
-  let baseScore = score;
-  
-  // Puan hesaplama
-  let finalScore = baseScore * difficultyMultiplier * timeMultiplier * accuracyMultiplier * hintPenalty * gameTypeMultiplier;
-  
-  // 0-100 arasına dönüştür - her oyun için farklı ölçekleme olabilir
-  const gameTypeNormalization = {
-    'tetris': 200, // Tetris'te 200 puan mükemmel puan
-    'wordle': 6,   // Wordle'da 6 deneme hakkı
-    'memoryCards': 20, // Hafıza kartlarında 20 hamle
-    'chess': 1000,  // Satranç puanı
-    'default': 100  // Varsayılan
-  };
-  
-  const maxScoreForGame = gameTypeNormalization[gameType] || gameTypeNormalization.default;
-  
-  // Nihai puanı 0-100 arasına normalize et
-  finalScore = Math.min(100, Math.max(0, (finalScore / maxScoreForGame) * 100));
-  
-  // Tam sayıya yuvarla
-  return Math.round(finalScore);
+  // Puan sistemi devre dışı bırakıldı
+  console.log("Puan sistemi devre dışı bırakıldı.");
+  return 0;
 }
 
-// Oyun sonucunu gösterme yardımcı fonksiyonu
+// Oyun sonucunu gösterme yardımcı fonksiyonu (devre dışı bırakıldı)
 function showGameScoreResult(gameType, score, gameStats = {}, options = {}) {
-  const {
-    difficulty = 'medium',
-    timeSpent = 0,
-    maxTime = 0,
-    correctAnswers = 0,
-    totalQuestions = 0,
-    hintsUsed = 0
-  } = gameStats;
-  
-  // Puanı hesapla
-  const calculatedScore = calculateGameScore({
-    score,
-    difficulty,
-    timeSpent,
-    maxTime,
-    correctAnswers,
-    totalQuestions,
-    hintsUsed,
-    gameType
-  });
-  
-  // Oyun istatistiklerini hazırla
-  const stats = {
-    ...gameStats,
-    timeBonus: maxTime > 0 ? Math.max(0, 1 - (timeSpent / maxTime)) : 0,
-    accuracy: totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 100
-  };
-  
-  // Liderlik tablosuna kaydet
-  if (window.saveScoreToLeaderboard) {
-    window.saveScoreToLeaderboard(gameType, score, timeSpent, difficulty, stats)
-      .then(data => {
-        console.log("Puan kaydedildi:", data);
-        
-        // Puan bildirimini göster (saveScoreToLeaderboard zaten gösteriyor)
-        // Ek özellikler eklenmek istenirse buraya eklenebilir
-      })
-      .catch(error => {
-        console.error("Puan kaydedilirken hata:", error);
-        // Hata durumunda da puanı göster
-        showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
-      });
-  } else {
-    // saveScoreToLeaderboard fonksiyonu yoksa sadece bildirimi göster
-    showNotification(`Oyun puanınız: ${calculatedScore}/100`, { type: 'info' });
-  }
-  
-  return calculatedScore;
+  // Puan gösterimi devre dışı bırakıldı
+  console.log("Puan gösterimi devre dışı bırakıldı.");
+  return 0;
 }
 
 // Dışa aktarılan tüm yardımcı fonksiyonlar
