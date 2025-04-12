@@ -8,14 +8,103 @@ import logging
 import secrets
 import string
 import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from models import db, User
-from main import send_verification_email
 
 # Blueprint tanımlaması
 password_reset = Blueprint('password_reset', __name__)
 
 logger = logging.getLogger(__name__)
+
+def send_email_in_background(to_email, subject, html_body, from_name="OmGame", verification_code=None):
+    """
+    E-posta gönderme işlemini gerçekleştirir.
+    Doğrudan SMTP kullanarak e-posta gönderimi.
+    
+    Args:
+        to_email (str): Gönderilecek e-posta adresi
+        subject (str): E-posta konusu
+        html_body (str): E-posta içeriği (HTML)
+        from_name (str, optional): Gönderen adı. Varsayılan: "OmGame"
+        verification_code (str, optional): Doğrulama kodu. Belirtilmezse içerikten otomatik çıkarılmaya çalışılır.
+    """
+    # İşlem başlangıcını logla
+    logger.info(f"E-posta gönderme işlemi başlatıldı: {to_email}, Konu: {subject}")
+    
+    # Doğrulama kodu verilmediyse ve bu bir şifre sıfırlama e-postası ise, HTML içeriğinden kodu çıkar
+    if not verification_code and ("Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject):
+        try:
+            import re
+            # Verification code'u çıkart (hem h3 etiketindeki hem de verification-code class'ındaki)
+            code_match = re.search(r'verification-code">(\d+)<|<h3[^>]*>(\d+)</h3>', html_body)
+            if code_match:
+                # İki gruptan hangisinde eşleşme varsa onu al
+                verification_code = code_match.group(1) if code_match.group(1) else code_match.group(2)
+                # Sadece logla, konsola yazdırma
+                logger.info(f"Doğrulama Kodu (sadece loglarda): {verification_code} - E-posta: {to_email}")
+        except Exception as e:
+            logger.error(f"Doğrulama kodu çıkarılırken hata: {str(e)}")
+    
+    # SMTP ile e-posta gönderimi
+    try:
+        # Gmail SMTP ayarları - doğrudan SMTP kullan
+        from_email = "omgameee@gmail.com"
+        password = "nevq zfmo lzvg nxkl"  # Uygulama şifresi
+        
+        # E-posta mesajını oluştur
+        smtp_msg = MIMEMultipart()
+        smtp_msg['From'] = f"{from_name} <{from_email}>"
+        smtp_msg['To'] = to_email
+        smtp_msg['Subject'] = subject
+        smtp_msg.attach(MIMEText(html_body, 'html'))
+        
+        # SMTP sunucusuna bağlan ve e-postayı gönder
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
+        server.login(from_email, password)
+        text = smtp_msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+        
+        logger.info(f"E-posta başarıyla gönderildi: {to_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"E-posta gönderme işlemi sırasında hata: {str(e)}")
+        
+        # Gmail uygulama şifresiyle ilgili bir hata olabilir
+        if "Application-specific password required" in str(e) or "Invalid credentials" in str(e):
+            logger.critical("Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
+            logger.error("ÖNEMLİ HATA: Gmail uygulama şifresi geçersiz veya süresi dolmuş olabilir!")
+            
+        return False
+
+def send_verification_email(to_email, subject, html_message):
+    """
+    Kullanıcıya bilgilendirme e-postası gönderir.
+    
+    Args:
+        to_email (str): Kullanıcının e-posta adresi
+        subject (str): E-posta konusu
+        html_message (str): HTML formatında e-posta içeriği
+    
+    Returns:
+        bool: E-posta gönderme işleminin başarılı olup olmadığı
+    """
+    try:
+        # E-posta gönderme işlemi
+        result = send_email_in_background(to_email, subject, html_message)
+        if result:
+            logger.info(f"E-posta başarıyla gönderildi: {to_email}")
+            return True
+        else:
+            logger.error("E-posta gönderimi başarısız")
+            return False
+    except Exception as e:
+        logger.error(f"E-posta gönderme hatası: {str(e)}")
+        return False
 
 def generate_token(length=64):
     """
