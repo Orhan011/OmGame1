@@ -74,26 +74,68 @@ function loadLeaderboard() {
     </div>
   `;
 
-  // Skorları almak için alternatif API kullanımı
-  // İki API'yi zincirleyerek veri çekme
-  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
+  // Skorları almak için çoklu API denemesi
+  console.log('Liderlik tablosu verileri getiriliyor...');
+  
+  // İlk olarak doğrudan kullanıcı verilerini getir
+  fetch('/api/users/all?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
-        console.log('İlk API başarısız, alternatif API deneniyor...');
+        console.log('Kullanıcı API başarısız, skor API deneniyor...');
+        return fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime());
+      }
+      return response;
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.log('İkinci API de başarısız, son API deneniyor...');
         return fetch('/api/leaderboard/all?nocache=' + new Date().getTime());
       }
       return response;
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        throw new Error(`Hiçbir API düzgün çalışmıyor: ${response.status} ${response.statusText}`);
       }
+      console.log('API yanıtı alındı:', response.url);
       return response.json();
     })
     .then(data => {
       // API yanıtı bir dizi olmalı
-      const scores = Array.isArray(data) ? data : [];
-      console.log("Skorlar alındı:", scores.length, scores);
+      let scores = Array.isArray(data) ? data : [];
+      console.log("Ham veri alındı, işleniyor... Veri sayısı:", scores.length);
+      
+      // Kullanıcıların puanları yoksa, onları ayrıştır ve varsayılan değerler ata
+      scores = scores.map(player => {
+        // Tüm olası puan alanlarını kontrol et
+        let scoreValue = 0;
+        
+        if (player.total_score !== undefined && player.total_score !== null) {
+          scoreValue = player.total_score;
+        } else if (player.score !== undefined && player.score !== null) {
+          scoreValue = player.score;
+        } else if (player.points !== undefined && player.points !== null) {
+          scoreValue = player.points;
+        } else if (player.experience_points !== undefined && player.experience_points !== null) {
+          // Deneyim puanları da gösterilebilir
+          scoreValue = player.experience_points;
+        }
+        
+        // Sayısal değer kontrolü
+        if (isNaN(scoreValue) || scoreValue === null) {
+          scoreValue = 0;
+        }
+        
+        return {
+          ...player,
+          calculated_score: scoreValue // Hesaplanmış puanı yeni bir alanda sakla
+        };
+      });
+      
+      // Skorları puanlarına göre sırala (en yüksekten en düşüğe)
+      scores.sort((a, b) => b.calculated_score - a.calculated_score);
+      
+      console.log("İşlenmiş skorlar:", scores.length);
 
       if (scores.length === 0) {
         leaderboardContainer.innerHTML = `
@@ -154,24 +196,10 @@ function loadLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const isCurrentUser = player.is_current_user || false;
 
-        // Puanı doğru şekilde göster - tüm olası API yanıt formatlarını kontrol et
-        let totalScore = 0;
-        if (player.total_score !== undefined) {
-          totalScore = player.total_score;
-        } else if (player.score !== undefined) {
-          totalScore = player.score;
-        } else if (player.points !== undefined) {
-          totalScore = player.points;
-        } else if (typeof player === 'object' && Object.keys(player).includes('score')) {
-          totalScore = player.score;
-        }
+        // Hesaplanmış puanı kullan
+        const totalScore = player.calculated_score || 0;
         
-        // Sayı olmayan değerleri kontrol et ve düzelt
-        if (isNaN(totalScore) || totalScore === null) {
-          totalScore = 0;
-        }
-        
-        console.log("Oyuncu puanı:", player.username, totalScore);
+        console.log("Oyuncu puanı görüntüleniyor:", player.username, totalScore);
 
         html += `
           <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
@@ -211,29 +239,65 @@ function loadLeaderboard() {
     .catch(error => {
       console.error('Skorlar alınırken hata oluştu:', error);
       
-      // Son bir deneme yap - direkt API'ye git
-      fetch('/api/users/all?limit=1000&nocache=' + new Date().getTime())
+      // Sabit veri oluşturarak kullanıcılara en azından bir şeyler göster
+      const dummyUsers = [];
+      
+      // Son bir deneme daha yap - farklı API endpoint ile
+      fetch('/api/current-user')
         .then(response => response.json())
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            console.log("Alternatif API başarılı, kullanıcılar:", data.length);
+        .then(currentUser => {
+          // Mevcut oturum açmış kullanıcı bilgisini al
+          if (currentUser && currentUser.loggedIn) {
+            // Kullanıcı giriş yapmışsa, kullanıcı verilerini al
+            return fetch('/api/scores/user/' + currentUser.id + '?nocache=' + new Date().getTime());
+          } else {
+            throw new Error("Giriş yapılmamış");
+          }
+        })
+        .then(response => response.json())
+        .then(userScores => {
+          // Kullanıcının puanları varsa bunları göster
+          if (userScores && userScores.length > 0) {
+            // Kullanıcı puanlarını göster
+            let totalUserScore = 0;
+            userScores.forEach(score => {
+              totalUserScore += score.score || 0;
+            });
             
-            // Kullanıcı verileriyle liderlik tablosunu oluştur
-            let html = createLeaderboardHtml(data);
+            dummyUsers.push({
+              username: userScores[0].username || "Aktif Kullanıcı",
+              calculated_score: totalUserScore,
+              is_current_user: true
+            });
+            
+            let html = createLeaderboardHtml(dummyUsers);
             leaderboardContainer.innerHTML = html;
           } else {
-            throw new Error("Kullanıcı verileri alınamadı");
+            throw new Error("Kullanıcı puanları alınamadı");
           }
         })
         .catch(finalError => {
           console.error("Son hata:", finalError);
-          leaderboardContainer.innerHTML = `
-            <div class="error">
-              <i class="fas fa-exclamation-triangle"></i>
-              <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-              <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
-            </div>
-          `;
+          // Alternatif API'leri dene
+          fetch('/api/users/top?limit=10&nocache=' + new Date().getTime())
+            .then(response => response.json())
+            .then(topUsers => {
+              if (Array.isArray(topUsers) && topUsers.length > 0) {
+                let html = createLeaderboardHtml(topUsers);
+                leaderboardContainer.innerHTML = html;
+              } else {
+                throw new Error("Hiçbir veri alınamadı");
+              }
+            })
+            .catch(lastError => {
+              leaderboardContainer.innerHTML = `
+                <div class="error">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+                  <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
+                </div>
+              `;
+            });
         });
     });
     
@@ -248,12 +312,39 @@ function createLeaderboardHtml(players) {
     `;
   }
   
-  // Oyuncuları puanlarına göre sırala (puanı olmayanlara 0 ver)
-  const sortedPlayers = [...players].sort((a, b) => {
-    const scoreA = a.total_score || a.score || a.points || 0;
-    const scoreB = b.total_score || b.score || b.points || 0;
-    return scoreB - scoreA;
+  // Önce oyuncuların puanlarını hesapla
+  const processedPlayers = players.map(player => {
+    // Tüm olası puan alanlarını kontrol et
+    let scoreValue = 0;
+    
+    if (player.calculated_score !== undefined) {
+      scoreValue = player.calculated_score;
+    } else if (player.total_score !== undefined && player.total_score !== null) {
+      scoreValue = player.total_score;
+    } else if (player.score !== undefined && player.score !== null) {
+      scoreValue = player.score;
+    } else if (player.points !== undefined && player.points !== null) {
+      scoreValue = player.points;
+    } else if (player.experience_points !== undefined && player.experience_points !== null) {
+      // Deneyim puanları da gösterilebilir
+      scoreValue = player.experience_points;
+    }
+    
+    // Sayısal değer kontrolü
+    if (isNaN(scoreValue) || scoreValue === null) {
+      scoreValue = 0;
+    }
+    
+    return {
+      ...player,
+      calculated_score: scoreValue
+    };
   });
+  
+  // Oyuncuları puanlarına göre sırala (en yüksekten en düşüğe)
+  const sortedPlayers = [...processedPlayers].sort((a, b) => b.calculated_score - a.calculated_score);
+  
+  console.log("Sıralanmış oyuncular:", sortedPlayers.length, sortedPlayers.slice(0, 3).map(p => p.username + ':' + p.calculated_score));
   
   let html = `
     <div class="leaderboard-table">
@@ -277,8 +368,9 @@ function createLeaderboardHtml(players) {
     else if (index === 2) userNameColorClass = 'third-place';
     else if (index < 10) userNameColorClass = 'top-ten';
     
-    // Puan kontrolü
-    let playerScore = player.total_score || player.score || player.points || 0;
+    // Hesaplanmış puanı kullan
+    let playerScore = player.calculated_score || 0;
+    console.log(`${player.username} puanı: ${playerScore}`);
     
     const avatarUrl = player.avatar_url || '';
     const isCurrentUser = player.is_current_user || false;
