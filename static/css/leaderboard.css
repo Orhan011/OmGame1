@@ -468,12 +468,15 @@
 .score-value {
   font-weight: 700;
   font-size: 1.2rem;
-  color: #fff;
   letter-spacing: 0.5px;
+  color: #fff; /* Puanların görünmesi için rengi beyaz yap */
+  /* Gradient kaldırıldı çünkü puanlar görünmüyor */
+  /* 
   background: linear-gradient(45deg, #6a5ae0, #9f8aff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  */
 }
 
 .score-label {
@@ -578,7 +581,7 @@
 }
 
 .score-value {
-  color: #fff;
+  color: #fff !important; /* !important ekleyerek diğer stillerin ezmesini engelledik */
   font-weight: 700;
   font-size: 1.1rem;
   position: relative;
