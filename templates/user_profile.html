@@ -1,0 +1,271 @@
+
+{% extends 'layout.html' %}
+
+{% block title %}{{ viewed_user.username }} | Kullanıcı Profili - OmGame{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+  <div class="row">
+    <!-- Sol Kolon - Profil Bilgileri -->
+    <div class="col-lg-3">
+      <div class="glass-card profile-card">
+        <!-- Profil Resmi ve Statüsü -->
+        <div class="profile-image-container">
+          <div class="profile-avatar">
+            {% if viewed_user.avatar_url %}
+              <img src="{{ url_for('static', filename=viewed_user.avatar_url) }}" alt="{{ viewed_user.username }}" class="profile-img">
+            {% else %}
+              <div class="profile-avatar-placeholder">{{ viewed_user.username[0]|upper }}</div>
+            {% endif %}
+            <div class="profile-status online"></div>
+          </div>
+        </div>
+        
+        <!-- Kullanıcı Bilgileri -->
+        <div class="profile-info">
+          <h2 class="profile-name">{{ viewed_user.username }}</h2>
+          <p class="profile-title">{{ viewed_user.rank }}</p>
+          
+          <!-- Seviye Bilgisi -->
+          <div class="level-progress-container">
+            <div class="level-badge">{{ current_level }}</div>
+            <div class="level-progress-bar">
+              <div class="level-progress" style="width: {{ ((viewed_user.experience_points - xp_for_current) / (xp_for_next - xp_for_current) * 100)|round }}%"></div>
+            </div>
+            <p class="level-text">{{ viewed_user.experience_points|int }} / {{ xp_for_next|int }} XP</p>
+          </div>
+          
+          <!-- Toplam Oyun Puanı -->
+          <div class="total-score-container mt-3">
+            <div class="d-flex align-items-center">
+              <div class="score-icon me-2">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="score-details">
+                <p class="score-title mb-0">Liderlik Puanı</p>
+                <p class="total-score-value mb-0" id="leaderboard-total-score">{{ total_score|default(0) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Kişisel Bilgiler -->
+        <div class="personal-info-container">
+          {% if viewed_user.full_name %}
+          <div class="info-item">
+            <i class="fas fa-user"></i>
+            <span>{{ viewed_user.full_name }}</span>
+          </div>
+          {% endif %}
+          
+          {% if viewed_user.location %}
+          <div class="info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ viewed_user.location }}</span>
+          </div>
+          {% endif %}
+          
+          <div class="info-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Kayıt: {{ viewed_user.created_at.strftime('%d.%m.%Y') }}</span>
+          </div>
+        </div>
+        
+        {% if viewed_user.bio %}
+        <div class="bio-container">
+          <h3 class="section-title">Hakkında</h3>
+          <p class="bio-text">{{ viewed_user.bio }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Sağ Kolon - Oyun İstatistikleri -->
+    <div class="col-lg-9">
+      <div class="glass-card">
+        <div class="profile-tab-container">
+          <div class="tab-navigation">
+            <button class="tab-button active" data-tab="stats">
+              <i class="fas fa-chart-bar"></i> İstatistikler
+            </button>
+            <button class="tab-button" data-tab="achievements">
+              <i class="fas fa-award"></i> Başarılar
+            </button>
+            <div class="tab-indicator"></div>
+          </div>
+          
+          <!-- Sekme İçerikleri -->
+          <div class="tab-content-container">
+            
+            <!-- İstatistikler Sekmesi -->
+            <div class="tab-content active" id="stats-tab">
+              <h3 class="tab-title">Oyun İstatistikleri</h3>
+              
+              <!-- Özet İstatistikler -->
+              <div class="stats-overview mb-4">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="stats-card">
+                      <div class="stats-icon">
+                        <i class="fas fa-gamepad"></i>
+                      </div>
+                      <div class="stats-info">
+                        <h4>Oynadığı Oyunlar</h4>
+                        <span class="stats-value" id="played-games-count">{{ played_games_count }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="stats-card">
+                      <div class="stats-icon">
+                        <i class="fas fa-star"></i>
+                      </div>
+                      <div class="stats-info">
+                        <h4>Toplam Puan</h4>
+                        <span class="stats-value" id="total-game-points">{{ total_score }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="stats-card">
+                      <div class="stats-icon">
+                        <i class="fas fa-trophy"></i>
+                      </div>
+                      <div class="stats-info">
+                        <h4>Sıralama</h4>
+                        <span class="stats-value" id="leaderboard-rank">{{ leaderboard_rank }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Oyun Skorları Tablosu -->
+              <div class="game-scores-table-container">
+                <h4 class="section-title">
+                  <i class="fas fa-list"></i>
+                  En Yüksek Skorlar
+                </h4>
+                
+                <div class="table-responsive">
+                  <table class="table game-table">
+                    <thead>
+                      <tr>
+                        <th>Oyun</th>
+                        <th>En Yüksek Skor</th>
+                        <th>Zorluk</th>
+                        <th>Son Oynama</th>
+                      </tr>
+                    </thead>
+                    <tbody id="game-scores-tbody">
+                      {% if game_scores %}
+                        {% for game_type, score in game_scores.items() %}
+                        <tr>
+                          <td class="game-name">
+                            <span class="game-icon">{{ game_icons.get(game_type, '<i class="fas fa-gamepad"></i>')|safe }}</span>
+                            <span>{{ game_names.get(game_type, game_type) }}</span>
+                          </td>
+                          <td class="game-score">
+                            <span class="score-value">{{ score.highest_score }}</span>
+                          </td>
+                          <td>
+                            <span class="difficulty-badge {{ score.difficulty or 'medium' }}">
+                              {{ difficulty_names.get(score.difficulty, score.difficulty) if score.difficulty else 'Orta' }}
+                            </span>
+                          </td>
+                          <td>{{ score.last_played.strftime('%d.%m.%Y %H:%M') if score.last_played else 'Bilinmiyor' }}</td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                        <tr>
+                          <td colspan="4" class="text-center no-data">
+                            <i class="fas fa-gamepad mb-2"></i>
+                            <p>Henüz oyun skoru bulunmuyor</p>
+                          </td>
+                        </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Başarılar Sekmesi -->
+            <div class="tab-content" id="achievements-tab">
+              <h3 class="tab-title">Başarılar</h3>
+              
+              {% if achievements %}
+              <div class="achievements-grid">
+                {% for achievement in achievements %}
+                <div class="achievement-card">
+                  <div class="achievement-icon">
+                    <i class="{{ achievement.icon }}"></i>
+                  </div>
+                  <div class="achievement-info">
+                    <h4>{{ achievement.title }}</h4>
+                    <p>{{ achievement.description }}</p>
+                    <span class="achievement-date">{{ achievement.unlocked_at.strftime('%d.%m.%Y') }}</span>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="no-achievements">
+                <div class="empty-icon">
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <h4>Henüz Başarı Kazanılmamış</h4>
+                <p>{{ viewed_user.username }} henüz bir başarı elde etmemiş.</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab navigasyonu
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabIndicator = document.querySelector('.tab-indicator');
+    
+    function positionTabIndicator(activeTab) {
+      if (!tabIndicator || !activeTab) return;
+      
+      const tabLeft = activeTab.offsetLeft;
+      const tabWidth = activeTab.offsetWidth;
+      
+      tabIndicator.style.width = `${tabWidth}px`;
+      tabIndicator.style.left = `${tabLeft}px`;
+    }
+    
+    // İlk yüklemede aktif sekmenin altını çiz
+    const activeTab = document.querySelector('.tab-button.active');
+    if (activeTab) {
+      positionTabIndicator(activeTab);
+    }
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Aktif sekme sınıfını kaldır
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        // Tıklanan sekmeyi ve içeriğini aktifleştir
+        button.classList.add('active');
+        const tabId = `${button.dataset.tab}-tab`;
+        document.getElementById(tabId).classList.add('active');
+        
+        // Tab göstergesini konumlandır
+        positionTabIndicator(button);
+      });
+    });
+  });
+</script>
+{% endblock %}

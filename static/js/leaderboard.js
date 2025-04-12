@@ -6,21 +6,21 @@
  */
 function updateScoreBoard(gameType = null, forceUpdate = false) {
   console.log(`Skor tablosu güncelleniyor... ${gameType ? 'Oyun: ' + gameType : ''}`);
-  
+
   loadLeaderboard();
   loadLevelLeaderboard();
   updateProfileScores();
-  
+
   // Başarı mesajı
   const updateMessage = document.createElement('div');
   updateMessage.className = 'update-notification';
   updateMessage.innerHTML = '<i class="fas fa-sync-alt"></i> Skor tablosu güncellendi!';
-  
+
   document.body.appendChild(updateMessage);
-  
+
   setTimeout(() => {
     updateMessage.classList.add('show');
-    
+
     setTimeout(() => {
       updateMessage.classList.remove('show');
       setTimeout(() => {
@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', function() {
     loadLevelLeaderboard();
     console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
-  
+
   // Global güncelleme fonksiyonunu dışa aktar
   window.updateScoreBoard = updateScoreBoard;
-  
+
   // Liderlik tablosu güncelleme butonu varsa, tıklama olayını ekle
   const refreshButtons = document.querySelectorAll('.refresh-leaderboard');
   refreshButtons.forEach(button => {
@@ -142,19 +142,19 @@ function loadLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const isCurrentUser = player.is_current_user || false;
 
+        const playerName = player.username;
+        const playerAvatar = player.avatar_url ? `<img src="${player.avatar_url}" alt="${playerName}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                   <span class="avatar-content" style="display:none">${initial}</span>` : `<span class="avatar-content">${initial}</span>`;
+
         html += `
           <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
             <div class="rank-cell">
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar">
+              <div class="player-avatar-container" onclick="window.location.href='/user/${player.user_id}'" style="cursor: pointer;" title="Profili Görüntüle: ${playerName}">
+                ${playerAvatar}
                 ${crownHTML}
-                ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                   <span class="avatar-content" style="display:none">${initial}</span>` : 
-                  `<span class="avatar-content">${initial}</span>`
-                }
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
@@ -210,7 +210,7 @@ function updateProfileScores() {
 
           if (currentUser && currentUser.total_score) {
             console.log("Profil sayfası toplam puanı güncelleniyor:", currentUser.total_score);
-            
+
             // Ana puan göstergesini güncelle
             if (totalScoreElement) {
               totalScoreElement.innerHTML = currentUser.total_score;
@@ -219,7 +219,7 @@ function updateProfileScores() {
                 totalScoreElement.classList.remove('score-change');
               }, 1500);
             }
-            
+
             // Tüm puan göstergelerini güncelle
             totalPointsElements.forEach(element => {
               element.textContent = currentUser.total_score;
@@ -232,17 +232,17 @@ function updateProfileScores() {
         })
         .catch(error => {
           console.error('Profil puanları güncellenirken hata:', error);
-          
+
           // Hata durumunda alternatif API'yi dene
           fetch('/api/scores/aggregated?nocache=' + new Date().getTime())
             .then(response => response.json())
             .then(scores => {
               // Mevcut kullanıcının puanını bul
               const currentUser = scores.find(score => score.is_current_user);
-              
+
               if (currentUser && currentUser.total_score) {
                 console.log("Alternatif API'den puan güncelleniyor:", currentUser.total_score);
-                
+
                 // Ana puan göstergesini güncelle
                 if (totalScoreElement) {
                   totalScoreElement.innerHTML = currentUser.total_score;
@@ -251,7 +251,7 @@ function updateProfileScores() {
                     totalScoreElement.classList.remove('score-change');
                   }, 1500);
                 }
-                
+
                 // Tüm puan göstergelerini güncelle
                 totalPointsElements.forEach(element => {
                   element.textContent = currentUser.total_score;
@@ -357,6 +357,7 @@ function loadLevelLeaderboard() {
           games_played: player.games_played || player.total_games_played || 0,
           progress_percent: player.progress_percent || 0,
           is_current_user: player.is_current_user || false,
+          user_id: player.user_id, // Added user_id
           rank: player.rank || ''
         };
 
@@ -411,19 +412,19 @@ function loadLevelLeaderboard() {
         else if (playerData.level >= 5) levelBadgeClass = 'level-expert';
         else if (playerData.level >= 3) levelBadgeClass = 'level-advanced';
 
+        const playerName = playerData.username;
+        const playerAvatar = playerData.avatar_url ? `<img src="${playerData.avatar_url}" alt="${playerName}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                   <span class="avatar-content" style="display:none">${initial}</span>` : `<span class="avatar-content">${initial}</span>`;
+
         html += `
           <div class="player-row ${rankClass} ${playerData.is_current_user ? 'current-user' : ''}">
             <div class="rank-cell">
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar">
+              <div class="player-avatar-container" onclick="window.location.href='/user/${playerData.user_id}'" style="cursor: pointer;" title="Profili Görüntüle: ${playerName}">
+                ${playerAvatar}
                 ${crownHTML}
-                ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                   <span class="avatar-content" style="display:none">${initial}</span>` : 
-                  `<span class="avatar-content">${initial}</span>`
-                }
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">${playerData.username}</div>
