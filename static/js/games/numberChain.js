@@ -476,40 +476,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore() {
-    if (score <= 0) return;
-    
-    // Oyun türü için backend'de tanımlı ID
-    const gameType = 'numberChain';
-    
-    // Oyun istatistiklerini hazırla
-    const gameStats = {
-      max_sequence: maxSequenceReached,
-      correct_answers: correctAnswers, 
-      level_reached: currentLevel - 1,
-      difficulty: difficulty
-    };
-    
-    // Doğru API endpointine ve formatına göre gönder
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: gameType,
-        score: score,
-        difficulty: difficulty,
-        playtime: totalPlayTime || 0,
-        game_stats: gameStats
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Sayı Zinciri skoru kaydedildi:', data);
-    })
-    .catch(error => {
-      console.error('Skor kaydedilirken hata oluştu:', error);
-    });
+    // Ana sayfaya yönlendir
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 1500);
   }
   
   // Skoru kopyala

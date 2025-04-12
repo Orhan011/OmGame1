@@ -34,12 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const shareScoreButton = document.getElementById('share-score');
   const levelButtons = document.querySelectorAll('.level-btn');
 
-  // Skore ve zaman göstergeleri
-  const scoreDisplay = document.getElementById('score-display');
+  // Skore ve zaman göstergeleri - Kaldırıldı
   const timerDisplay = document.getElementById('timer-display');
   const movesDisplay = document.getElementById('moves-display');
   const levelDisplay = document.getElementById('level-display');
-  const finalScore = document.getElementById('final-score');
   const finalTime = document.getElementById('final-time');
   const finalMoves = document.getElementById('final-moves');
   const ratingStars = document.getElementById('rating-stars');
@@ -52,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isPaused: false,
     difficulty: 'EASY',
     level: 1,
-    score: 0,
+    score: 0, // Puan değişkeni kaldırıldı
     moves: 0,
     timeRemaining: 300, // 5 dakika
     timerInterval: null,
@@ -71,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Seslerin ön yüklemesi
   const sounds = {
     pickup: new Audio('data:audio/wav;base64,UklGRiQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAEAAD+/wMA+v8IAA8ABgAIABkA9v/o//v/AgAFABQA/P/P/+3/AsAPAAQAyf+h/7T/2//9//H/vf+Z/7P/2P8DAA0A+/+9/8L/x//z/+//zv+//+7/8v/R/7r/qf/E/9X/AwAQAPL/xP/V/+z/6P/1//z/9//f/+X/7v8QAAEA7P/c/9f/vP/R//L/5/++/9D//f8hAAUA0f/a/9X/CQAMAPz/4//X/9//AQD2/x0A9v/3/wMAxf/n/wcAFgACAPP//P8GAAcAAgAHAAEADgAQAAwA+v/5/+L/8/8DABcA+P/6/+X/5P/s/+P/2P/P//j/7f/e/9H/5//1//P/7/8IAAQA+f8QAAwAKQAEAO//9f/l/wMA4//1/wAA3//0//D/BQAUAOv/8v/4/w4ABwAJABIA9v/6/+f/8v/t//n/6f8CAOv/9P/X/9//8//9/+v/4//n//n//f8aAAgABwADAAUA7v/O/9v/8f/2//j/7P/0//3/6//8/wsACgADAPL/6//4/+7/8v/r/+v/+f/5//b//v/9//7/AgACAAAA9v/t//f//v8GAPH/8P/0//T/+P/5//n//f8BAAIA/f/5//j/+f/7//3//v///wEA///9//z//f8AAAMAAQAAAP7//v8AAAEAAQAAAP7//v///wEAAQABAAAA//8AAAAAAAAAAAAAAAAAAAEAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
-    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
+    place: new Audio('data:audio/wav;base64,UklGRrQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaADAAD/////Gxz//9fXra3t7UlJoJ/Q0CMj/v6Dg8/P5eUvLykpmpkoKP//MjIzMysrIyOVlYWF1tYQED09y8vi4jMzGBg3N1BQ7e2np62tpaWtrb29vb21ta2tra2Rkbm5n5+Hh7m5wcGvr5+fqalYWDIyHh4YGDAwEBDw8Nra2trh4e/v+fnu7vHx/f0GBg8PEREKChUVGhoYGBISGRkYGBMTDw8NDQ0NCQkLCwcHBwcHBwcEBAcHBQUDAwICAgIBAfz8+fn39/X19PTz8/Pz8/Py8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vI='),
     complete: new Audio('data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQADAAD////////+//////7//v/////////+/////v////////////7////+//////////////7////9////+//5//j/+v/7//v//P/+//7///8AAP////8AAAAA/v///wAAAAD//wAA//8AAP//AQD+/wAAAAACAP//AQD9/wAA//8DAP//AgD8/wEA/v8DAP//AwD7/wEA/f8FAAIABAACAAEA/f8CAAUABQAFAPz/AAD//wMAAwAHAP//AgDy/wIAAQAHAAAA//8OAAoADgAHAAUAEgD//xIACwADAPD/AAD4//H/CAAEABIA7v/x/wYA7//7//X/7f/z/wcA8v/P//T/y/8cAP//LQAaAA0AFgAEAP//z/8MAPL/HQAdACwAEQD7/wQA4P8iAN//EAAtAAQAUQA0AP//8//u//r/5P/z/+j/3//H//b/6v8kAPD/8P8KAOf/FgD3/wEADQDu//j/3//3/w8A6f8PAOv/3v8YAOv/FwD9/wIAAwDv//H/7f8MAAAADwAfAAcAJgA5APj/KwAcAPL/CQASAOf/NQACAPb/9/8CAPL/AwD//xMATABBAEYAKwAWAP3/9P8FAOz/AgDm/wQA5v/W/9z/zf/p//7//v8IAAEABgAEAP7///8GAAQABgAEAP7/AAAGAP//AQAAAP7/AAABAP//AgD//wEAAAD+/wAAAQD//wEA//8BAP//AgAAAP//AAABAP7/AQAAAP//AgAAAP//AAABAP//AwD+/wEA/v8BAP//AgD//wEA//8BAP//AgD//wEAAAD//wEAAAD//wEA//8CAP//AgD//wEA//8BAAAA//8BAAAA//8BAP//AQD//wEA//8BAAAAAAD//wEA//8BAP//AQAAAP//AQAAAP//AQD//wEA//8BAAAAAAAAAAAAAQD//wEA/////wAA//8BAAAAAAD//wAAAAAAAAEA/////wAA//8=')
   };
 
@@ -396,7 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Oyun durumunu ayarla
     gameState.isPlaying = true;
     gameState.isPaused = false;
-    gameState.score = 0;
     gameState.moves = 0;
     gameState.correctPlacements = 0;
     gameState.bonusPoints = 0;
@@ -429,7 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateLevelDisplay();
-    updateScoreDisplay();
     updateMovesDisplay();
     updateTimerDisplay();
 
@@ -740,18 +736,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Doğru yerleşim sayısını güncelle
     gameState.correctPlacements = gameState.puzzlePieces.filter(p => p.isCorrect).length;
 
-    // Puan ekle
-    if (sourcePiece.isCorrect) {
-      gameState.score += 10;
-      gameState.bonusPoints += 5;
-    }
-
-    if (targetPiece.isCorrect) {
-      gameState.score += 10;
-      gameState.bonusPoints += 5;
-    }
-
-    updateScoreDisplay();
     updatePuzzleDisplay();
 
     // Yapboz tamamlandı mı kontrol et
@@ -781,13 +765,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pieceElement.classList.toggle('correct', piece.isCorrect);
       }
     });
-  }
-
-  /**
-   * Puan göstergesini günceller
-   */
-  function updateScoreDisplay() {
-    scoreDisplay.textContent = gameState.score;
   }
 
   /**
@@ -849,7 +826,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Oyun durumunu sıfırla
     gameState.isPlaying = false;
     gameState.isPaused = false;
-    gameState.score = 0;
     gameState.moves = 0;
     gameState.timeRemaining = 300;
     gameState.correctPlacements = 0;
@@ -857,7 +833,6 @@ document.addEventListener('DOMContentLoaded', () => {
     gameState.achievements = [];
 
     // Görünümü güncelle
-    updateScoreDisplay();
     updateMovesDisplay();
     updateTimerDisplay();
   }
@@ -872,36 +847,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Oyun durumunu güncelle
     gameState.isPlaying = false;
 
-    // Son puan hesaplama
-    if (completed) {
-      // Kalan süre bonusu
-      const timeBonus = Math.floor(gameState.timeRemaining / 10);
-      gameState.score += timeBonus;
-
-      // Hamle verimliliği bonusu
-      const efficiencyBonus = Math.max(0, 100 - Math.floor(gameState.moves / (gameState.grid.rows * gameState.grid.cols) * 10));
-      gameState.score += efficiencyBonus;
-
-      // Zorluk seviyesi bonusu
-      if (gameState.difficulty === 'MEDIUM') {
-        gameState.score = Math.floor(gameState.score * 1.5);
-      } else if (gameState.difficulty === 'HARD') {
-        gameState.score = Math.floor(gameState.score * 2);
-      }
-
-      // Başarımları kontrol et
-      checkAchievements();
-
-      // Başarım tamamlanmasını ses ile bildir
-      playSound('complete');
-    }
-
     // Sonuç ekranını güncelle
-    finalScore.textContent = gameState.score;
-
-    const minutes = Math.floor((300 - gameState.timeRemaining) / 60);
-    const seconds = (300 - gameState.timeRemaining) % 60;
-    finalTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    finalTime.textContent = `${Math.floor((300 - gameState.timeRemaining) / 60)}:${((300 - gameState.timeRemaining) % 60).toString().padStart(2, '0')}`;
 
     finalMoves.textContent = gameState.moves;
 
@@ -934,7 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveScore() {
     // Zorluk seviyesini belirle
     const difficulty = gameState.difficulty.toLowerCase();
-    
+
     // Toplam parça sayısı
     const totalPieces = gameState.grid.rows * gameState.grid.cols;
     // Harcanan süre
@@ -948,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const wrongMoves = Math.max(0, totalMoves - correctMoves);
     // Kullanılan ipucu sayısı tahmini
     const hintsUsed = gameState.bonusPoints > 0 ? Math.floor(gameState.bonusPoints / 5) : 0;
-    
+
     // Standardize edilmiş puan hesaplama sistemi için parametreler
     const scoreParams = {
       gameType: 'puzzle',
@@ -968,19 +915,19 @@ document.addEventListener('DOMContentLoaded', () => {
         gridSize: gameState.grid.rows + 'x' + gameState.grid.cols
       }
     };
-    
+
     // Standardize edilmiş puan hesaplama sistemini kullan
     let scoreDetails = { finalScore: 0, breakdown: {} };
-    
+
     try {
       // ScoreCalculator modülünü kullanarak puanı hesapla
       scoreDetails = window.ScoreCalculator.calculate(scoreParams);
       console.log("Standartlaştırılmış yapboz puanı hesaplandı:", scoreDetails);
-      
+
       // Puan detaylarını kaydet
       gameState.standardizedScore = scoreDetails.finalScore;
       gameState.scoreBreakdown = scoreDetails.breakdown;
-      
+
     } catch (error) {
       console.error("ScoreCalculator hatası:", error);
       // Hata durumunda yedek puan hesaplama yöntemini kullan
@@ -988,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
       scoreDetails.finalScore = finalScore;
       console.log("Yapboz puanı hesaplandı (yedek sistem):", finalScore);
     }
-    
+
     // Oyun istatistiklerini hazırla (geriye dönük uyumluluk için eski formatı koruyoruz)
     const gameStats = {
       moves: gameState.moves,
@@ -1011,10 +958,10 @@ document.addEventListener('DOMContentLoaded', () => {
         stats: gameStats
       }
     });
-    
+
     // Eventi dağıt
     document.dispatchEvent(gameCompletedEvent);
-    
+
     // Puan gösterimi ve kaydetme (geriye dönük uyumluluk için)
     saveScoreAndDisplay('puzzle', scoreDetails.finalScore, timeSpent, difficulty, gameStats, function(html) {
       // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
@@ -1134,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * Skoru panoya kopyalar
    */
   function copyScore() {
-    const scoreText = `Yapboz Oyunu: ${gameState.score} puan, ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
+    const scoreText = `Yapboz Oyunu: ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
 
     navigator.clipboard.writeText(scoreText)
       .then(() => {
@@ -1150,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * Skoru paylaşır (Web Share API)
    */
   function shareScore() {
-    const scoreText = `Yapboz Oyunu: ${gameState.score} puan, ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
+    const scoreText = `Yapboz Oyunu: ${gameState.moves} hamle, Zorluk: ${gameState.difficulty} 🧩`;
 
     if (navigator.share) {
       navigator.share({
@@ -1158,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         text: scoreText,
         url: window.location.href
       })
-      .then(() => console.log('Paylaşım başarılı'))
+      .then.then(() => console.log('Paylaşım başarılı'))
       .catch(error => console.log('Paylaşım hatası:', error));
     } else {
       copyScore();

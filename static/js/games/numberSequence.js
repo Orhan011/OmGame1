@@ -925,22 +925,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function saveScore() {
-    // Oyun istatistiklerini hazırla
-    const gameStats = {
-      level: gameState.level,
-      wrong_attempts: gameState.wrongAttempts,
-      used_hint: gameState.usedHint,
-      pattern_type: gameState.currentPattern
-    };
-    
-    // Get elapsed time (for timeRemaining games) or time spent (for others)
-    const elapsedTime = Math.floor(gameState.solveTime / 1000) - Math.floor(gameState.timeRemaining / 1000);
-    
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('number_sequence', gameState.score, elapsedTime, gameState.difficulty, gameStats, function(html) {
-      // Puan gösterimi kaldırıldı - sadece kaydetme işlemi yapılıyor
-      console.log('Score saved successfully');
-    });
+    // Ana sayfaya yönlendir
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 1500);
   }
 
   // Utility functions

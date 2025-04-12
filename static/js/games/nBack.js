@@ -557,22 +557,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Skoru kaydet
   function saveScore() {
-    if (score <= 0) return;
-    
-    // Oyun istatistiklerini hazırla
-    const gameStats = {
-      maxN: currentN,
-      correctResponses: correctResponses,
-      falsePositives: falsePositives,
-      falseNegatives: falseNegatives,
-      accuracy: calculateAccuracy()
-    };
-    
-    // Merkezi puan sistemini kullan
-    saveScoreAndDisplay('n_back', score, elapsedTime, difficulty, gameStats, function(html) {
-      // Kaldırıldı - artık merkezi sistem tarafından işleniyor
-      console.log('Score saved successfully');
-    });
+    // Ana sayfaya yönlendir
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 1500);
   }
   
   // Skoru kopyala
