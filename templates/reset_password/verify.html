@@ -220,45 +220,45 @@
     document.addEventListener('DOMContentLoaded', function() {
         // 5 dakika = 300 saniye
         let timeLeft = 300;
-        
+
         const timerElement = document.getElementById('timer');
-        
+
         function updateTimer() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            
+
             // İki basamaklı olarak göster
             timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
+
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 timerElement.textContent = '00:00';
                 timerElement.style.color = '#E53E3E';
-                
+
                 // Süre dolduğunda sayfa yenilenebilir veya kullanıcı bilgilendirilebilir
                 alert('Doğrulama kodunun süresi doldu. Lütfen yeni bir kod talep edin.');
             } else {
                 timeLeft--;
             }
         }
-        
+
         // İlk çağrı
         updateTimer();
-        
+
         // Her saniye güncelle
         const timerInterval = setInterval(updateTimer, 1000);
     });
-    
+
     // Otomatik odaklanma ve input formatı
     document.addEventListener('DOMContentLoaded', function() {
         const inputField = document.getElementById('verification_code');
         inputField.focus();
-        
+
         // Sadece sayı girişine izin ver
         inputField.addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
-        
+
         // Maksimum 4 karakter
         inputField.addEventListener('keydown', function(e) {
             if (e.target.value.length >= 4 && 
@@ -274,26 +274,26 @@
     // 5 dakika (300 saniye)
     let timeLeft = 300;
     const timerElement = document.getElementById('timer');
-    
+
     function updateTimer() {
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
-      
+
       // İki haneli gösterme (ör: 05:03)
       timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      
+
       if (timeLeft <= 0) {
         clearInterval(interval);
         timerElement.textContent = "00:00";
         timerElement.style.color = "#e53e3e";
-        
+
         // Süre doldu uyarısı
         alert("Doğrulama kodunun süresi doldu. Lütfen yeni bir kod isteyiniz.");
       } else {
         timeLeft--;
       }
     }
-    
+
     // Sayaç başlat
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
