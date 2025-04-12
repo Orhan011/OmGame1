@@ -1,3 +1,4 @@
+
 /**
  * Tüm oyunlar için puan sistemi entegrasyonu
  * Bu modül, oyunların puanlarını hesaplamak ve kaydetmek için ortak bir arayüz sağlar
@@ -293,6 +294,42 @@ class GameScoreIntegration {
       if (leaderboardBtn) {
         leaderboardBtn.addEventListener('click', function() {
           window.location.href = '/leaderboard?game=' + (scoreData.game_type || '');
+        });
+      }
+
+      // Paylaş düğmesi
+      const shareBtn = document.querySelector('.game-result-share');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+          if (navigator.share) {
+            navigator.share({
+              title: 'Oyun Skorumu Gör!',
+              text: `${scoreData.game_name || 'Oyun'} skorumu gör: ${scoreData.score} puan!`,
+              url: window.location.href,
+            })
+            .catch((error) => console.log('Paylaşım hatası:', error));
+          } else {
+            alert('Skorun: ' + scoreData.score + ' puan!');
+          }
+        });
+      }
+
+      // Kopyala düğmesi
+      const copyScoreBtn = document.querySelector('.game-result-copy');
+      if (copyScoreBtn) {
+        copyScoreBtn.addEventListener('click', function() {
+          const scoreText = `${scoreData.game_name || 'Oyun'} skorumu gör: ${scoreData.score} puan!`;
+          navigator.clipboard.writeText(scoreText)
+            .then(() => {
+              const originalText = copyScoreBtn.textContent;
+              copyScoreBtn.textContent = 'Kopyalandı!';
+              setTimeout(() => {
+                copyScoreBtn.textContent = originalText;
+              }, 2000);
+            })
+            .catch(err => {
+              console.error('Panoya kopyalama hatası:', err);
+            });
         });
       }
 

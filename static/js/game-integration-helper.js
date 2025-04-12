@@ -96,3 +96,18 @@ function integrateGameScore(gameType, gameInstance = {}, options = {}) {
 // Global erişim için window nesnesine ekle
 window.ensureScriptLoaded = ensureScriptLoaded;
 window.integrateGameScore = integrateGameScore;
+
+// Sayfa yüklendiğinde gerekli script'leri yükle
+document.addEventListener('DOMContentLoaded', function() {
+  // Temel script'leri yükle
+  ensureScriptLoaded('static/js/scoreCalculator.js')
+    .then(() => ensureScriptLoaded('static/js/score-handler.js'))
+    .then(() => ensureScriptLoaded('static/js/score-display.js'))
+    .then(() => ensureScriptLoaded('static/js/game-score-integration.js'))
+    .then(() => {
+      console.log('Puan sistemi script dosyaları başarıyla yüklendi.');
+    })
+    .catch(error => {
+      console.error('Puan sistemi script dosyaları yüklenirken hata oluştu:', error);
+    });
+});
