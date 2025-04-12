@@ -460,23 +460,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(106, 90, 224, 0.1);
+  background: rgba(106, 90, 224, 0.3);
   padding: 8px 15px;
   border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
 }
 
 .score-value {
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-weight: 700 !important;
+  font-size: 1.2rem !important;
   letter-spacing: 0.5px;
-  color: #fff; /* Puanların görünmesi için rengi beyaz yap */
-  /* Gradient kaldırıldı çünkü puanlar görünmüyor */
-  /* 
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  */
+  color: #fff !important; /* Puanların görünmesi için rengi beyaz yap */
+  text-shadow: 0 0 5px rgba(106, 90, 224, 0.5) !important;
+  display: inline !important;
 }
 
 .score-label {
@@ -570,7 +567,7 @@
 }
 
 .score-container {
-  background: rgba(106, 90, 224, 0.1);
+  background: rgba(106, 90, 224, 0.3);
   border-radius: 30px;
   padding: 8px 16px;
   display: inline-flex;
@@ -578,6 +575,8 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(106, 90, 224, 0.5);
 }
 
 .score-value {

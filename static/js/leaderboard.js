@@ -222,7 +222,7 @@ function loadLeaderboard() {
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${totalScore}</span>
+                <span class="score-value" style="color: white !important; font-size: 16px !important; font-weight: bold !important; display: inline !important;">${totalScore} puan</span>
               </div>
             </div>
           </div>
@@ -398,7 +398,7 @@ function createLeaderboardHtml(players) {
         </div>
         <div class="score-cell">
           <div class="score-container">
-            <span class="score-value">${playerScore}</span>
+            <span class="score-value" style="color: white !important; font-size: 16px !important; font-weight: bold !important; display: inline !important;">${playerScore} puan</span>
           </div>
         </div>
       </div>
