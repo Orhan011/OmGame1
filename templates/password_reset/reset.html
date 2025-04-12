@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Şifre Sıfırlama - OmGame{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-80">
+  <div class="auth-card glass-card">
+    <div class="auth-header">
+      <h2><i class="fas fa-key"></i> Yeni Şifre Oluştur</h2>
+      <p class="auth-subtitle">Lütfen yeni şifrenizi belirleyin</p>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {% if category == 'danger' %}alert-danger{% else %}alert-success{% endif %} d-flex align-items-center" role="alert">
+            <i class="fas {% if category == 'danger' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2"></i>
+            <div>{{ message }}</div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form class="auth-form" action="{{ url_for('password_reset.verify_token', token=token) }}" method="post">
+      <div class="mb-4">
+        <div class="form-group floating-label">
+          <div class="input-icon-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="new_password" id="newPassword" class="form-control" placeholder=" " 
+                  minlength="8" required>
+            <label for="newPassword">Yeni Şifre</label>
+          </div>
+          <div class="form-text form-hint mt-1">En az 8 karakter ve bir sayı içermeli</div>
+        </div>
+        
+        <div class="form-group floating-label mt-3">
+          <div class="input-icon-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="confirm_password" id="confirmPassword" class="form-control" placeholder=" " 
+                  minlength="8" required>
+            <label for="confirmPassword">Yeni Şifre (Tekrar)</label>
+          </div>
+          <div id="passwordMatch" class="form-text mt-1"></div>
+        </div>
+      </div>
+      
+      <div class="password-strength-meter mb-4">
+        <label class="form-label d-flex justify-content-between">
+          <span>Şifre Gücü:</span>
+          <span id="strengthText">Güç seviyen</span>
+        </label>
+        <div class="progress">
+          <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;" 
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+      
+      <div class="d-grid gap-2">
+        <button type="submit" id="resetButton" class="btn btn-primary btn-lg">
+          <i class="fas fa-key me-2"></i>Şifremi Güncelle
+        </button>
+      </div>
+    </form>
+    
+    <div class="auth-links">
+      Şifrenizi hatırladınız mı? <a href="{{ url_for('login') }}">Giriş Yap</a>
+    </div>
+    
+    <div class="text-center mt-4">
+      <div class="small text-secondary">
+        <i class="fas fa-shield-alt me-1"></i>
+        Güçlü bir şifre, hesabınızı korur
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Şifre gücü kontrolü
+  const newPasswordInput = document.getElementById('newPassword');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const strengthBar = document.getElementById('strengthBar');
+  const strengthText = document.getElementById('strengthText');
+  const passwordMatch = document.getElementById('passwordMatch');
+  const resetButton = document.getElementById('resetButton');
+  
+  function checkPasswordStrength(password) {
+    // Başlangıç skoru
+    let score = 0;
+    
+    if (password.length >= 8) {
+      score += 1;
+    }
+    
+    if (password.length >= 12) {
+      score += 1;
+    }
+    
+    if (/[0-9]/.test(password)) {
+      score += 1;
+    }
+    
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+      score += 1;
+    }
+    
+    if (/[^A-Za-z0-9]/.test(password)) {
+      score += 1;
+    }
+    
+    return score;
+  }
+  
+  function updateStrengthMeter() {
+    const password = newPasswordInput.value;
+    const strength = checkPasswordStrength(password);
+    let percentage = (strength / 5) * 100;
+    let text = '';
+    let barClass = '';
+    
+    if (strength === 0) {
+      text = 'Çok Zayıf';
+      barClass = 'bg-danger';
+    } else if (strength === 1) {
+      text = 'Zayıf';
+      barClass = 'bg-danger';
+    } else if (strength === 2) {
+      text = 'Orta';
+      barClass = 'bg-warning';
+    } else if (strength === 3) {
+      text = 'İyi';
+      barClass = 'bg-info';
+    } else if (strength === 4) {
+      text = 'Güçlü';
+      barClass = 'bg-success';
+    } else {
+      text = 'Çok Güçlü';
+      barClass = 'bg-success';
+    }
+    
+    strengthBar.style.width = percentage + '%';
+    strengthBar.className = 'progress-bar ' + barClass;
+    strengthText.textContent = text;
+  }
+  
+  function checkPasswordMatch() {
+    if (confirmPasswordInput.value === '') {
+      passwordMatch.innerHTML = '';
+      passwordMatch.className = 'form-text mt-1';
+      return;
+    }
+    
+    if (newPasswordInput.value === confirmPasswordInput.value) {
+      passwordMatch.innerHTML = '<i class="fas fa-check-circle"></i> Şifreler eşleşiyor';
+      passwordMatch.className = 'form-text mt-1 text-success';
+    } else {
+      passwordMatch.innerHTML = '<i class="fas fa-times-circle"></i> Şifreler eşleşmiyor';
+      passwordMatch.className = 'form-text mt-1 text-danger';
+    }
+  }
+  
+  newPasswordInput.addEventListener('input', function() {
+    updateStrengthMeter();
+    if (confirmPasswordInput.value !== '') {
+      checkPasswordMatch();
+    }
+  });
+  
+  confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+  
+  // Form gönderildiğinde butonu devre dışı bırak ve yükleniyor göster
+  document.querySelector('.auth-form').addEventListener('submit', function(e) {
+    if (newPasswordInput.value !== confirmPasswordInput.value) {
+      e.preventDefault();
+      passwordMatch.innerHTML = '<i class="fas fa-times-circle"></i> Şifreler eşleşmiyor, lütfen kontrol edin';
+      passwordMatch.className = 'form-text mt-1 text-danger';
+      return;
+    }
+    
+    resetButton.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Şifre Güncelleniyor...';
+    resetButton.disabled = true;
+  });
+</script>
+{% endblock %}
