@@ -148,7 +148,7 @@ function loadLeaderboard() {
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar" onclick="window.location.href='/profile/${player.user_id}'" style="cursor: pointer;" title="Kullanıcı profilini görüntüle">
+              <div class="player-avatar" onclick="location.href='/profile/${player.user_id}'" style="cursor: pointer;" title="Kullanıcı profilini görüntüle">
                 ${crownHTML}
                 ${avatarUrl ? 
                   `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -417,7 +417,7 @@ function loadLevelLeaderboard() {
               <div class="rank-number">${index + 1}</div>
             </div>
             <div class="player-cell">
-              <div class="player-avatar">
+              <div class="player-avatar" onclick="location.href='/profile/${player.user_id}'" style="cursor: pointer;" title="Kullanıcı profilini görüntüle">
                 ${crownHTML}
                 ${avatarUrl ? 
                   `<img src="${avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
