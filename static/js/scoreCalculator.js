@@ -32,8 +32,11 @@ const ScoreCalculator = {
         accuracy,         // Doğruluk oranı (0-1)
         timeSpent,        // Harcanan süre (saniye)
         expectedTime,     // Beklenen tamamlama süresi (saniye)
+        optimalTime,      // Optimal tamamlama süresi (saniye)
         moves,            // Yapılan hamle sayısı
+        totalMoves,       // Yapılan toplam hamle sayısı  
         expectedMoves,    // Beklenen hamle sayısı
+        optimalMoves,     // Optimal hamle sayısı
         hintsUsed,        // Kullanılan ipucu sayısı
         lives,            // Kalan can sayısı
         maxLives,         // Maksimum can sayısı
@@ -60,17 +63,22 @@ const ScoreCalculator = {
           baseScore = Math.round(40 + (lives / maxLives) * 40);
         }
       }
-      else if (moves !== undefined && expectedMoves !== undefined) {
+      else if ((moves !== undefined && expectedMoves !== undefined) || (totalMoves !== undefined && optimalMoves !== undefined)) {
         // Hamle temelli puanlama (örn. bulmaca oyunları)
-        if (expectedMoves > 0) {
-          const moveEfficiency = Math.min(expectedMoves / moves, 2);
+        const actualMoves = totalMoves || moves;
+        const targetMoves = optimalMoves || expectedMoves;
+        
+        if (targetMoves > 0) {
+          const moveEfficiency = Math.min(targetMoves / actualMoves, 2);
           baseScore = Math.round(40 + moveEfficiency * 30);
         }
       }
-      else if (timeSpent !== undefined && expectedTime !== undefined) {
+      else if ((timeSpent !== undefined && expectedTime !== undefined) || (timeSpent !== undefined && optimalTime !== undefined)) {
         // Zaman temelli puanlama (örn. hız testleri)
-        if (expectedTime > 0) {
-          const timeEfficiency = Math.min(expectedTime / timeSpent, 2);
+        const targetTime = optimalTime || expectedTime;
+        
+        if (targetTime > 0) {
+          const timeEfficiency = Math.min(targetTime / timeSpent, 2);
           baseScore = Math.round(40 + timeEfficiency * 30);
         }
       }
@@ -81,6 +89,12 @@ const ScoreCalculator = {
       else if (level !== undefined) {
         // Seviye temelli puanlama
         baseScore = Math.min(30 + level * 5, 90);
+      }
+      
+      // Oyun tipine göre özel temel puan ayarlamaları
+      const gameSpecificBaseScore = this.getGameSpecificBaseScore(gameType);
+      if (gameSpecificBaseScore) {
+        baseScore = Math.round((baseScore + gameSpecificBaseScore) / 2);
       }
       
       // Zorluk çarpanı
@@ -97,8 +111,29 @@ const ScoreCalculator = {
       // İpucu cezası (varsa)
       const hintPenalty = hintsUsed ? Math.min(hintsUsed * 5, 30) : 0;
       
+      // Zaman bonusu/cezası
+      let timeBonus = 0;
+      if (timeSpent && (optimalTime || expectedTime)) {
+        const targetTime = optimalTime || expectedTime;
+        const timeRatio = targetTime / timeSpent;
+        timeBonus = Math.round((timeRatio - 1) * 20); // -20 ile +20 arası bonus
+        // Sınırla
+        timeBonus = Math.max(-20, Math.min(20, timeBonus));
+      }
+      
+      // Hamle verimliliği bonusu
+      let moveBonus = 0;
+      if ((moves || totalMoves) && (optimalMoves || expectedMoves)) {
+        const actualMoves = totalMoves || moves;
+        const targetMoves = optimalMoves || expectedMoves;
+        const moveRatio = targetMoves / actualMoves;
+        moveBonus = Math.round((moveRatio - 1) * 15); // -15 ile +15 arası bonus
+        // Sınırla
+        moveBonus = Math.max(-15, Math.min(15, moveBonus));
+      }
+      
       // Final puan hesaplaması
-      let finalScore = Math.round(baseScore * difficultyMultiplier) - hintPenalty;
+      let finalScore = Math.round(baseScore * difficultyMultiplier) - hintPenalty + timeBonus + moveBonus;
       
       // Puanı 10-100 aralığında sınırla
       finalScore = Math.max(10, Math.min(100, finalScore));
@@ -111,6 +146,8 @@ const ScoreCalculator = {
           difficultyMultiplier,
           difficulty,
           hintPenalty: hintPenalty || 0,
+          timeBonus: timeBonus || 0,
+          moveBonus: moveBonus || 0,
           gameType
         }
       };
@@ -174,6 +211,37 @@ const ScoreCalculator = {
     }
     
     return difficultyMultipliers[difficulty] || 1.0;
+  },
+  
+  /**
+   * Oyun tipine göre özel temel puan değerleri
+   * @param {string} gameType - Oyun tipi
+   * @returns {number|null} Temel puan veya null
+   */
+  getGameSpecificBaseScore: function(gameType) {
+    const baseScores = {
+      'memoryCards': 70,
+      'wordPuzzle': 60,
+      'numberSequence': 80,
+      'tetris': 40,
+      'wordle': 100,
+      'puzzle_slider': 60,
+      'chess': 75,
+      'simon_says': 50,
+      'typing_speed': 40,
+      'snake_game': 30,
+      'audioMemory': 65,
+      'nBack': 85,
+      '2048': 45,
+      'labyrinth': 80,
+      'puzzle': 60,
+      'color_match': 55,
+      'math_challenge': 70,
+      'minesweeper': 75,
+      'hangman': 65
+    };
+    
+    return baseScores[gameType] || null;
   }
 };
 

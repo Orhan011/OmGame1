@@ -1,4 +1,3 @@
-
 /**
  * Skor tablosu ve sonuç ekranı için CSS stilleri
  */
@@ -73,7 +72,7 @@
 }
 
 
-/* Skor Ekranı Stilleri - Yeni Tasarım */
+/* Score Display Styles */
 .game-result-overlay {
   position: fixed;
   top: 0;
@@ -86,44 +85,51 @@
   align-items: center;
   z-index: 9999;
   backdrop-filter: blur(5px);
-  animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .game-result-container {
-  background: linear-gradient(145deg, rgba(30, 30, 60, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(32, 41, 64, 0.95) 0%, rgba(17, 24, 39, 0.95) 100%);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(106, 90, 205, 0.3);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
   padding: 30px;
   width: 90%;
   max-width: 500px;
-  color: #fff;
   text-align: center;
+  color: white;
   position: relative;
+  border: 1px solid rgba(99, 102, 241, 0.3);
   overflow: hidden;
-  animation: slideUp 0.6s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.animated-result {
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .result-header {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .result-header h2 {
   font-size: 2rem;
-  color: #fff;
-  margin-bottom: 10px;
-  text-shadow: 0 0 10px rgba(106, 90, 205, 0.7);
+  margin: 0 0 10px;
   font-weight: 700;
+  background: linear-gradient(90deg, #63b3ed, #4c51bf);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }
 
 .game-info {
@@ -131,194 +137,282 @@
   justify-content: center;
   align-items: center;
   gap: 15px;
-  margin-bottom: 25px;
+  margin-top: 8px;
 }
 
 .game-name {
   font-size: 1.2rem;
-  color: #e0e0e0;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 5px 15px;
-  border-radius: 50px;
-  display: inline-flex;
+  font-weight: 600;
+  opacity: 0.9;
+  display: flex;
   align-items: center;
-}
-
-.game-name i {
-  margin-right: 8px;
-  color: #6a5acd;
+  gap: 8px;
 }
 
 .difficulty-badge {
   font-size: 0.9rem;
-  padding: 4px 12px;
-  border-radius: 50px;
-  font-weight: 600;
-  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: flex;
   align-items: center;
-}
-
-.difficulty-badge i {
-  margin-right: 5px;
-  font-size: 0.8rem;
+  gap: 6px;
 }
 
 .difficulty-easy {
-  background-color: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: rgba(72, 187, 120, 0.2);
+  color: #48bb78;
+  border: 1px solid rgba(72, 187, 120, 0.3);
 }
 
 .difficulty-medium {
-  background-color: rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  background: rgba(66, 153, 225, 0.2);
+  color: #4299e1;
+  border: 1px solid rgba(66, 153, 225, 0.3);
 }
 
 .difficulty-hard {
-  background-color: rgba(255, 87, 34, 0.2);
-  color: #FF5722;
-  border: 1px solid rgba(255, 87, 34, 0.3);
+  background: rgba(237, 137, 54, 0.2);
+  color: #ed8936;
+  border: 1px solid rgba(237, 137, 54, 0.3);
 }
 
 .difficulty-expert {
-  background-color: rgba(233, 30, 99, 0.2);
-  color: #E91E63;
-  border: 1px solid rgba(233, 30, 99, 0.3);
+  background: rgba(229, 62, 62, 0.2);
+  color: #e53e3e;
+  border: 1px solid rgba(229, 62, 62, 0.3);
+}
+
+/* Score Display */
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 25px 0;
 }
 
 .score-circle {
-  display: none !important; /* Puan dairesini gizle */
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2), inset 0 1px 8px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-circle::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  z-index: -1;
 }
 
 .score-value {
-  display: none !important; /* Puan değerini gizle */
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(45deg, #63b3ed, #7f9cf5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }
 
 .score-label {
-  display: none !important; /* Puan etiketini gizle */
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  margin-top: 5px;
 }
 
-.score-breakdown {
-  display: none !important; /* Puan dökümünü gizle */
-}
-
-.breakdown-title {
-  display: none !important; /* Puan dökümü başlığını gizle */
+.score-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 15px;
 }
 
 .score-detail {
-  display: none !important; /* Puan detaylarını gizle */
+  background: rgba(66, 153, 225, 0.1);
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-.detail-label {
-  display: none !important; /* Detay etiketlerini gizle */
+.score-detail i {
+  color: #f6e05e;
+  font-size: 1.2rem;
 }
 
-.detail-value {
-  display: none !important; /* Detay değerlerini gizle */
+/* Level Up Notice */
+.level-up-notice {
+  background: linear-gradient(90deg, rgba(250, 202, 21, 0.2), rgba(245, 158, 11, 0.2));
+  border-radius: 100px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(250, 202, 21, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #fbbf24;
+  font-weight: 600;
 }
 
-.xp-info {
-  display: none !important; /* XP bilgisini gizle */
+.level-up-notice i {
+  font-size: 1.2rem;
+  color: #f59e0b;
 }
 
-.xp-label {
-  display: none !important; /* XP etiketini gizle */
+/* Guest Message */
+.guest-message {
+  background: rgba(55, 65, 81, 0.5);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-.xp-value {
-  display: none !important; /* XP değerini gizle */
+.guest-message i {
+  font-size: 2rem;
+  color: #9ca3af;
+  margin-bottom: 10px;
 }
 
-/* Ana oyun ekranındaki puan göstergelerini gizle */
-[id*="score"], [id*="point"], [id*="puan"], [class*="score"], [class*="point"], [class*="puan"],
-[id*="Score"], [id*="Point"], [id*="Puan"], [class*="Score"], [class*="Point"], [class*="Puan"] {
-  display: none !important;
+.guest-message h3 {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  color: #f0f0f0;
 }
 
-/* Özel oyun elemanlarındaki puan göstergelerini gizle */
-.toplam-puan, .puan, .total-score, .game-score, .player-score, .user-score,
-[id="gamePoints"], [class="gamePoints"], [id="scoreDisplay"], [class="scoreDisplay"],
-[id="scoreContainer"], [class="scoreContainer"] {
-  display: none !important;
+.guest-notice {
+  color: #d1d5db;
+  margin: 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* Gizlenecek diğer puan göstergeleri */
-.level-stat-value {
-  display: none !important;
+.guest-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
 }
 
+/* Action Buttons */
 .result-actions {
   display: flex;
   justify-content: center;
   gap: 15px;
+  margin-top: 10px;
 }
 
 .action-button {
-  padding: 12px 25px;
-  border-radius: 50px;
+  padding: 10px 25px;
+  border-radius: 30px;
   font-weight: 600;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: inline-flex;
+  font-size: 0.95rem;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  gap: 8px;
   border: none;
+  outline: none;
 }
 
 .action-button i {
-  margin-right: 8px;
+  font-size: 1rem;
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, #6a5acd, #9370DB);
+  background: linear-gradient(45deg, #4f46e5, #6366f1);
   color: white;
-  box-shadow: 0 4px 15px rgba(106, 90, 205, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(45deg, #5a4abd, #8360cb);
+  background: linear-gradient(45deg, #4338ca, #4f46e5);
   transform: translateY(-2px);
-  box-shadow: 0 7px 20px rgba(106, 90, 205, 0.5);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5);
 }
 
 .btn-secondary {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(99, 102, 241, 0.1);
+  color: #e0e0e0;
+  border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background: rgba(99, 102, 241, 0.2);
   transform: translateY(-2px);
 }
 
-/* Animasyonlar */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 40px, 0);
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .game-result-container {
+    width: 95%;
+    padding: 20px;
   }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+
+  .result-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .score-circle {
+    width: 130px;
+    height: 130px;
+  }
+
+  .score-value {
+    font-size: 3rem;
+  }
+
+  .guest-actions,
+  .result-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-.animate-detail {
+/* Animasyonlu sonuç paneli */
+.animated-result {
+  transform: scale(0.9);
   opacity: 0;
-  animation: fadeInUp 0.5s ease forwards;
+  animation: scaleIn 0.5s ease-out forwards;
 }
 
-.detail-1 { animation-delay: 0.1s; }
-.detail-2 { animation-delay: 0.2s; }
-.detail-3 { animation-delay: 0.3s; }
-.detail-4 { animation-delay: 0.4s; }
-.detail-5 { animation-delay: 0.5s; }
-.detail-6 { animation-delay: 0.6s; }
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
 /* Seviye Atlama Stili */
 .level-up-notice {
@@ -394,15 +488,6 @@
     gap: 10px;
   }
   
-  .score-circle {
-    width: 120px;
-    height: 120px;
-  }
-  
-  .score-value {
-    font-size: 2.5rem;
-  }
-  
   .result-actions {
     flex-direction: column;
   }
@@ -412,16 +497,135 @@
   }
 }
 
-/* Animasyonlu sonuç paneli */
-.animated-result {
-  transform: scale(0.9);
-  opacity: 0;
-  animation: scaleIn 0.5s ease-out forwards;
+/* Animasyonlar */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-@keyframes scaleIn {
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.animate-detail {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.detail-1 { animation-delay: 0.1s; }
+.detail-2 { animation-delay: 0.2s; }
+.detail-3 { animation-delay: 0.3s; }
+.detail-4 { animation-delay: 0.4s; }
+.detail-5 { animation-delay: 0.5s; }
+.detail-6 { animation-delay: 0.6s; }
+
+.score-breakdown {
+  display: block; /*Puan dökümünü göster*/
+}
+
+.breakdown-title {
+  display: block; /* Puan dökümü başlığını göster */
+}
+
+.score-detail {
+  display: block; /* Puan detaylarını göster */
+}
+
+.detail-label {
+  display: block; /* Detay etiketlerini göster */
+}
+
+.detail-value {
+  display: block; /* Detay değerlerini göster */
+}
+
+.xp-info {
+  display: block; /* XP bilgisini göster */
+}
+
+.xp-label {
+  display: block; /* XP etiketini göster */
+}
+
+.xp-value {
+  display: block; /* XP değerini göster */
+}
+
+.score-circle {
+  display: block; /* Puan dairesini göster */
+}
+
+.score-value {
+  display: block; /* Puan değerini göster */
+}
+
+.score-label {
+  display: block; /* Puan etiketini göster */
+}
+
+/* Ana oyun ekranındaki puan göstergelerini gizle */
+[id*="score"], [id*="point"], [id*="puan"], [class*="score"], [class*="point"], [class*="puan"],
+[id*="Score"], [id*="Point"], [id*="Puan"], [class*="Score"], [class*="Point"], [class*="Puan"] {
+  display: none !important;
+}
+
+/* Özel oyun elemanlarındaki puan göstergelerini gizle */
+.toplam-puan, .puan, .total-score, .game-score, .player-score, .user-score,
+[id="gamePoints"], [class="gamePoints"], [id="scoreDisplay"], [class="scoreDisplay"],
+[id="scoreContainer"], [class="scoreContainer"] {
+  display: none !important;
+}
+
+/* Gizlenecek diğer puan göstergeleri */
+.level-stat-value {
+  display: none !important;
+}
+
+.result-actions{
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.action-button {
+  padding: 12px 25px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+}
+
+.action-button i {
+  margin-right: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #6a5acd, #9370DB);
+  color: white;
+  box-shadow: 0 4px 15px rgba(106, 90, 205, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #5a4abd, #8360cb);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(106, 90, 205, 0.5);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }

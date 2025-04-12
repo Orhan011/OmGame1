@@ -1,3 +1,4 @@
+
 /**
  * Oyun sonu skorlarını gösteren modül
  * Standartlaştırılmış puan sistemine göre oyun sonunda gösterilecek sonuçları oluşturur
@@ -141,9 +142,16 @@ function createScoreDisplay(scoreData) {
       const difficulty = scoreInfo.difficulty || 'medium';
       const difficultyText = formatDifficulty(difficulty);
       const difficultyClass = difficulty.toLowerCase();
+      
+      // Puan hesaplaması
+      let calculatedScore = 0;
+      
+      // API yanıtından puan bilgisini çek
+      if (scoreData.points && scoreData.points.total) {
+        calculatedScore = scoreData.points.total;
+      }
 
-      // Puan bilgilerini gösterme
-      // Misafir kullanıcı için giriş mesajı (zorluk bilgisiyle)
+      // Misafir kullanıcı için giriş mesajı (zorluk ve puan bilgisiyle)
       return `
         <div class="game-result-overlay">
           <div class="game-result-container animated-result guest-result">
@@ -152,6 +160,13 @@ function createScoreDisplay(scoreData) {
               <div class="game-info">
                 <div class="game-name"><i class="fas fa-${gameIcon}"></i> ${gameName}</div>
                 <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
+              </div>
+            </div>
+            
+            <div class="score-display">
+              <div class="score-circle">
+                <span class="score-value">${calculatedScore}</span>
+                <span class="score-label">PUAN</span>
               </div>
             </div>
 
@@ -185,7 +200,20 @@ function createScoreDisplay(scoreData) {
   const difficulty = scoreInfo.difficulty || 'medium';
   const difficultyText = formatDifficulty(difficulty);
   const difficultyClass = difficulty.toLowerCase();
-
+  
+  // Puan hesaplaması
+  let calculatedScore = 0;
+  let xpGained = 0;
+  
+  // API yanıtından puan ve XP bilgisini çek
+  if (scoreData.points && scoreData.points.total) {
+    calculatedScore = scoreData.points.total;
+  }
+  
+  if (xp && xp.gain) {
+    xpGained = xp.gain;
+  }
+  
   // Seviye yükseltme durumunda bildirim
   if (xp.level_up) {
     return `
@@ -201,6 +229,20 @@ function createScoreDisplay(scoreData) {
             <div class="game-info">
               <div class="game-name"><i class="fas fa-${gameIcon}"></i> ${gameName}</div>
               <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
+            </div>
+          </div>
+          
+          <div class="score-display">
+            <div class="score-circle">
+              <span class="score-value">${calculatedScore}</span>
+              <span class="score-label">PUAN</span>
+            </div>
+            
+            <div class="score-details">
+              <div class="score-detail">
+                <i class="fas fa-star"></i>
+                <span>Kazanılan XP: +${xpGained}</span>
+              </div>
             </div>
           </div>
 
@@ -222,6 +264,20 @@ function createScoreDisplay(scoreData) {
           <div class="game-info">
             <div class="game-name"><i class="fas fa-${gameIcon}"></i> ${gameName}</div>
             <div class="difficulty-badge difficulty-${difficultyClass}"><i class="fas fa-${difficulty === 'easy' ? 'baby' : (difficulty === 'hard' ? 'fire' : (difficulty === 'expert' ? 'crown' : 'check'))}"></i> ${difficultyText}</div>
+          </div>
+        </div>
+        
+        <div class="score-display">
+          <div class="score-circle">
+            <span class="score-value">${calculatedScore}</span>
+            <span class="score-label">PUAN</span>
+          </div>
+          
+          <div class="score-details">
+            <div class="score-detail">
+              <i class="fas fa-star"></i>
+              <span>Kazanılan XP: +${xpGained}</span>
+            </div>
           </div>
         </div>
 
@@ -502,8 +558,25 @@ function calculateAndDisplayScore(scoreParams, callback) {
         scoreParams.difficulty === 'hard' ? 1.5 : 
         scoreParams.difficulty === 'expert' ? 2.0 : 1.0;
 
+      // İpucu cezası
+      const hintPenalty = scoreParams.hintsUsed ? Math.min(scoreParams.hintsUsed * 5, 30) : 0;
+      
+      // Zaman cezası/bonusu
+      let timeBonus = 0;
+      if (scoreParams.timeSpent && scoreParams.optimalTime) {
+        const timeRatio = scoreParams.optimalTime / scoreParams.timeSpent;
+        timeBonus = Math.round((timeRatio - 1) * 20); // -20 ile +20 arası bonus
+      }
+      
+      // Hamle verimliliği bonusu
+      let moveBonus = 0;
+      if (scoreParams.totalMoves && scoreParams.optimalMoves) {
+        const moveRatio = scoreParams.optimalMoves / scoreParams.totalMoves;
+        moveBonus = Math.round((moveRatio - 1) * 15); // -15 ile +15 arası bonus
+      }
+
       // Final puanı hesapla ve sınırlandır
-      const finalScore = Math.max(10, Math.min(100, Math.round(baseScore * difficultyMultiplier)));
+      const finalScore = Math.max(10, Math.min(100, Math.round(baseScore * difficultyMultiplier) + timeBonus + moveBonus - hintPenalty));
 
       console.log("Manuel hesaplanmış puan:", finalScore);
 
@@ -517,7 +590,10 @@ function calculateAndDisplayScore(scoreParams, callback) {
           ...scoreParams,
           manualCalculation: true,
           baseScore: baseScore,
-          difficultyMultiplier: difficultyMultiplier
+          difficultyMultiplier: difficultyMultiplier,
+          hintPenalty: hintPenalty,
+          timeBonus: timeBonus,
+          moveBonus: moveBonus
         },
         callback
       );
@@ -525,7 +601,7 @@ function calculateAndDisplayScore(scoreParams, callback) {
       return;
     }
 
-    // ModernScoreCalculator ile hesapla
+    // ScoreCalculator ile hesapla
     try {
       const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
       console.log("ScoreCalculator ile hesaplanan puan:", scoreDetails);
@@ -596,40 +672,8 @@ function calculateAndDisplayScore(scoreParams, callback) {
   }
 }
 
-// Oyun puanını tamamen gizle - Kullanıcıya puan kesinlikle gösterilmeyecek
-function showGamePoints(gameScore, details) {
-  // Sayfa içindeki tüm puan göstergelerini gizle
-  const hideElements = [
-    'gamePoints', 'scoreDisplay', 'scoreDetails', 'scoreInfo', 'gameScore', 
-    'pointsDisplay', 'totalScore', 'userScore', 'playerScore', 'finalScore',
-    'score-display', 'score-value', 'score-container', 'points', 'score',
-    'scoreBreakdown', 'levelPoints', 'gamePoints', 'totalPoints'
-  ];
-  
-  // Her bir olası puan elementini bul ve gizle
-  hideElements.forEach(id => {
-    const elements = document.querySelectorAll(`#${id}, .${id}, [data-score], [data-points]`);
-    elements.forEach(el => {
-      if (el) {
-        el.style.display = 'none';
-        el.innerHTML = '';
-      }
-    });
-  });
-  
-  // Sayfa yüklendikten sonra da çalıştır
-  setTimeout(() => {
-    // Tüm puan içerebilecek elementleri seç ve gizle
-    const scoreElements = document.querySelectorAll('[id*="score"], [id*="point"], [id*="puan"], [class*="score"], [class*="point"], [class*="puan"]');
-    scoreElements.forEach(el => {
-      el.style.display = 'none';
-    });
-  }, 500);
-}
-
 // Global olarak erişilebilir fonksiyonları dışa aktar
 window.saveScoreAndDisplay = saveScoreAndDisplay;
 window.showScoreScreen = showScoreScreen;
 window.calculateAndDisplayScore = calculateAndDisplayScore;
-window.showGamePoints = showGamePoints;
 window.createScoreDisplay = createScoreDisplay;
