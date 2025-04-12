@@ -1126,9 +1126,7 @@
 }
 
 .level-stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 5px;
+  display: none; /* Seviye stat değerlerini gizle */
 }
 
 .level-stat-label {

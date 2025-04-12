@@ -188,138 +188,47 @@
 }
 
 .score-circle {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, rgba(106, 90, 205, 0.3) 0%, rgba(147, 112, 219, 0.1) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto 25px;
-  position: relative;
-  border: 3px solid rgba(106, 90, 205, 0.5);
-  box-shadow: 0 0 20px rgba(106, 90, 205, 0.3);
-  animation: pulse 2s infinite alternate;
-}
-
-@keyframes pulse {
-  from { box-shadow: 0 0 20px rgba(106, 90, 205, 0.3); }
-  to { box-shadow: 0 0 30px rgba(106, 90, 205, 0.6); }
+  display: none; /* Puan dairesini gizle */
 }
 
 .score-value {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(106, 90, 205, 0.7);
-  line-height: 1;
-  margin-bottom: 5px;
+  display: none; /* Puan değerini gizle */
 }
 
 .score-label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  display: none; /* Puan etiketini gizle */
 }
 
 .score-breakdown {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: none; /* Puan dökümünü gizle */
 }
 
 .breakdown-title {
-  font-size: 1.1rem;
-  color: #9370DB;
-  margin-bottom: 15px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.breakdown-title i {
-  margin-right: 8px;
+  display: none; /* Puan dökümü başlığını gizle */
 }
 
 .score-detail {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.score-detail:last-child {
-  border-bottom: none;
+  display: none; /* Puan detaylarını gizle */
 }
 
 .detail-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
+  display: none; /* Detay etiketlerini gizle */
 }
 
 .detail-value {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.detail-value.positive {
-  color: #4CAF50;
-}
-
-.detail-value.negative {
-  color: #FF5252;
-}
-
-.detail-value.multiplier {
-  color: #FFC107;
-}
-
-.score-detail.total {
-  margin-top: 10px;
-  padding-top: 15px;
-  border-top: 2px solid rgba(255, 255, 255, 0.1);
-  border-bottom: none;
-  font-weight: 700;
-}
-
-.score-detail.total .detail-label {
-  color: white;
-  font-size: 1.1rem;
-}
-
-.score-detail.total .detail-value {
-  color: #9370DB;
-  font-size: 1.3rem;
-  text-shadow: 0 0 5px rgba(147, 112, 219, 0.5);
+  display: none; /* Detay değerlerini gizle */
 }
 
 .xp-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding: 10px 20px;
-  background-color: rgba(106, 90, 205, 0.2);
-  border-radius: 50px;
-  width: fit-content;
-  margin: 0 auto 25px;
-  border: 1px solid rgba(106, 90, 205, 0.3);
+  display: none; /* XP bilgisini gizle */
 }
 
 .xp-label {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
+  display: none; /* XP etiketini gizle */
 }
 
 .xp-value {
-  color: #4CAF50;
-  font-weight: 700;
-  font-size: 1.1rem;
+  display: none; /* XP değerini gizle */
 }
 
 .result-actions {
