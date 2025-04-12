@@ -395,17 +395,12 @@ function loadLevelLeaderboard() {
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
-        // Modernleştirilmiş seviye göstergesi
+        // Seviye ilerleme çubuğu
         const progressPercent = playerData.progress_percent || 0;
-        const currentXP = playerData.total_xp || 0;
-        const levelDisplay = playerData.level || 1;
-        
         const progressBarHTML = `
-          <div class="level-stats-container">
-            <div class="level-number-indicator ${levelNumberClass}">${levelDisplay}</div>
-            <div class="xp-stats">
-              <span class="xp-text">${currentXP} XP</span>
-            </div>
+          <div class="level-progress">
+            <div class="progress-bar" style="width: ${progressPercent}%"></div>
+            <span class="progress-text">${progressPercent}%</span>
           </div>
         `;
 
@@ -415,9 +410,6 @@ function loadLevelLeaderboard() {
         else if (playerData.level >= 7) levelBadgeClass = 'level-master';
         else if (playerData.level >= 5) levelBadgeClass = 'level-expert';
         else if (playerData.level >= 3) levelBadgeClass = 'level-advanced';
-        
-        // Seviye numarası göstergesi için de aynı sınıfı kullan
-        const levelNumberClass = levelBadgeClass;
 
         html += `
           <div class="player-row ${rankClass} ${playerData.is_current_user ? 'current-user' : ''}">
