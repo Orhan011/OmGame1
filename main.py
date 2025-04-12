@@ -65,63 +65,46 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame"):
     """
     def send_email_task():
         try:
-            # E-posta gönderme devre dışı bırakıldı - doğrudan başarılı kabul edilecek
-            # Gerçek e-posta gönderimi yerine log mesajı
-            logger.info(f"E-posta gönderme simülasyonu: Alıcı: {to_email}, Konu: {subject}")
-            
-            # Test amaçlı olarak doğrulama kodu konsola yazdırılıyor
+            # Gmail SMTP ayarları
+            from_email = "omgameee@gmail.com"
+            password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
+
+            # Doğrulama kodu loglanıyor
             if "Doğrulama Kodu" in subject or "Şifre Sıfırlama" in subject:
-                # HTML içeriğinden kodu çıkar
                 import re
                 code_match = re.search(r'<h3[^>]*>(\d+)</h3>', html_body)
                 if code_match:
                     verification_code = code_match.group(1)
-                    logger.info(f"TEST MODU: Doğrulama Kodu: {verification_code}")
-                
-            return True
+                    logger.info(f"Gönderilen Doğrulama Kodu: {verification_code}")
             
-            # Aşağıdaki gerçek gönderim kodu şu an devre dışı
+            # Test modunda - gerçek e-posta göndermek yerine sadece log
+            logger.info(f"E-posta gönderme simülasyonu: Alıcı: {to_email}, Konu: {subject}")
+            
+            # Geliştirme ortamında gerçek e-posta göndermek istiyorsanız, 
+            # aşağıdaki yorum satırlarını kaldırın
+            
             """
-            from_email = "omgameee@gmail.com"
-            password = "ithkbmqvkzuwosjv"  # App Password, not the actual Gmail password
-
+            # E-posta oluştur
             msg = MIMEMultipart()
             msg['From'] = f"{from_name} <{from_email}>"
             msg['To'] = to_email
             msg['Subject'] = subject
-
+            
+            # HTML içeriğini ekle
             msg.attach(MIMEText(html_body, 'html'))
+            
+            # Bağlantı ve gönderim
+            server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
+            server.login(from_email, password)
+            text = msg.as_string()
+            server.sendmail(from_email, to_email, text)
+            server.quit()
+            logger.info(f"E-posta başarıyla gönderildi: {to_email}")
             """
             
-            # Önce SSL ile dene (daha güvenli)
-            try:
-                logger.info(f"SSL ile e-posta göndermeye çalışılıyor: {to_email}")
-                server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)  # Timeout arttırıldı
-                server.login(from_email, password)
-                text = msg.as_string()
-                server.sendmail(from_email, to_email, text)
-                server.quit()
-                logger.info(f"SSL bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
-                return True
-            except Exception as ssl_error:
-                logger.error(f"SSL SMTP Hatası: {str(ssl_error)}")
-                
-                # SSL başarısız olursa TLS ile dene
-                try:
-                    logger.info(f"TLS ile e-posta göndermeye çalışılıyor: {to_email}")
-                    server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)  # Timeout arttırıldı
-                    server.ehlo()
-                    server.starttls()
-                    server.ehlo()
-                    server.login(from_email, password)
-                    text = msg.as_string()
-                    server.sendmail(from_email, to_email, text)
-                    server.quit()
-                    logger.info(f"TLS bağlantısı ile e-posta başarıyla gönderildi: {to_email}")
-                    return True
-                except Exception as tls_error:
-                    logger.error(f"TLS SMTP Hatası: {str(tls_error)}")
-                    return False
+            # Test ortamında başarılı kabul et
+            return True
+            
         except Exception as e:
             logger.error(f"E-posta gönderirken genel hata oluştu: {str(e)}")
             return False
@@ -356,26 +339,27 @@ def send_verification_email(to_email, verification_code):
     Uses the configured Gmail account (omgameee@gmail.com) to send verification emails.
     Runs in background to avoid blocking the user's browser.
     """
-    subject = "OmGame - E-posta Doğrulama Kodu"
+    subject = "OmGame - Şifre Sıfırlama Kodu"
     
     body = f"""
     <html>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-            <h2 style="color: #4a67e8; text-align: center;">OmGame'e Hoş Geldiniz!</h2>
+            <h2 style="color: #4a67e8; text-align: center;">OmGame Şifre Sıfırlama</h2>
             <p>Merhaba,</p>
-            <p>OmGame hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
+            <p>OmGame hesabınızın şifresini sıfırlamak için aşağıdaki kodu kullanın:</p>
             <div style="background-color: #f5f5f5; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
                 <h3 style="margin: 0; font-size: 24px; letter-spacing: 5px;">{verification_code}</h3>
             </div>
             <p>Bu kod 30 dakika boyunca geçerlidir.</p>
-            <p>Eğer böyle bir talepte bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
+            <p>Eğer şifre sıfırlama talebinde bulunmadıysanız, lütfen bu e-postayı dikkate almayın.</p>
             <p>Teşekkürler,<br>OmGame Ekibi</p>
         </div>
     </body>
     </html>
     """
     
+    logger.info(f"Doğrulama e-postası gönderiliyor: {to_email} - Kod: {verification_code}")
     # Arka planda e-posta gönder
     return send_email_in_background(to_email, subject, body)
 
@@ -2055,12 +2039,9 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
 
         if user:
-            # Test ortamı için basit kod
-            reset_code = "1234" 
+            # 4 haneli rastgele kod oluştur (test için basit kod değil)
+            reset_code = str(random.randint(1000, 9999))
             
-            # Normalde rastgele 6 haneli kod oluştur
-            # reset_code = str(random.randint(100000, 999999))
-
             # Token ve son kullanma tarihi kaydet
             user.reset_token = reset_code
             user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
@@ -2074,7 +2055,11 @@ def forgot_password():
             
             # Her durumda başarılı mesajı göster
             flash('Şifre sıfırlama kodunuz e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
-            flash('Test modu: Şifre sıfırlama kodu: 1234', 'info')
+            
+            # Test modu için kodu göster - sadece geliştirme ortamında
+            # Gerçek uygulamada bu kısmı kaldırın
+            flash(f'Test modu: Şifre sıfırlama kodu: {reset_code}', 'info')
+            
             return redirect(url_for('reset_code', email=email))
         else:
             # Kullanıcı bulunamadı
