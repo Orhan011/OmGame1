@@ -62,6 +62,9 @@ function loadLeaderboard() {
     console.error('Liderlik tablosu konteyneri bulunamadı!');
     return;
   }
+  
+  // Debug bilgisi
+  console.log('Liderlik tablosu yükleniyor...');
 
   // Yükleniyor gösterimi
   leaderboardContainer.innerHTML = `
@@ -72,12 +75,12 @@ function loadLeaderboard() {
   `;
 
   // Skorları almak için alternatif API kullanımı
-  fetch('/api/leaderboard/all?nocache=' + new Date().getTime())
+  // İki API'yi zincirleyerek veri çekme
+  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
-        // İlk API başarısız olursa alternatifi dene
         console.log('İlk API başarısız, alternatif API deneniyor...');
-        return fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime());
+        return fetch('/api/leaderboard/all?nocache=' + new Date().getTime());
       }
       return response;
     })
@@ -90,7 +93,7 @@ function loadLeaderboard() {
     .then(data => {
       // API yanıtı bir dizi olmalı
       const scores = Array.isArray(data) ? data : [];
-      console.log("Skorlar alındı:", scores.length);
+      console.log("Skorlar alındı:", scores.length, scores);
 
       if (scores.length === 0) {
         leaderboardContainer.innerHTML = `
@@ -151,10 +154,24 @@ function loadLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const isCurrentUser = player.is_current_user || false;
 
-        // Puanı doğru şekilde göster - farklı API yanıt formatlarını kontrol et
-        const totalScore = player.total_score !== undefined ? player.total_score : 
-                          (player.score !== undefined ? player.score : 
-                          (player.points !== undefined ? player.points : 0));
+        // Puanı doğru şekilde göster - tüm olası API yanıt formatlarını kontrol et
+        let totalScore = 0;
+        if (player.total_score !== undefined) {
+          totalScore = player.total_score;
+        } else if (player.score !== undefined) {
+          totalScore = player.score;
+        } else if (player.points !== undefined) {
+          totalScore = player.points;
+        } else if (typeof player === 'object' && Object.keys(player).includes('score')) {
+          totalScore = player.score;
+        }
+        
+        // Sayı olmayan değerleri kontrol et ve düzelt
+        if (isNaN(totalScore) || totalScore === null) {
+          totalScore = 0;
+        }
+        
+        console.log("Oyuncu puanı:", player.username, totalScore);
 
         html += `
           <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
@@ -193,14 +210,115 @@ function loadLeaderboard() {
     })
     .catch(error => {
       console.error('Skorlar alınırken hata oluştu:', error);
-      leaderboardContainer.innerHTML = `
-        <div class="error">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-          <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
-        </div>
-      `;
+      
+      // Son bir deneme yap - direkt API'ye git
+      fetch('/api/users/all?limit=1000&nocache=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            console.log("Alternatif API başarılı, kullanıcılar:", data.length);
+            
+            // Kullanıcı verileriyle liderlik tablosunu oluştur
+            let html = createLeaderboardHtml(data);
+            leaderboardContainer.innerHTML = html;
+          } else {
+            throw new Error("Kullanıcı verileri alınamadı");
+          }
+        })
+        .catch(finalError => {
+          console.error("Son hata:", finalError);
+          leaderboardContainer.innerHTML = `
+            <div class="error">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+              <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
+            </div>
+          `;
+        });
     });
+    
+// Liderlik tablosu HTML'ini oluşturan yardımcı fonksiyon
+function createLeaderboardHtml(players) {
+  if (!players || players.length === 0) {
+    return `
+      <div class="empty-state">
+        <i class="fas fa-trophy"></i>
+        <p>Henüz skor kaydı bulunmuyor. Oyun oynayarak liderlik tablosuna girmeye hak kazanabilirsiniz!</p>
+      </div>
+    `;
+  }
+  
+  // Oyuncuları puanlarına göre sırala (puanı olmayanlara 0 ver)
+  const sortedPlayers = [...players].sort((a, b) => {
+    const scoreA = a.total_score || a.score || a.points || 0;
+    const scoreB = b.total_score || b.score || b.points || 0;
+    return scoreB - scoreA;
+  });
+  
+  let html = `
+    <div class="leaderboard-table">
+      <div class="leaderboard-header-row">
+        <div class="rank-header">Sıra</div>
+        <div class="player-header">Oyuncu</div>
+        <div class="score-header">Toplam Puan</div>
+      </div>
+      <div class="leaderboard-body">
+  `;
+  
+  // Her bir kullanıcı için satır ekle
+  sortedPlayers.forEach((player, index) => {
+    const rankClass = index < 3 ? `top-${index + 1}` : '';
+    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+    
+    // Kullanıcı adı renk sınıfı
+    let userNameColorClass = '';
+    if (index === 0) userNameColorClass = 'first-place';
+    else if (index === 1) userNameColorClass = 'second-place';
+    else if (index === 2) userNameColorClass = 'third-place';
+    else if (index < 10) userNameColorClass = 'top-ten';
+    
+    // Puan kontrolü
+    let playerScore = player.total_score || player.score || player.points || 0;
+    
+    const avatarUrl = player.avatar_url || '';
+    const isCurrentUser = player.is_current_user || false;
+    const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
+    
+    html += `
+      <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
+        <div class="rank-cell">
+          <div class="rank-number">${index + 1}</div>
+        </div>
+        <div class="player-cell">
+          <div class="player-avatar">
+            ${crownHTML}
+            ${avatarUrl ? 
+              `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+               <span class="avatar-content" style="display:none">${initial}</span>` : 
+              `<span class="avatar-content">${initial}</span>`
+            }
+          </div>
+          <div class="player-info">
+            <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
+            ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
+          </div>
+        </div>
+        <div class="score-cell">
+          <div class="score-container">
+            <span class="score-value">${playerScore}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `
+      </div>
+    </div>
+  `;
+  
+  return html;
+}
 }
 
 // Ana sayfadaki liderlik tablosu güncellendikten sonra çağrılır
