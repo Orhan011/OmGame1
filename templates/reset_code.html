@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Doğrulama kodu alanı için iyileştirilmiş stiller */
     .verification-code-container {
       display: flex;
       flex-direction: column;
@@ -84,7 +83,6 @@
       color: #94a3b8;
     }
     
-    /* Animasyon efektleri */
     @keyframes pulse {
       0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
@@ -101,7 +99,6 @@
       animation: pulse 1.5s infinite;
     }
     
-    /* Mobil için iyileştirmeler */
     @media (max-width: 640px) {
       .code-input {
         width: 2.8rem;
@@ -179,7 +176,6 @@
   </div>
 
   <script>
-    // Kod girişleri için otomatik ilerleme ve stil iyileştirmeleri
     document.addEventListener('DOMContentLoaded', function() {
       const codeInputs = document.querySelectorAll('.code-input');
       const form = document.querySelector('.auth-form');
@@ -187,7 +183,7 @@
       const timerElement = document.getElementById('timer');
       const emailInput = document.getElementById('email-input');
       
-      // Sayaç için değişkenler
+      // Sayaç değişkenleri
       let secondsLeft = 120; // 2 dakika
       let timerInterval;
       
@@ -219,7 +215,7 @@
         e.preventDefault();
         
         if (this.classList.contains('disabled')) {
-          return; // Eğer buton devre dışıysa, hiçbir şey yapma
+          return; // Eğer buton devre dışıysa, işlem yapma
         }
         
         const email = emailInput.value;
@@ -380,11 +376,6 @@
           }
           code += input.value;
         });
-        
-        if (allFilled) {
-          // Otomatik gönderimi etkinleştirmek için yorum satırını kaldırabilirsiniz
-          // setTimeout(() => form.submit(), 500);
-        }
         
         return code;
       }
