@@ -24,14 +24,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,   # Her sorguda bağlantı kontrolü
     "pool_timeout": 10,      # Daha kısa bağlantı zaman aşımı
     "pool_size": 10,         # Daha büyük bağlantı havuzu
-    "max_overflow": 20,      # Daha fazla ek bağlantı
-    "connect_args": {
-        "connect_timeout": 5,
-        "keepalives": 1,
-        "keepalives_idle": 30,
-        "keepalives_interval": 10,
-        "keepalives_count": 5
-    }
+    "max_overflow": 20       # Daha fazla ek bağlantı
 }
 
 # E-posta yapılandırması - Gmail SMTP ayarları
