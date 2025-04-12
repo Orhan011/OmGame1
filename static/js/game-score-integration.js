@@ -206,7 +206,9 @@ class GameScoreIntegration {
 
         // Liderlik tablosunu ve profil puanlarını güncelle
         if (typeof window.updateScoreBoard === 'function') {
-          window.updateScoreBoard(this.gameType);
+          window.updateScoreBoard(this.gameType, true);
+        } else if (typeof window.LeaderboardManager !== 'undefined' && typeof window.LeaderboardManager.updateScoreBoard === 'function') {
+          window.LeaderboardManager.updateScoreBoard(this.gameType, true);
         }
       });
     } catch (error) {

@@ -109,6 +109,10 @@ function loadLeaderboard() {
         const totalScore = player.total_score || 0;
         console.log(`Oyuncu ${player.username} puanı: ${totalScore}`);
         
+        // Kullanıcının toplam puanı
+        const totalScore = player.total_score || 0;
+        console.log(`Oyuncu ${player.username} puanı: ${totalScore}`);
+        
         // Sıralama ve stil sınıfları
         const rankClass = index < 3 ? `top-${index + 1}` : '';
         const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
@@ -244,6 +248,9 @@ function loadLevelLeaderboard() {
           rank: player.rank || ''
         };
         
+        // Toplam XP için değişken tanımla
+        const totalXp = playerData.total_xp;
+        
         const rankClass = index < 3 ? `top-${index + 1}` : '';
         const initial = playerData.username.charAt(0).toUpperCase();
         
@@ -303,7 +310,7 @@ function loadLevelLeaderboard() {
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">
-                  <span class="score-badge mini-score" title="Seviye Puanı">${playerData.total_xp}</span>
+                  <span class="score-badge mini-score" title="Seviye Puanı">${totalXp}</span>
                   ${playerData.username}
                 </div>
                 <div class="player-stats">
