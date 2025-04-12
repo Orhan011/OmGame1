@@ -125,16 +125,22 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         
         # E-posta mesajını oluştur
         smtp_msg = MIMEMultipart()
-        smtp_msg['From'] = f"{from_name} <{from_email}>"
+        
+        # E-posta başlıklarını Türkçe karakterleri destekleyecek şekilde kodla
+        from email.header import Header
+        smtp_msg['From'] = f"{Header(from_name, 'utf-8').encode()} <{from_email}>"
         smtp_msg['To'] = to_email
-        smtp_msg['Subject'] = subject
-        smtp_msg.attach(MIMEText(html_body, 'html'))
+        smtp_msg['Subject'] = Header(subject, 'utf-8').encode()
+        
+        # HTML içeriği UTF-8 olarak kodla
+        smtp_msg.attach(MIMEText(html_body, 'html', 'utf-8'))
         
         # SMTP sunucusuna bağlan ve e-postayı gönder
         logger.info(f"SMTP sunucusuna bağlanılıyor: smtp.gmail.com:465")
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30)
         server.login(from_email, password)
-        text = smtp_msg.as_string()
+        # Türkçe karakterler için UTF-8 kodlaması kullan
+        text = smtp_msg.as_string().encode('utf-8')
         server.sendmail(from_email, to_email, text)
         server.quit()
         
