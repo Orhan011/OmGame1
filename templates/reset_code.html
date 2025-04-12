@@ -1,208 +1,416 @@
-{% extends "layout.html" %}
-
-{% block title %}Doğrulama Kodu - OmGame{% endblock %}
-
-{% block additional_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-<style>
-    .auth-container {
-        max-width: 450px;
-        margin: 50px auto;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şifre Sıfırlama Kodu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Doğrulama kodu alanı için iyileştirilmiş stiller */
+    .verification-code-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 1.5rem 0;
     }
     
-    .auth-header {
-        text-align: center;
-        margin-bottom: 25px;
+    .verification-code {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin: 1rem 0;
     }
     
-    .auth-header h2 {
-        font-size: 24px;
-        color: #333;
-        font-weight: 600;
+    .code-input {
+      width: 3.5rem;
+      height: 4rem;
+      font-size: 1.8rem;
+      text-align: center;
+      border-radius: 12px;
+      border: 2px solid rgba(113, 128, 150, 0.2);
+      background-color: rgba(15, 23, 42, 0.5);
+      color: #fff;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .auth-header p {
-        color: #666;
-        margin-top: 10px;
+    .code-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+      transform: translateY(-2px);
     }
     
-    .code-inputs {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 25px;
+    .code-input.filled {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.6);
     }
     
-    .code-inputs input {
-        width: 50px;
-        height: 60px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        text-align: center;
-        font-size: 24px;
-        font-weight: 600;
+    .verification-help {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 0.75rem;
+      text-align: center;
     }
     
-    .code-inputs input:focus {
-        border-color: #4a67e8;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(74, 103, 232, 0.2);
+    .resend-link {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 1rem;
+      display: inline-block;
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
     
-    .verification-message {
-        margin-bottom: 20px;
-        padding: 18px;
-        background-color: #4a67e8;
-        border-radius: 8px;
-        color: white;
-        font-size: 16px;
-        line-height: 1.6;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(74, 103, 232, 0.25);
-        animation: pulse 2s infinite;
+    .resend-link:hover {
+      color: #2563eb;
+      text-decoration: underline;
     }
     
+    .resend-link.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+    
+    .verification-timer {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    
+    /* Animasyon efektleri */
     @keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(74, 103, 232, 0.5);
-        }
-        70% {
-            box-shadow: 0 0 0 15px rgba(74, 103, 232, 0);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(74, 103, 232, 0);
-        }
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      }
     }
     
-    .btn-primary {
-        background-color: #4a67e8;
-        border: none;
-        color: white;
-        padding: 12px 0;
-        font-size: 16px;
-        font-weight: 500;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        width: 100%;
-        margin-top: 10px;
+    .code-input.active {
+      animation: pulse 1.5s infinite;
     }
     
-    .btn-primary:hover {
-        background-color: #3a56cb;
+    /* Mobil için iyileştirmeler */
+    @media (max-width: 640px) {
+      .code-input {
+        width: 2.8rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+      }
+      
+      .verification-code {
+        gap: 0.5rem;
+      }
     }
-    
-    .auth-links {
-        margin-top: 25px;
-        text-align: center;
-    }
-    
-    .auth-links a {
-        color: #4a67e8;
-        text-decoration: none;
-    }
-    
-    .auth-links a:hover {
-        text-decoration: underline;
-    }
-    
-    .resend-code {
-        display: block;
-        margin-top: 20px;
-        text-align: center;
-        color: #5f5f5f;
-        font-size: 14px;
-    }
-    
-    .resend-code a {
-        color: #4a67e8;
-        text-decoration: none;
-        margin-left: 5px;
-    }
-    
-    .resend-code a:hover {
-        text-decoration: underline;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="auth-container">
-    <div class="auth-header">
-        <h2>Doğrulama Kodu</h2>
-        <p>Aşağıda görüntülenen <strong>4 haneli doğrulama kodunu</strong> girin.</p>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                {% if 'Doğrulama kodunuz:' in message %}
-                    <div class="verification-message">
-                        <strong>Önemli:</strong> {{ message }}
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <form action="/reset-code" method="post">
-        <input type="hidden" name="email" value="{{ email }}">
+  </style>
+</head>
+<body class="auth-only-body">
+  <div class="fullscreen-auth">
+    <div class="auth-container">
+      <div class="auth-card glass-card">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="auth-logo-small">
         
-        <div class="code-inputs">
-            <input type="text" name="code1" id="code1" maxlength="1" pattern="[0-9]" inputmode="numeric" required autofocus>
-            <input type="text" name="code2" id="code2" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
-            <input type="text" name="code3" id="code3" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
-            <input type="text" name="code4" id="code4" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        <div class="auth-header">
+          <h2>Doğrulama Kodu</h2>
+          <p class="auth-subtitle">E-postanıza gönderilen 4 haneli kodu giriniz</p>
         </div>
         
-        <button type="submit" class="btn btn-primary">
-            Doğrula ve Devam Et
-        </button>
-    </form>
-    
-    <div class="resend-code">
-        Kodu almadınız mı? <a href="/sifremi-unuttum">Yeni Kod İste</a>
-    </div>
-    
-    <div class="auth-links">
-        <p><a href="{{ url_for('login') }}"><i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön</a></p>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Otomatik olarak bir sonraki input alanına geçme
-    document.addEventListener('DOMContentLoaded', function() {
-        const codeInputs = document.querySelectorAll('.code-inputs input');
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category if category != '_' else 'info' }} alert-dismissible fade show">
+                <i class="fas {% if category == 'danger' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
         
-        codeInputs.forEach((input, index) => {
-            // Maksimum 1 karakter
-            input.addEventListener('input', function() {
-                if (this.value.length >= 1) {
-                    // Sayısal değer kontrolü
-                    if (!/^\d+$/.test(this.value)) {
-                        this.value = '';
-                        return;
-                    }
-                    
-                    // Sonraki input alanına geç
-                    if (index < codeInputs.length - 1) {
-                        codeInputs[index + 1].focus();
-                    }
-                }
-            });
+        <form action="{{ url_for('reset_code') }}" method="POST" class="auth-form" id="verification-form">
+          <input type="hidden" name="email" value="{{ email }}" id="email-input">
+          
+          <div class="verification-code-container">
+            <div class="verification-code">
+              <input type="tel" inputmode="numeric" name="code1" maxlength="1" pattern="[0-9]" class="code-input active" required autofocus>
+              <input type="tel" inputmode="numeric" name="code2" maxlength="1" pattern="[0-9]" class="code-input" required>
+              <input type="tel" inputmode="numeric" name="code3" maxlength="1" pattern="[0-9]" class="code-input" required>
+              <input type="tel" inputmode="numeric" name="code4" maxlength="1" pattern="[0-9]" class="code-input" required>
+            </div>
             
-            // Backspace tuşu ile önceki input alanına geçme
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                    codeInputs[index - 1].focus();
-                }
-            });
+            <p class="verification-help">
+              <i class="fas fa-info-circle"></i> 
+              E-posta adresinize gönderilen 4 haneli kodu girin
+            </p>
+            
+            <div class="verification-timer">
+              Yeni kod talep etmek için kalan süre: <span id="timer">02:00</span>
+            </div>
+            
+            <a href="javascript:void(0)" class="resend-link disabled" id="resendLink">
+              <i class="fas fa-paper-plane"></i> Kodu tekrar gönder
+            </a>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-block btn-animated">
+            <span class="btn-text">Doğrula</span>
+            <i class="fas fa-check-circle btn-icon"></i>
+          </button>
+        </form>
+        
+        <div class="auth-links">
+          <a href="{{ url_for('login') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Kod girişleri için otomatik ilerleme ve stil iyileştirmeleri
+    document.addEventListener('DOMContentLoaded', function() {
+      const codeInputs = document.querySelectorAll('.code-input');
+      const form = document.querySelector('.auth-form');
+      const resendLink = document.getElementById('resendLink');
+      const timerElement = document.getElementById('timer');
+      const emailInput = document.getElementById('email-input');
+      
+      // Sayaç için değişkenler
+      let secondsLeft = 120; // 2 dakika
+      let timerInterval;
+      
+      // Sayacı başlat
+      startTimer();
+      
+      function startTimer() {
+        updateTimerDisplay();
+        
+        timerInterval = setInterval(() => {
+          secondsLeft--;
+          updateTimerDisplay();
+          
+          if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            resendLink.classList.remove('disabled');
+          }
+        }, 1000);
+      }
+      
+      function updateTimerDisplay() {
+        const minutes = Math.floor(secondsLeft / 60);
+        const seconds = secondsLeft % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+      
+      // Tekrar gönderme butonu için olay
+      resendLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (this.classList.contains('disabled')) {
+          return; // Eğer buton devre dışıysa, hiçbir şey yapma
+        }
+        
+        const email = emailInput.value;
+        
+        // Butonun durumunu güncelle
+        this.classList.add('disabled');
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kod gönderiliyor...';
+        
+        // AJAX ile kodu tekrar gönder
+        fetch("{{ url_for('forgot_password') }}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `email=${encodeURIComponent(email)}`
+        })
+        .then(response => {
+          // Sayacı sıfırla ve yeniden başlat
+          secondsLeft = 120;
+          startTimer();
+          
+          // Butonun metni ve durumunu güncelle
+          this.innerHTML = '<i class="fas fa-paper-plane"></i> Kodu tekrar gönder';
+          
+          // Başarılı mesajı göster
+          const alertElement = document.createElement('div');
+          alertElement.className = 'alert alert-success alert-dismissible fade show';
+          alertElement.innerHTML = `
+            <i class="fas fa-check-circle me-2"></i>
+            Yeni doğrulama kodu e-posta adresinize gönderildi.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+          `;
+          
+          // Eski mesajları temizle
+          const oldAlerts = document.querySelectorAll('.alert');
+          oldAlerts.forEach(alert => alert.remove());
+          
+          // Yeni mesajı ekle
+          form.parentNode.insertBefore(alertElement, form);
+          
+          // İlk input kutusuna odaklan
+          codeInputs[0].focus();
+          
+          // Tüm inputları temizle
+          codeInputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('filled');
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Hata mesajı göster
+          const alertElement = document.createElement('div');
+          alertElement.className = 'alert alert-danger alert-dismissible fade show';
+          alertElement.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Kod gönderilirken bir hata oluştu. Lütfen tekrar deneyin.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+          `;
+          
+          // Eski mesajları temizle
+          const oldAlerts = document.querySelectorAll('.alert');
+          oldAlerts.forEach(alert => alert.remove());
+          
+          // Yeni mesajı ekle
+          form.parentNode.insertBefore(alertElement, form);
+          
+          // Butonu normal haline getir
+          this.innerHTML = '<i class="fas fa-paper-plane"></i> Kodu tekrar gönder';
+          this.classList.remove('disabled');
         });
+      });
+      
+      // İlk input aktif animasyon ile başlar
+      codeInputs[0].classList.add('active');
+      
+      codeInputs.forEach((input, index) => {
+        // Input focus aldığında
+        input.addEventListener('focus', function() {
+          // Tüm inputlardan active sınıfını kaldır
+          codeInputs.forEach(inp => inp.classList.remove('active'));
+          // Sadece focus olan inputa active sınıfını ekle
+          this.classList.add('active');
+        });
+        
+        // Input dolduğunda
+        input.addEventListener('input', function() {
+          // Sadece rakamları kabul et
+          this.value = this.value.replace(/[^0-9]/g, '');
+          
+          if (this.value.length === 1) {
+            this.classList.add('filled');
+            
+            // Sonraki input'a geç
+            if (index < codeInputs.length - 1) {
+              codeInputs[index + 1].focus();
+              codeInputs[index + 1].classList.add('active');
+              this.classList.remove('active');
+            } else {
+              // Son input doldurulduğunda
+              this.blur();
+              checkAllFilled();
+            }
+          } else {
+            this.classList.remove('filled');
+          }
+        });
+        
+        // Backspace tuşuna basıldığında
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Backspace') {
+            // Eğer input boşsa, önceki input'a dön
+            if (this.value.length === 0 && index > 0) {
+              codeInputs[index - 1].focus();
+              codeInputs[index - 1].classList.add('active');
+              this.classList.remove('active');
+              e.preventDefault(); // Önceki input'un değerini silmeyi engelle
+            } else {
+              this.classList.remove('filled');
+            }
+          }
+        });
+        
+        // Paste olayını yakala ve kodu dağıt
+        input.addEventListener('paste', function(e) {
+          e.preventDefault();
+          
+          // Yapıştırılan içeriği al
+          let pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          
+          // Sadece rakamları kabul et
+          pastedText = pastedText.replace(/[^0-9]/g, '');
+          
+          // Her rakamı ilgili input'a yerleştir
+          for (let i = 0; i < Math.min(pastedText.length, codeInputs.length); i++) {
+            codeInputs[i].value = pastedText.charAt(i);
+            codeInputs[i].classList.add('filled');
+          }
+          
+          // Son doldurulan alana odaklan veya formu gönder
+          if (pastedText.length >= codeInputs.length) {
+            codeInputs[codeInputs.length - 1].focus();
+            checkAllFilled();
+          } else if (pastedText.length > 0) {
+            codeInputs[pastedText.length].focus();
+          }
+        });
+      });
+      
+      // Tüm alanlar dolduruldu mu kontrol et
+      function checkAllFilled() {
+        let allFilled = true;
+        let code = '';
+        
+        codeInputs.forEach(input => {
+          if (!input.value) {
+            allFilled = false;
+          }
+          code += input.value;
+        });
+        
+        if (allFilled) {
+          // Otomatik gönderimi etkinleştirmek için yorum satırını kaldırabilirsiniz
+          // setTimeout(() => form.submit(), 500);
+        }
+        
+        return code;
+      }
+      
+      // Form gönderimi
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Tüm kod kutularını kontrol et
+        const code = checkAllFilled();
+        
+        if (code.length === 4) {
+          // Gizli bir input oluştur
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'verification_code';
+          hiddenInput.value = code;
+          this.appendChild(hiddenInput);
+          
+          // Formu gönder
+          this.submit();
+        } else {
+          // Eksik kod uyarısı
+          alert('Lütfen 4 haneli doğrulama kodunu tam olarak giriniz.');
+        }
+      });
     });
-</script>
-{% endblock %}
+  </script>
+</body>
+</html>
