@@ -155,7 +155,10 @@ function loadLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
+                <div class="player-name ${userNameColorClass}">
+                  <span class="score-badge mini-score" title="Toplam Puan">${totalScore}</span>
+                  ${player.username || 'İsimsiz Oyuncu'}
+                </div>
                 ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
               </div>
             </div>
@@ -299,7 +302,10 @@ function loadLevelLeaderboard() {
                 }
               </div>
               <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${playerData.username}</div>
+                <div class="player-name ${userNameColorClass}">
+                  <span class="score-badge mini-score" title="Seviye Puanı">${playerData.total_xp}</span>
+                  ${playerData.username}
+                </div>
                 <div class="player-stats">
                   <span class="level-badge">XP: ${playerData.total_xp}</span>
                   ${playerData.games_played ? `<span class="games-badge"><i class="fas fa-gamepad"></i> ${playerData.games_played}</span>` : ''}

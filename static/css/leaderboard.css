@@ -997,3 +997,46 @@
   margin-right: 3px;
   font-size: 0.7rem;
 }
+
+/* Kullanıcı ismi önünde gösterilen puan sayacı */
+.mini-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(106, 90, 224, 0.25);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-right: 8px;
+  min-width: 35px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  vertical-align: middle;
+}
+
+/* İlk üç sıralama için özel stiller */
+.top-1 .mini-score {
+  background: rgba(255, 215, 0, 0.3);
+  color: gold;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.top-2 .mini-score {
+  background: rgba(192, 192, 192, 0.3);
+  color: silver;
+  font-weight: 800;
+  box-shadow: 0 0 6px rgba(192, 192, 192, 0.5);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.top-3 .mini-score {
+  background: rgba(205, 127, 50, 0.3);
+  color: #cd7f32;
+  font-weight: 800;
+  box-shadow: 0 0 6px rgba(205, 127, 50, 0.5);
+  border: 1px solid rgba(205, 127, 50, 0.3);
+}
