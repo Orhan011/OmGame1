@@ -21,6 +21,7 @@ class User(db.Model):
     rank = db.Column(db.String(50), default='Başlangıç')
     total_games_played = db.Column(db.Integer, default=0)
     highest_score = db.Column(db.Integer, default=0)
+    total_score = db.Column(db.Integer, default=0)  # Toplam puan - tüm oyunların toplam skoru
     theme_preference = db.Column(db.String(20), default='dark')
     account_status = db.Column(db.String(20), default='active')
     reset_token = db.Column(db.String(100))

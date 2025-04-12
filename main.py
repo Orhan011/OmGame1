@@ -2512,6 +2512,13 @@ def save_score():
         # Kullanıcının en yüksek skorunu güncelle (gerekirse)
         if score > user.highest_score:
             user.highest_score = score
+            
+        # Kullanıcının toplam puanını güncelle
+        # Hesaplanan toplam puanı kullanıcının toplam_score değerine ekle
+        adjusted_game_points = int(multipliers.get('total_score', 0))
+        user.total_score += adjusted_game_points
+        
+        logger.debug(f"Kullanıcı toplam puanı güncellendi: {user.total_score} (+{adjusted_game_points})")
 
         db.session.commit()
 
@@ -2816,6 +2823,9 @@ def get_current_user_api():
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
+                    'total_score': user.total_score,  # Toplam puanı ekle
+                    'experience_points': user.experience_points,
+                    'rank': user.rank,
                     'loggedIn': True
                 })
 
