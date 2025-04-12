@@ -216,9 +216,19 @@ def reset_code():
                 return render_template('reset_code.html', email=email)
 
             # Kodu doğruladık, şifre sıfırlama sayfasına yönlendir
+            # Yeni token oluştur (UUID yerine basitleştirilmiş token)
+            reset_token = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+            user.reset_token = reset_token
+            db.session.commit()
+            
+            # Session'a doğrulama bilgilerini kaydet
             session['reset_email'] = email
             session['reset_verified'] = True
-            return redirect(url_for('password_reset.reset_password'))
+            
+            logger.info(f"Doğrulama başarılı: {email}, token: {reset_token}")
+            
+            # Hem email hem token parametrelerini URL'e ekle
+            return redirect(url_for('password_reset.reset_password', email=email, token=reset_token))
 
     except Exception as e:
         logger.error(f"Hata: {e}")
