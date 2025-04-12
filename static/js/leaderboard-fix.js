@@ -1,3 +1,4 @@
+
 /**
  * ZekaPark - Liderlik Tablosu (Leaderboard) Modülü
  * Bu dosya, platform liderlik tablosu işlevlerini sağlar.
@@ -387,40 +388,10 @@ function updateProfileScores() {
   }
 }
 
-// Global skorları kaydetme yardımcı fonksiyonu
-window.saveScoreToLeaderboard = function(gameType, score, playTime, difficulty = 'medium', gameStats = {}) {
-  console.log(`${gameType} oyunu için puan kaydediliyor: ${score}`);
-  
-  return fetch('/api/save-score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      game_type: gameType,
-      score: score,
-      playtime: playTime,
-      difficulty: difficulty,
-      game_stats: gameStats
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      console.log("Skor başarıyla kaydedildi:", data);
-      // Liderlik tablosunu güncelle
-      updateScoreBoard(gameType);
-      return data;
-    } else {
-      console.error("Skor kaydedilirken hata oluştu:", data.message);
-      throw new Error(data.message);
-    }
-  });
-};
-
 // Global nesne olarak dışa aktar
 window.LeaderboardManager = {
   loadLeaderboard,
   loadLevelLeaderboard,
   updateScoreBoard,
-  updateProfileScores,
-  saveScoreToLeaderboard
+  updateProfileScores
 };

@@ -13,21 +13,6 @@
     <div class="tetris-container">
       <div class="tetris-layout">
         <div class="tetris-info-panel">
-          <div class="tetris-score-panel">
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Skor</div>
-              <div class="tetris-score-value" id="score">0</div>
-            </div>
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Level</div>
-              <div class="tetris-score-value" id="level">1</div>
-            </div>
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Çizgiler</div>
-              <div class="tetris-score-value" id="lines">0</div>
-            </div>
-          </div>
-
           <div class="tetris-next-piece">
             <div class="tetris-next-label">Sonraki Parça</div>
             <canvas id="next-piece-canvas" width="100" height="100"></canvas>
@@ -104,31 +89,6 @@
                 <div class="tetris-final-score-value" id="final-score">0</div>
               </div>
 
-              <!-- XP ve Seviye Bilgisi -->
-              <div class="tetris-xp-info" style="display: none;">
-                <div class="tetris-xp-gain">
-                  <div class="tetris-xp-gain-label"><i class="fas fa-star me-2"></i>Kazanılan XP</div>
-                  <div class="tetris-xp-gain-value" id="xp-gain">0</div>
-                </div>
-                <div class="tetris-level-info">
-                  <div class="tetris-level-label">Seviye</div>
-                  <div class="tetris-level-value" id="current-level">1</div>
-                </div>
-              </div>
-
-              <!-- Misafir kullanıcı bilgilendirme -->
-              <div id="guest-info" class="guest-info" style="display: none;">
-                <p class="guest-message"><i class="fas fa-info-circle me-2"></i>Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
-                <div class="guest-buttons">
-                  <a href="{{ url_for('login') }}" class="btn btn-success">
-                    <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
-                  </a>
-                  <a href="{{ url_for('register') }}" class="btn btn-outline-info">
-                    <i class="fas fa-user-plus me-2"></i>Kaydol
-                  </a>
-                </div>
-              </div>
-
               <button id="play-again" class="btn btn-primary btn-lg mt-3">
                 <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
               </button>
@@ -181,33 +141,6 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
-
-  .tetris-score-panel {
-    background: rgba(25, 25, 45, 0.7);
-    border-radius: 15px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .tetris-score-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .tetris-score-label {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .tetris-score-value {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--accent-color);
   }
 
   .tetris-next-piece {
@@ -346,77 +279,6 @@
     color: var(--accent-color);
   }
 
-  /* XP Info styling */
-  .tetris-xp-info {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 0 0 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: space-between;
-  }
-
-  .tetris-xp-gain, .tetris-level-info {
-    flex: 1;
-    min-width: 100px;
-  }
-
-  .tetris-xp-gain-label, .tetris-level-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 5px;
-  }
-
-  .tetris-xp-gain-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #ffc107; /* Gold color for XP */
-  }
-
-  .tetris-level-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #8BC34A; /* Green color for level */
-  }
-
-  /* Bonus details styling */
-  .tetris-bonus-details {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(30, 30, 60, 0.3);
-    border-radius: 8px;
-    padding: 10px;
-  }
-
-  .tetris-bonus-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .tetris-bonus-item span {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .tetris-bonus-item strong {
-    font-weight: 600;
-    color: #a890ff;
-  }
-
-  /* Bonus types */
-  .daily-bonus strong {
-    color: #FFD54F; /* Amber color for daily bonus */
-  }
-
-  .streak-bonus strong {
-    color: #FF7043; /* Deep Orange for streak bonus */
-  }
 
   /* Animations */
   @keyframes fadeIn {
@@ -442,106 +304,6 @@
     100% { transform: translateY(-30px); opacity: 0; }
   }
 
-  /* Misafir kullanıcı bilgilendirme */
-  .guest-info {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 15px 0;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(106, 90, 224, 0.3);
-  }
-
-  .guest-message {
-    color: #FFC107;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-  }
-
-  .guest-message-api {
-    color: #4CAF50;
-    font-size: 0.9rem;
-    padding: 8px 12px;
-    background: rgba(76, 175, 80, 0.1);
-    border-radius: 8px;
-    margin-top: 12px;
-  }
-
-  .guest-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 8px;
-  }
-
-  /* Giriş vurgulama sınıfı */
-  .highlight-login {
-    background: rgba(106, 90, 224, 0.2);
-    border: 2px solid rgba(106, 90, 224, 0.5);
-    animation: pulse-border 1.5s infinite;
-  }
-
-  /* Giriş butonları animasyonu */
-  .animate-buttons .btn {
-    animation: pulse-buttons 1.5s infinite;
-    transform-origin: center;
-  }
-
-  /* Buton animasyonu için keyframes */
-  @keyframes pulse-buttons {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(106, 90, 224, 0.7); }
-    100% { transform: scale(1); }
-  }
-
-  /* Kenarlık animasyonu için keyframes */
-  @keyframes pulse-border {
-    0% { border-color: rgba(106, 90, 224, 0.3); }
-    50% { border-color: rgba(106, 90, 224, 0.8); }
-    100% { border-color: rgba(106, 90, 224, 0.3); }
-  }
-
-  /* Level up animation */
-  .level-up-animation {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(100, 50, 255, 0.8);
-    z-index: 100;
-    animation: levelUpAnimation 2s forwards;
-    pointer-events: none;
-  }
-
-  /* Animate overlay */
-  .tetris-overlay-content {
-    animation: scaleUp 0.3s ease-out;
-  }
-
-  /* Score value animation */
-  .score-update {
-    animation: pulse 0.3s ease-out;
-  }
-
-  /* Tetris grid lines */
-  .grid-line {
-    position: absolute;
-    background-color: rgba(200, 200, 255, 0.05);
-    z-index: 1;
-  }
-
-  .grid-horizontal {
-    height: 1px;
-    width: 100%;
-  }
-
-  .grid-vertical {
-    width: 1px;
-    height: 100%;
-  }
 
   /* Controls enhancement */
   .tetris-key {
@@ -692,31 +454,6 @@
     .tetris-help-items {
       grid-template-columns: 1fr 1fr;
     }
-  }
-
-  /* Difficulty selector styles */
-  .difficulty-selector {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .difficulty-selector span {
-    color: white;
-    font-weight: bold;
-  }
-
-  .difficulty-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-
-  .difficulty-btn.active {
-    background-color: #2196F3;
   }
 </style>
 
@@ -1193,11 +930,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameOverSound = new Audio('/static/sounds/game-over.mp3');
     gameOverSound.play().catch(e => console.log('Game over sound playback prevented', e));
 
-    // Update final results
-    finalScoreElement.textContent = score;
-
-    // Save score to the server
-    saveGameScore(); // Call the new score saving function
 
     // Show game over overlay with animation
     tetrisOverlay.style.display = 'flex';
@@ -1230,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({
         game_type: 'tetris',
-        score: score,
+
         difficulty: difficulty,
         game_stats: gameStats
       })
@@ -1239,109 +971,17 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       console.log('Score saved:', data);
 
-      // Puan gösterimi kapatıldı
-      const xpInfoElement = document.querySelector('.tetris-xp-info');
-      const guestInfoElement = document.getElementById('guest-info');
-
-      // Tüm skor gösterim elementlerini gizle
-      if (xpInfoElement) {
-        xpInfoElement.style.display = 'none';
-      }
-
-      if (guestInfoElement) {
-        guestInfoElement.style.display = 'none';
-      }
 
       const finalScoreContainer = document.querySelector('.tetris-final-score');
       if (finalScoreContainer) {
         finalScoreContainer.style.display = 'block'; // Show final score container
       }
 
-      const bonusDetails = document.createElement('div');
-      bonusDetails.className = 'tetris-bonus-details';
-      const scoringSystemInfo = data.scoring_system_info ? `<p>${data.scoring_system_info}</p>` : '';
-
-      bonusDetails.innerHTML = `
-        <div class="tetris-bonus-item">
-          <span>Temel Puan:</span>
-          <strong>${data.points.rewards.base_points}</strong>
-        </div>
-        <div class="tetris-bonus-item">
-          <span>Skor Bonusu:</span>
-          <strong>${Math.floor(data.points.rewards.score_points)}</strong>
-        </div>
-        ${data.points.rewards.daily_bonus > 0 ? `
-          <div class="tetris-bonus-item daily-bonus">
-            <span>Günlük Bonus:</span>
-            <strong>+${data.points.rewards.daily_bonus}</strong>
-          </div>` : ''}
-        ${data.points.rewards.streak_bonus > 0 ? `
-          <div class="tetris-bonus-item streak-bonus">
-            <span>Seri Bonusu:</span>
-            <strong>+${data.points.rewards.streak_bonus}</strong>
-          </div>` : ''}
-        ${scoringSystemInfo}
-      `;
-
-      // Element bulunmazsa ekleme yap
-      if (!document.querySelector('.tetris-bonus-details')) {
-        finalScoreContainer.appendChild(bonusDetails);
-      }
 
       // Toplam puanı güncelle
       finalScoreElement.textContent = data.points.total;
 
-      // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
-      xpInfoElement.style.display = 'block';
 
-      const xpGainElement = document.getElementById('xp-gain');
-      const currentLevelElement = document.getElementById('current-level');
-
-
-      // XP kazanımı animasyonu
-      xpGainElement.classList.add('score-update');
-      setTimeout(() => {
-        xpGainElement.classList.remove('score-update');
-      }, 300);
-
-      // Seviye animasyonu
-      currentLevelElement.classList.add('score-update');
-      setTimeout(() => {
-        currentLevelElement.classList.remove('score-update');
-      }, 300);
-
-      // Eğer API'den özel bir mesaj geldiyse göster
-      if (data.message) {
-        const messageEl = document.createElement('div');
-        messageEl.className = 'guest-message-api mt-2';
-        messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
-
-        // Önceki mesaj varsa kaldır
-        const oldMessage = document.querySelector('.guest-message-api');
-        if (oldMessage) {
-          oldMessage.remove();
-        }
-
-        // Game over overlay'e ekle
-        const gameOverOverlay = document.getElementById('game-over-overlay');
-        if (gameOverOverlay) {
-          gameOverOverlay.appendChild(messageEl);
-        }
-      }
-
-      // Eğer giriş yapılması gerekiyorsa vurgula
-      if (data.login_required) {
-        const guestInfo = document.getElementById('guest-info');
-        if (guestInfo) {
-          guestInfo.classList.add('highlight-login');
-
-          // Giriş butonlarını daha belirgin yap
-          const loginButtons = guestInfo.querySelector('.guest-buttons');
-          if (loginButtons) {
-            loginButtons.classList.add('animate-buttons');
-          }
-        }
-      }
     })
     .catch(error => {
       console.error('Error saving score:', error);
@@ -1744,7 +1384,7 @@ function saveGameScore() {
     },
     body: JSON.stringify({
       game_type: 'tetris',
-      score: score,
+
       difficulty: difficulty,
       game_stats: gameStats
     })
@@ -1753,109 +1393,8 @@ function saveGameScore() {
   .then(data => {
     console.log('Score saved:', data);
 
-    // Puan gösterimi kapatıldı
-    const xpInfoElement = document.querySelector('.tetris-xp-info');
-    const guestInfoElement = document.getElementById('guest-info');
-
-    // Tüm skor gösterim elementlerini gizle
-    if (xpInfoElement) {
-      xpInfoElement.style.display = 'none';
-    }
-
-    if (guestInfoElement) {
-      guestInfoElement.style.display = 'none';
-    }
-
-    const finalScoreContainer = document.querySelector('.tetris-final-score');
-    if (finalScoreContainer) {
-      finalScoreContainer.style.display = 'block'; // Show final score container
-    }
-
-    const bonusDetails = document.createElement('div');
-    bonusDetails.className = 'tetris-bonus-details';
-    const scoringSystemInfo = data.scoring_system_info ? `<p>${data.scoring_system_info}</p>` : '';
-
-    bonusDetails.innerHTML = `
-      <div class="tetris-bonus-item">
-        <span>Temel Puan:</span>
-        <strong>${data.points.rewards.base_points}</strong>
-      </div>
-      <div class="tetris-bonus-item">
-        <span>Skor Bonusu:</span>
-        <strong>${Math.floor(data.points.rewards.score_points)}</strong>
-      </div>
-      ${data.points.rewards.daily_bonus > 0 ? `
-        <div class="tetris-bonus-item daily-bonus">
-          <span>Günlük Bonus:</span>
-          <strong>+${data.points.rewards.daily_bonus}</strong>
-        </div>` : ''}
-      ${data.points.rewards.streak_bonus > 0 ? `
-        <div class="tetris-bonus-item streak-bonus">
-          <span>Seri Bonusu:</span>
-          <strong>+${data.points.rewards.streak_bonus}</strong>
-        </div>` : ''}
-      ${scoringSystemInfo}
-    `;
-
-    // Element bulunmazsa ekleme yap
-    if (!document.querySelector('.tetris-bonus-details')) {
-      finalScoreContainer.appendChild(bonusDetails);
-    }
-
-    // Toplam puanı güncelle
-    finalScoreElement.textContent = data.points.total;
-
-    // XP bilgilerini göster (misafir için de bilgilendirici olarak gösterilir)
-    xpInfoElement.style.display = 'block';
-
-    const xpGainElement = document.getElementById('xp-gain');
-    const currentLevelElement = document.getElementById('current-level');
 
 
-    // XP kazanımı animasyonu
-    xpGainElement.classList.add('score-update');
-    setTimeout(() => {
-      xpGainElement.classList.remove('score-update');
-    }, 300);
-
-    // Seviye animasyonu
-    currentLevelElement.classList.add('score-update');
-    setTimeout(() => {
-      currentLevelElement.classList.remove('score-update');
-    }, 300);
-
-    // Eğer API'den özel bir mesaj geldiyse göster
-    if (data.message) {
-      const messageEl = document.createElement('div');
-      messageEl.className = 'guest-message-api mt-2';
-      messageEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.message}`;
-
-      // Önceki mesaj varsa kaldır
-      const oldMessage = document.querySelector('.guest-message-api');
-      if (oldMessage) {
-        oldMessage.remove();
-      }
-
-      // Game over overlay'e ekle
-      const gameOverOverlay = document.getElementById('game-over-overlay');
-      if (gameOverOverlay) {
-        gameOverOverlay.appendChild(messageEl);
-      }
-    }
-
-    // Eğer giriş yapılması gerekiyorsa vurgula
-    if (data.login_required) {
-      const guestInfo = document.getElementById('guest-info');
-      if (guestInfo) {
-        guestInfo.classList.add('highlight-login');
-
-        // Giriş butonlarını daha belirgin yap
-        const loginButtons = guestInfo.querySelector('.guest-buttons');
-        if (loginButtons) {
-          loginButtons.classList.add('animate-buttons');
-        }
-      }
-    }
   })
   .catch(error => {
     console.error('Error saving score:', error);
