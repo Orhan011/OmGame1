@@ -2990,36 +2990,18 @@ def get_aggregated_scores():
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
 
-        # Her kullanıcının tüm oyunlardaki en yüksek skorlarını topla
-        subquery = db.session.query(
-            Score.user_id,
-            Score.game_type,
-            db.func.max(Score.score).label('max_score')
-        ).group_by(
-            Score.user_id,
-            Score.game_type
-        ).subquery()
-
-        # Alt sorgudan gelen sonuçları topla
-        aggregated = db.session.query(
-            subquery.c.user_id,
-            db.func.sum(subquery.c.max_score).label('total_score')
-        ).group_by(
-            subquery.c.user_id
-        ).subquery()
-
-        # Kullanıcı bilgileriyle birleştir
+        # En yüksek 10 toplam skora sahip kullanıcıları getir
+        # Artık her kullanıcının total_score alanını kullanabiliriz
         result = db.session.query(
             User.id,
             User.username,
             User.avatar_url,
             User.rank,
-            aggregated.c.total_score
-        ).join(
-            aggregated,
-            User.id == aggregated.c.user_id
+            User.total_score
+        ).filter(
+            User.total_score > 0  # Sadece skoru olan kullanıcıları göster
         ).order_by(
-            aggregated.c.total_score.desc()
+            User.total_score.desc()  # Toplam skora göre sırala
         ).limit(10).all()  # En yüksek 10 kullanıcı
 
         scores = []
@@ -3116,13 +3098,13 @@ def get_users_levels():
 # Alternatif Kullanıcılar API'si (Top Users)
 @app.route('/api/scores/top-users')
 def get_top_users():
-    """En yüksek skora sahip kullanıcıları döndürür"""
+    """En yüksek toplam skora sahip kullanıcıları döndürür"""
     try:
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
 
         # En yüksek toplam skora sahip 10 kullanıcıyı getir
-        top_users = User.query.order_by(User.highest_score.desc()).limit(10).all()
+        top_users = User.query.filter(User.total_score > 0).order_by(User.total_score.desc()).limit(10).all()
 
         result = []
 
@@ -3143,7 +3125,7 @@ def get_top_users():
                 'progress_percent': 0,  # İlerleme yüzdesini burada hesaplamıyoruz
                 'games_played': user.total_games_played,
                 'avatar_url': avatar_url,
-                'total_score': user.highest_score,
+                'total_score': user.total_score,  # Toplam skoru kullan
                 'rank': user.rank,
                 'is_current_user': user.id == current_user_id
             })
@@ -3203,8 +3185,8 @@ def get_users_leaderboard():
             # Seviyeye göre sırala (experience_points)
             users = User.query.order_by(User.experience_points.desc()).limit(10).all()
         else:
-            # Toplam puana göre sırala (highest_score)
-            users = User.query.order_by(User.highest_score.desc()).limit(10).all()
+            # Toplam puana göre sırala (total_score) - artık total_score alanını kullanıyoruz
+            users = User.query.filter(User.total_score > 0).order_by(User.total_score.desc()).limit(10).all()
 
         result = []
 
@@ -3236,7 +3218,7 @@ def get_users_leaderboard():
                 'progress_percent': progress_percent,
                 'games_played': user.total_games_played,
                 'avatar_url': avatar_url,
-                'total_score': user.highest_score,
+                'total_score': user.total_score,
                 'rank': user.rank,
                 'is_current_user': user.id == current_user_id
             })
