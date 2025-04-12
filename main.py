@@ -3098,5 +3098,11 @@ def get_users_leaderboard():
         logging.error(f"Kullanıcılar liderlik tablosu getirilirken hata oluştu: {str(e)}")
         return jsonify([]), 500
 
+# Şifre sıfırlama blueprint'ini içe aktar
+from reset_password_routes import reset_password
+
+# Blueprint'i kaydet
+app.register_blueprint(reset_password)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
