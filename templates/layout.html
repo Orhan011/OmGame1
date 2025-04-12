@@ -161,8 +161,6 @@ function loadArticleContent() {
       </li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/articles' %}active{% endif %}" href="{{ url_for('articles') }}"><i class="fas fa-book nav-icon"></i>Makaleler</a></li>
       <li class="nav-item"><a class="nav-link {% if request.path == '/tips' %}active{% endif %}" href="{{ url_for('tips') }}"><i class="fas fa-lightbulb nav-icon"></i>İpuçları</a></li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/all-games' %}active{% endif %}" href="{{ url_for('all_games') }}"><i class="fas fa-th nav-icon"></i>Daha Çok Oyun</a></li>
-      <li class="nav-item"><a class="nav-link {% if request.path == '/education-entertainment' %}active{% endif %}" href="{{ url_for('education_entertainment') }}"><i class="fas fa-graduation-cap nav-icon"></i>Eğitim, Eğlence ve Oyun</a></li>
       <li class="nav-item">
                   <a class="nav-link {% if request.path == '/leaderboard' %}active{% endif %}" href="{{ url_for('leaderboard') }}"><i class="fas fa-trophy nav-icon"></i>Skor Tablosu</a>
                 </li>

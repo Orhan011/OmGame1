@@ -1760,15 +1760,6 @@ def all_games():
         logger.error(f"Error rendering all_games.html: {str(e)}")
         return f"An error occurred: {str(e)}", 500
 
-@app.route('/education-entertainment')
-def education_entertainment():
-    """Eğitim, Eğlence ve Oyun sayfası"""
-    try:
-        return render_template('education_entertainment.html')
-    except Exception as e:
-        logger.error(f"Error rendering all_games.html: {str(e)}")
-        return f"An error occurred: {str(e)}", 500
-
 # Skor Tablosu
 @app.route('/leaderboard')
 def leaderboard():
