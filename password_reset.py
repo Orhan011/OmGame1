@@ -199,8 +199,12 @@ def forgot_password():
                 logger.info(f"E-posta başarıyla gönderildi: {email}, Doğrulama kodu: {verification_code}")
             except Exception as e:
                 logger.error(f"E-posta gönderme hatası: {str(e)}")
+                # Hata detaylarını da yazdır
+                import traceback
+                logger.error(f"DETAYLI HATA: {traceback.format_exc()}")
                 # Geliştirme/Test modunda olduğumuz için, doğrulama kodunu konsola yazdıralım
                 print(f"### TEST MODU AKTIF - E-POSTA GÖNDERİLEMEDİ AMA DOĞRULAMA KODU: {verification_code} ###")
+                print(f"### HATA MESAJI: {str(e)} ###")
                 logger.warning(f"E-posta gönderilemedi ama test modunda olduğu için işlem devam ediyor. Kod: {verification_code}")
             
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')

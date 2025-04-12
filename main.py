@@ -113,7 +113,7 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         from email.mime.text import MIMEText
         
         from_email = "omgameee@gmail.com"
-        password = os.environ.get('GMAIL_APP_PASSWORD')  # Çevresel değişkenden alınan Gmail uygulama şifresi
+        password = os.environ.get('GMAIL_APP_PASSWORD', '')  # Çevresel değişkenden alınan Gmail uygulama şifresi (None değilse)
         
         # E-posta mesajını oluştur
         smtp_msg = MIMEMultipart()
@@ -135,6 +135,12 @@ def send_email_in_background(to_email, subject, html_body, from_name="OmGame", v
         
     except Exception as e:
         logger.error(f"E-posta gönderme işlemi sırasında hata: {str(e)}")
+        
+        # Traceback detaylarını yazdır
+        import traceback
+        logger.error(f"DETAYLI HATA: {traceback.format_exc()}")
+        print(f"### E-POSTA GÖNDERME HATA MESAJI: {str(e)} ###")
+        print(f"### GMAIL APP PASSWORD: {'VAR' if os.environ.get('GMAIL_APP_PASSWORD') else 'YOK'} ###")
         
         # Gmail uygulama şifresiyle ilgili bir hata olabilir
         if "Application-specific password required" in str(e) or "Invalid credentials" in str(e):
