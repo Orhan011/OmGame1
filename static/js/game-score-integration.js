@@ -107,6 +107,61 @@ class GameScoreIntegration {
   
   /**
    * Doğruluk oranını günceller
+
+  // Debug log
+  console.log('Oyun sonu puanı hesaplanıyor...', this.gameType, this.score, this.difficulty);
+  
+  try {
+    // Oyun henüz tamamlanmadıysa kontrol et ve tamamla
+    if (!this.completed) {
+      this.setCompleted(true);
+    }
+    
+    // Sonuç ekranını zorunlu göster - CSS görünürlük sorunlarını aşmak için
+    const forceShowScoreScreen = (html, data) => {
+      if (!html || html.trim() === '') {
+        console.error('Skor görüntüsü oluşturulamadı!');
+        return;
+      }
+      
+      console.log('Skor ekranı oluşturuldu, DOM\'a ekleniyor...');
+      
+      // Daha önce açık bir skor ekranı varsa kaldır
+      const existingOverlay = document.querySelector('.game-result-overlay');
+      if (existingOverlay) {
+        existingOverlay.remove();
+      }
+      
+      // HTML içeriğini ekle
+      document.body.insertAdjacentHTML('beforeend', html);
+      
+      // Ekranı görünür yap
+      setTimeout(() => {
+        const overlay = document.querySelector('.game-result-overlay');
+        if (overlay) {
+          overlay.style.display = 'flex';
+          overlay.style.opacity = '1';
+          overlay.style.visibility = 'visible';
+          console.log('Skor ekranı başarıyla gösterildi');
+        } else {
+          console.error('Skor ekranı DOM\'a eklendi ama bulunamadı!');
+        }
+        
+        // Etkinlik dinleyicileri ekle
+        addScoreScreenEventListeners();
+        
+        if (typeof callback === 'function') {
+          callback(html, data);
+        }
+      }, 100);
+    };
+    
+    // Özelleştirilmiş callback ile saveScore'u çağır
+    window.calculateAndDisplayScore(this.getGameData(), forceShowScoreScreen);
+  } catch (error) {
+    console.error('Skor gösterme hatası:', error);
+  }
+
    * @param {number} accuracy - Doğruluk oranı (0-1 arası)
    */
   updateAccuracy(accuracy) {
@@ -122,6 +177,37 @@ class GameScoreIntegration {
     this.completed = completed;
     this.endTime = Date.now();
     return this;
+
+  /**
+   * Oyun verilerini toplayıp hazırlayan yardımcı metot
+   * @returns {Object} Hazırlanan oyun verileri
+   */
+  getGameData() {
+    // Oyun süresini hesapla (saniye)
+    const timeSpent = Math.round(((this.endTime || Date.now()) - this.startTime) / 1000);
+    
+    // Tamamlanma yüzdesini hesapla (tamamlanmış ise 1, değilse 0.5)
+    const completionPercentage = this.completed ? 1.0 : 0.5;
+    
+    // Puan hesaplama için veri hazırla
+    return {
+      gameType: this.gameType,
+      difficulty: this.difficulty,
+      timeSpent: timeSpent,
+      expectedTime: this.expectedTime,
+      optimalTime: this.optimalTime,
+      moves: this.moves,
+      optimalMoves: this.optimalMoves,
+      hintsUsed: this.hintsUsed,
+      accuracy: this.accuracy,
+      completionPercentage: completionPercentage,
+      score: this.score,
+      maxScore: this.maxScore,
+      combo: this.combo,
+      completed: this.completed
+    };
+  }
+
   }
   
   /**
