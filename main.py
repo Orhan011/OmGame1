@@ -3118,10 +3118,10 @@ def get_users_leaderboard():
         return jsonify([]), 500
 
 # Şifre sıfırlama blueprint'ini içe aktar
-from reset_password_routes import reset_password
+# Password reset functionality removed
 
 # Blueprint'i kaydet
-app.register_blueprint(reset_password)
+# Password reset blueprint removed
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
