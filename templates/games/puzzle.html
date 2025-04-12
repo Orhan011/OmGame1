@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
   <h1 class="game-title text-center mb-4">Yapboz Oyunu</h1>
-  
+
   <!-- Yeni Oyun İstatistikleri Bölümü (Yatay) -->
   <div class="game-stats-container">
     <div class="game-stat-item">
@@ -13,26 +13,26 @@
       <div class="game-stat-value" id="score-display">0</div>
       <div class="game-stat-label">PUAN</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-hourglass-half"></i>
       <div class="game-stat-value" id="timer-display">5:00</div>
       <div class="game-stat-label">SÜRE</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-sync-alt"></i>
       <div class="game-stat-value" id="moves-display">0</div>
       <div class="game-stat-label">HAMLE</div>
     </div>
-    
+
     <div class="game-stat-item">
       <i class="fas fa-puzzle-piece"></i>
       <div class="game-stat-value" id="level-display">1</div>
       <div class="game-stat-label">SEVİYE</div>
     </div>
   </div>
-  
+
   <div class="row justify-content-center">
     <div class="col-lg-10">
       <!-- Intro Section -->
@@ -65,7 +65,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Game Container -->
       <div id="game-container" class="puzzle-game-container" style="display: none;">
         <!-- Game Controls -->
@@ -80,23 +80,23 @@
             <i class="fas fa-volume-up"></i>
           </button>
         </div>
-        
+
         <!-- Alert Container -->
         <div id="alert-container" class="puzzle-alert"></div>
-        
+
         <!-- Reference Image -->
         <div class="reference-image-container mb-4">
           <h5 class="reference-title">Referans Görsel</h5>
           <div id="reference-image" class="reference-image"></div>
         </div>
-        
+
         <!-- Puzzle Board -->
         <div class="puzzle-board-container">
           <div class="puzzle-board-backdrop"></div>
           <div id="puzzle-grid" class="puzzle-grid"></div>
         </div>
       </div>
-      
+
       <!-- Game Over Container -->
       <div id="game-over-container" class="puzzle-results-container" style="display: none;">
         <div class="puzzle-results-card">
@@ -106,7 +106,7 @@
             </span>
             <h2 class="mb-0" id="game-result-title">Yapboz Tamamlandı!</h2>
           </div>
-          
+
           <div class="puzzle-results-body">
             <div class="results-stats">
               <div class="result-stat">
@@ -116,7 +116,7 @@
                 </div>
                 <div class="result-stat-label">Toplam Puan</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-hourglass-end"></i>
                 <div class="result-stat-value">
@@ -124,7 +124,7 @@
                 </div>
                 <div class="result-stat-label">Süre</div>
               </div>
-              
+
               <div class="result-stat">
                 <i class="fas fa-sync-alt"></i>
                 <div class="result-stat-value">
@@ -133,7 +133,7 @@
                 <div class="result-stat-label">Hamle</div>
               </div>
             </div>
-            
+
             <div class="results-rating">
               <div class="rating-stars" id="rating-stars">
                 <i class="fas fa-star"></i>
@@ -144,7 +144,7 @@
               </div>
               <div class="rating-text" id="rating-text">İyi!</div>
             </div>
-            
+
             <div class="puzzle-achievement" id="puzzle-achievement" style="display: none;">
               <div class="achievement-icon">
                 <i class="fas fa-award"></i>
@@ -155,7 +155,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="puzzle-results-footer">
             <button id="play-again" class="btn btn-primary btn-lg">
               <i class="fas fa-redo me-2"></i>Tekrar Oyna
@@ -164,7 +164,7 @@
               <i class="fas fa-trophy me-2"></i>Skor Tablosu
             </a>
           </div>
-          
+
           <div class="puzzle-share-section">
             <p>Skorunuzu paylaşın:</p>
             <div class="share-buttons">
@@ -178,7 +178,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Pause Menu Overlay -->
       <div id="pause-overlay" class="pause-overlay" style="display: none;">
         <div class="pause-card">
@@ -209,14 +209,14 @@
     gap: 20px;
     margin: 20px 0;
   }
-  
+
   @media (min-width: 992px) {
     .puzzle-board-wrapper {
       flex-direction: row;
       align-items: flex-start;
     }
   }
-  
+
   .puzzle-board-container {
     flex: 1;
     position: relative;
@@ -231,7 +231,7 @@
     margin: 0 auto; /* Ortalama */
     touch-action: manipulation; /* Dokunmatik cihazlar için optimize */
   }
-  
+
   .puzzle-grid {
     display: grid;
     gap: 2px;
@@ -241,7 +241,7 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .puzzle-piece {
     background-color: rgba(50, 50, 80, 0.7);
     border-radius: 4px;
@@ -261,18 +261,18 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     touch-action: none; /* Dokunmatik cihazlar için optimize */
   }
-  
+
   .puzzle-piece.correct {
     box-shadow: 0 0 8px rgba(46, 213, 115, 0.6);
     border-color: rgba(46, 213, 115, 0.3);
   }
-  
+
   .puzzle-piece.selected {
     z-index: 10;
     box-shadow: 0 0 15px rgba(106, 90, 224, 0.8);
     transform: scale(1.05);
   }
-  
+
   .reference-image-container {
     background: rgba(30, 30, 60, 0.3);
     border-radius: 15px;
@@ -282,13 +282,13 @@
     max-width: 240px; /* Küçültülmüş boyut */
     margin: 0 auto;
   }
-  
+
   @media (min-width: 992px) {
     .reference-image-container {
       margin: 0;
     }
   }
-  
+
   .reference-title {
     font-size: 1rem;
     margin-bottom: 10px;
@@ -296,7 +296,7 @@
     color: var(--accent-color);
     font-weight: 500;
   }
-  
+
   .reference-image {
     width: 100%;
     aspect-ratio: 1;
@@ -304,59 +304,59 @@
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
-  
+
   .reference-image img, .reference-image svg {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   /* Cihaz uyumluluğu için ek stiller */
   @media (max-width: 576px) {
     .game-stats-container {
       flex-wrap: wrap;
       justify-content: center;
     }
-    
+
     .game-stat-item {
       flex-basis: 45%;
       margin-bottom: 10px;
     }
-    
+
     .level-buttons {
       display: flex;
       flex-direction: column;
     }
-    
+
     .level-btn {
       margin-bottom: 5px;
     }
-    
+
     .puzzle-board-container {
       min-height: 300px;
     }
-    
+
     .puzzle-grid {
       min-height: 280px;
     }
   }
-  
+
   /* Animasyonları iyileştirme */
   .puzzle-piece {
     /* Parça animasyonları */
     transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
-  
+
   .puzzle-piece.correct {
     animation: correctPlacement 0.5s ease-out;
   }
-  
+
   @keyframes correctPlacement {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
-  
+
   /* Daha şık ve modern dokunuşlar */
   .alert-message {
     background: rgba(30, 30, 60, 0.9);
@@ -371,20 +371,20 @@
     margin-bottom: 15px;
     border-left: 4px solid var(--accent-color);
   }
-  
+
   .alert-message.success {
     border-left-color: #2ed573;
   }
-  
+
   .alert-message.error {
     border-left-color: #ff4757;
   }
-  
+
   .alert-message i {
     margin-right: 10px;
     font-size: 1.2rem;
   }
-  
+
   /* Oyun kontrolleri için gelişmiş stil */
   .game-controls-top {
     display: flex;
@@ -392,7 +392,7 @@
     margin-bottom: 15px;
     gap: 10px;
   }
-  
+
   .game-control-btn {
     width: 40px;
     height: 40px;
@@ -407,7 +407,7 @@
     transition: all 0.2s ease;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   }
-  
+
   .game-control-btn:hover, .game-control-btn.active {
     background: var(--accent-color);
     transform: translateY(-2px);
@@ -421,4 +421,73 @@
 <script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 <script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/games/puzzle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-score-integration.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-integration-helper.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.puzzleGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('puzzle', window.puzzleGame, {
+        maxScore: 100,
+        optimalMoves: 15,
+        expectedTime: 180
+      });
+
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+
+      // Hamle sayacını izle
+      const originalMove = window.puzzleGame.movePiece;
+      window.puzzleGame.movePiece = function(...args) {
+        const result = originalMove.apply(this, args);
+        if (result) {
+          scoreSystem.incrementMoves();
+        }
+        return result;
+      };
+
+      // İpucu kullanımını izle
+      if (typeof window.puzzleGame.useHint === 'function') {
+        const originalHint = window.puzzleGame.useHint;
+        window.puzzleGame.useHint = function(...args) {
+          const result = originalHint.apply(this, args);
+          if (result) {
+            scoreSystem.incrementHints();
+          }
+          return result;
+        };
+      }
+
+      // Oyun tamamlandığında puanı hesapla
+      const originalComplete = window.puzzleGame.checkCompletion;
+      window.puzzleGame.checkCompletion = function(...args) {
+        const isCompleted = originalComplete.apply(this, args);
+
+        if (isCompleted) {
+          // Oyunla ilgili metrikleri hesapla
+          const timeSpent = (Date.now() - scoreSystem.startTime) / 1000;
+          const moveEfficiency = this.optimalMoves ? (this.optimalMoves / this.moveCount) : 0.7;
+          const timeEfficiency = this.expectedTime ? (this.expectedTime / timeSpent) : 0.8;
+
+          // Oyundaki ham puan (0-100)
+          const rawScore = 100 - (this.moveCount * 2) - Math.min(30, this.hintsUsed * 10);
+
+          // Metrikleri güncelle
+          scoreSystem.updateMetrics({
+            moves: this.moveCount || scoreSystem.moves,
+            hintsUsed: this.hintsUsed || 0,
+            accuracy: moveEfficiency,
+            completed: true,
+            score: Math.max(0, rawScore)
+          });
+
+          // Puan hesapla ve göster
+          scoreSystem.endGame(true);
+        }
+
+        return isCompleted;
+      };
+    }
+  });
+</script>
 {% endblock %}

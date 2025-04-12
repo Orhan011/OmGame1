@@ -15,21 +15,21 @@
     <div class="memory-header">
       <h1 class="game-title"><i class="bi bi-grid-3x3-gap"></i> Hafıza Kartları</h1>
     </div>
-    
+
     <!-- Game introduction section -->
     <div class="memory-intro" id="gameIntro">
       <div class="row">
         <div class="col-lg-6">
           <h2 class="instruction-title"><i class="bi bi-lightbulb-fill"></i> Oyun Hakkında</h2>
           <p>Hafıza Kartları oyunu, bilişsel becerilerinizi ve görsel hafızanızı geliştirmek için tasarlanmış eğlenceli bir zihin egzersizidir.</p>
-          
+
           <div class="instruction-steps">
             <div class="instruction-step"><div class="step-number">1</div><div class="step-text">İki kart seçerek eşleşen çiftleri bulun</div></div>
             <div class="instruction-step"><div class="step-number">2</div><div class="step-text">Eşleşen kartlar açık kalır, diğerleri kapanır</div></div>
             <div class="instruction-step"><div class="step-number">3</div><div class="step-text">Tüm çiftleri minimum hamlede bulun</div></div>
           </div>
         </div>
-        
+
         <div class="col-lg-6">
           <!-- Game settings -->
           <div class="memory-levels-selector">
@@ -40,7 +40,7 @@
               <button class="level-btn" data-level="hard">Zor (3x10)</button>
             </div>
           </div>
-          
+
           <div class="memory-theme-selector mt-3">
             <h3 class="level-label">Tema Seçimi</h3>
             <div class="level-buttons">
@@ -52,25 +52,25 @@
           </div>
         </div>
       </div>
-      
+
       <div class="memory-controls">
         <button class="btn btn-primary standard-start-btn" id="startGame">
           <i class="bi bi-controller"></i> Oyunu Başlat
         </button>
       </div>
     </div>
-    
+
     <!-- Game board section -->
     <div class="memory-board-container" id="gameBoard" style="display: none;">
       <div class="memory-board-backdrop"></div>
-      
+
       <!-- Game stats and controls -->
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="theme-indicator">
           <i class="bi bi-palette-fill theme-icon"></i>
           <span class="theme-name" id="currentTheme">Hayvanlar</span>
         </div>
-        
+
         <div class="game-controls-top">
           <button class="game-control-btn" id="hintBtn" title="İpucu (3)">
             <i class="bi bi-lightbulb-fill"></i><span class="hint-counter">3</span>
@@ -83,10 +83,10 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Memory cards grid -->
       <div class="memory-grid" id="memoryGrid"></div>
-      
+
       <!-- Progress bar -->
       <div class="memory-progress">
         <div class="progress-label">
@@ -98,10 +98,10 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Game alerts -->
     <div class="memory-alert" id="gameAlerts"></div>
-    
+
     <!-- Game results section -->
     <div class="memory-results-container" id="gameResults" style="display: none;">
       <div class="memory-results-card">
@@ -109,7 +109,7 @@
           <div class="result-badge"><i class="bi bi-trophy-fill"></i></div>
           <h2>Oyun Tamamlandı!</h2>
         </div>
-        
+
         <div class="memory-results-body">
           <div class="results-stats">
             <div class="result-stat">
@@ -125,7 +125,7 @@
               <div class="result-stat-label">Hamle</div>
             </div>
           </div>
-          
+
           <div class="performance-rating mt-3">
             <div class="rating-stars" id="performanceStars">
               <i class="bi bi-star-fill"></i>
@@ -137,7 +137,7 @@
             <div class="rating-text" id="performanceText">İyi Performans!</div>
           </div>
         </div>
-        
+
         <div class="memory-results-footer">
           <button class="btn btn-outline-light" id="playAgainBtn">
             <i class="bi bi-arrow-repeat"></i> Tekrar Oyna
@@ -148,7 +148,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Pause overlay -->
     <div class="game-pause-overlay" id="pauseOverlay" style="display: none;">
       <div class="pause-card">
@@ -165,4 +165,76 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/memoryCards.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scoreCalculator.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-score-integration.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-integration-helper.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.memoryGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('memoryCards', window.memoryGame, {
+        maxScore: 100,
+        optimalMoves: window.memoryGame.totalPairs * 2, // Her çift için en az 2 hamle
+        expectedTime: window.memoryGame.totalPairs * 10 // Her çift için ortalama 10 saniye
+      });
+
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+
+      // Hamle sayacını izle
+      const originalFlip = window.memoryGame.flipCard;
+      window.memoryGame.flipCard = function(...args) {
+        const result = originalFlip.apply(this, args);
+        if (result) {
+          scoreSystem.incrementMoves();
+        }
+        return result;
+      };
+
+      // İpucu kullanımını izle
+      if (typeof window.memoryGame.showHint === 'function') {
+        const originalHint = window.memoryGame.showHint;
+        window.memoryGame.showHint = function(...args) {
+          const result = originalHint.apply(this, args);
+          if (result) {
+            scoreSystem.incrementHints();
+          }
+          return result;
+        };
+      }
+
+      // Oyun tamamlandığında puanı hesapla
+      const originalGameOver = window.memoryGame.checkGameOver;
+      window.memoryGame.checkGameOver = function(...args) {
+        const isCompleted = originalGameOver.apply(this, args);
+
+        if (isCompleted) {
+          // Oyunla ilgili metrikleri hesapla
+          const moves = this.moves || scoreSystem.moves;
+          const optimalMoves = this.totalPairs * 2;
+          const accuracy = calculateAccuracy(this.matchedPairs, moves / 2);
+
+          // Oyundaki ham puan (0-100)
+          const rawScore = Math.max(0, 100 - (moves - optimalMoves));
+
+          // Metrikleri güncelle
+          scoreSystem.updateMetrics({
+            moves: moves,
+            hintsUsed: this.hintsUsed || 0,
+            accuracy: accuracy,
+            completed: true,
+            score: rawScore
+          });
+
+          // Puan hesapla ve göster
+          scoreSystem.endGame(true);
+        }
+
+        return isCompleted;
+      };
+    }
+  });
+</script>
 {% endblock %}

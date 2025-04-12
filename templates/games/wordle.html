@@ -383,4 +383,44 @@
 <script src="{{ url_for('static', filename='js/score-display.js') }}"></script>
 <script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
 <script src="{{ url_for('static', filename='js/games/wordle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scoreCalculator.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-score-integration.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game-integration-helper.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.wordleGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('wordle', window.wordleGame, {
+        maxScore: 6, // 6 satır maksimum
+        optimalMoves: 3, // Ortalama 3 tahminde doğru cevap
+        expectedTime: 120 // 2 dakika
+      });
+
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+
+      // Orijinal oyun sonlandırma fonksiyonunu genişlet
+      const originalEndGame = window.wordleGame.endGame;
+      window.wordleGame.endGame = function(won) {
+        // Önce orijinal fonksiyonu çağır
+        if (originalEndGame) {
+          originalEndGame.call(this, won);
+        }
+
+        // Puan hesaplama
+        const accuracy = won ? 1.0 : (this.attempts / 6);
+        scoreSystem.updateMetrics({
+          moves: this.attempts,
+          hintsUsed: this.hintsUsed || 0,
+          accuracy: accuracy,
+          completed: won,
+          score: won ? (6 - this.attempts + 1) : 0
+        });
+
+        // Oyun sonu puanını hesapla ve göster
+        scoreSystem.endGame(true);
+      };
+    }
+  });
+</script>
 {% endblock %}

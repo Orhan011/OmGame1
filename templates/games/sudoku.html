@@ -22,7 +22,77 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="/static/js/sudoku.js"></script>
+<script src="/static/js/scoreCalculator.js"></script>
+<script src="/static/js/score-handler.js"></script>
+<script src="/static/js/score-display.js"></script>
+<script src="/static/js/game-score-integration.js"></script>
+<script src="/static/js/game-integration-helper.js"></script>
 <script>
-  //Removed Sudoku game initialization script.
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.sudokuGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('sudoku', window.sudokuGame, {
+        maxScore: 100,
+        expectedTime: 600 // 10 dakika
+      });
+
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+
+      // Hamle sayacını izle
+      const originalSetCell = window.sudokuGame.setCell;
+      window.sudokuGame.setCell = function(...args) {
+        const prevValue = this.board[args[0]][args[1]];
+        const result = originalSetCell.apply(this, args);
+
+        // Sadece değer değiştiyse hamle olarak say
+        if (result && prevValue !== args[2]) {
+          scoreSystem.incrementMoves();
+        }
+        return result;
+      };
+
+      // İpucu kullanımını izle
+      if (typeof window.sudokuGame.showHint === 'function') {
+        const originalHint = window.sudokuGame.showHint;
+        window.sudokuGame.showHint = function(...args) {
+          const result = originalHint.apply(this, args);
+          if (result) {
+            scoreSystem.incrementHints();
+          }
+          return result;
+        };
+      }
+
+      // Oyun tamamlandığında puanı hesapla
+      const originalCheckComplete = window.sudokuGame.checkComplete;
+      window.sudokuGame.checkComplete = function(...args) {
+        const isCompleted = originalCheckComplete.apply(this, args);
+
+        if (isCompleted) {
+          // Oyun süresini hesapla
+          const timeSpent = (Date.now() - scoreSystem.startTime) / 1000;
+
+          // Oyundaki ham puan (0-100)
+          const timeFactor = Math.min(1, scoreSystem.expectedTime / timeSpent);
+          const hintPenalty = (this.hintsUsed || 0) * 5;
+          const rawScore = Math.max(0, Math.min(100, 80 + (timeFactor * 20) - hintPenalty));
+
+          // Metrikleri güncelle
+          scoreSystem.updateMetrics({
+            hintsUsed: this.hintsUsed || 0,
+            completed: true,
+            score: rawScore
+          });
+
+          // Puan hesapla ve göster
+          scoreSystem.endGame(true);
+        }
+
+        return isCompleted;
+      };
+    }
+  });
 </script>
 {% endblock %}

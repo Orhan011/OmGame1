@@ -268,6 +268,9 @@ function loadArticleContent() {
     <!-- Standartlaştırılmış Puanlama Sistemi -->
     <script src="{{ url_for('static', filename='js/scoreCalculator.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/game-score-integration.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/game-integration-helper.js') }}" defer></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
       document.addEventListener('DOMContentLoaded', function() {
