@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
 {% block title %}Şifre Sıfırlama - OmGame{% endblock %}
 
@@ -24,6 +24,16 @@
     <form class="auth-form" action="{{ url_for('password_reset.verify_token', token=token) }}" method="post">
       <div class="mb-4">
         <div class="form-group floating-label">
+          <div class="input-icon-wrapper">
+            <i class="fas fa-key input-icon"></i>
+            <input type="text" name="verification_code" id="verificationCode" class="form-control" placeholder=" " 
+                   maxlength="4" minlength="4" required pattern="[0-9]{4}">
+            <label for="verificationCode">Doğrulama Kodu</label>
+          </div>
+          <div class="form-text form-hint mt-1">E-posta adresinize gönderilen 4 haneli doğrulama kodunu girin</div>
+        </div>
+        
+        <div class="form-group floating-label mt-3">
           <div class="input-icon-wrapper">
             <i class="fas fa-lock input-icon"></i>
             <input type="password" name="new_password" id="newPassword" class="form-control" placeholder=" " 

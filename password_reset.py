@@ -119,12 +119,12 @@ def generate_token(length=64):
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-def generate_verification_code(length=6):
+def generate_verification_code(length=4):
     """
     Sayısal doğrulama kodu oluşturur
     
     Args:
-        length (int): Doğrulama kodu uzunluğu (varsayılan: 6)
+        length (int): Doğrulama kodu uzunluğu (varsayılan: 4)
         
     Returns:
         str: Doğrulama kodu
@@ -149,12 +149,13 @@ def request_reset():
             flash('Şifre sıfırlama talimatları email adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.', 'success')
             return redirect(url_for('password_reset.request_reset'))
         
-        # Şifre sıfırlama token'ı oluştur
+        # Şifre sıfırlama token'ı ve doğrulama kodu oluştur
         token = generate_token()
         verification_code = generate_verification_code()
         
-        # Token ve son kullanma tarihini veritabanına kaydet
+        # Token, doğrulama kodu ve son kullanma tarihini veritabanına kaydet
         user.reset_token = token
+        user.reset_verification_code = verification_code  # Doğrulama kodunu kaydet
         user.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)  # 1 saat geçerli
         db.session.commit()
         
@@ -218,13 +219,19 @@ def verify_token(token):
         return redirect(url_for('password_reset.request_reset'))
     
     if request.method == 'POST':
-        code = request.form.get('verification_code')
+        verification_code = request.form.get('verification_code')
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
         
-        # Manuel kod girişi için doğrulama kodu kontrolü - kullanılmayacaksa kaldırılabilir
-        # Bu örnekte kodu e-postadan alıp manuel girmek için kullanıyoruz
-        # Gerçek bir uygulamada db'de saklanan kod ile karşılaştırılabilir
+        # Doğrulama kodu kontrolü
+        if not verification_code:
+            flash('Lütfen doğrulama kodunu girin.', 'danger')
+            return redirect(url_for('password_reset.verify_token', token=token))
+        
+        # Doğrulama kodunu kontrol et
+        if user.reset_verification_code != verification_code:
+            flash('Doğrulama kodu hatalı. Lütfen e-postanıza gönderilen kodu kontrol edin.', 'danger')
+            return redirect(url_for('password_reset.verify_token', token=token))
         
         if not new_password:
             flash('Lütfen yeni şifrenizi girin.', 'danger')
@@ -242,6 +249,7 @@ def verify_token(token):
         user.password_hash = generate_password_hash(new_password)
         user.reset_token = None
         user.reset_token_expiry = None
+        user.reset_verification_code = None  # Doğrulama kodunu da temizle
         db.session.commit()
         
         flash('Şifreniz başarıyla güncellenmiştir. Yeni şifrenizle giriş yapabilirsiniz.', 'success')
