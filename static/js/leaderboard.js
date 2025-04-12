@@ -411,7 +411,6 @@ function createLeaderboardHtml(players) {
   
   return html;
 }
-}
 
 // Ana sayfadaki liderlik tablosu güncellendikten sonra çağrılır
 function updateProfileScores() {
