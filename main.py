@@ -1232,7 +1232,242 @@ def login():
 
     return render_template('login.html')
 
-# Şifre sıfırlama fonksiyonları kaldırıldı
+# Şifre Sıfırlama Fonksiyonları
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    try:
+        if request.method == 'POST':
+            email = request.form.get('email')
+            if not email:
+                flash('Lütfen e-posta adresinizi girin.', 'danger')
+                return redirect(url_for('forgot_password'))
+
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                # Kullanıcı bulunamadı mesajı
+                flash('Bu email ile kayıtlı bir kullanıcı bulunamadı.', 'danger')
+                return redirect(url_for('forgot_password'))
+
+            # 4 haneli doğrulama kodu oluşturma
+            verification_code = ''.join(random.choices('0123456789', k=4))
+            token_expiry = datetime.utcnow() + timedelta(minutes=30)
+            user.reset_token = verification_code
+            user.reset_token_expiry = token_expiry
+            db.session.commit()
+
+            # E-posta için HTML içeriği oluştur
+            html_body = f"""
+            <!DOCTYPE html>
+            <html lang="tr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Şifre Sıfırlama Doğrulama Kodu</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+                    
+                    body {{
+                        font-family: 'Poppins', sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f4f5f7;
+                        color: #333;
+                        line-height: 1.6;
+                    }}
+                    
+                    .container {{
+                        max-width: 600px;
+                        margin: 20px auto;
+                        background: #ffffff;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+                    }}
+                    
+                    .header {{
+                        background: linear-gradient(135deg, #6b46c1 0%, #8a63d2 100%);
+                        padding: 30px 40px;
+                        text-align: center;
+                    }}
+                    
+                    .header h1 {{
+                        color: white;
+                        margin: 0;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }}
+                    
+                    .content {{
+                        padding: 40px;
+                        text-align: center;
+                    }}
+                    
+                    .verification-code {{
+                        font-size: 36px;
+                        font-weight: 700;
+                        letter-spacing: 5px;
+                        margin: 30px 0;
+                        color: #6b46c1;
+                        background: #f7f4ff;
+                        padding: 15px 25px;
+                        border-radius: 8px;
+                        display: inline-block;
+                    }}
+                    
+                    .expiry-notice {{
+                        color: #e53e3e;
+                        margin-top: 25px;
+                        font-size: 14px;
+                        font-weight: 500;
+                    }}
+                    
+                    .notice {{
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin-top: 30px;
+                        font-size: 14px;
+                        color: #718096;
+                    }}
+                    
+                    .footer {{
+                        text-align: center;
+                        padding: 20px;
+                        font-size: 12px;
+                        color: #a0aec0;
+                        border-top: 1px solid #edf2f7;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Şifre Sıfırlama Doğrulama Kodunuz</h1>
+                    </div>
+                    <div class="content">
+                        <p>Merhaba,</p>
+                        <p>Şifrenizi sıfırlamak için talepte bulundunuz. Şifre sıfırlama işlemine devam etmek için aşağıdaki doğrulama kodunu kullanın:</p>
+                        
+                        <div class="verification-code">{verification_code}</div>
+                        
+                        <p class="expiry-notice">Bu kod 30 dakika içinde geçerliliğini yitirecektir.</p>
+                        
+                        <div class="notice">
+                            <strong>Önemli:</strong> Eğer bu talebi siz yapmadıysanız, lütfen bu e-postayı dikkate almayın ve hesabınızın güvenliği için şifrenizi değiştirin.
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>Bu e-posta, OmGame şifre sıfırlama talebiniz üzerine gönderilmiştir.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+
+            # E-postayı gönder
+            email_sent = send_email_in_background(
+                to_email=email,
+                subject="OmGame - Şifre Sıfırlama Doğrulama Kodunuz",
+                html_body=html_body,
+                verification_code=verification_code
+            )
+            
+            if email_sent:
+                flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
+                return redirect(url_for('reset_code', email=email))
+            else:
+                flash('E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+                return redirect(url_for('forgot_password'))
+
+    except Exception as e:
+        logger.error(f"Şifre sıfırlama hatası: {str(e)}")
+        flash('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        return render_template('forgot_password.html')
+
+    return render_template('forgot_password.html')
+
+@app.route('/reset-code', methods=['GET', 'POST'])
+def reset_code():
+    try:
+        email = request.args.get('email', '')
+        if not email:
+            flash('Geçersiz istek.', 'danger')
+            return redirect(url_for('forgot_password'))
+
+        if request.method == 'POST':
+            verification_code = ""
+            # Dört ayrı input alanından gelen değerleri birleştir
+            for i in range(1, 5):
+                code_part = request.form.get(f'code{i}', '')
+                verification_code += code_part
+            
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                flash('Kullanıcı bulunamadı.', 'danger')
+                return redirect(url_for('forgot_password'))
+
+            if user.reset_token != verification_code:
+                flash('Geçersiz doğrulama kodu.', 'danger')
+                return render_template('reset_code.html', email=email)
+
+            if not user.reset_token_expiry or user.reset_token_expiry < datetime.utcnow():
+                flash('Doğrulama kodunun süresi dolmuş. Lütfen yeni bir kod talep edin.', 'danger')
+                return redirect(url_for('forgot_password'))
+
+            # Geçici bir token oluştur
+            reset_token = str(uuid.uuid4())
+            user.reset_token = reset_token
+            db.session.commit()
+
+            return redirect(url_for('reset_password', email=email, token=reset_token))
+
+    except Exception as e:
+        logger.error(f"Doğrulama kodu hatası: {str(e)}")
+        flash('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+    
+    return render_template('reset_code.html', email=email)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    try:
+        email = request.args.get('email', '')
+        token = request.args.get('token', '')
+        
+        if not email or not token:
+            flash('Geçersiz istek.', 'danger')
+            return redirect(url_for('forgot_password'))
+            
+        user = User.query.filter_by(email=email, reset_token=token).first()
+        if not user:
+            flash('Geçersiz veya süresi dolmuş link. Lütfen tekrar şifre sıfırlama talebinde bulunun.', 'danger')
+            return redirect(url_for('forgot_password'))
+            
+        if request.method == 'POST':
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirm_password')
+            
+            if password != confirm_password:
+                flash('Şifreler eşleşmiyor.', 'danger')
+                return render_template('reset_password.html', email=email, token=token)
+                
+            if len(password) < 6:
+                flash('Şifre en az 6 karakter uzunluğunda olmalıdır.', 'danger')
+                return render_template('reset_password.html', email=email, token=token)
+                
+            # Şifreyi güncelle
+            user.password_hash = generate_password_hash(password)
+            user.reset_token = None
+            user.reset_token_expiry = None
+            db.session.commit()
+            
+            flash('Şifreniz başarıyla değiştirildi! Artık giriş yapabilirsiniz.', 'success')
+            return redirect(url_for('login'))
+            
+    except Exception as e:
+        logger.error(f"Şifre sıfırlama hatası: {str(e)}")
+        flash('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
+        
+    return render_template('reset_password.html', email=email, token=token)
 
 # OYUNLAR
 
