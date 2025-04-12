@@ -89,17 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof callback === 'function') {
           let scoreHtml = '';
 
-          // Basit bir puan gösterimi
+          // Artık basit bir puan gösterimi yapmıyoruz, direk skorlar arka planda saklanıyor
+          // Puan verisini başarıyla kaydettik ancak gösterim yapmayacağız
           if (data.success) {
-            scoreHtml = `
-              <div class="game-result-overlay">
-                <div class="game-result-container">
-                  <h2>Oyun Tamamlandı!</h2>
-                  <div class="score-value">${data.points?.total || score} puan</div>
-                  <button class="close-button">Kapat</button>
-                </div>
-              </div>
-            `;
+            console.log(`Puan başarıyla kaydedildi: ${data.points?.total || score}`);
+            // Boş HTML - gösterim yapmıyoruz
+            scoreHtml = '';
           }
 
           callback(scoreHtml, data);
@@ -119,9 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`Test puanı gönderiliyor: ${gameType}, ${score}, ${difficulty}`);
     window.saveScoreAndDisplay(gameType, score, 60, difficulty, {}, function(html, data) {
       console.log("Test sonucu:", data);
-      if (html) {
-        document.body.insertAdjacentHTML('beforeend', html);
-      }
+      // Artık HTML görüntülemiyoruz
+      // if (html) {
+      //   document.body.insertAdjacentHTML('beforeend', html);
+      // }
     });
   };
 
