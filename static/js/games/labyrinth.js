@@ -512,43 +512,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Seviye tamamlandı mesajını göster
+  // Seviye tamamlandı mesajını göster - puan detayları olmadan
   function showLevelCompleteMessage(scoreDetails) {
     const message = document.createElement('div');
     message.className = 'level-complete-message';
     
-    // Puanlama detaylarını al
-    const bd = scoreDetails.breakdown;
-    const finalScore = scoreDetails.finalScore;
-    
     message.innerHTML = `
       <h3>Seviye ${currentLevel} Tamamlandı!</h3>
-      <div class="score-breakdown mini-breakdown">
-        <div class="score-detail">
-          <span class="detail-label">Temel Puan:</span>
-          <span class="detail-value">+${bd.baseScore}</span>
-        </div>
-        <div class="score-detail">
-          <span class="detail-label">Seviye Bonusu:</span>
-          <span class="detail-value">+${bd.levelBonus}</span>
-        </div>
-        <div class="score-detail">
-          <span class="detail-label">Zaman Bonusu:</span>
-          <span class="detail-value">+${bd.timeBonus}</span>
-        </div>
-        <div class="score-detail">
-          <span class="detail-label">Hamle Bonusu:</span>
-          <span class="detail-value">+${bd.moveBonus}</span>
-        </div>
-        <div class="score-detail multiplier">
-          <span class="detail-label">Zorluk Çarpanı:</span>
-          <span class="detail-value">×${bd.difficultyMultiplier.toFixed(1)}</span>
-        </div>
-        <div class="score-detail total">
-          <span class="detail-label">Toplam:</span>
-          <span class="detail-value">${finalScore}</span>
-        </div>
-      </div>
       <div class="next-level-text">Sonraki seviye hazırlanıyor...</div>
     `;
     
@@ -769,89 +739,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Skoru kaydet
+  // Skoru kaydet - skoru hesaplamadan doğrudan yönlendir
   function saveScore() {
-    // Oynama süresini hesapla
-    const playTime = difficultyToTime(difficulty, currentLevel) - timeLeft;
-    
-    // Toplam hamle sayısını breadcrumbs ile hesapla
-    const totalMoves = breadcrumbs.length;
-    
-    // Zorluk seviyesini string olarak belirle
-    let difficultyName;
-    switch(difficulty) {
-      case 1: difficultyName = 'easy'; break;
-      case 2: difficultyName = 'medium'; break;
-      case 3: difficultyName = 'hard'; break;
-      default: difficultyName = 'medium';
-    }
-    
-    // Standartlaştırılmış puan hesaplama sistemini kullan
-    const scoreParams = {
-      gameType: 'labyrinth',
-      difficulty: difficultyName,
-      timeSpent: playTime,
-      optimalTime: difficultyToTime(difficulty, currentLevel) * 0.6, // Optimal süre: toplam sürenin %60'ı
-      totalMoves: totalMoves,
-      correctMoves: totalMoves, // Labirentte tüm hamleler geçerli
-      hintsUsed: 0, // Labirentte ipucu kullanımı yok
-      level: currentLevel,
-      maxLevel: 5, // Varsayılan maksimum seviye 5
-      gameSpecificStats: {
-        level: currentLevel,
-        completed: gameActive === false,
-        visitedCells: Object.keys(visitedCells).length,
-        timeLeft: timeLeft
-      }
-    };
-    
-    // Standardize edilmiş puanı hesapla
-    let scoreDetails = { finalScore: 0, breakdown: {} };
-    try {
-      scoreDetails = window.ScoreCalculator.calculate(scoreParams);
-      console.log("Standartlaştırılmış labirent oyun sonu puanı:", scoreDetails);
-    } catch (error) {
-      console.error("ScoreCalculator hatası:", error);
-      // Hata durumunda yedek puan hesaplama yöntemi - seviye bazlı puanlama
-      const levelBonus = currentLevel * 10;
-      const timeBonus = Math.max(0, Math.min(40, Math.floor(timeLeft / 5)));
-      scoreDetails.finalScore = 40 + levelBonus + timeBonus;
-      scoreDetails.breakdown = {
-        baseScore: 40,
-        levelBonus: levelBonus,
-        timeBonus: timeBonus,
-        moveBonus: 0,
-        hintPenalty: 0,
-        difficultyMultiplier: 1
-      };
-    }
-    const finalScore = scoreDetails.finalScore;
-    
-    console.log(`Standardize edilmiş labirent puanı: ${finalScore}`);
-    
-    // Oyun tamamlandı eventi oluştur (puan hesaplayıcı için)
-    const gameCompletedEvent = new CustomEvent('gameCompleted', {
-      detail: {
-        gameType: 'labyrinth',
-        score: finalScore,
-        difficulty: difficultyName,
-        playtime: playTime,
-        stats: {
-          level: currentLevel,
-          totalMoves: totalMoves,
-          visitedCells: Object.keys(visitedCells).length,
-          timeLeft: timeLeft,
-          scoreBreakdown: scoreDetails.breakdown
-        }
-      }
-    });
-    
-    // Eventi dağıt (bu, ana score-handler.js'deki kaydetme fonksiyonunu tetikleyecek)
-    document.dispatchEvent(gameCompletedEvent);
-    
-    // Ekrandaki toplam puanı güncelle
-    totalScore = finalScore;
-    updateUI();
+    // Skoru hesaplamadan doğrudan oyundan çık
+    setTimeout(() => {
+      window.location.href = '/all_games';
+    }, 500);
   }
   
   // UI güncellemeleri

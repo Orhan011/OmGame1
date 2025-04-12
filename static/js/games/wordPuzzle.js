@@ -638,37 +638,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Skoru API'ye gönder (puan gösterim ekranı olmadan)
   function saveScoreToServer(completed, gameTime, wordsCount) {
-    // Skorun 10-100 arasında olduğundan emin ol
-    const limitedScore = Math.max(10, Math.min(100, score));
-    
-    fetch('/api/save-score', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        game_type: 'wordPuzzle',
-        score: limitedScore,
-        difficulty: 'medium',
-        playtime: gameTime,
-        game_stats: {
-          words_solved: wordsCount,
-          longest_word: longestSolvedWord || '',
-          completed: completed,
-          original_score: score
-        }
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Kelime Bulmaca skoru kaydedildi:', data);
-      // Kullanıcıya sonuç sayfası gösterilmeden ana sayfaya yönlendir
+    // Skoru kaydetmeden sadece ana sayfaya yönlendir
+    setTimeout(() => {
       window.location.href = '/all_games';
-    })
-    .catch(error => {
-      console.error('Skor kaydedilirken hata:', error);
-      window.location.href = '/all_games';
-    });
+    }, 500);
   }
 
   // Oyunu sıfırla
