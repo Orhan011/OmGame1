@@ -129,7 +129,6 @@
               <div class="alert alert-{{ category if category != '_' else 'info' }} alert-dismissible fade show">
                 <i class="fas {% if category == 'danger' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} me-2"></i>
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
               </div>
             {% endfor %}
           {% endif %}
@@ -246,7 +245,6 @@
           alertElement.innerHTML = `
             <i class="fas fa-check-circle me-2"></i>
             Yeni doğrulama kodu e-posta adresinize gönderildi.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
           `;
           
           // Eski mesajları temizle
@@ -273,7 +271,6 @@
           alertElement.innerHTML = `
             <i class="fas fa-exclamation-circle me-2"></i>
             Kod gönderilirken bir hata oluştu. Lütfen tekrar deneyin.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
           `;
           
           // Eski mesajları temizle
@@ -376,6 +373,16 @@
           }
           code += input.value;
         });
+        
+        if (allFilled) {
+          // Gizli bir input oluştur ve formu gönder
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'verification_code';
+          hiddenInput.value = code;
+          form.appendChild(hiddenInput);
+          form.submit();
+        }
         
         return code;
       }
