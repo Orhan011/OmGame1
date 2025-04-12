@@ -478,20 +478,20 @@
     padding: 20px;
     width: 95%;
   }
-  
+
   .result-header h2 {
     font-size: 1.6rem;
   }
-  
+
   .game-info {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .result-actions {
     flex-direction: column;
   }
-  
+
   .action-button {
     width: 100%;
   }
@@ -628,4 +628,217 @@
 .btn-secondary:hover {
   background-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
+}
+
+/**
+ * Puan gösterme stil dosyası
+ * Tüm oyunlar için standart puan gösterimi için CSS
+ */
+
+.score-display-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.score-result {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeInScale 0.3s ease-out;
+}
+
+.score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.score-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 28px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.final-score-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.score-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: white;
+  animation: pulse 1.5s infinite alternate;
+}
+
+.score-value {
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 14px;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.score-details {
+  margin: 20px 0;
+}
+
+.score-breakdown h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.score-breakdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.score-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-name {
+  color: #666;
+}
+
+.detail-value {
+  font-weight: bold;
+  color: #333;
+}
+
+.detail-value.positive {
+  color: #4CAF50;
+}
+
+.detail-value.negative {
+  color: #F44336;
+}
+
+.score-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.score-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.replay-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.replay-btn:hover {
+  background-color: #1976D2;
+  transform: scale(1.05);
+}
+
+.share-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.share-btn:hover {
+  background-color: #388E3C;
+  transform: scale(1.05);
+}
+
+/* Animasyonlar */
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Mobil cihazlar için duyarlı tasarım */
+@media (max-width: 600px) {
+  .score-result {
+    padding: 15px;
+    width: 95%;
+  }
+
+  .score-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .score-value {
+    font-size: 36px;
+  }
+
+  .score-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .score-actions button {
+    width: 100%;
+  }
 }

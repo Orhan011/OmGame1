@@ -1,3 +1,266 @@
+/**
+ * Liderlik tablosu işlevleri
+ * Bu modül, liderlik tablolarını yükleme ve görüntüleme işlemlerini yönetir
+ */
+
+// Liderlik tablosu yükleme fonksiyonu
+function loadLeaderboard() {
+  console.log('Liderlik tablosu yükleniyor...');
+
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  if (!leaderboardContainer) {
+    console.error('Liderlik tablosu konteyneri bulunamadı!');
+    return;
+  }
+
+  // Yükleniyor mesajı göster
+  leaderboardContainer.innerHTML = `
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Sıralama yükleniyor...</p>
+    </div>
+  `;
+
+  // Skorları almak için API çağrısı
+  fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // API yanıtı bir dizi olmalı
+      const scores = Array.isArray(data) ? data : [];
+      console.log("Skorlar alındı:", scores.length);
+
+      if (scores.length === 0) {
+        leaderboardContainer.innerHTML = `
+          <div class="empty-leaderboard">
+            <i class="fas fa-trophy"></i>
+            <h3>Henüz hiç skor yok</h3>
+            <p>İlk skoru kaydetmek için bir oyun oynayın.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Sıralama renk sınıfları
+      const rankClasses = ['gold-rank', 'silver-rank', 'bronze-rank'];
+
+      // HTML oluştur
+      let html = `
+        <div class="leaderboard-header">
+          <div class="rank-cell header-cell">Sıra</div>
+          <div class="user-cell header-cell">Kullanıcı</div>
+          <div class="score-cell header-cell">Puan</div>
+        </div>
+      `;
+
+      // Her oyuncu için satır ekle
+      scores.forEach((player, index) => {
+        // Sıralama sınıfı (ilk 3 için özel renk)
+        const rankClass = index < 3 ? rankClasses[index] : '';
+
+        // Taç HTML'i (sadece birinci için)
+        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
+        const isCurrentUser = player.is_current_user || false;
+
+        // Puanı doğru şekilde göster - farklı API yanıt formatlarını kontrol et
+        let totalScore = 0;
+
+        // Farklı puan alanlarını kontrol et
+        if (player.total_score !== undefined && player.total_score !== null) {
+          totalScore = player.total_score;
+        } else if (player.score !== undefined && player.score !== null) {
+          totalScore = player.score;
+        } else if (player.points !== undefined && player.points !== null) {
+          totalScore = typeof player.points === 'object' ? player.points.total || 0 : player.points;
+        } else if (player.adjusted_score !== undefined && player.adjusted_score !== null) {
+          totalScore = player.adjusted_score;
+        }
+
+        // Sayısal olmayan değerleri kontrol et ve varsayılan değere ayarla
+        if (isNaN(totalScore) || totalScore === null) {
+          totalScore = 0;
+        }
+
+        html += `
+          <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
+            <div class="rank-cell">
+              ${crownHTML}
+              <span class="rank-number">${index + 1}</span>
+            </div>
+            <div class="user-cell">
+              <div class="user-avatar">
+                <img src="${player.avatar_url || '/static/images/avatars/default.svg'}" alt="Avatar" onerror="this.src='/static/images/avatars/default.svg'">
+              </div>
+              <div class="user-info">
+                <span class="username">${player.username || 'Anonim'}</span>
+              </div>
+            </div>
+            <div class="score-cell">
+              <div class="score-container">
+                <span class="score-value">${totalScore}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Liderlik tablosunu güncelle
+      leaderboardContainer.innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Skorlar alınırken hata oluştu:', error);
+      leaderboardContainer.innerHTML = `
+        <div class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Skorlar yüklenemedi</h3>
+          <p>Bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
+          <button class="retry-btn" onclick="loadLeaderboard()">Tekrar Dene</button>
+        </div>
+      `;
+    });
+}
+
+// Belirli bir oyun için liderlik tablosu yükleme
+function loadGameLeaderboard(gameType) {
+  console.log(`${gameType} oyunu için liderlik tablosu yükleniyor...`);
+
+  const gameLeaderboardContainer = document.getElementById('game-leaderboard-container');
+  if (!gameLeaderboardContainer) {
+    console.error('Oyun liderlik tablosu konteyneri bulunamadı!');
+    return;
+  }
+
+  // Yükleniyor mesajı göster
+  gameLeaderboardContainer.innerHTML = `
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>En yüksek skorlar yükleniyor...</p>
+    </div>
+  `;
+
+  // Belirli oyun için en iyi skorları al
+  fetch(`/api/scores/game/${gameType}?nocache=${new Date().getTime()}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Ağ yanıtı başarısız: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const scores = Array.isArray(data) ? data : [];
+
+      if (scores.length === 0) {
+        gameLeaderboardContainer.innerHTML = `
+          <div class="empty-leaderboard">
+            <i class="fas fa-trophy"></i>
+            <h3>Henüz skor yok</h3>
+            <p>Bu oyun için ilk skoru kaydedin!</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Sıralama renk sınıfları
+      const rankClasses = ['gold-rank', 'silver-rank', 'bronze-rank'];
+
+      // HTML oluştur
+      let html = `
+        <div class="leaderboard-header">
+          <div class="rank-cell header-cell">Sıra</div>
+          <div class="user-cell header-cell">Kullanıcı</div>
+          <div class="score-cell header-cell">Puan</div>
+        </div>
+      `;
+
+      // Her oyuncu için satır ekle
+      scores.forEach((player, index) => {
+        // Sıralama sınıfı (ilk 3 için özel renk)
+        const rankClass = index < 3 ? rankClasses[index] : '';
+
+        // Taç HTML'i (sadece birinci için)
+        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
+        const isCurrentUser = player.is_current_user || false;
+
+        // Doğru puan değerini kullan
+        let scoreValue = 0;
+
+        if (player.adjusted_score !== undefined && player.adjusted_score !== null) {
+          scoreValue = player.adjusted_score;
+        } else if (player.score !== undefined && player.score !== null) {
+          scoreValue = player.score;
+        }
+
+        // Sayısal olmayan değerleri kontrol et
+        if (isNaN(scoreValue) || scoreValue === null) {
+          scoreValue = 0;
+        }
+
+        html += `
+          <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
+            <div class="rank-cell">
+              ${crownHTML}
+              <span class="rank-number">${index + 1}</span>
+            </div>
+            <div class="user-cell">
+              <div class="user-avatar">
+                <img src="${player.avatar_url || '/static/images/avatars/default.svg'}" alt="Avatar" onerror="this.src='/static/images/avatars/default.svg'">
+              </div>
+              <div class="user-info">
+                <span class="username">${player.username || 'Anonim'}</span>
+              </div>
+            </div>
+            <div class="score-cell">
+              <div class="score-container">
+                <span class="score-value">${scoreValue}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Liderlik tablosunu güncelle
+      gameLeaderboardContainer.innerHTML = html;
+    })
+    .catch(error => {
+      console.error(`${gameType} için skorlar alınırken hata:`, error);
+      gameLeaderboardContainer.innerHTML = `
+        <div class="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Skorlar yüklenemedi</h3>
+          <p>Bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
+          <button class="retry-btn" onclick="loadGameLeaderboard('${gameType}')">Tekrar Dene</button>
+        </div>
+      `;
+    });
+}
+
+// Otomatik olarak sayfa yüklendiğinde liderlik tablosunu yükle
+document.addEventListener('DOMContentLoaded', function() {
+  // Genel liderlik tablosu varsa yükle
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  if (leaderboardContainer) {
+    loadLeaderboard();
+  }
+
+  // Oyun liderlik tablosu varsa ve oyun tipi belirtilmişse yükle
+  const gameLeaderboardContainer = document.getElementById('game-leaderboard-container');
+  if (gameLeaderboardContainer) {
+    const gameType = gameLeaderboardContainer.getAttribute('data-game-type');
+    if (gameType) {
+      loadGameLeaderboard(gameType);
+    }
+  }
+});
+
+// Global olarak erişim için dışa aktar
+window.loadLeaderboard = loadLeaderboard;
+window.loadGameLeaderboard = loadGameLeaderboard;
+
+
 // Sayfa yüklendiğinde ve belirli aralıklarla skorları getir
 /**
  * Kullanıcı skorlarını manuel olarak günceller
@@ -32,9 +295,6 @@ function updateScoreBoard(gameType = null, forceUpdate = false) {
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Liderlik tablosu modülü yükleniyor...');
-  loadLeaderboard();
-  loadLevelLeaderboard();
-
   // Her 60 saniyede bir skor tablosunu otomatik yenile
   setInterval(function() {
     loadLeaderboard();
@@ -54,364 +314,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Skor tablosunu yükleyen fonksiyon
-function loadLeaderboard() {
-  const leaderboardContainer = document.getElementById('leaderboardContainer');
+// Skor tablosunu yükleyen fonksiyon - Bu fonksiyon artık kullanılmıyor.
+// function loadLeaderboard() { ... }
 
-  if (!leaderboardContainer) {
-    console.error('Liderlik tablosu konteyneri bulunamadı!');
-    return;
-  }
-  
-  // Debug bilgisi
-  console.log('Liderlik tablosu yükleniyor...');
-
-  // Yükleniyor gösterimi
-  leaderboardContainer.innerHTML = `
-    <div class="loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Skorlar yükleniyor...</p>
-    </div>
-  `;
-
-  // Skorları almak için çoklu API denemesi
-  console.log('Liderlik tablosu verileri getiriliyor...');
-  
-  // İlk olarak doğrudan kullanıcı verilerini getir
-  fetch('/api/users/all?limit=1000&nocache=' + new Date().getTime())
-    .then(response => {
-      if (!response.ok) {
-        console.log('Kullanıcı API başarısız, skor API deneniyor...');
-        return fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime());
-      }
-      return response;
-    })
-    .then(response => {
-      if (!response.ok) {
-        console.log('İkinci API de başarısız, son API deneniyor...');
-        return fetch('/api/leaderboard/all?nocache=' + new Date().getTime());
-      }
-      return response;
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Hiçbir API düzgün çalışmıyor: ${response.status} ${response.statusText}`);
-      }
-      console.log('API yanıtı alındı:', response.url);
-      return response.json();
-    })
-    .then(data => {
-      // API yanıtı bir dizi olmalı
-      let scores = Array.isArray(data) ? data : [];
-      console.log("Ham veri alındı, işleniyor... Veri sayısı:", scores.length);
-      
-      // Kullanıcıların puanları yoksa, onları ayrıştır ve varsayılan değerler ata
-      scores = scores.map(player => {
-        // Tüm olası puan alanlarını kontrol et
-        let scoreValue = 0;
-        
-        if (player.total_score !== undefined && player.total_score !== null) {
-          scoreValue = player.total_score;
-        } else if (player.score !== undefined && player.score !== null) {
-          scoreValue = player.score;
-        } else if (player.points !== undefined && player.points !== null) {
-          scoreValue = player.points;
-        } else if (player.experience_points !== undefined && player.experience_points !== null) {
-          // Deneyim puanları da gösterilebilir
-          scoreValue = player.experience_points;
-        }
-        
-        // Sayısal değer kontrolü
-        if (isNaN(scoreValue) || scoreValue === null) {
-          scoreValue = 0;
-        }
-        
-        return {
-          ...player,
-          calculated_score: scoreValue // Hesaplanmış puanı yeni bir alanda sakla
-        };
-      });
-      
-      // Skorları puanlarına göre sırala (en yüksekten en düşüğe)
-      scores.sort((a, b) => b.calculated_score - a.calculated_score);
-      
-      console.log("İşlenmiş skorlar:", scores.length);
-
-      if (scores.length === 0) {
-        leaderboardContainer.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-trophy"></i>
-            <p>Henüz skor kaydı bulunmuyor. Oyun oynayarak liderlik tablosuna girmeye hak kazanabilirsiniz!</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Skor tablosu oluştur
-      let html = `
-        <div class="leaderboard-table">
-          <div class="leaderboard-header-row">
-            <div class="rank-header">Sıra</div>
-            <div class="player-header">Oyuncu</div>
-            <div class="score-header">Toplam Puan</div>
-          </div>
-          <div class="leaderboard-body">
-      `;
-
-      // Her bir skoru tabloya ekle
-      scores.forEach((player, index) => {
-        const rankClass = index < 3 ? `top-${index + 1}` : '';
-        const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
-
-        // Kullanıcı adı renk sınıfı
-        let userNameColorClass = '';
-        if (index === 0) userNameColorClass = 'first-place';
-        else if (index === 1) userNameColorClass = 'second-place';
-        else if (index === 2) userNameColorClass = 'third-place';
-        else if (index < 10) userNameColorClass = 'top-ten';
-
-        // Avatar URL'ini kontrol et ve düzelt
-        let avatarUrl = player.avatar_url || '';
-        if (avatarUrl) {
-          // HTTP veya HTTPS ile başlamıyorsa
-          if (!avatarUrl.startsWith('http')) {
-            // Eğer / ile başlamıyorsa başına / ekle
-            if (!avatarUrl.startsWith('/')) {
-              avatarUrl = '/' + avatarUrl;
-            }
-
-            // Farklı formatlardaki avatar url'lerini düzelt
-            if (avatarUrl.startsWith('/uploads/')) {
-              avatarUrl = '/static' + avatarUrl;
-            } else if (!avatarUrl.startsWith('/static/')) {
-              // Static içinde değilse ve uploads içinde değilse, 
-              // muhtemelen bir dosya adıdır, static/uploads/ dizinine ekle
-              if (!avatarUrl.startsWith('/static/uploads/')) {
-                avatarUrl = '/static/uploads' + avatarUrl;
-              }
-            }
-          }
-        }
-
-        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-        const isCurrentUser = player.is_current_user || false;
-
-        // Hesaplanmış puanı kullan
-        const totalScore = player.calculated_score || 0;
-        
-        console.log("Oyuncu puanı görüntüleniyor:", player.username, totalScore);
-
-        html += `
-          <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
-            <div class="rank-cell">
-              <div class="rank-number">${index + 1}</div>
-            </div>
-            <div class="player-cell">
-              <div class="player-avatar">
-                ${crownHTML}
-                ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                   <span class="avatar-content" style="display:none">${initial}</span>` : 
-                  `<span class="avatar-content">${initial}</span>`
-                }
-              </div>
-              <div class="player-info">
-                <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
-                ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
-              </div>
-            </div>
-            <div class="score-cell">
-              <div class="score-container">
-                <span class="score-value">${totalScore}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      html += `
-          </div>
-        </div>
-      `;
-
-      leaderboardContainer.innerHTML = html;
-    })
-    .catch(error => {
-      console.error('Skorlar alınırken hata oluştu:', error);
-      
-      // Sabit veri oluşturarak kullanıcılara en azından bir şeyler göster
-      const dummyUsers = [];
-      
-      // Son bir deneme daha yap - farklı API endpoint ile
-      fetch('/api/current-user')
-        .then(response => response.json())
-        .then(currentUser => {
-          // Mevcut oturum açmış kullanıcı bilgisini al
-          if (currentUser && currentUser.loggedIn) {
-            // Kullanıcı giriş yapmışsa, kullanıcı verilerini al
-            return fetch('/api/scores/user/' + currentUser.id + '?nocache=' + new Date().getTime());
-          } else {
-            throw new Error("Giriş yapılmamış");
-          }
-        })
-        .then(response => response.json())
-        .then(userScores => {
-          // Kullanıcının puanları varsa bunları göster
-          if (userScores && userScores.length > 0) {
-            // Kullanıcı puanlarını göster
-            let totalUserScore = 0;
-            userScores.forEach(score => {
-              totalUserScore += score.score || 0;
-            });
-            
-            dummyUsers.push({
-              username: userScores[0].username || "Aktif Kullanıcı",
-              calculated_score: totalUserScore,
-              is_current_user: true
-            });
-            
-            let html = createLeaderboardHtml(dummyUsers);
-            leaderboardContainer.innerHTML = html;
-          } else {
-            throw new Error("Kullanıcı puanları alınamadı");
-          }
-        })
-        .catch(finalError => {
-          console.error("Son hata:", finalError);
-          // Alternatif API'leri dene
-          fetch('/api/users/top?limit=10&nocache=' + new Date().getTime())
-            .then(response => response.json())
-            .then(topUsers => {
-              if (Array.isArray(topUsers) && topUsers.length > 0) {
-                let html = createLeaderboardHtml(topUsers);
-                leaderboardContainer.innerHTML = html;
-              } else {
-                throw new Error("Hiçbir veri alınamadı");
-              }
-            })
-            .catch(lastError => {
-              leaderboardContainer.innerHTML = `
-                <div class="error">
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <p>Skorlar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-                  <button onclick="loadLeaderboard()" class="retry-button">Tekrar Dene</button>
-                </div>
-              `;
-            });
-        });
-    });
-    
-// Liderlik tablosu HTML'ini oluşturan yardımcı fonksiyon
-function createLeaderboardHtml(players) {
-  if (!players || players.length === 0) {
-    return `
-      <div class="empty-state">
-        <i class="fas fa-trophy"></i>
-        <p>Henüz skor kaydı bulunmuyor. Oyun oynayarak liderlik tablosuna girmeye hak kazanabilirsiniz!</p>
-      </div>
-    `;
-  }
-  
-  // Önce oyuncuların puanlarını hesapla
-  const processedPlayers = players.map(player => {
-    // Tüm olası puan alanlarını kontrol et
-    let scoreValue = 0;
-    
-    if (player.calculated_score !== undefined) {
-      scoreValue = player.calculated_score;
-    } else if (player.total_score !== undefined && player.total_score !== null) {
-      scoreValue = player.total_score;
-    } else if (player.score !== undefined && player.score !== null) {
-      scoreValue = player.score;
-    } else if (player.points !== undefined && player.points !== null) {
-      scoreValue = player.points;
-    } else if (player.experience_points !== undefined && player.experience_points !== null) {
-      // Deneyim puanları da gösterilebilir
-      scoreValue = player.experience_points;
-    }
-    
-    // Sayısal değer kontrolü
-    if (isNaN(scoreValue) || scoreValue === null) {
-      scoreValue = 0;
-    }
-    
-    return {
-      ...player,
-      calculated_score: scoreValue
-    };
-  });
-  
-  // Oyuncuları puanlarına göre sırala (en yüksekten en düşüğe)
-  const sortedPlayers = [...processedPlayers].sort((a, b) => b.calculated_score - a.calculated_score);
-  
-  console.log("Sıralanmış oyuncular:", sortedPlayers.length, sortedPlayers.slice(0, 3).map(p => p.username + ':' + p.calculated_score));
-  
-  let html = `
-    <div class="leaderboard-table">
-      <div class="leaderboard-header-row">
-        <div class="rank-header">Sıra</div>
-        <div class="player-header">Oyuncu</div>
-        <div class="score-header">Toplam Puan</div>
-      </div>
-      <div class="leaderboard-body">
-  `;
-  
-  // Her bir kullanıcı için satır ekle
-  sortedPlayers.forEach((player, index) => {
-    const rankClass = index < 3 ? `top-${index + 1}` : '';
-    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
-    
-    // Kullanıcı adı renk sınıfı
-    let userNameColorClass = '';
-    if (index === 0) userNameColorClass = 'first-place';
-    else if (index === 1) userNameColorClass = 'second-place';
-    else if (index === 2) userNameColorClass = 'third-place';
-    else if (index < 10) userNameColorClass = 'top-ten';
-    
-    // Hesaplanmış puanı kullan
-    let playerScore = player.calculated_score || 0;
-    console.log(`${player.username} puanı: ${playerScore}`);
-    
-    const avatarUrl = player.avatar_url || '';
-    const isCurrentUser = player.is_current_user || false;
-    const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-    
-    html += `
-      <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
-        <div class="rank-cell">
-          <div class="rank-number">${index + 1}</div>
-        </div>
-        <div class="player-cell">
-          <div class="player-avatar">
-            ${crownHTML}
-            ${avatarUrl ? 
-              `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-               <span class="avatar-content" style="display:none">${initial}</span>` : 
-              `<span class="avatar-content">${initial}</span>`
-            }
-          </div>
-          <div class="player-info">
-            <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
-            ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
-          </div>
-        </div>
-        <div class="score-cell">
-          <div class="score-container">
-            <span class="score-value">${playerScore}</span>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += `
-      </div>
-    </div>
-  `;
-  
-  return html;
-}
-}
 
 // Ana sayfadaki liderlik tablosu güncellendikten sonra çağrılır
 function updateProfileScores() {
