@@ -70,6 +70,14 @@ function loadLeaderboard() {
       }
 
       console.log("Kullanıcı skorları alındı:", data.length);
+      
+      // Kullanıcı son oyun puanını ekle
+      data = data.map(player => {
+        return {
+          ...player,
+          last_game_score: player.last_game_score || null
+        };
+      });
 
       // Skor tablosu oluştur
       let html = `
@@ -369,13 +377,18 @@ function updateProfileScores() {
 // Global skorları kaydetme yardımcı fonksiyonu
 window.saveScoreToLeaderboard = function(gameType, score, playTime, difficulty = 'medium', gameStats = {}) {
   console.log(`${gameType} oyunu için puan kaydediliyor: ${score}`);
-
+  
+  // Puan hesaplama parametreleri
+  const calculatedScore = calculateGameScore(gameType, score, playTime, difficulty, gameStats);
+  console.log(`Hesaplanan puan: ${calculatedScore}`);
+  
   return fetch('/api/save-score', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       game_type: gameType,
-      score: score,
+      score: calculatedScore, // Hesaplanan puanı gönder
+      original_score: score, // Orijinal skoru da sakla
       playtime: playTime,
       difficulty: difficulty,
       game_stats: gameStats
@@ -385,15 +398,65 @@ window.saveScoreToLeaderboard = function(gameType, score, playTime, difficulty =
   .then(data => {
     if (data.success) {
       console.log("Skor başarıyla kaydedildi:", data);
+      // Kullanıcıya puanını göster
+      showScoreNotification(calculatedScore, data.total_score);
       // Liderlik tablosunu güncelle
       updateScoreBoard(gameType);
-      return data;
+      return {...data, calculated_score: calculatedScore};
     } else {
       console.error("Skor kaydedilirken hata oluştu:", data.message);
       throw new Error(data.message);
     }
   });
 };
+
+// Oyun puanını hesaplama fonksiyonu
+function calculateGameScore(gameType, score, playTime, difficulty, gameStats = {}) {
+  // Zorluk seviyesi katsayısı
+  const difficultyMultiplier = {
+    'easy': 0.8,
+    'medium': 1.0,
+    'hard': 1.3,
+    'expert': 1.6
+  }[difficulty] || 1.0;
+  
+  // Oyun tipine göre baz puan hesaplama
+  let baseScore = score;
+  
+  // Oynama süresi faktörü (oyun tipine bağlı olarak değişebilir)
+  const timeFactorMultiplier = gameStats.timeBonus || 1.0;
+  
+  // Doğruluk oranı (eğer varsa)
+  const accuracyMultiplier = gameStats.accuracy ? (gameStats.accuracy / 100 * 0.5 + 0.5) : 1.0;
+  
+  // Final puan hesaplama
+  let finalScore = Math.round(baseScore * difficultyMultiplier * timeFactorMultiplier * accuracyMultiplier);
+  
+  // Puanı 0-100 arasında sınırla
+  finalScore = Math.min(100, Math.max(0, finalScore));
+  
+  return finalScore;
+}
+
+// Kullanıcıya puan bildirimini gösterme
+function showScoreNotification(gameScore, totalScore) {
+  if (typeof GameHelper !== 'undefined' && GameHelper.showNotification) {
+    GameHelper.showNotification(
+      `<div class="score-notification">
+        <div>Bu oyun puanınız: <strong>${gameScore}/100</strong></div>
+        <div>Toplam puanınız: <strong>${totalScore}</strong></div>
+      </div>`,
+      { 
+        type: 'success', 
+        duration: 5000,
+        position: 'top-center'
+      }
+    );
+  } else {
+    // GameHelper yoksa basit alert göster
+    console.log(`Oyun puanı: ${gameScore}/100, Toplam puan: ${totalScore}`);
+  }
+}
 
 // Global nesne olarak dışa aktar
 window.LeaderboardManager = {
