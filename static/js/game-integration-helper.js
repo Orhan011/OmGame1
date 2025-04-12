@@ -1,762 +1,103 @@
 
 /**
- * Oyun entegrasyonu için yardımcı fonksiyonlar
- * Oyunları modernize eden ve ortak özellikleri sağlayan yardımcı fonksiyonlar içerir
+ * Oyun puan entegrasyonu için yardımcı fonksiyonlar
+ * Bu modül, oyunlara puan sistemini kolayca entegre etmek için yardımcı fonksiyonlar sağlar
+ * @version 1.0.0
  */
 
-// Tarayıcı için kapsamlı kontroller
-function checkBrowserCompatibility() {
-  if (typeof window === 'undefined') return true;
-  
-  // Temel HTML5 kontrolü
-  const hasHTML5 = !!document.createElement('canvas').getContext;
-  // Temel CSS3 kontrolü
-  const hasCSS3 = window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)');
-  // LocalStorage kontrolü
-  const hasLocalStorage = (function() {
-    try {
-      localStorage.setItem('test', 'test');
-      localStorage.removeItem('test');
-      return true;
-    } catch (e) {
-      return false;
+/**
+ * Oyuna puan sistemi entegrasyonu ekler
+ * @param {string} gameType - Oyun tipi (wordle, puzzle, memoryCards vb.)
+ * @param {Object} gameInstance - Oyun örneği veya oyun verilerini içeren nesne
+ * @param {Object} options - Ek seçenekler
+ * @returns {Object} GameScoreIntegration örneği
+ */
+function integrateGameScore(gameType, gameInstance = {}, options = {}) {
+  // Gerekli script dosyalarını kontrol et ve yükle
+  ensureScriptLoaded('static/js/scoreCalculator.js');
+  ensureScriptLoaded('static/js/score-handler.js');
+  ensureScriptLoaded('static/js/score-display.js');
+  ensureScriptLoaded('static/js/game-score-integration.js');
+
+  // Zorluk seviyesini al (HTML'de varsa)
+  const difficultySelector = document.querySelector('.difficulty-selector .selected');
+  const difficulty = difficultySelector ? 
+                    difficultySelector.getAttribute('data-difficulty') : 
+                    (options.difficulty || 'medium');
+
+  // Oyun tipi, zorluk ve diğer parametrelerle bir puan entegrasyonu oluştur
+  const scoreIntegration = new GameScoreIntegration({
+    gameType: gameType,
+    difficulty: difficulty,
+    maxScore: options.maxScore || 100,
+    optimalMoves: options.optimalMoves || null,
+    optimalTime: options.optimalTime || null,
+    expectedTime: options.expectedTime || null
+  });
+
+  // GameScore örneğini oyun nesnesine bağla
+  if (gameInstance) {
+    gameInstance.scoreIntegration = scoreIntegration;
+    
+    // Oyunun restart metodu varsa, onu genişlet
+    if (typeof gameInstance.restart === 'function') {
+      const originalRestart = gameInstance.restart;
+      gameInstance.restart = function(...args) {
+        // Önce orijinal restart fonksiyonunu çağır
+        originalRestart.apply(this, args);
+        // Sonra puan entegrasyonunu da yeniden başlat
+        this.scoreIntegration.restart();
+      };
     }
-  })();
-  
-  // Temel tarayıcı özelliklerinin kontrolü
-  if (!hasHTML5 || !hasCSS3 || !hasLocalStorage) {
-    console.warn('Tarayıcınız güncel değil veya bazı özellikler desteklenmiyor.');
-    return false;
   }
-  
-  return true;
+
+  return scoreIntegration;
 }
 
-// Standart zorluk seçici ekleme (gameContainer, zorluk değişikliği için callback)
-function addDifficultySelector(container, callback) {
-  if (!container) return null;
-  
-  const difficultySelector = document.createElement('div');
-  difficultySelector.className = 'difficulty-selector';
-  difficultySelector.innerHTML = `
-    <div class="difficulty-title">Zorluk Seviyesi</div>
-    <div class="difficulty-options">
-      <button class="difficulty-btn" data-difficulty="easy">Kolay</button>
-      <button class="difficulty-btn selected" data-difficulty="medium">Orta</button>
-      <button class="difficulty-btn" data-difficulty="hard">Zor</button>
-      <button class="difficulty-btn" data-difficulty="expert">Uzman</button>
-    </div>
-  `;
-  
-  // Önceden belirtilen konteynere ekle
-  if (typeof container === 'string') {
-    const targetElement = document.querySelector(container);
-    if (targetElement) {
-      targetElement.appendChild(difficultySelector);
-    } else {
-      console.error(`Belirtilen konteyner bulunamadı: ${container}`);
-      return null;
-    }
-  } else if (container instanceof HTMLElement) {
-    container.appendChild(difficultySelector);
-  } else {
-    console.error('Geçersiz konteyner, string ya da HTMLElement olmalı');
-    return null;
+/**
+ * Script dosyasının yüklü olduğundan emin olur
+ * @param {string} src - Script dosyasının yolu
+ */
+function ensureScriptLoaded(src) {
+  if (!document.querySelector(`script[src="${src}"]`)) {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = false;
+    document.head.appendChild(script);
   }
+}
+
+/**
+ * Doğruluk oranını hesaplar
+ * @param {number} correct - Doğru sayısı
+ * @param {number} total - Toplam sayı
+ * @returns {number} Doğruluk oranı (0-1 arası)
+ */
+function calculateAccuracy(correct, total) {
+  if (!total) return 0;
+  return Math.max(0, Math.min(1, correct / total));
+}
+
+/**
+ * Zorluk seviyesini izler ve değişikliklerini takip eder
+ * @param {Object} scoreIntegration - GameScoreIntegration örneği
+ */
+function setupDifficultyListener(scoreIntegration) {
+  if (!scoreIntegration) return;
   
-  // Zorluk seviyesi değişimini dinle
-  const buttons = difficultySelector.querySelectorAll('.difficulty-btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      
-      // Seçilen zorluğu callback ile bildir
-      if (typeof callback === 'function') {
-        callback(btn.getAttribute('data-difficulty'));
+  const difficultyButtons = document.querySelectorAll('.difficulty-selector .difficulty-option');
+  
+  difficultyButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const difficulty = this.getAttribute('data-difficulty');
+      if (difficulty) {
+        scoreIntegration.setDifficulty(difficulty);
       }
     });
   });
-  
-  return difficultySelector;
 }
 
-// Oyun yeniden başlatma işlemi
-function addRestartButton(container, callback) {
-  if (!container) return null;
-  
-  const restartButton = document.createElement('button');
-  restartButton.className = 'restart-button';
-  restartButton.innerHTML = '<i class="fas fa-redo"></i> Yeniden Başlat';
-  
-  // Konteynere ekle
-  if (typeof container === 'string') {
-    const targetElement = document.querySelector(container);
-    if (targetElement) {
-      targetElement.appendChild(restartButton);
-    } else {
-      console.error(`Belirtilen konteyner bulunamadı: ${container}`);
-      return null;
-    }
-  } else if (container instanceof HTMLElement) {
-    container.appendChild(restartButton);
-  } else {
-    console.error('Geçersiz konteyner, string ya da HTMLElement olmalı');
-    return null;
-  }
-  
-  // Tıklama olayını dinle
-  restartButton.addEventListener('click', () => {
-    if (typeof callback === 'function') {
-      callback();
-    }
-  });
-  
-  return restartButton;
-}
-
-// Oyun ipucu sistemi
-function addHintButton(container, callback, hints = 3) {
-  if (!container) return null;
-  
-  const hintSystem = document.createElement('div');
-  hintSystem.className = 'hint-system';
-  hintSystem.innerHTML = `
-    <button class="hint-button" ${hints <= 0 ? 'disabled' : ''}>
-      <i class="fas fa-lightbulb"></i> İpucu
-      <span class="hint-count">${hints}</span>
-    </button>
-  `;
-  
-  // Konteynere ekle
-  if (typeof container === 'string') {
-    const targetElement = document.querySelector(container);
-    if (targetElement) {
-      targetElement.appendChild(hintSystem);
-    } else {
-      console.error(`Belirtilen konteyner bulunamadı: ${container}`);
-      return null;
-    }
-  } else if (container instanceof HTMLElement) {
-    container.appendChild(hintSystem);
-  } else {
-    console.error('Geçersiz konteyner, string ya da HTMLElement olmalı');
-    return null;
-  }
-  
-  const hintButton = hintSystem.querySelector('.hint-button');
-  const hintCount = hintSystem.querySelector('.hint-count');
-  
-  // İpucu kullanım olayını dinle
-  hintButton.addEventListener('click', () => {
-    if (hints <= 0) return;
-    
-    hints--;
-    hintCount.textContent = hints;
-    
-    if (hints <= 0) {
-      hintButton.setAttribute('disabled', 'disabled');
-    }
-    
-    // İpucu kullanıldığını bildir
-    if (typeof callback === 'function') {
-      callback(hints);
-    }
-    
-    // İpucu kullanıldı ses efekti
-    playSound('hint');
-  });
-  
-  // İpucu sayısını güncelleyen yardımcı fonksiyon
-  hintSystem.updateHintCount = (newCount) => {
-    hints = newCount;
-    hintCount.textContent = hints;
-    
-    if (hints <= 0) {
-      hintButton.setAttribute('disabled', 'disabled');
-    } else {
-      hintButton.removeAttribute('disabled');
-    }
-  };
-  
-  return hintSystem;
-}
-
-// Ses efektleri çalmak için yardımcı fonksiyon
-function playSound(soundName) {
-  try {
-    const soundMap = {
-      'correct': '/static/sounds/correct.mp3',
-      'wrong': '/static/sounds/wrong.mp3',
-      'success': '/static/sounds/success.mp3',
-      'game-over': '/static/sounds/game-over.mp3',
-      'hint': '/static/sounds/hint.mp3',
-      'click': '/static/sounds/click.mp3',
-      'match': '/static/sounds/match.mp3',
-      'no-match': '/static/sounds/no-match.mp3',
-      'game-complete': '/static/sounds/game-complete.mp3',
-      'level-up': '/static/sounds/level-up.mp3',
-      'card-flip': '/static/sounds/card-flip.mp3'
-    };
-    
-    const soundPath = soundMap[soundName] || soundName;
-    const audio = new Audio(soundPath);
-    audio.play().catch(err => {
-      console.warn('Ses çalınamadı:', err);
-    });
-  } catch (e) {
-    console.warn('Ses çalarken hata:', e);
-  }
-}
-
-// Kronometre / zamanlayıcı oluşturma
-function createTimer(container, options = {}) {
-  if (!container) return null;
-  
-  const {
-    autoStart = false,
-    countDown = false,
-    duration = 0,
-    updateInterval = 1000,
-    onTick = null,
-    onComplete = null,
-    format = 'mm:ss'
-  } = options;
-  
-  const timerElement = document.createElement('div');
-  timerElement.className = 'game-timer';
-  
-  // Konteynere ekle
-  if (typeof container === 'string') {
-    const targetElement = document.querySelector(container);
-    if (targetElement) {
-      targetElement.appendChild(timerElement);
-    } else {
-      console.error(`Belirtilen konteyner bulunamadı: ${container}`);
-      return null;
-    }
-  } else if (container instanceof HTMLElement) {
-    container.appendChild(timerElement);
-  } else {
-    console.error('Geçersiz konteyner, string ya da HTMLElement olmalı');
-    return null;
-  }
-  
-  // Zamanlayıcı durumu
-  let startTime = 0;
-  let elapsedTime = 0;
-  let timerInterval = null;
-  let isRunning = false;
-  let remainingTime = countDown ? duration : 0;
-  
-  // Zaman formatını oluştur
-  function formatTime(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    
-    if (format === 'hh:mm:ss') {
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    } else if (format === 'mm:ss') {
-      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    } else if (format === 'ss') {
-      return `${seconds}`;
-    }
-    
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
-  
-  // Zamanlayıcıyı güncelle
-  function updateTimer() {
-    const currentTime = Date.now();
-    elapsedTime = Math.floor((currentTime - startTime) / 1000);
-    
-    if (countDown) {
-      remainingTime = Math.max(0, duration - elapsedTime);
-      timerElement.textContent = formatTime(remainingTime);
-      
-      if (remainingTime <= 0) {
-        stopTimer();
-        if (typeof onComplete === 'function') {
-          onComplete();
-        }
-      }
-    } else {
-      timerElement.textContent = formatTime(elapsedTime);
-    }
-    
-    if (typeof onTick === 'function') {
-      onTick(countDown ? remainingTime : elapsedTime);
-    }
-  }
-  
-  // Zamanlayıcıyı başlat
-  function startTimer() {
-    if (isRunning) return;
-    
-    isRunning = true;
-    startTime = Date.now() - (elapsedTime * 1000);
-    timerInterval = setInterval(updateTimer, updateInterval);
-    updateTimer();
-  }
-  
-  // Zamanlayıcıyı durdur
-  function stopTimer() {
-    if (!isRunning) return;
-    
-    isRunning = false;
-    clearInterval(timerInterval);
-  }
-  
-  // Zamanlayıcıyı sıfırla
-  function resetTimer() {
-    stopTimer();
-    elapsedTime = 0;
-    remainingTime = countDown ? duration : 0;
-    timerElement.textContent = formatTime(countDown ? remainingTime : 0);
-  }
-  
-  // İlk zaman görüntüsünü oluştur
-  timerElement.textContent = formatTime(countDown ? duration : 0);
-  
-  // Otomatik başlatma
-  if (autoStart) {
-    startTimer();
-  }
-  
-  // API
-  return {
-    element: timerElement,
-    start: startTimer,
-    stop: stopTimer,
-    reset: resetTimer,
-    getTime: () => countDown ? remainingTime : elapsedTime,
-    isRunning: () => isRunning,
-    setDuration: (newDuration) => {
-      duration = newDuration;
-      if (countDown) {
-        remainingTime = duration;
-        timerElement.textContent = formatTime(remainingTime);
-      }
-    }
-  };
-}
-
-// Oyun arayüzü için başlık ve kontrol öğeleri oluşturma
-function createGameHeader(container, options = {}) {
-  if (!container) return null;
-  
-  const {
-    title = 'Oyun',
-    showTimer = false,
-    timerOptions = {},
-    showDifficulty = false,
-    difficultyCallback = null,
-    showRestart = false,
-    restartCallback = null,
-    showHint = false,
-    hintCallback = null,
-    hintCount = 3
-  } = options;
-  
-  // Ana başlık konteyneri
-  const headerElement = document.createElement('div');
-  headerElement.className = 'game-header';
-  
-  // Başlık metni
-  const titleElement = document.createElement('h1');
-  titleElement.className = 'game-title';
-  titleElement.textContent = title;
-  headerElement.appendChild(titleElement);
-  
-  // Kontrol öğeleri konteyneri
-  const controlsElement = document.createElement('div');
-  controlsElement.className = 'game-controls';
-  headerElement.appendChild(controlsElement);
-  
-  // API nesnesi
-  const api = {
-    element: headerElement,
-    title: titleElement,
-    controls: controlsElement,
-    timer: null,
-    difficultySelector: null,
-    restartButton: null,
-    hintSystem: null
-  };
-  
-  // Zamanlayıcı
-  if (showTimer) {
-    api.timer = createTimer(controlsElement, timerOptions);
-  }
-  
-  // Zorluk seçici
-  if (showDifficulty) {
-    api.difficultySelector = addDifficultySelector(controlsElement, difficultyCallback);
-  }
-  
-  // Yeniden başlat butonu
-  if (showRestart) {
-    api.restartButton = addRestartButton(controlsElement, restartCallback);
-  }
-  
-  // İpucu sistemi
-  if (showHint) {
-    api.hintSystem = addHintButton(controlsElement, hintCallback, hintCount);
-  }
-  
-  // Konteynere ekle
-  if (typeof container === 'string') {
-    const targetElement = document.querySelector(container);
-    if (targetElement) {
-      targetElement.appendChild(headerElement);
-    } else {
-      console.error(`Belirtilen konteyner bulunamadı: ${container}`);
-      return api;
-    }
-  } else if (container instanceof HTMLElement) {
-    container.appendChild(headerElement);
-  } else {
-    console.error('Geçersiz konteyner, string ya da HTMLElement olmalı');
-    return api;
-  }
-  
-  return api;
-}
-
-// Oyun başarısı / tamamlanması gösterimi
-function showGameSuccess(message, options = {}) {
-  const {
-    title = 'Tebrikler!',
-    buttonText = 'Yeniden Oyna',
-    buttonCallback = () => location.reload()
-  } = options;
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'game-success-overlay';
-  
-  overlay.innerHTML = `
-    <div class="game-success-popup">
-      <h2>${title}</h2>
-      <p>${message}</p>
-      <button class="success-button">${buttonText}</button>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-  
-  // Animasyon için küçük bir gecikme ekleyin
-  setTimeout(() => {
-    overlay.classList.add('visible');
-  }, 50);
-  
-  // Buton tıklama olayını dinle
-  const button = overlay.querySelector('.success-button');
-  button.addEventListener('click', () => {
-    overlay.classList.remove('visible');
-    
-    // Kaldırma için animasyonun tamamlanmasını bekle
-    setTimeout(() => {
-      overlay.remove();
-      if (typeof buttonCallback === 'function') {
-        buttonCallback();
-      }
-    }, 300);
-  });
-  
-  // Başarı ses efekti çal
-  playSound('success');
-  
-  return overlay;
-}
-
-// Oyun sonu (başarısız) gösterimi
-function showGameOver(message, options = {}) {
-  const {
-    title = 'Oyun Bitti',
-    buttonText = 'Tekrar Dene',
-    buttonCallback = () => location.reload()
-  } = options;
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'game-over-overlay';
-  
-  overlay.innerHTML = `
-    <div class="game-over-popup">
-      <h2>${title}</h2>
-      <p>${message}</p>
-      <button class="retry-button">${buttonText}</button>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-  
-  // Animasyon için küçük bir gecikme ekleyin
-  setTimeout(() => {
-    overlay.classList.add('visible');
-  }, 50);
-  
-  // Buton tıklama olayını dinle
-  const button = overlay.querySelector('.retry-button');
-  button.addEventListener('click', () => {
-    overlay.classList.remove('visible');
-    
-    // Kaldırma için animasyonun tamamlanmasını bekle
-    setTimeout(() => {
-      overlay.remove();
-      if (typeof buttonCallback === 'function') {
-        buttonCallback();
-      }
-    }, 300);
-  });
-  
-  // Başarısız ses efekti çal
-  playSound('game-over');
-  
-  return overlay;
-}
-
-// Öğretici modal gösterimi
-function showTutorial(steps, options = {}) {
-  const {
-    title = 'Nasıl Oynanır',
-    closeText = 'Başla',
-    closeCallback = null
-  } = options;
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'tutorial-overlay';
-  
-  let stepsHTML = '';
-  steps.forEach((step, index) => {
-    stepsHTML += `
-      <div class="tutorial-step" data-step="${index + 1}">
-        <div class="step-number">${index + 1}</div>
-        <div class="step-content">
-          <h3>${step.title}</h3>
-          <p>${step.content}</p>
-          ${step.image ? `<img src="${step.image}" alt="${step.title}">` : ''}
-        </div>
-      </div>
-    `;
-  });
-  
-  overlay.innerHTML = `
-    <div class="tutorial-popup">
-      <h2>${title}</h2>
-      <div class="tutorial-content">
-        ${stepsHTML}
-      </div>
-      <div class="tutorial-navigation">
-        <button class="tutorial-prev" disabled>&laquo; Önceki</button>
-        <div class="tutorial-indicators"></div>
-        <button class="tutorial-next">Sonraki &raquo;</button>
-      </div>
-      <button class="tutorial-close">${closeText}</button>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-  
-  // Adımlar arası gezinme
-  const popup = overlay.querySelector('.tutorial-popup');
-  const stepsElements = overlay.querySelectorAll('.tutorial-step');
-  const prevButton = overlay.querySelector('.tutorial-prev');
-  const nextButton = overlay.querySelector('.tutorial-next');
-  const closeButton = overlay.querySelector('.tutorial-close');
-  const indicators = overlay.querySelector('.tutorial-indicators');
-  
-  // Gösterge noktalarını oluştur
-  steps.forEach((_, index) => {
-    const dot = document.createElement('span');
-    dot.className = 'tutorial-dot';
-    dot.dataset.step = index + 1;
-    if (index === 0) dot.classList.add('active');
-    indicators.appendChild(dot);
-    
-    // Gösterge tıklanınca o adıma git
-    dot.addEventListener('click', () => {
-      goToStep(index + 1);
-    });
-  });
-  
-  let currentStep = 1;
-  
-  // Belirli bir adıma git
-  function goToStep(step) {
-    stepsElements.forEach(el => el.classList.remove('active'));
-    const targetStep = overlay.querySelector(`.tutorial-step[data-step="${step}"]`);
-    if (targetStep) targetStep.classList.add('active');
-    
-    // Göstergeleri güncelle
-    const dots = overlay.querySelectorAll('.tutorial-dot');
-    dots.forEach(dot => dot.classList.remove('active'));
-    const targetDot = overlay.querySelector(`.tutorial-dot[data-step="${step}"]`);
-    if (targetDot) targetDot.classList.add('active');
-    
-    // Gezinme butonlarını güncelle
-    prevButton.disabled = step === 1;
-    if (step === steps.length) {
-      nextButton.disabled = true;
-      closeButton.style.display = 'block';
-    } else {
-      nextButton.disabled = false;
-      closeButton.style.display = 'none';
-    }
-    
-    currentStep = step;
-  }
-  
-  // İlk adımı göster
-  goToStep(1);
-  
-  // Önceki adıma git
-  prevButton.addEventListener('click', () => {
-    if (currentStep > 1) {
-      goToStep(currentStep - 1);
-    }
-  });
-  
-  // Sonraki adıma git
-  nextButton.addEventListener('click', () => {
-    if (currentStep < steps.length) {
-      goToStep(currentStep + 1);
-    }
-  });
-  
-  // Kapatma işlemi
-  closeButton.addEventListener('click', () => {
-    overlay.classList.add('closing');
-    
-    // Kapatma için animasyonun tamamlanmasını bekle
-    setTimeout(() => {
-      overlay.remove();
-      if (typeof closeCallback === 'function') {
-        closeCallback();
-      }
-    }, 300);
-  });
-  
-  // Animasyon için küçük bir gecikme ekleyin
-  setTimeout(() => {
-    overlay.classList.add('visible');
-  }, 50);
-  
-  return overlay;
-}
-
-// Bildirim gösterimi
-function showNotification(message, options = {}) {
-  const {
-    type = 'info',
-    duration = 3000,
-    position = 'top-right'
-  } = options;
-  
-  const notification = document.createElement('div');
-  notification.className = `game-notification ${type} ${position}`;
-  notification.innerHTML = message;
-  
-  // Varsa mevcut bildirim konteyneri bul, yoksa oluştur
-  let container = document.querySelector(`.notification-container.${position}`);
-  if (!container) {
-    container = document.createElement('div');
-    container.className = `notification-container ${position}`;
-    document.body.appendChild(container);
-  }
-  
-  container.appendChild(notification);
-  
-  // Gösterme animasyonu için küçük bir gecikme
-  setTimeout(() => {
-    notification.classList.add('visible');
-  }, 10);
-  
-  // Otomatik kapatma
-  const closeTimeout = setTimeout(() => {
-    notification.classList.remove('visible');
-    setTimeout(() => notification.remove(), 300);
-    
-    // Konteyner boşaldıysa kaldır
-    if (container.children.length === 0) {
-      container.remove();
-    }
-  }, duration);
-  
-  // Manuel kapatma
-  notification.addEventListener('click', () => {
-    clearTimeout(closeTimeout);
-    notification.classList.remove('visible');
-    setTimeout(() => notification.remove(), 300);
-    
-    // Konteyner boşaldıysa kaldır
-    if (container.children.length === 0) {
-      container.remove();
-    }
-  });
-  
-  return notification;
-}
-
-// Kullanıcı oturumu kontrolü
-function isUserLoggedIn() {
-  return new Promise((resolve) => {
-    // API'den mevcut kullanıcı bilgilerini al
-    fetch('/api/get-current-user')
-      .then(response => response.json())
-      .then(data => {
-        resolve(data.loggedIn === true);
-      })
-      .catch(() => {
-        resolve(false);
-      });
-  });
-}
-
-// Kullanıcı kimliği alımı
-function getUserId() {
-  return new Promise((resolve) => {
-    // API'den mevcut kullanıcı bilgilerini al
-    fetch('/api/get-current-user')
-      .then(response => response.json())
-      .then(data => {
-        resolve(data.id || null);
-      })
-      .catch(() => {
-        resolve(null);
-      });
-  });
-}
-
-// Oyun puanı hesaplama yardımcı fonksiyonu (devre dışı bırakıldı)
-function calculateGameScore(params) {
-  // Puan sistemi devre dışı bırakıldı
-  console.log("Puan sistemi devre dışı bırakıldı.");
-  return 0;
-}
-
-// Oyun sonucunu gösterme yardımcı fonksiyonu (devre dışı bırakıldı)
-function showGameScoreResult(gameType, score, gameStats = {}, options = {}) {
-  // Puan gösterimi devre dışı bırakıldı
-  console.log("Puan gösterimi devre dışı bırakıldı.");
-  return 0;
-}
-
-// Dışa aktarılan tüm yardımcı fonksiyonlar
-window.GameHelper = {
-  checkBrowserCompatibility,
-  addDifficultySelector,
-  addRestartButton,
-  addHintButton,
-  playSound,
-  createTimer,
-  createGameHeader,
-  showGameSuccess,
-  showGameOver,
-  showTutorial,
-  showNotification,
-  isUserLoggedIn,
-  getUserId,
-  calculateGameScore,
-  showGameScoreResult
-};
+// Global erişim için window nesnesine ekle
+window.integrateGameScore = integrateGameScore;
+window.setupDifficultyListener = setupDifficultyListener;
+window.calculateAccuracy = calculateAccuracy;

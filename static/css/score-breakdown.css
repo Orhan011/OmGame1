@@ -1,0 +1,279 @@
+/**
+ * Score Breakdown CSS
+ * Puan ayrıntılarını gösteren stil dosyası.
+ */
+
+.score-breakdown {
+  background: rgba(15, 25, 55, 0.75);
+  border-radius: 12px;
+  padding: 15px;
+  margin: 15px 0;
+  border: 1px solid rgba(120, 130, 200, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+}
+
+/* Mini skor dökümü - seviye tamamlandı mesajı için */
+.mini-breakdown {
+  background: rgba(20, 30, 70, 0.8);
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  max-width: 300px;
+}
+
+.mini-breakdown .score-detail {
+  padding: 4px 8px;
+  margin-bottom: 3px;
+}
+
+.mini-breakdown .detail-label,
+.mini-breakdown .detail-value {
+  font-size: 0.85rem;
+}
+
+.level-complete-message .score-breakdown {
+  border: 1px solid rgba(100, 120, 255, 0.3);
+}
+
+.breakdown-title {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.score-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  background: rgba(30, 40, 85, 0.4);
+}
+
+.score-detail:nth-child(odd) {
+  background: rgba(40, 50, 95, 0.4);
+}
+
+.detail-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #4CAF50;
+  font-size: 0.9rem;
+}
+
+.score-detail.penalty .detail-value {
+  color: #f44336;
+}
+
+.score-detail.multiplier .detail-value {
+  color: #2196F3;
+}
+
+.score-detail.total {
+  margin-top: 10px;
+  background: rgba(50, 60, 120, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+}
+
+.score-detail.total .detail-label {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.score-detail.total .detail-value {
+  font-weight: 700;
+  color: #7bed9f;
+  font-size: 1.1rem;
+}
+
+.score-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(20, 30, 70, 0.6);
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.difficulty-badge {
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.difficulty-badge.difficulty-easy {
+  background: rgba(76, 175, 80, 0.3);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.difficulty-badge.difficulty-medium {
+  background: rgba(33, 150, 243, 0.3);
+  color: #64b5f6;
+  border: 1px solid rgba(33, 150, 243, 0.5);
+}
+
+.difficulty-badge.difficulty-hard {
+  background: rgba(255, 152, 0, 0.3);
+  color: #ffb74d;
+  border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+.difficulty-badge.difficulty-expert {
+  background: rgba(244, 67, 54, 0.3);
+  color: #e57373;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+.final-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4CAF50;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+}
+
+.xp-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(100, 70, 140, 0.3);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.xp-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.xp-value {
+  font-weight: 600;
+  color: #bb86fc;
+  font-size: 1rem;
+}
+
+.level-up-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(187, 134, 252, 0.3), rgba(30, 30, 70, 0.3));
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(187, 134, 252, 0.3);
+}
+
+.level-up-notice i {
+  color: #bb86fc;
+  font-size: 1.5rem;
+}
+
+.level-up-notice span {
+  font-weight: 600;
+  color: #fff;
+}
+
+.score-result {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+.guest-result {
+  text-align: center;
+}
+
+.guest-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guest-message i {
+  font-size: 2.5rem;
+  color: #bb86fc;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.guest-message h3 {
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.guest-notice {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 15px 0;
+  font-size: 0.9rem;
+}
+
+.guest-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Duyarlı Tasarım */
+@media (max-width: 576px) {
+  .score-summary {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .final-score {
+    align-items: flex-start;
+  }
+  
+  .score-detail {
+    padding: 8px;
+  }
+  
+  .detail-label, .detail-value {
+    font-size: 0.85rem;
+  }
+  
+  .score-value {
+    font-size: 1.6rem;
+  }
+}
