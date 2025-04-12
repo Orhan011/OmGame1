@@ -180,8 +180,8 @@ def forgot_password():
                 verification_code=verification_code
             )
             
-            # Loglama sadece debug seviyesinde yapılsın
-            logger.debug(f"E-posta: {email}, Doğrulama kodu gönderildi")
+            # Sadece loglama amaçlı kaydet (sunucu loglarında görünecek, kullanıcıya gösterilmeyecek)
+            logger.info(f"E-posta: {email}, Doğrulama kodu gönderildi")
             
             flash('Doğrulama kodu e-posta adresinize gönderildi.', 'success')
             return redirect(url_for('password_reset.reset_code', email=email))

@@ -196,14 +196,20 @@ def send_reset_code():
             # Doğrulama kodu sayfasına yönlendir ve e-posta adresini session'da tut
             session['reset_email'] = email
             
+            # Geliştirme/test amaçlı doğrulama kodunu göster
+            logger.info(f"Doğrulama kodu: {verification_code} (Kullanıcı: {email})")
+            flash(f"Test/Geliştirme modu: Doğrulama kodu: {verification_code}", 'info')
+            
             return redirect(url_for('reset_password.verify_reset_code'))
         else:
             # E-posta gönderme başarısız olsa bile, kodu kaydedip kullanıcıya gösteriyoruz (test/geliştirme için)
             logger.error(f"E-posta gönderme başarısız: {email}")
             
-            # E-posta gönderilemedi hatası göster
-            flash('Doğrulama kodu gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
-            return redirect(url_for('reset_password.password_reset_request'))
+            # Test veya geliştirme ortamında ise, doğrulama kodunu göster ve devam et
+            session['reset_email'] = email
+            logger.info(f"Doğrulama kodu: {verification_code} (Kullanıcı: {email})")
+            flash(f"E-posta gönderilemedi ancak test modu aktif. Doğrulama kodu: {verification_code}", 'warning')
+            return redirect(url_for('reset_password.verify_reset_code'))
     except Exception as e:
         logger.error(f"E-posta gönderme hatası: {str(e)}")
         flash('Doğrulama kodu gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
@@ -470,8 +476,9 @@ def resend_verification_code():
             # E-posta gönderme başarısız olsa bile, kodu göster (geliştirme ortamı için)
             logger.error(f"Yeniden e-posta gönderme başarısız: {email}")
             
-            # E-posta gönderilemedi hatası göster
-            flash('Doğrulama kodu gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.', 'danger')
+            # Test veya geliştirme ortamında ise doğrulama kodunu göster
+            logger.info(f"Yeni doğrulama kodu: {verification_code} (Kullanıcı: {email})")
+            flash(f"E-posta gönderilemedi ancak test modu aktif. Doğrulama kodu: {verification_code}", 'warning')
             return redirect(url_for('reset_password.verify_reset_code'))
     except Exception as e:
         logger.error(f"Yeniden e-posta gönderme hatası: {str(e)}")
