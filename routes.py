@@ -40,59 +40,28 @@ def update_game_play_count(game_id):
     pass
 
 
-@app.route('/games/memoryMatch3D')
-def memory_match_3d():
-    game_name = "Memory Match 3D"
-    update_game_play_count("memoryMatch3D")
-    return render_template('games/memoryMatch3D.html', title=game_name)
+@app.route('/games/rhythmRunner')
+def rhythm_runner():
+    game_name = "Rhythm Runner"
+    update_game_play_count("rhythmRunner")
+    return render_template('games/rhythmRunner.html', title=game_name)
 
-# Ana sayfaya alternatif rota
-@app.route('/game/memoryMatch3D')
-def memory_match_3d_alt():
-    return memory_match_3d()
+# Rhythm Runner için alternatif rotalar
+@app.route('/game/rhythmRunner')
+def rhythm_runner_alt():
+    return rhythm_runner()
     
-# Alternatif rotalar ekleniyor
-@app.route('/games/memory-match-3d')
-def memory_match_3d_kebab():
-    return memory_match_3d()
+@app.route('/games/rhythm-runner')
+def rhythm_runner_kebab():
+    return rhythm_runner()
     
-@app.route('/memory-match-3d')
-def memory_match_3d_root():
-    return memory_match_3d()
+@app.route('/rhythm-runner')
+def rhythm_runner_root():
+    return rhythm_runner()
     
-@app.route('/memoryMatch3D')
-def memory_match_3d_short():
-    return memory_match_3d()
-
-# Diğer URL biçimleri için rotalar
-@app.route('/games/memorymatch3d')
-def memory_match_3d_lowercase():
-    return memory_match_3d()
-    
-@app.route('/memorymatch3d')
-def memory_match_3d_all_lowercase():
-    return memory_match_3d()
-    
-@app.route('/memory_match_3d')
-def memory_match_3d_underscore():
-    return memory_match_3d()
-    
-@app.route('/games/memory_match_3d')
-def memory_match_3d_games_underscore():
-    return memory_match_3d()
-
-# Daha fazla alternatif rotalar
-@app.route('/memory-match-3d.html')
-def memory_match_3d_html():
-    return memory_match_3d()
-
-@app.route('/game/memory-match-3d')
-def memory_match_3d_game_kebab():
-    return memory_match_3d()
-
-@app.route('/game/memoryMatch3D.html')
-def memory_match_3d_game_html():
-    return memory_match_3d()
+@app.route('/rhythmRunner')
+def rhythm_runner_short():
+    return rhythm_runner()
 
 # Oyun rotası için genel catch-all (Memory Match 3D için de çalışacak)
 @app.route('/<path:game_path>.html')

@@ -8,7 +8,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 main:app"]
 
 [workflows]
-runButton = "Restart Memory Match"
+runButton = "Restart Rhythm Runner"
 
 [[workflows.workflow]]
 name = "Project"
@@ -114,6 +114,19 @@ args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 
 [[workflows.workflow]]
 name = "Restart Memory Match"
+author = 41471502
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill gunicorn || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
+
+[[workflows.workflow]]
+name = "Restart Rhythm Runner"
 author = 41471502
 mode = "sequential"
 

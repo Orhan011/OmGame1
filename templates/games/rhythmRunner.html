@@ -1,0 +1,232 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="rhythm-runner-page">
+  <div class="game-container">
+    <div class="game-header-section">
+      <div class="game-title">
+        <h1>Rhythm Runner</h1>
+        <p class="game-subtitle">Müzik ritmine uygun tuşlara bas ve yüksek puan topla!</p>
+      </div>
+
+      <div class="game-controls-section">
+        <div class="game-stats">
+          <div class="stat-box score-counter">
+            <i class="fas fa-star"></i>
+            <span id="score-count">0</span>
+          </div>
+          <div class="stat-box combo-counter">
+            <i class="fas fa-fire"></i>
+            <span id="combo-count">0</span>
+          </div>
+        </div>
+
+        <div class="difficulty-selector">
+          <select id="song-select" class="song-select">
+            <option value="easy">Kolay Parça</option>
+            <option value="medium">Orta Parça</option>
+            <option value="hard">Zor Parça</option>
+          </select>
+          <button id="start-game-btn" class="control-btn start-game">
+            <i class="fas fa-play"></i> Başlat
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-board-section">
+      <div id="rhythm-game-container">
+        <div class="rhythm-track">
+          <!-- Track 1 -->
+          <div class="rhythm-lane" id="lane-1">
+            <div class="lane-target">
+              <div class="target-key">A</div>
+            </div>
+            <div class="lane-notes" id="notes-container-1">
+              <!-- Notes will be added dynamically -->
+            </div>
+          </div>
+          
+          <!-- Track 2 -->
+          <div class="rhythm-lane" id="lane-2">
+            <div class="lane-target">
+              <div class="target-key">S</div>
+            </div>
+            <div class="lane-notes" id="notes-container-2">
+              <!-- Notes will be added dynamically -->
+            </div>
+          </div>
+          
+          <!-- Track 3 -->
+          <div class="rhythm-lane" id="lane-3">
+            <div class="lane-target">
+              <div class="target-key">D</div>
+            </div>
+            <div class="lane-notes" id="notes-container-3">
+              <!-- Notes will be added dynamically -->
+            </div>
+          </div>
+          
+          <!-- Track 4 -->
+          <div class="rhythm-lane" id="lane-4">
+            <div class="lane-target">
+              <div class="target-key">F</div>
+            </div>
+            <div class="lane-notes" id="notes-container-4">
+              <!-- Notes will be added dynamically -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="feedback-display" id="feedback-display">
+          <!-- Feedback messages will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="game-options-section">
+      <div class="options-row">
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="sound-effects" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">Ses Efektleri</span>
+        </div>
+
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="background-music" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">Müzik</span>
+        </div>
+      </div>
+
+      <div class="help-buttons">
+        <button id="help-btn" class="help-btn">
+          <i class="fas fa-question-circle"></i> Nasıl Oynanır?
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yardım Paneli (varsayılan olarak gizli) -->
+  <div id="help-panel" class="help-panel hidden">
+    <div class="help-header">
+      <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
+      <button id="close-help-btn" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="help-content">
+      <div class="help-section">
+        <h4>Oyun Kuralları</h4>
+        <p>Rhythm Runner, müzik ritmine uygun şekilde tuşlara basarak puan kazandığınız bir ritim oyunudur.</p>
+        <ul>
+          <li>Oyun başladığında, şarkı ritmine göre notalar yukarıdan aşağıya doğru akar.</li>
+          <li>Notalar hedef çizgisine geldiğinde doğru tuşa basmalısınız (A, S, D veya F).</li>
+          <li>Zamanlama ne kadar doğru olursa o kadar çok puan kazanırsınız.</li>
+          <li>Arka arkaya doğru notaları yakalarsanız combo oluşturarak bonus puanlar kazanırsınız.</li>
+          <li>Amacınız, en yüksek puanı elde etmektir.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>İpuçları</h4>
+        <ul>
+          <li>Ritmi hissetmeye çalışın ve müziğe odaklanın.</li>
+          <li>Tuşları önceden ezberleyin: A, S, D ve F.</li>
+          <li>Doğru zamanlamaya odaklanın, hızdan çok doğruluk önemlidir.</li>
+          <li>Combo'nuzu kaybetmemeye çalışın, bonus puanlar büyük fark yaratır.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sonuç Modalı -->
+<div class="modal fade" id="result-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Oyun Bitti!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="result-message win">
+          <div class="result-icon">
+            <i class="fas fa-music"></i>
+          </div>
+          <h4>Ritim duygunuz harika!</h4>
+          <p>İşte sonuçlarınız:</p>
+        </div>
+        <div class="result-stats">
+          <div class="stat-item">
+            <div class="stat-label">Puan</div>
+            <div class="stat-value" id="result-score">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">En Yüksek Combo</div>
+            <div class="stat-value" id="result-max-combo">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Doğruluk</div>
+            <div class="stat-value" id="result-accuracy">0%</div>
+          </div>
+        </div>
+
+        <!-- Skor Gösterimi -->
+        <div id="score-display-container" class="mt-4"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="modal-btn primary" id="play-again-btn">Tekrar Oyna</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/games/rhythmRunner.css">
+<link rel="stylesheet" href="/static/css/score-display.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/games/rhythmRunner.js"></script>
+<script src="/static/js/score-handler.js"></script>
+<script src="/static/js/score-display.js"></script>
+<script src="/static/js/game-integration-helper.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.rhythmRunnerGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('rhythmRunner', window.rhythmRunnerGame, {
+        maxScore: 10000,
+        expectedTime: 180 // 3 dakika
+      });
+      
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+      
+      // Oyun tamamlandığında puan hesapla
+      window.rhythmRunnerGame.onComplete = function(stats) {
+        const score = stats.score;
+        const accuracy = stats.accuracy;
+        const maxCombo = stats.maxCombo;
+        
+        // Metrikleri güncelle
+        scoreSystem.updateMetrics({
+          completed: true,
+          score: score,
+          accuracy: accuracy,
+          maxCombo: maxCombo
+        });
+        
+        // Puan hesapla ve göster
+        scoreSystem.endGame(true);
+      };
+    }
+  });
+</script>
+{% endblock %}
