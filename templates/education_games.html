@@ -8,12 +8,24 @@
   </div>
 
   <div class="game-grid">
-    <!-- Bu alanda henüz oyun yok, ileride eklenecek -->
-    <div class="coming-soon-message">
-      <i class="fas fa-tools"></i>
-      <h3>Yakında Geliyor!</h3>
-      <p>Eğitim kategorisindeki oyunlarımız hazırlanıyor. Çok yakında burada olacaklar.</p>
-    </div>
+    {% if games %}
+      {% for game in games %}
+        <div class="game-card">
+          <div class="game-icon"><i class="{{ game.icon }}"></i></div>
+          <div class="game-info">
+            <h3>{{ game.title }}</h3>
+            <p>{{ game.description }}</p>
+          </div>
+          <a href="{{ game.url }}" class="game-btn">Oyna</a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="coming-soon-message">
+        <i class="fas fa-tools"></i>
+        <h3>Yakında Geliyor!</h3>
+        <p>Eğitim kategorisindeki oyunlarımız hazırlanıyor. Çok yakında burada olacaklar.</p>
+      </div>
+    {% endif %}
   </div>
 
   <div class="row mt-5 mb-5">

@@ -3398,8 +3398,15 @@ def get_users_leaderboard():
 @app.route('/education-games')
 def education_games():
     """Eğitim, eğlence ve oyun sayfası"""
-    # Şu an için boş bir oyun listesi oluştur
-    games = []
+    # Eğitici oyun listesi oluştur
+    games = [
+        {
+            "title": "Dil Öğrenme",
+            "description": "Duolingo tarzı interaktif dil öğrenme egzersizleri ile yeni bir dil öğrenin.",
+            "icon": "fas fa-language",
+            "url": "/games/language-learning"
+        }
+    ]
     
     # Sayfa template'ini döndür
     return render_template('education_games.html', games=games)
