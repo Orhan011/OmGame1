@@ -1,6 +1,7 @@
+
 /**
  * Liderlik Tablosu Yöneticisi
- * Bu script, liderlik tablosundaki verileri yüklemek ve görüntülemek için kullanılır.
+ * Modern, camsı tasarım için geliştirilmiş JS
  */
 
 // Sayfa yüklendiğinde çalışacak fonksiyon
@@ -14,26 +15,30 @@ document.addEventListener('DOMContentLoaded', function() {
   const refreshBtn = document.getElementById('refreshBtn');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', function() {
-      this.classList.add('spin-animation');
-      loadLeaderboard();
-
-      setTimeout(() => {
-        this.classList.remove('spin-animation');
-      }, 1000);
+      this.querySelector('i').classList.add('spin-animation');
+      const buttonText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-sync-alt spin-animation"></i> Yenileniyor...';
+      
+      loadLeaderboard().then(() => {
+        setTimeout(() => {
+          this.innerHTML = buttonText;
+          this.querySelector('i').classList.remove('spin-animation');
+        }, 800);
+      });
     });
   }
 
   // Her 60 saniyede bir liderlik tablosunu yenile
   setInterval(function() {
     loadLeaderboard();
-    console.log("Liderlik tablosu yenilendi - " + new Date().toLocaleTimeString());
+    console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
 });
 
-// Liderlik tablosunu yükle
+// Liderlik tablosunu yükle - Promise döndürür
 function loadLeaderboard() {
   const container = document.getElementById('leaderboardRows');
-  if (!container) return;
+  if (!container) return Promise.resolve();
 
   console.log('Liderlik tablosu yükleniyor...');
 
@@ -46,7 +51,7 @@ function loadLeaderboard() {
   `;
 
   // API'den verileri al - sadece ilk 10 kullanıcı
-  fetch('/api/scores/aggregated?limit=10&nocache=' + new Date().getTime())
+  return fetch('/api/scores/aggregated?limit=10&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         throw new Error('API yanıtı başarısız: ' + response.status);
@@ -86,11 +91,21 @@ function loadLeaderboard() {
         const avatarUrl = fixAvatarUrl(player.avatar_url);
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
+        
+        // Rank ikonlarını oluştur
+        let rankIcon = '';
+        if (rank === 1) {
+          rankIcon = '<i class="fas fa-crown" style="color: var(--gold); margin-right: 5px;"></i>';
+        } else if (rank === 2) {
+          rankIcon = '<i class="fas fa-medal" style="color: var(--silver); margin-right: 5px;"></i>';
+        } else if (rank === 3) {
+          rankIcon = '<i class="fas fa-award" style="color: var(--bronze); margin-right: 5px;"></i>';
+        }
 
         // Satır HTML'i
         html += `
           <div class="player-row" data-rank="${rank}">
-            <div class="rank">${rank}</div>
+            <div class="rank">${rankIcon}${rank}</div>
             <div class="player">
               <div class="player-avatar">
                 <img src="${avatarUrl || '/static/images/avatars/default.svg'}" alt="${username}" 
@@ -101,6 +116,9 @@ function loadLeaderboard() {
             <div class="score">${formatNumber(totalScore)}</div>
           </div>
         `;
+        
+        // Her oyuncu satırı eklendikten sonra eklemek için log
+        console.log(`Seviye tablosuna eklenen kullanıcı: ${username}`);
       });
 
       // HTML'i konteyner'a ekle
@@ -155,7 +173,7 @@ function animateRows() {
     setTimeout(() => {
       row.style.opacity = '1';
       row.style.transform = 'translateY(0)';
-    }, index * 80);
+    }, index * 100);
   });
 }
 
@@ -175,7 +193,7 @@ function showNotification(message, duration = 3000) {
   }
 }
 
-// Global API (modified to only include relevant functions)
+// Global API
 window.LeaderboardManager = {
   loadLeaderboard: loadLeaderboard,
   updateScoreBoard: function() {
@@ -183,7 +201,7 @@ window.LeaderboardManager = {
   }
 };
 
-// Global fonksiyon (simplified)
+// Global fonksiyon
 window.updateScoreBoard = function() {
   loadLeaderboard();
   showNotification('Liderlik tablosu güncellendi!');
