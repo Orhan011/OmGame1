@@ -5,6 +5,7 @@
 
 // Sayfa yüklendiğinde liderlik tablosu verilerini al
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Liderlik tablosu modülü yükleniyor...');
   loadLeaderboard();
   loadLevelLeaderboard();
 
