@@ -8,29 +8,12 @@
   </div>
 
   <div class="game-grid">
-    {% if games %}
-      {% for game in games %}
-        <div class="game-card">
-          <div class="game-icon"><i class="{{ game.icon }}"></i></div>
-          <div class="game-info">
-            <h3>{{ game.name }}</h3>
-            <p>{{ game.description }}</p>
-            {% if game.level %}
-              <div class="game-level">
-                <span class="level-badge">{{ game.level }}</span>
-              </div>
-            {% endif %}
-          </div>
-          <a href="{{ game.url }}" class="game-btn">Oyna</a>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="coming-soon-message">
-        <i class="fas fa-tools"></i>
-        <h3>Yakında Geliyor!</h3>
-        <p>Eğitim kategorisindeki oyunlarımız hazırlanıyor. Çok yakında burada olacaklar.</p>
-      </div>
-    {% endif %}
+    <!-- Bu alanda henüz oyun yok, ileride eklenecek -->
+    <div class="coming-soon-message">
+      <i class="fas fa-tools"></i>
+      <h3>Yakında Geliyor!</h3>
+      <p>Eğitim kategorisindeki oyunlarımız hazırlanıyor. Çok yakında burada olacaklar.</p>
+    </div>
   </div>
 
   <div class="row mt-5 mb-5">
@@ -261,43 +244,6 @@
     font-size: 1.2rem;
     max-width: 600px;
     margin: 0 auto;
-  }
-  
-  /* Seviye gösterimi */
-  .game-level {
-    margin-top: 10px;
-  }
-  
-  .level-badge {
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    display: inline-block;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    font-weight: 600;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .level-badge::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to right, rgba(255, 123, 179, 0.4), rgba(106, 90, 224, 0.4));
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .game-card:hover .level-badge::before {
-    opacity: 1;
   }
 </style>
 {% endblock %}

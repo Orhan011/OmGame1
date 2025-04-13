@@ -1728,13 +1728,6 @@ def hangman():
     Gizli kelimeyi bulmak için harfleri tahmin edin ve kelimeyi tamamlamaya çalışın."""
     return render_template('games/hangman.html')
 
-# İngilizce Öğrenme Oyunu
-@app.route('/games/language-learning')
-def language_learning():
-    """İngilizce Öğrenme Oyunu: Dil becerilerini geliştirmek için eğlenceli aktiviteler
-    Kelime dağarcığı, dilbilgisi ve dinleme becerilerini interaktif bir şekilde geliştirin."""
-    return render_template('games/language_learning.html')
-
 @app.route('/games/crossword')
 def crossword():
     """Bulmaca: Kelime bulmaca oyunu
@@ -3405,16 +3398,8 @@ def get_users_leaderboard():
 @app.route('/education-games')
 def education_games():
     """Eğitim, eğlence ve oyun sayfası"""
-    # Eğitim oyunlarını listeye ekle
-    games = [
-        {
-            'name': 'İngilizce Öğrenme Oyunu',
-            'description': 'Eğlenceli aktivitelerle İngilizce dil becerilerini geliştirin',
-            'icon': 'fas fa-language',
-            'url': '/games/language-learning',
-            'level': 'Başlangıçtan İleri Seviyeye'
-        }
-    ]
+    # Şu an için boş bir oyun listesi oluştur
+    games = []
     
     # Sayfa template'ini döndür
     return render_template('education_games.html', games=games)
