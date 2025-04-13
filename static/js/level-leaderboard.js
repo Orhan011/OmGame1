@@ -17,7 +17,6 @@ function loadLevelLeaderboard() {
   levelLeaderboardContainer.innerHTML = `
     <div class="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>Seviye bilgileri yükleniyor...</p>
     </div>
   `;
 
@@ -34,7 +33,6 @@ function loadLevelLeaderboard() {
         levelLeaderboardContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-user-graduate"></i>
-            <p>Henüz seviye kaydı bulunmuyor. Platform üzerinde etkinlik göstererek seviye kazanabilirsiniz!</p>
           </div>
         `;
         return;
@@ -109,7 +107,6 @@ function loadLevelLeaderboard() {
       levelLeaderboardContainer.innerHTML = `
         <div class="error">
           <i class="fas fa-exclamation-triangle"></i>
-          <p>Seviye bilgileri yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
         </div>
       `;
     });
