@@ -92,14 +92,17 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
         
-        // Rank ikonlarını oluştur
+        // Rank numarasına göre satır oluştur (1. sıradaki oyuncu için özel taç yok, CSS üzerinden eklenecek)
         let rankIcon = '';
         if (rank === 1) {
-          rankIcon = '<i class="fas fa-crown" style="color: var(--gold); margin-right: 5px;"></i>';
+          // 1. sıra için ikonu kaldırdık, CSS üzerinden otomatik eklenecek
+          rankIcon = '';
         } else if (rank === 2) {
-          rankIcon = '<i class="fas fa-medal" style="color: var(--silver); margin-right: 5px;"></i>';
+          // 2. sıra için madalyon ikonu kaldırıldı
+          rankIcon = '';
         } else if (rank === 3) {
-          rankIcon = '<i class="fas fa-award" style="color: var(--bronze); margin-right: 5px;"></i>';
+          // 3. sıra için madalyon ikonu kaldırıldı
+          rankIcon = '';
         }
 
         // Satır HTML'i

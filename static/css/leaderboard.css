@@ -280,6 +280,33 @@ body {
 .player-row[data-rank="1"] .player-avatar {
   border: 2px solid var(--gold);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  position: relative;
+}
+
+/* Taç ikonu */
+.player-row[data-rank="1"] .player-avatar::after {
+  content: '\f521'; /* Font Awesome crown ikonu */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--gold);
+  font-size: 16px;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+  animation: float 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+.player-row[data-rank="1"] .player-name {
+  color: var(--gold);
+}
+
+.player-row[data-rank="1"] .score {
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 .player-row[data-rank="2"] {
@@ -296,6 +323,16 @@ body {
   border: 2px solid var(--silver);
 }
 
+.player-row[data-rank="2"] .player-name {
+  color: var(--silver);
+}
+
+.player-row[data-rank="2"] .score {
+  background: rgba(192, 192, 192, 0.15);
+  color: var(--silver);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
 .player-row[data-rank="3"] {
   background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(42, 42, 64, 0.6));
   border-left: 3px solid var(--bronze);
@@ -308,6 +345,22 @@ body {
 
 .player-row[data-rank="3"] .player-avatar {
   border: 2px solid var(--bronze);
+}
+
+.player-row[data-rank="3"] .player-name {
+  color: var(--bronze);
+}
+
+.player-row[data-rank="3"] .score {
+  background: rgba(205, 127, 50, 0.15);
+  color: var(--bronze);
+  border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+@keyframes float {
+  0% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+  100% { transform: translateX(-50%) translateY(0); }
 }
 
 /* Yükleniyor Durumu */
