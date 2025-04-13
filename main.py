@@ -3411,5 +3411,134 @@ def education_games():
     # Sayfa template'ini döndür
     return render_template('education_games.html', games=games)
 
+@app.route('/games/language-learning')
+def language_learning():
+    """Duolingo tarzı dil öğrenme oyunu"""
+    # Dil öğrenme oyunu için dersler ve ifadeler oluştur
+    lessons = [
+        {
+            "id": 1,
+            "title": "Temel İfadeler",
+            "description": "Günlük hayatta kullanılan temel ifadeleri öğrenin",
+            "difficulty": "Kolay",
+            "progress": 0
+        },
+        {
+            "id": 2,
+            "title": "Selamlaşma",
+            "description": "Farklı dillerde selamlaşma ve tanışma ifadeleri",
+            "difficulty": "Kolay", 
+            "progress": 0
+        },
+        {
+            "id": 3,
+            "title": "Yemek ve İçecekler",
+            "description": "Restoranlarda ve kafelerde kullanabileceğiniz ifadeler",
+            "difficulty": "Orta",
+            "progress": 0
+        },
+        {
+            "id": 4,
+            "title": "Seyahat Terimleri",
+            "description": "Seyahat ederken ihtiyaç duyacağınız temel kelimeler",
+            "difficulty": "Orta",
+            "progress": 0
+        },
+        {
+            "id": 5,
+            "title": "Alışveriş Terimleri",
+            "description": "Alışveriş yaparken kullanabileceğiniz ifadeler",
+            "difficulty": "Zor",
+            "progress": 0
+        }
+    ]
+    
+    # Dil seçenekleri
+    languages = [
+        {"code": "en", "name": "İngilizce", "flag": "gb"},
+        {"code": "de", "name": "Almanca", "flag": "de"},
+        {"code": "fr", "name": "Fransızca", "flag": "fr"},
+        {"code": "es", "name": "İspanyolca", "flag": "es"},
+        {"code": "it", "name": "İtalyanca", "flag": "it"}
+    ]
+    
+    # Şablonu döndür
+    return render_template('language_learning.html', lessons=lessons, languages=languages)
+
+@app.route('/games/language-learning/lesson/<int:lesson_id>')
+def language_lesson(lesson_id):
+    """Belirli bir dil öğrenme dersini gösterir"""
+    # Örnek veri dizisi
+    
+    # Kullanıcının seçtiği dil (gerçek uygulamada session veya veritabanından alınır)
+    selected_language = request.args.get('lang', 'en')
+    
+    # Ders bilgisi
+    lesson = None
+    
+    # Ders ID'sine göre içerik hazırla
+    if lesson_id == 1:
+        lesson = {
+            "id": 1,
+            "title": "Temel İfadeler",
+            "description": "Günlük hayatta kullanılan temel ifadeleri öğrenin",
+            "exercises": [
+                {
+                    "type": "translation",
+                    "question": "Merhaba",
+                    "options": ["Hello", "Goodbye", "Thank you", "Please"],
+                    "correct": "Hello",
+                    "language": "en"
+                },
+                {
+                    "type": "multiple_choice",
+                    "question": "Hangi kelime 'Teşekkür ederim' anlamına gelir?",
+                    "options": ["Hello", "Sorry", "Thank you", "Goodbye"],
+                    "correct": "Thank you"
+                },
+                {
+                    "type": "matching",
+                    "pairs": [
+                        {"native": "Merhaba", "foreign": "Hello"},
+                        {"native": "Hoşça kal", "foreign": "Goodbye"},
+                        {"native": "Teşekkürler", "foreign": "Thank you"},
+                        {"native": "Lütfen", "foreign": "Please"}
+                    ]
+                }
+            ]
+        }
+    elif lesson_id == 2:
+        lesson = {
+            "id": 2,
+            "title": "Selamlaşma",
+            "description": "Farklı dillerde selamlaşma ve tanışma ifadeleri",
+            "exercises": [
+                {
+                    "type": "translation",
+                    "question": "İyi günler",
+                    "options": ["Good day", "Good night", "Good evening", "Good morning"],
+                    "correct": "Good day",
+                    "language": "en"
+                },
+                {
+                    "type": "multiple_choice",
+                    "question": "Hangi kelime 'Nasılsın?' anlamına gelir?",
+                    "options": ["What's up?", "How are you?", "Where are you?", "Who are you?"],
+                    "correct": "How are you?"
+                }
+            ]
+        }
+    else:
+        # Diğer dersler için basit bir şablon
+        lesson = {
+            "id": lesson_id,
+            "title": f"Ders {lesson_id}",
+            "description": "Bu ders henüz hazırlanıyor...",
+            "exercises": []
+        }
+    
+    # Şablonu döndür
+    return render_template('language_lesson.html', lesson=lesson, lesson_id=lesson_id, selected_language=selected_language)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
