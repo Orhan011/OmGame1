@@ -133,11 +133,18 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
-        // Modern tasarıma göre oyuncu satırı ekle
+        // Liderlik rozeti (ilk 3 sıra için)
+        const badge = rank <= 3 ? 
+          `<span class="rank-badge rank-${rank}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>` : '';
+
+        // Modern ve profesyonel tasarıma göre oyuncu satırı ekle
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
             <div class="simple-rank">${rank}</div>
-            <div class="simple-name">${username}</div>
+            <div class="player-info">
+              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
+              <div class="simple-name">${username} ${badge}</div>
+            </div>
             <div class="simple-score">${formatNumber(totalScore)}</div>
           </div>
         `;
@@ -230,12 +237,25 @@ function loadLevelLeaderboard() {
         const avatarUrl = fixAvatarUrl(player.avatar_url);
         const rank = index + 1;
 
-        // Modern tasarıma göre seviye satırı ekle
+        // Liderlik rozeti (ilk 3 sıra için)
+        const badge = rank <= 3 ? 
+          `<span class="rank-badge rank-${rank}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>` : '';
+
+        // Modern ve profesyonel tasarıma göre seviye satırı ekle
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
             <div class="simple-rank">${rank}</div>
-            <div class="simple-name">${username}</div>
-            <div class="simple-score">Seviye ${level}</div>
+            <div class="player-info">
+              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
+              <div class="simple-name">${username} ${badge}</div>
+            </div>
+            <div class="simple-score">
+              <span class="level-badge">Seviye ${level}</span>
+              <div class="level-progress">
+                <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                <span class="progress-text">${progressPercent}%</span>
+              </div>
+            </div>
           </div>
         `;
       });
