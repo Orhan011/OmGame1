@@ -522,206 +522,121 @@
   border-collapse: collapse;
 }
 
+/* Basit Tablo Tasarımı */
 .player-row {
   display: flex;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   background: var(--background-element);
-  border-radius: var(--border-radius);
-  margin-bottom: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 2px;
+  border-left: 3px solid transparent;
   transition: var(--transition);
 }
 
 .player-row:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   background: rgba(106, 90, 224, 0.1);
+  border-left-color: var(--primary-color);
 }
 
-.rank-column {
-  width: 40px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text-muted);
-  margin-right: 0.5rem;
-}
-
-.player-column {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.player-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 1rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-  font-weight: 600;
-  flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-
-.player-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.player-avatar .avatar-fallback {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.player-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.player-name {
-  color: var(--text-light);
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 0.2rem;
+/* Basitleştirilmiş tek satır formatı için stiller */
+.simple-rank, .simple-name, .simple-score {
+  padding: 0 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.player-badges {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.player-badge {
-  font-size: 0.7rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
+.simple-rank {
+  width: 50px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
   color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
 }
 
-.level-badge {
-  background: rgba(106, 90, 224, 0.2);
-  color: var(--primary-light);
+.simple-name {
+  flex: 1;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 1rem;
 }
 
-.games-badge {
-  background: rgba(255, 122, 80, 0.2);
-  color: var(--secondary-color);
-}
-
-.score-column {
-  min-width: 90px;
+.simple-score {
+  width: 120px;
   text-align: right;
-  padding-left: 1rem;
-}
-
-.score-box {
-  background: rgba(106, 90, 224, 0.2);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  display: inline-block;
   font-weight: 700;
   font-size: 1rem;
   color: var(--primary-light);
-  border: 1px solid rgba(106, 90, 224, 0.3);
 }
 
-/* Top players styling */
+/* Tablo başlığı */
+.leaderboard-header {
+  display: flex;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.header-rank, .header-name, .header-score {
+  padding: 0 1rem;
+}
+
+.header-rank {
+  width: 50px;
+  text-align: center;
+}
+
+.header-name {
+  flex: 1;
+}
+
+.header-score {
+  width: 120px;
+  text-align: right;
+}
+
+/* İlk 3 satır için özel renkler */
 .player-row[data-rank="1"] {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, var(--background-element) 100%);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  transform: scale(1.02);
-  z-index: 2;
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), var(--background-element));
+  border-left-color: var(--gold);
 }
 
-.player-row[data-rank="1"]:hover {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(42, 42, 64, 0.8) 100%);
-  transform: scale(1.03) translateY(-3px);
-}
-
-.player-row[data-rank="1"] .rank-column {
+.player-row[data-rank="1"] .simple-rank {
   color: var(--gold);
-}
-
-.player-row[data-rank="1"] .player-name {
-  color: var(--gold);
-}
-
-.player-row[data-rank="1"] .player-avatar {
-  border: 2px solid var(--gold);
 }
 
 .player-row[data-rank="2"] {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, var(--background-element) 100%);
-  border: 1px solid rgba(192, 192, 192, 0.3);
-  transform: scale(1.01);
-  z-index: 1;
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), var(--background-element));
+  border-left-color: var(--silver);
 }
 
-.player-row[data-rank="2"]:hover {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.2) 0%, rgba(42, 42, 64, 0.8) 100%);
-  transform: scale(1.02) translateY(-3px);
-}
-
-.player-row[data-rank="2"] .rank-column {
+.player-row[data-rank="2"] .simple-rank {
   color: var(--silver);
-}
-
-.player-row[data-rank="2"] .player-name {
-  color: var(--silver);
-}
-
-.player-row[data-rank="2"] .player-avatar {
-  border: 2px solid var(--silver);
 }
 
 .player-row[data-rank="3"] {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.1) 0%, var(--background-element) 100%);
-  border: 1px solid rgba(205, 127, 50, 0.3);
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), var(--background-element));
+  border-left-color: var(--bronze);
 }
 
-.player-row[data-rank="3"]:hover {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.2) 0%, rgba(42, 42, 64, 0.8) 100%);
-  transform: scale(1.01) translateY(-3px);
-}
-
-.player-row[data-rank="3"] .rank-column {
+.player-row[data-rank="3"] .simple-rank {
   color: var(--bronze);
 }
 
-.player-row[data-rank="3"] .player-name {
-  color: var(--bronze);
-}
-
-.player-row[data-rank="3"] .player-avatar {
-  border: 2px solid var(--bronze);
-}
-
+/* Kullanıcının kendi satırı */
 .player-row.current-user {
-  background: linear-gradient(90deg, rgba(106, 90, 224, 0.15) 0%, var(--background-element) 100%);
-  border: 1px solid rgba(106, 90, 224, 0.4);
+  background: linear-gradient(90deg, rgba(106, 90, 224, 0.15), var(--background-element));
+  border-left-color: var(--primary-color);
   position: relative;
 }
 
-.player-row.current-user::before {
+.player-row.current-user::after {
   content: 'Siz';
   position: absolute;
-  top: -8px;
   right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   background: var(--primary-color);
   color: var(--text-light);
   padding: 0.1rem 0.5rem;
@@ -729,6 +644,8 @@
   font-size: 0.7rem;
   font-weight: 600;
 }
+
+/* Eski stiller kaldırıldı - yukarıdaki yeni stiller kullanılıyor */
 
 /* Progress bar for level leaderboard */
 .level-progress {

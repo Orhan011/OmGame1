@@ -387,120 +387,41 @@ function animateRows() {
   });
 }
 
-// Oyuncu satırı HTML'i oluştur
+// Oyuncu satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser, playerRank) {
-  const initial = username.charAt(0).toUpperCase();
   const currentUserClass = isCurrentUser ? 'current-user' : '';
   
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="rank-column">${rank}</div>
-      <div class="player-column">
-        <div class="player-avatar">
-          ${avatarUrl ? 
-            `<img src="${avatarUrl}" alt="${username}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-             <span class="avatar-fallback" style="display:none">${initial}</span>` : 
-            `<span class="avatar-fallback">${initial}</span>`
-          }
-        </div>
-        <div class="player-info">
-          <div class="player-name">${username}</div>
-          <div class="player-badges">
-            ${playerRank ? `<span class="player-badge">${playerRank}</span>` : ''}
-          </div>
-        </div>
-      </div>
-      <div class="score-column">
-        <div class="score-box">${formatNumber(score)}</div>
-      </div>
+      <div class="simple-rank">${rank}</div>
+      <div class="simple-name">${username}</div>
+      <div class="simple-score">${formatNumber(score)}</div>
     </div>
   `;
 }
 
-// Seviye satırı HTML'i oluştur
+// Seviye satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createLevelRow(rank, username, level, totalXp, progressPercent, avatarUrl, isCurrentUser, playerRank) {
-  const initial = username.charAt(0).toUpperCase();
   const currentUserClass = isCurrentUser ? 'current-user' : '';
-  
-  // Level badge sınıfı
-  let levelBadgeClass = '';
-  if (level >= 10) levelBadgeClass = 'level-elite';
-  else if (level >= 7) levelBadgeClass = 'level-master';
-  else if (level >= 5) levelBadgeClass = 'level-expert';
-  else if (level >= 3) levelBadgeClass = 'level-advanced';
   
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="rank-column">${rank}</div>
-      <div class="player-column">
-        <div class="player-avatar">
-          ${avatarUrl ? 
-            `<img src="${avatarUrl}" alt="${username}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-             <span class="avatar-fallback" style="display:none">${initial}</span>` : 
-            `<span class="avatar-fallback">${initial}</span>`
-          }
-        </div>
-        <div class="player-info">
-          <div class="player-name">${username}</div>
-          <div class="player-badges">
-            <span class="player-badge level-badge">XP: ${formatNumber(totalXp)}</span>
-            ${playerRank ? `<span class="player-badge">${playerRank}</span>` : ''}
-          </div>
-          <div class="level-progress">
-            <div class="progress-bar" style="width: ${progressPercent}%"></div>
-            <span class="progress-text">${progressPercent}%</span>
-          </div>
-        </div>
-      </div>
-      <div class="score-column">
-        <div class="score-box ${levelBadgeClass}">Seviye ${level}</div>
-      </div>
+      <div class="simple-rank">${rank}</div>
+      <div class="simple-name">${username}</div>
+      <div class="simple-score">Seviye ${level}</div>
     </div>
   `;
 }
 
-// Oyun satırı HTML'i oluştur
+// Oyun satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createGameRow(rank, username, score, avatarUrl, isCurrentUser, gameInfo, gameType) {
-  const initial = username.charAt(0).toUpperCase();
   const currentUserClass = isCurrentUser ? 'current-user' : '';
-  
-  // Oyun bilgilerinden badge'ler oluştur
-  let gameBadges = '';
-  
-  if (gameInfo.difficulty) {
-    const difficultyClass = gameInfo.difficulty === 'hard' ? 'difficulty-hard' : 
-                           gameInfo.difficulty === 'medium' ? 'difficulty-medium' : 
-                           'difficulty-easy';
-    
-    gameBadges += `<span class="player-badge ${difficultyClass}">${gameInfo.difficulty}</span>`;
-  }
-  
-  if (gameInfo.level) {
-    gameBadges += `<span class="player-badge">Seviye ${gameInfo.level}</span>`;
-  }
   
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="rank-column">${rank}</div>
-      <div class="player-column">
-        <div class="player-avatar">
-          ${avatarUrl ? 
-            `<img src="${avatarUrl}" alt="${username}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-             <span class="avatar-fallback" style="display:none">${initial}</span>` : 
-            `<span class="avatar-fallback">${initial}</span>`
-          }
-        </div>
-        <div class="player-info">
-          <div class="player-name">${username}</div>
-          <div class="player-badges">
-            <span class="player-badge games-badge">${gameType === 'all' ? 'Tüm Oyunlar' : gameType}</span>
-            ${gameBadges}
-          </div>
-        </div>
-      </div>
-      <div class="score-column">
-        <div class="score-box">${formatNumber(score)}</div>
-      </div>
+      <div class="simple-rank">${rank}</div>
+      <div class="simple-name">${username}</div>
+      <div class="simple-score">${formatNumber(score)}</div>
     </div>
   `;
 }
