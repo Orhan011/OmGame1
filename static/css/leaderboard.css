@@ -690,9 +690,9 @@
 
 .score-block {
   position: relative;
-  width: 70px;
+  width: 80px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   flex-shrink: 0;
   margin-right: 5px;
 }
@@ -718,7 +718,9 @@
                     rgba(106, 90, 224, 0.2) 0%, 
                     rgba(159, 138, 255, 0.1) 100%);
   min-width: 40px;
+  min-height: 35px;
   text-align: center;
+  width: auto;
 }
 
 .player-row:hover .score-container {
@@ -733,30 +735,21 @@
 .score-value {
   color: #fff;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   position: relative;
   z-index: 1;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(45deg, #fff 10%, #e0d8ff 60%, #b5a4ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
+  margin: 0 auto;
+  display: block;
 }
 
 .player-row:hover .score-value {
-  background: linear-gradient(45deg, #fff 10%, #e2dbff 40%, #b5a4ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
   transform: scale(1.05);
   letter-spacing: 0.6px;
-}
-
-.player-row:hover .score-value {
-  background: linear-gradient(45deg, #fff, #9f8aff);
-  -webkit-background-clip: text;
-  background-clip: text;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(106, 90, 224, 0.8);
 }
 
 .score-sparkles {
