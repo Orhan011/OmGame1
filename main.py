@@ -3503,7 +3503,7 @@ def language_learning():
     # Şablonu döndür
     return render_template('language_learning.html', lessons=lessons, languages=languages)
 
-@app.route('/games/language-learning/lesson/<int:lesson_id>')
+@app.route('/language-lesson/<int:lesson_id>')
 def language_lesson(lesson_id):
     """Belirli bir dil öğrenme dersini gösterir"""
     # Örnek veri dizisi
