@@ -11,16 +11,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const refreshButton = document.getElementById('refreshLeaderboard');
   if (refreshButton) {
     refreshButton.addEventListener('click', function() {
+      // Yenileme animasyonu
       this.classList.add('refreshing');
       const icon = this.querySelector('i');
       if (icon) icon.classList.add('fa-spin');
       
-      loadLeaderboard().then(() => {
-        setTimeout(() => {
-          this.classList.remove('refreshing');
-          if (icon) icon.classList.remove('fa-spin');
-        }, 500);
-      });
+      // Tabloyu yenile
+      loadLeaderboard();
+      
+      // Animasyonu biraz sonra kaldır
+      setTimeout(() => {
+        this.classList.remove('refreshing');
+        if (icon) icon.classList.remove('fa-spin');
+      }, 1000);
     });
   }
 });
