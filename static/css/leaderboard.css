@@ -258,7 +258,8 @@ body {
   background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(42, 42, 64, 0.6));
   border-left: 3px solid var(--gold);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 10;
 }
 
 .player-row[data-rank="1"]::before {
@@ -275,6 +276,19 @@ body {
 .player-row[data-rank="1"] .rank {
   color: var(--gold);
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  position: relative;
+}
+
+.player-row[data-rank="1"] .player-name {
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.player-row[data-rank="1"] .score {
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 .player-row[data-rank="1"] .player-avatar {
@@ -292,6 +306,18 @@ body {
   text-shadow: 0 0 10px rgba(192, 192, 192, 0.4);
 }
 
+.player-row[data-rank="2"] .player-name {
+  color: var(--silver);
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.4);
+}
+
+.player-row[data-rank="2"] .score {
+  color: var(--silver);
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.4);
+  background: rgba(192, 192, 192, 0.1);
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
 .player-row[data-rank="2"] .player-avatar {
   border: 2px solid var(--silver);
 }
@@ -304,6 +330,18 @@ body {
 .player-row[data-rank="3"] .rank {
   color: var(--bronze);
   text-shadow: 0 0 10px rgba(205, 127, 50, 0.4);
+}
+
+.player-row[data-rank="3"] .player-name {
+  color: var(--bronze);
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.4);
+}
+
+.player-row[data-rank="3"] .score {
+  color: var(--bronze);
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.4);
+  background: rgba(205, 127, 50, 0.1);
+  border: 1px solid rgba(205, 127, 50, 0.3);
 }
 
 .player-row[data-rank="3"] .player-avatar {
