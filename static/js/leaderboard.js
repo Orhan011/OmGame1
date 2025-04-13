@@ -78,8 +78,8 @@ function loadLeaderboard() {
     </div>
   `;
   
-  // Sunucudan verileri al
-  fetch('/api/scores/aggregated?limit=100&nocache=' + new Date().getTime())
+  // Sunucudan verileri al - sadece ilk 10 kişiyi iste
+  fetch('/api/scores/aggregated?limit=10&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         throw new Error('API yanıtı başarısız: ' + response.status);
@@ -112,10 +112,18 @@ function loadLeaderboard() {
       updatePodium(data);
       
       // Tablo HTML'ini oluştur
-      let html = '';
+      let html = `
+        <div class="leaderboard-header">
+          <div class="simple-rank">Sıra</div>
+          <div class="simple-name">Kullanıcı</div>
+          <div class="simple-score">Puan</div>
+        </div>
+      `;
       
-      // Her kullanıcı için bir satır oluştur
-      data.forEach((player, index) => {
+      // Sadece ilk 10 oyuncu için satır oluştur
+      const playersToShow = data.slice(0, 10);
+      
+      playersToShow.forEach((player, index) => {
         const totalScore = player.total_score || 0;
         const username = player.username || 'İsimsiz Oyuncu';
         const avatarUrl = fixAvatarUrl(player.avatar_url);
@@ -157,12 +165,12 @@ function loadLevelLeaderboard() {
     </div>
   `;
   
-  // Sunucudan verileri al
-  fetch('/api/users/levels?limit=20&nocache=' + new Date().getTime())
+  // Sunucudan verileri al - sadece ilk 10 kullanıcı
+  fetch('/api/users/levels?limit=10&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         // Alternatif API'yi dene
-        return fetch('/api/scores/top-users?limit=20');
+        return fetch('/api/scores/top-users?limit=10');
       }
       return response;
     })
@@ -181,10 +189,19 @@ function loadLevelLeaderboard() {
       }
       
       // Tablo HTML'ini oluştur
-      let html = '';
+      let html = `
+        <div class="leaderboard-header">
+          <div class="simple-rank">Sıra</div>
+          <div class="simple-name">Kullanıcı</div>
+          <div class="simple-score">Seviye</div>
+        </div>
+      `;
+      
+      // Sadece ilk 10 kullanıcı için satır oluştur
+      const playersToShow = data.slice(0, 10);
       
       // Her kullanıcı için bir satır oluştur
-      data.forEach((player, index) => {
+      playersToShow.forEach((player, index) => {
         const username = player.username || 'İsimsiz Oyuncu';
         console.log(`Seviye tablosuna eklenen kullanıcı: ${username}`);
         
@@ -228,10 +245,10 @@ function loadGameLeaderboard(gameType) {
     </div>
   `;
   
-  // API URL'ini belirle
+  // API URL'ini belirle - sadece ilk 10 kullanıcı
   const apiUrl = gameType === 'all' 
-    ? '/api/scores/aggregated?limit=20' 
-    : `/api/leaderboard/${gameType}?limit=20`;
+    ? '/api/scores/aggregated?limit=10' 
+    : `/api/leaderboard/${gameType}?limit=10`;
   
   // Sunucudan verileri al
   fetch(apiUrl + '&nocache=' + new Date().getTime())
@@ -255,10 +272,19 @@ function loadGameLeaderboard(gameType) {
       }
       
       // Tablo HTML'ini oluştur
-      let html = '';
+      let html = `
+        <div class="leaderboard-header">
+          <div class="simple-rank">Sıra</div>
+          <div class="simple-name">Kullanıcı</div>
+          <div class="simple-score">Puan</div>
+        </div>
+      `;
+      
+      // Sadece ilk 10 oyuncu için satır oluştur
+      const playersToShow = data.slice(0, 10);
       
       // Her kullanıcı için bir satır oluştur
-      data.forEach((player, index) => {
+      playersToShow.forEach((player, index) => {
         const username = player.username || 'İsimsiz Oyuncu';
         const score = player.score || player.total_score || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
