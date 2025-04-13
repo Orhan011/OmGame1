@@ -1,4 +1,3 @@
-
 /* Liderlik Tablosu Stil Dosyası - Modern Glassmorphism Tasarım */
 :root {
   --primary-color: #6a5ae0;
@@ -157,10 +156,6 @@ body {
 }
 
 /* Oyuncu Satırları */
-.leaderboard-rows {
-  padding: 1rem 2rem;
-}
-
 .player-row {
   display: flex;
   align-items: center;
@@ -175,6 +170,8 @@ body {
   transform: translateY(10px);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  justify-content: space-between;
 }
 
 .player-row:hover {
@@ -468,11 +465,11 @@ body {
   .refresh-button {
     align-self: flex-end;
   }
-  
+
   .leaderboard-rows {
     padding: 1rem;
   }
-  
+
   .player-row {
     padding: 1rem;
   }
@@ -499,11 +496,11 @@ body {
     width: 35px;
     height: 35px;
   }
-  
+
   .player-name {
     font-size: 1rem;
   }
-  
+
   .score {
     font-size: 1rem;
   }

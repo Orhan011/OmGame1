@@ -92,23 +92,10 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
         
-        // Rank numarasına göre satır oluştur (1. sıradaki oyuncu için özel taç yok, CSS üzerinden eklenecek)
-        let rankIcon = '';
-        if (rank === 1) {
-          // 1. sıra için ikonu kaldırdık, CSS üzerinden otomatik eklenecek
-          rankIcon = '';
-        } else if (rank === 2) {
-          // 2. sıra için madalyon ikonu kaldırıldı
-          rankIcon = '';
-        } else if (rank === 3) {
-          // 3. sıra için madalyon ikonu kaldırıldı
-          rankIcon = '';
-        }
-
         // Satır HTML'i
         html += `
           <div class="player-row" data-rank="${rank}">
-            <div class="rank">${rankIcon}${rank}</div>
+            <div class="rank">${rank}</div>
             <div class="player">
               <div class="player-avatar">
                 <img src="${avatarUrl || '/static/images/avatars/default.svg'}" alt="${username}" 
