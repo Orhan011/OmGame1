@@ -4,16 +4,16 @@
 {% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
 
 {% block head_extras %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/new_leaderboard.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="leaderboard-wrapper">
   <div class="leaderboard-container">
     <div class="leaderboard-header">
       <h1 class="leaderboard-title">
-        <i class="fas fa-trophy"></i> En İyi Oyuncular
+        <i class="fas fa-trophy"></i> Liderlik Tablosu
       </h1>
       <button id="refreshBtn" class="refresh-button">
         <i class="fas fa-sync-alt"></i> Yenile
@@ -22,9 +22,9 @@
 
     <div class="leaderboard-table">
       <div class="table-header">
-        <div class="header-rank"><i class="fas fa-medal"></i> Sıra</div>
-        <div class="header-player"><i class="fas fa-user"></i> Oyuncu</div>
-        <div class="header-score"><i class="fas fa-star"></i> Puan</div>
+        <div class="header-rank">Sıra</div>
+        <div class="header-player">Oyuncu</div>
+        <div class="header-score">Toplam Puan</div>
       </div>
       
       <div id="leaderboardRows" class="leaderboard-rows">
@@ -37,5 +37,5 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/new_leaderboard.js') }}"></script>
 {% endblock %}
