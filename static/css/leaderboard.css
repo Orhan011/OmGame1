@@ -6,6 +6,7 @@
   text-align: center;
   position: relative;
   padding-bottom: 2rem;
+  animation: fadeInDown 1s ease;
 }
 
 .leaderboard-header:after {
@@ -993,6 +994,150 @@
 
 .refresh-leaderboard:hover i {
   transform: rotate(180deg);
+}
+
+
+/* Yeni stiller ve animasyonlar */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.leaderboard-info-card {
+  background: rgba(33, 33, 61, 0.5);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: fadeInUp 1s ease 0.5s both;
+}
+
+.leaderboard-info-card h3 {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.leaderboard-info-card p {
+  color: #a6a6c0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.leaderboard-badges {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge-item i {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
+.badge-item span {
+  color: #a6a6c0;
+  font-weight: 600;
+}
+
+.badge-item i.fa-crown {
+  animation: floating 3s ease-in-out infinite;
+}
+
+.retry-button {
+  margin-top: 1rem;
+  background: linear-gradient(45deg, #6a5ae0, #9f8aff) !important;
+  border: none !important;
+  padding: 0.6rem 1.5rem !important;
+  border-radius: 50px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 20px rgba(106, 90, 224, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.retry-button:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 15px 25px rgba(106, 90, 224, 0.4) !important;
+}
+
+.leaderboard-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.leaderboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.score-container:hover .score-sparkles {
+  opacity: 1;
+}
+
+.score-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.score-sparkles {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Responsive İyileştirmeler */
+@media (max-width: 768px) {
+  .leaderboard-badges {
+    gap: 1rem;
+  }
+  
+  .leaderboard-info-card {
+    padding: 1.5rem;
+  }
+  
+  .leaderboard-info-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .leaderboard-info-card p {
+    font-size: 1rem;
+  }
 }
 
 .error i {
