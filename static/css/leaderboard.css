@@ -1,4 +1,4 @@
-/* Modern Leaderboard Styles - 2025 Edition */
+/* Basit Liderlik Tablosu - 2025 */
 :root {
   --primary-color: #6a5ae0;
   --primary-light: #9f8aff;
@@ -17,7 +17,7 @@
   --warning: #ff9800;
   --danger: #f44336;
   --border-radius: 12px;
-  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   --transition: all 0.3s ease;
 }
 
