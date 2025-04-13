@@ -32,14 +32,7 @@ def send_welcome_email(email, username):
     msg.body = f"Merhaba {username},\nOmGame dünyasına hoş geldin!  Keyifli oyunlar dileriz."
     mail.send(msg)
 
-# Bu rota main.py'de tanımlandı
-# @app.route('/games/minesweeper')
-# @login_required
-# def minesweeper():
-#     """Mayın Tarlası: Mantık ve strateji oyunu
-#     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
-#     return render_template('games/minesweeper.html')
-
+# Mayın Tarlası oyunu kaldırıldı
 
 # routes.py
 # Bu dosya artık kullanılmıyor, yönlendirmeler main.py içerisinde.
