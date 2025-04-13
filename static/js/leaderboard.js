@@ -124,7 +124,10 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
-        html += createPlayerRow(index + 1, username, totalScore, avatarUrl, player.is_current_user, player.rank);
+        // Tek satır formatında oyuncu ekle
+        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
+          ${index + 1} ${username} ${formatNumber(totalScore)}
+        </div>`;
       });
 
       container.innerHTML = html;
@@ -198,7 +201,10 @@ function loadLevelLeaderboard() {
         const progressPercent = player.progress_percent || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
 
-        html += createLevelRow(index + 1, username, level, totalXp, progressPercent, avatarUrl, player.is_current_user, player.rank);
+        // Tek satır formatında seviye bilgisi ekle
+        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
+          ${index + 1} ${username} Seviye ${level}
+        </div>`;
       });
 
       container.innerHTML = html;
@@ -271,7 +277,10 @@ function loadGameLeaderboard(gameType) {
         const score = player.score || player.total_score || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
 
-        html += createGameRow(index + 1, username, score, avatarUrl, player.is_current_user, player.game_info || {}, gameType);
+        // Tek satır formatında oyun puanı ekle
+        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
+          ${index + 1} ${username} ${formatNumber(score)}
+        </div>`;
       });
 
       container.innerHTML = html;
