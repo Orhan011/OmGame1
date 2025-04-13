@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="professional-game-container">
+  <div class="game-header">
+    <h1>{{ game_title }} <span class="version-badge">Geliyor</span></h1>
+    <p class="game-description">{{ game_description }}</p>
+  </div>
+
+  <div class="coming-soon-panel">
+    <div class="icon-container">
+      <i class="fas {{ game_icon }}"></i>
+    </div>
+    <h2>Bu oyun yakında sizlerle!</h2>
+    <p>{{ game_title }} oyunu şu anda geliştirme aşamasındadır ve çok yakında kullanıma açılacaktır.</p>
+    <p>Bu profesyonel oyun, gerçek dünya becerilerinizi geliştirmenize yardımcı olacak interaktif bir deneyim sunacak.</p>
+    
+    <div class="feature-list">
+      <h3>Oyunda Sizi Neler Bekliyor:</h3>
+      <ul>
+        {% for feature in features %}
+          <li><i class="fas fa-check-circle"></i> {{ feature }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    
+    <div class="notification-box">
+      <i class="fas fa-bell"></i>
+      <p>Oyun hazır olduğunda bildirim almak için <a href="/profile">profilinizden</a> bildirim ayarlarınızı kontrol edin.</p>
+    </div>
+    
+    <a href="/all-games" class="back-btn"><i class="fas fa-arrow-left"></i> Diğer Oyunlara Dön</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .professional-game-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .game-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .game-header h1 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .version-badge {
+    font-size: 0.9rem;
+    background-color: #e74c3c;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    right: -70px;
+    font-weight: normal;
+  }
+
+  .game-description {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .coming-soon-panel {
+    background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .icon-container {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-radius: 50%;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+  }
+
+  .icon-container i {
+    font-size: 50px;
+    color: white;
+  }
+
+  .coming-soon-panel h2 {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .coming-soon-panel p {
+    color: #5d6778;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  .feature-list {
+    max-width: 600px;
+    margin: 30px auto;
+    text-align: left;
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .feature-list h3 {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .feature-list ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .feature-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
+    display: flex;
+    align-items: center;
+  }
+
+  .feature-list li:last-child {
+    border-bottom: none;
+  }
+
+  .feature-list li i {
+    color: #2ecc71;
+    margin-right: 10px;
+  }
+
+  .notification-box {
+    background-color: #f1f9fe;
+    border-left: 4px solid #3498db;
+    padding: 15px 20px;
+    margin: 30px auto;
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    border-radius: 5px;
+  }
+
+  .notification-box i {
+    color: #3498db;
+    font-size: 24px;
+    margin-right: 15px;
+  }
+
+  .notification-box p {
+    margin: 0;
+    color: #34495e;
+  }
+
+  .notification-box a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .notification-box a:hover {
+    text-decoration: underline;
+  }
+
+  .back-btn {
+    display: inline-block;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    margin-top: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+  }
+
+  .back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+    text-decoration: none;
+    color: white;
+  }
+
+  .back-btn i {
+    margin-right: 8px;
+  }
+</style>
+{% endblock %}
