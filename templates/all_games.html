@@ -183,6 +183,15 @@
       <a href="/games/snake" class="game-btn">Oyna</a>
     </div>
 
+    <!-- Mayın Tarlası -->
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-bomb"></i></div>
+      <div class="game-info">
+        <h3>Mayın Tarlası</h3>
+        <p>Mantık yürüterek mayınları işaretle ve tarlanı temizle!</p>
+      </div>
+      <a href="/games/minesweeper" class="game-btn">Oyna</a>
+    </div>
 
     <!-- Hafıza Eşleştirme -->
     <div class="game-card">
@@ -202,28 +211,6 @@
         <p>Gizli kelimeyi bulmak için harfleri tahmin edin ve kelimeyi tamamlamaya çalışın.</p>
       </div>
       <a href="/games/hangman" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Rhythm Runner -->
-    <div class="game-card">
-      <div class="game-card-inner">
-        <div class="game-image">
-          <a href="/games/rhythmRunner">
-            <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" alt="Rhythm Runner">
-          </a>
-        </div>
-        <div class="game-info">
-          <h3>Rhythm Runner</h3>
-          <p>Müzik ritmine uygun tuşlara basarak yüksek puan topla!</p>
-          <div class="game-meta">
-            <span class="game-difficulty"><i class="fas fa-brain"></i> Orta</span>
-            <span class="game-category"><i class="fas fa-music"></i> Müzik</span>
-          </div>
-          <div class="game-actions">
-            <a href="/games/rhythmRunner" class="btn btn-primary">Oyna</a>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Hafıza Kart Çevirme ve Breakout oyunları kaldırıldı -->
@@ -456,49 +443,6 @@
 
   .home-button i {
     margin-right: 8px;
-  }
-
-  .game-card-inner {
-    display: flex;
-  }
-
-  .game-image {
-    width: 100px;
-    margin-right: 20px;
-  }
-
-  .game-image img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .game-meta {
-    margin-top: 10px;
-    display: flex;
-  }
-
-  .game-meta span {
-    margin-right: 15px;
-    font-size: 0.9rem;
-    color: #999;
-  }
-
-  .game-actions {
-    margin-top: 15px;
-  }
-
-  .btn {
-    padding: 8px 16px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
   }
 </style>
 {% endblock %}
