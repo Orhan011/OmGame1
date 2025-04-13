@@ -1,34 +1,31 @@
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Liderlik Tablosu</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-  <div class="container">
-    <div class="leaderboard-container">
-      <div class="leaderboard-header">
-        <h1 class="leaderboard-title">
-          <i class="fas fa-trophy"></i> Liderlik Tablosu
-        </h1>
-        <button id="refreshBtn" class="refresh-button">
-          <i class="fas fa-sync-alt"></i> Yenile
-        </button>
-      </div>
+{% extends "layout.html" %}
 
-      <div id="leaderboardRows" class="leaderboard-rows">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Liderlik tablosu yükleniyor...</p>
-        </div>
+{% block title %}Liderlik Tablosu - OmGame{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="leaderboard-container">
+    <div class="leaderboard-header">
+      <h1 class="leaderboard-title">
+        <i class="fas fa-trophy"></i> Liderlik Tablosu
+      </h1>
+      <button id="refreshBtn" class="refresh-button">
+        <i class="fas fa-sync-alt"></i> Yenile
+      </button>
+    </div>
+
+    <div id="leaderboardRows" class="leaderboard-rows">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Liderlik tablosu yükleniyor...</p>
       </div>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
+{% endblock %}
