@@ -1,0 +1,1166 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid stock-simulator-container py-4">
+  <div class="game-header text-center mb-4">
+    <h1 class="game-title">Stok Piyasası Simülatörü</h1>
+    <p class="game-description">Gerçek verilere dayalı borsa simülasyonunda yatırım stratejileri geliştirin</p>
+  </div>
+
+  <div class="row">
+    <!-- Sol Taraf - Portföy ve İşlemler -->
+    <div class="col-md-3">
+      <div class="card dashboard-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Portföyünüz</h5>
+        </div>
+        <div class="card-body">
+          <div class="portfolio-summary">
+            <div class="balance-info mb-3">
+              <h6>Bakiye</h6>
+              <div class="balance-value">
+                <span id="current-balance">₺100,000.00</span>
+              </div>
+            </div>
+            
+            <div class="portfolio-value mb-3">
+              <h6>Portföy Değeri</h6>
+              <div class="portfolio-amount">
+                <span id="portfolio-value">₺0.00</span>
+              </div>
+            </div>
+            
+            <div class="total-value">
+              <h6>Toplam Değer</h6>
+              <div class="total-amount">
+                <span id="total-value">₺100,000.00</span>
+              </div>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="holdings-section">
+            <h6 class="mb-3">Hisse Senetleriniz</h6>
+            <div id="stock-holdings" class="stock-holdings-list">
+              <div class="empty-holdings text-center py-3">
+                <i class="fas fa-folder-open mb-2"></i>
+                <p>Henüz hisse senedi almadınız</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card dashboard-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-history me-2"></i>İşlem Geçmişi</h5>
+        </div>
+        <div class="card-body">
+          <div id="transaction-history" class="transaction-list">
+            <div class="empty-transactions text-center py-3">
+              <i class="fas fa-receipt mb-2"></i>
+              <p>İşlem geçmişiniz boş</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Orta Kısım - Grafik ve Piyasa -->
+    <div class="col-md-6">
+      <div class="card dashboard-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <span id="selected-stock-name">BİST 100</span>
+            <span id="selected-stock-price" class="ms-2">-</span>
+            <span id="selected-stock-change" class="ms-2 badge">-</span>
+          </h5>
+          <div class="btn-group" role="group">
+            <button class="btn btn-sm btn-outline-primary active" data-timeframe="1d">1G</button>
+            <button class="btn btn-sm btn-outline-primary" data-timeframe="1w">1H</button>
+            <button class="btn btn-sm btn-outline-primary" data-timeframe="1m">1A</button>
+            <button class="btn btn-sm btn-outline-primary" data-timeframe="6m">6A</button>
+            <button class="btn btn-sm btn-outline-primary" data-timeframe="1y">1Y</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="stock-chart" class="stock-chart">
+            <!-- Chart will be rendered here -->
+            <div class="chart-placeholder text-center py-5">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+              </div>
+              <p>Grafik yükleniyor...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card dashboard-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Piyasa Özeti</h5>
+        </div>
+        <div class="card-body">
+          <div class="row market-summary">
+            <div class="col-md-4">
+              <div class="market-index">
+                <h6>BİST 100</h6>
+                <div class="index-value">9,870.45</div>
+                <div class="index-change positive">+1.25%</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="market-index">
+                <h6>Dolar/TL</h6>
+                <div class="index-value">32.45</div>
+                <div class="index-change negative">-0.15%</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="market-index">
+                <h6>Euro/TL</h6>
+                <div class="index-value">35.21</div>
+                <div class="index-change positive">+0.32%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Güncel Haberler</h5>
+        </div>
+        <div class="card-body">
+          <div class="news-list">
+            <div class="news-item">
+              <h6 class="news-title">Merkez Bankası faiz kararını açıkladı</h6>
+              <p class="news-time">Bugün, 14:00</p>
+              <p class="news-snippet">Merkez Bankası, faiz oranlarını beklendiği gibi değiştirmedi ve %45 seviyesinde sabit tuttu.</p>
+            </div>
+            <div class="news-item">
+              <h6 class="news-title">Teknoloji şirketleri güçlü finansal sonuçlar açıkladı</h6>
+              <p class="news-time">Dün, 16:30</p>
+              <p class="news-snippet">Önde gelen teknoloji şirketleri beklentilerin üzerinde kâr rakamları açıklayarak piyasalara olumlu sinyaller verdi.</p>
+            </div>
+            <div class="news-item">
+              <h6 class="news-title">Otomotiv sektöründe yeni vergi düzenlemesi</h6>
+              <p class="news-time">2 gün önce, 09:15</p>
+              <p class="news-snippet">Hükümet, elektrikli araçlara yönelik vergi teşviklerini artıran yeni bir düzenleme yaptı.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sağ Taraf - Alım-Satım ve Hisse Listesi -->
+    <div class="col-md-3">
+      <div class="card dashboard-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Alım-Satım</h5>
+        </div>
+        <div class="card-body">
+          <div class="trade-form">
+            <div class="form-group mb-3">
+              <label for="trade-type" class="form-label">İşlem Türü</label>
+              <select id="trade-type" class="form-select">
+                <option value="buy">Satın Al</option>
+                <option value="sell">Sat</option>
+              </select>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="stock-symbol" class="form-label">Hisse Senedi</label>
+              <select id="stock-symbol" class="form-select">
+                <option value="">Seçiniz...</option>
+                <option value="THYAO">Türk Hava Yolları (THYAO)</option>
+                <option value="GARAN">Garanti Bankası (GARAN)</option>
+                <option value="ASELS">Aselsan (ASELS)</option>
+                <option value="EREGL">Ereğli Demir Çelik (EREGL)</option>
+                <option value="KCHOL">Koç Holding (KCHOL)</option>
+              </select>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="stock-price" class="form-label">Güncel Fiyat</label>
+              <div class="input-group">
+                <span class="input-group-text">₺</span>
+                <input type="text" id="stock-price" class="form-control" value="0.00" disabled>
+              </div>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="stock-quantity" class="form-label">Miktar</label>
+              <input type="number" id="stock-quantity" class="form-control" min="1" value="1">
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="total-amount" class="form-label">Toplam Tutar</label>
+              <div class="input-group">
+                <span class="input-group-text">₺</span>
+                <input type="text" id="total-amount" class="form-control" value="0.00" disabled>
+              </div>
+            </div>
+            
+            <button id="execute-trade" class="btn btn-primary w-100">İşlemi Gerçekleştir</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-list me-2"></i>Hisse Senetleri</h5>
+          <div class="search-box">
+            <input type="text" id="stock-search" class="form-control form-control-sm" placeholder="Ara...">
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="stocks-list">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Sembol</th>
+                  <th>Fiyat (₺)</th>
+                  <th>Değişim</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="stock-item" data-symbol="THYAO">
+                  <td>THYAO</td>
+                  <td>215.50</td>
+                  <td class="positive">+2.5%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="GARAN">
+                  <td>GARAN</td>
+                  <td>32.64</td>
+                  <td class="negative">-0.8%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="ASELS">
+                  <td>ASELS</td>
+                  <td>75.25</td>
+                  <td class="positive">+1.2%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="EREGL">
+                  <td>EREGL</td>
+                  <td>43.82</td>
+                  <td class="positive">+0.3%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="KCHOL">
+                  <td>KCHOL</td>
+                  <td>128.40</td>
+                  <td class="negative">-1.4%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="SISE">
+                  <td>SISE</td>
+                  <td>25.68</td>
+                  <td class="positive">+0.9%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="TUPRS">
+                  <td>TUPRS</td>
+                  <td>152.30</td>
+                  <td class="positive">+1.8%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="ISCTR">
+                  <td>ISCTR</td>
+                  <td>18.56</td>
+                  <td class="negative">-0.4%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="PETKM">
+                  <td>PETKM</td>
+                  <td>12.75</td>
+                  <td class="positive">+0.6%</td>
+                </tr>
+                <tr class="stock-item" data-symbol="TOASO">
+                  <td>TOASO</td>
+                  <td>187.20</td>
+                  <td class="negative">-0.2%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="trade-result-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="trade-result-title">İşlem Sonucu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="trade-result-message">
+        İşleminiz başarıyla gerçekleştirildi.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Menü Butonu -->
+<div class="back-btn-container">
+  <a href="{{ url_for('all_games') }}" class="back-to-menu-btn">
+    <i class="fas fa-th-large"></i> TÜM OYUNLAR
+  </a>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .stock-simulator-container {
+    background-color: #f8fafc;
+    min-height: calc(100vh - 70px);
+  }
+  
+  .game-header {
+    margin-bottom: 2rem;
+  }
+  
+  .game-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .game-description {
+    color: #6c757d;
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .dashboard-card {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 0.75rem 1rem;
+  }
+  
+  .card-header h5 {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+  }
+  
+  .card-body {
+    padding: 1.25rem;
+  }
+  
+  /* Portföy Stilleri */
+  .portfolio-summary h6 {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .balance-value, .portfolio-amount, .total-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  
+  .total-amount {
+    color: #3b82f6;
+  }
+  
+  .stock-holdings-list {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  .holding-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .holding-info h6 {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: #0f172a;
+  }
+  
+  .holding-quantity {
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+  
+  .holding-value {
+    font-weight: 600;
+    color: #0f172a;
+  }
+  
+  .transaction-list {
+    max-height: 350px;
+    overflow-y: auto;
+  }
+  
+  .transaction-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .transaction-time {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .transaction-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+  }
+  
+  .transaction-detail {
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+  
+  .transaction-buy {
+    color: #10b981;
+  }
+  
+  .transaction-sell {
+    color: #ef4444;
+  }
+  
+  /* Grafik Stilleri */
+  .stock-chart {
+    height: 350px;
+    position: relative;
+  }
+  
+  /* Piyasa Özeti */
+  .market-summary {
+    text-align: center;
+  }
+  
+  .market-index h6 {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .index-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  
+  .index-change {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .positive {
+    color: #10b981;
+  }
+  
+  .negative {
+    color: #ef4444;
+  }
+  
+  /* Haberler */
+  .news-list {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  .news-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .news-item:last-child {
+    border-bottom: none;
+  }
+  
+  .news-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #0f172a;
+    margin-bottom: 0.25rem;
+  }
+  
+  .news-time {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .news-snippet {
+    color: #334155;
+    font-size: 0.85rem;
+    margin-bottom: 0;
+    line-height: 1.4;
+  }
+  
+  /* Alım-Satım Formu */
+  .trade-form label {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Hisse Senetleri Listesi */
+  .stocks-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .stocks-list table {
+    font-size: 0.9rem;
+  }
+  
+  .stocks-list th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .stock-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .stock-item:hover {
+    background-color: #f1f5f9;
+  }
+  
+  .stock-item td:first-child {
+    font-weight: 600;
+    color: #0f172a;
+  }
+  
+  /* Empty State Stillleri */
+  .empty-holdings, .empty-transactions {
+    color: #94a3b8;
+  }
+  
+  .empty-holdings i, .empty-transactions i {
+    font-size: 2rem;
+    opacity: 0.5;
+  }
+  
+  .empty-holdings p, .empty-transactions p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+  }
+  
+  /* Back Button */
+  .back-btn-container {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 100;
+  }
+  
+  .back-to-menu-btn {
+    display: inline-block;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(30, 60, 114, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .back-to-menu-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(30, 60, 114, 0.4);
+    color: white;
+  }
+  
+  .back-to-menu-btn i {
+    margin-right: 0.5rem;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(to right, #2a5298, #3a6fb7);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .market-summary {
+      flex-direction: column;
+    }
+    
+    .market-index {
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .stock-chart {
+      height: 250px;
+    }
+    
+    .back-btn-container {
+      bottom: 1rem;
+      left: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Simülasyon verileri
+  const initialBalance = 100000;
+  let currentBalance = initialBalance;
+  let holdings = {};
+  let transactions = [];
+  
+  // DOM elementleri
+  const balanceEl = document.getElementById('current-balance');
+  const portfolioValueEl = document.getElementById('portfolio-value');
+  const totalValueEl = document.getElementById('total-value');
+  const holdingsListEl = document.getElementById('stock-holdings');
+  const transactionHistoryEl = document.getElementById('transaction-history');
+  const stockSymbolEl = document.getElementById('stock-symbol');
+  const stockPriceEl = document.getElementById('stock-price');
+  const stockQuantityEl = document.getElementById('stock-quantity');
+  const totalAmountEl = document.getElementById('total-amount');
+  const executeTradeBtn = document.getElementById('execute-trade');
+  const tradeTypeEl = document.getElementById('trade-type');
+  const selectedStockNameEl = document.getElementById('selected-stock-name');
+  const selectedStockPriceEl = document.getElementById('selected-stock-price');
+  const selectedStockChangeEl = document.getElementById('selected-stock-change');
+  
+  // Ana grafiği oluştur
+  createMainChart();
+  
+  // Alım-satım form hesaplamaları
+  stockSymbolEl.addEventListener('change', updateTradeForm);
+  stockQuantityEl.addEventListener('input', updateTotalAmount);
+  tradeTypeEl.addEventListener('change', updateTradeForm);
+  
+  // İşlem gerçekleştirme
+  executeTradeBtn.addEventListener('click', executeTrade);
+  
+  // Hisse senedi listesindeki tıklamalara tepki verme
+  document.querySelectorAll('.stock-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const symbol = this.getAttribute('data-symbol');
+      selectStock(symbol);
+    });
+  });
+  
+  // Grafik zaman aralığı butonları
+  document.querySelectorAll('[data-timeframe]').forEach(button => {
+    button.addEventListener('click', function() {
+      document.querySelectorAll('[data-timeframe]').forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      updateChart(this.getAttribute('data-timeframe'));
+    });
+  });
+  
+  // Çartı oluştur
+  function createMainChart() {
+    const ctx = document.createElement('canvas');
+    ctx.id = 'mainChart';
+    document.getElementById('stock-chart').innerHTML = '';
+    document.getElementById('stock-chart').appendChild(ctx);
+    
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(30, 60, 114, 0.2)');
+    gradient.addColorStop(1, 'rgba(30, 60, 114, 0)');
+    
+    // Rastgele veri oluştur
+    const data = generateChartData(180);
+    
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: 'Fiyat (₺)',
+          data: data.values,
+          borderColor: '#1e3c72',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 3,
+          pointBackgroundColor: '#1e3c72',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                return '₺' + context.parsed.y.toFixed(2);
+              }
+            }
+          },
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              maxTicksLimit: 8,
+              font: {
+                size: 10
+              }
+            }
+          },
+          y: {
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              callback: function(value) {
+                return '₺' + value;
+              },
+              font: {
+                size: 10
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+  
+  // Çartı güncelle
+  function updateChart(timeframe) {
+    let days;
+    
+    switch(timeframe) {
+      case '1d':
+        days = 1;
+        break;
+      case '1w':
+        days = 7;
+        break;
+      case '1m':
+        days = 30;
+        break;
+      case '6m':
+        days = 180;
+        break;
+      case '1y':
+        days = 365;
+        break;
+      default:
+        days = 30;
+    }
+    
+    const data = generateChartData(days);
+    createMainChart();
+  }
+  
+  // Rastgele grafik verisi oluştur
+  function generateChartData(days) {
+    const labels = [];
+    const values = [];
+    
+    const now = new Date();
+    let baseValue = 100;
+    
+    for (let i = days; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      
+      if (days <= 1) {
+        // Günlük veri için saat
+        let hours = [];
+        for (let h = 9; h <= 18; h++) {
+          hours.push(h + ':00');
+        }
+        labels.push(...hours);
+        
+        // Günlük fiyat değişimleri
+        for (let h = 0; h < hours.length; h++) {
+          const change = (Math.random() - 0.5) * 2;
+          baseValue += change;
+          if (baseValue < 50) baseValue = 50;
+          values.push(baseValue);
+        }
+      } else {
+        // Tarih formatı
+        const dateStr = date.toLocaleDateString('tr-TR', {
+          day: 'numeric',
+          month: 'short'
+        });
+        
+        labels.push(dateStr);
+        
+        // Fiyat değişimi
+        const change = (Math.random() - 0.48) * 5; // Hafif yukarı trend
+        baseValue += change;
+        if (baseValue < 50) baseValue = 50;
+        values.push(baseValue);
+      }
+    }
+    
+    return { labels, values };
+  }
+  
+  // Bir hisse senedi seç
+  function selectStock(symbol) {
+    stockSymbolEl.value = symbol;
+    const stockRow = document.querySelector(`.stock-item[data-symbol="${symbol}"]`);
+    
+    if (stockRow) {
+      const stockName = stockNameMap[symbol] || symbol;
+      const stockPrice = stockRow.children[1].textContent;
+      const stockChange = stockRow.children[2].textContent;
+      
+      selectedStockNameEl.textContent = stockName;
+      selectedStockPriceEl.textContent = stockPrice + ' ₺';
+      selectedStockChangeEl.textContent = stockChange;
+      
+      if (stockChange.includes('+')) {
+        selectedStockChangeEl.className = 'ms-2 badge bg-success';
+      } else {
+        selectedStockChangeEl.className = 'ms-2 badge bg-danger';
+      }
+      
+      stockPriceEl.value = parseFloat(stockPrice).toFixed(2);
+      updateTotalAmount();
+      
+      // Yeni veriyle grafiği güncelle
+      updateChart('1m');
+    }
+  }
+  
+  // Hisse senedi isimleri
+  const stockNameMap = {
+    'THYAO': 'Türk Hava Yolları',
+    'GARAN': 'Garanti Bankası',
+    'ASELS': 'Aselsan',
+    'EREGL': 'Ereğli Demir Çelik',
+    'KCHOL': 'Koç Holding',
+    'SISE': 'Şişecam',
+    'TUPRS': 'Tüpraş',
+    'ISCTR': 'İş Bankası',
+    'PETKM': 'Petkim',
+    'TOASO': 'Tofaş Oto'
+  };
+  
+  // Alım-satım formunu güncelle
+  function updateTradeForm() {
+    const symbol = stockSymbolEl.value;
+    const tradeType = tradeTypeEl.value;
+    
+    if (!symbol) {
+      stockPriceEl.value = '0.00';
+      totalAmountEl.value = '0.00';
+      return;
+    }
+    
+    const stockRow = document.querySelector(`.stock-item[data-symbol="${symbol}"]`);
+    if (stockRow) {
+      const price = parseFloat(stockRow.children[1].textContent);
+      stockPriceEl.value = price.toFixed(2);
+      
+      // Satış işlemiyse ve elinde bu hisseden yoksa
+      if (tradeType === 'sell' && (!holdings[symbol] || holdings[symbol].quantity <= 0)) {
+        executeTradeBtn.disabled = true;
+        executeTradeBtn.textContent = 'Yeterli hisse yok';
+      } else {
+        executeTradeBtn.disabled = false;
+        executeTradeBtn.textContent = tradeType === 'buy' ? 'Satın Al' : 'Sat';
+      }
+      
+      updateTotalAmount();
+    }
+  }
+  
+  // Toplam tutarı güncelle
+  function updateTotalAmount() {
+    const price = parseFloat(stockPriceEl.value) || 0;
+    const quantity = parseInt(stockQuantityEl.value) || 0;
+    const total = price * quantity;
+    
+    totalAmountEl.value = total.toFixed(2);
+    
+    // Eğer alım işlemiyse ve bakiye yetersizse
+    if (tradeTypeEl.value === 'buy' && total > currentBalance) {
+      executeTradeBtn.disabled = true;
+      executeTradeBtn.textContent = 'Yetersiz bakiye';
+    } else {
+      executeTradeBtn.disabled = false;
+      executeTradeBtn.textContent = tradeTypeEl.value === 'buy' ? 'Satın Al' : 'Sat';
+    }
+  }
+  
+  // İşlemi gerçekleştir
+  function executeTrade() {
+    const symbol = stockSymbolEl.value;
+    const price = parseFloat(stockPriceEl.value) || 0;
+    const quantity = parseInt(stockQuantityEl.value) || 0;
+    const total = price * quantity;
+    const tradeType = tradeTypeEl.value;
+    
+    if (!symbol || price <= 0 || quantity <= 0) {
+      showTradeResult('Hata', 'Lütfen geçerli bir hisse senedi ve miktar seçin.');
+      return;
+    }
+    
+    // Alım işlemi
+    if (tradeType === 'buy') {
+      if (total > currentBalance) {
+        showTradeResult('Yetersiz Bakiye', 'Bu işlemi gerçekleştirmek için yeterli bakiyeniz yok.');
+        return;
+      }
+      
+      // Bakiyeyi güncelle
+      currentBalance -= total;
+      
+      // Hisse senedini portföye ekle
+      if (!holdings[symbol]) {
+        holdings[symbol] = {
+          name: stockNameMap[symbol] || symbol,
+          quantity: 0,
+          totalCost: 0
+        };
+      }
+      
+      holdings[symbol].quantity += quantity;
+      holdings[symbol].totalCost += total;
+      
+      // İşlemi kaydet
+      const transaction = {
+        type: 'buy',
+        symbol: symbol,
+        name: stockNameMap[symbol] || symbol,
+        quantity: quantity,
+        price: price,
+        total: total,
+        date: new Date()
+      };
+      
+      transactions.unshift(transaction);
+      
+      showTradeResult('Alım İşlemi Başarılı', `${quantity} adet ${stockNameMap[symbol] || symbol} hissesi ${total.toFixed(2)} ₺'ye satın alındı.`);
+    } 
+    // Satış işlemi
+    else if (tradeType === 'sell') {
+      if (!holdings[symbol] || holdings[symbol].quantity < quantity) {
+        showTradeResult('Yetersiz Hisse', 'Satmak istediğiniz miktarda hisseniz bulunmuyor.');
+        return;
+      }
+      
+      // Bakiyeyi güncelle
+      currentBalance += total;
+      
+      // Hisse senedini portföyden çıkar
+      holdings[symbol].quantity -= quantity;
+      
+      // Eğer hisse kalmadıysa objeyi tamamen silelim
+      if (holdings[symbol].quantity <= 0) {
+        delete holdings[symbol];
+      }
+      
+      // İşlemi kaydet
+      const transaction = {
+        type: 'sell',
+        symbol: symbol,
+        name: stockNameMap[symbol] || symbol,
+        quantity: quantity,
+        price: price,
+        total: total,
+        date: new Date()
+      };
+      
+      transactions.unshift(transaction);
+      
+      showTradeResult('Satış İşlemi Başarılı', `${quantity} adet ${stockNameMap[symbol] || symbol} hissesi ${total.toFixed(2)} ₺'ye satıldı.`);
+    }
+    
+    // Arayüzü güncelle
+    updateUI();
+  }
+  
+  // İşlem sonucunu göster
+  function showTradeResult(title, message) {
+    const modal = new bootstrap.Modal(document.getElementById('trade-result-modal'));
+    document.getElementById('trade-result-title').textContent = title;
+    document.getElementById('trade-result-message').textContent = message;
+    modal.show();
+  }
+  
+  // Arayüzü güncelle
+  function updateUI() {
+    // Bakiye ve portföy değeri güncelleme
+    balanceEl.textContent = formatCurrency(currentBalance);
+    
+    // Portföy değerini hesapla
+    let portfolioValue = 0;
+    
+    for (const symbol in holdings) {
+      const stockRow = document.querySelector(`.stock-item[data-symbol="${symbol}"]`);
+      if (stockRow) {
+        const currentPrice = parseFloat(stockRow.children[1].textContent);
+        portfolioValue += currentPrice * holdings[symbol].quantity;
+      }
+    }
+    
+    portfolioValueEl.textContent = formatCurrency(portfolioValue);
+    totalValueEl.textContent = formatCurrency(currentBalance + portfolioValue);
+    
+    // Portföyü render et
+    renderHoldings();
+    
+    // İşlem geçmişini render et
+    renderTransactions();
+    
+    // Alım-satım formunu güncelle
+    updateTradeForm();
+  }
+  
+  // Para formatı
+  function formatCurrency(amount) {
+    return '₺' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+  
+  // Portföyü render et
+  function renderHoldings() {
+    let html = '';
+    
+    if (Object.keys(holdings).length === 0) {
+      html = `
+        <div class="empty-holdings text-center py-3">
+          <i class="fas fa-folder-open mb-2"></i>
+          <p>Henüz hisse senedi almadınız</p>
+        </div>
+      `;
+    } else {
+      for (const symbol in holdings) {
+        const holding = holdings[symbol];
+        const stockRow = document.querySelector(`.stock-item[data-symbol="${symbol}"]`);
+        
+        if (stockRow) {
+          const currentPrice = parseFloat(stockRow.children[1].textContent);
+          const currentValue = currentPrice * holding.quantity;
+          const profitLoss = currentValue - holding.totalCost;
+          const profitLossPercent = (profitLoss / holding.totalCost) * 100;
+          
+          html += `
+            <div class="holding-item">
+              <div class="holding-info">
+                <h6>${holding.name} (${symbol})</h6>
+                <div class="holding-quantity">${holding.quantity} adet</div>
+              </div>
+              <div class="holding-value">
+                ${formatCurrency(currentValue)}
+                <div class="profit-loss ${profitLoss >= 0 ? 'positive' : 'negative'}">
+                  ${profitLoss >= 0 ? '+' : ''}${formatCurrency(profitLoss)} (${profitLossPercent.toFixed(2)}%)
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+    }
+    
+    holdingsListEl.innerHTML = html;
+  }
+  
+  // İşlem geçmişini render et
+  function renderTransactions() {
+    let html = '';
+    
+    if (transactions.length === 0) {
+      html = `
+        <div class="empty-transactions text-center py-3">
+          <i class="fas fa-receipt mb-2"></i>
+          <p>İşlem geçmişiniz boş</p>
+        </div>
+      `;
+    } else {
+      for (const transaction of transactions) {
+        const dateStr = formatDate(transaction.date);
+        
+        html += `
+          <div class="transaction-item">
+            <div class="transaction-time">${dateStr}</div>
+            <div class="transaction-title ${transaction.type === 'buy' ? 'transaction-buy' : 'transaction-sell'}">
+              ${transaction.type === 'buy' ? 'Satın Alma' : 'Satış'}: ${transaction.name}
+            </div>
+            <div class="transaction-detail">
+              ${transaction.quantity} adet × ₺${transaction.price.toFixed(2)} = ₺${transaction.total.toFixed(2)}
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    transactionHistoryEl.innerHTML = html;
+  }
+  
+  // Tarih formatı
+  function formatDate(date) {
+    const now = new Date();
+    const diff = (now - date) / 1000; // saniye cinsinden fark
+    
+    if (diff < 60) {
+      return 'Az önce';
+    } else if (diff < 3600) {
+      const minutes = Math.floor(diff / 60);
+      return `${minutes} dakika önce`;
+    } else if (diff < 86400 && date.getDate() === now.getDate()) {
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      return `Bugün, ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    } else {
+      return date.toLocaleDateString('tr-TR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
+});
+</script>
+{% endblock %}
