@@ -146,6 +146,48 @@
     background: #999;
     cursor: not-allowed;
   }
+  
+  /* Mobile Controls */
+  .mobile-controls {
+    margin: 15px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+  }
+  
+  .mobile-controls-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .mobile-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(106, 90, 205, 0.5);
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+  }
+  
+  .mobile-btn:active {
+    background: rgba(106, 90, 205, 0.8);
+  }
+  
+  /* Hide mobile controls on desktop */
+  @media (min-width: 768px) {
+    .mobile-controls {
+      display: none;
+    }
+  }
 </style>
 
 <script>
@@ -159,9 +201,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const nextCtx = nextCanvas.getContext('2d');
   
   // Game Constants
-  const COLS = 12;
-  const ROWS = 18;
-  const BLOCK_SIZE = 30;
+  const COLS = 10;
+  const ROWS = 16;
+  const BLOCK_SIZE = 28;
   const NEXT_BLOCK_SIZE = 20;
   
   // Set canvas dimensions
@@ -216,8 +258,109 @@ document.addEventListener('DOMContentLoaded', function() {
     // Keyboard controls
     document.addEventListener('keydown', handleKeyPress);
     
+    // Touch controls for mobile
+    setupTouchControls();
+    
     // Initialize board
     resetGame();
+  }
+  
+  // Setup touch controls for mobile devices
+  function setupTouchControls() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    
+    // Add touch event listeners to the canvas
+    canvas.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, false);
+    
+    canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      
+      if (gameOver || paused) return;
+      
+      // Check if it was a tap (short touch)
+      if (Math.abs(touchEndX - touchStartX) < 20 && 
+          Math.abs(touchEndY - touchStartY) < 20) {
+        // Tap to rotate
+        rotate();
+        return;
+      }
+      
+      // Determine swipe direction
+      const xDiff = touchStartX - touchEndX;
+      const yDiff = touchStartY - touchEndY;
+      
+      // Horizontal swipe detection (left or right)
+      if (Math.abs(xDiff) > Math.abs(yDiff)) {
+        if (xDiff > 0) {
+          // Swipe left
+          moveLeft();
+        } else {
+          // Swipe right
+          moveRight();
+        }
+      } else {
+        // Vertical swipe detection
+        if (yDiff > 0) {
+          // Swipe up - rotate
+          rotate();
+        } else {
+          // Swipe down - move down faster or hard drop
+          if (Math.abs(yDiff) > 50) {
+            // Hard drop for strong downward swipe
+            hardDrop();
+          } else {
+            // Just move down one step
+            moveDown();
+          }
+        }
+      }
+    }, false);
+    
+    canvas.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+      touchEndX = e.touches[0].clientX;
+      touchEndY = e.touches[0].clientY;
+    }, false);
+    
+    // Add mobile control buttons
+    addMobileControlButtons();
+  }
+  
+  // Add mobile control buttons for easier touch input
+  function addMobileControlButtons() {
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = 'mobile-controls';
+    controlsContainer.innerHTML = `
+      <div class="mobile-controls-row">
+        <button id="rotateBtn" class="mobile-btn">↻</button>
+      </div>
+      <div class="mobile-controls-row">
+        <button id="leftBtn" class="mobile-btn">←</button>
+        <button id="downBtn" class="mobile-btn">↓</button>
+        <button id="rightBtn" class="mobile-btn">→</button>
+      </div>
+      <div class="mobile-controls-row">
+        <button id="dropBtn" class="mobile-btn">⤓</button>
+      </div>
+    `;
+    
+    // Add mobile controls after the game board
+    const boardContainer = document.querySelector('.board-container');
+    boardContainer.after(controlsContainer);
+    
+    // Add event listeners to mobile control buttons
+    document.getElementById('rotateBtn').addEventListener('click', rotate);
+    document.getElementById('leftBtn').addEventListener('click', moveLeft);
+    document.getElementById('rightBtn').addEventListener('click', moveRight);
+    document.getElementById('downBtn').addEventListener('click', moveDown);
+    document.getElementById('dropBtn').addEventListener('click', hardDrop);
   }
   
   // Start Game
