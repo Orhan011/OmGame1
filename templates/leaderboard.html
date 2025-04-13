@@ -21,18 +21,6 @@
         <p>Skorlar yükleniyor...</p>
       </div>
     </div>
-    
-    <!-- Seviye tablosu -->
-    <div class="leaderboard-header">
-      <h1>Seviye Sıralaması</h1>
-      <p>Kullanıcıların seviye puanlarına göre sıralaması. Platform üzerindeki etkinliklerle seviyenizi yükseltin ve lider tablosunda yerinizi alın!</p>
-    </div>
-    <div id="levelLeaderboardContainer" class="leaderboard-card-container">
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Seviye bilgileri yükleniyor...</p>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -40,6 +28,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
-<script src="{{ url_for('static', filename='js/level-leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 {% endblock %}
