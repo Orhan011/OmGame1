@@ -64,7 +64,7 @@ function loadLevelLeaderboard() {
         else if (index < 10) userNameColorClass = 'top-ten';
 
         const avatarUrl = player.avatar_url || '';
-        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
+        const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';own"></i></div>' : '';
 
         html += `
           <div class="player-row ${rankClass} ${player.is_current_user ? 'current-user' : ''}">

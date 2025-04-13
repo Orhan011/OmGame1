@@ -670,6 +670,19 @@
   font-size: 18px;
   z-index: 10;
   filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  animation: shine 2s infinite alternate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes shine {
+  0% {
+    filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0px 2px 10px rgba(255, 215, 0, 0.8));
+  }
 }
 
 /* Kullanıcı adı renkleri */
@@ -1063,6 +1076,425 @@
   font-size: 18px;
   z-index: 10;
   filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  animation: shine 2s infinite alternate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes shine {
+  0% {
+    filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0px 2px 10px rgba(255, 215, 0, 0.8));
+  }
+}
+
+/* Kullanıcı adı renkleri */
+.first-place {
+  color: gold !important;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  font-weight: 700;
+}
+
+.second-place {
+  color: silver !important;
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+  font-weight: 700;
+}
+
+.third-place {
+  color: #cd7f32 !important; /* Bronz renk */
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+  font-weight: 700;
+}
+
+.top-ten {
+  color: #6a5ae0 !important; /* Mor tonu */
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .leaderboard-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .leaderboard-header p {
+    font-size: 1rem;
+  }
+
+  .rank-block {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+
+  .player-avatar {
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+  }
+
+  .avatar-content {
+    font-size: 1.1rem;
+  }
+
+  .player-name {
+    font-size: 1rem;
+  }
+
+  .score-container {
+    padding: 6px 12px;
+  }
+
+  .score-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .leaderboard-header p {
+    font-size: 0.9rem;
+  }
+
+  .leaderboard-table-container {
+    padding: 5px;
+  }
+
+  .row-content {
+    padding: 5px 0;
+  }
+
+  .rank-block {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+
+  .avatar-content {
+    font-size: 0.9rem;
+  }
+
+  .player-name {
+    font-size: 0.9rem;
+  }
+
+  .score-block {
+    width: 90px;
+  }
+
+  .score-container {
+    padding: 4px 10px;
+  }
+
+  .score-value {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .player-row {
+    grid-template-columns: 60px 1fr 100px;
+    padding: 0.8rem 1rem;
+  }
+
+  .leaderboard-header-row {
+    grid-template-columns: 60px 1fr 100px;
+    padding: 0.8rem 1rem;
+  }
+
+  .player-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .player-cell {
+    gap: 0.8rem;
+  }
+
+  .rank-cell {
+    width: 40px;
+    font-size: 1.2rem;
+  }
+
+  .player-name {
+    font-size: 1rem;
+  }
+
+  .score-value {
+    font-size: 1.1rem;
+  }
+}
+
+.rank-number {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #a6a6c0;
+  position: relative;
+  z-index: 2;
+}
+
+
+.player-info {
+  flex-grow: 1;
+  margin-right: 15px;
+  overflow: hidden;
+}
+
+.player-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.player-stats {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.level-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: rgba(106, 90, 224, 0.2);
+  color: #9f8aff;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.games-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #8a8aa3;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.games-badge i {
+  margin-right: 3px;
+  font-size: 0.65rem;
+}
+
+
+.player-row[data-rank="1"] .player-name {
+  color: gold; /* Changed to gold */
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.player-row[data-rank="2"] .player-name {
+  color: silver; /* Changed to silver */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.player-row[data-rank="3"] .player-name {
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+
+.score-block {
+  position: relative;
+  width: 110px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.score-container {
+  background: rgba(106, 90, 224, 0.1);
+  border-radius: 30px;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.score-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(106, 90, 224, 0), rgba(106, 90, 224, 0.2), rgba(106, 90, 224, 0));
+  background-size: 200% 100%;
+  z-index: 0;
+}
+
+
+.player-row[data-rank="1"] .score-container {
+  background: rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.player-row[data-rank="1"] .score-value {
+  color: gold; /* Changed to gold */
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.player-row[data-rank="1"] .score-sparkles {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0), rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0));
+  background-size: 200% 100%;
+  animation: shimmerGold 2s infinite;
+}
+
+.player-row[data-rank="2"] .score-container {
+  background: rgba(192, 192, 192, 0.2);
+  box-shadow: 0 0 8px rgba(192, 192, 192, 0.3);
+}
+
+.player-row[data-rank="2"] .score-value {
+  color: silver; /* Changed to silver */
+  text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+}
+
+.player-row[data-rank="2"] .score-sparkles {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0), rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0));
+  background-size: 200% 100%;
+  animation: shimmerSilver 2s infinite;
+}
+
+.player-row[data-rank="3"] .score-container {
+  background: rgba(205, 127, 50, 0.2);
+  box-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
+}
+
+.player-row[data-rank="3"] .score-value {
+  color: darkgoldenrod; /* Changed to darkgoldenrod */
+  text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
+}
+
+.player-row[data-rank="3"] .score-sparkles {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0), rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0));
+  background-size: 200% 100%;
+  animation: shimmerBronze 2s infinite;
+}
+
+@keyframes shimmerGold {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@keyframes shimmerSilver {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@keyframes shimmerBronze {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Loading and empty states */
+.loading, .empty-state, .error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  background: rgba(30, 30, 50, 0.7);
+  border-radius: 16px;
+  margin-top: 2rem;
+}
+
+.loading i, .empty-state i, .error i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #6a5ae0;
+}
+
+.error i {
+  color: #ff5252;
+}
+
+.loading p, .empty-state p, .error p {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+}
+
+.loading i {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Avatar ve taç stilleri */
+.player-avatar {
+  position: relative;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.crown {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: gold;
+  font-size: 18px;
+  z-index: 10;
+  filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  animation: shine 2s infinite alternate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes shine {
+  0% {
+    filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0px 2px 10px rgba(255, 215, 0, 0.8));
+  }
 }
 
 /* Kullanıcı adı renkleri */
