@@ -81,6 +81,38 @@ def memory_match_3d_underscore():
 def memory_match_3d_games_underscore():
     return memory_match_3d()
 
+# Daha fazla alternatif rotalar
+@app.route('/memory-match-3d.html')
+def memory_match_3d_html():
+    return memory_match_3d()
+
+@app.route('/game/memory-match-3d')
+def memory_match_3d_game_kebab():
+    return memory_match_3d()
+
+@app.route('/game/memoryMatch3D.html')
+def memory_match_3d_game_html():
+    return memory_match_3d()
+
+# Oyun rotası için genel catch-all (Memory Match 3D için de çalışacak)
+@app.route('/<path:game_path>.html')
+def game_html_handler(game_path):
+    # game_path'i normalize et
+    normalized_path = game_path.replace('-', '').replace('_', '').lower()
+    
+    # memoryMatch3D kontrolü
+    if normalized_path in ['memorymatch3d', 'memory3dmatch', '3dmemorymatch']:
+        return memory_match_3d()
+    
+    # Diğer oyunlar için
+    try:
+        # Orjinal game_path ile template yüklemeyi dene
+        return render_template(f'games/{game_path}.html')
+    except:
+        # Bulunamazsa 404 hatası döndür
+        from flask import abort
+        abort(404)
+
 # Diğer oyunlar için eksik olabilecek rotalar
 @app.route('/games/tetris')
 def tetris_game():
