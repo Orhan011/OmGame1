@@ -1,3 +1,169 @@
+
+/* Modern Liderlik Tablosu Stili - 2025 Edition */
+:root {
+  --primary-color: #6a5ae0;
+  --primary-light: #9f8aff;
+  --accent-color: #ffd700;
+  --dark-bg: #1a1a2e;
+  --card-bg: #22223b;
+  --text-light: #ffffff;
+  --text-muted: #8a8aa3;
+  --border-radius: 12px;
+  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Ana liderlik tablosu konteyneri */
+.leaderboard-table {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--box-shadow);
+}
+
+/* Tablo başlığı */
+.leaderboard-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  text-align: left;
+  border-left: 3px solid var(--primary-color);
+  padding-left: 0.5rem;
+}
+
+/* Tablo başlık satırı */
+.table-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Oyuncu satırları */
+.player-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  padding: 0.8rem 1rem;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.player-row:hover {
+  background-color: rgba(106, 90, 224, 0.1);
+}
+
+/* Oyuncu avatarı */
+.player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Sütunlar */
+.column-sira {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--primary-light);
+}
+
+.column-isim {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.column-puan {
+  text-align: right;
+}
+
+/* Puan rozeti */
+.score-badge {
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  color: #000;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* İlk üç sıradaki oyuncular için özel stil */
+.player-row[data-rank="1"] .column-sira {
+  color: #ffd700;
+}
+
+.player-row[data-rank="2"] .column-sira {
+  color: #c0c0c0;
+}
+
+.player-row[data-rank="3"] .column-sira {
+  color: #cd7f32;
+}
+
+/* Satır ayırıcı */
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 1rem;
+}
+
+/* Güncel kullanıcının satırı */
+.current-user {
+  background-color: rgba(106, 90, 224, 0.2);
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Toplam puan butonu */
+.total-score-btn {
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  color: white;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.total-score-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
+}
+
+.total-score-btn i {
+  margin-right: 0.5rem;
+}
+
+/* Mobil cihazlar için uyarlama */
+@media (max-width: 768px) {
+  .table-header, .player-row {
+    grid-template-columns: 60px 1fr 100px;
+  }
+  
+  .score-badge {
+    padding: 0.4rem 0.8rem;
+    min-width: 70px;
+    font-size: 0.9rem;
+  }
+  
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 /* Modern Leaderboard Styles - 2025 Edition */
 :root {
   --primary-color: #6a5ae0;

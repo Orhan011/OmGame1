@@ -112,7 +112,15 @@ function loadLeaderboard() {
       updatePodium(data);
 
       // Tablo HTML'ini oluştur
-      let html = `<div class="leaderboard-header">Sıralama İsim Puan</div>`;
+      let html = `
+        <h2 class="leaderboard-title">En İyi Oyuncular</h2>
+        <div class="leaderboard-table">
+          <div class="table-header">
+            <div class="column-sira">Sıra</div>
+            <div class="column-isim">İsim</div>
+            <div class="column-puan">Puan</div>
+          </div>
+      `;
 
       // Sadece ilk 10 oyuncu için satır oluştur
       const playersToShow = data.slice(0, 10);
@@ -121,14 +129,31 @@ function loadLeaderboard() {
         const totalScore = player.total_score || 0;
         const username = player.username || 'İsimsiz Oyuncu';
         const avatarUrl = fixAvatarUrl(player.avatar_url);
+        const rank = index + 1;
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
-        // Tek satır formatında oyuncu ekle
-        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
-          ${index + 1} ${username} ${formatNumber(totalScore)}
-        </div>`;
+        // Yeni tasarıma göre oyuncu satırı ekle
+        html += `
+          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
+            <div class="column-sira">${rank}</div>
+            <div class="column-isim">
+              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
+              <span>${username}</span>
+            </div>
+            <div class="column-puan"><span class="score-badge">${formatNumber(totalScore)}</span></div>
+          </div>
+          <div class="divider"></div>
+        `;
       });
+
+      // Toplam puan butonu ekle
+      html += `
+        </div>
+        <div class="total-score-btn">
+          <i class="fas fa-trophy"></i> Toplam Puan
+        </div>
+      `;
 
       container.innerHTML = html;
 
@@ -186,7 +211,15 @@ function loadLevelLeaderboard() {
       }
 
       // Tablo HTML'ini oluştur
-      let html = `<div class="leaderboard-header">Sıralama İsim Seviye</div>`;
+      let html = `
+        <h2 class="leaderboard-title">En İyi Seviyeler</h2>
+        <div class="leaderboard-table">
+          <div class="table-header">
+            <div class="column-sira">Sıra</div>
+            <div class="column-isim">İsim</div>
+            <div class="column-puan">Seviye</div>
+          </div>
+      `;
 
       // Sadece ilk 10 kullanıcı için satır oluştur
       const playersToShow = data.slice(0, 10);
@@ -200,12 +233,29 @@ function loadLevelLeaderboard() {
         const totalXp = player.total_xp || player.experience_points || 0;
         const progressPercent = player.progress_percent || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
+        const rank = index + 1;
 
-        // Tek satır formatında seviye bilgisi ekle
-        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
-          ${index + 1} ${username} Seviye ${level}
-        </div>`;
+        // Yeni tasarıma göre seviye satırı ekle
+        html += `
+          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
+            <div class="column-sira">${rank}</div>
+            <div class="column-isim">
+              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
+              <span>${username}</span>
+            </div>
+            <div class="column-puan"><span class="score-badge">Seviye ${level}</span></div>
+          </div>
+          <div class="divider"></div>
+        `;
       });
+
+      // Toplam seviye butonu ekle
+      html += `
+        </div>
+        <div class="total-score-btn">
+          <i class="fas fa-star"></i> Toplam Seviye
+        </div>
+      `;
 
       container.innerHTML = html;
 
@@ -266,7 +316,15 @@ function loadGameLeaderboard(gameType) {
       }
 
       // Tablo HTML'ini oluştur
-      let html = `<div class="leaderboard-header">Sıralama İsim Puan</div>`;
+      let html = `
+        <h2 class="leaderboard-title">${gameType === 'all' ? 'Tüm Oyunlar' : gameType} Puan Sıralaması</h2>
+        <div class="leaderboard-table">
+          <div class="table-header">
+            <div class="column-sira">Sıra</div>
+            <div class="column-isim">İsim</div>
+            <div class="column-puan">Puan</div>
+          </div>
+      `;
 
       // Sadece ilk 10 oyuncu için satır oluştur
       const playersToShow = data.slice(0, 10);
@@ -276,12 +334,28 @@ function loadGameLeaderboard(gameType) {
         const username = player.username || 'İsimsiz Oyuncu';
         const score = player.score || player.total_score || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
+        const rank = index + 1;
 
-        // Tek satır formatında oyun puanı ekle
-        html += `<div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
-          ${index + 1} ${username} ${formatNumber(score)}
-        </div>`;
+        // Yeni tasarıma göre oyun puanı satırı ekle
+        html += `
+          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
+            <div class="column-sira">${rank}</div>
+            <div class="column-isim">
+              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
+              <span>${username}</span>
+            </div>
+            <div class="column-puan"><span class="score-badge">${formatNumber(score)}</span></div>
+          </div>
+          <div class="divider"></div>
+        `;
       });
+
+      html += `
+        </div>
+        <div class="total-score-btn">
+          <i class="fas fa-gamepad"></i> ${gameType === 'all' ? 'Tüm Oyunlar' : gameType}
+        </div>
+      `;
 
       container.innerHTML = html;
 
