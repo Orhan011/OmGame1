@@ -1,31 +1,41 @@
 
 {% extends "layout.html" %}
 
-{% block title %}Liderlik Tablosu - OmGame{% endblock %}
+{% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
+
+{% block head_extras %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
 
 {% block content %}
 <div class="container">
   <div class="leaderboard-container">
     <div class="leaderboard-header">
       <h1 class="leaderboard-title">
-        <i class="fas fa-trophy"></i> Liderlik Tablosu
+        <i class="fas fa-trophy"></i> En İyi Oyuncular
       </h1>
       <button id="refreshBtn" class="refresh-button">
         <i class="fas fa-sync-alt"></i> Yenile
       </button>
     </div>
 
-    <div id="leaderboardRows" class="leaderboard-rows">
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Liderlik tablosu yükleniyor...</p>
+    <div class="leaderboard-table">
+      <div class="table-header">
+        <div class="header-rank"><i class="fas fa-medal"></i> Sıra</div>
+        <div class="header-player"><i class="fas fa-user"></i> Oyuncu</div>
+        <div class="header-score"><i class="fas fa-star"></i> Puan</div>
+      </div>
+      
+      <div id="leaderboardRows" class="leaderboard-rows">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Liderlik tablosu yükleniyor...</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
-<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 {% endblock %}
