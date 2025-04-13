@@ -677,32 +677,34 @@
 
 .score-block {
   position: relative;
-  width: 90px;
+  width: 70px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   flex-shrink: 0;
+  margin-right: 5px;
 }
 
 .score-container {
   background: rgba(106, 90, 224, 0.2);
-  border-radius: 12px;
-  padding: 3px 8px;
+  border-radius: 10px;
+  padding: 2px 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1), 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 
               inset 0 1px 1px rgba(255, 255, 255, 0.15),
               inset 0 -1px 1px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transform: translateZ(0);
   background-image: linear-gradient(135deg, 
-                    rgba(106, 90, 224, 0.25) 0%, 
-                    rgba(159, 138, 255, 0.15) 100%);
+                    rgba(106, 90, 224, 0.2) 0%, 
+                    rgba(159, 138, 255, 0.1) 100%);
+  margin-left: 5px;
 }
 
 .player-row:hover .score-container {
@@ -717,16 +719,16 @@
 .score-value {
   color: #fff;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   position: relative;
   z-index: 1;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   background: linear-gradient(45deg, #fff 10%, #e0d8ff 60%, #b5a4ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   transition: all 0.3s ease;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 
 .player-row:hover .score-value {
@@ -773,7 +775,7 @@
 .player-row[data-rank="1"] .score-value {
   color: gold; /* Changed to gold */
   text-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 .player-row[data-rank="1"] .score-sparkles {
@@ -790,7 +792,7 @@
 .player-row[data-rank="2"] .score-value {
   color: silver; /* Changed to silver */
   text-shadow: 0 0 4px rgba(192, 192, 192, 0.4);
-  font-size: 0.8rem;
+  font-size: 0.68rem;
 }
 
 .player-row[data-rank="2"] .score-sparkles {
@@ -807,7 +809,7 @@
 .player-row[data-rank="3"] .score-value {
   color: darkgoldenrod; /* Changed to darkgoldenrod */
   text-shadow: 0 0 4px rgba(205, 127, 50, 0.4);
-  font-size: 0.8rem;
+  font-size: 0.68rem;
 }
 
 .player-row[data-rank="3"] .score-sparkles {
