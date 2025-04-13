@@ -33,15 +33,15 @@ def send_welcome_email(email, username):
     mail.send(msg)
 
 # Bu rota main.py'de tanımlandı
-# @app.route('/games/minesweeper')
-# @login_required
-# def minesweeper():
-#     """Mayın Tarlası: Mantık ve strateji oyunu
-#     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
-#     return render_template('games/minesweeper.html')
+
+def update_game_play_count(game_id):
+    #  Bu fonksiyonun gerçek implementasyonu burada olmalı.
+    #  Örneğin, bir veritabanına oyun oynama sayısını güncelleyebilir.
+    pass
 
 
-# routes.py
-# Bu dosya artık kullanılmıyor, yönlendirmeler main.py içerisinde.
-# 2048 oyunu kaldırıldı
-# 2048 API endpoint'i kaldırıldı
+@app.route('/games/memoryMatch3D')
+def memory_match_3d():
+    game_name = "Memory Match 3D"
+    update_game_play_count("memoryMatch3D")
+    return render_template('games/memoryMatch3D.html', title=game_name)

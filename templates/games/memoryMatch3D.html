@@ -1,0 +1,250 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="memory-match-3d-page">
+  <div class="game-container">
+    <div class="game-header-section">
+      <div class="game-title">
+        <h1>Memory Match 3D</h1>
+        <p class="game-subtitle">Eşleşen kartları bul ve hafızanı test et!</p>
+      </div>
+
+      <div class="game-controls-section">
+        <div class="game-stats">
+          <div class="stat-box moves-counter">
+            <i class="fas fa-sync-alt"></i>
+            <span id="moves-count">0</span>
+          </div>
+          <div class="stat-box timer">
+            <i class="fas fa-clock"></i>
+            <span id="timer">00:00</span>
+          </div>
+        </div>
+
+        <div class="difficulty-selector">
+          <select id="difficulty-select" class="difficulty-select">
+            <option value="easy">Kolay (4x4)</option>
+            <option value="medium">Orta (6x6)</option>
+            <option value="hard">Zor (8x8)</option>
+          </select>
+          <button id="new-game-btn" class="control-btn new-game">
+            <i class="fas fa-play"></i> Yeni Oyun
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-board-section">
+      <div id="memory-board-container">
+        <div class="board-background">
+          <div id="memory-board" class="memory-board">
+            <!-- JavaScript ile kartlar burada oluşturulacak -->
+          </div>
+          <div class="board-shadow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-options-section">
+      <div class="options-row">
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="sound-effects" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">Ses Efektleri</span>
+        </div>
+
+        <div class="option-toggle">
+          <label class="toggle-switch">
+            <input type="checkbox" id="animations" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="option-label">Animasyonlar</span>
+        </div>
+      </div>
+
+      <div class="help-buttons">
+        <button id="hint-btn" class="help-btn">
+          <i class="fas fa-lightbulb"></i> İpucu
+        </button>
+        <button id="help-btn" class="help-btn">
+          <i class="fas fa-question-circle"></i> Nasıl Oynanır?
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yardım Paneli (varsayılan olarak gizli) -->
+  <div id="help-panel" class="help-panel hidden">
+    <div class="help-header">
+      <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
+      <button id="close-help-btn" class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="help-content">
+      <div class="help-section">
+        <h4>Oyun Kuralları</h4>
+        <p>Memory Match 3D, hafızanızı ve görsel algınızı test eden eğlenceli bir kart eşleştirme oyunudur.</p>
+        <ul>
+          <li>Oyun başladığında, tüm kartlar kapalıdır.</li>
+          <li>Her hamlenizde iki kart açabilirsiniz.</li>
+          <li>Açtığınız iki kart aynı ise, kartlar açık kalır.</li>
+          <li>Farklı ise, kartlar tekrar kapanır.</li>
+          <li>Amacınız, en az hamle ile tüm kartları eşleştirmektir.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>İpuçları</h4>
+        <ul>
+          <li>Açtığınız kartların yerlerini hatırlamaya çalışın.</li>
+          <li>Özellikle farklı çıkan kartların konumlarını aklınızda tutun.</li>
+          <li>Zorlanırsanız, ipucu butonu size yardımcı olabilir.</li>
+          <li>Farklı zorluk seviyelerinde pratik yaparak hafızanızı geliştirebilirsiniz.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sonuç Modalı -->
+<div class="modal fade" id="result-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tebrikler!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="result-message win">
+          <div class="result-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <h4>Tüm eşleştirmeleri buldunuz!</h4>
+          <p>Harika bir hafızanız var!</p>
+        </div>
+        <div class="result-stats">
+          <div class="stat-item">
+            <div class="stat-label">Süre</div>
+            <div class="stat-value" id="result-time">00:00</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Hamleler</div>
+            <div class="stat-value" id="result-moves">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Zorluk</div>
+            <div class="stat-value" id="result-difficulty">Kolay</div>
+          </div>
+        </div>
+
+        <!-- Skor Gösterimi -->
+        <div id="score-display-container" class="mt-4"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="modal-btn primary" id="new-game-modal">Yeni Oyun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- İpucu Modalı -->
+<div class="modal fade" id="hint-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">İpucu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="hint-content">
+          <div class="hint-icon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <p id="hint-text">Burada bir ipucu göreceksiniz...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="modal-btn primary" id="show-hint-btn">Göster</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/games/memoryMatch3D.css">
+<link rel="stylesheet" href="/static/css/score-display.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/games/memoryMatch3D.js"></script>
+<script src="/static/js/score-handler.js"></script>
+<script src="/static/js/score-display.js"></script>
+<script src="/static/js/game-integration-helper.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
+    if (typeof window.memoryMatchGame !== 'undefined') {
+      const scoreSystem = integrateGameScore('memoryMatch3D', window.memoryMatchGame, {
+        maxScore: 100,
+        expectedTime: 180 // 3 dakika
+      });
+      
+      // Zorluk dinleyicisini kur
+      setupDifficultyListener(scoreSystem);
+      
+      // Hamle sayacını izle
+      window.memoryMatchGame.onMove = function(moves) {
+        scoreSystem.incrementMoves();
+      };
+      
+      // İpucu kullanımını izle
+      window.memoryMatchGame.onHint = function() {
+        scoreSystem.incrementHints();
+      };
+      
+      // Oyun tamamlandığında puan hesapla
+      window.memoryMatchGame.onComplete = function(stats) {
+        const timeSpent = stats.time;
+        const moves = stats.moves;
+        
+        // Zorluk seviyesine göre beklenen hamle sayısı
+        let expectedMoves;
+        switch(window.memoryMatchGame.difficulty) {
+          case 'easy': expectedMoves = 24; break;
+          case 'medium': expectedMoves = 45; break;
+          case 'hard': expectedMoves = 80; break;
+          default: expectedMoves = 30;
+        }
+        
+        // Süre ve hamle faktörleri
+        const timeFactor = Math.min(1, scoreSystem.expectedTime / timeSpent);
+        const movesFactor = Math.min(1, expectedMoves / moves);
+        
+        // Puanı hesapla
+        const timeScore = timeFactor * 50; // Zaman 50 puana kadar etkili
+        const movesScore = movesFactor * 50; // Hamle 50 puana kadar etkili
+        const hintPenalty = (stats.hints || 0) * 5; // Her ipucu 5 puan düşürür
+        
+        const rawScore = Math.max(0, timeScore + movesScore - hintPenalty);
+        
+        // Metrikleri güncelle
+        scoreSystem.updateMetrics({
+          hintsUsed: stats.hints || 0,
+          completed: true,
+          score: rawScore,
+          moves: moves,
+          time: timeSpent
+        });
+        
+        // Puan hesapla ve göster
+        scoreSystem.endGame(true);
+      };
+    }
+  });
+</script>
+{% endblock %}
