@@ -357,6 +357,94 @@
     transform: translateY(0);
     box-shadow: 0 2px 5px rgba(106, 90, 205, 0.4);
   }
+  
+  /* Inline Game Over Modal Styles */
+  .tetris-inline-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 10px;
+  }
+  
+  .tetris-inline-modal.show {
+    opacity: 1;
+  }
+  
+  .tetris-inline-modal-content {
+    width: 90%;
+    max-width: 280px;
+    background: linear-gradient(135deg, #2c3e50, #1a2a38);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    border: 2px solid rgba(106, 90, 205, 0.7);
+  }
+  
+  .tetris-inline-modal.show .tetris-inline-modal-content {
+    transform: scale(1);
+  }
+  
+  .tetris-inline-modal-header {
+    background: rgba(106, 90, 205, 0.7);
+    padding: 12px;
+    text-align: center;
+  }
+  
+  .tetris-inline-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .tetris-inline-modal-body {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .tetris-inline-modal-footer {
+    padding: 10px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .inline-modal-btn {
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    background: linear-gradient(135deg, #6C5CE7, #8A70FF);
+    box-shadow: 0 4px 10px rgba(106, 90, 205, 0.4);
+  }
+  
+  .inline-modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(106, 90, 205, 0.5);
+  }
+  
+  .inline-modal-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(106, 90, 205, 0.4);
+  }
 </style>
 
 <script>
@@ -894,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
     saveScore(finalScore);
   }
   
-  // Show a modern game over modal
+  // Show a modern game over modal inside the game board
   function showGameOverModal(finalScore) {
     // Remove existing modal if it exists
     const existingModal = document.getElementById('game-over-modal');
@@ -905,42 +993,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create modal container
     const modal = document.createElement('div');
     modal.id = 'game-over-modal';
-    modal.className = 'tetris-modal';
+    modal.className = 'tetris-inline-modal';
     
     // Create modal content
     modal.innerHTML = `
-      <div class="tetris-modal-content">
-        <div class="tetris-modal-header">
+      <div class="tetris-inline-modal-content">
+        <div class="tetris-inline-modal-header">
           <h2>OYUN BİTTİ</h2>
         </div>
-        <div class="tetris-modal-body">
+        <div class="tetris-inline-modal-body">
           <div class="final-score-container">
             <div class="final-score-value">${finalScore}</div>
             <div class="final-score-label">Skor</div>
           </div>
-          <div class="game-stats">
-            <div class="game-stat">
-              <div class="stat-value">${level}</div>
-              <div class="stat-label">Seviye</div>
-            </div>
-            <div class="game-stat">
-              <div class="stat-value">${lines}</div>
-              <div class="stat-label">Satırlar</div>
-            </div>
-          </div>
-          <div class="modal-message">
-            Skorunuz kaydedildi ve liderlik tablosuna eklendi.
-          </div>
         </div>
-        <div class="tetris-modal-footer">
-          <button id="play-again-btn" class="modal-btn">Tekrar Oyna</button>
-          <button id="home-btn" class="modal-btn">Ana Sayfa</button>
+        <div class="tetris-inline-modal-footer">
+          <button id="play-again-btn" class="inline-modal-btn">Tekrar Oyna</button>
+          <button id="home-btn" class="inline-modal-btn">Ana Sayfa</button>
         </div>
       </div>
     `;
     
-    // Add modal to the document
-    document.body.appendChild(modal);
+    // Add modal to the board container instead of body
+    const boardContainer = document.querySelector('.board-container');
+    boardContainer.appendChild(modal);
     
     // Add event listeners to buttons
     document.getElementById('play-again-btn').addEventListener('click', function() {
