@@ -6,13 +6,13 @@
 // Sayfa yüklendiğinde çalıştırılacak fonksiyonlar
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Liderlik tablosu modülü yükleniyor...');
-  
+
   // Skorları yükle
   loadLeaderboard();
-  
+
   // Seviye tablosunu yükle
   loadLevelLeaderboard();
-  
+
   // Yenileme butonunu tanımla
   document.querySelectorAll('.refresh-leaderboard').forEach(function(button) {
     button.addEventListener('click', function() {
@@ -20,32 +20,32 @@ document.addEventListener('DOMContentLoaded', function() {
       loadLeaderboard();
       loadLevelLeaderboard();
       updatePodium();
-      
+
       setTimeout(() => {
         this.classList.remove('spin-animation');
         showNotification('Liderlik tablosu güncellendi!');
       }, 1000);
     });
   });
-  
+
   // Tab değiştirme işlemleri
   const tabButtons = document.querySelectorAll('.tab-item');
   const tabContents = document.querySelectorAll('.tab-content');
-  
+
   tabButtons.forEach(button => {
     button.addEventListener('click', function() {
       const tabId = this.getAttribute('data-tab');
-      
+
       // Aktif sekmeyi güncelle
       tabButtons.forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
-      
+
       // İçeriği göster/gizle
       tabContents.forEach(content => content.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
     });
   });
-  
+
   // Oyun filtresi
   const applyFilterBtn = document.getElementById('applyGameFilter');
   if (applyFilterBtn) {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
       loadGameLeaderboard(gameType);
     });
   }
-  
+
   // Her 60 saniyede bir skorları otomatik yenile
   setInterval(function() {
     loadLeaderboard();
@@ -67,9 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadLeaderboard() {
   const container = document.getElementById('leaderboardContainer');
   if (!container) return;
-  
+
   console.log('Liderlik tablosu yükleniyor...');
-  
+
   // Yükleniyor göstergesini göster
   container.innerHTML = `
     <div class="leaderboard-loading">
@@ -77,7 +77,7 @@ function loadLeaderboard() {
       <p class="loading-text">Liderlik tablosu yükleniyor...</p>
     </div>
   `;
-  
+
   // Sunucudan verileri al - sadece ilk 10 kişiyi iste
   fetch('/api/scores/aggregated?limit=10&nocache=' + new Date().getTime())
     .then(response => {
@@ -89,7 +89,7 @@ function loadLeaderboard() {
     })
     .then(data => {
       console.log('Kullanıcı skorları alındı:', data.length);
-      
+
       // Veri yoksa bilgi mesajı göster
       if (!data || data.length === 0) {
         container.innerHTML = `
@@ -101,40 +101,34 @@ function loadLeaderboard() {
         `;
         return;
       }
-      
+
       // İstatistikleri güncelle
       updateStats(data);
-      
+
       // Skorları sırala
       data.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
-      
+
       // Podium'u güncelle
       updatePodium(data);
-      
+
       // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-header">
-          <div class="simple-rank">Sıra</div>
-          <div class="simple-name">Kullanıcı</div>
-          <div class="simple-score">Puan</div>
-        </div>
-      `;
-      
+      let html = `<div class="leaderboard-header">Sıralama İsim Puan</div>`;
+
       // Sadece ilk 10 oyuncu için satır oluştur
       const playersToShow = data.slice(0, 10);
-      
+
       playersToShow.forEach((player, index) => {
         const totalScore = player.total_score || 0;
         const username = player.username || 'İsimsiz Oyuncu';
         const avatarUrl = fixAvatarUrl(player.avatar_url);
-        
+
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
-        
+
         html += createPlayerRow(index + 1, username, totalScore, avatarUrl, player.is_current_user, player.rank);
       });
-      
+
       container.innerHTML = html;
-      
+
       // Satırları animasyonlu göster
       animateRows();
     })
@@ -156,7 +150,7 @@ function loadLeaderboard() {
 function loadLevelLeaderboard() {
   const container = document.getElementById('levelLeaderboardContainer');
   if (!container) return;
-  
+
   // Yükleniyor göstergesini göster
   container.innerHTML = `
     <div class="leaderboard-loading">
@@ -164,7 +158,7 @@ function loadLevelLeaderboard() {
       <p class="loading-text">Seviye bilgileri yükleniyor...</p>
     </div>
   `;
-  
+
   // Sunucudan verileri al - sadece ilk 10 kullanıcı
   fetch('/api/users/levels?limit=10&nocache=' + new Date().getTime())
     .then(response => {
@@ -187,34 +181,28 @@ function loadLevelLeaderboard() {
         `;
         return;
       }
-      
+
       // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-header">
-          <div class="simple-rank">Sıra</div>
-          <div class="simple-name">Kullanıcı</div>
-          <div class="simple-score">Seviye</div>
-        </div>
-      `;
-      
+      let html = `<div class="leaderboard-header">Sıralama İsim Seviye</div>`;
+
       // Sadece ilk 10 kullanıcı için satır oluştur
       const playersToShow = data.slice(0, 10);
-      
+
       // Her kullanıcı için bir satır oluştur
       playersToShow.forEach((player, index) => {
         const username = player.username || 'İsimsiz Oyuncu';
         console.log(`Seviye tablosuna eklenen kullanıcı: ${username}`);
-        
+
         const level = player.level || 1;
         const totalXp = player.total_xp || player.experience_points || 0;
         const progressPercent = player.progress_percent || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
-        
+
         html += createLevelRow(index + 1, username, level, totalXp, progressPercent, avatarUrl, player.is_current_user, player.rank);
       });
-      
+
       container.innerHTML = html;
-      
+
       // Satırları animasyonlu göster
       animateRows();
     })
@@ -236,7 +224,7 @@ function loadLevelLeaderboard() {
 function loadGameLeaderboard(gameType) {
   const container = document.getElementById('gameLeaderboardContainer');
   if (!container) return;
-  
+
   // Yükleniyor göstergesini göster
   container.innerHTML = `
     <div class="leaderboard-loading">
@@ -244,12 +232,12 @@ function loadGameLeaderboard(gameType) {
       <p class="loading-text">${gameType === 'all' ? 'Tüm oyunlar' : gameType} için skorlar yükleniyor...</p>
     </div>
   `;
-  
+
   // API URL'ini belirle - sadece ilk 10 kullanıcı
   const apiUrl = gameType === 'all' 
     ? '/api/scores/aggregated?limit=10' 
     : `/api/leaderboard/${gameType}?limit=10`;
-  
+
   // Sunucudan verileri al
   fetch(apiUrl + '&nocache=' + new Date().getTime())
     .then(response => {
@@ -270,30 +258,24 @@ function loadGameLeaderboard(gameType) {
         `;
         return;
       }
-      
+
       // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-header">
-          <div class="simple-rank">Sıra</div>
-          <div class="simple-name">Kullanıcı</div>
-          <div class="simple-score">Puan</div>
-        </div>
-      `;
-      
+      let html = `<div class="leaderboard-header">Sıralama İsim Puan</div>`;
+
       // Sadece ilk 10 oyuncu için satır oluştur
       const playersToShow = data.slice(0, 10);
-      
+
       // Her kullanıcı için bir satır oluştur
       playersToShow.forEach((player, index) => {
         const username = player.username || 'İsimsiz Oyuncu';
         const score = player.score || player.total_score || 0;
         const avatarUrl = fixAvatarUrl(player.avatar_url);
-        
+
         html += createGameRow(index + 1, username, score, avatarUrl, player.is_current_user, player.game_info || {}, gameType);
       });
-      
+
       container.innerHTML = html;
-      
+
       // Satırları animasyonlu göster
       animateRows();
     })
@@ -315,7 +297,7 @@ function loadGameLeaderboard(gameType) {
 function updatePodium(data) {
   const container = document.getElementById('podiumContainer');
   if (!container) return;
-  
+
   // Eğer data parametresi verilmediyse, skorları al
   if (!data) {
     fetch('/api/scores/aggregated?limit=3')
@@ -336,10 +318,10 @@ function updatePodium(data) {
 function renderPodium(topPlayers, container) {
   // HTML oluştur
   let html = '';
-  
+
   // Özel sıralama: 2. (sol) - 1. (orta) - 3. (sağ)
   const podiumOrder = [1, 0, 2];
-  
+
   podiumOrder.forEach(index => {
     if (index < topPlayers.length) {
       const player = topPlayers[index];
@@ -348,10 +330,10 @@ function renderPodium(topPlayers, container) {
       const totalScore = player.total_score || 0;
       const avatarUrl = fixAvatarUrl(player.avatar_url);
       const playerRank = player.rank || '';
-      
+
       // Medal emoji
       const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
-      
+
       html += `
         <div class="podium-player ${rank === 1 ? 'first-place' : ''}" data-rank="${rank}">
           <div class="podium-rank rank-${rank}">${medalEmoji}</div>
@@ -369,7 +351,7 @@ function renderPodium(topPlayers, container) {
       `;
     }
   });
-  
+
   // Eğer hiç oyuncu yoksa
   if (topPlayers.length === 0) {
     html = `
@@ -380,7 +362,7 @@ function renderPodium(topPlayers, container) {
       </div>
     `;
   }
-  
+
   // Sonuçları konteyner'a ekle
   container.innerHTML = html;
 }
@@ -392,7 +374,7 @@ function updateStats(data) {
   if (playerCount) {
     playerCount.textContent = data.length;
   }
-  
+
   // Toplam puan
   const scoreCount = document.getElementById('totalScoreCount');
   if (scoreCount) {
@@ -404,7 +386,7 @@ function updateStats(data) {
 // Animasyonlu satır gösterimi
 function animateRows() {
   const rows = document.querySelectorAll('.player-row');
-  
+
   rows.forEach((row, index) => {
     setTimeout(() => {
       row.style.opacity = '1';
@@ -416,7 +398,7 @@ function animateRows() {
 // Oyuncu satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser, playerRank) {
   const currentUserClass = isCurrentUser ? 'current-user' : '';
-  
+
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
       <div class="simple-rank">${rank}</div>
@@ -429,7 +411,7 @@ function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser, player
 // Seviye satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createLevelRow(rank, username, level, totalXp, progressPercent, avatarUrl, isCurrentUser, playerRank) {
   const currentUserClass = isCurrentUser ? 'current-user' : '';
-  
+
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
       <div class="simple-rank">${rank}</div>
@@ -442,7 +424,7 @@ function createLevelRow(rank, username, level, totalXp, progressPercent, avatarU
 // Oyun satırı HTML'i oluştur - Basitleştirilmiş tek satır format
 function createGameRow(rank, username, score, avatarUrl, isCurrentUser, gameInfo, gameType) {
   const currentUserClass = isCurrentUser ? 'current-user' : '';
-  
+
   return `
     <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
       <div class="simple-rank">${rank}</div>
@@ -455,13 +437,13 @@ function createGameRow(rank, username, score, avatarUrl, isCurrentUser, gameInfo
 // Avatar URL'lerini düzelt
 function fixAvatarUrl(url) {
   if (!url) return '';
-  
+
   if (!url.startsWith('http')) {
     // Göreceli URL'leri düzelt
     if (!url.startsWith('/')) {
       url = '/' + url;
     }
-    
+
     if (url.startsWith('/uploads/')) {
       url = '/static' + url;
     } else if (!url.startsWith('/static/')) {
@@ -470,7 +452,7 @@ function fixAvatarUrl(url) {
       }
     }
   }
-  
+
   return url;
 }
 
@@ -483,12 +465,12 @@ function formatNumber(num) {
 function showNotification(message, duration = 3000) {
   const toast = document.getElementById('notificationToast');
   if (!toast) return;
-  
+
   const messageElement = toast.querySelector('.notification-message');
   if (messageElement) {
     messageElement.textContent = message;
     toast.classList.add('show');
-    
+
     setTimeout(() => {
       toast.classList.remove('show');
     }, duration);
@@ -510,11 +492,11 @@ window.LeaderboardManager = {
 window.updateScoreBoard = function(gameType = null) {
   loadLeaderboard();
   loadLevelLeaderboard();
-  
+
   if (gameType) {
     loadGameLeaderboard(gameType);
   }
-  
+
   // Bildirim göster
   showNotification('Liderlik tablosu güncellendi!');
 };
