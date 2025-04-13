@@ -1,3 +1,4 @@
+
 // Sayfa yüklendiğinde ve belirli aralıklarla skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Liderlik tablosu modülü yükleniyor...');
@@ -75,6 +76,7 @@ function loadLeaderboard() {
       if (!response.ok) {
         throw new Error(`Sunucu yanıtı hatalı: ${response.status}`);
       }
+      console.log("API yanıtı alındı");
       return response.json();
     })
     .then(data => {
@@ -112,10 +114,14 @@ function loadLeaderboard() {
       data.forEach((player, index) => {
         // Kullanıcının puanını al
         const totalScore = player.total_score || 0;
+        
+        // Kullanıcı adını kontrol et
+        const username = player.username || 'İsimsiz Oyuncu';
+        console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
         // Sıralama ve stil sınıfları
         const rankClass = index < 3 ? `top-${index + 1}` : '';
-        const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+        const initial = username.charAt(0).toUpperCase();
 
         // Kullanıcı adı renk sınıfı
         let userNameColorClass = '';
@@ -153,7 +159,7 @@ function loadLeaderboard() {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl}" alt="${username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }
@@ -161,7 +167,7 @@ function loadLeaderboard() {
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">
                   <span class="mini-score" title="Toplam Puan">${totalScore}</span>
-                  ${player.username || 'İsimsiz Oyuncu'}
+                  ${username}
                 </div>
                 ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
               </div>
@@ -246,8 +252,12 @@ function loadLevelLeaderboard() {
 
       // Her bir kullanıcıyı tabloya ekle
       data.forEach((player, index) => {
+        // Kullanıcı adını kontrol et
+        const username = player.username || 'İsimsiz Oyuncu';
+        console.log(`Seviye tablosuna eklenen kullanıcı: ${username}`);
+        
         const playerData = {
-          username: player.username || 'İsimsiz Oyuncu',
+          username: username,
           avatar_url: player.avatar_url || '',
           level: player.level || 1,
           total_xp: player.total_xp || player.experience_points || 0,
@@ -444,18 +454,17 @@ function createLeaderboardHtml(players) {
       scoreValue = 0;
     }
 
-    console.log(`createLeaderboardHtml: Oyuncu ${player.username || 'İsimsiz'} puanı: ${scoreValue}`);
-
     return {
       ...player,
-      calculated_score: scoreValue
+      calculated_score: scoreValue,
+      username: player.username || 'İsimsiz Oyuncu'
     };
   });
 
   // Oyuncuları puanlarına göre sırala (en yüksekten en düşüğe)
   const sortedPlayers = [...processedPlayers].sort((a, b) => b.calculated_score - a.calculated_score);
 
-  console.log("Sıralanmış oyuncular:", sortedPlayers.length, sortedPlayers.slice(0, 3).map(p => p.username + ':' + p.calculated_score));
+  console.log("Sıralanmış oyuncular:", sortedPlayers.length);
 
   let html = `
     <div class="leaderboard-table">
@@ -470,7 +479,7 @@ function createLeaderboardHtml(players) {
   // Her bir kullanıcı için satır ekle
   sortedPlayers.forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
-    const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
+    const initial = player.username.charAt(0).toUpperCase();
 
     // Kullanıcı adı renk sınıfı
     let userNameColorClass = '';
@@ -481,9 +490,23 @@ function createLeaderboardHtml(players) {
 
     // Hesaplanmış puanı kullan
     let playerScore = player.calculated_score || 0;
-    console.log(`${player.username} puanı: ${playerScore}`);
 
-    const avatarUrl = player.avatar_url || '';
+    // Avatar URL'ini düzgün şekilde ayarla
+    let avatarUrl = player.avatar_url || '';
+    if (avatarUrl && !avatarUrl.startsWith('http')) {
+      if (!avatarUrl.startsWith('/')) {
+        avatarUrl = '/' + avatarUrl;
+      }
+
+      if (avatarUrl.startsWith('/uploads/')) {
+        avatarUrl = '/static' + avatarUrl;
+      } else if (!avatarUrl.startsWith('/static/')) {
+        if (!avatarUrl.startsWith('/static/uploads/')) {
+          avatarUrl = '/static/uploads/' + avatarUrl;
+        }
+      }
+    }
+    
     const isCurrentUser = player.is_current_user || false;
     const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
@@ -502,7 +525,7 @@ function createLeaderboardHtml(players) {
             }
           </div>
           <div class="player-info">
-            <div class="player-name ${userNameColorClass}">${player.username || 'İsimsiz Oyuncu'}</div>
+            <div class="player-name ${userNameColorClass}">${player.username}</div>
             ${player.rank ? `<div class="player-rank">${player.rank}</div>` : ''}
           </div>
         </div>
