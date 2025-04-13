@@ -65,7 +65,7 @@ function loadLevelLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
         html += `
-          <div class="player-row ${rankClass} ${player.is_current_user ? 'current-user' : ''}">
+          <div class="player-row ${rankClass} ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
             <div class="rank-cell">
               <div class="rank-number">${index + 1}</div>
             </div>
