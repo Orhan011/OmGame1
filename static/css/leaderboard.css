@@ -683,16 +683,16 @@
 
 .score-container {
   background: rgba(106, 90, 224, 0.15);
-  border-radius: 30px;
-  padding: 10px 25px;
+  border-radius: 20px;
+  padding: 6px 15px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 
-              inset 0 1px 3px rgba(255, 255, 255, 0.15),
-              inset 0 -2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 
+              inset 0 1px 2px rgba(255, 255, 255, 0.15),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -714,11 +714,11 @@
 
 .score-value {
   color: #fff;
-  font-weight: 800;
-  font-size: 1.3rem;
+  font-weight: 700;
+  font-size: 1rem;
   position: relative;
   z-index: 1;
-  text-shadow: 0 3px 6px rgba(0, 0, 0,.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0,.3);
   background: linear-gradient(45deg, #fff 10%, #d0c4ff 60%, #9f8aff 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -771,7 +771,7 @@
 .player-row[data-rank="1"] .score-value {
   color: gold; /* Changed to gold */
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .player-row[data-rank="1"] .score-sparkles {
@@ -788,7 +788,7 @@
 .player-row[data-rank="2"] .score-value {
   color: silver; /* Changed to silver */
   text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .player-row[data-rank="2"] .score-sparkles {
@@ -805,7 +805,7 @@
 .player-row[data-rank="3"] .score-value {
   color: darkgoldenrod; /* Changed to darkgoldenrod */
   text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 
 .player-row[data-rank="3"] .score-sparkles {
