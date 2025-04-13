@@ -50,6 +50,19 @@ def memory_match_3d():
 @app.route('/game/memoryMatch3D')
 def memory_match_3d_alt():
     return memory_match_3d()
+    
+# Alternatif rotalar ekleniyor
+@app.route('/games/memory-match-3d')
+def memory_match_3d_kebab():
+    return memory_match_3d()
+    
+@app.route('/memory-match-3d')
+def memory_match_3d_root():
+    return memory_match_3d()
+    
+@app.route('/memoryMatch3D')
+def memory_match_3d_short():
+    return memory_match_3d()
 
 # Diğer oyunlar için eksik olabilecek rotalar
 @app.route('/games/tetris')
