@@ -1,32 +1,25 @@
 
-{% extends "layout.html" %}
-
-{% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
-
-{% block head_extras %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/new_leaderboard.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-{% endblock %}
-
-{% block content %}
-<div class="leaderboard-wrapper">
-  <div class="leaderboard-container">
-    <div class="leaderboard-header">
-      <h1 class="leaderboard-title">
-        <i class="fas fa-trophy"></i> Liderlik Tablosu
-      </h1>
-      <button id="refreshBtn" class="refresh-button">
-        <i class="fas fa-sync-alt"></i> Yenile
-      </button>
-    </div>
-
-    <div class="leaderboard-table">
-      <div class="table-header">
-        <div class="header-rank">Sıra</div>
-        <div class="header-player">Oyuncu</div>
-        <div class="header-score">Toplam Puan</div>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liderlik Tablosu</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <h1 class="leaderboard-title">
+          <i class="fas fa-trophy"></i> Liderlik Tablosu
+        </h1>
+        <button id="refreshBtn" class="refresh-button">
+          <i class="fas fa-sync-alt"></i> Yenile
+        </button>
       </div>
-      
+
       <div id="leaderboardRows" class="leaderboard-rows">
         <div class="loading-state">
           <div class="spinner"></div>
@@ -35,7 +28,7 @@
       </div>
     </div>
   </div>
-</div>
 
-<script src="{{ url_for('static', filename='js/new_leaderboard.js') }}"></script>
-{% endblock %}
+  <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+</body>
+</html>

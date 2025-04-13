@@ -1,5 +1,4 @@
-
-/* Liderlik Tablosu Stil Dosyası - Modern Glassmorphism Tasarım */
+/* Liderlik Tablosu Stil Dosyası */
 :root {
   --primary-color: #6a5ae0;
   --primary-light: #9f8aff;
@@ -19,6 +18,12 @@
   --glass-blur: blur(10px);
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--background-dark);
   background-image: 
@@ -27,15 +32,18 @@ body {
   color: var(--text-light);
   font-family: 'Poppins', sans-serif;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .container {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 700px;
   padding: 2rem 1rem;
 }
 
-/* Liderlik Tablosu Konteyneri - Glassmorphism */
+/* Liderlik Tablosu Konteyneri */
 .leaderboard-container {
   background-color: var(--background-card);
   backdrop-filter: var(--glass-blur);
@@ -185,14 +193,6 @@ body {
   border-left: 2px solid var(--primary-color);
 }
 
-.player-row:not([data-rank="1"]):not([data-rank="2"]):not([data-rank="3"]) {
-  border-left: 2px solid rgba(255, 255, 255, 0.08);
-}
-
-.player-row:not([data-rank="1"]):not([data-rank="2"]):not([data-rank="3"]):hover {
-  border-left: 2px solid var(--primary-color);
-}
-
 .rank {
   width: 80px;
   font-weight: 700;
@@ -229,17 +229,6 @@ body {
   50% { transform: translateX(-50%) translateY(-4px) rotate(5deg); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1)); }
   75% { transform: translateX(-50%) translateY(-2px) rotate(0deg); filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)); }
   100% { transform: translateX(-50%) translateY(0) rotate(-5deg); filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
-}
-
-.player-avatar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(106, 90, 224, 0.2), transparent);
-  z-index: 1;
 }
 
 .player-avatar img {
@@ -293,28 +282,6 @@ body {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
-.player-row[data-rank="1"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255, 215, 0, 0.12), transparent 70%);
-  z-index: -1;
-}
-
-.player-row[data-rank="1"]::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 60px;
-  background: linear-gradient(to right, transparent, rgba(255, 215, 0, 0.1));
-  border-radius: 0 12px 12px 0;
-}
-
 .player-row[data-rank="1"] .rank {
   color: var(--gold);
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
@@ -354,17 +321,6 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(192, 192, 192, 0.2);
 }
 
-.player-row[data-rank="2"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(192, 192, 192, 0.1), transparent 70%);
-  z-index: -1;
-}
-
 .player-row[data-rank="2"] .rank {
   color: var(--silver);
   text-shadow: 0 0 10px rgba(192, 192, 192, 0.4);
@@ -401,17 +357,6 @@ body {
 .player-row[data-rank="3"]:hover {
   transform: scale(1.02) translateX(5px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15), 0 0 12px rgba(205, 127, 50, 0.15);
-}
-
-.player-row[data-rank="3"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(205, 127, 50, 0.08), transparent 70%);
-  z-index: -1;
 }
 
 .player-row[data-rank="3"] .rank {
@@ -541,27 +486,28 @@ body {
   .refresh-button {
     align-self: flex-end;
   }
-  
+
   .leaderboard-rows {
     padding: 1rem;
   }
-  
+
   .player-row {
     padding: 1rem;
   }
 }
 
 @media (max-width: 576px) {
-  .table-header, .player-row {
+  .player-row {
     font-size: 0.9rem;
   }
 
-  .header-rank, .rank {
+  .rank {
     width: 60px;
   }
 
-  .header-score, .score {
+  .score {
     width: 100px;
+    font-size: 1rem;
   }
 
   .player {
@@ -572,12 +518,8 @@ body {
     width: 35px;
     height: 35px;
   }
-  
+
   .player-name {
-    font-size: 1rem;
-  }
-  
-  .score {
     font-size: 1rem;
   }
 }
