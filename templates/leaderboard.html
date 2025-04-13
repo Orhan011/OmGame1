@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
@@ -15,38 +16,52 @@
 
   <div class="row">
     <!-- Skor Tablosu -->
-    <div class="col-12 mb-4">
-      <div class="leaderboard-title">Toplam Puan Sıralaması</div>
-      <div class="leaderboard-container">
-        <div id="leaderboardContainer" class="leaderboard-card-container">
-          <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Skorlar yükleniyor...</p>
+    <div class="col-md-6 col-12 mb-4">
+      <div class="leaderboard-card">
+        <div class="leaderboard-title">
+          <i class="fas fa-trophy me-2"></i>Toplam Puan Sıralaması
+        </div>
+        <div class="leaderboard-table-container">
+          <div id="leaderboardContainer">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Skorlar yükleniyor...</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Seviye Tablosu -->
-    <div class="col-12">
-      <div class="leaderboard-title">Kullanıcı Seviyeleri</div>
-      <div class="leaderboard-container">
-        <div id="levelLeaderboardContainer" class="leaderboard-card-container">
-          <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Seviye bilgileri yükleniyor...</p>
-          </div>
-          <noscript>
-            <div class="error">
-              <i class="fas fa-exclamation-triangle"></i>
-              <p>Seviye bilgilerini görmek için JavaScript'i etkinleştirin.</p>
+    <div class="col-md-6 col-12">
+      <div class="leaderboard-card">
+        <div class="leaderboard-title">
+          <i class="fas fa-star me-2"></i>Kullanıcı Seviyeleri
+        </div>
+        <div class="leaderboard-table-container">
+          <div id="levelLeaderboardContainer">
+            <div class="loading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Seviye bilgileri yükleniyor...</p>
             </div>
-          </noscript>
+            <noscript>
+              <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Seviye bilgilerini görmek için JavaScript'i etkinleştirin.</p>
+              </div>
+            </noscript>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  
+  <div class="d-flex justify-content-center mt-4">
+    <button class="btn btn-primary refresh-leaderboard">
+      <i class="fas fa-sync-alt me-2"></i>Tabloyu Yenile
+    </button>
+  </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/leaderboard-fix.js') }}"></script>
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}
