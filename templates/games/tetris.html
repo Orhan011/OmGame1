@@ -6,235 +6,75 @@
 <div class="page-container">
   <div class="game-container">
     <div class="game-header">
-      <h1>Tetris <span class="badge">Klasik Blok Puzzle</span></h1>
-      <p class="game-description">Düşen blokları doğru yerleştirerek çizgileri tamamlayın.</p>
+      <h1>Tetris <span class="badge">Klasik Blok Oyunu</span></h1>
     </div>
 
-    <div class="tetris-modern-container">
-      <div class="tetris-modern-layout">
-        <!-- Sol Panel: İstatistikler, Kontroller -->
-        <div class="tetris-modern-sidebar">
-          <div class="tetris-modern-panel tetris-modern-score-panel">
-            <div class="tetris-modern-score-item">
-              <div class="tetris-modern-score-label">Skor</div>
-              <div class="tetris-modern-score-value" id="score">0</div>
-            </div>
-            <div class="tetris-modern-score-item">
-              <div class="tetris-modern-score-label">Level</div>
-              <div class="tetris-modern-score-value" id="level">1</div>
-            </div>
-            <div class="tetris-modern-score-item">
-              <div class="tetris-modern-score-label">Çizgiler</div>
-              <div class="tetris-modern-score-value" id="lines">0</div>
-            </div>
-          </div>
-
-          <div class="tetris-modern-panel tetris-modern-next-panel">
-            <div class="tetris-modern-panel-title">Sonraki</div>
-            <canvas id="next-piece-canvas" width="120" height="120"></canvas>
-          </div>
-          
-          <div class="tetris-modern-panel tetris-modern-hold-panel">
-            <div class="tetris-modern-panel-title">Beklet</div>
-            <canvas id="hold-piece-canvas" width="120" height="120"></canvas>
-          </div>
-
-          <div class="tetris-modern-panel">
-            <div class="difficulty-selector">
-              <div class="tetris-modern-panel-title">Zorluk</div>
-              <div class="difficulty-buttons">
-                <button id="easy-btn" class="difficulty-btn">Kolay</button>
-                <button id="medium-btn" class="difficulty-btn active">Orta</button>
-                <button id="hard-btn" class="difficulty-btn">Zor</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="tetris-modern-panel tetris-modern-controls">
-            <button id="start-game" class="tetris-modern-btn tetris-modern-btn-primary">
-              <i class="fas fa-play"></i> Başla
-            </button>
-            <button id="pause-game" class="tetris-modern-btn tetris-modern-btn-secondary" disabled>
-              <i class="fas fa-pause"></i> Duraklat
-            </button>
-            <button id="reset-game" class="tetris-modern-btn tetris-modern-btn-danger">
-              <i class="fas fa-redo-alt"></i> Yeniden Başlat
-            </button>
-          </div>
-        </div>
-
-        <!-- Orta Panel: Oyun Alanı -->
-        <div class="tetris-modern-game-area">
+    <div class="tetris-container">
+      <div class="tetris-layout">
+        <!-- Oyun Alanı -->
+        <div class="tetris-board-container">
           <canvas id="tetris-canvas" width="300" height="600"></canvas>
-          <div id="level-up-notification" class="level-up-notification">Level Up!</div>
-
-          <!-- Oyun Overlay'leri -->
-          <div id="tetris-overlay" class="tetris-modern-overlay">
-            <!-- Duraklatma Overlay'i -->
-            <div class="tetris-modern-overlay-content" id="pause-overlay" style="display: none;">
-              <div class="tetris-modern-overlay-container">
-                <h2><i class="fas fa-pause"></i> Oyun Duraklatıldı</h2>
-                <p>Devam etmek için aşağıdaki butona tıklayın</p>
-                <button id="resume-game" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
-                  <i class="fas fa-play"></i> Devam Et
-                </button>
-              </div>
-            </div>
-
-            <!-- Başlangıç Overlay'i -->
-            <div class="tetris-modern-overlay-content" id="game-start-overlay">
-              <div class="tetris-modern-overlay-container">
-                <h2>Tetris</h2>
-                <div class="tetris-modern-game-intro">
-                  <p>Modern Tetris oyununa hoş geldiniz!</p>
-                  <p>Düşen blokları yerleştirerek satırları tamamlayın.</p>
-                  
-                  <div class="tetris-modern-controls-info">
-                    <h3>Kontroller</h3>
-                    <div class="tetris-modern-controls-grid">
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">←</div>
-                        <span>Sola Hareket</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">→</div>
-                        <span>Sağa Hareket</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">↓</div>
-                        <span>Hızlı Düşür</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">↑</div>
-                        <span>Döndür</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">Boşluk</div>
-                        <span>Anında Düşür</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">C</div>
-                        <span>Parçayı Tut</span>
-                      </div>
-                      <div class="tetris-modern-control-item">
-                        <div class="tetris-modern-key">P</div>
-                        <span>Duraklat</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button id="start-button" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
-                  <i class="fas fa-play"></i> Oyuna Başla
-                </button>
-              </div>
-            </div>
-
-            <!-- Oyun Sonu Overlay'i -->
-            <div class="tetris-modern-overlay-content" id="game-over-overlay" style="display: none;">
-              <div class="tetris-modern-overlay-container">
-                <h2><i class="fas fa-trophy"></i> Oyun Bitti!</h2>
-                
-                <div class="tetris-modern-result-card">
-                  <div class="tetris-modern-final-score">
-                    <div class="tetris-modern-final-score-label">Final Skoru</div>
-                    <div class="tetris-modern-final-score-value" id="final-score">0</div>
-                  </div>
-                  
-                  <div class="tetris-modern-stats">
-                    <div class="tetris-modern-stat-item">
-                      <div class="tetris-modern-stat-label">Seviye</div>
-                      <div class="tetris-modern-stat-value" id="final-level">1</div>
-                    </div>
-                    <div class="tetris-modern-stat-item">
-                      <div class="tetris-modern-stat-label">Çizgiler</div>
-                      <div class="tetris-modern-stat-value" id="final-lines">0</div>
-                    </div>
-                    <div class="tetris-modern-stat-item">
-                      <div class="tetris-modern-stat-label">Süre</div>
-                      <div class="tetris-modern-stat-value" id="game-duration">0:00</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- XP ve Seviye Bilgisi -->
-                <div class="tetris-modern-xp-info" style="display: none;">
-                  <div class="tetris-modern-xp-gain">
-                    <div class="tetris-modern-xp-gain-label"><i class="fas fa-star"></i> Kazanılan XP</div>
-                    <div class="tetris-modern-xp-gain-value" id="xp-gain">0</div>
-                  </div>
-                  <div class="tetris-modern-level-progress">
-                    <div class="tetris-modern-progress-bar">
-                      <div class="tetris-modern-progress-fill" id="level-progress-bar"></div>
-                    </div>
-                    <div class="tetris-modern-progress-text">
-                      <span id="current-level">1</span> → <span id="next-level">2</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Misafir kullanıcı bilgilendirme -->
-                <div id="guest-info" class="tetris-modern-guest-info" style="display: none;">
-                  <p class="tetris-modern-guest-message"><i class="fas fa-info-circle"></i> Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
-                  <div class="tetris-modern-guest-buttons">
-                    <a href="{{ url_for('login') }}" class="tetris-modern-btn tetris-modern-btn-success">
-                      <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                    </a>
-                    <a href="{{ url_for('register') }}" class="tetris-modern-btn tetris-modern-btn-outline">
-                      <i class="fas fa-user-plus"></i> Kaydol
-                    </a>
-                  </div>
-                </div>
-
-                <div class="tetris-modern-action-buttons">
-                  <button id="play-again" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
-                    <i class="fas fa-redo-alt"></i> Tekrar Oyna
-                  </button>
-                  <a href="{{ url_for('all_games') }}" class="tetris-modern-btn tetris-modern-btn-secondary tetris-modern-btn-lg">
-                    <i class="fas fa-th-large"></i> Tüm Oyunlar
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Mobil Kontroller (ekran boyutu küçük olduğunda görünür) -->
-          <div class="tetris-modern-touch-controls" id="touch-controls">
-            <div class="tetris-modern-touch-top">
-              <button class="tetris-modern-touch-btn" id="touch-rotate">
-                <i class="fas fa-redo"></i>
-              </button>
-              <button class="tetris-modern-touch-btn" id="touch-hold">
-                <i class="fas fa-hand-rock"></i>
-              </button>
-            </div>
-            <div class="tetris-modern-touch-middle">
-              <button class="tetris-modern-touch-btn" id="touch-left">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <button class="tetris-modern-touch-btn" id="touch-drop">
-                <i class="fas fa-angle-double-down"></i>
-              </button>
-              <button class="tetris-modern-touch-btn" id="touch-right">
-                <i class="fas fa-arrow-right"></i>
-              </button>
-            </div>
-            <div class="tetris-modern-touch-bottom">
-              <button class="tetris-modern-touch-btn" id="touch-down">
-                <i class="fas fa-arrow-down"></i>
-              </button>
-            </div>
-          </div>
         </div>
 
-        <!-- Sağ Panel: Skor Tablosu -->
-        <div class="tetris-modern-leaderboard">
-          <div class="tetris-modern-panel tetris-modern-leaderboard-panel">
-            <div class="tetris-modern-panel-title">En Yüksek Skorlar</div>
-            <div id="leaderboard-container" class="tetris-modern-leaderboard-list">
-              <div class="tetris-modern-leaderboard-loading">
-                <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+        <!-- Sağ Panel -->
+        <div class="tetris-info-panel">
+          <!-- Skor Bilgisi -->
+          <div class="tetris-score-panel">
+            <div class="tetris-score-item">
+              <div class="tetris-score-label">Skor</div>
+              <div class="tetris-score-value" id="score">0</div>
+            </div>
+            <div class="tetris-score-item">
+              <div class="tetris-score-label">Seviye</div>
+              <div class="tetris-score-value" id="level">1</div>
+            </div>
+            <div class="tetris-score-item">
+              <div class="tetris-score-label">Satırlar</div>
+              <div class="tetris-score-value" id="lines">0</div>
+            </div>
+          </div>
+
+          <!-- Sonraki Parça -->
+          <div class="tetris-next-piece">
+            <div class="tetris-next-label">Sonraki Parça</div>
+            <canvas id="next-piece-canvas" width="100" height="100"></canvas>
+          </div>
+
+          <!-- Oyun Kontrolleri -->
+          <div class="tetris-controls">
+            <button id="start-button" class="btn btn-primary btn-lg">Başlat</button>
+            <button id="pause-button" class="btn btn-secondary btn-lg" disabled>Duraklat</button>
+            <button id="reset-button" class="btn btn-danger btn-lg">Yeniden Başlat</button>
+          </div>
+
+          <!-- Oyun Kontrolleri Bilgisi -->
+          <div class="tetris-help">
+            <div class="tetris-help-title">Kontroller</div>
+            <div class="tetris-help-items">
+              <div class="tetris-help-item">
+                <div class="tetris-key">←</div>
+                <span>Sol</span>
               </div>
-              <!-- Buraya JS ile skor tablosu eklenecek -->
+              <div class="tetris-help-item">
+                <div class="tetris-key">→</div>
+                <span>Sağ</span>
+              </div>
+              <div class="tetris-help-item">
+                <div class="tetris-key">↓</div>
+                <span>Aşağı</span>
+              </div>
+              <div class="tetris-help-item">
+                <div class="tetris-key">↑</div>
+                <span>Döndür</span>
+              </div>
+              <div class="tetris-help-item">
+                <div class="tetris-key">Boşluk</div>
+                <span>Düşür</span>
+              </div>
+              <div class="tetris-help-item">
+                <div class="tetris-key">P</div>
+                <span>Duraklat</span>
+              </div>
             </div>
           </div>
         </div>
@@ -243,6 +83,7 @@
   </div>
 </div>
 
+<!-- CSS Stil -->
 <style>
   .tetris-container {
     max-width: 100%;
@@ -364,8 +205,8 @@
 
   .tetris-board-container {
     position: relative;
-    width: 250px;
-    height: 500px;
+    width: 300px;
+    height: 600px;
   }
 
   #tetris-canvas {
@@ -376,1226 +217,596 @@
     height: 100%;
   }
 
-  .tetris-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 15, 35, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 15px;
-    z-index: 10;
-  }
-
-  .tetris-overlay-content {
-    text-align: center;
-    padding: 20px;
-    max-width: 90%;
-  }
-
-  .tetris-overlay-content h2 {
-    color: var(--accent-color);
-    margin-bottom: 15px;
-    font-size: 1.6rem;
-  }
-
-  .tetris-overlay-content p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-  }
-
-  .tetris-final-score {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 15px 0 20px;
-  }
-
-  .tetris-final-score-label {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 8px;
-  }
-
-  .tetris-final-score-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--accent-color);
-  }
-
-  /* XP Info styling */
-  .tetris-xp-info {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 0 0 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: space-between;
-  }
-
-  .tetris-xp-gain, .tetris-level-info {
-    flex: 1;
-    min-width: 100px;
-  }
-
-  .tetris-xp-gain-label, .tetris-level-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 5px;
-  }
-
-  .tetris-xp-gain-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #ffc107; /* Gold color for XP */
-  }
-
-  .tetris-level-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #8BC34A; /* Green color for level */
-  }
-
-  /* Bonus details styling */
-  .tetris-bonus-details {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(30, 30, 60, 0.3);
-    border-radius: 8px;
-    padding: 10px;
-  }
-
-  .tetris-bonus-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .tetris-bonus-item span {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .tetris-bonus-item strong {
-    font-weight: 600;
-    color: #a890ff;
-  }
-
-  /* Bonus types */
-  .daily-bonus strong {
-    color: #FFD54F; /* Amber color for daily bonus */
-  }
-
-  .streak-bonus strong {
-    color: #FF7043; /* Deep Orange for streak bonus */
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes scaleUp {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-
-  @keyframes levelUpAnimation {
-    0% { transform: translateY(20px); opacity: 0; }
-    20% { transform: translateY(-10px); opacity: 1; }
-    80% { transform: translateY(-10px); opacity: 1; }
-    100% { transform: translateY(-30px); opacity: 0; }
-  }
-
-  /* Misafir kullanıcı bilgilendirme */
-  .guest-info {
-    background: rgba(40, 40, 80, 0.5);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 15px 0;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(106, 90, 224, 0.3);
-  }
-
-  .guest-message {
-    color: #FFC107;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-  }
-
-  .guest-message-api {
-    color: #4CAF50;
-    font-size: 0.9rem;
-    padding: 8px 12px;
-    background: rgba(76, 175, 80, 0.1);
-    border-radius: 8px;
-    margin-top: 12px;
-  }
-
-  .guest-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 8px;
-  }
-
-  /* Giriş vurgulama sınıfı */
-  .highlight-login {
-    background: rgba(106, 90, 224, 0.2);
-    border: 2px solid rgba(106, 90, 224, 0.5);
-    animation: pulse-border 1.5s infinite;
-  }
-
-  /* Giriş butonları animasyonu */
-  .animate-buttons .btn {
-    animation: pulse-buttons 1.5s infinite;
-    transform-origin: center;
-  }
-
-  /* Buton animasyonu için keyframes */
-  @keyframes pulse-buttons {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(106, 90, 224, 0.7); }
-    100% { transform: scale(1); }
-  }
-
-  /* Kenarlık animasyonu için keyframes */
-  @keyframes pulse-border {
-    0% { border-color: rgba(106, 90, 224, 0.3); }
-    50% { border-color: rgba(106, 90, 224, 0.8); }
-    100% { border-color: rgba(106, 90, 224, 0.3); }
-  }
-
-  /* Level up animation */
-  .level-up-animation {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--accent-color);
-    text-shadow: 0 0 10px rgba(100, 50, 255, 0.8);
-    z-index: 100;
-    animation: levelUpAnimation 2s forwards;
-    pointer-events: none;
-  }
-
-  /* Animate overlay */
-  .tetris-overlay-content {
-    animation: scaleUp 0.3s ease-out;
-  }
-
-  /* Score value animation */
-  .score-update {
-    animation: pulse 0.3s ease-out;
-  }
-
-  /* Tetris grid lines */
-  .grid-line {
-    position: absolute;
-    background-color: rgba(200, 200, 255, 0.05);
-    z-index: 1;
-  }
-
-  .grid-horizontal {
-    height: 1px;
-    width: 100%;
-  }
-
-  .grid-vertical {
-    width: 1px;
-    height: 100%;
-  }
-
-  /* Controls enhancement */
-  .tetris-key {
-    background: rgba(106, 90, 224, 0.3);
-    padding: 4px 8px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    min-width: 25px;
-    text-align: center;
-    color: var(--accent-color);
-    transition: all 0.2s ease;
-    border: 1px solid rgba(106, 90, 224, 0.3);
-  }
-
-  .tetris-key:hover {
-    background: rgba(106, 90, 224, 0.6);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Mobile Responsive */
   @media (max-width: 768px) {
-    .game-container {
-      padding: 10px;
-    }
-
-    .game-header h1 {
-      font-size: 1.5rem;
-    }
-
-    .game-header .badge {
-      font-size: 0.8rem;
-    }
-
-    .game-description {
-      font-size: 0.9rem;
-    }
-
     .tetris-layout {
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .tetris-info-panel {
-      width: 100%;
-      max-width: 350px;
-    }
-
-    .tetris-board-container {
-      width: 80vw;
-      max-width: 250px;
-      height: 160vw;
-      max-height: 500px;
-    }
-
-    .tetris-score-panel, .tetris-next-piece, .tetris-controls, .tetris-help {
-      padding: 12px;
-    }
-
-    .tetris-score-label {
-      font-size: 0.9rem;
-    }
-
-    .tetris-score-value {
-      font-size: 1.2rem;
-    }
-
-    .tetris-next-label {
-      font-size: 0.9rem;
-    }
-
-    .tetris-help-title {
-      font-size: 0.9rem;
-    }
-
-    .tetris-help-items {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    .tetris-help-item span {
-      font-size: 0.8rem;
-    }
-
-    .tetris-key {
-      font-size: 0.75rem;
-      padding: 3px 6px;
-    }
-
-    .tetris-overlay-content h2 {
-      font-size: 1.4rem;
-    }
-
-    .tetris-overlay-content p {
-      font-size: 0.85rem;
-    }
-
-    .tetris-final-score-value {
-      font-size: 2rem;
-    }
-
-    /* Add touchscreen controls for mobile */
-    .touch-controls {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .touch-control-btn {
-      width: 50px;
-      height: 50px;
-      background: rgba(106, 90, 224, 0.3);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: rgba(255, 255, 255, 0.9);
-      border: none;
-      touch-action: manipulation;
-    }
-
-    .touch-control-btn:active {
-      background: rgba(106, 90, 224, 0.6);
-      transform: scale(0.95);
-    }
-  }
-
-  /* Handle Landscape Mobile */
-  @media (max-width: 1000px) and (max-height: 500px) and (orientation: landscape) {
-    .tetris-layout {
-      flex-direction: row;
-      align-items: flex-start;
-    }
-
-    .tetris-info-panel {
-      width: 40%;
-      min-width: 200px;
-    }
-
-    .tetris-board-container {
-      width: 50vh;
-      height: 90vh;
-      max-height: 450px;
-    }
-
-    .tetris-help-items {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  /* Difficulty selector styles */
-  .difficulty-selector {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .difficulty-selector span {
-    color: white;
-    font-weight: bold;
-  }
-
-  .difficulty-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-
-  .difficulty-btn.active {
-    background-color: #2196F3;
-  }
-</style>
-
-<!-- Tetris oyunu için JavaScript -->
-<style>
-  /* Modern Tetris Game Styling */
-  .tetris-modern-container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px 10px;
-  }
-
-  .tetris-modern-layout {
-    display: flex;
-    gap: 25px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  /* Sidebar */
-  .tetris-modern-sidebar {
-    width: 230px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* Game Area */
-  .tetris-modern-game-area {
-    position: relative;
-    width: 300px;
-    height: 600px;
-  }
-
-  /* Leaderboard Panel */
-  .tetris-modern-leaderboard {
-    width: 230px;
-  }
-
-  /* Panel Styling */
-  .tetris-modern-panel {
-    background: linear-gradient(135deg, rgba(25, 25, 60, 0.9), rgba(40, 40, 80, 0.8));
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-  }
-
-  /* Score Panel */
-  .tetris-modern-score-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .tetris-modern-score-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .tetris-modern-score-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
-  }
-
-  .tetris-modern-score-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #6C5CE7;
-    text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
-  }
-
-  /* Panel Title */
-  .tetris-modern-panel-title {
-    font-size: 1.1rem;
-    color: white;
-    margin-bottom: 15px;
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Next and Hold Piece Panels */
-  .tetris-modern-next-panel, .tetris-modern-hold-panel {
-    text-align: center;
-  }
-
-  #next-piece-canvas, #hold-piece-canvas {
-    background: rgba(15, 15, 35, 0.5);
-    border-radius: 8px;
-    margin: 0 auto;
-    display: block;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  /* Control Buttons */
-  .tetris-modern-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .tetris-modern-btn {
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .tetris-modern-btn i {
-    font-size: 1rem;
-  }
-
-  .tetris-modern-btn-primary {
-    background: linear-gradient(135deg, #6C5CE7, #4834d4);
-    color: white;
-  }
-
-  .tetris-modern-btn-primary:hover {
-    background: linear-gradient(135deg, #7d6ef0, #5842e3);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
-  }
-
-  .tetris-modern-btn-secondary {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .tetris-modern-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-  }
-
-  .tetris-modern-btn-danger {
-    background: linear-gradient(135deg, #FF6B6B, #ee5253);
-    color: white;
-  }
-
-  .tetris-modern-btn-danger:hover {
-    background: linear-gradient(135deg, #ff8383, #f56565);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(238, 82, 83, 0.4);
-  }
-
-  .tetris-modern-btn-success {
-    background: linear-gradient(135deg, #4CAF50, #388E3C);
-    color: white;
-  }
-
-  .tetris-modern-btn-success:hover {
-    background: linear-gradient(135deg, #5dc160, #409c3e);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
-  }
-
-  .tetris-modern-btn-outline {
-    background: transparent;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .tetris-modern-btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
-  }
-
-  .tetris-modern-btn-lg {
-    padding: 14px 24px;
-    font-size: 1.1rem;
-  }
-
-  .tetris-modern-btn:disabled {
-    opacity: 0.6;
-    pointer-events: none;
-  }
-
-  /* Game Canvas */
-  #tetris-canvas {
-    background: rgba(10, 10, 30, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 
-                inset 0 0 80px rgba(0, 0, 0, 0.6);
-    width: 100%;
-    height: 100%;
-    display: block;
-    border: 1px solid rgba(108, 92, 231, 0.3);
-  }
-
-  /* Overlay Styling */
-  .tetris-modern-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(10, 10, 35, 0.95), rgba(15, 15, 45, 0.9));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 12px;
-    z-index: 100;
-    backdrop-filter: blur(5px);
-  }
-
-  .tetris-modern-overlay-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-  }
-
-  .tetris-modern-overlay-container {
-    padding: 25px;
-    width: 90%;
-    max-width: 500px;
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  .tetris-modern-overlay-container h2 {
-    color: white;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-    text-shadow: 0 2px 10px rgba(108, 92, 231, 0.5);
-  }
-
-  .tetris-modern-overlay-container p {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 10px;
-    font-size: 1rem;
-    text-align: center;
-  }
-
-  /* Game Intro */
-  .tetris-modern-game-intro {
-    margin: 20px 0;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* Controls Info */
-  .tetris-modern-controls-info {
-    margin-top: 20px;
-  }
-
-  .tetris-modern-controls-info h3 {
-    color: white;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .tetris-modern-controls-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-  }
-
-  .tetris-modern-control-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .tetris-modern-control-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
-
-  .tetris-modern-key {
-    background: rgba(108, 92, 231, 0.3);
-    padding: 5px 8px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    min-width: 30px;
-    text-align: center;
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(108, 92, 231, 0.5);
-  }
-
-  .tetris-modern-control-item span {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  /* Results Card */
-  .tetris-modern-result-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .tetris-modern-final-score {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .tetris-modern-final-score-label {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 10px;
-  }
-
-  .tetris-modern-final-score-value {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #6C5CE7;
-    text-shadow: 0 0 15px rgba(108, 92, 231, 0.4);
-  }
-
-  /* Stats */
-  .tetris-modern-stats {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .tetris-modern-stat-item {
-    flex: 1;
-    min-width: 70px;
-    text-align: center;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-  }
-
-  .tetris-modern-stat-label {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
-  }
-
-  .tetris-modern-stat-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* XP Info */
-  .tetris-modern-xp-info {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .tetris-modern-xp-gain {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-  }
-
-  .tetris-modern-xp-gain-label {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .tetris-modern-xp-gain-label i {
-    color: #FFD700;
-  }
-
-  .tetris-modern-xp-gain-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #FFD700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  }
-
-  /* Level Progress */
-  .tetris-modern-level-progress {
-    margin-top: 10px;
-  }
-
-  .tetris-modern-progress-bar {
-    height: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 5px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  .tetris-modern-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6C5CE7, #a29bfe);
-    width: 0%;
-    transition: width 1s ease;
-    border-radius: 5px;
-  }
-
-  .tetris-modern-progress-text {
-    display: flex;
-    justify-content: space-between;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-  }
-
-  /* Guest Info */
-  .tetris-modern-guest-info {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    border: 1px solid rgba(255, 193, 7, 0.3);
-  }
-
-  .tetris-modern-guest-message {
-    color: #FFC107;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .tetris-modern-guest-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
-
-  /* Action Buttons */
-  .tetris-modern-action-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  .tetris-modern-action-buttons .tetris-modern-btn {
-    flex: 1;
-  }
-
-  /* Level Up Animation */
-  .level-up-notification {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    background: rgba(108, 92, 231, 0.8);
-    color: white;
-    padding: 15px 30px;
-    border-radius: 50px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    box-shadow: 0 0 30px rgba(108, 92, 231, 0.6);
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  }
-
-  .level-up-notification.show {
-    animation: levelUpShow 1.5s ease-out forwards;
-  }
-
-  @keyframes levelUpShow {
-    0% {
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0;
-    }
-    40% {
-      transform: translate(-50%, -50%) scale(1.2);
-      opacity: 1;
-    }
-    70% {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(1.1);
-      opacity: 0;
-    }
-  }
-
-  /* Leaderboard */
-  .tetris-modern-leaderboard-panel {
-    height: 100%;
-    max-height: 600px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .tetris-modern-leaderboard-list {
-    flex: 1;
-    overflow-y: auto;
-    margin-top: 10px;
-  }
-
-  .tetris-modern-leaderboard-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
-    gap: 10px;
-  }
-
-  .tetris-modern-leaderboard-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .tetris-modern-leaderboard-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(3px);
-  }
-
-  .tetris-modern-leaderboard-rank {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(108, 92, 231, 0.3);
-    border-radius: 50%;
-    font-weight: 600;
-    margin-right: 10px;
-    color: white;
-  }
-
-  .tetris-modern-leaderboard-top1 .tetris-modern-leaderboard-rank {
-    background: linear-gradient(135deg, #FFD700, #FFA000);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  }
-
-  .tetris-modern-leaderboard-top2 .tetris-modern-leaderboard-rank {
-    background: linear-gradient(135deg, #C0C0C0, #9E9E9E);
-    box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
-  }
-
-  .tetris-modern-leaderboard-top3 .tetris-modern-leaderboard-rank {
-    background: linear-gradient(135deg, #CD7F32, #A04000);
-    box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
-  }
-
-  .tetris-modern-leaderboard-user {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9rem;
-  }
-
-  .tetris-modern-leaderboard-score {
-    font-weight: 600;
-    color: #6C5CE7;
-    min-width: 60px;
-    text-align: right;
-  }
-
-  /* Mobile Touch Controls */
-  .tetris-modern-touch-controls {
-    position: absolute;
-    bottom: -180px;
-    left: 0;
-    width: 100%;
-    z-index: 90;
-    display: none;
-  }
-
-  .tetris-modern-touch-top,
-  .tetris-modern-touch-middle,
-  .tetris-modern-touch-bottom {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 15px;
-  }
-
-  .tetris-modern-touch-btn {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: rgba(108, 92, 231, 0.2);
-    border: 2px solid rgba(108, 92, 231, 0.4);
-    color: white;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .tetris-modern-touch-btn:active {
-    background: rgba(108, 92, 231, 0.6);
-    transform: scale(0.92);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Difficulty Selector */
-  .difficulty-selector {
-    text-align: center;
-  }
-
-  .difficulty-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .difficulty-btn {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .difficulty-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .difficulty-btn.active {
-    background: #6C5CE7;
-    font-weight: 600;
-    box-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @keyframes scaleUp {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* Responsive Design */
-  @media (max-width: 1200px) {
-    .tetris-modern-layout {
-      gap: 15px;
-    }
-    
-    .tetris-modern-leaderboard {
-      width: 200px;
-    }
-    
-    .tetris-modern-sidebar {
-      width: 200px;
-    }
-  }
-
-  @media (max-width: 992px) {
-    .tetris-modern-layout {
       flex-direction: column;
       align-items: center;
     }
     
-    .tetris-modern-sidebar, .tetris-modern-leaderboard {
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 20px;
+    .tetris-board-container {
+      width: 280px;
+      height: 560px;
     }
     
-    .tetris-modern-sidebar {
-      order: 2;
-    }
-    
-    .tetris-modern-game-area {
-      order: 1;
-      margin-bottom: 20px;
-    }
-    
-    .tetris-modern-leaderboard {
-      order: 3;
-    }
-
-    .tetris-modern-panel {
-      padding: 15px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .tetris-modern-game-area {
-      width: 90vw;
-      max-width: 320px;
-      height: calc(90vw * 2);
-      max-height: 640px;
-    }
-    
-    .tetris-modern-overlay-container {
-      padding: 15px;
-      width: 95%;
-    }
-    
-    .tetris-modern-overlay-container h2 {
-      font-size: 1.6rem;
-    }
-    
-    .tetris-modern-final-score-value {
-      font-size: 2.5rem;
-    }
-    
-    .tetris-modern-controls-grid {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-    
-    .tetris-modern-key {
-      min-width: 25px;
-      font-size: 0.8rem;
-    }
-    
-    .tetris-modern-control-item span {
-      font-size: 0.8rem;
-    }
-    
-    .tetris-modern-touch-controls {
-      display: block;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .game-header h1 {
-      font-size: 1.5rem;
-    }
-    
-    .tetris-modern-game-area {
-      width: 95vw;
-      height: calc(95vw * 2);
-    }
-    
-    .tetris-modern-controls-grid {
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 8px;
-    }
-    
-    .tetris-modern-control-item {
-      padding: 6px;
-    }
-    
-    .tetris-modern-key {
-      padding: 4px 6px;
-      font-size: 0.75rem;
-    }
-    
-    .tetris-modern-btn-lg {
-      padding: 12px 16px;
-      font-size: 1rem;
-    }
-    
-    .tetris-modern-touch-btn {
-      width: 54px;
-      height: 54px;
-      font-size: 1.3rem;
+    .tetris-info-panel {
+      width: 280px;
+      margin-top: 15px;
     }
   }
 </style>
 
-<script src="{{ url_for('static', filename='js/games/tetris.js') }}"></script>
+<!-- Javascript -->
+<script>
+/**
+ * Sade Tetris Oyunu
+ */
 
+// Oyun değişkenleri
+let canvas, ctx;
+let nextCanvas, nextCtx;
+let scoreElement, levelElement, linesElement;
+let board = [];
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+let isGameOver = false;
+let isPaused = false;
+let piece, nextPiece;
+let score = 0;
+let lines = 0;
+let level = 1;
+
+// Oyun sabitleri
+const COLS = 10;
+const ROWS = 20;
+const BLOCK_SIZE = 30;
+const PREVIEW_BLOCK_SIZE = 20;
+
+// Tetris parça renkleri
+const COLORS = [
+  null,
+  '#FF3F3F', // I - Kırmızı
+  '#3FFF7F', // O - Yeşil
+  '#3F7FFF', // T - Mavi
+  '#FFDF3F', // L - Sarı
+  '#3FFFFF', // J - Açık Mavi
+  '#FF3FFF', // S - Mor
+  '#FF7F3F'  // Z - Turuncu
+];
+
+// Tetromino şekilleri
+const SHAPES = [
+  null,
+  [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I
+  [[2, 2], [2, 2]],                                         // O
+  [[0, 3, 0], [3, 3, 3], [0, 0, 0]],                        // T
+  [[0, 0, 4], [4, 4, 4], [0, 0, 0]],                        // L
+  [[5, 0, 0], [5, 5, 5], [0, 0, 0]],                        // J
+  [[0, 6, 6], [6, 6, 0], [0, 0, 0]],                        // S
+  [[7, 7, 0], [0, 7, 7], [0, 0, 0]]                         // Z
+];
+
+// DOM yüklendikten sonra çalış
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+  // Canvas elementlerini al
+  canvas = document.getElementById('tetris-canvas');
+  ctx = canvas.getContext('2d');
+  
+  nextCanvas = document.getElementById('next-piece-canvas');
+  nextCtx = nextCanvas.getContext('2d');
+  
+  // Skor elementlerini al
+  scoreElement = document.getElementById('score');
+  levelElement = document.getElementById('level');
+  linesElement = document.getElementById('lines');
+  
+  // Butonlara event listener ekle
+  document.getElementById('start-button').addEventListener('click', startGame);
+  document.getElementById('pause-button').addEventListener('click', togglePause);
+  document.getElementById('reset-button').addEventListener('click', resetGame);
+  
+  // Klavye kontrollerini ekle
+  document.addEventListener('keydown', handleKeyPress);
+  
+  // Oyun tahtasını oluştur
+  resetGame();
+}
+
+// Klavye tuşlarını işle
+function handleKeyPress(e) {
+  if (isGameOver) return;
+  
+  if (e.key === 'p' || e.key === 'P') {
+    togglePause();
+    return;
+  }
+  
+  if (isPaused) return;
+  
+  switch(e.key) {
+    case 'ArrowLeft':
+      moveLeft();
+      break;
+    case 'ArrowRight':
+      moveRight();
+      break;
+    case 'ArrowDown':
+      moveDown();
+      break;
+    case 'ArrowUp':
+      rotate();
+      break;
+    case ' ': // Boşluk tuşu
+      hardDrop();
+      break;
+  }
+}
+
+// Oyunu başlat
+function startGame() {
+  if (isGameOver || isPaused) {
+    resetGame();
+  }
+  
+  // Duraklat düğmesini aktif et
+  document.getElementById('pause-button').disabled = false;
+  document.getElementById('start-button').disabled = true;
+  
+  // Oyun döngüsünü başlat
+  requestAnimationFrame(update);
+}
+
+// Oyunu sıfırla
+function resetGame() {
+  // Oyun değişkenlerini sıfırla
+  board = createBoard();
+  isGameOver = false;
+  isPaused = false;
+  score = 0;
+  lines = 0;
+  level = 1;
+  dropInterval = 1000;
+  
+  // Parçaları oluştur
+  piece = createPiece();
+  nextPiece = createPiece();
+  
+  // Skoru güncelle
+  updateScore();
+  
+  // Başlat düğmesini aktif et
+  document.getElementById('start-button').disabled = false;
+  document.getElementById('pause-button').disabled = true;
+  
+  // Oyun alanını çiz
+  draw();
+  drawNextPiece();
+}
+
+// Oyunu duraklat
+function togglePause() {
+  if (isGameOver) return;
+  
+  isPaused = !isPaused;
+  
+  if (isPaused) {
+    document.getElementById('pause-button').textContent = 'Devam Et';
+  } else {
+    document.getElementById('pause-button').textContent = 'Duraklat';
+    // Oyun döngüsünü devam ettir
+    requestAnimationFrame(update);
+  }
+}
+
+// Oyun tahtası oluştur
+function createBoard() {
+  const board = [];
+  for (let r = 0; r < ROWS; r++) {
+    board[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      board[r][c] = 0;
+    }
+  }
+  return board;
+}
+
+// Rastgele parça oluştur
+function createPiece() {
+  const type = Math.floor(Math.random() * 7) + 1;
+  const piece = {
+    type: type,
+    shape: SHAPES[type],
+    x: Math.floor(COLS / 2) - Math.floor(SHAPES[type][0].length / 2),
+    y: 0
+  };
+  return piece;
+}
+
+// Ana oyun döngüsü
+function update(time = 0) {
+  if (isGameOver || isPaused) return;
+  
+  const deltaTime = time - lastTime;
+  lastTime = time;
+  
+  dropCounter += deltaTime;
+  if (dropCounter > dropInterval) {
+    moveDown();
+    dropCounter = 0;
+  }
+  
+  draw();
+  requestAnimationFrame(update);
+}
+
+// Oyun alanını çiz
+function draw() {
+  clearCanvas(ctx, canvas.width, canvas.height);
+  drawBoard();
+  drawPiece();
+}
+
+// Oyun tahtasını çiz
+function drawBoard() {
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (board[r][c]) {
+        drawBlock(ctx, c, r, board[r][c]);
+      }
+    }
+  }
+}
+
+// Aktif parçayı çiz
+function drawPiece() {
+  if (!piece) return;
+  
+  for (let r = 0; r < piece.shape.length; r++) {
+    for (let c = 0; c < piece.shape[r].length; c++) {
+      if (piece.shape[r][c]) {
+        drawBlock(ctx, piece.x + c, piece.y + r, piece.type);
+      }
+    }
+  }
+}
+
+// Sonraki parçayı çiz
+function drawNextPiece() {
+  clearCanvas(nextCtx, nextCanvas.width, nextCanvas.height);
+  
+  if (!nextPiece) return;
+  
+  // Merkezi hesapla
+  const centerX = (nextCanvas.width - nextPiece.shape[0].length * PREVIEW_BLOCK_SIZE) / 2;
+  const centerY = (nextCanvas.height - nextPiece.shape.length * PREVIEW_BLOCK_SIZE) / 2;
+  
+  for (let r = 0; r < nextPiece.shape.length; r++) {
+    for (let c = 0; c < nextPiece.shape[r].length; c++) {
+      if (nextPiece.shape[r][c]) {
+        nextCtx.fillStyle = COLORS[nextPiece.type];
+        nextCtx.fillRect(
+          centerX + c * PREVIEW_BLOCK_SIZE, 
+          centerY + r * PREVIEW_BLOCK_SIZE, 
+          PREVIEW_BLOCK_SIZE, 
+          PREVIEW_BLOCK_SIZE
+        );
+        
+        nextCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        nextCtx.lineWidth = 1;
+        nextCtx.strokeRect(
+          centerX + c * PREVIEW_BLOCK_SIZE, 
+          centerY + r * PREVIEW_BLOCK_SIZE, 
+          PREVIEW_BLOCK_SIZE, 
+          PREVIEW_BLOCK_SIZE
+        );
+      }
+    }
+  }
+}
+
+// Bir blok çiz
+function drawBlock(context, x, y, type) {
+  context.fillStyle = COLORS[type];
+  context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  
+  context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  context.lineWidth = 1;
+  context.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  
+  // Parlama efekti
+  context.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE / 3, BLOCK_SIZE / 3);
+}
+
+// Canvas'ı temizle
+function clearCanvas(context, width, height) {
+  context.clearRect(0, 0, width, height);
+}
+
+// Çarpışma kontrolü
+function checkCollision(shape, x, y) {
+  for (let r = 0; r < shape.length; r++) {
+    for (let c = 0; c < shape[r].length; c++) {
+      // Boş hücreleri atla
+      if (!shape[r][c]) continue;
+      
+      // Oyun alanı koordinatlarını hesapla
+      const boardX = x + c;
+      const boardY = y + r;
+      
+      // Sınır kontrolleri
+      if (boardX < 0 || boardX >= COLS || boardY >= ROWS) {
+        return true;
+      }
+      
+      // Üst sınırın üzerinde olup olmadığını kontrol et
+      if (boardY < 0) continue;
+      
+      // Diğer parçalarla çarpışma kontrolü
+      if (board[boardY][boardX]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Parçayı sola hareket ettir
+function moveLeft() {
+  if (!piece) return;
+  
+  const newX = piece.x - 1;
+  if (!checkCollision(piece.shape, newX, piece.y)) {
+    piece.x = newX;
+    draw();
+  }
+}
+
+// Parçayı sağa hareket ettir
+function moveRight() {
+  if (!piece) return;
+  
+  const newX = piece.x + 1;
+  if (!checkCollision(piece.shape, newX, piece.y)) {
+    piece.x = newX;
+    draw();
+  }
+}
+
+// Parçayı aşağı hareket ettir
+function moveDown() {
+  if (!piece) return;
+  
+  const newY = piece.y + 1;
+  if (!checkCollision(piece.shape, piece.x, newY)) {
+    piece.y = newY;
+    draw();
+    return true;
+  } else {
+    lockPiece();
+    return false;
+  }
+}
+
+// Parçayı anında düşür
+function hardDrop() {
+  if (!piece) return;
+  
+  while(moveDown()) {
+    // Parça yere düşene kadar aşağı taşı
+  }
+}
+
+// Parçayı kilitle
+function lockPiece() {
+  if (!piece) return;
+  
+  for (let r = 0; r < piece.shape.length; r++) {
+    for (let c = 0; c < piece.shape[r].length; c++) {
+      if (piece.shape[r][c]) {
+        // Oyun alanının üstüne çıkarsa oyun biter
+        if (piece.y + r < 0) {
+          gameOver();
+          return;
+        }
+        
+        // Parçayı tahta üzerine yerleştir
+        board[piece.y + r][piece.x + c] = piece.type;
+      }
+    }
+  }
+  
+  // Tamamlanan satırları kontrol et
+  checkLines();
+  
+  // Yeni parça oluştur
+  piece = nextPiece;
+  nextPiece = createPiece();
+  drawNextPiece();
+}
+
+// Tamamlanan satırları kontrol et
+function checkLines() {
+  let linesCleared = 0;
+  
+  for (let r = ROWS - 1; r >= 0; r--) {
+    let rowFull = true;
+    
+    // Satırın dolu olup olmadığını kontrol et
+    for (let c = 0; c < COLS; c++) {
+      if (board[r][c] === 0) {
+        rowFull = false;
+        break;
+      }
+    }
+    
+    if (rowFull) {
+      // Satırı temizle ve üstündekileri aşağı indir
+      for (let y = r; y > 0; y--) {
+        for (let c = 0; c < COLS; c++) {
+          board[y][c] = board[y-1][c];
+        }
+      }
+      
+      // En üst satırı temizle
+      for (let c = 0; c < COLS; c++) {
+        board[0][c] = 0;
+      }
+      
+      // Temizlenen satır sayısını artır
+      linesCleared++;
+      
+      // Aynı satırı tekrar kontrol et
+      r++;
+    }
+  }
+  
+  // Temizlenen satır varsa skoru güncelle
+  if (linesCleared > 0) {
+    // Toplam satır sayısını güncelle
+    lines += linesCleared;
+    
+    // Skor hesapla
+    const points = [0, 40, 100, 300, 1200][linesCleared] * level;
+    score += points;
+    
+    // Seviye kontrolü
+    const newLevel = Math.floor(lines / 10) + 1;
+    if (newLevel > level) {
+      level = newLevel;
+      // Düşüş hızını güncelle (her seviyede %10 daha hızlı)
+      dropInterval = 1000 * Math.pow(0.9, level - 1);
+    }
+    
+    // Skoru güncelle
+    updateScore();
+  }
+}
+
+// Oyun sonu
+function gameOver() {
+  isGameOver = true;
+  document.getElementById('pause-button').disabled = true;
+  
+  // Skoru kaydet
+  saveScore();
+  
+  // Kullanıcıyı bilgilendir
+  alert(`Oyun bitti! Skor: ${score}`);
+}
+
+// Skoru güncelle
+function updateScore() {
+  if (scoreElement) scoreElement.textContent = score;
+  if (levelElement) levelElement.textContent = level;
+  if (linesElement) linesElement.textContent = lines;
+}
+
+// Parçayı döndür
+function rotate() {
+  if (!piece) return;
+  
+  // I parçası (çubuk) özel döndürme
+  if (piece.type === 1) {
+    // I parçası için özel döndürme şekilleri
+    const I_SHAPES = [
+      [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
+      [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]]
+    ];
+    
+    // Mevcut şekil ilk şekil mi kontrol et
+    const currentShape = JSON.stringify(piece.shape);
+    const firstShape = JSON.stringify(I_SHAPES[0]);
+    
+    // Şekli değiştir
+    piece.shape = (currentShape === firstShape) ? I_SHAPES[1] : I_SHAPES[0];
+    
+    // Çarpışma kontrolü
+    if (checkCollision(piece.shape, piece.x, piece.y)) {
+      // Önceki şekline geri döndür
+      piece.shape = (currentShape === firstShape) ? I_SHAPES[0] : I_SHAPES[1];
+    }
+    
+    draw();
+    return;
+  }
+  
+  // O parçası (kare) dönmez
+  if (piece.type === 2) {
+    return;
+  }
+  
+  // Diğer parçalar için normal döndürme
+  const oldShape = piece.shape;
+  
+  // Yeni döndürülmüş şekli oluştur
+  const rotated = [];
+  for (let c = 0; c < oldShape[0].length; c++) {
+    const row = [];
+    for (let r = oldShape.length - 1; r >= 0; r--) {
+      row.push(oldShape[r][c]);
+    }
+    rotated.push(row);
+  }
+  
+  // Yeni şekli uygula
+  piece.shape = rotated;
+  
+  // Çarpışma kontrolü
+  if (checkCollision(piece.shape, piece.x, piece.y)) {
+    // Duvar tepmesi - sağa doğru itelemeyi dene
+    if (!checkCollision(piece.shape, piece.x + 1, piece.y)) {
+      piece.x++;
+    }
+    // Duvar tepmesi - sola doğru itelemeyi dene
+    else if (!checkCollision(piece.shape, piece.x - 1, piece.y)) {
+      piece.x--;
+    }
+    // Yukarı doğru itelemeyi dene
+    else if (!checkCollision(piece.shape, piece.x, piece.y - 1)) {
+      piece.y--;
+    }
+    // Hiçbiri işe yaramazsa, önceki şekline geri döndür
+    else {
+      piece.shape = oldShape;
+    }
+  }
+  
+  draw();
+}
+
+// Skoru kaydet
+function saveScore() {
+  try {
+    // Oyun istatistiklerini topla
+    const gameStats = {
+      lines_cleared: lines,
+      level: level,
+      duration_seconds: Math.floor(Date.now() / 1000) - Math.floor(lastTime / 1000)
+    };
+    
+    // API'ye skoru gönder
+    fetch('/api/save-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game_type: 'tetris',
+        score: score,
+        difficulty: 'medium',
+        playtime: gameStats.duration_seconds,
+        game_stats: gameStats
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Score saved:", data);
+    })
+    .catch(err => console.error("Skor kaydetme hatası:", err));
+  } catch (e) {
+    console.error("Skor kaydetme işleminde hata:", e);
+  }
+}
+</script>
 {% endblock %}
