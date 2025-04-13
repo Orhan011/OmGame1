@@ -7,74 +7,39 @@
 {% endblock %}
 
 {% block content %}
-<div class="leaderboard-bg-wrapper">
-  <div class="animated-bg"></div>
-  <div class="container py-4">
-    <div class="leaderboard-main">
-      <div class="leaderboard-header">
-        <div class="header-content">
-          <h1><i class="fas fa-trophy"></i> Liderlik Tablosu</h1>
-          <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
-        </div>
-      </div>
+<div class="container py-4">
+  <div class="leaderboard-header">
+    <h1>Liderlik Tablosu</h1>
+    <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
+  </div>
 
-      <div class="leaderboard-tabs">
-        <button class="tab-btn active" data-tab="scores"><i class="fas fa-star"></i> Puan Tablosu</button>
-        <button class="tab-btn" data-tab="levels"><i class="fas fa-level-up-alt"></i> Seviye Tablosu</button>
+  <div class="leaderboard-container">
+    <!-- Skor tablosu -->
+    <div id="leaderboardContainer" class="leaderboard-card-container">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Skorlar yükleniyor...</p>
       </div>
-
-      <div class="leaderboard-container">
-        <!-- Skor tablosu -->
-        <div id="scores" class="tab-content active">
-          <div id="leaderboardContainer" class="leaderboard-card-container">
-            <div class="loading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <p>Skorlar yükleniyor...</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Seviye tablosu -->
-        <div id="levels" class="tab-content">
-          <div id="levelLeaderboardContainer" class="leaderboard-card-container">
-            <div class="loading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <p>Seviye bilgileri yükleniyor...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="leaderboard-footer">
-        <p><i class="fas fa-info-circle"></i> Skorlar günlük olarak güncellenir. Yüksek sıralama elde etmek için sürekli oyun oynamayı unutmayın!</p>
+    </div>
+    
+    <!-- Seviye tablosu -->
+    <div class="leaderboard-header">
+      <h1>Seviye Sıralaması</h1>
+      <p>Kullanıcıların seviye puanlarına göre sıralaması. Platform üzerinde etkinlik göstererek seviye kazanın!</p>
+    </div>
+    <div id="levelLeaderboardContainer" class="leaderboard-card-container">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Seviye bilgileri yükleniyor...</p>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/level-leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
-<script>
-  // Tab switching functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Remove active class from all buttons and contents
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        
-        // Add active class to current button and its corresponding content
-        this.classList.add('active');
-        const tabId = this.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
-    });
-  });
-</script>
 {% endblock %}

@@ -1,9 +1,8 @@
-
 // Sayfa yüklendiğinde seviye tablosunu getir
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('levelLeaderboardContainer')) {
     loadLevelLeaderboard();
-    
+
     // Her 60 saniyede bir tabloyu otomatik güncelle
     setInterval(loadLevelLeaderboard, 60000);
   }
@@ -12,12 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // Seviye tablosunu yükleyen fonksiyon
 function loadLevelLeaderboard() {
   const levelLeaderboardContainer = document.getElementById('levelLeaderboardContainer');
-  
+
   // Yükleniyor gösterimi
   levelLeaderboardContainer.innerHTML = `
     <div class="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>Seviye bilgileri yükleniyor...</p>
     </div>
   `;
 
@@ -34,7 +32,6 @@ function loadLevelLeaderboard() {
         levelLeaderboardContainer.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-user-graduate"></i>
-            <p>Henüz seviye kaydı bulunmuyor. Platform üzerinde etkinlik göstererek seviye kazanabilirsiniz!</p>
           </div>
         `;
         return;
@@ -67,7 +64,7 @@ function loadLevelLeaderboard() {
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
         html += `
-          <div class="player-row ${rankClass} ${player.is_current_user ? 'current-user' : ''}">
+          <div class="player-row ${rankClass} ${player.is_current_user ? 'current-user' : ''}" data-rank="${index + 1}">
             <div class="rank-cell">
               <div class="rank-number">${index + 1}</div>
             </div>
@@ -82,15 +79,12 @@ function loadLevelLeaderboard() {
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">${player.username}</div>
-                <div class="player-stats">
-                  <div class="games-badge"><i class="fas fa-gamepad"></i> ${player.games_played || 0} oyun</div>
-                </div>
+                <div class="player-level">${player.level > 1 ? 'Seviye ' + player.level : 'Başlangıç'}</div>
               </div>
             </div>
             <div class="score-cell">
               <div class="score-container">
                 <span class="score-value">${player.level || 1}</span>
-                <div class="score-sparkles"></div>
               </div>
             </div>
           </div>
@@ -109,7 +103,6 @@ function loadLevelLeaderboard() {
       levelLeaderboardContainer.innerHTML = `
         <div class="error">
           <i class="fas fa-exclamation-triangle"></i>
-          <p>Seviye bilgileri yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
         </div>
       `;
     });
