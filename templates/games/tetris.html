@@ -10,151 +10,232 @@
       <p class="game-description">Düşen blokları doğru yerleştirerek çizgileri tamamlayın.</p>
     </div>
 
-    <div class="tetris-container">
-      <div class="tetris-layout">
-        <div class="tetris-info-panel">
-          <div class="tetris-score-panel">
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Skor</div>
-              <div class="tetris-score-value" id="score">0</div>
+    <div class="tetris-modern-container">
+      <div class="tetris-modern-layout">
+        <!-- Sol Panel: İstatistikler, Kontroller -->
+        <div class="tetris-modern-sidebar">
+          <div class="tetris-modern-panel tetris-modern-score-panel">
+            <div class="tetris-modern-score-item">
+              <div class="tetris-modern-score-label">Skor</div>
+              <div class="tetris-modern-score-value" id="score">0</div>
             </div>
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Level</div>
-              <div class="tetris-score-value" id="level">1</div>
+            <div class="tetris-modern-score-item">
+              <div class="tetris-modern-score-label">Level</div>
+              <div class="tetris-modern-score-value" id="level">1</div>
             </div>
-            <div class="tetris-score-item">
-              <div class="tetris-score-label">Çizgiler</div>
-              <div class="tetris-score-value" id="lines">0</div>
+            <div class="tetris-modern-score-item">
+              <div class="tetris-modern-score-label">Çizgiler</div>
+              <div class="tetris-modern-score-value" id="lines">0</div>
             </div>
           </div>
 
-          <div class="tetris-next-piece">
-            <div class="tetris-next-label">Sonraki Parça</div>
-            <canvas id="next-piece-canvas" width="100" height="100"></canvas>
+          <div class="tetris-modern-panel tetris-modern-next-panel">
+            <div class="tetris-modern-panel-title">Sonraki</div>
+            <canvas id="next-piece-canvas" width="120" height="120"></canvas>
+          </div>
+          
+          <div class="tetris-modern-panel tetris-modern-hold-panel">
+            <div class="tetris-modern-panel-title">Beklet</div>
+            <canvas id="hold-piece-canvas" width="120" height="120"></canvas>
           </div>
 
-          <div class="tetris-controls">
-            <button id="start-game" class="btn btn-primary btn-lg">
-              <i class="fas fa-play me-2"></i>Başla
-            </button>
-            <button id="pause-game" class="btn btn-outline-light" disabled>
-              <i class="fas fa-pause me-2"></i>Duraklat
-            </button>
-            <button id="reset-game" class="btn btn-outline-danger">
-              <i class="fas fa-redo-alt me-2"></i>Yeniden Başlat
-            </button>
+          <div class="tetris-modern-panel">
+            <div class="difficulty-selector">
+              <div class="tetris-modern-panel-title">Zorluk</div>
+              <div class="difficulty-buttons">
+                <button id="easy-btn" class="difficulty-btn">Kolay</button>
+                <button id="medium-btn" class="difficulty-btn active">Orta</button>
+                <button id="hard-btn" class="difficulty-btn">Zor</button>
+              </div>
+            </div>
           </div>
 
-          <div class="tetris-help">
-            <h4 class="tetris-help-title"><i class="fas fa-keyboard me-2"></i>Kontroller</h4>
-            <div class="tetris-help-items">
-              <div class="tetris-help-item">
-                <div class="tetris-key">←</div>
-                <span>Sola Hareket</span>
+          <div class="tetris-modern-panel tetris-modern-controls">
+            <button id="start-game" class="tetris-modern-btn tetris-modern-btn-primary">
+              <i class="fas fa-play"></i> Başla
+            </button>
+            <button id="pause-game" class="tetris-modern-btn tetris-modern-btn-secondary" disabled>
+              <i class="fas fa-pause"></i> Duraklat
+            </button>
+            <button id="reset-game" class="tetris-modern-btn tetris-modern-btn-danger">
+              <i class="fas fa-redo-alt"></i> Yeniden Başlat
+            </button>
+          </div>
+        </div>
+
+        <!-- Orta Panel: Oyun Alanı -->
+        <div class="tetris-modern-game-area">
+          <canvas id="tetris-canvas" width="300" height="600"></canvas>
+          <div id="level-up-notification" class="level-up-notification">Level Up!</div>
+
+          <!-- Oyun Overlay'leri -->
+          <div id="tetris-overlay" class="tetris-modern-overlay">
+            <!-- Duraklatma Overlay'i -->
+            <div class="tetris-modern-overlay-content" id="pause-overlay" style="display: none;">
+              <div class="tetris-modern-overlay-container">
+                <h2><i class="fas fa-pause"></i> Oyun Duraklatıldı</h2>
+                <p>Devam etmek için aşağıdaki butona tıklayın</p>
+                <button id="resume-game" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
+                  <i class="fas fa-play"></i> Devam Et
+                </button>
               </div>
-              <div class="tetris-help-item">
-                <div class="tetris-key">→</div>
-                <span>Sağa Hareket</span>
+            </div>
+
+            <!-- Başlangıç Overlay'i -->
+            <div class="tetris-modern-overlay-content" id="game-start-overlay">
+              <div class="tetris-modern-overlay-container">
+                <h2>Tetris</h2>
+                <div class="tetris-modern-game-intro">
+                  <p>Modern Tetris oyununa hoş geldiniz!</p>
+                  <p>Düşen blokları yerleştirerek satırları tamamlayın.</p>
+                  
+                  <div class="tetris-modern-controls-info">
+                    <h3>Kontroller</h3>
+                    <div class="tetris-modern-controls-grid">
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">←</div>
+                        <span>Sola Hareket</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">→</div>
+                        <span>Sağa Hareket</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">↓</div>
+                        <span>Hızlı Düşür</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">↑</div>
+                        <span>Döndür</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">Boşluk</div>
+                        <span>Anında Düşür</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">C</div>
+                        <span>Parçayı Tut</span>
+                      </div>
+                      <div class="tetris-modern-control-item">
+                        <div class="tetris-modern-key">P</div>
+                        <span>Duraklat</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button id="start-button" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
+                  <i class="fas fa-play"></i> Oyuna Başla
+                </button>
               </div>
-              <div class="tetris-help-item">
-                <div class="tetris-key">↓</div>
-                <span>Hızlı Düşür</span>
+            </div>
+
+            <!-- Oyun Sonu Overlay'i -->
+            <div class="tetris-modern-overlay-content" id="game-over-overlay" style="display: none;">
+              <div class="tetris-modern-overlay-container">
+                <h2><i class="fas fa-trophy"></i> Oyun Bitti!</h2>
+                
+                <div class="tetris-modern-result-card">
+                  <div class="tetris-modern-final-score">
+                    <div class="tetris-modern-final-score-label">Final Skoru</div>
+                    <div class="tetris-modern-final-score-value" id="final-score">0</div>
+                  </div>
+                  
+                  <div class="tetris-modern-stats">
+                    <div class="tetris-modern-stat-item">
+                      <div class="tetris-modern-stat-label">Seviye</div>
+                      <div class="tetris-modern-stat-value" id="final-level">1</div>
+                    </div>
+                    <div class="tetris-modern-stat-item">
+                      <div class="tetris-modern-stat-label">Çizgiler</div>
+                      <div class="tetris-modern-stat-value" id="final-lines">0</div>
+                    </div>
+                    <div class="tetris-modern-stat-item">
+                      <div class="tetris-modern-stat-label">Süre</div>
+                      <div class="tetris-modern-stat-value" id="game-duration">0:00</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XP ve Seviye Bilgisi -->
+                <div class="tetris-modern-xp-info" style="display: none;">
+                  <div class="tetris-modern-xp-gain">
+                    <div class="tetris-modern-xp-gain-label"><i class="fas fa-star"></i> Kazanılan XP</div>
+                    <div class="tetris-modern-xp-gain-value" id="xp-gain">0</div>
+                  </div>
+                  <div class="tetris-modern-level-progress">
+                    <div class="tetris-modern-progress-bar">
+                      <div class="tetris-modern-progress-fill" id="level-progress-bar"></div>
+                    </div>
+                    <div class="tetris-modern-progress-text">
+                      <span id="current-level">1</span> → <span id="next-level">2</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Misafir kullanıcı bilgilendirme -->
+                <div id="guest-info" class="tetris-modern-guest-info" style="display: none;">
+                  <p class="tetris-modern-guest-message"><i class="fas fa-info-circle"></i> Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
+                  <div class="tetris-modern-guest-buttons">
+                    <a href="{{ url_for('login') }}" class="tetris-modern-btn tetris-modern-btn-success">
+                      <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                    </a>
+                    <a href="{{ url_for('register') }}" class="tetris-modern-btn tetris-modern-btn-outline">
+                      <i class="fas fa-user-plus"></i> Kaydol
+                    </a>
+                  </div>
+                </div>
+
+                <div class="tetris-modern-action-buttons">
+                  <button id="play-again" class="tetris-modern-btn tetris-modern-btn-primary tetris-modern-btn-lg">
+                    <i class="fas fa-redo-alt"></i> Tekrar Oyna
+                  </button>
+                  <a href="{{ url_for('all_games') }}" class="tetris-modern-btn tetris-modern-btn-secondary tetris-modern-btn-lg">
+                    <i class="fas fa-th-large"></i> Tüm Oyunlar
+                  </a>
+                </div>
               </div>
-              <div class="tetris-help-item">
-                <div class="tetris-key">↑</div>
-                <span>Döndür</span>
-              </div>
-              <div class="tetris-help-item">
-                <div class="tetris-key">Boşluk</div>
-                <span>Anında Düşür</span>
-              </div>
-              <div class="tetris-help-item">
-                <div class="tetris-key">P</div>
-                <span>Duraklat</span>
-              </div>
+            </div>
+          </div>
+          
+          <!-- Mobil Kontroller (ekran boyutu küçük olduğunda görünür) -->
+          <div class="tetris-modern-touch-controls" id="touch-controls">
+            <div class="tetris-modern-touch-top">
+              <button class="tetris-modern-touch-btn" id="touch-rotate">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="tetris-modern-touch-btn" id="touch-hold">
+                <i class="fas fa-hand-rock"></i>
+              </button>
+            </div>
+            <div class="tetris-modern-touch-middle">
+              <button class="tetris-modern-touch-btn" id="touch-left">
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <button class="tetris-modern-touch-btn" id="touch-drop">
+                <i class="fas fa-angle-double-down"></i>
+              </button>
+              <button class="tetris-modern-touch-btn" id="touch-right">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+            <div class="tetris-modern-touch-bottom">
+              <button class="tetris-modern-touch-btn" id="touch-down">
+                <i class="fas fa-arrow-down"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="tetris-board-container">
-          <canvas id="tetris-canvas" width="300" height="600"></canvas>
-
-          <div id="tetris-overlay" class="tetris-overlay">
-            <div class="tetris-overlay-content" id="pause-overlay" style="display: none;">
-              <h2><i class="fas fa-pause me-2"></i>Oyun Duraklatıldı</h2>
-              <p>Devam etmek için "Devam Et" düğmesine basın</p>
-              <button id="resume-game" class="btn btn-primary btn-lg">
-                <i class="fas fa-play me-2"></i>Devam Et
-              </button>
-            </div>
-
-            <div class="tetris-overlay-content" id="game-start-overlay">
-              <h2>Tetris</h2>
-              <p>Klasik Tetris oyununa hoş geldiniz!</p>
-              <p>Düşen blokları yerleştirin ve çizgiler oluşturun</p>
-              <button id="start-button" class="btn btn-primary btn-lg">
-                <i class="fas fa-play me-2"></i>Oyuna Başla
-              </button>
-            </div>
-
-            <div class="tetris-overlay-content" id="game-over-overlay" style="display: none;">
-              <h2><i class="fas fa-trophy me-2"></i>Oyun Bitti!</h2>
-              <div class="tetris-final-score">
-                <div class="tetris-final-score-label">Final Skoru</div>
-                <div class="tetris-final-score-value" id="final-score">0</div>
+        <!-- Sağ Panel: Skor Tablosu -->
+        <div class="tetris-modern-leaderboard">
+          <div class="tetris-modern-panel tetris-modern-leaderboard-panel">
+            <div class="tetris-modern-panel-title">En Yüksek Skorlar</div>
+            <div id="leaderboard-container" class="tetris-modern-leaderboard-list">
+              <div class="tetris-modern-leaderboard-loading">
+                <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
               </div>
-
-              <!-- XP ve Seviye Bilgisi -->
-              <div class="tetris-xp-info" style="display: none;">
-                <div class="tetris-xp-gain">
-                  <div class="tetris-xp-gain-label"><i class="fas fa-star me-2"></i>Kazanılan XP</div>
-                  <div class="tetris-xp-gain-value" id="xp-gain">0</div>
-                </div>
-                <div class="tetris-level-info">
-                  <div class="tetris-level-label">Seviye</div>
-                  <div class="tetris-level-value" id="current-level">1</div>
-                </div>
-              </div>
-
-              <!-- Misafir kullanıcı bilgilendirme -->
-              <div id="guest-info" class="guest-info" style="display: none;">
-                <p class="guest-message"><i class="fas fa-info-circle me-2"></i>Misafir olarak oynuyorsunuz! Skorunuzu kaydetmek ve XP kazanmak için giriş yapın.</p>
-                <div class="guest-buttons">
-                  <a href="{{ url_for('login') }}" class="btn btn-success">
-                    <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
-                  </a>
-                  <a href="{{ url_for('register') }}" class="btn btn-outline-info">
-                    <i class="fas fa-user-plus me-2"></i>Kaydol
-                  </a>
-                </div>
-              </div>
-
-              <button id="play-again" class="btn btn-primary btn-lg mt-3">
-                <i class="fas fa-redo-alt me-2"></i>Tekrar Oyna
-              </button>
-              <a href="{{ url_for('all_games') }}" class="btn btn-outline-light btn-lg mt-3">
-                <i class="fas fa-th-large me-2"></i>Tüm Oyunlar
-              </a>
+              <!-- Buraya JS ile skor tablosu eklenecek -->
             </div>
-          </div>
-
-          <!-- Mobile touch controls -->
-          <div class="touch-controls" id="touch-controls" style="display: none;">
-            <button class="touch-control-btn" id="touch-left">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <button class="touch-control-btn" id="touch-rotate">
-              <i class="fas fa-redo"></i>
-            </button>
-            <button class="touch-control-btn" id="touch-right">
-              <i class="fas fa-arrow-right"></i>
-            </button>
-            <button class="touch-control-btn" id="touch-down">
-              <i class="fas fa-arrow-down"></i>
-            </button>
-            <button class="touch-control-btn" id="touch-drop">
-              <i class="fas fa-angle-double-down"></i>
-            </button>
           </div>
         </div>
       </div>
@@ -721,6 +802,800 @@
 </style>
 
 <!-- Tetris oyunu için JavaScript -->
+<style>
+  /* Modern Tetris Game Styling */
+  .tetris-modern-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 10px;
+  }
+
+  .tetris-modern-layout {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Sidebar */
+  .tetris-modern-sidebar {
+    width: 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Game Area */
+  .tetris-modern-game-area {
+    position: relative;
+    width: 300px;
+    height: 600px;
+  }
+
+  /* Leaderboard Panel */
+  .tetris-modern-leaderboard {
+    width: 230px;
+  }
+
+  /* Panel Styling */
+  .tetris-modern-panel {
+    background: linear-gradient(135deg, rgba(25, 25, 60, 0.9), rgba(40, 40, 80, 0.8));
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Score Panel */
+  .tetris-modern-score-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tetris-modern-score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tetris-modern-score-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+  }
+
+  .tetris-modern-score-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #6C5CE7;
+    text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+  }
+
+  /* Panel Title */
+  .tetris-modern-panel-title {
+    font-size: 1.1rem;
+    color: white;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Next and Hold Piece Panels */
+  .tetris-modern-next-panel, .tetris-modern-hold-panel {
+    text-align: center;
+  }
+
+  #next-piece-canvas, #hold-piece-canvas {
+    background: rgba(15, 15, 35, 0.5);
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Control Buttons */
+  .tetris-modern-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tetris-modern-btn {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .tetris-modern-btn i {
+    font-size: 1rem;
+  }
+
+  .tetris-modern-btn-primary {
+    background: linear-gradient(135deg, #6C5CE7, #4834d4);
+    color: white;
+  }
+
+  .tetris-modern-btn-primary:hover {
+    background: linear-gradient(135deg, #7d6ef0, #5842e3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+  }
+
+  .tetris-modern-btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tetris-modern-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .tetris-modern-btn-danger {
+    background: linear-gradient(135deg, #FF6B6B, #ee5253);
+    color: white;
+  }
+
+  .tetris-modern-btn-danger:hover {
+    background: linear-gradient(135deg, #ff8383, #f56565);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(238, 82, 83, 0.4);
+  }
+
+  .tetris-modern-btn-success {
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    color: white;
+  }
+
+  .tetris-modern-btn-success:hover {
+    background: linear-gradient(135deg, #5dc160, #409c3e);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+  }
+
+  .tetris-modern-btn-outline {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .tetris-modern-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .tetris-modern-btn-lg {
+    padding: 14px 24px;
+    font-size: 1.1rem;
+  }
+
+  .tetris-modern-btn:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Game Canvas */
+  #tetris-canvas {
+    background: rgba(10, 10, 30, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 
+                inset 0 0 80px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 1px solid rgba(108, 92, 231, 0.3);
+  }
+
+  /* Overlay Styling */
+  .tetris-modern-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(10, 10, 35, 0.95), rgba(15, 15, 45, 0.9));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+  }
+
+  .tetris-modern-overlay-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  .tetris-modern-overlay-container {
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .tetris-modern-overlay-container h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 2px 10px rgba(108, 92, 231, 0.5);
+  }
+
+  .tetris-modern-overlay-container p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  /* Game Intro */
+  .tetris-modern-game-intro {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Controls Info */
+  .tetris-modern-controls-info {
+    margin-top: 20px;
+  }
+
+  .tetris-modern-controls-info h3 {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .tetris-modern-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .tetris-modern-control-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .tetris-modern-control-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .tetris-modern-key {
+    background: rgba(108, 92, 231, 0.3);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    min-width: 30px;
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(108, 92, 231, 0.5);
+  }
+
+  .tetris-modern-control-item span {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Results Card */
+  .tetris-modern-result-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tetris-modern-final-score {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .tetris-modern-final-score-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+  }
+
+  .tetris-modern-final-score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #6C5CE7;
+    text-shadow: 0 0 15px rgba(108, 92, 231, 0.4);
+  }
+
+  /* Stats */
+  .tetris-modern-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .tetris-modern-stat-item {
+    flex: 1;
+    min-width: 70px;
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+  }
+
+  .tetris-modern-stat-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+  }
+
+  .tetris-modern-stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* XP Info */
+  .tetris-modern-xp-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .tetris-modern-xp-gain {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .tetris-modern-xp-gain-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tetris-modern-xp-gain-label i {
+    color: #FFD700;
+  }
+
+  .tetris-modern-xp-gain-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  /* Level Progress */
+  .tetris-modern-level-progress {
+    margin-top: 10px;
+  }
+
+  .tetris-modern-progress-bar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .tetris-modern-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6C5CE7, #a29bfe);
+    width: 0%;
+    transition: width 1s ease;
+    border-radius: 5px;
+  }
+
+  .tetris-modern-progress-text {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+  }
+
+  /* Guest Info */
+  .tetris-modern-guest-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+  }
+
+  .tetris-modern-guest-message {
+    color: #FFC107;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tetris-modern-guest-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* Action Buttons */
+  .tetris-modern-action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tetris-modern-action-buttons .tetris-modern-btn {
+    flex: 1;
+  }
+
+  /* Level Up Animation */
+  .level-up-notification {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(108, 92, 231, 0.8);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 0 30px rgba(108, 92, 231, 0.6);
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .level-up-notification.show {
+    animation: levelUpShow 1.5s ease-out forwards;
+  }
+
+  @keyframes levelUpShow {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+    }
+    40% {
+      transform: translate(-50%, -50%) scale(1.2);
+      opacity: 1;
+    }
+    70% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.1);
+      opacity: 0;
+    }
+  }
+
+  /* Leaderboard */
+  .tetris-modern-leaderboard-panel {
+    height: 100%;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tetris-modern-leaderboard-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+
+  .tetris-modern-leaderboard-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    gap: 10px;
+  }
+
+  .tetris-modern-leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .tetris-modern-leaderboard-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(3px);
+  }
+
+  .tetris-modern-leaderboard-rank {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(108, 92, 231, 0.3);
+    border-radius: 50%;
+    font-weight: 600;
+    margin-right: 10px;
+    color: white;
+  }
+
+  .tetris-modern-leaderboard-top1 .tetris-modern-leaderboard-rank {
+    background: linear-gradient(135deg, #FFD700, #FFA000);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  .tetris-modern-leaderboard-top2 .tetris-modern-leaderboard-rank {
+    background: linear-gradient(135deg, #C0C0C0, #9E9E9E);
+    box-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+  }
+
+  .tetris-modern-leaderboard-top3 .tetris-modern-leaderboard-rank {
+    background: linear-gradient(135deg, #CD7F32, #A04000);
+    box-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
+  }
+
+  .tetris-modern-leaderboard-user {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+  }
+
+  .tetris-modern-leaderboard-score {
+    font-weight: 600;
+    color: #6C5CE7;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* Mobile Touch Controls */
+  .tetris-modern-touch-controls {
+    position: absolute;
+    bottom: -180px;
+    left: 0;
+    width: 100%;
+    z-index: 90;
+    display: none;
+  }
+
+  .tetris-modern-touch-top,
+  .tetris-modern-touch-middle,
+  .tetris-modern-touch-bottom {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+  }
+
+  .tetris-modern-touch-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(108, 92, 231, 0.2);
+    border: 2px solid rgba(108, 92, 231, 0.4);
+    color: white;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .tetris-modern-touch-btn:active {
+    background: rgba(108, 92, 231, 0.6);
+    transform: scale(0.92);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Difficulty Selector */
+  .difficulty-selector {
+    text-align: center;
+  }
+
+  .difficulty-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .difficulty-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .difficulty-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .difficulty-btn.active {
+    background: #6C5CE7;
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes scaleUp {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .tetris-modern-layout {
+      gap: 15px;
+    }
+    
+    .tetris-modern-leaderboard {
+      width: 200px;
+    }
+    
+    .tetris-modern-sidebar {
+      width: 200px;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .tetris-modern-layout {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .tetris-modern-sidebar, .tetris-modern-leaderboard {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    
+    .tetris-modern-sidebar {
+      order: 2;
+    }
+    
+    .tetris-modern-game-area {
+      order: 1;
+      margin-bottom: 20px;
+    }
+    
+    .tetris-modern-leaderboard {
+      order: 3;
+    }
+
+    .tetris-modern-panel {
+      padding: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .tetris-modern-game-area {
+      width: 90vw;
+      max-width: 320px;
+      height: calc(90vw * 2);
+      max-height: 640px;
+    }
+    
+    .tetris-modern-overlay-container {
+      padding: 15px;
+      width: 95%;
+    }
+    
+    .tetris-modern-overlay-container h2 {
+      font-size: 1.6rem;
+    }
+    
+    .tetris-modern-final-score-value {
+      font-size: 2.5rem;
+    }
+    
+    .tetris-modern-controls-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .tetris-modern-key {
+      min-width: 25px;
+      font-size: 0.8rem;
+    }
+    
+    .tetris-modern-control-item span {
+      font-size: 0.8rem;
+    }
+    
+    .tetris-modern-touch-controls {
+      display: block;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .game-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .tetris-modern-game-area {
+      width: 95vw;
+      height: calc(95vw * 2);
+    }
+    
+    .tetris-modern-controls-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+    }
+    
+    .tetris-modern-control-item {
+      padding: 6px;
+    }
+    
+    .tetris-modern-key {
+      padding: 4px 6px;
+      font-size: 0.75rem;
+    }
+    
+    .tetris-modern-btn-lg {
+      padding: 12px 16px;
+      font-size: 1rem;
+    }
+    
+    .tetris-modern-touch-btn {
+      width: 54px;
+      height: 54px;
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
 <script src="{{ url_for('static', filename='js/games/tetris.js') }}"></script>
 
 {% endblock %}
