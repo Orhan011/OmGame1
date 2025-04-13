@@ -266,9 +266,10 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
     <!-- Standartlaştırılmış Puanlama Sistemi -->
-    <script src="{{ url_for('static', filename='js/score-calculator.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/standard-score-helper.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/game-integration-helper.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/score-calculator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/standard-score-helper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/game-integration-helper.js') }}"></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
       document.addEventListener('DOMContentLoaded', function() {
