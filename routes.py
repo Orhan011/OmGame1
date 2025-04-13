@@ -45,3 +45,55 @@ def memory_match_3d():
     game_name = "Memory Match 3D"
     update_game_play_count("memoryMatch3D")
     return render_template('games/memoryMatch3D.html', title=game_name)
+
+# Ana sayfaya alternatif rota
+@app.route('/game/memoryMatch3D')
+def memory_match_3d_alt():
+    return memory_match_3d()
+
+# Diğer oyunlar için eksik olabilecek rotalar
+@app.route('/games/tetris')
+def tetris_game():
+    game_name = "Tetris"
+    update_game_play_count("tetris")
+    return render_template('games/tetris.html', title=game_name)
+
+@app.route('/games/chess')
+def chess_game():
+    game_name = "Satranç"
+    update_game_play_count("chess")
+    return render_template('games/chess.html', title=game_name)
+
+@app.route('/games/snake')
+def snake_game():
+    game_name = "Yılan Oyunu"
+    update_game_play_count("snake")
+    return render_template('games/snake.html', title=game_name)
+
+@app.route('/games/memory-match')
+def memory_match_game():
+    game_name = "Hafıza Eşleştirme"
+    update_game_play_count("memory-match")
+    return render_template('games/memoryMatch.html', title=game_name)
+
+@app.route('/games/hangman')
+def hangman_game():
+    game_name = "Adam Asmaca"
+    update_game_play_count("hangman")
+    return render_template('games/hangman.html', title=game_name)
+
+# Tüm genel rota yönlendirmeleri için catch-all
+@app.route('/<path:game_path>')
+def game_route_handler(game_path):
+    if game_path.startswith('games/'):
+        game_name = game_path.split('/')[-1]
+        template_path = f"games/{game_name}.html"
+        try:
+            update_game_play_count(game_name)
+            return render_template(template_path, title=game_name.replace('_', ' ').title())
+        except:
+            from flask import abort
+            # Template bulunamazsa 404 hatası döndür
+            abort(404)
+    from flask import abort
+    abort(404)
