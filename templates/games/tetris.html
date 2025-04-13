@@ -680,18 +680,23 @@ document.addEventListener('DOMContentLoaded', function() {
     for (let y = 0; y < currentPiece.shape.length; y++) {
       for (let x = 0; x < currentPiece.shape[y].length; x++) {
         if (currentPiece.shape[y][x]) {
-          // Game over if piece locks above board
+          // Game over if piece locks above board or top row is filled
           if (currentPiece.y + y < 0) {
-            gameOver = true;
-            document.getElementById('pauseBtn').disabled = true;
-            alert('Oyun Bitti! Skor: ' + score);
-            saveScore();
+            endGame();
             return;
           }
           
           // Add piece to board
           board[currentPiece.y + y][currentPiece.x + x] = currentPiece.type;
         }
+      }
+    }
+    
+    // Check if the top row has any blocks - if so, end game
+    for (let x = 0; x < COLS; x++) {
+      if (board[0][x] !== 0) {
+        endGame();
+        return;
       }
     }
     
@@ -702,6 +707,34 @@ document.addEventListener('DOMContentLoaded', function() {
     currentPiece = nextPiece;
     nextPiece = createPiece();
     drawNextPiece();
+  }
+  
+  // End game and normalize score between 0-100
+  function endGame() {
+    gameOver = true;
+    document.getElementById('pauseBtn').disabled = true;
+    
+    // Normalize score to 0-100 range
+    // Base score on lines cleared, level and raw score
+    // Higher weight on lines cleared as it's the main objective
+    let normalizedScore = Math.min(100, Math.floor(
+      (lines * 5) +          // Each line is worth 5 points
+      (level * 10) +         // Each level is worth 10 points
+      (score / 1000)         // Raw score / 1000 (typically 0-20 points)
+    ));
+    
+    // Ensure score is at least 5 if player made any progress
+    if (lines > 0 || level > 1) {
+      normalizedScore = Math.max(5, normalizedScore);
+    }
+    
+    // Ensure the range is properly capped
+    normalizedScore = Math.max(0, Math.min(100, normalizedScore));
+    
+    alert(`Oyun Bitti!\nSkor: ${score}\nNormalleştirilmiş Puan: ${normalizedScore}/100`);
+    
+    // Save normalized score to leaderboard
+    saveNormalizedScore(normalizedScore);
   }
   
   // Check for completed lines
@@ -796,29 +829,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Save score to server
-  function saveScore() {
+  // Save normalized score (0-100) to server
+  function saveNormalizedScore(normalizedScore) {
     try {
       fetch('/api/save-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           game_type: 'tetris',
-          score: score,
+          score: normalizedScore, // Normalized score (0-100)
           difficulty: 'medium',
-          playtime: 0,
+          playtime: Math.floor(Date.now() / 1000) - Math.floor(lastTime / 1000),
           game_stats: {
+            raw_score: score,    // Original tetris score
             lines_cleared: lines,
-            level: level
+            level: level,
+            normalized_score: normalizedScore
           }
         })
       })
       .then(res => res.json())
-      .then(data => console.log('Score saved'))
-      .catch(err => console.error('Error saving score'));
+      .then(data => {
+        console.log('Normalized score saved');
+        // Show success message to user
+        setTimeout(() => {
+          alert('Skorunuz başarıyla kaydedildi ve liderlik tablosuna eklendi.');
+        }, 500);
+      })
+      .catch(err => {
+        console.error('Error saving score:', err);
+        alert('Skor kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
+      });
     } catch (error) {
-      console.error('Failed to save score');
+      console.error('Failed to save score:', error);
+      alert('Skor kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
+  }
+  
+  // Legacy function - Kept for compatibility
+  function saveScore() {
+    // Just use normalized score function
+    // Calculate a normalized score based on current game state
+    let normalizedScore = Math.min(100, Math.floor(
+      (lines * 5) + (level * 10) + (score / 1000)
+    ));
+    normalizedScore = Math.max(0, Math.min(100, normalizedScore));
+    saveNormalizedScore(normalizedScore);
   }
   
   // Initialize game
