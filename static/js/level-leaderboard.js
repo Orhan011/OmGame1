@@ -1,9 +1,8 @@
-
 // Sayfa yüklendiğinde seviye tablosunu getir
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('levelLeaderboardContainer')) {
     loadLevelLeaderboard();
-    
+
     // Her 60 saniyede bir tabloyu otomatik güncelle
     setInterval(loadLevelLeaderboard, 60000);
   }
@@ -12,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Seviye tablosunu yükleyen fonksiyon
 function loadLevelLeaderboard() {
   const levelLeaderboardContainer = document.getElementById('levelLeaderboardContainer');
-  
+
   // Yükleniyor gösterimi
   levelLeaderboardContainer.innerHTML = `
     <div class="loading">
