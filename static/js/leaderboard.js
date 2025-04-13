@@ -1,3 +1,4 @@
+
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard('all');
@@ -109,9 +110,6 @@ function loadLeaderboard(gameType = 'all') {
       `;
     });
 }
-
-// Skorları tabloya dönüştüren fonksiyon (Bu fonksiyon artık kullanılmıyor)
-// function displayLeaderboard(scores) { ... }
 
 // Toplam skorları hesapla
 function calculateTotalScores(scoresData) {
