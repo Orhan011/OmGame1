@@ -69,15 +69,20 @@ function loadLeaderboard() {
     </div>
   `;
 
+  console.log('Liderlik tablosu verileri getiriliyor...');
+
   // Skorları almak için API isteği
   fetch('/api/scores/aggregated?limit=1000&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         throw new Error(`Sunucu yanıtı hatalı: ${response.status}`);
       }
+      console.log('API yanıtı alındı:', response.url);
       return response.json();
     })
     .then(data => {
+      console.log('Ham veri alındı, işleniyor... Veri sayısı:', data.length);
+
       if (!Array.isArray(data) || data.length === 0) {
         leaderboardContainer.innerHTML = `
           <div class="empty-state">
@@ -88,14 +93,14 @@ function loadLeaderboard() {
         return;
       }
 
-      console.log("Kullanıcı skorları alındı:", data.length);
-
       // Skorları puanlarına göre sırala (en yüksekten en düşüğe)
       data.sort((a, b) => {
         const scoreA = a.total_score || 0;
         const scoreB = b.total_score || 0;
         return scoreB - scoreA;
       });
+
+      console.log('İşlenmiş skorlar:', data.length);
 
       // Skor tablosu oluştur
       let html = `
@@ -112,6 +117,7 @@ function loadLeaderboard() {
       data.forEach((player, index) => {
         // Kullanıcının puanını al
         const totalScore = player.total_score || 0;
+        console.log(`Oyuncu puanı görüntüleniyor:`, player.username, totalScore);
 
         // Sıralama ve stil sınıfları
         const rankClass = index < 3 ? `top-${index + 1}` : '';
@@ -135,7 +141,7 @@ function loadLeaderboard() {
             avatarUrl = '/static' + avatarUrl;
           } else if (!avatarUrl.startsWith('/static/')) {
             if (!avatarUrl.startsWith('/static/uploads/')) {
-              avatarUrl = '/static/uploads' + avatarUrl;
+              avatarUrl = '/static/uploads/' + avatarUrl;
             }
           }
         }
@@ -277,7 +283,7 @@ function loadLevelLeaderboard() {
             avatarUrl = '/static' + avatarUrl;
           } else if (!avatarUrl.startsWith('/static/')) {
             if (!avatarUrl.startsWith('/static/uploads/')) {
-              avatarUrl = '/static/uploads' + avatarUrl;
+              avatarUrl = '/static/uploads/' + avatarUrl;
             }
           }
         }
