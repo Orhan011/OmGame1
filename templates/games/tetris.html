@@ -5,50 +5,19 @@
 {% block content %}
 <div class="game-container">
   <h1 class="game-title">Tetris</h1>
-
+  
   <div class="tetris-wrapper">
     <!-- Next Piece Display -->
     <div class="next-piece-container">
       <div class="next-label">Sonraki Parça</div>
       <canvas id="nextCanvas" width="100" height="100"></canvas>
     </div>
-
+    
     <!-- Main Game Board -->
     <div class="board-container">
       <canvas id="tetrisCanvas"></canvas>
-      <!-- Game Over Modal -->
-      <div id="game-over-modal" class="tetris-modal">
-        <div class="tetris-modal-content">
-          <div class="tetris-modal-header">
-            <h2>OYUN BİTTİ</h2>
-          </div>
-          <div class="tetris-modal-body">
-            <div class="final-score-container">
-              <div class="final-score-value" id="final-score">0</div>
-              <div class="final-score-label">Skor</div>
-            </div>
-            <div class="game-stats">
-              <div class="game-stat">
-                <div class="stat-value" id="final-level">1</div>
-                <div class="stat-label">Seviye</div>
-              </div>
-              <div class="game-stat">
-                <div class="stat-value" id="final-lines">0</div>
-                <div class="stat-label">Satırlar</div>
-              </div>
-            </div>
-            <div class="modal-message">
-              Skorunuz kaydedildi ve liderlik tablosuna eklendi.
-            </div>
-          </div>
-          <div class="tetris-modal-footer">
-            <button id="play-again-btn" class="modal-btn">Tekrar Oyna</button>
-            <button id="home-btn" class="modal-btn">Ana Sayfa</button>
-          </div>
-        </div>
-      </div>
     </div>
-
+    
     <!-- Score Panel -->
     <div class="score-container">
       <div class="score-item">
@@ -65,7 +34,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Game Controls -->
   <div class="controls-container">
     <button id="startBtn" class="control-btn">Başlat</button>
@@ -79,21 +48,20 @@
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
-    position: relative; /* Added to position the modal within the container */
   }
-
+  
   .game-title {
     margin-bottom: 20px;
     color: #fff;
   }
-
+  
   .tetris-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
   }
-
+  
   .next-piece-container {
     background: rgba(0, 0, 0, 0.2);
     padding: 10px;
@@ -104,28 +72,27 @@
     justify-content: center;
     gap: 20px;
   }
-
+  
   .next-label {
     font-size: 18px;
     font-weight: bold;
     color: #fff;
   }
-
+  
   #nextCanvas {
     background: rgba(0, 0, 0, 0.4);
     border-radius: 5px;
   }
-
+  
   .board-container {
     margin: 0 auto;
-    position: relative; /* Added to position the modal */
   }
-
+  
   #tetrisCanvas {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
   }
-
+  
   .score-container {
     background: rgba(0, 0, 0, 0.2);
     padding: 10px;
@@ -134,32 +101,32 @@
     display: flex;
     justify-content: space-around;
   }
-
+  
   .score-item {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
-
+  
   .score-item span:first-child {
     font-size: 14px;
     color: #ccc;
   }
-
+  
   .score-item span:last-child {
     font-size: 24px;
     font-weight: bold;
     color: #fff;
     margin-top: 5px;
   }
-
+  
   .controls-container {
     margin-top: 20px;
     display: flex;
     gap: 15px;
     justify-content: center;
   }
-
+  
   .control-btn {
     padding: 10px 20px;
     font-size: 16px;
@@ -170,16 +137,16 @@
     color: white;
     transition: all 0.2s;
   }
-
+  
   .control-btn:hover {
     background: #5649c0;
   }
-
+  
   .control-btn:disabled {
     background: #999;
     cursor: not-allowed;
   }
-
+  
   /* Mobile Controls */
   .mobile-controls {
     margin: 15px auto;
@@ -188,13 +155,13 @@
     gap: 10px;
     max-width: 300px;
   }
-
+  
   .mobile-controls-row {
     display: flex;
     justify-content: center;
     gap: 10px;
   }
-
+  
   .mobile-btn {
     width: 60px;
     height: 60px;
@@ -210,18 +177,18 @@
     -webkit-tap-highlight-color: transparent;
     transition: background 0.2s;
   }
-
+  
   .mobile-btn:active {
     background: rgba(106, 90, 205, 0.8);
   }
-
+  
   /* Hide mobile controls on desktop */
   @media (min-width: 768px) {
     .mobile-controls {
       display: none;
     }
   }
-
+  
   /* Score animation */
   .score-animation {
     position: absolute;
@@ -236,7 +203,7 @@
     pointer-events: none;
     z-index: 10;
   }
-
+  
   @keyframes score-float {
     0% {
       opacity: 0;
@@ -255,34 +222,31 @@
       font-size: 3rem;
     }
   }
-
+  
   /* Game Over Modal Styles */
   .tetris-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 350px;
-    background-color: rgba(0, 0, 0, 0.85);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
     transition: opacity 0.3s ease;
     backdrop-filter: blur(5px);
-    border-radius: 15px;
   }
-
+  
   .tetris-modal.show {
     opacity: 1;
-    pointer-events: auto;
   }
-
+  
   .tetris-modal-content {
-    width: 100%;
+    width: 90%;
+    max-width: 400px;
     background: linear-gradient(135deg, #2c3e50, #1a2a38);
     border-radius: 15px;
     overflow: hidden;
@@ -291,17 +255,17 @@
     transition: transform 0.3s ease;
     border: 2px solid rgba(106, 90, 205, 0.7);
   }
-
+  
   .tetris-modal.show .tetris-modal-content {
     transform: scale(1);
   }
-
+  
   .tetris-modal-header {
     background: rgba(106, 90, 205, 0.7);
     padding: 15px;
     text-align: center;
   }
-
+  
   .tetris-modal-header h2 {
     margin: 0;
     color: white;
@@ -310,16 +274,16 @@
     font-weight: 700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
-
+  
   .tetris-modal-body {
     padding: 25px;
     text-align: center;
   }
-
+  
   .final-score-container {
     margin-bottom: 25px;
   }
-
+  
   .final-score-value {
     font-size: 3rem;
     font-weight: bold;
@@ -327,50 +291,50 @@
     text-shadow: 0 0 10px rgba(106, 90, 205, 0.5);
     margin-bottom: 5px;
   }
-
+  
   .final-score-label {
     font-size: 1rem;
     color: #ddd;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-
+  
   .game-stats {
     display: flex;
     justify-content: space-around;
     margin-bottom: 25px;
   }
-
+  
   .game-stat {
     text-align: center;
   }
-
+  
   .stat-value {
     font-size: 1.8rem;
     font-weight: bold;
     color: #fff;
     margin-bottom: 5px;
   }
-
+  
   .stat-label {
     font-size: 0.9rem;
     color: #bbb;
     text-transform: uppercase;
   }
-
+  
   .modal-message {
     font-size: 0.95rem;
     color: #ddd;
     margin-bottom: 20px;
     line-height: 1.4;
   }
-
+  
   .tetris-modal-footer {
     padding: 15px 25px 25px;
     display: flex;
     justify-content: space-around;
   }
-
+  
   .modal-btn {
     padding: 10px 25px;
     font-size: 1rem;
@@ -383,12 +347,12 @@
     background: linear-gradient(135deg, #6C5CE7, #8A70FF);
     box-shadow: 0 4px 10px rgba(106, 90, 205, 0.4);
   }
-
+  
   .modal-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(106, 90, 205, 0.5);
   }
-
+  
   .modal-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 5px rgba(106, 90, 205, 0.4);
@@ -401,20 +365,20 @@ document.addEventListener('DOMContentLoaded', function() {
   // Canvas Setup
   const canvas = document.getElementById('tetrisCanvas');
   const ctx = canvas.getContext('2d');
-
+  
   const nextCanvas = document.getElementById('nextCanvas');
   const nextCtx = nextCanvas.getContext('2d');
-
+  
   // Game Constants
   const COLS = 10;
   const ROWS = 16;
   const BLOCK_SIZE = 28;
   const NEXT_BLOCK_SIZE = 20;
-
+  
   // Set canvas dimensions
   canvas.width = COLS * BLOCK_SIZE;
   canvas.height = ROWS * BLOCK_SIZE;
-
+  
   // Game Variables
   let board = [];
   let currentPiece;
@@ -428,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let dropInterval = 1000; // ms
   let lastTime = 0;
   let gameTimer;
-
+  
   // Tetromino Colors
   const COLORS = [
     null, // 0 - empty
@@ -440,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
     '#FF720D', // 6 - S - orange
     '#0DFFFF'  // 7 - Z - cyan
   ];
-
+  
   // Tetromino Shapes
   const SHAPES = [
     null,
@@ -452,43 +416,43 @@ document.addEventListener('DOMContentLoaded', function() {
     [[0,6,6], [6,6,0], [0,0,0]],                  // S
     [[7,7,0], [0,7,7], [0,0,0]]                   // Z
   ];
-
+  
   // Initialize Game
   function init() {
     // Add event listeners
     document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('pauseBtn').addEventListener('click', togglePause);
     document.getElementById('resetBtn').addEventListener('click', resetGame);
-
+    
     // Keyboard controls
     document.addEventListener('keydown', handleKeyPress);
-
+    
     // Touch controls for mobile
     setupTouchControls();
-
+    
     // Initialize board
     resetGame();
   }
-
+  
   // Setup touch controls for mobile devices
   function setupTouchControls() {
     let touchStartX = 0;
     let touchStartY = 0;
     let touchEndX = 0;
     let touchEndY = 0;
-
+    
     // Add touch event listeners to the canvas
     canvas.addEventListener('touchstart', function(e) {
       e.preventDefault();
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     }, false);
-
+    
     canvas.addEventListener('touchend', function(e) {
       e.preventDefault();
-
+      
       if (gameOver || paused) return;
-
+      
       // Check if it was a tap (short touch)
       if (Math.abs(touchEndX - touchStartX) < 20 && 
           Math.abs(touchEndY - touchStartY) < 20) {
@@ -496,11 +460,11 @@ document.addEventListener('DOMContentLoaded', function() {
         rotate();
         return;
       }
-
+      
       // Determine swipe direction
       const xDiff = touchStartX - touchEndX;
       const yDiff = touchStartY - touchEndY;
-
+      
       // Horizontal swipe detection (left or right)
       if (Math.abs(xDiff) > Math.abs(yDiff)) {
         if (xDiff > 0) {
@@ -527,17 +491,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }, false);
-
+    
     canvas.addEventListener('touchmove', function(e) {
       e.preventDefault();
       touchEndX = e.touches[0].clientX;
       touchEndY = e.touches[0].clientY;
     }, false);
-
+    
     // Add mobile control buttons
     addMobileControlButtons();
   }
-
+  
   // Add mobile control buttons for easier touch input
   function addMobileControlButtons() {
     const controlsContainer = document.createElement('div');
@@ -555,11 +519,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <button id="dropBtn" class="mobile-btn">⤓</button>
       </div>
     `;
-
+    
     // Add mobile controls after the game board
     const boardContainer = document.querySelector('.board-container');
     boardContainer.after(controlsContainer);
-
+    
     // Add event listeners to mobile control buttons
     document.getElementById('rotateBtn').addEventListener('click', rotate);
     document.getElementById('leftBtn').addEventListener('click', moveLeft);
@@ -567,24 +531,24 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('downBtn').addEventListener('click', moveDown);
     document.getElementById('dropBtn').addEventListener('click', hardDrop);
   }
-
+  
   // Start Game
   function startGame() {
     if (gameOver || paused) {
       resetGame();
     }
-
+    
     document.getElementById('startBtn').disabled = true;
     document.getElementById('pauseBtn').disabled = false;
-
+    
     gameTimer = requestAnimationFrame(update);
   }
-
+  
   // Reset Game
   function resetGame() {
     // Clear board
     board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
-
+    
     // Reset stats
     score = 0;
     lines = 0;
@@ -592,29 +556,28 @@ document.addEventListener('DOMContentLoaded', function() {
     gameOver = false;
     paused = false;
     dropInterval = 1000;
-
+    
     // Create new pieces
     currentPiece = createPiece();
     nextPiece = createPiece();
-
+    
     // Reset UI
     updateScore();
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
     document.getElementById('pauseBtn').textContent = 'Duraklat';
-
+    
     // Draw initial state
     draw();
     drawNextPiece();
-    hideGameOverModal(); // Hide modal on reset
   }
-
+  
   // Toggle Pause
   function togglePause() {
     if (gameOver) return;
-
+    
     paused = !paused;
-
+    
     if (paused) {
       document.getElementById('pauseBtn').textContent = 'Devam Et';
       cancelAnimationFrame(gameTimer);
@@ -624,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
       gameTimer = requestAnimationFrame(update);
     }
   }
-
+  
   // Create Piece
   function createPiece() {
     const type = Math.floor(Math.random() * 7) + 1;
@@ -635,34 +598,34 @@ document.addEventListener('DOMContentLoaded', function() {
       y: 0
     };
   }
-
+  
   // Game Loop
   function update(time = 0) {
     // Calculate delta time
     const deltaTime = time - lastTime;
     lastTime = time;
-
+    
     // Auto-drop piece
     dropCounter += deltaTime;
     if (dropCounter > dropInterval) {
       moveDown();
       dropCounter = 0;
     }
-
+    
     // Draw game state
     draw();
-
+    
     // Continue loop if game is active
     if (!gameOver && !paused) {
       gameTimer = requestAnimationFrame(update);
     }
   }
-
+  
   // Draw Game
   function draw() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    
     // Draw board
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
@@ -671,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-
+    
     // Draw current piece
     if (currentPiece) {
       for (let y = 0; y < currentPiece.shape.length; y++) {
@@ -688,16 +651,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
-
+    
     // Draw grid
     drawGrid();
   }
-
+  
   // Draw Grid
   function drawGrid() {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 1;
-
+    
     // Vertical lines
     for (let x = 0; x <= COLS; x++) {
       ctx.beginPath();
@@ -705,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.lineTo(x * BLOCK_SIZE, ROWS * BLOCK_SIZE);
       ctx.stroke();
     }
-
+    
     // Horizontal lines
     for (let y = 0; y <= ROWS; y++) {
       ctx.beginPath();
@@ -714,17 +677,17 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.stroke();
     }
   }
-
+  
   // Draw Next Piece
   function drawNextPiece() {
     nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-
+    
     if (!nextPiece) return;
-
+    
     // Center the next piece in the canvas
     const offsetX = (nextCanvas.width - nextPiece.shape[0].length * NEXT_BLOCK_SIZE) / 2;
     const offsetY = (nextCanvas.height - nextPiece.shape.length * NEXT_BLOCK_SIZE) / 2;
-
+    
     for (let y = 0; y < nextPiece.shape.length; y++) {
       for (let x = 0; x < nextPiece.shape[y].length; x++) {
         if (nextPiece.shape[y][x]) {
@@ -741,43 +704,43 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-
+  
   // Draw Block
   function drawBlock(context, x, y, type, size, offsetX = 0, offsetY = 0) {
     const realX = x * size + offsetX;
     const realY = y * size + offsetY;
-
+    
     // Block fill
     context.fillStyle = COLORS[type];
     context.fillRect(realX, realY, size, size);
-
+    
     // Highlight effect
     context.fillStyle = 'rgba(255, 255, 255, 0.2)';
     context.fillRect(realX, realY, size / 3, size / 3);
-
+    
     // Block border
     context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     context.lineWidth = 1;
     context.strokeRect(realX, realY, size, size);
   }
-
+  
   // Check Collision
   function checkCollision(piece, offsetX, offsetY) {
     for (let y = 0; y < piece.shape.length; y++) {
       for (let x = 0; x < piece.shape[y].length; x++) {
         if (!piece.shape[y][x]) continue;
-
+        
         const newX = piece.x + x + offsetX;
         const newY = piece.y + y + offsetY;
-
+        
         // Check boundaries
         if (newX < 0 || newX >= COLS || newY >= ROWS) {
           return true;
         }
-
+        
         // Skip above board
         if (newY < 0) continue;
-
+        
         // Check board pieces
         if (board[newY][newX]) {
           return true;
@@ -786,68 +749,68 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return false;
   }
-
+  
   // Move current piece left
   function moveLeft() {
     if (!checkCollision(currentPiece, -1, 0)) {
       currentPiece.x--;
     }
   }
-
+  
   // Move current piece right
   function moveRight() {
     if (!checkCollision(currentPiece, 1, 0)) {
       currentPiece.x++;
     }
   }
-
+  
   // Move current piece down
   function moveDown() {
     if (!checkCollision(currentPiece, 0, 1)) {
       currentPiece.y++;
       return true;
     }
-
+    
     lockPiece();
     return false;
   }
-
+  
   // Drop piece immediately
   function hardDrop() {
     while (moveDown()) {
       // Move down until collision
     }
   }
-
+  
   // Rotate current piece
   function rotate() {
     const originalShape = currentPiece.shape;
-
+    
     // Special case for I piece rotation
     if (currentPiece.type === 1) {
       const shapes = [
         [[0,0,0,0], [1,1,1,1], [0,0,0,0], [0,0,0,0]],
         [[0,0,1,0], [0,0,1,0], [0,0,1,0], [0,0,1,0]]
       ];
-
+      
       // Check current shape
       const isHorizontal = JSON.stringify(currentPiece.shape) === 
                           JSON.stringify(shapes[0]);
-
+      
       // Rotate to next shape
       currentPiece.shape = isHorizontal ? shapes[1] : shapes[0];
-
+      
       // Check collision and revert if needed
       if (checkCollision(currentPiece, 0, 0)) {
         currentPiece.shape = originalShape;
       }
-
+      
       return;
     }
-
+    
     // Special case for O piece - no rotation needed
     if (currentPiece.type === 2) return;
-
+    
     // Rotate shape
     const rotated = [];
     for (let x = 0; x < originalShape[0].length; x++) {
@@ -857,9 +820,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       rotated.push(row);
     }
-
+    
     currentPiece.shape = rotated;
-
+    
     // Wall kicks - try to push away from walls if there's collision
     if (checkCollision(currentPiece, 0, 0)) {
       // Try to move right
@@ -880,7 +843,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-
+  
   // Lock piece and check for line clears
   function lockPiece() {
     for (let y = 0; y < currentPiece.shape.length; y++) {
@@ -893,20 +856,20 @@ document.addEventListener('DOMContentLoaded', function() {
             endGame();
             return;
           }
-
+          
           // Add piece to board
           board[currentPiece.y + y][currentPiece.x + x] = currentPiece.type;
         }
       }
     }
-
+    
     // Check for line clears
     checkLines();
-
+    
     // Next piece becomes current
     currentPiece = nextPiece;
     nextPiece = createPiece();
-
+    
     // Check if the new piece can be placed
     if (checkCollision(currentPiece, 0, 0)) {
       // If there's no space for the new piece, game over
@@ -915,67 +878,115 @@ document.addEventListener('DOMContentLoaded', function() {
       endGame();
       return;
     }
-
+    
     drawNextPiece();
   }
-
+  
   // End game and save score
   function endGame() {
     // Calculate final score with bonuses
     const finalScore = calculateFinalScore();
-
-    // Update final score display in the modal
-    document.getElementById('final-score').textContent = finalScore;
-    document.getElementById('final-level').textContent = level;
-    document.getElementById('final-lines').textContent = lines;
-
-    // Show game over modal
-    showGameOverModal();
-
+    
+    // Create and show a modern game over modal
+    showGameOverModal(finalScore);
+    
     // Save score to user account and leaderboard
     saveScore(finalScore);
   }
-
-
+  
   // Show a modern game over modal
-  function showGameOverModal() {
-    const modal = document.getElementById('game-over-modal');
-    modal.classList.add('show');
+  function showGameOverModal(finalScore) {
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('game-over-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'game-over-modal';
+    modal.className = 'tetris-modal';
+    
+    // Create modal content
+    modal.innerHTML = `
+      <div class="tetris-modal-content">
+        <div class="tetris-modal-header">
+          <h2>OYUN BİTTİ</h2>
+        </div>
+        <div class="tetris-modal-body">
+          <div class="final-score-container">
+            <div class="final-score-value">${finalScore}</div>
+            <div class="final-score-label">Skor</div>
+          </div>
+          <div class="game-stats">
+            <div class="game-stat">
+              <div class="stat-value">${level}</div>
+              <div class="stat-label">Seviye</div>
+            </div>
+            <div class="game-stat">
+              <div class="stat-value">${lines}</div>
+              <div class="stat-label">Satırlar</div>
+            </div>
+          </div>
+          <div class="modal-message">
+            Skorunuz kaydedildi ve liderlik tablosuna eklendi.
+          </div>
+        </div>
+        <div class="tetris-modal-footer">
+          <button id="play-again-btn" class="modal-btn">Tekrar Oyna</button>
+          <button id="home-btn" class="modal-btn">Ana Sayfa</button>
+        </div>
+      </div>
+    `;
+    
+    // Add modal to the document
+    document.body.appendChild(modal);
+    
+    // Add event listeners to buttons
+    document.getElementById('play-again-btn').addEventListener('click', function() {
+      // Close modal and reset game
+      modal.remove();
+      resetGame();
+    });
+    
+    document.getElementById('home-btn').addEventListener('click', function() {
+      // Navigate to home page
+      window.location.href = '/';
+    });
+    
+    // Show modal with animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 100);
   }
-
-  // Hide the game over modal
-  function hideGameOverModal() {
-    const modal = document.getElementById('game-over-modal');
-    modal.classList.remove('show');
-  }
-
+  
   // Calculate final score with bonuses
   function calculateFinalScore() {
     // Base score
     let finalScore = score;
-
+    
     // Level bonus: Higher levels get multiplier
     const levelMultiplier = 1 + (level * 0.1);
     finalScore = Math.floor(finalScore * levelMultiplier);
-
+    
     // Lines cleared bonus
     finalScore += lines * 10;
-
+    
     // Return the final calculated score
     return finalScore;
   }
-
+  
   // Game state variables for scoring
   let combo = 0;
   let lastClearTime = 0;
-
+  
   // Check for completed lines
   function checkLines() {
     let linesCleared = 0;
-
+    
     for (let y = ROWS - 1; y >= 0; y--) {
       let isRowFull = true;
-
+      
       // Check if row is full
       for (let x = 0; x < COLS; x++) {
         if (board[y][x] === 0) {
@@ -983,7 +994,7 @@ document.addEventListener('DOMContentLoaded', function() {
           break;
         }
       }
-
+      
       if (isRowFull) {
         // Remove the line and shift all above lines down
         for (let y2 = y; y2 > 0; y2--) {
@@ -991,27 +1002,27 @@ document.addEventListener('DOMContentLoaded', function() {
             board[y2][x] = board[y2-1][x];
           }
         }
-
+        
         // Clear the top row
         for (let x = 0; x < COLS; x++) {
           board[0][x] = 0;
         }
-
+        
         // Check this row again
         y++;
         linesCleared++;
       }
     }
-
+    
     // Update score if lines were cleared
     if (linesCleared > 0) {
       // Increase total lines cleared
       lines += linesCleared;
-
+      
       // Calculate base points based on lines cleared
       // 1 line: 40, 2 lines: 100, 3 lines: 300, 4 lines: 1200
       let linePoints = [0, 40, 100, 300, 1200][linesCleared] * level;
-
+      
       // Add combo bonus if lines were cleared in quick succession
       const now = Date.now();
       if (now - lastClearTime < 3000) { // 3 seconds window for combos
@@ -1022,26 +1033,26 @@ document.addEventListener('DOMContentLoaded', function() {
         combo = 0;
       }
       lastClearTime = now;
-
+      
       // Update score
       score += linePoints;
-
+      
       // Update level
       const oldLevel = level;
       level = Math.floor(lines / 10) + 1;
-
+      
       // If level increased, add level-up bonus
       if (level > oldLevel) {
         const levelUpBonus = level * 100;
         score += levelUpBonus;
       }
-
+      
       // Speed up as level increases (each level makes game 20% faster)
       dropInterval = 1000 * Math.pow(0.8, level - 1);
-
+      
       // Update UI
       updateScore();
-
+      
       // Show score animation if significant points earned
       if (linePoints > 200) {
         showScoreAnimation(linePoints);
@@ -1051,42 +1062,42 @@ document.addEventListener('DOMContentLoaded', function() {
       combo = 0;
     }
   }
-
+  
   // Show a visual animation for points earned
   function showScoreAnimation(points) {
     // Create a floating score element
     const scoreAnimation = document.createElement('div');
     scoreAnimation.className = 'score-animation';
     scoreAnimation.textContent = `+${points}`;
-
+    
     // Add it to the game container
     document.querySelector('.board-container').appendChild(scoreAnimation);
-
+    
     // Remove it after animation completes
     setTimeout(() => {
       scoreAnimation.remove();
     }, 1500);
   }
-
+  
   // Update score display
   function updateScore() {
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
     document.getElementById('lines').textContent = lines;
   }
-
+  
   // Handle keyboard controls
   function handleKeyPress(e) {
     if (gameOver) return;
-
+    
     // Pause
     if (e.key === 'p' || e.key === 'P') {
       togglePause();
       return;
     }
-
+    
     if (paused) return;
-
+    
     switch(e.key) {
       case 'ArrowLeft':
         moveLeft();
@@ -1105,12 +1116,12 @@ document.addEventListener('DOMContentLoaded', function() {
         break;
     }
   }
-
+  
   // Save score to server
   function saveScore(finalScore) {
     // Get game duration in seconds
     const gameTime = Math.floor((Date.now() - lastTime) / 1000);
-
+    
     // Get real-time play statistics
     const gameStats = {
       lines_cleared: lines,
@@ -1119,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
       blocks_dropped: score / 10, // Approximate number of pieces dropped
       combo_bonuses: Math.floor(lines / 4) // Approximate number of combos
     };
-
+    
     // Calculate difficulty
     let difficulty = 'medium';
     if (level < 3) {
@@ -1127,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (level > 7) {
       difficulty = 'hard';
     }
-
+    
     try {
       // Send score data to server - will update user account and leaderboard
       fetch('/api/save-score', {
@@ -1156,7 +1167,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Failed to save score:', error);
     }
   }
-
+  
   // Initialize game
   init();
 });
