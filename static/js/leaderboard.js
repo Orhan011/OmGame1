@@ -2,12 +2,6 @@
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard('all');
-  
-  // Her 60 saniyede bir skor tablosunu otomatik yenile
-  setInterval(function() {
-    loadLeaderboard('all');
-    console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
-  }, 60000);
 });
 
 // Skor tablosunu yükleyen fonksiyon
