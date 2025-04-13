@@ -79,7 +79,7 @@ function loadLevelLeaderboard() {
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">${player.username}</div>
-                <div class="player-level">Başlangıç</div>
+                <div class="player-level">${player.level > 1 ? 'Seviye ' + player.level : 'Başlangıç'}</div>
               </div>
             </div>
             <div class="score-cell">

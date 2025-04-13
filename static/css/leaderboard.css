@@ -235,7 +235,7 @@
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  width: 100%;
+  width: calc(100% - 1.2rem);
   justify-content: space-between;
 }
 
@@ -623,6 +623,17 @@
   letter-spacing: 0.3px;
 }
 
+.player-level {
+  color: #a6a6c0;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+  letter-spacing: 0.2px;
+  font-weight: 500;
+}
+
 .player-stats {
   display: flex;
   gap: 6px;
@@ -721,8 +732,8 @@
 
 .score-value {
   color: #fff;
-  font-weight: 600;
-  font-size: 0.65rem;
+  font-weight: 700;
+  font-size: 1.2rem;
   position: relative;
   z-index: 1;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
@@ -731,7 +742,7 @@
   background-clip: text;
   color: transparent;
   transition: all 0.3s ease;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
 }
 
 .player-row:hover .score-value {
@@ -778,7 +789,7 @@
 .player-row[data-rank="1"] .score-value {
   color: gold; /* Changed to gold */
   text-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
-  font-size: 0.7rem;
+  font-size: 1.5rem;
 }
 
 .player-row[data-rank="1"] .score-sparkles {
@@ -795,7 +806,7 @@
 .player-row[data-rank="2"] .score-value {
   color: silver; /* Changed to silver */
   text-shadow: 0 0 4px rgba(192, 192, 192, 0.4);
-  font-size: 0.68rem;
+  font-size: 1.4rem;
 }
 
 .player-row[data-rank="2"] .score-sparkles {
@@ -812,7 +823,7 @@
 .player-row[data-rank="3"] .score-value {
   color: darkgoldenrod; /* Changed to darkgoldenrod */
   text-shadow: 0 0 4px rgba(205, 127, 50, 0.4);
-  font-size: 0.68rem;
+  font-size: 1.3rem;
 }
 
 .player-row[data-rank="3"] .score-sparkles {
