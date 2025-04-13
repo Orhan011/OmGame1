@@ -677,7 +677,7 @@
 
 .score-block {
   position: relative;
-  width: 110px;
+  width: 90px;
   display: flex;
   justify-content: center;
   flex-shrink: 0;
@@ -685,20 +685,20 @@
 
 .score-container {
   background: rgba(106, 90, 224, 0.2);
-  border-radius: 20px;
-  padding: 8px 17px;
+  border-radius: 15px;
+  padding: 4px 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), 
-              inset 0 1px 3px rgba(255, 255, 255, 0.2),
-              inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 
+              inset 0 1px 2px rgba(255, 255, 255, 0.15),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transform: translateZ(0);
   background-image: linear-gradient(135deg, 
                     rgba(106, 90, 224, 0.25) 0%, 
@@ -706,35 +706,35 @@
 }
 
 .player-row:hover .score-container {
-  transform: scale(1.1) rotate(-2deg);
-  background: linear-gradient(135deg, rgba(106, 90, 224, 0.3), rgba(159, 138, 255, 0.15));
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25), 
-              inset 0 2px 5px rgba(255, 255, 255, 0.3),
-              inset 0 -2px 3px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: scale(1.05) rotate(-1deg);
+  background: linear-gradient(135deg, rgba(106, 90, 224, 0.25), rgba(159, 138, 255, 0.12));
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.18), 
+              inset 0 1px 3px rgba(255, 255, 255, 0.2),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .score-value {
   color: #fff;
-  font-weight: 700;
-  font-size: 1.05rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   position: relative;
   z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   background: linear-gradient(45deg, #fff 10%, #e0d8ff 60%, #b5a4ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   transition: all 0.3s ease;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.5px;
 }
 
 .player-row:hover .score-value {
   background: linear-gradient(45deg, #fff 10%, #e2dbff 40%, #b5a4ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  transform: scale(1.1);
-  letter-spacing: 1px;
+  transform: scale(1.05);
+  letter-spacing: 0.6px;
 }
 
 .player-row:hover .score-value {
@@ -766,14 +766,14 @@
 
 
 .player-row[data-rank="1"] .score-container {
-  background: rgba(255, 215, 0, 0.2);
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
 }
 
 .player-row[data-rank="1"] .score-value {
   color: gold; /* Changed to gold */
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-  font-size: 1rem;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
+  font-size: 0.9rem;
 }
 
 .player-row[data-rank="1"] .score-sparkles {
@@ -783,14 +783,14 @@
 }
 
 .player-row[data-rank="2"] .score-container {
-  background: rgba(192, 192, 192, 0.2);
-  box-shadow: 0 0 6px rgba(192, 192, 192, 0.3);
+  background: rgba(192, 192, 192, 0.15);
+  box-shadow: 0 0 5px rgba(192, 192, 192, 0.25);
 }
 
 .player-row[data-rank="2"] .score-value {
   color: silver; /* Changed to silver */
-  text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
-  font-size: 1rem;
+  text-shadow: 0 0 4px rgba(192, 192, 192, 0.4);
+  font-size: 0.9rem;
 }
 
 .player-row[data-rank="2"] .score-sparkles {
@@ -800,14 +800,14 @@
 }
 
 .player-row[data-rank="3"] .score-container {
-  background: rgba(205, 127, 50, 0.2);
-  box-shadow: 0 0 6px rgba(205, 127, 50, 0.3);
+  background: rgba(205, 127, 50, 0.15);
+  box-shadow: 0 0 5px rgba(205, 127, 50, 0.25);
 }
 
 .player-row[data-rank="3"] .score-value {
   color: darkgoldenrod; /* Changed to darkgoldenrod */
-  text-shadow: 0 0 5px rgba(205, 127, 50, 0.5);
-  font-size: 1rem;
+  text-shadow: 0 0 4px rgba(205, 127, 50, 0.4);
+  font-size: 0.9rem;
 }
 
 .player-row[data-rank="3"] .score-sparkles {
