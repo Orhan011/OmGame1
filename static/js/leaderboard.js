@@ -1,99 +1,60 @@
-
 /**
  * Liderlik Tablosu Yöneticisi
  * Bu script, liderlik tablosundaki verileri yüklemek ve görüntülemek için kullanılır.
  */
 
-// Sayfa yüklendiğinde çalıştırılacak fonksiyonlar
+// Sayfa yüklendiğinde çalışacak fonksiyon
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Liderlik tablosu modülü yükleniyor...');
 
-  // Skorları yükle
+  // Liderlik tablosunu yükle
   loadLeaderboard();
 
-  // Seviye tablosunu yükle
-  loadLevelLeaderboard();
-
-  // İlk 3 oyuncuyu podyuma yerleştir
-  updatePodium();
-
   // Yenileme butonunu tanımla
-  document.querySelectorAll('.refresh-leaderboard').forEach(function(button) {
-    button.addEventListener('click', function() {
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
       this.classList.add('spin-animation');
       loadLeaderboard();
-      loadLevelLeaderboard();
-      updatePodium();
 
       setTimeout(() => {
         this.classList.remove('spin-animation');
-        showNotification('Liderlik tablosu güncellendi!');
       }, 1000);
-    });
-  });
-
-  // Tab değiştirme işlemleri
-  const tabButtons = document.querySelectorAll('.tab-item');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const tabId = this.getAttribute('data-tab');
-
-      // Aktif sekmeyi güncelle
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-
-      // İçeriği göster/gizle
-      tabContents.forEach(content => content.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-    });
-  });
-
-  // Oyun filtresi
-  const applyFilterBtn = document.getElementById('applyGameFilter');
-  if (applyFilterBtn) {
-    applyFilterBtn.addEventListener('click', function() {
-      const gameType = document.getElementById('gameTypeSelect').value;
-      loadGameLeaderboard(gameType);
     });
   }
 
-  // Her 60 saniyede bir skorları otomatik yenile
+  // Her 60 saniyede bir liderlik tablosunu yenile
   setInterval(function() {
     loadLeaderboard();
-    loadLevelLeaderboard();
-    updatePodium();
-    console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
+    console.log("Liderlik tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
 });
 
-// Genel skor tablosunu yükle
+// Liderlik tablosunu yükle
 function loadLeaderboard() {
-  const container = document.getElementById('leaderboardContainer');
+  const container = document.getElementById('leaderboardRows');
   if (!container) return;
 
   console.log('Liderlik tablosu yükleniyor...');
 
   // Yükleniyor göstergesini göster
   container.innerHTML = `
-    <div class="leaderboard-loading">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Liderlik tablosu yükleniyor...</p>
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Liderlik tablosu yükleniyor...</p>
     </div>
   `;
 
-  // Sunucudan verileri al - sadece ilk 10 kişiyi iste
+  // API'den verileri al - sadece ilk 10 kullanıcı
   fetch('/api/scores/aggregated?limit=10&nocache=' + new Date().getTime())
     .then(response => {
       if (!response.ok) {
         throw new Error('API yanıtı başarısız: ' + response.status);
       }
-      console.log('API yanıtı alındı');
       return response.json();
     })
     .then(data => {
-      console.log('Kullanıcı skorları alındı:', data.length);
+      console.log('API yanıtı alındı');
 
       // Veri yoksa bilgi mesajı göster
       if (!data || data.length === 0) {
@@ -107,411 +68,64 @@ function loadLeaderboard() {
         return;
       }
 
-      // İstatistikleri güncelle
-      updateStats(data);
+      console.log('Kullanıcı skorları alındı:', data.length);
 
       // Skorları sırala
       data.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
 
-      // Podium'u güncelle
-      updatePodium(data);
+      // HTML çıktısını oluştur
+      let html = '';
 
-      // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-table">
-          <div class="table-header">
-            <div class="header-rank">Sıra</div>
-            <div class="header-name">İsim</div>
-            <div class="header-score">Puan</div>
-          </div>
-      `;
-
-      // Sadece ilk 10 oyuncu için satır oluştur
+      // İlk 10 kullanıcı için satır ekle
       const playersToShow = data.slice(0, 10);
 
       playersToShow.forEach((player, index) => {
-        const totalScore = player.total_score || 0;
-        const username = player.username || 'İsimsiz Oyuncu';
-        const avatarUrl = fixAvatarUrl(player.avatar_url);
         const rank = index + 1;
+        const username = player.username || 'İsimsiz Oyuncu';
+        const totalScore = player.total_score || 0;
+        const avatarUrl = fixAvatarUrl(player.avatar_url);
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
-        // Liderlik rozeti (ilk 3 sıra için)
-        const badge = rank <= 3 ? 
-          `<span class="rank-badge rank-${rank}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>` : '';
-
-        // Modern ve profesyonel tasarıma göre oyuncu satırı ekle
+        // Satır HTML'i
         html += `
-          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="simple-rank">${rank}</div>
-            <div class="player-info">
-              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
-              <div class="simple-name">${username} ${badge}</div>
+          <div class="player-row" data-rank="${rank}">
+            <div class="rank">${rank}</div>
+            <div class="player">
+              <div class="player-avatar">
+                <img src="${avatarUrl || '/static/images/avatars/default.svg'}" alt="${username}" 
+                     onerror="this.src='/static/images/avatars/default.svg'">
+              </div>
+              <div class="player-name">${username}</div>
             </div>
-            <div class="simple-score">${formatNumber(totalScore)}</div>
+            <div class="score">${formatNumber(totalScore)}</div>
           </div>
         `;
       });
 
-      html += `</div>`;
-
+      // HTML'i konteyner'a ekle
       container.innerHTML = html;
 
-      // Satırları animasyonlu göster
+      // Satır animasyonlarını başlat
       animateRows();
     })
     .catch(error => {
       console.error('Skorlar alınırken hata oluştu:', error);
       container.innerHTML = `
-        <div class="error-state">
+        <div class="empty-state">
           <i class="fas fa-exclamation-triangle"></i>
-          <p>Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
-          <button onclick="loadLeaderboard()" class="btn-retry">
-            <i class="fas fa-redo-alt"></i> Tekrar Dene
-          </button>
+          <h3>Bir hata oluştu</h3>
+          <p>Liderlik tablosu verilerine erişilemiyor. Lütfen daha sonra tekrar deneyin.</p>
         </div>
       `;
     });
 }
 
-// Seviye tablosunu yükle
-function loadLevelLeaderboard() {
-  const container = document.getElementById('levelLeaderboardContainer');
-  if (!container) return;
-
-  // Yükleniyor göstergesini göster
-  container.innerHTML = `
-    <div class="leaderboard-loading">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Seviye bilgileri yükleniyor...</p>
-    </div>
-  `;
-
-  // Sunucudan verileri al - sadece ilk 10 kullanıcı
-  fetch('/api/users/levels?limit=10&nocache=' + new Date().getTime())
-    .then(response => {
-      if (!response.ok) {
-        // Alternatif API'yi dene
-        return fetch('/api/scores/top-users?limit=10');
-      }
-      return response;
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Veri yoksa bilgi mesajı göster
-      if (!data || data.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-star"></i>
-            <h3>Henüz seviye bilgisi bulunmuyor</h3>
-            <p>Oyun oynayarak seviye kazanabilirsiniz!</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-table">
-          <div class="table-header">
-            <div class="header-rank">Sıra</div>
-            <div class="header-name">İsim</div>
-            <div class="header-score">Seviye</div>
-          </div>
-      `;
-
-      // Sadece ilk 10 kullanıcı için satır oluştur
-      const playersToShow = data.slice(0, 10);
-
-      // Her kullanıcı için bir satır oluştur
-      playersToShow.forEach((player, index) => {
-        const username = player.username || 'İsimsiz Oyuncu';
-        console.log(`Seviye tablosuna eklenen kullanıcı: ${username}`);
-
-        const level = player.level || 1;
-        const totalXp = player.total_xp || player.experience_points || 0;
-        const progressPercent = player.progress_percent || 0;
-        const avatarUrl = fixAvatarUrl(player.avatar_url);
-        const rank = index + 1;
-
-        // Liderlik rozeti (ilk 3 sıra için)
-        const badge = rank <= 3 ? 
-          `<span class="rank-badge rank-${rank}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</span>` : '';
-
-        // Modern ve profesyonel tasarıma göre seviye satırı ekle
-        html += `
-          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="simple-rank">${rank}</div>
-            <div class="player-info">
-              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
-              <div class="simple-name">${username} ${badge}</div>
-            </div>
-            <div class="simple-score">
-              <span class="level-badge">Seviye ${level}</span>
-              <div class="level-progress">
-                <div class="progress-bar" style="width: ${progressPercent}%"></div>
-                <span class="progress-text">${progressPercent}%</span>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-
-      container.innerHTML = html;
-
-      // Satırları animasyonlu göster
-      animateRows();
-    })
-    .catch(error => {
-      console.error('Seviye verileri yüklenirken hata:', error);
-      container.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Seviye bilgileri yüklenirken bir hata oluştu.</p>
-          <button onclick="loadLevelLeaderboard()" class="btn-retry">
-            <i class="fas fa-redo-alt"></i> Tekrar Dene
-          </button>
-        </div>
-      `;
-    });
-}
-
-// Oyun bazlı skor tablosunu yükle
-function loadGameLeaderboard(gameType) {
-  const container = document.getElementById('gameLeaderboardContainer');
-  if (!container) return;
-
-  // Yükleniyor göstergesini göster
-  container.innerHTML = `
-    <div class="leaderboard-loading">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">${gameType === 'all' ? 'Tüm oyunlar' : gameType} için skorlar yükleniyor...</p>
-    </div>
-  `;
-
-  // API URL'ini belirle - sadece ilk 10 kullanıcı
-  const apiUrl = gameType === 'all' 
-    ? '/api/scores/aggregated?limit=10' 
-    : `/api/leaderboard/${gameType}?limit=10`;
-
-  // Sunucudan verileri al
-  fetch(apiUrl + '&nocache=' + new Date().getTime())
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('API yanıtı başarısız: ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Veri yoksa bilgi mesajı göster
-      if (!data || data.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-gamepad"></i>
-            <h3>Henüz oyun skoru bulunmuyor</h3>
-            <p>${gameType === 'all' ? 'Herhangi bir oyun' : gameType} oynayarak liderlik tablosuna girmeye hak kazanabilirsiniz!</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Tablo HTML'ini oluştur
-      let html = `
-        <div class="leaderboard-table">
-          <div class="table-header">
-            <div class="header-rank">Sıra</div>
-            <div class="header-name">İsim</div>
-            <div class="header-score">Puan</div>
-          </div>
-      `;
-
-      // Sadece ilk 10 oyuncu için satır oluştur
-      const playersToShow = data.slice(0, 10);
-
-      // Her kullanıcı için bir satır oluştur
-      playersToShow.forEach((player, index) => {
-        const username = player.username || 'İsimsiz Oyuncu';
-        const score = player.score || player.total_score || 0;
-        const avatarUrl = fixAvatarUrl(player.avatar_url);
-        const rank = index + 1;
-
-        // Modern tasarıma göre oyun puanı satırı ekle
-        html += `
-          <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="simple-rank">${rank}</div>
-            <div class="player-info">
-              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
-              <div class="simple-name">${username}</div>
-            </div>
-            <div class="simple-score">${formatNumber(score)}</div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-
-      container.innerHTML = html;
-
-      // Satırları animasyonlu göster
-      animateRows();
-    })
-    .catch(error => {
-      console.error(`${gameType} oyunu için skorlar yüklenirken hata:`, error);
-      container.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Oyun skorları yüklenirken bir hata oluştu.</p>
-          <button onclick="loadGameLeaderboard('${gameType}')" class="btn-retry">
-            <i class="fas fa-redo-alt"></i> Tekrar Dene
-          </button>
-        </div>
-      `;
-    });
-}
-
-// İlk üç oyuncuyu podium'a yerleştir
-function updatePodium(data) {
-  const container = document.getElementById('podiumContainer');
-  if (!container) return;
-
-  // Eğer data parametresi verilmediyse, skorları al
-  if (!data) {
-    fetch('/api/scores/aggregated?limit=3&nocache=' + new Date().getTime())
-      .then(response => response.json())
-      .then(result => {
-        if (result && result.length > 0) {
-          result.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
-          renderPodium(result, container);
-        } else {
-          renderEmptyPodium(container);
-        }
-      })
-      .catch(error => {
-        console.error('Podium verileri yüklenirken hata:', error);
-        renderEmptyPodium(container);
-      });
-  } else {
-    // Verilen datayı kullan
-    if (data && data.length > 0) {
-      data.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
-      renderPodium(data.slice(0, 3), container);
-    } else {
-      renderEmptyPodium(container);
-    }
-  }
-}
-
-// Boş podyum gösterimi
-function renderEmptyPodium(container) {
-  container.innerHTML = `
-    <div class="empty-state">
-      <i class="fas fa-trophy"></i>
-      <h3>Henüz üst sırada oyuncu yok</h3>
-      <p>İlk oyuncu siz olabilirsiniz!</p>
-    </div>
-  `;
-}
-
-// Podyum HTML'ini oluştur ve göster
-function renderPodium(topPlayers, container) {
-  // HTML oluştur
-  let html = '';
-
-  // İlk 3 oyuncuyu sıralama sırasına göre yerleştir (2-1-3 sıralaması)
-  // Özel sıralama: 2. (sol) - 1. (orta) - 3. (sağ)
-  const orderedPlayers = [...topPlayers].slice(0, 3);
-  
-  // Eksik oyuncuları doldur
-  while (orderedPlayers.length < 3) {
-    orderedPlayers.push({
-      username: 'Boş Yer',
-      total_score: 0,
-      avatar_url: ''
-    });
-  }
-
-  // Her oyuncu için podyum kartı oluştur
-  for (let i = 0; i < 3; i++) {
-    const player = orderedPlayers[i];
-    const rank = i + 1;
-    const username = player.username || 'İsimsiz Oyuncu';
-    const totalScore = player.total_score || 0;
-    const avatarUrl = fixAvatarUrl(player.avatar_url);
-    const playerRank = player.rank || '';
-
-    // Medal emoji
-    const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
-
-    html += `
-      <div class="podium-player" data-rank="${rank}">
-        <div class="podium-rank rank-${rank}">${medalEmoji}</div>
-        <div class="podium-avatar">
-          ${avatarUrl ? 
-            `<img src="${avatarUrl}" alt="${username}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'avatar-fallback\'>${username.charAt(0).toUpperCase()}</div>';" />` : 
-            `<div class="avatar-fallback">${username.charAt(0).toUpperCase()}</div>`
-          }
-        </div>
-        <div class="podium-username username-${rank}">${username}</div>
-        <div class="podium-score">${formatNumber(totalScore)}</div>
-        ${playerRank ? `<div class="podium-badge">${playerRank}</div>` : ''}
-      </div>
-    `;
-  }
-
-  // Sonuçları konteyner'a ekle
-  container.innerHTML = html;
-}
-
-// İstatistik sayaçlarını güncelle
-function updateStats(data) {
-  // Toplam oyuncu sayısı
-  const playerCount = document.getElementById('totalPlayerCount');
-  if (playerCount) {
-    playerCount.textContent = data.length;
-  }
-
-  // İstatistik kısmındaki oyuncu sayısı
-  const activePlayerCount = document.getElementById('totalActivePlayerCount');
-  if (activePlayerCount) {
-    activePlayerCount.textContent = data.length;
-  }
-
-  // Toplam puan
-  const scoreCount = document.getElementById('totalScoreCount');
-  if (scoreCount) {
-    const totalScore = data.reduce((sum, player) => sum + (player.total_score || 0), 0);
-    scoreCount.textContent = formatNumber(totalScore);
-  }
-
-  // Toplam oynanmış oyun sayısı
-  const gamesPlayedCount = document.getElementById('totalGamesPlayedCount');
-  if (gamesPlayedCount) {
-    const totalGames = data.reduce((sum, player) => sum + (player.games_played || 0), 0);
-    gamesPlayedCount.textContent = formatNumber(totalGames || data.length * 5); // Eğer veri yoksa tahmini değer
-  }
-}
-
-// Animasyonlu satır gösterimi
-function animateRows() {
-  const rows = document.querySelectorAll('.player-row');
-
-  rows.forEach((row, index) => {
-    setTimeout(() => {
-      row.style.opacity = '1';
-      row.style.transform = 'translateY(0)';
-    }, index * 50);
-  });
-}
-
-// Avatar URL'lerini düzelt
+// Avatar URL'i düzelt
 function fixAvatarUrl(url) {
   if (!url) return '';
 
   if (!url.startsWith('http')) {
-    // Göreceli URL'leri düzelt
     if (!url.startsWith('/')) {
       url = '/' + url;
     }
@@ -533,7 +147,19 @@ function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-// Bildirim gösterme
+// Satırları animasyonlu göster
+function animateRows() {
+  const rows = document.querySelectorAll('.player-row');
+
+  rows.forEach((row, index) => {
+    setTimeout(() => {
+      row.style.opacity = '1';
+      row.style.transform = 'translateY(0)';
+    }, index * 80);
+  });
+}
+
+// Bildirim gösterme (from original code)
 function showNotification(message, duration = 3000) {
   const toast = document.getElementById('notificationToast');
   if (!toast) return;
@@ -549,29 +175,16 @@ function showNotification(message, duration = 3000) {
   }
 }
 
-// Global API
+// Global API (modified to only include relevant functions)
 window.LeaderboardManager = {
   loadLeaderboard: loadLeaderboard,
-  loadLevelLeaderboard: loadLevelLeaderboard,
-  loadGameLeaderboard: loadGameLeaderboard,
-  updatePodium: updatePodium,
   updateScoreBoard: function() {
     loadLeaderboard();
-    loadLevelLeaderboard();
-    updatePodium();
   }
 };
 
-// Global fonksiyon
-window.updateScoreBoard = function(gameType = null) {
+// Global fonksiyon (simplified)
+window.updateScoreBoard = function() {
   loadLeaderboard();
-  loadLevelLeaderboard();
-  updatePodium();
-
-  if (gameType) {
-    loadGameLeaderboard(gameType);
-  }
-
-  // Bildirim göster
   showNotification('Liderlik tablosu güncellendi!');
 };
