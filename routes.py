@@ -64,6 +64,23 @@ def memory_match_3d_root():
 def memory_match_3d_short():
     return memory_match_3d()
 
+# Diğer URL biçimleri için rotalar
+@app.route('/games/memorymatch3d')
+def memory_match_3d_lowercase():
+    return memory_match_3d()
+    
+@app.route('/memorymatch3d')
+def memory_match_3d_all_lowercase():
+    return memory_match_3d()
+    
+@app.route('/memory_match_3d')
+def memory_match_3d_underscore():
+    return memory_match_3d()
+    
+@app.route('/games/memory_match_3d')
+def memory_match_3d_games_underscore():
+    return memory_match_3d()
+
 # Diğer oyunlar için eksik olabilecek rotalar
 @app.route('/games/tetris')
 def tetris_game():
