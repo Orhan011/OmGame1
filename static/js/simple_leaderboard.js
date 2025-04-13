@@ -111,6 +111,16 @@ function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser) {
   const initial = username.charAt(0).toUpperCase();
   const currentUserClass = isCurrentUser ? 'current-user' : '';
   
+  // 1., 2., 3. sıra için özel rozet
+  let rankBadge = '';
+  if (rank === 1) {
+    rankBadge = '<i class="fas fa-crown crown-gold"></i>';
+  } else if (rank === 2) {
+    rankBadge = '<i class="fas fa-crown crown-silver"></i>';
+  } else if (rank === 3) {
+    rankBadge = '<i class="fas fa-crown crown-bronze"></i>';
+  }
+  
   // Avatarı hazırla
   let avatarHtml = '';
   if (avatarUrl) {
@@ -124,15 +134,21 @@ function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser) {
   }
   
   return `
-    <div class="player-row ${currentUserClass}">
-      <div class="player-rank">${rank}</div>
+    <div class="player-row ${currentUserClass}" data-rank="${rank}">
+      <div class="player-rank">
+        ${rankBadge}
+        <span>${rank}</span>
+      </div>
       <div class="player-info">
         <div class="player-avatar">
           ${avatarHtml}
         </div>
         <div class="player-name">${username}</div>
       </div>
-      <div class="player-score">${formatNumber(score)}</div>
+      <div class="player-score">
+        <i class="fas fa-star score-star"></i>
+        ${formatNumber(score)}
+      </div>
     </div>
   `;
 }
