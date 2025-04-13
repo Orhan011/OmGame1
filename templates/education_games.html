@@ -67,21 +67,22 @@
 
   /* Oyun kartı tasarımı */
   .game-card {
-    background: linear-gradient(135deg, #2c3e50, #1a1a2e);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #6a5ae0, #4437c0);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(106, 90, 224, 0.3);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
   }
 
   .game-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    box-shadow: 0 15px 35px rgba(106, 90, 224, 0.4);
   }
 
   .game-card::before {
@@ -89,9 +90,9 @@
     position: absolute;
     top: -50%;
     right: -50%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05), transparent);
+    width: 150%;
+    height: 150%;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
     transform: rotate(45deg);
     transition: all 0.5s ease;
   }
@@ -103,17 +104,25 @@
 
   /* İkon stilleri */
   .game-icon {
-    font-size: 3.5rem;
+    font-size: 4rem;
     text-align: center;
-    margin-bottom: 15px;
-    color: #6a5ae0;
+    margin-bottom: 20px;
+    color: white;
     transition: all 0.3s ease;
-    text-shadow: 0 2px 10px rgba(106, 90, 224, 0.3);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 20px;
   }
 
   .game-card:hover .game-icon {
-    transform: scale(1.1);
-    color: #8170ff;
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(255, 255, 255, 0.25);
   }
 
   /* Oyun bilgileri */
@@ -124,52 +133,73 @@
   .game-info h3 {
     margin-top: 0;
     color: #fff;
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-    font-weight: 600;
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    font-weight: 700;
     position: relative;
-    padding-bottom: 8px;
+    padding-bottom: 15px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
   .game-info h3::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background: #6a5ae0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 3px;
   }
 
   .game-info p {
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.5;
-    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 15px;
   }
 
   /* Oyun butonu */
   .game-btn {
-    background: linear-gradient(to right, #6a5ae0, #8170ff);
-    color: white;
-    padding: 10px 24px;
+    background: white;
+    color: #6a5ae0;
+    padding: 12px 30px;
     border: none;
-    border-radius: 30px;
+    border-radius: 50px;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
     margin-top: 15px;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
   }
 
+  .game-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(to right, #ff7eb3, #ff758c);
+    transition: all 0.4s ease;
+    z-index: -1;
+  }
+  
   .game-btn:hover {
-    background: linear-gradient(to right, #8170ff, #9a8eff);
-    box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-    transform: translateY(-2px);
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 123, 179, 0.4);
+  }
+  
+  .game-btn:hover::before {
+    width: 100%;
   }
 
   /* Sayfa başlığı */
@@ -269,13 +299,35 @@
   }
   
   .level-badge {
-    background: rgba(106, 90, 224, 0.2);
-    color: #8170ff;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.9rem;
     display: inline-block;
-    border: 1px solid rgba(106, 90, 224, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .level-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 123, 179, 0.4), rgba(106, 90, 224, 0.4));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .game-card:hover .level-badge::before {
+    opacity: 1;
   }
 </style>
 {% endblock %}
