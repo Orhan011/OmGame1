@@ -10,10 +10,16 @@
     </div>
 
     <div class="tetris-container">
+      <!-- Sonraki Parça - ÜST KISIM -->
+      <div class="tetris-next-piece">
+        <div class="tetris-next-label">Sonraki Parça</div>
+        <canvas id="next-piece-canvas" width="100" height="100"></canvas>
+      </div>
+
       <div class="tetris-layout">
         <!-- Oyun Alanı -->
         <div class="tetris-board-container">
-          <canvas id="tetris-canvas" width="300" height="600"></canvas>
+          <canvas id="tetris-canvas" width="360" height="500"></canvas>
         </div>
 
         <!-- Sağ Panel -->
@@ -32,19 +38,6 @@
               <div class="tetris-score-label">Satırlar</div>
               <div class="tetris-score-value" id="lines">0</div>
             </div>
-          </div>
-
-          <!-- Sonraki Parça -->
-          <div class="tetris-next-piece">
-            <div class="tetris-next-label">Sonraki Parça</div>
-            <canvas id="next-piece-canvas" width="100" height="100"></canvas>
-          </div>
-
-          <!-- Oyun Kontrolleri -->
-          <div class="tetris-controls">
-            <button id="start-button" class="btn btn-primary btn-lg">Başlat</button>
-            <button id="pause-button" class="btn btn-secondary btn-lg" disabled>Duraklat</button>
-            <button id="reset-button" class="btn btn-danger btn-lg">Yeniden Başlat</button>
           </div>
 
           <!-- Oyun Kontrolleri Bilgisi -->
@@ -79,6 +72,13 @@
           </div>
         </div>
       </div>
+
+      <!-- Oyun Kontrolleri - ALT KISIM -->
+      <div class="tetris-controls">
+        <button id="start-button" class="btn btn-primary btn-lg">Başlat</button>
+        <button id="pause-button" class="btn btn-secondary btn-lg" disabled>Duraklat</button>
+        <button id="reset-button" class="btn btn-danger btn-lg">Yeniden Başlat</button>
+      </div>
     </div>
   </div>
 </div>
@@ -89,6 +89,10 @@
     max-width: 100%;
     margin: 0 auto;
     padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
   }
 
   .tetris-layout {
@@ -96,6 +100,31 @@
     gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .tetris-next-piece {
+    background: rgba(25, 25, 45, 0.7);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    width: 360px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .tetris-next-label {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+  }
+
+  #next-piece-canvas {
+    display: block;
+    margin: 0 auto;
+    background: rgba(20, 20, 40, 0.5);
   }
 
   .tetris-info-panel {
@@ -132,34 +161,16 @@
     color: var(--accent-color);
   }
 
-  .tetris-next-piece {
-    background: rgba(25, 25, 45, 0.7);
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .tetris-next-label {
-    text-align: center;
-    margin-bottom: 8px;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  #next-piece-canvas {
-    display: block;
-    margin: 0 auto;
-    background: rgba(20, 20, 40, 0.5);
-  }
-
   .tetris-controls {
     background: rgba(25, 25, 45, 0.7);
     border-radius: 15px;
     padding: 15px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 15px;
+    justify-content: center;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
   }
 
   .tetris-help {
@@ -205,8 +216,8 @@
 
   .tetris-board-container {
     position: relative;
-    width: 300px;
-    height: 600px;
+    width: 360px;
+    height: 500px;
   }
 
   #tetris-canvas {
@@ -224,13 +235,17 @@
     }
     
     .tetris-board-container {
-      width: 280px;
-      height: 560px;
+      width: 300px;
+      height: 450px;
     }
     
     .tetris-info-panel {
-      width: 280px;
+      width: 300px;
       margin-top: 15px;
+    }
+    
+    .tetris-next-piece {
+      width: 300px;
     }
   }
 </style>
@@ -257,8 +272,8 @@ let lines = 0;
 let level = 1;
 
 // Oyun sabitleri
-const COLS = 10;
-const ROWS = 20;
+const COLS = 12;       // Genişletilmiş oyun alanı
+const ROWS = 17;       // Kısaltılmış oyun alanı
 const BLOCK_SIZE = 30;
 const PREVIEW_BLOCK_SIZE = 20;
 
