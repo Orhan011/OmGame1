@@ -413,6 +413,17 @@
   font-weight: 800;
   font-size: 1.3rem;
   position: relative;
+  display: inline-block !important;
+}
+
+.mini-score {
+  background-color: rgba(106, 90, 224, 0.2);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  color: #fff;
+  margin-left: 8px;
+  display: inline-block;
 }
 
 .top-1 .score-value {

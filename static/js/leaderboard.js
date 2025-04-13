@@ -135,7 +135,7 @@ function loadLeaderboard() {
             avatarUrl = '/static' + avatarUrl;
           } else if (!avatarUrl.startsWith('/static/')) {
             if (!avatarUrl.startsWith('/static/uploads/')) {
-              avatarUrl = '/static/uploads' + avatarUrl;
+              avatarUrl = '/static/uploads/' + avatarUrl;
             }
           }
         }
@@ -277,7 +277,7 @@ function loadLevelLeaderboard() {
             avatarUrl = '/static' + avatarUrl;
           } else if (!avatarUrl.startsWith('/static/')) {
             if (!avatarUrl.startsWith('/static/uploads/')) {
-              avatarUrl = '/static/uploads' + avatarUrl;
+              avatarUrl = '/static/uploads/' + avatarUrl;
             }
           }
         }
@@ -415,12 +415,12 @@ function createLeaderboardHtml(players) {
       </div>
     `;
   }
-  
+
   // Önce oyuncuların puanlarını hesapla
   const processedPlayers = players.map(player => {
     // Tüm olası puan alanlarını kontrol et
     let scoreValue = 0;
-    
+
     // Eğer daha önce hesaplanmış bir skor varsa onu kullan
     if (player.calculated_score !== undefined) {
       scoreValue = parseInt(player.calculated_score);
@@ -438,25 +438,25 @@ function createLeaderboardHtml(players) {
       // Deneyim puanları da gösterilebilir
       scoreValue = parseInt(player.experience_points);
     }
-    
+
     // Sayısal değer kontrolü ve düzeltme
     if (isNaN(scoreValue) || scoreValue === null) {
       scoreValue = 0;
     }
-    
+
     console.log(`createLeaderboardHtml: Oyuncu ${player.username || 'İsimsiz'} puanı: ${scoreValue}`);
-    
+
     return {
       ...player,
       calculated_score: scoreValue
     };
   });
-  
+
   // Oyuncuları puanlarına göre sırala (en yüksekten en düşüğe)
   const sortedPlayers = [...processedPlayers].sort((a, b) => b.calculated_score - a.calculated_score);
-  
+
   console.log("Sıralanmış oyuncular:", sortedPlayers.length, sortedPlayers.slice(0, 3).map(p => p.username + ':' + p.calculated_score));
-  
+
   let html = `
     <div class="leaderboard-table">
       <div class="leaderboard-header-row">
@@ -466,27 +466,27 @@ function createLeaderboardHtml(players) {
       </div>
       <div class="leaderboard-body">
   `;
-  
+
   // Her bir kullanıcı için satır ekle
   sortedPlayers.forEach((player, index) => {
     const rankClass = index < 3 ? `top-${index + 1}` : '';
     const initial = player.username ? player.username.charAt(0).toUpperCase() : '?';
-    
+
     // Kullanıcı adı renk sınıfı
     let userNameColorClass = '';
     if (index === 0) userNameColorClass = 'first-place';
     else if (index === 1) userNameColorClass = 'second-place';
     else if (index === 2) userNameColorClass = 'third-place';
     else if (index < 10) userNameColorClass = 'top-ten';
-    
+
     // Hesaplanmış puanı kullan
     let playerScore = player.calculated_score || 0;
     console.log(`${player.username} puanı: ${playerScore}`);
-    
+
     const avatarUrl = player.avatar_url || '';
     const isCurrentUser = player.is_current_user || false;
     const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
-    
+
     html += `
       <div class="player-row ${rankClass} ${isCurrentUser ? 'current-user' : ''}">
         <div class="rank-cell">
@@ -514,11 +514,11 @@ function createLeaderboardHtml(players) {
       </div>
     `;
   });
-  
+
   html += `
       </div>
     </div>
   `;
-  
+
   return html;
 }
