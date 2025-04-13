@@ -33,6 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadLeaderboard();
     console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
+  
+  // Sayfa yüklendikten sonra 2 saniye içinde yeniden yükle (ek veri almak için)
+  setTimeout(function() {
+    loadLeaderboard();
+  }, 2000);
 });
 
 // Liderlik tablosunu yükle - Promise döndürür
@@ -98,7 +103,7 @@ function loadLeaderboard() {
             <div class="rank">${rank}</div>
             <div class="player">
               <div class="player-avatar">
-                ${rank === 1 ? '<i class="fas fa-crown crown-icon" style="color: var(--gold); position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); z-index: 10;"></i>' : ''}
+                ${rank === 1 ? '<i class="fas fa-crown crown-icon" style="color: var(--gold); position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.4rem; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7)); z-index: 10;"></i>' : ''}
                 <img src="${avatarUrl || '/static/images/avatars/default.svg'}" alt="${username}" 
                      onerror="this.src='/static/images/avatars/default.svg'">
               </div>
