@@ -209,6 +209,72 @@
 
     <!-- Sudoku kaldırıldı -->
 
+    <!-- PROFESYONEL OYUNLAR BÖLÜMÜ -->
+    <div class="category-header">
+      <h2>Profesyonel Oyunlar</h2>
+      <p>Gerçek dünya becerileri ve profesyonel gelişim için tasarlanmış ileri seviye oyunlar</p>
+    </div>
+
+    <!-- Stok Piyasası Simülatörü -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="game-info">
+        <h3>Stok Piyasası Simülatörü</h3>
+        <p>Gerçek verilere dayalı bir borsa simülasyonunda yatırım stratejileri geliştirin.</p>
+      </div>
+      <a href="/games/stock-simulator" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Kod Çözme Uzmanı -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-code"></i></div>
+      <div class="game-info">
+        <h3>Kod Çözme Uzmanı</h3>
+        <p>Programlama mantığını öğreten interaktif bulmacalarla algoritma becerilerini geliştirin.</p>
+      </div>
+      <a href="/games/coding-expert" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- İş Stratejisi Simülatörü -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-briefcase"></i></div>
+      <div class="game-info">
+        <h3>İş Stratejisi Simülatörü</h3>
+        <p>Sanal bir şirketi yöneterek stratejik karar verme ve iş yönetimi becerilerinizi geliştirin.</p>
+      </div>
+      <a href="/games/business-strategy" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Mimari Tasarım Stüdyosu -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-drafting-compass"></i></div>
+      <div class="game-info">
+        <h3>Mimari Tasarım Stüdyosu</h3>
+        <p>3D tasarım araçlarıyla mimari projeler geliştirerek mekansal düşünme yeteneklerinizi artırın.</p>
+      </div>
+      <a href="/games/architecture-studio" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Çeviri Ustası -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-language"></i></div>
+      <div class="game-info">
+        <h3>Çeviri Ustası</h3>
+        <p>Farklı zorluk seviyelerindeki metinleri çevirerek dil becerilerinizi geliştirin.</p>
+      </div>
+      <a href="/games/translation-master" class="game-btn">Oyna</a>
+    </div>
+
+    <!-- Üretim & Lojistik Yöneticisi -->
+    <div class="game-card professional-game">
+      <div class="game-icon"><i class="fas fa-truck-loading"></i></div>
+      <div class="game-info">
+        <h3>Üretim & Lojistik Yöneticisi</h3>
+        <p>Karmaşık tedarik zinciri simülasyonlarında verimlilik ve optimizasyon becerilerinizi test edin.</p>
+      </div>
+      <a href="/games/logistics-manager" class="game-btn">Oyna</a>
+    </div>
+
   </div>
 
   <div class="row mt-5 mb-5">
@@ -435,6 +501,71 @@
 
   .home-button i {
     margin-right: 8px;
+  }
+
+  /* Kategori başlığı stilleri */
+  .category-header {
+    text-align: center;
+    margin: 50px 0 30px;
+    grid-column: 1 / -1;
+    position: relative;
+  }
+
+  .category-header h2 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .category-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to right, #6a5ae0, #8170ff);
+    border-radius: 3px;
+  }
+
+  .category-header p {
+    color: #666;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Profesyonel oyun kartları için özel stiller */
+  .professional-game {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .professional-game .game-icon {
+    color: #4facfe;
+    text-shadow: 0 2px 10px rgba(79, 172, 254, 0.4);
+  }
+
+  .professional-game:hover .game-icon {
+    color: #7ed6ff;
+  }
+
+  .professional-game .game-info h3::after {
+    background: #4facfe;
+  }
+
+  .professional-game .game-btn {
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+  }
+
+  .professional-game .game-btn:hover {
+    background: linear-gradient(to right, #00f2fe, #7ed6ff);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
   }
 </style>
 {% endblock %}

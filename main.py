@@ -1759,6 +1759,44 @@ def all_games():
     except Exception as e:
         logger.error(f"Error rendering all_games.html: {str(e)}")
         return f"An error occurred: {str(e)}", 500
+        
+# Profesyonel Oyunlar - Yeni eklenen oyunlar
+
+@app.route('/games/stock-simulator')
+def stock_simulator():
+    """Stok Piyasası Simülatörü: Borsa eğitim oyunu
+    Gerçek verilere dayalı bir borsa simülasyonunda yatırım stratejileri geliştirin."""
+    return render_template('games/professional/stock_simulator.html')
+
+@app.route('/games/coding-expert')
+def coding_expert():
+    """Kod Çözme Uzmanı: Programlama mantık oyunu
+    Programlama mantığını öğreten interaktif bulmacalarla algoritma becerilerini geliştirin."""
+    return render_template('games/professional/coding_expert.html')
+
+@app.route('/games/business-strategy')
+def business_strategy():
+    """İş Stratejisi Simülatörü: Yönetim oyunu
+    Sanal bir şirketi yöneterek stratejik karar verme ve iş yönetimi becerilerinizi geliştirin."""
+    return render_template('games/professional/business_strategy.html')
+
+@app.route('/games/architecture-studio')
+def architecture_studio():
+    """Mimari Tasarım Stüdyosu: 3D modelleme oyunu
+    3D tasarım araçlarıyla mimari projeler geliştirerek mekansal düşünme yeteneklerinizi artırın."""
+    return render_template('games/professional/architecture_studio.html')
+
+@app.route('/games/translation-master')
+def translation_master():
+    """Çeviri Ustası: Dil gelişim oyunu
+    Farklı zorluk seviyelerindeki metinleri çevirerek dil becerilerinizi geliştirin."""
+    return render_template('games/professional/translation_master.html')
+
+@app.route('/games/logistics-manager')
+def logistics_manager():
+    """Üretim & Lojistik Yöneticisi: Tedarik zinciri simülasyonu
+    Karmaşık tedarik zinciri simülasyonlarında verimlilik ve optimizasyon becerilerinizi test edin."""
+    return render_template('games/professional/logistics_manager.html')
 
 # Skor Tablosu
 @app.route('/leaderboard')
