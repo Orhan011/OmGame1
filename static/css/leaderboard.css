@@ -573,24 +573,51 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.score-container {
+.score-block {
+  position: relative;
+  width: 60px;
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin-right: 5px;
+}
+
+.score-container {
+  background: rgba(106, 90, 224, 0.2);
+  border-radius: 8px;
+  padding: 2px 5px;
+  display: inline-flex;
   align-items: center;
-  background: rgba(106, 90, 224, 0.1);
-  padding: 8px 15px;
-  border-radius: 20px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.15),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
+  background-image: linear-gradient(135deg, 
+                    rgba(106, 90, 224, 0.2) 0%, 
+                    rgba(159, 138, 255, 0.1) 100%);
+  margin-left: 0;
 }
 
 .score-value {
-  font-weight: 700;
-  font-size: 1.2rem;
   color: #fff;
-  letter-spacing: 0.5px;
-  background: linear-gradient(45deg, #6a5ae0, #9f8aff);
+  font-weight: 600;
+  font-size: 0.6rem;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(45deg, #fff 10%, #e0d8ff 60%, #b5a4ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  transition: all 0.3s ease;
+  letter-spacing: 0.1px;
 }
 
 .score-label {
@@ -700,8 +727,7 @@
 .score-container {
   background: rgba(106, 90, 224, 0.2);
   border-radius: 10px;
-  padding: 5px 12px;
-  display: inline-flex;
+  padding: 5px 12px;  display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;

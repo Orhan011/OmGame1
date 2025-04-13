@@ -148,3 +148,15 @@ function calculateTotalScores(scoresData) {
 
   // Her 60 saniyede bir tabloyu otomatik güncelle
   setInterval(loadLeaderboard, 60000);
+
+
+  //Added CSS to reduce and left-align scores
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .score-value {
+      font-size: 0.9em; /* Küçültülmüş yazı boyutu */
+      text-align: left; /* Sola hizalama */
+    }
+  `;
+  document.head.appendChild(style);
+}
