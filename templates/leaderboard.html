@@ -4,86 +4,309 @@
 
 {% block head_extras %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="leaderboard-header">
-    <h1>Liderlik Tablosu</h1>
-    <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz. <button class="btn btn-sm btn-primary refresh-leaderboard"><i class="fas fa-sync-alt"></i> Yenile</button></p>
+<div class="container py-4">
+  <!-- Başlık Bölümü -->
+  <div class="leaderboard-hero">
+    <div class="hero-content animate__animated animate__fadeIn">
+      <h1 class="hero-title"><i class="fas fa-trophy"></i> Liderlik Tablosu</h1>
+      <p class="hero-subtitle">En yüksek puanları topla, sıralamalarda yüksel ve şampiyonlar arasına katıl!</p>
+      <div class="refresh-container">
+        <button class="btn-refresh refresh-leaderboard" aria-label="Tabloyu Yenile">
+          <i class="fas fa-sync-alt"></i>
+          <span>Yenile</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="row">
-    <!-- Skor Tablosu -->
-    <div class="col-md-6 col-12 mb-4" data-aos="fade-up" data-aos-delay="100">
-      <div class="leaderboard-card">
-        <div class="leaderboard-title">
-          <i class="fas fa-trophy me-2"></i>Toplam Puan Sıralaması
-        </div>
-        <div class="leaderboard-table-container">
-          <div id="leaderboardContainer">
-            <div class="loading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <p>Skorlar yükleniyor...</p>
-            </div>
-          </div>
-        </div>
+  <!-- Podium: Top 3 Oyuncular -->
+  <div class="podium-section animate__animated animate__fadeInUp animate__delay-1s">
+    <h2 class="section-title">En İyi Oyuncular</h2>
+    <div class="podium-container" id="podiumContainer">
+      <!-- Podium JavaScript tarafından doldurulacak -->
+      <div class="podium-loading">
+        <div class="shimmer-effect"></div>
+        <div class="shimmer-effect"></div>
+        <div class="shimmer-effect"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ana Liderlik Bölümü -->
+  <div class="main-leaderboard-section">
+    <!-- Tab Menü -->
+    <div class="tab-navigation">
+      <div class="tab-list">
+        <button class="tab-item active" data-tab="score-tab">
+          <i class="fas fa-trophy"></i> <span>Toplam Puan</span>
+        </button>
+        <button class="tab-item" data-tab="level-tab">
+          <i class="fas fa-star"></i> <span>Seviyeler</span>
+        </button>
+        <button class="tab-item" data-tab="games-tab">
+          <i class="fas fa-gamepad"></i> <span>Oyun Bazlı</span>
+        </button>
       </div>
     </div>
 
-    <!-- Seviye Tablosu -->
-    <div class="col-md-6 col-12" data-aos="fade-up" data-aos-delay="200">
-      <div class="leaderboard-card">
-        <div class="leaderboard-title">
-          <i class="fas fa-star me-2"></i>Kullanıcı Seviyeleri
-        </div>
-        <div class="leaderboard-table-container">
-          <div id="levelLeaderboardContainer">
-            <div class="loading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <p>Seviye bilgileri yükleniyor...</p>
+    <!-- Tab İçeriği -->
+    <div class="tab-content-container">
+      <!-- Toplam Puan Tablosu -->
+      <div class="tab-content active" id="score-tab">
+        <div class="leaderboard-card">
+          <div class="leaderboard-header">
+            <div class="header-left">
+              <h3 class="card-title"><i class="fas fa-trophy"></i> En Yüksek Puanlar</h3>
             </div>
-            <noscript>
-              <div class="error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Seviye bilgilerini görmek için JavaScript'i etkinleştirin.</p>
+            <div class="header-right">
+              <div class="leaderboard-stats">
+                <div class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <span class="stat-count" id="totalPlayerCount">--</span>
+                  <span class="stat-label">Oyuncu</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-award"></i>
+                  <span class="stat-count" id="totalScoreCount">--</span>
+                  <span class="stat-label">Toplam Puan</span>
+                </div>
               </div>
-            </noscript>
+            </div>
+          </div>
+          <div class="leaderboard-content">
+            <div id="leaderboardContainer" class="leaderboard-table-wrapper">
+              <!-- JavaScript ile doldurulacak -->
+              <div class="leaderboard-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Liderlik tablosu yükleniyor...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seviye Tablosu -->
+      <div class="tab-content" id="level-tab">
+        <div class="leaderboard-card">
+          <div class="leaderboard-header">
+            <div class="header-left">
+              <h3 class="card-title"><i class="fas fa-star"></i> En Yüksek Seviyeler</h3>
+            </div>
+            <div class="header-right">
+              <div class="filter-controls">
+                <button class="btn-filter active" data-filter="all">Tümü</button>
+                <button class="btn-filter" data-filter="weekly">Haftalık</button>
+                <button class="btn-filter" data-filter="monthly">Aylık</button>
+              </div>
+            </div>
+          </div>
+          <div class="leaderboard-content">
+            <div id="levelLeaderboardContainer" class="leaderboard-table-wrapper">
+              <!-- JavaScript ile doldurulacak -->
+              <div class="leaderboard-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Seviye tablosu yükleniyor...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Oyun Bazlı Sıralama -->
+      <div class="tab-content" id="games-tab">
+        <div class="leaderboard-card">
+          <div class="leaderboard-header">
+            <div class="header-left">
+              <h3 class="card-title"><i class="fas fa-gamepad"></i> Oyun Bazlı Puanlar</h3>
+            </div>
+            <div class="header-right">
+              <div class="game-selector-wrapper">
+                <select id="gameTypeSelect" class="game-selector">
+                  <option value="all">Tüm Oyunlar</option>
+                  <option value="tetris">Tetris</option>
+                  <option value="chess">Satranç</option>
+                  <option value="minesweeper">Mayın Tarlası</option>
+                  <option value="wordle">Kelime Oyunu</option>
+                  <option value="sudoku">Sudoku</option>
+                  <option value="snake_game">Yılan</option>
+                  <option value="puzzle">Yapboz</option>
+                  <option value="typing_speed">Yazma Hızı</option>
+                </select>
+                <button id="applyGameFilter" class="btn-filter-apply">Uygula</button>
+              </div>
+            </div>
+          </div>
+          <div class="leaderboard-content">
+            <div id="gameLeaderboardContainer" class="leaderboard-table-wrapper">
+              <!-- JavaScript ile doldurulacak -->
+              <div class="leaderboard-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Oyun skorları yükleniyor...</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-center mt-5">
-    <button class="btn btn-primary refresh-leaderboard">
-      <i class="fas fa-sync-alt me-2"></i>Tabloyu Yenile
-    </button>
-  </div>
-
-  <div class="row mt-5">
-    <div class="col-12 text-center">
-      <div class="leaderboard-info-card">
-        <h3><i class="fas fa-lightbulb me-2"></i>Nasıl Lider Olunur?</h3>
-        <p>En yüksek puanları kazanmak için daha fazla oyun oynayın ve becerilerinizi geliştirin. Oyun zorluk seviyesi ve doğruluk oranınız puanlarınızı etkiler.</p>
-        <div class="leaderboard-badges mt-3">
-          <div class="badge-item">
-            <i class="fas fa-crown" style="color: gold;"></i>
-            <span>1. Sıra</span>
+  <!-- Başarı Kuralları ve İpuçları -->
+  <div class="achievement-tips-section animate__animated animate__fadeInUp animate__delay-2s">
+    <div class="tips-card">
+      <div class="tips-header">
+        <h3><i class="fas fa-lightbulb"></i> Sıralamada Yükselmek İçin İpuçları</h3>
+      </div>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <div class="tip-icon">
+            <i class="fas fa-calendar-check"></i>
           </div>
-          <div class="badge-item">
-            <i class="fas fa-medal" style="color: silver;"></i>
-            <span>2. Sıra</span>
+          <div class="tip-content">
+            <h4>Düzenli Olarak Oyna</h4>
+            <p>Her gün farklı oyun türlerinde pratik yap, beyin jimnastiği yap ve düzenli XP kazan.</p>
           </div>
-          <div class="badge-item">
-            <i class="fas fa-award" style="color: #cd7f32;"></i>
-            <span>3. Sıra</span>
+        </div>
+        
+        <div class="tip-item">
+          <div class="tip-icon">
+            <i class="fas fa-fire"></i>
+          </div>
+          <div class="tip-content">
+            <h4>Zorluk Seviyesi</h4>
+            <p>Daha yüksek zorluk seviyeleri, daha yüksek puan çarpanları sağlar. Kendinizi zorlayın!</p>
+          </div>
+        </div>
+        
+        <div class="tip-item">
+          <div class="tip-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <div class="tip-content">
+            <h4>Hızlı ve Doğru</h4>
+            <p>Hızlı tepki verirken doğruluktan ödün vermeyin. Hız ve doğruluk en yüksek puanları getirir.</p>
+          </div>
+        </div>
+        
+        <div class="tip-item">
+          <div class="tip-icon">
+            <i class="fas fa-medal"></i>
+          </div>
+          <div class="tip-content">
+            <h4>Günlük Bonus</h4>
+            <p>Her gün giriş yaparak özel bonuslar kazanın ve rütbenizi daha hızlı yükseltin.</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Notification Toast -->
+<div id="notificationToast" class="notification-toast">
+  <div class="notification-content">
+    <i class="notification-icon fas fa-sync-alt"></i>
+    <span class="notification-message">Liderlik tablosu güncellendi!</span>
+  </div>
+</div>
+
+<!-- Scriptle -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab değiştirme işlemi
+  const tabButtons = document.querySelectorAll('.tab-item');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Data özelliğini kullanarak ilgili içeriği bul
+      const tabId = this.getAttribute('data-tab');
+      
+      // Aktif sekmeyi güncelle
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // İçeriği göster/gizle
+      tabContents.forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // Yenile butonu
+  const refreshButtons = document.querySelectorAll('.refresh-leaderboard');
+  refreshButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      this.classList.add('spin-animation');
+      
+      // Yenileme fonksiyonunu çağır
+      if (typeof updateScoreBoard === 'function') {
+        updateScoreBoard();
+      }
+      
+      // Animasyonu durdur
+      setTimeout(() => {
+        this.classList.remove('spin-animation');
+        showNotification('Liderlik tablosu güncellendi!');
+      }, 1000);
+    });
+  });
+
+  // Oyun filtresi
+  const applyFilterBtn = document.getElementById('applyGameFilter');
+  if (applyFilterBtn) {
+    applyFilterBtn.addEventListener('click', function() {
+      const gameType = document.getElementById('gameTypeSelect').value;
+      const container = document.getElementById('gameLeaderboardContainer');
+      
+      container.innerHTML = `
+        <div class="leaderboard-loading">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">${gameType === 'all' ? 'Tüm oyunlar' : gameType} için skorlar yükleniyor...</p>
+        </div>
+      `;
+      
+      if (typeof window.LeaderboardManager !== 'undefined') {
+        if (typeof window.LeaderboardManager.loadGameLeaderboard === 'function') {
+          window.LeaderboardManager.loadGameLeaderboard(gameType);
+        }
+      }
+    });
+  }
+  
+  // Filtre butonları
+  const filterButtons = document.querySelectorAll('.btn-filter');
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Filtre tipini al
+      const filterType = this.getAttribute('data-filter');
+      console.log('Filtre uygulanıyor:', filterType);
+      
+      // TODO: Filtre fonksiyonunu çağır
+      // Bu özellik henüz eklenecek...
+    });
+  });
+});
+
+// Bildirim gösterme fonksiyonu
+function showNotification(message, duration = 3000) {
+  const toast = document.getElementById('notificationToast');
+  const messageElement = toast.querySelector('.notification-message');
+  
+  messageElement.textContent = message;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, duration);
+}
+</script>
 
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}
