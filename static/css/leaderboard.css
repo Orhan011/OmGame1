@@ -203,10 +203,20 @@ body {
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.crown-icon {
+  animation: float-crown 2s ease-in-out infinite;
+}
+
+@keyframes float-crown {
+  0% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+  100% { transform: translateX(-50%) translateY(0); }
 }
 
 .player-avatar::before {
