@@ -4,10 +4,32 @@
 <div class="container language-learning-container">
   <div class="page-title-section">
     <div class="duolingo-header">
-      <img src="https://d35aaqx5ub95lt.cloudfront.net/images/owls/duo-spark.svg" alt="Duo Owl" class="duo-owl">
+      <div class="duo-owl-container">
+        <svg class="duo-owl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" fill="#58cc02" />
+          <circle cx="65" cy="80" r="25" fill="white" />
+          <circle cx="135" cy="80" r="25" fill="white" />
+          <circle cx="65" cy="80" r="15" fill="#1cb0f6" />
+          <circle cx="135" cy="80" r="15" fill="#1cb0f6" />
+          <circle cx="65" cy="75" r="7" fill="white" />
+          <circle cx="135" cy="75" r="7" fill="white" />
+          <ellipse cx="100" cy="130" rx="30" ry="20" fill="#fed5b2" />
+          <path d="M80,110 Q100,130 120,110" stroke="#784918" stroke-width="5" fill="none" />
+        </svg>
+      </div>
       <div class="header-text">
         <h1>Dil Ustası</h1>
         <p>Eğlenceli ve ücretsiz dil öğrenme deneyimi</p>
+      </div>
+      <div class="header-actions">
+        <div class="xp-badge">
+          <i class="fas fa-star"></i>
+          <span>15 XP</span>
+        </div>
+        <div class="level-badge">
+          <i class="fas fa-crown"></i>
+          <span>Seviye 1</span>
+        </div>
       </div>
     </div>
   </div>
@@ -184,11 +206,40 @@
     box-shadow: 0 8px 25px rgba(88, 204, 2, 0.3);
   }
   
-  .duo-owl {
-    width: 80px;
-    height: 80px;
+  .duo-owl-container {
+    width: 100px;
+    height: 100px;
     margin-right: 20px;
+  }
+  
+  .duo-owl {
+    width: 100%;
+    height: 100%;
     animation: bounce 2s ease infinite;
+  }
+  
+  .header-actions {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    gap: 10px;
+  }
+  
+  .xp-badge, .level-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .xp-badge i, .level-badge i {
+    margin-right: 8px;
+    font-size: 1.1rem;
   }
   
   @keyframes bounce {
@@ -648,6 +699,37 @@
   
   /* Mobil uyumluluk */
   @media (max-width: 768px) {
+    .duolingo-header {
+      flex-direction: column;
+      text-align: center;
+      padding: 15px;
+    }
+    
+    .duo-owl-container {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+    
+    .header-text {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .header-text h1 {
+      font-size: 2rem;
+    }
+    
+    .header-text p {
+      font-size: 1rem;
+    }
+    
+    .header-actions {
+      flex-direction: row;
+      margin-left: 0;
+      justify-content: center;
+      gap: 15px;
+    }
+    
     .lessons-grid {
       grid-template-columns: 1fr;
     }
@@ -665,6 +747,21 @@
     
     .language-option {
       flex: 0 0 auto;
+    }
+    
+    .lesson-card {
+      padding: 20px 15px;
+    }
+    
+    .lesson-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .lesson-progress {
+      align-items: flex-start;
+      margin-top: 10px;
     }
   }
 </style>
