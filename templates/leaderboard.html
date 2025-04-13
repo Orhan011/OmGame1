@@ -8,38 +8,29 @@
 
 {% block content %}
 <div class="container py-4">
-  <div class="leaderboard-main-header">
+  <div class="leaderboard-header">
     <h1>Liderlik Tablosu</h1>
     <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
   </div>
 
-  <div class="leaderboard-tabs">
-    <div class="leaderboard-tab active" data-tab="score">
-      <i class="fas fa-trophy"></i> Skor Sıralaması
-    </div>
-    <div class="leaderboard-tab" data-tab="level">
-      <i class="fas fa-star"></i> Seviye Sıralaması
-    </div>
-  </div>
-
   <div class="leaderboard-container">
     <!-- Skor tablosu -->
-    <div id="scoreTabContent" class="leaderboard-tab-content active">
-      <div id="leaderboardContainer" class="leaderboard-card-container">
-        <div class="loading">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>Skorlar yükleniyor...</p>
-        </div>
+    <div id="leaderboardContainer" class="leaderboard-card-container">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Skorlar yükleniyor...</p>
       </div>
     </div>
     
     <!-- Seviye tablosu -->
-    <div id="levelTabContent" class="leaderboard-tab-content">
-      <div id="levelLeaderboardContainer" class="leaderboard-card-container">
-        <div class="loading">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>Seviye bilgileri yükleniyor...</p>
-        </div>
+    <div class="leaderboard-header">
+      <h1>Seviye Sıralaması</h1>
+      <p>Kullanıcıların seviye puanlarına göre sıralaması. Platform üzerinde etkinlik göstererek seviye kazanın!</p>
+    </div>
+    <div id="levelLeaderboardContainer" class="leaderboard-card-container">
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Seviye bilgileri yükleniyor...</p>
       </div>
     </div>
   </div>
@@ -50,26 +41,5 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/level-leaderboard.js') }}"></script>
-<script>
-// Tab değiştirme işlevselliği
-document.addEventListener('DOMContentLoaded', function() {
-  const tabs = document.querySelectorAll('.leaderboard-tab');
-  const tabContents = document.querySelectorAll('.leaderboard-tab-content');
-  
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      // Aktif tab'ı değiştir
-      tabs.forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-      
-      // İlgili içeriği göster
-      const tabName = this.getAttribute('data-tab');
-      tabContents.forEach(content => {
-        content.classList.remove('active');
-      });
-      document.getElementById(`${tabName}TabContent`).classList.add('active');
-    });
-  });
-});
-</script>
+<script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>
 {% endblock %}
