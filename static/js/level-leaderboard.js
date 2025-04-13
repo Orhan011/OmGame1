@@ -86,7 +86,7 @@ function loadLevelLeaderboard() {
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${player.level || 1}</span>
+                <span class="score-value">${player.level || 1}</span> <span class="score-value">${player.level_points ? Number(player.level_points).toLocaleString('tr-TR') : 0}</span>
                 <div class="score-sparkles"></div>
               </div>
             </div>
