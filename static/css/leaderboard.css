@@ -733,7 +733,7 @@
 .score-value {
   color: #fff;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   position: relative;
   z-index: 1;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
@@ -789,7 +789,7 @@
 .player-row[data-rank="1"] .score-value {
   color: gold; /* Changed to gold */
   text-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
-  font-size: 1.5rem;
+  font-size: 1.1rem;
 }
 
 .player-row[data-rank="1"] .score-sparkles {
@@ -806,7 +806,7 @@
 .player-row[data-rank="2"] .score-value {
   color: silver; /* Changed to silver */
   text-shadow: 0 0 4px rgba(192, 192, 192, 0.4);
-  font-size: 1.4rem;
+  font-size: 1.05rem;
 }
 
 .player-row[data-rank="2"] .score-sparkles {
@@ -823,7 +823,7 @@
 .player-row[data-rank="3"] .score-value {
   color: darkgoldenrod; /* Changed to darkgoldenrod */
   text-shadow: 0 0 4px rgba(205, 127, 50, 0.4);
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 
 .player-row[data-rank="3"] .score-sparkles {
@@ -1133,6 +1133,6 @@
   }
 
   .score-value {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
   }
 }
