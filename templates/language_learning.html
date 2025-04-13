@@ -113,7 +113,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Dil seçimi için event listener
@@ -122,7 +122,10 @@
     languageOptions.forEach(option => {
       option.addEventListener('click', function() {
         // Önceki aktif seçeneği sıfırla
-        document.querySelector('.language-option.active').classList.remove('active');
+        const activeOption = document.querySelector('.language-option.active');
+        if (activeOption) {
+          activeOption.classList.remove('active');
+        }
         // Yeni seçeneği aktif et
         this.classList.add('active');
         

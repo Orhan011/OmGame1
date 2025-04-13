@@ -28,7 +28,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endif %}
 
-{% if request.endpoint in ['all_games', 'leaderboard'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
+{% if request.endpoint in ['all_games', 'leaderboard', 'education_games', 'language_learning', 'language_lesson'] or 'game' in request.endpoint or request.endpoint in ['word_puzzle', 'memory_match', 'labyrinth', 'puzzle', 'memory_cards', 'number_chain', 'audio_memory', 'n_back', 'game_2048', 'wordle', 'chess', 'simon_says', 'minesweeper', 'tetris', 'typing_speed', 'snake_game', 'sudoku', 'hangman', 'crossword', 'tangram', 'solitaire', 'iq_test', 'color_match_game', 'math_challenge', 'puzzle_slider'] %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-components.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game-responsive-modernizer.css') }}">
@@ -112,9 +112,8 @@ function loadArticleContent() {
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 
-<!-- Derecelendirme sistemi için CSS ve JS -->
+<!-- Derecelendirme sistemi için CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rating.css') }}">
-<script src="{{ url_for('static', filename='js/rating-handler.js') }}" defer></script>
 </head>
 <body>
 <!-- Dinamik Arkaplan Efekti -->

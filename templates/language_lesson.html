@@ -51,7 +51,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Ders verileri
@@ -74,38 +74,46 @@
     showExercise(currentExerciseIndex);
     
     // Kontrol Et butonuna tıklama olay dinleyicisi
-    checkBtn.addEventListener('click', function() {
-      if (checkBtn.classList.contains('disabled')) return;
-      
-      // Kullanıcının cevabını kontrol et
-      checkAnswer();
-    });
+    if (checkBtn) {
+      checkBtn.addEventListener('click', function() {
+        if (checkBtn.classList.contains('disabled')) return;
+        
+        // Kullanıcının cevabını kontrol et
+        checkAnswer();
+      });
+    }
     
     // Devam Et butonuna tıklama olay dinleyicisi
-    continueBtn.addEventListener('click', function() {
-      currentExerciseIndex++;
-      
-      if (currentExerciseIndex < exercises.length) {
-        // Sonraki egzersizi göster
-        showExercise(currentExerciseIndex);
-        // İlerleme çubuğunu güncelle
-        updateProgressBar();
+    if (continueBtn) {
+      continueBtn.addEventListener('click', function() {
+        currentExerciseIndex++;
         
-        continueBtn.style.display = 'none';
-        checkBtn.style.display = 'block';
-        checkBtn.classList.add('disabled');
-      } else {
-        // Dersi tamamla
-        showLessonComplete();
-      }
-    });
+        if (currentExerciseIndex < exercises.length) {
+          // Sonraki egzersizi göster
+          showExercise(currentExerciseIndex);
+          // İlerleme çubuğunu güncelle
+          updateProgressBar();
+          
+          continueBtn.style.display = 'none';
+          checkBtn.style.display = 'block';
+          checkBtn.classList.add('disabled');
+        } else {
+          // Dersi tamamla
+          showLessonComplete();
+        }
+      });
+    }
     
     // Egzersizi görüntüle
     function showExercise(index) {
+      if (!exerciseContainer) return;
+      
       const exercise = exercises[index];
       
       // Mevcut egzersiz numarasını güncelle
-      currentExerciseEl.textContent = index + 1;
+      if (currentExerciseEl) {
+        currentExerciseEl.textContent = index + 1;
+      }
       
       let html = '';
       
@@ -178,7 +186,9 @@
             this.classList.add('selected');
             
             // Kontrol butonunu aktifleştir
-            checkBtn.classList.remove('disabled');
+            if (checkBtn) {
+              checkBtn.classList.remove('disabled');
+            }
             
             // Kullanıcı seçimini kaydet
             userChoices = parseInt(this.getAttribute('data-index'));
@@ -203,7 +213,7 @@
             
             // Tüm terimler eşleştirildiğinde kontrol butonunu aktifleştir
             const allMatched = document.querySelectorAll('.foreign-term.matched').length === exercise.pairs.length;
-            if (allMatched) {
+            if (allMatched && checkBtn) {
               checkBtn.classList.remove('disabled');
               userChoices = true;
             }
@@ -239,7 +249,7 @@
               
               // Tüm terimler eşleştirildiğinde kontrol butonunu aktifleştir
               const allMatched = document.querySelectorAll('.foreign-term.matched').length === exercise.pairs.length;
-              if (allMatched) {
+              if (allMatched && checkBtn) {
                 checkBtn.classList.remove('disabled');
                 userChoices = true;
               }
@@ -256,6 +266,8 @@
       
       if (exercise.type === 'translation' || exercise.type === 'multiple_choice') {
         const selectedOption = document.querySelector('.option.selected');
+        if (!selectedOption) return;
+        
         const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
         isCorrect = exercise.options[selectedIndex] === exercise.correct;
         
@@ -268,7 +280,10 @@
           
           // Doğru cevabı göster
           const correctIndex = exercise.options.indexOf(exercise.correct);
-          document.querySelectorAll('.option')[correctIndex].classList.add('correct');
+          const options = document.querySelectorAll('.option');
+          if (options[correctIndex]) {
+            options[correctIndex].classList.add('correct');
+          }
         }
       } else if (exercise.type === 'matching') {
         // Tüm eşleştirmeler tamamlandıysa, zaten doğru kabul edilir
@@ -277,18 +292,22 @@
       }
       
       // Kontrol butonunu gizle, devam butonunu göster
-      checkBtn.style.display = 'none';
-      continueBtn.style.display = 'block';
+      if (checkBtn) checkBtn.style.display = 'none';
+      if (continueBtn) continueBtn.style.display = 'block';
     }
     
     // İlerleme çubuğunu güncelle
     function updateProgressBar() {
+      if (!progressBar) return;
+      
       const progress = ((currentExerciseIndex + 1) / exercises.length) * 100;
       progressBar.style.width = `${progress}%`;
     }
     
     // Ders tamamlandı ekranını göster
     function showLessonComplete() {
+      if (!exerciseContainer) return;
+      
       const accuracy = Math.floor((correctAnswers / exercises.length) * 100);
       
       exerciseContainer.innerHTML = `
@@ -319,7 +338,10 @@
       `;
       
       // Navigasyon butonlarını gizle
-      document.querySelector('.lesson-navigation').style.display = 'none';
+      const navigation = document.querySelector('.lesson-navigation');
+      if (navigation) {
+        navigation.style.display = 'none';
+      }
     }
     
     // İlk ilerleme çubuğu güncellemesi
