@@ -222,6 +222,141 @@
       font-size: 3rem;
     }
   }
+  
+  /* Game Over Modal Styles */
+  .tetris-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+  
+  .tetris-modal.show {
+    opacity: 1;
+  }
+  
+  .tetris-modal-content {
+    width: 90%;
+    max-width: 400px;
+    background: linear-gradient(135deg, #2c3e50, #1a2a38);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    border: 2px solid rgba(106, 90, 205, 0.7);
+  }
+  
+  .tetris-modal.show .tetris-modal-content {
+    transform: scale(1);
+  }
+  
+  .tetris-modal-header {
+    background: rgba(106, 90, 205, 0.7);
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .tetris-modal-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .tetris-modal-body {
+    padding: 25px;
+    text-align: center;
+  }
+  
+  .final-score-container {
+    margin-bottom: 25px;
+  }
+  
+  .final-score-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #6C5CE7;
+    text-shadow: 0 0 10px rgba(106, 90, 205, 0.5);
+    margin-bottom: 5px;
+  }
+  
+  .final-score-label {
+    font-size: 1rem;
+    color: #ddd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .game-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+  }
+  
+  .game-stat {
+    text-align: center;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    color: #bbb;
+    text-transform: uppercase;
+  }
+  
+  .modal-message {
+    font-size: 0.95rem;
+    color: #ddd;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  
+  .tetris-modal-footer {
+    padding: 15px 25px 25px;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .modal-btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    background: linear-gradient(135deg, #6C5CE7, #8A70FF);
+    box-shadow: 0 4px 10px rgba(106, 90, 205, 0.4);
+  }
+  
+  .modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(106, 90, 205, 0.5);
+  }
+  
+  .modal-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(106, 90, 205, 0.4);
+  }
 </style>
 
 <script>
@@ -752,11 +887,77 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate final score with bonuses
     const finalScore = calculateFinalScore();
     
-    // Display game over message with final score
-    alert(`Oyun Bitti!\n\nSkor: ${finalScore}\nSeviye: ${level}\nSatırlar: ${lines}`);
+    // Create and show a modern game over modal
+    showGameOverModal(finalScore);
     
     // Save score to user account and leaderboard
     saveScore(finalScore);
+  }
+  
+  // Show a modern game over modal
+  function showGameOverModal(finalScore) {
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('game-over-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'game-over-modal';
+    modal.className = 'tetris-modal';
+    
+    // Create modal content
+    modal.innerHTML = `
+      <div class="tetris-modal-content">
+        <div class="tetris-modal-header">
+          <h2>OYUN BİTTİ</h2>
+        </div>
+        <div class="tetris-modal-body">
+          <div class="final-score-container">
+            <div class="final-score-value">${finalScore}</div>
+            <div class="final-score-label">Skor</div>
+          </div>
+          <div class="game-stats">
+            <div class="game-stat">
+              <div class="stat-value">${level}</div>
+              <div class="stat-label">Seviye</div>
+            </div>
+            <div class="game-stat">
+              <div class="stat-value">${lines}</div>
+              <div class="stat-label">Satırlar</div>
+            </div>
+          </div>
+          <div class="modal-message">
+            Skorunuz kaydedildi ve liderlik tablosuna eklendi.
+          </div>
+        </div>
+        <div class="tetris-modal-footer">
+          <button id="play-again-btn" class="modal-btn">Tekrar Oyna</button>
+          <button id="home-btn" class="modal-btn">Ana Sayfa</button>
+        </div>
+      </div>
+    `;
+    
+    // Add modal to the document
+    document.body.appendChild(modal);
+    
+    // Add event listeners to buttons
+    document.getElementById('play-again-btn').addEventListener('click', function() {
+      // Close modal and reset game
+      modal.remove();
+      resetGame();
+    });
+    
+    document.getElementById('home-btn').addEventListener('click', function() {
+      // Navigate to home page
+      window.location.href = '/';
+    });
+    
+    // Show modal with animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 100);
   }
   
   // Calculate final score with bonuses
