@@ -79,15 +79,12 @@ function loadLevelLeaderboard() {
               </div>
               <div class="player-info">
                 <div class="player-name ${userNameColorClass}">${player.username}</div>
-                <div class="player-stats">
-                  <div class="games-badge"><i class="fas fa-gamepad"></i> ${player.games_played || 0} oyun</div>
-                </div>
+                <div class="player-level">Başlangıç</div>
               </div>
             </div>
             <div class="score-cell">
               <div class="score-container">
                 <span class="score-value">${player.level || 1}</span>
-                <div class="score-sparkles"></div>
               </div>
             </div>
           </div>
