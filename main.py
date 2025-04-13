@@ -3449,6 +3449,7 @@ def education_games():
     # Sayfa template'ini döndür
     return render_template('education_games.html', games=games)
 
+@app.route('/language-learning')
 @app.route('/games/language-learning')
 def language_learning():
     """Duolingo tarzı dil öğrenme oyunu"""
