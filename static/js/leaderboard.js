@@ -116,9 +116,9 @@ function loadLeaderboard() {
         <h2 class="leaderboard-title">En İyi Oyuncular</h2>
         <div class="leaderboard-table">
           <div class="table-header">
-            <div class="column-sira">Sıra</div>
-            <div class="column-isim">İsim</div>
-            <div class="column-puan">Puan</div>
+            <div class="header-rank">Sıra</div>
+            <div class="header-name">İsim</div>
+            <div class="header-score">Puan</div>
           </div>
       `;
 
@@ -133,21 +133,16 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
 
-        // Yeni tasarıma göre oyuncu satırı ekle
+        // Modern tasarıma göre oyuncu satırı ekle
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="column-sira">${rank}</div>
-            <div class="column-isim">
-              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
-              <span>${username}</span>
-            </div>
-            <div class="column-puan"><span class="score-badge">${formatNumber(totalScore)}</span></div>
+            <div class="simple-rank">${rank}</div>
+            <div class="simple-name">${username}</div>
+            <div class="simple-score">${formatNumber(totalScore)}</div>
           </div>
-          <div class="divider"></div>
         `;
       });
 
-      // Toplam puan butonu ekle
       html += `
         </div>
         <div class="total-score-btn">
@@ -215,9 +210,9 @@ function loadLevelLeaderboard() {
         <h2 class="leaderboard-title">En İyi Seviyeler</h2>
         <div class="leaderboard-table">
           <div class="table-header">
-            <div class="column-sira">Sıra</div>
-            <div class="column-isim">İsim</div>
-            <div class="column-puan">Seviye</div>
+            <div class="header-rank">Sıra</div>
+            <div class="header-name">İsim</div>
+            <div class="header-score">Seviye</div>
           </div>
       `;
 
@@ -235,17 +230,13 @@ function loadLevelLeaderboard() {
         const avatarUrl = fixAvatarUrl(player.avatar_url);
         const rank = index + 1;
 
-        // Yeni tasarıma göre seviye satırı ekle
+        // Modern tasarıma göre seviye satırı ekle
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="column-sira">${rank}</div>
-            <div class="column-isim">
-              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
-              <span>${username}</span>
-            </div>
-            <div class="column-puan"><span class="score-badge">Seviye ${level}</span></div>
+            <div class="simple-rank">${rank}</div>
+            <div class="simple-name">${username}</div>
+            <div class="simple-score">Seviye ${level}</div>
           </div>
-          <div class="divider"></div>
         `;
       });
 
@@ -320,9 +311,9 @@ function loadGameLeaderboard(gameType) {
         <h2 class="leaderboard-title">${gameType === 'all' ? 'Tüm Oyunlar' : gameType} Puan Sıralaması</h2>
         <div class="leaderboard-table">
           <div class="table-header">
-            <div class="column-sira">Sıra</div>
-            <div class="column-isim">İsim</div>
-            <div class="column-puan">Puan</div>
+            <div class="header-rank">Sıra</div>
+            <div class="header-name">İsim</div>
+            <div class="header-score">Puan</div>
           </div>
       `;
 
@@ -336,17 +327,13 @@ function loadGameLeaderboard(gameType) {
         const avatarUrl = fixAvatarUrl(player.avatar_url);
         const rank = index + 1;
 
-        // Yeni tasarıma göre oyun puanı satırı ekle
+        // Modern tasarıma göre oyun puanı satırı ekle
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
-            <div class="column-sira">${rank}</div>
-            <div class="column-isim">
-              ${avatarUrl ? `<img src="${avatarUrl}" alt="${username}" class="player-avatar">` : ''}
-              <span>${username}</span>
-            </div>
-            <div class="column-puan"><span class="score-badge">${formatNumber(score)}</span></div>
+            <div class="simple-rank">${rank}</div>
+            <div class="simple-name">${username}</div>
+            <div class="simple-score">${formatNumber(score)}</div>
           </div>
-          <div class="divider"></div>
         `;
       });
 
@@ -478,44 +465,6 @@ function animateRows() {
   });
 }
 
-// Oyuncu satırı HTML'i oluştur - Basitleştirilmiş tek satır format
-function createPlayerRow(rank, username, score, avatarUrl, isCurrentUser, playerRank) {
-  const currentUserClass = isCurrentUser ? 'current-user' : '';
-
-  return `
-    <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="simple-rank">${rank}</div>
-      <div class="simple-name">${username}</div>
-      <div class="simple-score">${formatNumber(score)}</div>
-    </div>
-  `;
-}
-
-// Seviye satırı HTML'i oluştur - Basitleştirilmiş tek satır format
-function createLevelRow(rank, username, level, totalXp, progressPercent, avatarUrl, isCurrentUser, playerRank) {
-  const currentUserClass = isCurrentUser ? 'current-user' : '';
-
-  return `
-    <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="simple-rank">${rank}</div>
-      <div class="simple-name">${username}</div>
-      <div class="simple-score">Seviye ${level}</div>
-    </div>
-  `;
-}
-
-// Oyun satırı HTML'i oluştur - Basitleştirilmiş tek satır format
-function createGameRow(rank, username, score, avatarUrl, isCurrentUser, gameInfo, gameType) {
-  const currentUserClass = isCurrentUser ? 'current-user' : '';
-
-  return `
-    <div class="player-row ${currentUserClass}" data-rank="${rank}" style="opacity: 0; transform: translateY(20px);">
-      <div class="simple-rank">${rank}</div>
-      <div class="simple-name">${username}</div>
-      <div class="simple-score">${formatNumber(score)}</div>
-    </div>
-  `;
-}
 
 // Avatar URL'lerini düzelt
 function fixAvatarUrl(url) {
