@@ -92,10 +92,20 @@ function loadLeaderboard() {
 
         console.log(`Kullanıcı eklenıyor: ${username}, Puan: ${totalScore}`);
         
+        // Rank ikonlarını oluştur
+        let rankIcon = '';
+        if (rank === 1) {
+          rankIcon = '<i class="fas fa-crown" style="color: var(--gold); margin-right: 5px;"></i>';
+        } else if (rank === 2) {
+          rankIcon = '<i class="fas fa-medal" style="color: var(--silver); margin-right: 5px;"></i>';
+        } else if (rank === 3) {
+          rankIcon = '<i class="fas fa-award" style="color: var(--bronze); margin-right: 5px;"></i>';
+        }
+
         // Satır HTML'i
         html += `
           <div class="player-row" data-rank="${rank}">
-            <div class="rank">${rank}</div>
+            <div class="rank">${rankIcon}${rank}</div>
             <div class="player">
               <div class="player-avatar">
                 <img src="${avatarUrl || '/static/images/avatars/default.svg'}" alt="${username}" 
