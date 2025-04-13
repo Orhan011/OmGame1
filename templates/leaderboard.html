@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block title %}Liderlik Tablosu | ZekaPark{% endblock %}
@@ -13,12 +14,22 @@
     <p>Tüm oyuncuların performansını takip edin! Farklı oyunlar oynayarak yeteneklerinizi geliştirebilir, toplam puanınızı artırabilir ve liderlik tablosunda yerinizi alabilirsiniz.</p>
   </div>
 
-  <div class="row">
-    <!-- Skor Tablosu -->
-    <div class="col-12 mb-4">
-      <div class="leaderboard-title">Toplam Puan Sıralaması</div>
-      <div class="leaderboard-container">
-        <div id="leaderboardContainer" class="leaderboard-card-container">
+  <div class="leaderboard-tabs">
+    <button class="tab-btn active" data-tab="points">
+      <i class="fas fa-trophy"></i>
+      Toplam Puan
+    </button>
+    <button class="tab-btn" data-tab="levels">
+      <i class="fas fa-star"></i>
+      Seviyeler
+    </button>
+  </div>
+
+  <div class="leaderboard-content">
+    <!-- Puan Tablosu -->
+    <div class="tab-panel active" id="points-panel">
+      <div class="leaderboard-card">
+        <div id="leaderboardContainer">
           <div class="loading">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Skorlar yükleniyor...</p>
@@ -28,25 +39,18 @@
     </div>
 
     <!-- Seviye Tablosu -->
-    <div class="col-12">
-      <div class="leaderboard-title">Kullanıcı Seviyeleri</div>
-      <div class="leaderboard-container">
-        <div id="levelLeaderboardContainer" class="leaderboard-card-container">
+    <div class="tab-panel" id="levels-panel">
+      <div class="leaderboard-card">
+        <div id="levelLeaderboardContainer">
           <div class="loading">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Seviye bilgileri yükleniyor...</p>
           </div>
-          <noscript>
-            <div class="error">
-              <i class="fas fa-exclamation-triangle"></i>
-              <p>Seviye bilgilerini görmek için JavaScript'i etkinleştirin.</p>
-            </div>
-          </noscript>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/leaderboard-fix.js') }}"></script>
+<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}
