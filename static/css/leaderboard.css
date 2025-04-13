@@ -1,355 +1,3 @@
-
-/* Modern Liderlik Tablosu Stili - 2025 Edition */
-:root {
-  --primary-color: #6a5ae0;
-  --primary-light: #9f8aff;
-  --accent-color: #ffd700;
-  --dark-bg: #1a1a2e;
-  --card-bg: #22223b;
-  --text-light: #ffffff;
-  --text-muted: #8a8aa3;
-  --border-radius: 12px;
-  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-/* Ana liderlik tablosu konteyneri */
-.leaderboard-table {
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--box-shadow);
-}
-
-/* Tablo başlığı */
-.leaderboard-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-light);
-  margin-bottom: 1.5rem;
-  text-align: center;
-  position: relative;
-  padding-bottom: 0.8rem;
-}
-
-.leaderboard-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-  border-radius: 3px;
-}
-
-/* Tablo ana konteyneri */
-.leaderboard-table {
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  box-shadow: var(--box-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Tablo başlık satırı */
-.leaderboard-header, .table-header {
-  display: flex;
-  padding: 1rem 1.5rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(106, 90, 224, 0.1);
-}
-
-.header-rank, .header-name, .header-score {
-  padding: 0 0.5rem;
-}
-
-.header-rank {
-  width: 80px;
-  text-align: center;
-}
-
-.header-name {
-  flex: 1;
-}
-
-.header-score {
-  width: 120px;
-  text-align: right;
-}
-
-/* Oyuncu satırları */
-.player-row {
-  display: flex;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  transition: all 0.3s ease;
-  border-left: 3px solid transparent;
-  margin-bottom: 6px;
-  background: var(--background-element);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.player-row:hover {
-  background: linear-gradient(90deg, rgba(106, 90, 224, 0.1), var(--background-element));
-  transform: translateX(5px);
-  border-left-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.player-row::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.02), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.8s ease;
-  pointer-events: none;
-}
-
-.player-row:hover::before {
-  transform: translateX(100%);
-}
-
-/* Basitleştirilmiş tek satır formatı için stiller */
-.simple-rank, .simple-name, .simple-score {
-  padding: 0 0.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.simple-rank {
-  width: 50px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.player-info {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  gap: 0.8rem;
-}
-
-.player-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
-}
-
-.player-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.simple-name {
-  flex: 1;
-  color: var(--text-light);
-  font-weight: 600;
-  font-size: 1.05rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.simple-score {
-  width: 150px;
-  text-align: right;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--primary-light);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.rank-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 4px;
-  padding: 0.1rem 0.4rem;
-  margin-left: 0.5rem;
-  animation: pulse 2s infinite;
-}
-
-.rank-1 {
-  color: var(--gold);
-}
-
-.rank-2 {
-  color: var(--silver);
-}
-
-.rank-3 {
-  color: var(--bronze);
-}
-
-.level-badge {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* İlk 3 satır için özel renkler */
-.player-row[data-rank="1"] {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), var(--background-element));
-  border-left-color: var(--gold);
-}
-
-.player-row[data-rank="1"] .simple-rank {
-  color: var(--gold);
-}
-
-.player-row[data-rank="2"] {
-  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), var(--background-element));
-  border-left-color: var(--silver);
-}
-
-.player-row[data-rank="2"] .simple-rank {
-  color: var(--silver);
-}
-
-.player-row[data-rank="3"] {
-  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), var(--background-element));
-  border-left-color: var(--bronze);
-}
-
-.player-row[data-rank="3"] .simple-rank {
-  color: var(--bronze);
-}
-
-/* Toplam puan butonu */
-.total-score-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-  color: white;
-  font-weight: 600;
-  padding: 1.2rem;
-  border-radius: var(--border-radius);
-  text-align: center;
-  margin: 1.5rem 0;
-  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.total-score-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(106, 90, 224, 0.4);
-}
-
-.total-score-btn i {
-  font-size: 1.2rem;
-}
-
-/* İlk üç sıradaki oyuncular için özel stil */
-.player-row[data-rank="1"] .column-sira {
-  color: #ffd700;
-}
-
-.player-row[data-rank="2"] .column-sira {
-  color: #c0c0c0;
-}
-
-.player-row[data-rank="3"] .column-sira {
-  color: #cd7f32;
-}
-
-/* Satır ayırıcı */
-.divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.05);
-  margin: 0 1rem;
-}
-
-/* Güncel kullanıcının satırı */
-.current-user {
-  background-color: rgba(106, 90, 224, 0.2);
-  border-left: 3px solid var(--primary-color);
-}
-
-/* Toplam puan butonu */
-.total-score-btn {
-  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
-  color: white;
-  font-weight: 600;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  text-align: center;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(106, 90, 224, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.total-score-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(106, 90, 224, 0.4);
-}
-
-.total-score-btn i {
-  margin-right: 0.5rem;
-}
-
-/* Mobil cihazlar için uyarlama */
-@media (max-width: 768px) {
-  .table-header, .player-row {
-    grid-template-columns: 60px 1fr 100px;
-  }
-  
-  .score-badge {
-    padding: 0.4rem 0.8rem;
-    min-width: 70px;
-    font-size: 0.9rem;
-  }
-  
-  .player-avatar {
-    width: 32px;
-    height: 32px;
-  }
-}
-
 /* Modern Leaderboard Styles - 2025 Edition */
 :root {
   --primary-color: #6a5ae0;
@@ -373,6 +21,12 @@
   --transition: all 0.3s ease;
 }
 
+body {
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  font-family: 'Poppins', sans-serif;
+}
+
 /* ======= Hero Section ======= */
 .leaderboard-hero {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
@@ -391,6 +45,7 @@
   justify-content: center;
   gap: 2.5rem;
   margin: 1.5rem 0;
+  flex-wrap: wrap;
 }
 
 .hero-stat {
@@ -432,30 +87,6 @@
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
-}
-
-.hero-title {
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  font-size: 2.8rem;
-  margin-bottom: 1rem;
-}
-
-.hero-subtitle {
-  font-size: 1.2rem;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.leaderboard-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='rgba(255, 255, 255, 0.05)' fill-rule='evenodd'/%3E%3C/svg%3E");
-  opacity: 0.5;
-  z-index: 0;
 }
 
 .hero-content {
@@ -558,49 +189,106 @@
   animation: pulse 2s infinite;
 }
 
-@keyframes glow {
-  0% {
-    box-shadow: 0 0 5px rgba(106, 90, 224, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(106, 90, 224, 0.5);
-  }
-  100% {
-    box-shadow: 0 0 5px rgba(106, 90, 224, 0.3);
-  }
+.section-title i {
+  margin-right: 0.5rem;
+  color: var(--gold);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 5px rgba(106, 90, 224, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(106, 90, 224, 0.5); }
+  100% { box-shadow: 0 0 5px rgba(106, 90, 224, 0.3); }
+}
+
+.podium-wrapper {
+  background: var(--background-card);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.podium-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='rgba(255, 255, 255, 0.03)' fill-rule='evenodd'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 0;
 }
 
 .podium-container {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: flex-end;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+  min-height: 280px;
+  padding: 1rem 0;
 }
 
 .podium-player {
-  background: var(--background-card);
+  background: var(--background-element);
   border-radius: var(--border-radius);
   padding: 1.5rem;
-  width: 250px;
+  width: calc(33.333% - 1rem);
+  max-width: 220px;
   text-align: center;
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   transition: var(--transition);
   position: relative;
-  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  height: 100%;
+}
+
+/* Podyum konumlandırma */
+.podium-player[data-rank="1"] {
+  order: 2;
+  transform: translateY(-30px);
+  height: 240px;
+  z-index: 3;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), var(--background-element));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+}
+
+.podium-player[data-rank="2"] {
+  order: 1;
+  height: 210px;
+  z-index: 2;
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), var(--background-element));
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.podium-player[data-rank="3"] {
+  order: 3;
+  height: 180px;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), var(--background-element));
+  border: 1px solid rgba(205, 127, 50, 0.3);
 }
 
 .podium-player:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.podium-player[data-rank="1"]:hover {
+  transform: translateY(-40px);
 }
 
 .podium-rank {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--background-element);
-  color: var(--text-light);
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 30px;
   height: 30px;
   display: flex;
@@ -609,11 +297,16 @@
   border-radius: 50%;
   font-weight: 700;
   font-size: 0.9rem;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .rank-1 {
   background: var(--gold);
   color: var(--text-dark);
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
 }
 
 .rank-2 {
@@ -630,20 +323,44 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  margin: 0 auto 1rem;
+  margin: 0.5rem auto 1rem;
   overflow: hidden;
   border: 3px solid rgba(255, 255, 255, 0.1);
   transition: var(--transition);
+  position: relative;
+}
+
+.podium-player[data-rank="1"] .podium-avatar {
+  width: 100px;
+  height: 100px;
+  border-color: rgba(255, 215, 0, 0.3);
 }
 
 .podium-player:hover .podium-avatar {
   transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .avatar-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.podium-player[data-rank="1"] .avatar-fallback {
+  font-size: 2.5rem;
 }
 
 .podium-username {
@@ -658,6 +375,7 @@
 
 .username-1 {
   color: var(--gold);
+  font-size: 1.4rem;
 }
 
 .username-2 {
@@ -675,6 +393,19 @@
   margin-bottom: 0.5rem;
 }
 
+.podium-player[data-rank="1"] .podium-score {
+  color: var(--gold);
+  font-size: 1.8rem;
+}
+
+.podium-player[data-rank="2"] .podium-score {
+  color: var(--silver);
+}
+
+.podium-player[data-rank="3"] .podium-score {
+  color: var(--bronze);
+}
+
 .podium-badge {
   display: inline-block;
   background: rgba(106, 90, 224, 0.2);
@@ -685,9 +416,32 @@
   margin-top: 0.5rem;
 }
 
+.podium-player::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  z-index: -1;
+}
+
+.podium-platform {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: var(--background-element);
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
 .podium-loading {
   width: 100%;
   display: flex;
+  justify-content: center;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
@@ -700,7 +454,7 @@
   animation: shimmer 1.5s infinite;
   border-radius: var(--border-radius);
   height: 150px;
-  width: 250px;
+  width: 200px;
 }
 
 @keyframes shimmer {
@@ -956,25 +710,56 @@
   border-collapse: collapse;
 }
 
+.leaderboard-table {
+  margin-bottom: 1rem;
+}
+
 /* Basit Tablo Tasarımı */
 .player-row {
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
   background: var(--background-element);
-  margin-bottom: 2px;
+  margin-bottom: 8px;
   border-left: 3px solid transparent;
   transition: var(--transition);
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.5s ease forwards;
 }
 
 .player-row:hover {
   background: rgba(106, 90, 224, 0.1);
   border-left-color: var(--primary-color);
+  transform: translateX(5px);
 }
 
 /* Basitleştirilmiş tek satır formatı için stiller */
+.player-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.8rem;
+}
+
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .simple-rank, .simple-name, .simple-score {
-  padding: 0 1rem;
+  padding: 0 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -984,36 +769,49 @@
   width: 50px;
   text-align: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .simple-name {
   flex: 1;
   color: var(--text-light);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .simple-score {
-  width: 120px;
+  width: 100px;
   text-align: right;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--primary-light);
+  background: rgba(106, 90, 224, 0.1);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Tablo başlığı */
-.leaderboard-header {
+.table-header {
   display: flex;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .header-rank, .header-name, .header-score {
-  padding: 0 1rem;
+  padding: 0 0.5rem;
 }
 
 .header-rank {
@@ -1026,8 +824,8 @@
 }
 
 .header-score {
-  width: 120px;
-  text-align: right;
+  width: 100px;
+  text-align: center;
 }
 
 /* İlk 3 satır için özel renkler */
@@ -1058,6 +856,30 @@
   color: var(--bronze);
 }
 
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  margin-left: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+.rank-1 {
+  color: var(--gold);
+}
+
+.rank-2 {
+  color: var(--silver);
+}
+
+.rank-3 {
+  color: var(--bronze);
+}
+
 /* Kullanıcının kendi satırı */
 .player-row.current-user {
   background: linear-gradient(90deg, rgba(106, 90, 224, 0.15), var(--background-element));
@@ -1079,13 +901,19 @@
   font-weight: 600;
 }
 
-/* Eski stiller kaldırıldı - yukarıdaki yeni stiller kullanılıyor */
-
 /* Progress bar for level leaderboard */
+.level-badge {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
 .level-progress {
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);border-radius: 3px;
   overflow: hidden;
   margin-top: 0.3rem;
   position: relative;
@@ -1243,42 +1071,59 @@
   .leaderboard-hero {
     padding: 2rem 1rem;
   }
-  
+
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .hero-subtitle {
     font-size: 1rem;
   }
-  
+
   .section-title {
     font-size: 1.3rem;
   }
-  
+
   .podium-container {
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
   }
-  
+
   .podium-player {
     width: 100%;
-    max-width: 300px;
+    max-width: 250px;
+    order: 0 !important;
+    transform: none !important;
+    height: auto !important;
   }
-  
+
+  .podium-player[data-rank="1"] {
+    order: 1 !important;
+  }
+
+  .podium-player[data-rank="2"] {
+    order: 2 !important;
+  }
+
+  .podium-player[data-rank="3"] {
+    order: 3 !important;
+  }
+
   .leaderboard-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .header-right {
     width: 100%;
     margin-top: 1rem;
   }
-  
+
   .player-row {
     padding: 0.8rem;
   }
-  
+
   .tips-grid {
     grid-template-columns: 1fr;
   }
@@ -1288,43 +1133,37 @@
   .tab-list {
     flex-direction: column;
   }
-  
+
   .tab-item {
     width: 100%;
   }
-  
+
   .leaderboard-stats {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.8rem;
   }
-  
+
   .stat-item {
     flex-direction: row;
     gap: 0.5rem;
   }
-  
+
   .filter-controls {
     flex-wrap: wrap;
   }
-  
+
   .game-selector-wrapper {
     flex-direction: column;
     align-items: stretch;
   }
-  
-  .player-row {
-    flex-wrap: wrap;
+
+  .simple-score {
+    margin-left: auto;
   }
-  
-  .score-column {
-    width: 100%;
-    text-align: left;
-    margin-top: 1rem;
-    padding-left: 0;
-  }
-  
-  .player-column {
-    width: 100%;
-  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

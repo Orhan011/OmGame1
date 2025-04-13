@@ -41,15 +41,17 @@
     </div>
   </div>
 
-  <!-- Podium: Top 3 Oyuncular -->
+  <!-- Podyum Bölümü: İlk 3 Oyuncu -->
   <div class="podium-section animate__animated animate__fadeInUp animate__delay-1s">
-    <h2 class="section-title">En İyi Oyuncular</h2>
-    <div class="podium-container" id="podiumContainer">
-      <!-- Podium JavaScript tarafından doldurulacak -->
-      <div class="podium-loading">
-        <div class="shimmer-effect"></div>
-        <div class="shimmer-effect"></div>
-        <div class="shimmer-effect"></div>
+    <h2 class="section-title"><i class="fas fa-trophy"></i> Şampiyonlar Podyumu</h2>
+    <div class="podium-wrapper">
+      <div class="podium-container" id="podiumContainer">
+        <!-- Podyum JavaScript tarafından doldurulacak -->
+        <div class="podium-loading">
+          <div class="shimmer-effect"></div>
+          <div class="shimmer-effect"></div>
+          <div class="shimmer-effect"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -83,14 +85,12 @@
             <div class="header-right">
               <div class="leaderboard-stats">
                 <div class="stat-item">
-                  <i class="fas fa-users"></i>
-                  <span class="stat-count" id="totalPlayerCount">--</span>
-                  <span class="stat-label">Oyuncu</span>
+                  <span class="stat-count" id="totalActivePlayerCount">--</span>
+                  <span class="stat-label">Aktif Oyuncu</span>
                 </div>
                 <div class="stat-item">
-                  <i class="fas fa-award"></i>
-                  <span class="stat-count" id="totalScoreCount">--</span>
-                  <span class="stat-label">Toplam Puan</span>
+                  <span class="stat-count" id="totalGamesPlayedCount">--</span>
+                  <span class="stat-label">Toplam Oyun</span>
                 </div>
               </div>
             </div>
@@ -172,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Başarı Kuralları ve İpuçları -->
+  <!-- Başarı İpuçları -->
   <div class="achievement-tips-section animate__animated animate__fadeInUp animate__delay-2s">
     <div class="tips-card">
       <div class="tips-header">
@@ -188,7 +188,7 @@
             <p>Her gün farklı oyun türlerinde pratik yap, beyin jimnastiği yap ve düzenli XP kazan.</p>
           </div>
         </div>
-        
+
         <div class="tip-item">
           <div class="tip-icon">
             <i class="fas fa-fire"></i>
@@ -198,7 +198,7 @@
             <p>Daha yüksek zorluk seviyeleri, daha yüksek puan çarpanları sağlar. Kendinizi zorlayın!</p>
           </div>
         </div>
-        
+
         <div class="tip-item">
           <div class="tip-icon">
             <i class="fas fa-bolt"></i>
@@ -208,7 +208,7 @@
             <p>Hızlı tepki verirken doğruluktan ödün vermeyin. Hız ve doğruluk en yüksek puanları getirir.</p>
           </div>
         </div>
-        
+
         <div class="tip-item">
           <div class="tip-icon">
             <i class="fas fa-medal"></i>
@@ -223,7 +223,7 @@
   </div>
 </div>
 
-<!-- Notification Toast -->
+<!-- Bildirim Toast -->
 <div id="notificationToast" class="notification-toast">
   <div class="notification-content">
     <i class="notification-icon fas fa-sync-alt"></i>
@@ -231,99 +231,6 @@
   </div>
 </div>
 
-<!-- Scriptle -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Tab değiştirme işlemi
-  const tabButtons = document.querySelectorAll('.tab-item');
-  const tabContents = document.querySelectorAll('.tab-content');
-  
-  tabButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      // Data özelliğini kullanarak ilgili içeriği bul
-      const tabId = this.getAttribute('data-tab');
-      
-      // Aktif sekmeyi güncelle
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      
-      // İçeriği göster/gizle
-      tabContents.forEach(content => content.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-    });
-  });
-
-  // Yenile butonu
-  const refreshButtons = document.querySelectorAll('.refresh-leaderboard');
-  refreshButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      this.classList.add('spin-animation');
-      
-      // Yenileme fonksiyonunu çağır
-      if (typeof updateScoreBoard === 'function') {
-        updateScoreBoard();
-      }
-      
-      // Animasyonu durdur
-      setTimeout(() => {
-        this.classList.remove('spin-animation');
-        showNotification('Liderlik tablosu güncellendi!');
-      }, 1000);
-    });
-  });
-
-  // Oyun filtresi
-  const applyFilterBtn = document.getElementById('applyGameFilter');
-  if (applyFilterBtn) {
-    applyFilterBtn.addEventListener('click', function() {
-      const gameType = document.getElementById('gameTypeSelect').value;
-      const container = document.getElementById('gameLeaderboardContainer');
-      
-      container.innerHTML = `
-        <div class="leaderboard-loading">
-          <div class="loading-spinner"></div>
-          <p class="loading-text">${gameType === 'all' ? 'Tüm oyunlar' : gameType} için skorlar yükleniyor...</p>
-        </div>
-      `;
-      
-      if (typeof window.LeaderboardManager !== 'undefined') {
-        if (typeof window.LeaderboardManager.loadGameLeaderboard === 'function') {
-          window.LeaderboardManager.loadGameLeaderboard(gameType);
-        }
-      }
-    });
-  }
-  
-  // Filtre butonları
-  const filterButtons = document.querySelectorAll('.btn-filter');
-  filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-      
-      // Filtre tipini al
-      const filterType = this.getAttribute('data-filter');
-      console.log('Filtre uygulanıyor:', filterType);
-      
-      // TODO: Filtre fonksiyonunu çağır
-      // Bu özellik henüz eklenecek...
-    });
-  });
-});
-
-// Bildirim gösterme fonksiyonu
-function showNotification(message, duration = 3000) {
-  const toast = document.getElementById('notificationToast');
-  const messageElement = toast.querySelector('.notification-message');
-  
-  messageElement.textContent = message;
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, duration);
-}
-</script>
-
+<!-- Script -->
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 {% endblock %}

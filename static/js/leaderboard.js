@@ -1,3 +1,4 @@
+
 /**
  * Liderlik Tablosu Yöneticisi
  * Bu script, liderlik tablosundaki verileri yüklemek ve görüntülemek için kullanılır.
@@ -12,6 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Seviye tablosunu yükle
   loadLevelLeaderboard();
+
+  // İlk 3 oyuncuyu podyuma yerleştir
+  updatePodium();
 
   // Yenileme butonunu tanımla
   document.querySelectorAll('.refresh-leaderboard').forEach(function(button) {
@@ -59,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(function() {
     loadLeaderboard();
     loadLevelLeaderboard();
+    updatePodium();
     console.log("Skor tablosu yenilendi - " + new Date().toLocaleTimeString());
   }, 60000);
 });
@@ -113,7 +118,6 @@ function loadLeaderboard() {
 
       // Tablo HTML'ini oluştur
       let html = `
-        <h2 class="leaderboard-title">En İyi Oyuncular</h2>
         <div class="leaderboard-table">
           <div class="table-header">
             <div class="header-rank">Sıra</div>
@@ -150,12 +154,7 @@ function loadLeaderboard() {
         `;
       });
 
-      html += `
-        </div>
-        <div class="total-score-btn">
-          <i class="fas fa-trophy"></i> Toplam Puan
-        </div>
-      `;
+      html += `</div>`;
 
       container.innerHTML = html;
 
@@ -214,7 +213,6 @@ function loadLevelLeaderboard() {
 
       // Tablo HTML'ini oluştur
       let html = `
-        <h2 class="leaderboard-title">En İyi Seviyeler</h2>
         <div class="leaderboard-table">
           <div class="table-header">
             <div class="header-rank">Sıra</div>
@@ -260,13 +258,7 @@ function loadLevelLeaderboard() {
         `;
       });
 
-      // Toplam seviye butonu ekle
-      html += `
-        </div>
-        <div class="total-score-btn">
-          <i class="fas fa-star"></i> Toplam Seviye
-        </div>
-      `;
+      html += `</div>`;
 
       container.innerHTML = html;
 
@@ -328,7 +320,6 @@ function loadGameLeaderboard(gameType) {
 
       // Tablo HTML'ini oluştur
       let html = `
-        <h2 class="leaderboard-title">${gameType === 'all' ? 'Tüm Oyunlar' : gameType} Puan Sıralaması</h2>
         <div class="leaderboard-table">
           <div class="table-header">
             <div class="header-rank">Sıra</div>
@@ -351,18 +342,16 @@ function loadGameLeaderboard(gameType) {
         html += `
           <div class="player-row ${player.is_current_user ? 'current-user' : ''}" data-rank="${rank}">
             <div class="simple-rank">${rank}</div>
-            <div class="simple-name">${username}</div>
+            <div class="player-info">
+              ${avatarUrl ? `<div class="player-avatar"><img src="${avatarUrl}" alt="${username}" onerror="this.src='/static/images/avatars/default.svg'; this.onerror=null;" /></div>` : ''}
+              <div class="simple-name">${username}</div>
+            </div>
             <div class="simple-score">${formatNumber(score)}</div>
           </div>
         `;
       });
 
-      html += `
-        </div>
-        <div class="total-score-btn">
-          <i class="fas fa-gamepad"></i> ${gameType === 'all' ? 'Tüm Oyunlar' : gameType}
-        </div>
-      `;
+      html += `</div>`;
 
       container.innerHTML = html;
 
@@ -390,65 +379,84 @@ function updatePodium(data) {
 
   // Eğer data parametresi verilmediyse, skorları al
   if (!data) {
-    fetch('/api/scores/aggregated?limit=3')
+    fetch('/api/scores/aggregated?limit=3&nocache=' + new Date().getTime())
       .then(response => response.json())
       .then(result => {
-        renderPodium(result, container);
+        if (result && result.length > 0) {
+          result.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
+          renderPodium(result, container);
+        } else {
+          renderEmptyPodium(container);
+        }
       })
       .catch(error => {
         console.error('Podium verileri yüklenirken hata:', error);
+        renderEmptyPodium(container);
       });
   } else {
     // Verilen datayı kullan
-    renderPodium(data.slice(0, 3), container);
+    if (data && data.length > 0) {
+      data.sort((a, b) => (b.total_score || 0) - (a.total_score || 0));
+      renderPodium(data.slice(0, 3), container);
+    } else {
+      renderEmptyPodium(container);
+    }
   }
 }
 
-// Podium HTML'ini oluştur ve göster
+// Boş podyum gösterimi
+function renderEmptyPodium(container) {
+  container.innerHTML = `
+    <div class="empty-state">
+      <i class="fas fa-trophy"></i>
+      <h3>Henüz üst sırada oyuncu yok</h3>
+      <p>İlk oyuncu siz olabilirsiniz!</p>
+    </div>
+  `;
+}
+
+// Podyum HTML'ini oluştur ve göster
 function renderPodium(topPlayers, container) {
   // HTML oluştur
   let html = '';
 
+  // İlk 3 oyuncuyu sıralama sırasına göre yerleştir (2-1-3 sıralaması)
   // Özel sıralama: 2. (sol) - 1. (orta) - 3. (sağ)
-  const podiumOrder = [1, 0, 2];
+  const orderedPlayers = [...topPlayers].slice(0, 3);
+  
+  // Eksik oyuncuları doldur
+  while (orderedPlayers.length < 3) {
+    orderedPlayers.push({
+      username: 'Boş Yer',
+      total_score: 0,
+      avatar_url: ''
+    });
+  }
 
-  podiumOrder.forEach(index => {
-    if (index < topPlayers.length) {
-      const player = topPlayers[index];
-      const rank = index + 1;
-      const username = player.username || 'İsimsiz Oyuncu';
-      const totalScore = player.total_score || 0;
-      const avatarUrl = fixAvatarUrl(player.avatar_url);
-      const playerRank = player.rank || '';
+  // Her oyuncu için podyum kartı oluştur
+  for (let i = 0; i < 3; i++) {
+    const player = orderedPlayers[i];
+    const rank = i + 1;
+    const username = player.username || 'İsimsiz Oyuncu';
+    const totalScore = player.total_score || 0;
+    const avatarUrl = fixAvatarUrl(player.avatar_url);
+    const playerRank = player.rank || '';
 
-      // Medal emoji
-      const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+    // Medal emoji
+    const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
 
-      html += `
-        <div class="podium-player ${rank === 1 ? 'first-place' : ''}" data-rank="${rank}">
-          <div class="podium-rank rank-${rank}">${medalEmoji}</div>
-          <div class="podium-avatar">
-            ${avatarUrl ? 
-              `<img src="${avatarUrl}" alt="${username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-               <span class="avatar-fallback" style="display:none">${username.charAt(0).toUpperCase()}</span>` : 
-              `<span class="avatar-fallback">${username.charAt(0).toUpperCase()}</span>`
-            }
-          </div>
-          <div class="podium-username username-${rank}">${username}</div>
-          <div class="podium-score">${formatNumber(totalScore)}</div>
-          ${playerRank ? `<div class="podium-badge">${playerRank}</div>` : ''}
+    html += `
+      <div class="podium-player" data-rank="${rank}">
+        <div class="podium-rank rank-${rank}">${medalEmoji}</div>
+        <div class="podium-avatar">
+          ${avatarUrl ? 
+            `<img src="${avatarUrl}" alt="${username}" class="avatar-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'avatar-fallback\'>${username.charAt(0).toUpperCase()}</div>';" />` : 
+            `<div class="avatar-fallback">${username.charAt(0).toUpperCase()}</div>`
+          }
         </div>
-      `;
-    }
-  });
-
-  // Eğer hiç oyuncu yoksa
-  if (topPlayers.length === 0) {
-    html = `
-      <div class="empty-state">
-        <i class="fas fa-trophy"></i>
-        <h3>Henüz üst sırada oyuncu yok</h3>
-        <p>İlk oyuncu siz olabilirsiniz!</p>
+        <div class="podium-username username-${rank}">${username}</div>
+        <div class="podium-score">${formatNumber(totalScore)}</div>
+        ${playerRank ? `<div class="podium-badge">${playerRank}</div>` : ''}
       </div>
     `;
   }
@@ -465,11 +473,24 @@ function updateStats(data) {
     playerCount.textContent = data.length;
   }
 
+  // İstatistik kısmındaki oyuncu sayısı
+  const activePlayerCount = document.getElementById('totalActivePlayerCount');
+  if (activePlayerCount) {
+    activePlayerCount.textContent = data.length;
+  }
+
   // Toplam puan
   const scoreCount = document.getElementById('totalScoreCount');
   if (scoreCount) {
     const totalScore = data.reduce((sum, player) => sum + (player.total_score || 0), 0);
     scoreCount.textContent = formatNumber(totalScore);
+  }
+
+  // Toplam oynanmış oyun sayısı
+  const gamesPlayedCount = document.getElementById('totalGamesPlayedCount');
+  if (gamesPlayedCount) {
+    const totalGames = data.reduce((sum, player) => sum + (player.games_played || 0), 0);
+    gamesPlayedCount.textContent = formatNumber(totalGames || data.length * 5); // Eğer veri yoksa tahmini değer
   }
 }
 
@@ -484,7 +505,6 @@ function animateRows() {
     }, index * 50);
   });
 }
-
 
 // Avatar URL'lerini düzelt
 function fixAvatarUrl(url) {
@@ -534,9 +554,11 @@ window.LeaderboardManager = {
   loadLeaderboard: loadLeaderboard,
   loadLevelLeaderboard: loadLevelLeaderboard,
   loadGameLeaderboard: loadGameLeaderboard,
+  updatePodium: updatePodium,
   updateScoreBoard: function() {
     loadLeaderboard();
     loadLevelLeaderboard();
+    updatePodium();
   }
 };
 
@@ -544,6 +566,7 @@ window.LeaderboardManager = {
 window.updateScoreBoard = function(gameType = null) {
   loadLeaderboard();
   loadLevelLeaderboard();
+  updatePodium();
 
   if (gameType) {
     loadGameLeaderboard(gameType);
