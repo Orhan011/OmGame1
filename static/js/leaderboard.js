@@ -1,8 +1,3 @@
-// Puanları formatlamak için yardımcı fonksiyon
-function formatScore(score) {
-  // 1000'den büyük puanları formatlı göster (örn: 1,234)
-  return score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
@@ -91,7 +86,7 @@ function loadLeaderboard(gameType = 'all') {
             </div>
             <div class="score-cell">
               <div class="score-container">
-                <span class="score-value">${formatScore(scoreValue)}</span>
+                <span class="score-value">${scoreValue || 0}</span>
               </div>
             </div>
           </div>
@@ -145,6 +140,3 @@ function calculateTotalScores(scoresData) {
     // Oyuncuları diziye dönüştür ve puana göre sırala
     return Object.values(players).sort((a, b) => b.total_score - a.total_score);
   }
-
-  // Her 60 saniyede bir tabloyu otomatik güncelle
-  setInterval(loadLeaderboard, 60000);
