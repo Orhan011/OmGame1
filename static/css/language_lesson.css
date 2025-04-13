@@ -1,0 +1,436 @@
+.language-lesson-container {
+  padding-bottom: 60px;
+}
+
+/* Ders başlığı */
+.lesson-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding: 20px 30px;
+  background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.back-btn {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.back-btn i {
+  margin-right: 8px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-5px);
+}
+
+.lesson-title-container {
+  text-align: center;
+}
+
+.lesson-title-container h1 {
+  color: white;
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.lesson-title-container p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.hearts {
+  display: flex;
+  align-items: center;
+  color: #e74c3c;
+  font-size: 1.3rem;
+}
+
+.hearts i {
+  margin-right: 5px;
+}
+
+.hearts span {
+  margin-left: 5px;
+  color: white;
+  font-weight: 600;
+}
+
+/* Ders içeriği */
+.lesson-content {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 30px;
+  min-height: 400px;
+  position: relative;
+}
+
+/* Egzersiz stilleri */
+.exercise {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+}
+
+.exercise-prompt {
+  text-align: center;
+  margin-bottom: 30px;
+  background-color: #f5f7fa;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.exercise-prompt h2 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+/* Seçenek stilleri */
+.options-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.option {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option:hover {
+  border-color: #6a5ae0;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.option.selected {
+  border-color: #6a5ae0;
+  background: rgba(106, 90, 224, 0.05);
+}
+
+.option.correct {
+  border-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.option.incorrect {
+  border-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.option span {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* Eşleştirme egzersizi stilleri */
+.matching-container {
+  width: 100%;
+}
+
+.matching-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.matching-pair {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.native-term, .foreign-term {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 45%;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.native-term:hover, .foreign-term:hover {
+  border-color: #6a5ae0;
+  transform: translateY(-3px);
+}
+
+.foreign-term.selected {
+  border-color: #6a5ae0;
+  background: rgba(106, 90, 224, 0.05);
+}
+
+.native-term.matched, .foreign-term.matched {
+  border-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+  cursor: default;
+}
+
+.native-term.error, .foreign-term.error {
+  border-color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Buton stilleri */
+.lesson-navigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.action-btn {
+  border: none;
+  border-radius: 50px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.check-btn {
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  color: white;
+  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+}
+
+.check-btn:hover {
+  background: linear-gradient(to right, #8170ff, #9a8eff);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
+}
+
+.check-btn.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.continue-btn {
+  background: linear-gradient(to right, #2ecc71, #27ae60);
+  color: white;
+  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.continue-btn:hover {
+  background: linear-gradient(to right, #27ae60, #219653);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+}
+
+/* İlerleme çubuğu */
+.progress-bar-container {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background-color: #f1f3f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Egzersiz yok mesajı */
+.no-exercises {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.no-exercises i {
+  font-size: 5rem;
+  color: #6a5ae0;
+  margin-bottom: 20px;
+}
+
+.no-exercises h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.no-exercises p {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+}
+
+.back-link {
+  display: inline-block;
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.3);
+}
+
+.back-link:hover {
+  background: linear-gradient(to right, #8170ff, #9a8eff);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
+}
+
+/* Ders tamamlama ekranı */
+.lesson-complete {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.lesson-complete-header {
+  margin-bottom: 30px;
+}
+
+.lesson-complete-header i {
+  font-size: 5rem;
+  color: #f39c12;
+  margin-bottom: 20px;
+  text-shadow: 0 3px 10px rgba(243, 156, 18, 0.3);
+}
+
+.lesson-complete-header h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+}
+
+.lesson-results {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 30px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.result-label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.result-value {
+  font-weight: 700;
+  color: #6a5ae0;
+}
+
+.lesson-complete-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.back-to-lessons {
+  background: linear-gradient(to right, #2c3e50, #3498db);
+  text-decoration: none;
+}
+
+.back-to-lessons:hover {
+  background: linear-gradient(to right, #3498db, #2980b9);
+}
+
+.retry-lesson {
+  background: linear-gradient(to right, #6a5ae0, #8170ff);
+  text-decoration: none;
+}
+
+.retry-lesson:hover {
+  background: linear-gradient(to right, #8170ff, #9a8eff);
+}
+
+/* Mobil uyumluluk */
+@media (max-width: 768px) {
+  .lesson-header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px 15px;
+  }
+  
+  .lesson-content {
+    padding: 20px 15px;
+  }
+  
+  .options-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .matching-pair {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .native-term, .foreign-term {
+    width: 100%;
+  }
+  
+  .lesson-complete-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
