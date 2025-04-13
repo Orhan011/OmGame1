@@ -188,6 +188,40 @@
       display: none;
     }
   }
+  
+  /* Score animation */
+  .score-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    animation: score-float 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+  
+  @keyframes score-float {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0);
+      font-size: 1.5rem;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -100px);
+      font-size: 3rem;
+    }
+  }
 </style>
 
 <script>
@@ -684,8 +718,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (currentPiece.y + y < 0) {
             gameOver = true;
             document.getElementById('pauseBtn').disabled = true;
-            alert('Oyun Bitti! Skor: ' + score);
-            saveScore();
+            endGame();
             return;
           }
           
@@ -701,8 +734,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // Next piece becomes current
     currentPiece = nextPiece;
     nextPiece = createPiece();
+    
+    // Check if the new piece can be placed
+    if (checkCollision(currentPiece, 0, 0)) {
+      // If there's no space for the new piece, game over
+      gameOver = true;
+      document.getElementById('pauseBtn').disabled = true;
+      endGame();
+      return;
+    }
+    
     drawNextPiece();
   }
+  
+  // End game and save score
+  function endGame() {
+    // Calculate final score with bonuses
+    const finalScore = calculateFinalScore();
+    
+    // Display game over message with final score
+    alert(`Oyun Bitti!\n\nSkor: ${finalScore}\nSeviye: ${level}\nSatırlar: ${lines}`);
+    
+    // Save score to user account and leaderboard
+    saveScore(finalScore);
+  }
+  
+  // Calculate final score with bonuses
+  function calculateFinalScore() {
+    // Base score
+    let finalScore = score;
+    
+    // Level bonus: Higher levels get multiplier
+    const levelMultiplier = 1 + (level * 0.1);
+    finalScore = Math.floor(finalScore * levelMultiplier);
+    
+    // Lines cleared bonus
+    finalScore += lines * 10;
+    
+    // Return the final calculated score
+    return finalScore;
+  }
+  
+  // Game state variables for scoring
+  let combo = 0;
+  let lastClearTime = 0;
   
   // Check for completed lines
   function checkLines() {
@@ -743,19 +818,64 @@ document.addEventListener('DOMContentLoaded', function() {
       // Increase total lines cleared
       lines += linesCleared;
       
-      // Calculate points based on lines cleared
+      // Calculate base points based on lines cleared
+      // 1 line: 40, 2 lines: 100, 3 lines: 300, 4 lines: 1200
       let linePoints = [0, 40, 100, 300, 1200][linesCleared] * level;
+      
+      // Add combo bonus if lines were cleared in quick succession
+      const now = Date.now();
+      if (now - lastClearTime < 3000) { // 3 seconds window for combos
+        combo++;
+        // Combo bonus increases with each consecutive clear
+        linePoints += combo * 50;
+      } else {
+        combo = 0;
+      }
+      lastClearTime = now;
+      
+      // Update score
       score += linePoints;
       
       // Update level
+      const oldLevel = level;
       level = Math.floor(lines / 10) + 1;
       
-      // Speed up as level increases
+      // If level increased, add level-up bonus
+      if (level > oldLevel) {
+        const levelUpBonus = level * 100;
+        score += levelUpBonus;
+      }
+      
+      // Speed up as level increases (each level makes game 20% faster)
       dropInterval = 1000 * Math.pow(0.8, level - 1);
       
       // Update UI
       updateScore();
+      
+      // Show score animation if significant points earned
+      if (linePoints > 200) {
+        showScoreAnimation(linePoints);
+      }
+    } else {
+      // Reset combo if no lines were cleared
+      combo = 0;
     }
+  }
+  
+  // Show a visual animation for points earned
+  function showScoreAnimation(points) {
+    // Create a floating score element
+    const scoreAnimation = document.createElement('div');
+    scoreAnimation.className = 'score-animation';
+    scoreAnimation.textContent = `+${points}`;
+    
+    // Add it to the game container
+    document.querySelector('.board-container').appendChild(scoreAnimation);
+    
+    // Remove it after animation completes
+    setTimeout(() => {
+      scoreAnimation.remove();
+    }, 1500);
   }
   
   // Update score display
@@ -797,27 +917,53 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Save score to server
-  function saveScore() {
+  function saveScore(finalScore) {
+    // Get game duration in seconds
+    const gameTime = Math.floor((Date.now() - lastTime) / 1000);
+    
+    // Get real-time play statistics
+    const gameStats = {
+      lines_cleared: lines,
+      level: level,
+      game_duration_seconds: gameTime,
+      blocks_dropped: score / 10, // Approximate number of pieces dropped
+      combo_bonuses: Math.floor(lines / 4) // Approximate number of combos
+    };
+    
+    // Calculate difficulty
+    let difficulty = 'medium';
+    if (level < 3) {
+      difficulty = 'easy';
+    } else if (level > 7) {
+      difficulty = 'hard';
+    }
+    
     try {
+      // Send score data to server - will update user account and leaderboard
       fetch('/api/save-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          game_type: 'tetris',
-          score: score,
-          difficulty: 'medium',
-          playtime: 0,
-          game_stats: {
-            lines_cleared: lines,
-            level: level
-          }
+          game_type: 'tetris', 
+          score: finalScore || score, // Use finalScore if provided, otherwise use base score
+          difficulty: difficulty,
+          playtime: gameTime,
+          game_stats: gameStats
         })
       })
       .then(res => res.json())
-      .then(data => console.log('Score saved'))
-      .catch(err => console.error('Error saving score'));
+      .then(data => {
+        console.log('Score saved successfully');
+        // Show success message or update user XP/level if data contains that information
+        if (data && data.message) {
+          console.log(data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error saving score:', err);
+      });
     } catch (error) {
-      console.error('Failed to save score');
+      console.error('Failed to save score:', error);
     }
   }
   
