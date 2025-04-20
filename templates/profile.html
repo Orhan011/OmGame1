@@ -1,2 +1,146 @@
+<!-- Avatar Gallery -->
+<div class="avatar-gallery mt-4">
+  <h6 class="gallery-title">Hazır Avatarlar</h6>
+  <div class="avatar-options">
+    <!-- Bot Avatarları -->
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/bots/avatar_male_1.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/bots/avatar_male_1.svg') }}" alt="Avatar 1" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/bots/avatar_male_2.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/bots/avatar_male_2.svg') }}" alt="Avatar 2" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/bots/avatar_male_3.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/bots/avatar_male_3.svg') }}" alt="Avatar 3" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/bots/avatar_female_1.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/bots/avatar_female_1.svg') }}" alt="Avatar 4" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/bots/avatar_female_2.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/bots/avatar_female_2.svg') }}" alt="Avatar 5" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
 
-<!-- Bu dosya silinmiştir -->
+    <!-- Yeni Avatarlar -->
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar1.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar1.svg') }}" alt="Modern Avatar 1" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar2.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar2.svg') }}" alt="Modern Avatar 2" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar3.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar3.svg') }}" alt="Modern Avatar 3" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar4.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar4.svg') }}" alt="Modern Avatar 4" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar5.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar5.svg') }}" alt="Modern Avatar 5" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar6.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar6.svg') }}" alt="Modern Avatar 6" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar7.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar7.svg') }}" alt="Modern Avatar 7" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar8.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar8.svg') }}" alt="Modern Avatar 8" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar9.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar9.svg') }}" alt="Modern Avatar 9" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+    <div class="preset-avatar" data-avatar="{{ url_for('static', filename='avatars/avatar10.svg') }}">
+      <img src="{{ url_for('static', filename='avatars/avatar10.svg') }}" alt="Modern Avatar 10" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/avatars/default.svg') }}';">
+    </div>
+  </div>
+</div>
+<form method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" id="selectedAvatar" name="selected_avatar" value="{{ current_user.avatar_url if current_user.avatar_url else '' }}">
+</form>
+
+<!-- Bir sonraki seviyeye ne kadar XP kaldığını hesapla -->
+  <div class="xp-progress-container">
+    <div class="xp-progress-bar">
+      <div class="xp-progress" style="width: {{ xp_progress }}%"></div>
+    </div>
+    <div class="xp-info">
+      <span>{{ user.experience_points|int }}</span> / <span>{{ next_level_xp }}</span> XP
+    </div>
+  </div>
+
+  <!-- Kullanıcının sıralama bilgisi -->
+  <div class="user-ranking-info">
+    <div class="ranking-item" id="points-ranking">
+      <span class="ranking-label">Puan Sıralaması:</span>
+      <span class="ranking-value">
+        <div class="ranking-loader"><i class="fas fa-spinner fa-spin"></i></div>
+      </span>
+    </div>
+    <div class="ranking-item" id="level-ranking">
+      <span class="ranking-label">Seviye Sıralaması:</span>
+      <span class="ranking-value">
+        <div class="ranking-loader"><i class="fas fa-spinner fa-spin"></i></div>
+      </span>
+    </div>
+  </div>
+
+  <!-- Sıralama bilgisi için doğrudan script -->
+  <script>
+    // Sayfa yüklendiğinde sıralama bilgisini getir
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Kullanıcı ID'sini doğrudan al
+        const currentUserId = {{ user.id }};
+        
+        // Puan sıralaması ve seviye sıralamasını getir
+        let pointRanking = null;
+        let levelRanking = null;
+        
+        try {
+          // Puan sıralaması
+          const pointsResponse = await fetch('/api/scores/aggregated?nocache=' + new Date().getTime());
+          const pointsData = await pointsResponse.json();
+          const pointIndex = pointsData.findIndex(user => user.is_current_user || user.user_id == currentUserId);
+          if (pointIndex >= 0) {
+            pointRanking = pointIndex + 1;
+          }
+        } catch (error) {
+          console.error('Puan sıralaması alınırken hata:', error);
+        }
+        
+        try {
+          // Seviye sıralaması
+          const levelResponse = await fetch('/api/users/levels?limit=100&nocache=' + new Date().getTime());
+          const levelData = await levelResponse.json();
+          const levelIndex = levelData.findIndex(user => user.is_current_user || user.user_id == currentUserId);
+          if (levelIndex >= 0) {
+            levelRanking = levelIndex + 1;
+          }
+        } catch (error) {
+          console.error('Seviye sıralaması alınırken hata:', error);
+        }
+        
+        // Sıralama bilgilerini göster
+        // Puan sıralamasını göster
+        const pointsElement = document.querySelector('#points-ranking .ranking-value');
+        if (pointsElement) {
+          if (pointRanking) {
+            pointsElement.innerHTML = `<span class="ranking-number">${pointRanking}.</span> sırada`;
+          } else {
+            pointsElement.innerHTML = '<span class="ranking-unknown">Henüz sıralamada değil</span>';
+          }
+        }
+
+        // Seviye sıralamasını göster
+        const levelElement = document.querySelector('#level-ranking .ranking-value');
+        if (levelElement) {
+          if (levelRanking) {
+            levelElement.innerHTML = `<span class="ranking-number">${levelRanking}.</span> sırada`;
+          } else {
+            levelElement.innerHTML = '<span class="ranking-unknown">Henüz sıralamada değil</span>';
+          }
+        }
+      } catch (error) {
+        console.error('Sıralama bilgisi gösterilirken hata:', error);
+      }
+    });
+  </script>

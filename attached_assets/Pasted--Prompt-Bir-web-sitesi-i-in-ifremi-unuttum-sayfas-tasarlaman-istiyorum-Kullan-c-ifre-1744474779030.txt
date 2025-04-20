@@ -1,0 +1,41 @@
+**Prompt:**  
+
+"Bir web sitesi için 'şifremi unuttum' sayfası tasarlamanı istiyorum. Kullanıcı şifresini unuttuğunda, kayıtlı e-posta adresini girerek **4 haneli bir doğrulama kodu** alabilmeli. Bu kod, web sitenin resmi Gmail hesabından (örneğin `omgameee@gmail.com`) otomatik olarak gönderilmeli.  
+
+### **İstenen Özellikler:**  
+1. **Kullanıcı Arayüzü:**  
+   - Temiz ve modern bir tasarım  
+   - E-posta giriş alanı  
+   - "Doğrulama Kodu Gönder" butonu  
+   - Kullanıcıya "Kodunuz e-posta adresinize gönderildi" bildirimi  
+   - 4 haneli kodu girebileceği bir input alanı  
+   - "Kodu Doğrula" butonu  
+   - "Kodu Yeniden Gönder" seçeneği  
+
+2. **E-posta Gönderme Mekanizması:**  
+   - Kullanıcı "Doğrulama Kodu Gönder"e bastığında, sistem:  
+     - E-posta adresinin veritabanında kayıtlı olup olmadığını kontrol etmeli.  
+     - Kayıtlıysa, **rastgele 4 haneli bir kod oluşturmalı** (örneğin: `7421`).  
+     - Bu kodu, web sitenin **resmi Gmail hesabından** kullanıcıya iletmeli.  
+
+3. **E-posta Şablonu:**  
+   - Profesyonel ve şık bir tasarım  
+   - Web sitesi logosu ve adı  
+   - **"Şifre Sıfırlama Doğrulama Kodunuz"** başlığı  
+   - **4 haneli kod** büyük ve belirgin şekilde gösterilmeli  
+   - **"Bu kod 10 dakika geçerlidir"** uyarısı  
+   - "Eğer bu talebi siz yapmadıysanız, lütfen bu e-postayı dikkate almayın" güvenlik uyarısı  
+
+4. **Güvenlik ve Doğrulama:**  
+   - Kod **sadece 5 dakika geçerli** olmalı.  
+   - Kod doğrulandığında, kullanıcı **şifre sıfırlama sayfasına** yönlendirilmeli.  
+
+5. **Hata Yönetimi:**  
+   - Eğer e-posta kayıtlı değilse: **"Bu e-posta adresi kayıtlı değil"** uyarısı verilmeli.  
+   - Yanlış kod girilirse: **"Doğrulama kodu hatalı, lütfen tekrar deneyin"** mesajı gösterilmeli.  
+   - Kodun süresi dolduysa: **"Kodun süresi doldu, lütfen yeni bir kod talep edin"** hatası verilmeli.  
+
+### **Ekstra Not:**  
+- E-posta gönderimi için **SMTP/Gmail API** entegrasyonu kullanılmalı.  
+- Kodlar veritabanında **şifrelenerek** saklanmalı.  
+- Mobil uyumlu (responsive) bir tasarım olmalı.  

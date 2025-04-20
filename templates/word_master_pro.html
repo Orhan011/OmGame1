@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Master Pro - İngilizce Kelime Öğrenme Uygulaması</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            /* Color Palette */
+            --primary-color: #3b82f6; /* Blue */
+            --primary-dark: #1d4ed8;
+            --primary-light: #60a5fa;
+            --secondary-color: #f43f5e; /* Pink */
+            --secondary-dark: #e11d48;
+            --secondary-light: #fb7185;
+            --success-color: #10b981; /* Green */
+            --success-light: #34d399;
+            --danger-color: #ef4444; /* Red */
+            --danger-light: #f87171;
+            --warning-color: #f59e0b; /* Amber */
+            --warning-light: #fbbf24;
+            --info-color: #0ea5e9; /* Sky */
+            --info-light: #38bdf8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --black: #000000;
+            
+            /* Typography */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-heading: 'Montserrat', var(--font-sans);
+            
+            /* Elevation */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            --gradient-blue-purple: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            --gradient-orange-pink: linear-gradient(135deg, #f97316, var(--secondary-color));
+            --gradient-green-blue: linear-gradient(135deg, var(--success-color), var(--info-color));
+            
+            /* Other Variables */
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-full: 9999px;
+            --transition-fast: all 0.2s ease;
+            --transition-normal: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+        }
+
+        /* Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--gray-800);
+            background-color: var(--gray-50);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        a:hover, a:focus {
+            color: var(--primary-dark);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button, .btn {
+            font-family: var(--font-sans);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: -0.75rem;
+        }
+
+        .col {
+            flex: 1 0 0%;
+            padding: 0.75rem;
+        }
+
+        /* Header & Navigation */
+        .header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-fast);
+        }
+
+        .nav-link:hover, .nav-link:focus {
+            color: var(--primary-color);
+            background-color: var(--gray-100);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 3rem 0;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 3rem;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .hero-image {
+            flex: 1;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .hero-image img {
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            transition: var(--transition-normal);
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-secondary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary:hover, .btn-secondary:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover, .btn-outline:focus {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition-normal);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background-color: var(--white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        /* Game Screens */
+        .screen {
+            display: none;
+            padding: 2rem;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .logo-lg {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-blue-purple);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-description {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .level-selection {
+            margin-bottom: 2rem;
+        }
+
+        .level-selection h3 {
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        .level-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            background-color: var(--white);
+            color: var(--gray-800);
+            border: 2px solid var(--gray-300);
+            transition: var(--transition-normal);
+        }
+
+        .level-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .level-btn.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        .daily-target {
+            margin-bottom: 2rem;
+        }
+
+        .daily-target h3 {
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        .target-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .target-input {
+            width: 100px;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+
+        .target-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .target-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-200);
+            color: var(--gray-800);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-fast);
+        }
+
+        .target-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+
+        /* Game Screen */
+        .game-screen {
+            padding: 2rem;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .game-info {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+        }
+
+        .score-display {
+            font-size: 1.125rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .progress-bar {
+            height: 0.75rem;
+            background-color: var(--gray-200);
+            border-radius: var(--border-radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: var(--border-radius-full);
+        }
+
+        /* Game Phases */
+        .phase-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .phase-container.active {
+            display: block;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .phase-dot {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--gray-300);
+            position: relative;
+        }
+
+        .phase-dot.active {
+            background-color: var(--primary-color);
+            transform: scale(1.2);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .phase-dot.completed {
+            background-color: var(--success-color);
+        }
+
+        .word-display {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .current-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            position: relative;
+        }
+
+        .audio-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            position: absolute;
+            top: 50%;
+            right: -2.5rem;
+            transform: translateY(-50%);
+        }
+
+        .audio-btn:hover, .audio-btn:focus {
+            color: var(--primary-dark);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .phase-title {
+            font-size: 1.25rem;
+            color: var(--gray-700);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Multiple Choice Phase */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-btn {
+            padding: 1.25rem;
+            background-color: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius-md);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            text-align: center;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover, .option-btn:focus {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success-color);
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .option-btn.correct::before {
+            content: "✓";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 1rem;
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--danger-color);
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .option-btn.wrong::before {
+            content: "✕";
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 1rem;
+            color: var(--danger-color);
+            font-weight: 700;
+        }
+
+        /* Spelling Phase */
+        .spelling-phase {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .spelling-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.25rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+
+        .spelling-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .feedback-message {
+            min-height: 1.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .feedback-message.error {
+            color: var(--danger-color);
+        }
+
+        .feedback-message.success {
+            color: var(--success-color);
+        }
+
+        .feedback-message.hint {
+            color: var(--warning-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Pronunciation Phase */
+        .pronunciation-phase {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .mic-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: var(--gray-100);
+            border-radius: var(--border-radius-md);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .mic-status i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .recording-status {
+            display: inline-block;
+        }
+
+        .recording-active i {
+            color: var(--danger-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Result Phase */
+        .result-phase {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .result-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-icon.success {
+            color: var(--success-color);
+            animation: bounce 1s ease;
+        }
+
+        .result-icon.error {
+            color: var(--danger-color);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            20%, 60% {
+                transform: translateX(-10px);
+            }
+            40%, 80% {
+                transform: translateX(10px);
+            }
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-details {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        /* Example Phase */
+        .example-phase {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .example-word {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .example-sentence {
+            padding: 1.5rem;
+            background-color: var(--gray-100);
+            border-radius: var(--border-radius-md);
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            position: relative;
+            line-height: 1.6;
+            font-style: italic;
+            color: var(--gray-800);
+        }
+
+        .word-details {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            background-color: var(--gray-100);
+            border-radius: var(--border-radius-md);
+            min-width: 150px;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Game Over Screen */
+        .game-over-screen {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .completion-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .completion-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .completion-subtitle {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            margin-bottom: 2.5rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            transition: var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .words-learned-container {
+            margin-bottom: 2.5rem;
+        }
+
+        .words-learned-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--gray-900);
+        }
+
+        .words-learned-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+        }
+
+        .word-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            background-color: var(--gray-50);
+        }
+
+        .word-text {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .word-translation {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .final-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        /* Animation Classes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.5s ease-in-out;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-image {
+                margin-top: 2rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .word-details {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .final-actions {
+                flex-direction: column;
+            }
+            
+            .game-container {
+                margin: 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .completion-title {
+                font-size: 2rem;
+            }
+            
+            .level-buttons {
+                flex-direction: column;
+            }
+            
+            .level-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>OmGame</span>
+                </a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Ana Sayfa</a>
+                    <a href="/all-games" class="nav-link">Tüm Oyunlar</a>
+                    <a href="/leaderboard" class="nav-link">Sıralama</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Game Container -->
+    <div class="container">
+        <div class="game-container">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <div class="start-screen">
+                    <div class="logo-lg">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h1 class="game-title">Word Master Pro</h1>
+                    <p class="game-description">
+                        Çoktan seçmeli sorular, yazım ve telaffuz egzersizleriyle İngilizce kelime haznenizi genişletin. 
+                        Bu interaktif oyun ile dil öğrenmeyi eğlenceli hale getirin!
+                    </p>
+                    
+                    <div class="level-selection">
+                        <h3>Seviye Seçin</h3>
+                        <div class="level-buttons">
+                            <button class="level-btn active" data-level="A1">Başlangıç (A1)</button>
+                            <button class="level-btn" data-level="A2">Temel (A2)</button>
+                            <button class="level-btn" data-level="B1">Orta (B1)</button>
+                            <button class="level-btn" data-level="B2">İleri (B2)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="daily-target">
+                        <h3>Günlük Kelime Hedefi</h3>
+                        <div class="target-input-container">
+                            <button class="target-btn" id="decrease-target">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" id="target-input" class="target-input" min="5" max="50" value="10">
+                            <button class="target-btn" id="increase-target">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button id="start-game-btn" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play"></i> Oyuna Başla
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen">
+                <div class="game-header">
+                    <div class="game-info">
+                        <div class="info-item">
+                            <i class="fas fa-star"></i>
+                            <span>Puan:</span>
+                            <span id="score" class="score-display">0</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Doğru:</span>
+                            <span id="correct-count" class="score-display">0</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Yanlış:</span>
+                            <span id="wrong-count" class="score-display">0</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>İpucu:</span>
+                        <span id="hint-count" class="score-display">3</span>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span id="progress-text">Günlük Hedef: 0/10</span>
+                        <span id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <!-- Phase Indicators -->
+                <div class="phase-indicator">
+                    <div class="phase-dot active" data-phase="1" title="Çoktan Seçmeli"></div>
+                    <div class="phase-dot" data-phase="2" title="Yazım"></div>
+                    <div class="phase-dot" data-phase="3" title="Telaffuz"></div>
+                </div>
+                
+                <!-- Multiple Choice Phase -->
+                <div id="multiple-choice-phase" class="phase-container active">
+                    <div class="word-display">
+                        <h2 id="current-word" class="current-word">Loading...</h2>
+                        <button id="listen-word" class="audio-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    
+                    <h3 class="phase-title">Bu kelimenin Türkçe karşılığını seçin</h3>
+                    
+                    <div id="options-container" class="options-grid">
+                        <!-- Options will be added here dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Spelling Phase -->
+                <div id="spelling-phase" class="phase-container">
+                    <div class="word-display">
+                        <h2 id="spelling-translation" class="current-word">Loading...</h2>
+                    </div>
+                    
+                    <h3 class="phase-title">Bu kelimenin İngilizce yazılışını girin</h3>
+                    
+                    <div class="spelling-phase">
+                        <input type="text" id="spelling-input" class="spelling-input" placeholder="Kelimeyi yazın..." autocomplete="off">
+                        <div id="spelling-feedback" class="feedback-message"></div>
+                        
+                        <div class="action-buttons">
+                            <button id="check-spelling" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Kontrol Et
+                            </button>
+                            <button id="spelling-hint" class="btn btn-outline">
+                                <i class="fas fa-lightbulb"></i> İpucu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pronunciation Phase -->
+                <div id="pronunciation-phase" class="phase-container">
+                    <div class="word-display">
+                        <h2 id="pronunciation-word" class="current-word">Loading...</h2>
+                        <button id="listen-pronunciation" class="audio-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    
+                    <h3 class="phase-title">Bu kelimeyi telaffuz edin</h3>
+                    
+                    <div class="pronunciation-phase">
+                        <div id="mic-status" class="mic-status">
+                            <i class="fas fa-microphone"></i>
+                            <span id="recording-status" class="recording-status">Kayıt Bekleniyor</span>
+                        </div>
+                        
+                        <div id="pronunciation-feedback" class="feedback-message"></div>
+                        
+                        <div class="action-buttons">
+                            <button id="start-recording" class="btn btn-primary">
+                                <i class="fas fa-microphone"></i> Kayda Başla
+                            </button>
+                            <button id="pronunciation-hint" class="btn btn-outline">
+                                <i class="fas fa-lightbulb"></i> Nasıl Telaffuz Edilir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Result Phase -->
+                <div id="result-phase" class="phase-container">
+                    <div class="result-phase">
+                        <div id="result-icon" class="result-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 id="result-title" class="result-title">Doğru!</h2>
+                        <p id="result-details" class="result-details">Mükemmel! Kelimeyi doğru bir şekilde seçtiniz.</p>
+                        <button id="continue-btn" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> Devam Et
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Example Phase -->
+                <div id="example-phase" class="phase-container">
+                    <div class="example-phase">
+                        <h2 class="example-word">Harika! <span id="example-word">Word</span></h2>
+                        
+                        <div class="example-sentence">
+                            <p id="example-sentence-text">This is an example sentence using the word.</p>
+                            <button id="listen-sentence" class="audio-btn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="word-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Telaffuz</div>
+                                <div id="pronunciation-text" class="detail-value">/wɜːrd/</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Türkçe</div>
+                                <div id="translation-text" class="detail-value">Kelime</div>
+                            </div>
+                        </div>
+                        
+                        <button id="next-word-btn" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> Sonraki Kelime
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="screen">
+                <div class="game-over-screen">
+                    <div class="completion-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h1 class="completion-title">Tebrikler!</h1>
+                    <p class="completion-subtitle">Günün kelime çalışmasını tamamladınız!</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div id="final-score" class="stat-value">0</div>
+                            <div class="stat-label">Toplam Puan</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div id="total-correct" class="stat-value">0</div>
+                            <div class="stat-label">Doğru Cevap</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div id="time-bonus" class="stat-value">0</div>
+                            <div class="stat-label">Zaman Bonusu</div>
+                        </div>
+                    </div>
+                    
+                    <div class="words-learned-container">
+                        <h3 class="words-learned-title">Bugün Öğrenilen Kelimeler</h3>
+                        <div id="learned-words-list" class="words-learned-grid">
+                            <!-- Learned words will be added here dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="final-actions">
+                        <button id="play-again-btn" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> Tekrar Oyna
+                        </button>
+                        <button id="share-results-btn" class="btn btn-secondary">
+                            <i class="fas fa-share-alt"></i> Sonuçları Paylaş
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            
+            const levelButtons = document.querySelectorAll('.level-btn');
+            const targetInput = document.getElementById('target-input');
+            const decreaseTargetBtn = document.getElementById('decrease-target');
+            const increaseTargetBtn = document.getElementById('increase-target');
+            const startGameBtn = document.getElementById('start-game-btn');
+            
+            const scoreEl = document.getElementById('score');
+            const correctCountEl = document.getElementById('correct-count');
+            const wrongCountEl = document.getElementById('wrong-count');
+            const hintCountEl = document.getElementById('hint-count');
+            const progressTextEl = document.getElementById('progress-text');
+            const progressPercentageEl = document.getElementById('progress-percentage');
+            const progressFillEl = document.getElementById('progress-fill');
+            
+            const multipleChoicePhase = document.getElementById('multiple-choice-phase');
+            const spellingPhase = document.getElementById('spelling-phase');
+            const pronunciationPhase = document.getElementById('pronunciation-phase');
+            const resultPhase = document.getElementById('result-phase');
+            const examplePhase = document.getElementById('example-phase');
+            
+            const currentWordEl = document.getElementById('current-word');
+            const listenWordBtn = document.getElementById('listen-word');
+            const optionsContainer = document.getElementById('options-container');
+            
+            const spellingTranslationEl = document.getElementById('spelling-translation');
+            const spellingInputEl = document.getElementById('spelling-input');
+            const spellingFeedbackEl = document.getElementById('spelling-feedback');
+            const checkSpellingBtn = document.getElementById('check-spelling');
+            const spellingHintBtn = document.getElementById('spelling-hint');
+            
+            const pronunciationWordEl = document.getElementById('pronunciation-word');
+            const recordingStatusEl = document.getElementById('recording-status');
+            const micStatusEl = document.getElementById('mic-status');
+            const startRecordingBtn = document.getElementById('start-recording');
+            const pronunciationHintBtn = document.getElementById('pronunciation-hint');
+            const listenPronunciationBtn = document.getElementById('listen-pronunciation');
+            const pronunciationFeedbackEl = document.getElementById('pronunciation-feedback');
+            
+            const resultIconEl = document.getElementById('result-icon');
+            const resultTitleEl = document.getElementById('result-title');
+            const resultDetailsEl = document.getElementById('result-details');
+            const continueBtn = document.getElementById('continue-btn');
+            
+            const exampleWordEl = document.getElementById('example-word');
+            const exampleSentenceTextEl = document.getElementById('example-sentence-text');
+            const listenSentenceBtn = document.getElementById('listen-sentence');
+            const nextWordBtn = document.getElementById('next-word-btn');
+            const pronunciationTextEl = document.getElementById('pronunciation-text');
+            const translationTextEl = document.getElementById('translation-text');
+            
+            const finalScoreEl = document.getElementById('final-score');
+            const totalCorrectEl = document.getElementById('total-correct');
+            const timeBonusEl = document.getElementById('time-bonus');
+            const learnedWordsListEl = document.getElementById('learned-words-list');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const shareResultsBtn = document.getElementById('share-results-btn');
+            
+            const phaseDots = document.querySelectorAll('.phase-dot');
+            
+            // Game state
+            const gameState = {
+                currentLevel: 'A1',
+                dailyTarget: 10,
+                score: 0,
+                correct: 0,
+                wrong: 0,
+                correctSpelling: 0,
+                correctPronunciation: 0,
+                timeBonus: 0,
+                hintCount: 3,
+                currentWord: null,
+                currentPhase: 'multiple-choice', // multiple-choice, spelling, pronunciation, example, result
+                words: [],
+                wordHistory: [],
+                learnedWords: [],
+                startTime: null,
+                speechRecognition: null,
+                synthesis: window.speechSynthesis
+            };
+            
+            // Sample word database for different levels
+            const wordDatabase = {
+                'A1': [
+                    { 
+                        word: 'hello', 
+                        translation: 'merhaba', 
+                        pronunciation: '/həˈloʊ/',
+                        options: ['merhaba', 'teşekkürler', 'hoşça kal', 'nasılsın'],
+                        sentence: 'Hello, how are you today?'
+                    },
+                    { 
+                        word: 'dog', 
+                        translation: 'köpek', 
+                        pronunciation: '/dɔɡ/',
+                        options: ['köpek', 'kedi', 'kuş', 'at'],
+                        sentence: 'My dog likes to play in the park.'
+                    },
+                    { 
+                        word: 'house', 
+                        translation: 'ev', 
+                        pronunciation: '/haʊs/',
+                        options: ['ev', 'araba', 'okul', 'bahçe'],
+                        sentence: 'I live in a small house near the beach.'
+                    },
+                    { 
+                        word: 'water', 
+                        translation: 'su', 
+                        pronunciation: '/ˈwɔːtər/',
+                        options: ['su', 'ateş', 'toprak', 'hava'],
+                        sentence: 'Please drink some water when you are thirsty.'
+                    },
+                    { 
+                        word: 'book', 
+                        translation: 'kitap', 
+                        pronunciation: '/bʊk/',
+                        options: ['kitap', 'kalem', 'defter', 'silgi'],
+                        sentence: 'I read a book every night before bed.'
+                    },
+                    { 
+                        word: 'friend', 
+                        translation: 'arkadaş', 
+                        pronunciation: '/frend/',
+                        options: ['arkadaş', 'aile', 'düşman', 'öğretmen'],
+                        sentence: 'She has been my friend since childhood.'
+                    },
+                    { 
+                        word: 'food', 
+                        translation: 'yemek', 
+                        pronunciation: '/fuːd/',
+                        options: ['yemek', 'içecek', 'meyve', 'sebze'],
+                        sentence: 'The food in this restaurant is delicious.'
+                    },
+                    { 
+                        word: 'good', 
+                        translation: 'iyi', 
+                        pronunciation: '/ɡʊd/',
+                        options: ['iyi', 'kötü', 'büyük', 'küçük'],
+                        sentence: 'You did a good job on your test.'
+                    },
+                    { 
+                        word: 'bad', 
+                        translation: 'kötü', 
+                        pronunciation: '/bæd/',
+                        options: ['kötü', 'iyi', 'zor', 'kolay'],
+                        sentence: 'It was a bad idea to go out in the rain.'
+                    },
+                    { 
+                        word: 'big', 
+                        translation: 'büyük', 
+                        pronunciation: '/bɪɡ/',
+                        options: ['büyük', 'küçük', 'uzun', 'kısa'],
+                        sentence: 'They live in a big house with a garden.'
+                    }
+                ],
+                'A2': [
+                    { 
+                        word: 'beautiful', 
+                        translation: 'güzel', 
+                        pronunciation: '/ˈbjuːtɪfl/',
+                        options: ['güzel', 'çirkin', 'ilginç', 'sıkıcı'],
+                        sentence: 'The sunset at the beach was beautiful.'
+                    },
+                    { 
+                        word: 'difficult', 
+                        translation: 'zor', 
+                        pronunciation: '/ˈdɪfɪkəlt/',
+                        options: ['zor', 'kolay', 'hızlı', 'yavaş'],
+                        sentence: 'Learning a new language can be difficult at first.'
+                    },
+                    { 
+                        word: 'important', 
+                        translation: 'önemli', 
+                        pronunciation: '/ɪmˈpɔːrtnt/',
+                        options: ['önemli', 'önemsiz', 'kolay', 'zor'],
+                        sentence: 'It is important to drink water every day.'
+                    },
+                    { 
+                        word: 'interesting', 
+                        translation: 'ilginç', 
+                        pronunciation: '/ˈɪntrəstɪŋ/',
+                        options: ['ilginç', 'sıkıcı', 'güzel', 'çirkin'],
+                        sentence: 'The book was so interesting that I couldn\'t put it down.'
+                    },
+                    { 
+                        word: 'expensive', 
+                        translation: 'pahalı', 
+                        pronunciation: '/ɪkˈspensɪv/',
+                        options: ['pahalı', 'ucuz', 'güzel', 'çirkin'],
+                        sentence: 'That restaurant is too expensive for me.'
+                    },
+                    { 
+                        word: 'famous', 
+                        translation: 'ünlü', 
+                        pronunciation: '/ˈfeɪməs/',
+                        options: ['ünlü', 'sıradan', 'komik', 'ciddi'],
+                        sentence: 'She became famous after starring in that movie.'
+                    },
+                    { 
+                        word: 'dangerous', 
+                        translation: 'tehlikeli', 
+                        pronunciation: '/ˈdeɪndʒərəs/',
+                        options: ['tehlikeli', 'güvenli', 'kolay', 'zor'],
+                        sentence: 'It can be dangerous to swim in this river.'
+                    },
+                    { 
+                        word: 'delicious', 
+                        translation: 'lezzetli', 
+                        pronunciation: '/dɪˈlɪʃəs/',
+                        options: ['lezzetli', 'lezzetsiz', 'tatlı', 'tuzlu'],
+                        sentence: 'The cake was absolutely delicious.'
+                    },
+                    { 
+                        word: 'friendly', 
+                        translation: 'arkadaş canlısı', 
+                        pronunciation: '/ˈfrendli/',
+                        options: ['arkadaş canlısı', 'soğuk', 'ciddi', 'komik'],
+                        sentence: 'The locals were very friendly and helpful.'
+                    },
+                    { 
+                        word: 'useful', 
+                        translation: 'faydalı', 
+                        pronunciation: '/ˈjuːsfl/',
+                        options: ['faydalı', 'faydasız', 'kolay', 'zor'],
+                        sentence: 'This app is very useful for learning vocabulary.'
+                    }
+                ],
+                'B1': [
+                    { 
+                        word: 'achievement', 
+                        translation: 'başarı', 
+                        pronunciation: '/əˈtʃiːvmənt/',
+                        options: ['başarı', 'başarısızlık', 'hedef', 'amaç'],
+                        sentence: 'Graduating from university was a significant achievement for her.'
+                    },
+                    { 
+                        word: 'commitment', 
+                        translation: 'taahhüt', 
+                        pronunciation: '/kəˈmɪtmənt/',
+                        options: ['taahhüt', 'önemseme', 'zorluk', 'mücadele'],
+                        sentence: 'Marriage requires commitment and understanding.'
+                    },
+                    { 
+                        word: 'controversy', 
+                        translation: 'tartışma', 
+                        pronunciation: '/ˈkɑːntrəvɜːrsi/',
+                        options: ['tartışma', 'anlaşma', 'mücadele', 'barış'],
+                        sentence: 'His statement caused a lot of controversy in the media.'
+                    },
+                    { 
+                        word: 'demonstrate', 
+                        translation: 'göstermek', 
+                        pronunciation: '/ˈdemənstreɪt/',
+                        options: ['göstermek', 'gizlemek', 'söylemek', 'anlatmak'],
+                        sentence: 'The experiment will demonstrate how this chemical reaction works.'
+                    },
+                    { 
+                        word: 'enthusiasm', 
+                        translation: 'heyecan', 
+                        pronunciation: '/ɪnˈθuːziæzəm/',
+                        options: ['heyecan', 'sıkıntı', 'üzüntü', 'kızgınlık'],
+                        sentence: 'She showed great enthusiasm for the new project.'
+                    },
+                    { 
+                        word: 'inevitable', 
+                        translation: 'kaçınılmaz', 
+                        pronunciation: '/ɪnˈevɪtəbl/',
+                        options: ['kaçınılmaz', 'önlenebilir', 'olası', 'imkansız'],
+                        sentence: 'Change is inevitable in any growing organization.'
+                    },
+                    { 
+                        word: 'perspective', 
+                        translation: 'bakış açısı', 
+                        pronunciation: '/pərˈspektɪv/',
+                        options: ['bakış açısı', 'düşünce', 'fikir', 'görüş'],
+                        sentence: 'It\'s important to consider different perspectives on this issue.'
+                    },
+                    { 
+                        word: 'reluctant', 
+                        translation: 'isteksiz', 
+                        pronunciation: '/rɪˈlʌktənt/',
+                        options: ['isteksiz', 'hevesli', 'mutlu', 'üzgün'],
+                        sentence: 'He was reluctant to share his personal information.'
+                    },
+                    { 
+                        word: 'sufficient', 
+                        translation: 'yeterli', 
+                        pronunciation: '/səˈfɪʃnt/',
+                        options: ['yeterli', 'yetersiz', 'fazla', 'az'],
+                        sentence: 'Do we have sufficient funds for this project?'
+                    },
+                    { 
+                        word: 'tremendous', 
+                        translation: 'muazzam', 
+                        pronunciation: '/trəˈmendəs/',
+                        options: ['muazzam', 'küçük', 'sıradan', 'önemsiz'],
+                        sentence: 'The earthquake caused tremendous damage to the city.'
+                    }
+                ],
+                'B2': [
+                    { 
+                        word: 'ambiguous', 
+                        translation: 'belirsiz', 
+                        pronunciation: '/æmˈbɪɡjuəs/',
+                        options: ['belirsiz', 'kesin', 'açık', 'net'],
+                        sentence: 'His answer was ambiguous and could be interpreted in different ways.'
+                    },
+                    { 
+                        word: 'concede', 
+                        translation: 'kabul etmek', 
+                        pronunciation: '/kənˈsiːd/',
+                        options: ['kabul etmek', 'reddetmek', 'tartışmak', 'düşünmek'],
+                        sentence: 'She had to concede that her opponent made a valid point.'
+                    },
+                    { 
+                        word: 'dilemma', 
+                        translation: 'ikilem', 
+                        pronunciation: '/dɪˈlemə/',
+                        options: ['ikilem', 'çözüm', 'problem', 'zorluk'],
+                        sentence: 'He faced a moral dilemma when he found the wallet.'
+                    },
+                    { 
+                        word: 'eloquent', 
+                        translation: 'güzel konuşan', 
+                        pronunciation: '/ˈeləkwənt/',
+                        options: ['güzel konuşan', 'kaba', 'sessiz', 'gürültülü'],
+                        sentence: 'She gave an eloquent speech that moved everyone in the audience.'
+                    },
+                    { 
+                        word: 'frugal', 
+                        translation: 'tutumlu', 
+                        pronunciation: '/ˈfruːɡl/',
+                        options: ['tutumlu', 'savurgan', 'cimri', 'cömert'],
+                        sentence: 'My grandmother was very frugal and saved every penny.'
+                    },
+                    { 
+                        word: 'hypocritical', 
+                        translation: 'ikiyüzlü', 
+                        pronunciation: '/ˌhɪpəˈkrɪtɪkl/',
+                        options: ['ikiyüzlü', 'dürüst', 'samimi', 'açık'],
+                        sentence: 'It was hypocritical of him to criticize others for the same thing he does.'
+                    },
+                    { 
+                        word: 'innovative', 
+                        translation: 'yenilikçi', 
+                        pronunciation: '/ˈɪnəveɪtɪv/',
+                        options: ['yenilikçi', 'geleneksel', 'eski', 'sıradan'],
+                        sentence: 'The company is known for its innovative approach to problem-solving.'
+                    },
+                    { 
+                        word: 'meticulous', 
+                        translation: 'titiz', 
+                        pronunciation: '/məˈtɪkjələs/',
+                        options: ['titiz', 'özensiz', 'dikkatsiz', 'dağınık'],
+                        sentence: 'He is meticulous about keeping detailed records of all transactions.'
+                    },
+                    { 
+                        word: 'profound', 
+                        translation: 'derin', 
+                        pronunciation: '/prəˈfaʊnd/',
+                        options: ['derin', 'yüzeysel', 'basit', 'anlamsız'],
+                        sentence: 'The book had a profound impact on her view of the world.'
+                    },
+                    { 
+                        word: 'versatile', 
+                        translation: 'çok yönlü', 
+                        pronunciation: '/ˈvɜːrsətl/',
+                        options: ['çok yönlü', 'tek yönlü', 'sıradan', 'sınırlı'],
+                        sentence: 'This is a versatile tool that can be used for many different tasks.'
+                    }
+                ]
+            };
+            
+            // Initialize the game
+            function init() {
+                // Level selection
+                levelButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        levelButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        gameState.currentLevel = button.dataset.level;
+                    });
+                });
+                
+                // Daily target controls
+                decreaseTargetBtn.addEventListener('click', () => {
+                    const currentValue = parseInt(targetInput.value);
+                    if (currentValue > 5) {
+                        targetInput.value = currentValue - 1;
+                    }
+                });
+                
+                increaseTargetBtn.addEventListener('click', () => {
+                    const currentValue = parseInt(targetInput.value);
+                    if (currentValue < 50) {
+                        targetInput.value = currentValue + 1;
+                    }
+                });
+                
+                // Start game
+                startGameBtn.addEventListener('click', startGame);
+                
+                // Multiple Choice Phase
+                listenWordBtn.addEventListener('click', () => {
+                    speakText(gameState.currentWord.word);
+                });
+                
+                // Spelling Phase
+                checkSpellingBtn.addEventListener('click', checkSpelling);
+                spellingInputEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        checkSpelling();
+                    }
+                });
+                
+                spellingHintBtn.addEventListener('click', () => {
+                    if (gameState.hintCount > 0) {
+                        gameState.hintCount--;
+                        updateScoreDisplay();
+                        
+                        const word = gameState.currentWord.word;
+                        const hint = word.charAt(0) + word.slice(1).replace(/[a-zA-Z]/g, '_ ');
+                        
+                        spellingFeedbackEl.textContent = `İpucu: ${hint}`;
+                        spellingFeedbackEl.className = 'feedback-message hint';
+                    } else {
+                        spellingFeedbackEl.textContent = 'İpucu kalmadı!';
+                        spellingFeedbackEl.className = 'feedback-message error';
+                    }
+                });
+                
+                // Pronunciation Phase - Otomatik mikrofon kullanımı
+                // Telaffuz aşamasına geldiğinde otomatik mikrofon açma
+                
+                pronunciationHintBtn.addEventListener('click', () => {
+                    if (gameState.hintCount > 0) {
+                        gameState.hintCount--;
+                        updateScoreDisplay();
+                        
+                        pronunciationFeedbackEl.textContent = `İpucu: Telaffuz "${gameState.currentWord.pronunciation}"`;
+                        pronunciationFeedbackEl.className = 'feedback-message hint';
+                        
+                        speakText(gameState.currentWord.word);
+                    } else {
+                        pronunciationFeedbackEl.textContent = 'İpucu kalmadı!';
+                        pronunciationFeedbackEl.className = 'feedback-message error';
+                    }
+                });
+                
+                listenPronunciationBtn.addEventListener('click', () => {
+                    speakText(gameState.currentWord.word);
+                });
+                
+                // Example Phase
+                listenSentenceBtn.addEventListener('click', () => {
+                    speakText(gameState.currentWord.sentence);
+                });
+                
+                nextWordBtn.addEventListener('click', showNextWord);
+                
+                // Result Phase
+                continueBtn.addEventListener('click', continueToNextPhase);
+                
+                // Game Over
+                playAgainBtn.addEventListener('click', () => {
+                    resetGame();
+                    showScreen('start-screen');
+                });
+                
+                shareResultsBtn.addEventListener('click', shareResults);
+                
+                // Initialize speech recognition
+                if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    gameState.speechRecognition = new SpeechRecognition();
+                    gameState.speechRecognition.lang = 'en-US';
+                    gameState.speechRecognition.continuous = false;
+                    gameState.speechRecognition.interimResults = false;
+                    
+                    gameState.speechRecognition.onresult = (event) => {
+                        const speechResult = event.results[0][0].transcript.toLowerCase();
+                        const currentWord = gameState.currentWord.word.toLowerCase();
+                        
+                        recordingStatusEl.textContent = "Değerlendiriliyor...";
+                        micStatusEl.classList.remove('recording-active');
+                        
+                        setTimeout(() => {
+                            const similarity = stringSimilarity(speechResult, currentWord);
+                            
+                            if (similarity > 0.7) {
+                                pronunciationFeedbackEl.textContent = "Harika telaffuz!";
+                                pronunciationFeedbackEl.className = "feedback-message success";
+                                recordingStatusEl.textContent = "Doğru Telaffuz ✓";
+                                
+                                // Update score
+                                gameState.score += 15;
+                                gameState.correctPronunciation++;
+                                updateScoreDisplay();
+                                
+                                // Otomatik olarak bir sonraki aşamaya geçme
+                                setTimeout(() => {
+                                    showExamplePhase();
+                                }, 1500);
+                            } else if (similarity > 0.4) {
+                                pronunciationFeedbackEl.textContent = "Yakın! Tekrar dinleyin ve deneyin.";
+                                pronunciationFeedbackEl.className = "feedback-message hint";
+                                recordingStatusEl.textContent = "Yaklaştınız";
+                                
+                                // Speak the word to help
+                                speakText(gameState.currentWord.word);
+                                
+                                // Tekrar kayıt için kısa bir bekleme
+                                setTimeout(() => {
+                                    // Tekrar kayıt başlatma
+                                    if (gameState.currentPhase === 'pronunciation') {
+                                        startRecording();
+                                        recordingStatusEl.textContent = "Kaydediliyor...";
+                                        micStatusEl.classList.add('recording-active');
+                                    }
+                                }, 2000);
+                            } else {
+                                pronunciationFeedbackEl.textContent = "Telaffuz doğru değil.";
+                                pronunciationFeedbackEl.className = "feedback-message error";
+                                recordingStatusEl.textContent = "Yanlış Telaffuz";
+                                
+                                // Speak the word to help
+                                speakText(gameState.currentWord.word);
+                                
+                                // Bir süre bekleme ve sonra bir sonraki aşamaya geçme
+                                setTimeout(() => {
+                                    // Son bir şans daha verme
+                                    if (gameState.currentPhase === 'pronunciation') {
+                                        startRecording();
+                                        recordingStatusEl.textContent = "Son bir deneme...";
+                                        micStatusEl.classList.add('recording-active');
+                                    }
+                                }, 2500);
+                            }
+                        }, 1000);
+                    };
+                    
+                    gameState.speechRecognition.onerror = (event) => {
+                        pronunciationFeedbackEl.textContent = "Mikrofon kullanılamıyor: " + event.error;
+                        pronunciationFeedbackEl.className = "feedback-message error";
+                        recordingStatusEl.textContent = "Hata!";
+                        micStatusEl.classList.remove('recording-active');
+                    };
+                    
+                    gameState.speechRecognition.onend = () => {
+                        // Otomatik olarak bir sonraki faza geçme işlemi
+                        const autoAdvance = (gameState.currentPhase === 'pronunciation');
+                        
+                        if (autoAdvance) {
+                            // Sonuç analizi için kısa bir bekleme
+                            setTimeout(() => {
+                                // Kullanıcı doğru telaffuz edemediyse ve ekranda hata feedback'i varsa
+                                const hasError = pronunciationFeedbackEl.className.includes('error');
+                                
+                                if (hasError) {
+                                    // Yanlış telaffuz durumunda
+                                    recordingStatusEl.textContent = "Tamamlandı";
+                                    // Biraz süre tanıyarak kullanıcıya sonucu göster, sonra devam et
+                                    setTimeout(() => {
+                                        showExamplePhase();
+                                    }, 2000);
+                                }
+                                // Doğru telaffuz durumunda showResultPhase fonksiyonu içinde zaten bir sonraki aşamaya geçiş var
+                            }, 1000);
+                        } else {
+                            // Manuel mod için
+                            startRecordingBtn.disabled = false;
+                            startRecordingBtn.innerHTML = '<i class="fas fa-microphone"></i> Tekrar Dene';
+                            startRecordingBtn.style.display = 'inline-flex'; // Göster
+                        }
+                    };
+                } else {
+                    startRecordingBtn.disabled = true;
+                    startRecordingBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Tarayıcınız Desteklemiyor';
+                    recordingStatusEl.textContent = "Telaffuz desteği mevcut değil";
+                }
+                
+                // Load learned words from localStorage
+                loadLearnedWordsFromStorage();
+                
+                // Add animations to start screen elements
+                animateStartScreen();
+            }
+            
+            function animateStartScreen() {
+                const elements = [
+                    { el: document.querySelector('.logo-lg'), delay: 0 },
+                    { el: document.querySelector('.game-title'), delay: 200 },
+                    { el: document.querySelector('.game-description'), delay: 400 },
+                    { el: document.querySelector('.level-selection'), delay: 600 },
+                    { el: document.querySelector('.daily-target'), delay: 800 },
+                    { el: document.querySelector('#start-game-btn'), delay: 1000 }
+                ];
+                
+                elements.forEach(item => {
+                    setTimeout(() => {
+                        item.el.classList.add('fade-in');
+                    }, item.delay);
+                });
+                
+                // Add staggered animations to level buttons
+                levelButtons.forEach((btn, index) => {
+                    setTimeout(() => {
+                        btn.classList.add('slide-in-up');
+                    }, 700 + (index * 100));
+                });
+            }
+            
+            function startGame() {
+                // Set daily target
+                gameState.dailyTarget = parseInt(targetInput.value) || 10;
+                
+                // Load words for selected level
+                gameState.words = [...wordDatabase[gameState.currentLevel]];
+                
+                // Shuffle words
+                shuffleArray(gameState.words);
+                
+                // Reset game state
+                gameState.score = 0;
+                gameState.correct = 0;
+                gameState.wrong = 0;
+                gameState.correctSpelling = 0;
+                gameState.correctPronunciation = 0;
+                gameState.timeBonus = 0;
+                gameState.hintCount = 3;
+                gameState.wordHistory = [];
+                gameState.learnedWords = [];
+                
+                // Update display
+                updateScoreDisplay();
+                updateProgress();
+                
+                // Show game screen
+                showScreen('game-screen');
+                
+                // Update phase indicators
+                updatePhaseIndicators(1);
+                
+                // Show first word
+                showNextWord();
+            }
+            
+            function showScreen(screenId) {
+                const screens = ['start-screen', 'game-screen', 'game-over-screen'];
+                screens.forEach(screen => {
+                    document.getElementById(screen).classList.remove('active');
+                });
+                
+                const targetScreen = document.getElementById(screenId);
+                targetScreen.classList.add('active');
+                
+                // Add fade-in animation
+                targetScreen.classList.add('fade-in');
+                setTimeout(() => {
+                    targetScreen.classList.remove('fade-in');
+                }, 500);
+            }
+            
+            function updateScoreDisplay() {
+                scoreEl.textContent = gameState.score;
+                correctCountEl.textContent = gameState.correct;
+                wrongCountEl.textContent = gameState.wrong;
+                hintCountEl.textContent = gameState.hintCount;
+            }
+            
+            function updateProgress() {
+                const progress = (gameState.wordHistory.length / gameState.dailyTarget) * 100;
+                progressFillEl.style.width = `${Math.min(progress, 100)}%`;
+                progressPercentageEl.textContent = `${Math.min(Math.round(progress), 100)}%`;
+                progressTextEl.textContent = `Günlük Hedef: ${gameState.wordHistory.length}/${gameState.dailyTarget}`;
+            }
+            
+            function updatePhaseIndicators(phaseNumber) {
+                phaseDots.forEach(dot => {
+                    dot.classList.remove('active', 'completed');
+                });
+                
+                for (let i = 1; i < phaseNumber; i++) {
+                    const dot = document.querySelector(`.phase-dot[data-phase="${i}"]`);
+                    if (dot) dot.classList.add('completed');
+                }
+                
+                const currentDot = document.querySelector(`.phase-dot[data-phase="${phaseNumber}"]`);
+                if (currentDot) currentDot.classList.add('active');
+            }
+            
+            function showNextWord() {
+                // Check if we've reached the daily target
+                if (gameState.wordHistory.length >= gameState.dailyTarget) {
+                    endGame();
+                    return;
+                }
+                
+                // If no more words, reset the word list
+                if (gameState.words.length === 0) {
+                    gameState.words = [...wordDatabase[gameState.currentLevel]];
+                    shuffleArray(gameState.words);
+                }
+                
+                // Get next word
+                gameState.currentWord = gameState.words.pop();
+                
+                // Record start time
+                gameState.startTime = Date.now();
+                
+                // Add to history
+                gameState.wordHistory.push(gameState.currentWord);
+                
+                // Update progress
+                updateProgress();
+                
+                // Reset to multiple choice phase
+                showMultipleChoicePhase();
+            }
+            
+            function showMultipleChoicePhase() {
+                // Show the multiple choice phase
+                hideAllPhases();
+                multipleChoicePhase.classList.add('active');
+                
+                // Update phase indicators
+                updatePhaseIndicators(1);
+                
+                // Update current phase in game state
+                gameState.currentPhase = 'multiple-choice';
+                
+                // Display the word
+                currentWordEl.textContent = gameState.currentWord.word;
+                
+                // Set up options
+                optionsContainer.innerHTML = '';
+                
+                // Shuffle options
+                const options = [...gameState.currentWord.options];
+                shuffleArray(options);
+                
+                // Create option buttons
+                options.forEach(option => {
+                    const optionBtn = document.createElement('button');
+                    optionBtn.className = 'option-btn';
+                    optionBtn.textContent = option;
+                    
+                    optionBtn.addEventListener('click', () => {
+                        // Determine if this is the correct answer
+                        const isCorrect = option === gameState.currentWord.translation;
+                        
+                        // Add appropriate class
+                        optionBtn.classList.add(isCorrect ? 'correct' : 'wrong');
+                        
+                        // If wrong, highlight the correct answer
+                        if (!isCorrect) {
+                            const buttons = optionsContainer.querySelectorAll('.option-btn');
+                            buttons.forEach(btn => {
+                                if (btn.textContent === gameState.currentWord.translation) {
+                                    btn.classList.add('correct');
+                                }
+                            });
+                        }
+                        
+                        // Disable all buttons
+                        const buttons = optionsContainer.querySelectorAll('.option-btn');
+                        buttons.forEach(btn => {
+                            btn.disabled = true;
+                        });
+                        
+                        // Update score
+                        if (isCorrect) {
+                            gameState.score += 5;
+                            gameState.correct++;
+                        } else {
+                            gameState.wrong++;
+                        }
+                        
+                        updateScoreDisplay();
+                        
+                        // Show result after a delay
+                        setTimeout(() => {
+                            if (isCorrect) {
+                                showResultPhase(true, "Doğru!", "Mükemmel! Kelimeyi doğru bir şekilde seçtiniz.");
+                            } else {
+                                showResultPhase(false, "Yanlış!", `Doğru cevap: ${gameState.currentWord.translation}`);
+                            }
+                        }, 1000);
+                    });
+                    
+                    optionsContainer.appendChild(optionBtn);
+                });
+                
+                // Add fade-in animation to the phase
+                multipleChoicePhase.classList.add('fade-in');
+                setTimeout(() => {
+                    multipleChoicePhase.classList.remove('fade-in');
+                }, 500);
+            }
+            
+            function showSpellingPhase() {
+                // Show the spelling phase
+                hideAllPhases();
+                spellingPhase.classList.add('active');
+                
+                // Update phase indicators
+                updatePhaseIndicators(2);
+                
+                // Update current phase in game state
+                gameState.currentPhase = 'spelling';
+                
+                // Display the translation
+                spellingTranslationEl.textContent = gameState.currentWord.translation;
+                
+                // Clear input and feedback
+                spellingInputEl.value = '';
+                spellingFeedbackEl.textContent = '';
+                spellingFeedbackEl.className = 'feedback-message';
+                
+                // Enable input and button
+                spellingInputEl.disabled = false;
+                checkSpellingBtn.disabled = false;
+                
+                // Focus on input
+                setTimeout(() => {
+                    spellingInputEl.focus();
+                }, 100);
+                
+                // Add fade-in animation to the phase
+                spellingPhase.classList.add('fade-in');
+                setTimeout(() => {
+                    spellingPhase.classList.remove('fade-in');
+                }, 500);
+            }
+            
+            function checkSpelling() {
+                const input = spellingInputEl.value.trim().toLowerCase();
+                const correctWord = gameState.currentWord.word.toLowerCase();
+                
+                if (input === '') {
+                    spellingFeedbackEl.textContent = 'Lütfen bir kelime yazın!';
+                    spellingFeedbackEl.className = 'feedback-message error';
+                    return;
+                }
+                
+                // Calculate similarity
+                const similarity = stringSimilarity(input, correctWord);
+                
+                if (input === correctWord) {
+                    // Correct
+                    spellingFeedbackEl.textContent = 'Doğru yazım!';
+                    spellingFeedbackEl.className = 'feedback-message success';
+                    
+                    // Update score
+                    gameState.score += 10;
+                    gameState.correctSpelling++;
+                    updateScoreDisplay();
+                    
+                    // Disable input and button
+                    spellingInputEl.disabled = true;
+                    checkSpellingBtn.disabled = true;
+                    
+                    // Show result
+                    setTimeout(() => {
+                        showResultPhase(true, "Doğru Yazım!", "Harika! Kelimeyi doğru yazdınız.");
+                    }, 1000);
+                } else if (similarity > 0.8) {
+                    // Close (small typo)
+                    spellingFeedbackEl.textContent = `Neredeyse doğru! Doğrusu: ${correctWord}`;
+                    spellingFeedbackEl.className = 'feedback-message hint';
+                    
+                    // Partial points
+                    gameState.score += 5;
+                    updateScoreDisplay();
+                    
+                    // Disable input and button
+                    spellingInputEl.disabled = true;
+                    checkSpellingBtn.disabled = true;
+                    
+                    // Show result
+                    setTimeout(() => {
+                        showResultPhase(true, "Neredeyse Doğru!", `Küçük bir yazım hatası yaptınız. Doğrusu: ${correctWord}`);
+                    }, 1000);
+                } else {
+                    // Wrong
+                    spellingFeedbackEl.textContent = `Yanlış yazım. Doğrusu: ${correctWord}`;
+                    spellingFeedbackEl.className = 'feedback-message error';
+                    
+                    // Disable input and button
+                    spellingInputEl.disabled = true;
+                    checkSpellingBtn.disabled = true;
+                    
+                    // Show result
+                    setTimeout(() => {
+                        showResultPhase(false, "Yanlış Yazım", `Doğru yazım: ${correctWord}`);
+                    }, 1000);
+                }
+            }
+            
+            function showPronunciationPhase() {
+                // Show the pronunciation phase
+                hideAllPhases();
+                pronunciationPhase.classList.add('active');
+                
+                // Update phase indicators
+                updatePhaseIndicators(3);
+                
+                // Update current phase in game state
+                gameState.currentPhase = 'pronunciation';
+                
+                // Display the word
+                pronunciationWordEl.textContent = gameState.currentWord.word;
+                
+                // Reset status and feedback
+                recordingStatusEl.textContent = "Kayıt Hazırlanıyor...";
+                pronunciationFeedbackEl.textContent = '';
+                pronunciationFeedbackEl.className = 'feedback-message';
+                
+                // Speak the word after a delay
+                setTimeout(() => {
+                    speakText(gameState.currentWord.word);
+                }, 500);
+                
+                // Add fade-in animation to the phase
+                pronunciationPhase.classList.add('fade-in');
+                setTimeout(() => {
+                    pronunciationPhase.classList.remove('fade-in');
+                }, 500);
+                
+                // Automatically start recording after the word is spoken (give time to hear the word)
+                setTimeout(() => {
+                    // If speech recognition is not available, skip this phase
+                    if (!gameState.speechRecognition) {
+                        showExamplePhase();
+                        return;
+                    }
+                    
+                    // Start recording automatically
+                    startRecording();
+                    recordingStatusEl.textContent = "Kaydediliyor...";
+                    micStatusEl.classList.add('recording-active');
+                    startRecordingBtn.style.display = 'none'; // Hide the button since we're automating
+                }, 2000); // 2 second delay to let the user hear the word first
+            }
+            
+            function startRecording() {
+                if (gameState.speechRecognition) {
+                    startRecordingBtn.disabled = true;
+                    recordingStatusEl.textContent = "Dinleniyor...";
+                    micStatusEl.classList.add('recording-active');
+                    
+                    try {
+                        gameState.speechRecognition.start();
+                    } catch (e) {
+                        console.error("Speech recognition error:", e);
+                        recordingStatusEl.textContent = "Hata: " + e.message;
+                    }
+                }
+            }
+            
+            function showExamplePhase() {
+                // Show the example phase
+                hideAllPhases();
+                examplePhase.classList.add('active');
+                
+                // Update current phase in game state
+                gameState.currentPhase = 'example';
+                
+                // Display word information
+                exampleWordEl.textContent = gameState.currentWord.word;
+                exampleSentenceTextEl.textContent = gameState.currentWord.sentence;
+                pronunciationTextEl.textContent = gameState.currentWord.pronunciation;
+                translationTextEl.textContent = gameState.currentWord.translation;
+                
+                // Add word to learned words
+                addToLearnedWords(gameState.currentWord);
+                
+                // Calculate time bonus
+                const timeElapsed = (Date.now() - gameState.startTime) / 1000; // seconds
+                if (timeElapsed < 10) {
+                    const bonus = Math.floor((10 - timeElapsed) * 2);
+                    gameState.timeBonus += bonus;
+                    gameState.score += bonus;
+                    
+                    // Display time bonus notification
+                    const bonusNotification = document.createElement('div');
+                    bonusNotification.style.position = 'absolute';
+                    bonusNotification.style.top = '10px';
+                    bonusNotification.style.right = '10px';
+                    bonusNotification.style.background = 'var(--success-color)';
+                    bonusNotification.style.color = 'white';
+                    bonusNotification.style.padding = '10px 15px';
+                    bonusNotification.style.borderRadius = 'var(--border-radius-md)';
+                    bonusNotification.style.boxShadow = 'var(--shadow-md)';
+                    bonusNotification.style.fontWeight = '600';
+                    bonusNotification.textContent = `Hız Bonusu: +${bonus} puan!`;
+                    bonusNotification.style.animation = 'slideInUp 0.5s ease, fadeOut 0.5s ease 2s forwards';
+                    
+                    examplePhase.appendChild(bonusNotification);
+                    
+                    // Remove notification after animation
+                    setTimeout(() => {
+                        examplePhase.removeChild(bonusNotification);
+                    }, 2500);
+                    
+                    updateScoreDisplay();
+                }
+                
+                // Speak the sentence
+                setTimeout(() => {
+                    speakText(gameState.currentWord.sentence);
+                }, 500);
+                
+                // Add fade-in animation to the phase
+                examplePhase.classList.add('fade-in');
+                setTimeout(() => {
+                    examplePhase.classList.remove('fade-in');
+                }, 500);
+            }
+            
+            function showResultPhase(isSuccess, title, details) {
+                // Show the result phase
+                hideAllPhases();
+                resultPhase.classList.add('active');
+                
+                // Update current phase in game state
+                gameState.currentPhase = 'result';
+                
+                // Set content based on success/failure
+                if (isSuccess) {
+                    resultIconEl.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    resultIconEl.className = 'result-icon success';
+                } else {
+                    resultIconEl.innerHTML = '<i class="fas fa-times-circle"></i>';
+                    resultIconEl.className = 'result-icon error';
+                }
+                
+                resultTitleEl.textContent = title;
+                resultDetailsEl.textContent = details;
+                
+                // Add appropriate animation
+                resultPhase.classList.add('fade-in');
+                setTimeout(() => {
+                    resultPhase.classList.remove('fade-in');
+                }, 500);
+            }
+            
+            function continueToNextPhase() {
+                switch (gameState.currentPhase) {
+                    case 'multiple-choice':
+                        showSpellingPhase();
+                        break;
+                    case 'spelling':
+                        showPronunciationPhase();
+                        break;
+                    case 'pronunciation':
+                        showExamplePhase();
+                        break;
+                    case 'result':
+                        // Determine next phase based on the previous successful phase
+                        if (resultPhase.previousElementSibling === multipleChoicePhase) {
+                            showSpellingPhase();
+                        } else if (resultPhase.previousElementSibling === spellingPhase) {
+                            showPronunciationPhase();
+                        } else if (resultPhase.previousElementSibling === pronunciationPhase) {
+                            showExamplePhase();
+                        }
+                        break;
+                    default:
+                        showNextWord();
+                        break;
+                }
+            }
+            
+            function hideAllPhases() {
+                const phases = [multipleChoicePhase, spellingPhase, pronunciationPhase, resultPhase, examplePhase];
+                phases.forEach(phase => {
+                    phase.classList.remove('active');
+                });
+            }
+            
+            function endGame() {
+                // Update final stats
+                finalScoreEl.textContent = gameState.score;
+                totalCorrectEl.textContent = gameState.correct;
+                timeBonusEl.textContent = gameState.timeBonus;
+                
+                // Display learned words
+                displayLearnedWords();
+                
+                // Show game over screen
+                showScreen('game-over-screen');
+                
+                // Add animations to stats
+                const statValues = document.querySelectorAll('.stat-value');
+                statValues.forEach((stat, index) => {
+                    setTimeout(() => {
+                        stat.classList.add('slide-in-up');
+                        setTimeout(() => {
+                            stat.classList.remove('slide-in-up');
+                        }, 500);
+                    }, index * 200);
+                });
+                
+                // Save results
+                saveGameResults();
+            }
+            
+            function displayLearnedWords() {
+                learnedWordsListEl.innerHTML = '';
+                
+                gameState.learnedWords.forEach((word, index) => {
+                    const wordCard = document.createElement('div');
+                    wordCard.className = 'word-card';
+                    
+                    const wordText = document.createElement('div');
+                    wordText.className = 'word-text';
+                    wordText.textContent = word.word;
+                    
+                    const wordTranslation = document.createElement('div');
+                    wordTranslation.className = 'word-translation';
+                    wordTranslation.textContent = word.translation;
+                    
+                    wordCard.appendChild(wordText);
+                    wordCard.appendChild(wordTranslation);
+                    
+                    // Add staggered animation
+                    setTimeout(() => {
+                        wordCard.classList.add('slide-in-up');
+                        setTimeout(() => {
+                            wordCard.classList.remove('slide-in-up');
+                        }, 500);
+                    }, index * 50);
+                    
+                    // Add click event to speak the word
+                    wordCard.addEventListener('click', () => {
+                        speakText(word.word);
+                    });
+                    
+                    learnedWordsListEl.appendChild(wordCard);
+                });
+            }
+            
+            function resetGame() {
+                // Reset game state
+                gameState.score = 0;
+                gameState.correct = 0;
+                gameState.wrong = 0;
+                gameState.correctSpelling = 0;
+                gameState.correctPronunciation = 0;
+                gameState.timeBonus = 0;
+                gameState.hintCount = 3;
+                gameState.words = [];
+                gameState.wordHistory = [];
+                gameState.learnedWords = [];
+                
+                // Reset UI
+                updateScoreDisplay();
+                updateProgress();
+                
+                // Clear feedback elements
+                spellingFeedbackEl.textContent = '';
+                pronunciationFeedbackEl.textContent = '';
+                
+                // Reset animations in start screen
+                animateStartScreen();
+            }
+            
+            function addToLearnedWords(word) {
+                // Check if word is already in learned words
+                const exists = gameState.learnedWords.some(item => item.word === word.word);
+                
+                if (!exists) {
+                    gameState.learnedWords.push(word);
+                    saveLearnedWordsToStorage();
+                }
+            }
+            
+            function saveLearnedWordsToStorage() {
+                try {
+                    // Save essential data only
+                    const wordsToSave = gameState.learnedWords.map(word => ({
+                        word: word.word,
+                        translation: word.translation,
+                        pronunciation: word.pronunciation
+                    }));
+                    
+                    localStorage.setItem('wordMaster_learnedWords', JSON.stringify(wordsToSave));
+                } catch (error) {
+                    console.error('Error saving learned words:', error);
+                }
+            }
+            
+            function loadLearnedWordsFromStorage() {
+                try {
+                    const saved = localStorage.getItem('wordMaster_learnedWords');
+                    if (saved) {
+                        gameState.learnedWords = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('Error loading learned words:', error);
+                }
+            }
+            
+            function saveGameResults() {
+                try {
+                    // Create results object
+                    const results = {
+                        date: new Date().toISOString(),
+                        level: gameState.currentLevel,
+                        score: gameState.score,
+                        correct: gameState.correct,
+                        wrong: gameState.wrong,
+                        learnedWords: gameState.learnedWords.length
+                    };
+                    
+                    // Get existing history or initialize new array
+                    let history = [];
+                    const savedHistory = localStorage.getItem('wordMaster_history');
+                    if (savedHistory) {
+                        history = JSON.parse(savedHistory);
+                    }
+                    
+                    // Add new result
+                    history.push(results);
+                    
+                    // Save back to localStorage (limit to last 30 sessions)
+                    if (history.length > 30) {
+                        history = history.slice(history.length - 30);
+                    }
+                    
+                    localStorage.setItem('wordMaster_history', JSON.stringify(history));
+                    
+                    // Save to server (placeholder)
+                    console.log('Results saved:', results);
+                } catch (error) {
+                    console.error('Error saving game results:', error);
+                }
+            }
+            
+            function shareResults() {
+                // Create share text
+                const shareText = `Word Master Pro'da ${gameState.score} puan topladım! ${gameState.correct} doğru cevapla ${gameState.currentLevel} seviyesinde ${gameState.dailyTarget} kelime öğrendim. #WordMasterPro #DilÖğrenme`;
+                
+                // Try native share
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Word Master Pro Sonuçlarım',
+                        text: shareText
+                    }).catch(err => {
+                        console.error('Paylaşım hatası:', err);
+                        // Fallback to clipboard
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            alert('Sonuçlar panoya kopyalandı!');
+                        });
+                    });
+                } else {
+                    // Fallback to clipboard
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        alert('Sonuçlar panoya kopyalandı!');
+                    });
+                }
+            }
+            
+            function speakText(text) {
+                if (gameState.synthesis) {
+                    // Cancel any ongoing speech
+                    gameState.synthesis.cancel();
+                    
+                    // Create new utterance
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9; // Slightly slower for better comprehension
+                    
+                    // Speak
+                    gameState.synthesis.speak(utterance);
+                }
+            }
+            
+            // String similarity using Levenshtein distance
+            function stringSimilarity(str1, str2) {
+                if (!str1 || !str2) return 0;
+                
+                const track = Array(str2.length + 1).fill(null).map(() => 
+                    Array(str1.length + 1).fill(null));
+                
+                for (let i = 0; i <= str1.length; i++) {
+                    track[0][i] = i;
+                }
+                
+                for (let j = 0; j <= str2.length; j++) {
+                    track[j][0] = j;
+                }
+                
+                for (let j = 1; j <= str2.length; j++) {
+                    for (let i = 1; i <= str1.length; i++) {
+                        const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                        track[j][i] = Math.min(
+                            track[j][i - 1] + 1, // deletion
+                            track[j - 1][i] + 1, // insertion
+                            track[j - 1][i - 1] + indicator // substitution
+                        );
+                    }
+                }
+                
+                const maxLength = Math.max(str1.length, str2.length);
+                if (maxLength === 0) return 1.0;
+                
+                return 1 - (track[str2.length][str1.length] / maxLength);
+            }
+            
+            // Shuffle array using Fisher-Yates algorithm
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+            
+            // Initialize the game
+            init();
+        });
+    </script>
+</body>
+</html>

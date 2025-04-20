@@ -7,6 +7,11 @@ import json
 from werkzeug.utils import secure_filename
 import logging
 import uuid
+
+from werkzeug.utils import secure_filename
+import os
+import time
+
 import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -20,8 +25,12 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///beyin_egzersizi.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///beyin_egzersizi.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
 app.secret_key = os.environ.get("SESSION_SECRET", "beyin_egzersizi_gizli_anahtar")
@@ -31,6 +40,8 @@ UPLOAD_FOLDER = 'static/uploads/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB limit
+app.config['FEEDBACK_EMAIL'] = "omgameee@gmail.com"
+app.config['SENDGRID_API_KEY'] = os.environ.get("SENDGRID_API_KEY")
 
 # Logging ayarları
 logging.basicConfig(level=logging.DEBUG)
@@ -425,11 +436,21 @@ def get_user_avatar(user_id):
 
     URL'leri frontend'de kullanmak için hazır hale getirir.
     """
-    user = User.query.get(user_id)
-    if user and user.avatar_url:
-        return user.avatar_url
-    else:
-        return "images/placeholder.jpg"  # Varsayılan profil fotoğrafı
+    try:
+        user = User.query.get(user_id)
+        if user and user.avatar_url and user.avatar_url.strip():
+            # Kullanıcının avatar_url'si var, session'a kaydedelim
+            if 'avatar_url' not in session or session['avatar_url'] != user.avatar_url:
+                session['avatar_url'] = user.avatar_url
+            return user.avatar_url
+        else:
+            # Kullanıcının avatar_url'si yok, session'dan silelim (varsa)
+            if 'avatar_url' in session:
+                session.pop('avatar_url', None)
+            return "images/placeholder.jpg"  # Varsayılan profil fotoğrafı
+    except Exception as e:
+        print(f"Avatar URL alınırken hata: {str(e)}")
+        return "images/placeholder.jpg"  # Hata durumunda varsayılan
 
 @app.context_processor
 def utility_processor():
@@ -993,43 +1014,169 @@ def initialize_database():
                     content="""
                     <h3>Bilişsel Sağlığı Yaş Aldıkça Koruma Yöntemleri</h3>
                     <p>Yaşlanma kaçınılmaz olsa da, bilişsel gerilemeyi yavaşlatmak ve beyni sağlıklı tutmak için atılabilecek birçok adım vardır.</p>
-                    
-                    <h4>Bilişsel sağlık için uzun vadeli stratejiler:</h4>
-                    <ul>
-                        <li><strong>Düzenli Bilişsel Zorluklar:</strong> OmGame'deki beyin egzersizleri gibi yeni ve zorlayıcı aktiviteler, bilişsel rezerv oluşturmanıza yardımcı olur.</li>
-                        <li><strong>Sosyal Bağlantılar:</strong> Aktif bir sosyal yaşam, bilişsel gerileme riskini azaltır.</li>
-                        <li><strong>Fiziksel Aktivite:</strong> Düzenli egzersiz, beyin sağlığını destekleyen en güçlü faktörlerden biridir.</li>
-                        <li><strong>Sağlıklı Beslenme:</strong> Akdeniz tarzı diyet gibi beyin dostu beslenme düzenleri, bilişsel sağlığı destekler.</li>
-                        <li><strong>Kaliteli Uyku:</strong> Uyku sırasında beyin toksinlerden arınır ve hafıza konsolidasyonu gerçekleşir.</li>
-                        <li><strong>Stres Yönetimi:</strong> Kronik stres, beyin sağlığı için zararlıdır. Meditasyon ve nefes egzersizleri yardımcı olabilir.</li>
-                    </ul>
-                    
-                    <p>Bu stratejileri yaşam tarzınıza entegre ederek ve OmGame'deki beyin egzersizlerini düzenli olarak yaparak, yaşlandıkça bilişsel sağlığınızı koruyabilirsiniz.</p>
-                    """,
-                    category="article"
-                ),
-                Article(
-                    title="Bilişsel Egzersizlere Yeni Başlayanlar İçin Rehber",
-                    content="""
-                    <h3>Beyin Egzersizi Yolculuğuna Başlamak</h3>
-                    <p>Beyin egzersizleri yapmak ilk başta korkutucu olabilir, ama doğru yaklaşımla herkes için erişilebilir ve eğlenceli olabilir.</p>
-
-                    <h4>Başlangıç seviyesi stratejileri:</h4>
-                    <ol>
-                        <li><strong>Basit Başlayın:</strong> Temel zorluk seviyelerinde kendinize güven kazanın ve aşırı zorlamadan ilerleme kaydedin.</li>
-                        <li><strong>Düzenli, Kısa Seanslar:</strong> Her gün 10-15 dakikalık oturumlar, uzun ama seyrek oturumlardan daha etkilidir.</li>
-                        <li><strong>Çeşitliliği Benimseyin:</strong> Farklı bilişsel becerileri hedefleyen çeşitli oyunlar deneyin.</li>
-                        <li><strong>Gelişimi Takip Edin:</strong> İlerlemenizi izleyin, ancak kendiniziyle rekabet edin, başkalarıyla değil.</li>
-                        <li><strong>Eğlenceyi Önceliklendirin:</strong> Keyif aldığınız zihinsel aktivitelerde daha iyi performans göstereceksiniz.</li>
-                        <li><strong>Sabırlı Olun:</strong> Bilişsel gelişim zaman alır, sürekli küçük gelişmeleri hedefleyin.</li>
-                        <li><strong>Gerçekçi Beklentiler Oluşturun:</strong> Herkes farklı başlangıç becerilerine ve ilerleme hızlarına sahiptir.</li>
-                    </ol>
-                    <p>Unutmayın, bilişsel egzersiz bir maraton, sprint değil. ZekaPark'ta, seviyeniz ne olursa olsun sizin için uygun zorluklar bulabilirsiniz.</p>
                     """,
                     category="tip"
+                ),
+            ]
+            db.session.add_all(articles)
+            db.session.commit()
+            
+            logging.info(f"Created {len(articles)} articles")
+            return "Veritabanı başarıyla başlatıldı!"
+    except Exception as e:
+        logging.error(f"Veritabanı başlatma hatası: {str(e)}")
+        return f"Veritabanı başlatma hatası: {str(e)}"
+
+@app.route('/profile/update/avatar', methods=['POST'])
+def update_avatar():
+    """Kullanıcı profil fotoğrafını güncelleme."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
+
+    try:
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı!'})
+
+        # Avatar seçimi kontrolü
+        selected_avatar = request.form.get('selected_avatar', '')
+        
+        # Dosya yükleme kontrolü
+        if 'avatar' in request.files and request.files['avatar'].filename:
+            # Dosya yüklendi
+            avatar_file = request.files['avatar']
+            
+            # Dosya doğrulama
+            if not allowed_file(avatar_file.filename):
+                return jsonify({'success': False, 'message': 'Geçersiz dosya formatı! İzin verilen formatlar: JPG, JPEG, PNG, GIF'})
+            
+            if not avatar_file.content_type.startswith('image/'):
+                return jsonify({'success': False, 'message': 'Yüklenen dosya bir resim değil!'})
+            
+            # Dosya boyutu kontrolü (5MB)
+            avatar_file.seek(0, os.SEEK_END)
+            file_size = avatar_file.tell()
+            avatar_file.seek(0)
+            
+            if file_size > 5 * 1024 * 1024:  # 5MB
+                return jsonify({'success': False, 'message': 'Dosya boyutu çok büyük! Maksimum 5MB.'})
+            
+            # Güvenli dosya adı oluştur
+            filename = secure_filename(avatar_file.filename)
+            timestamp = int(time.time())
+            new_filename = f"{user.id}_{timestamp}_{filename}"
+            
+            # Dosya yolunu oluştur ve kaydet
+            upload_folder = os.path.join('static', 'uploads', 'avatars')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            filepath = os.path.join(upload_folder, new_filename)
+            avatar_file.save(filepath)
+            
+            # Veritabanında güncelle
+            avatar_url = os.path.join('uploads', 'avatars', new_filename)
+            user.avatar_url = avatar_url
+            db.session.commit()
+            
+            logger.info(f"Kullanıcı {user.username} profil fotoğrafını güncelledi. Dosya: {new_filename}")
+            return jsonify({'success': True, 'message': 'Profil fotoğrafı başarıyla güncellendi!', 'avatar_url': avatar_url})
+            
+        elif selected_avatar:
+            # Hazır avatar seçildi
+            user.avatar_url = selected_avatar
+            db.session.commit()
+            
+            logger.info(f"Kullanıcı {user.username} hazır avatar seçti: {selected_avatar}")
+            return jsonify({'success': True, 'message': 'Avatar başarıyla güncellendi!', 'avatar_url': selected_avatar})
+        
+        else:
+            return jsonify({'success': False, 'message': 'Lütfen bir fotoğraf yükleyin veya hazır avatar seçin!'})
+    
+    except Exception as e:
+        logger.error(f"Avatar güncelleme hatası: {str(e)}")
+        return jsonify({'success': False, 'message': 'Avatar güncellenirken bir hata oluştu!'})
+
+def allowed_file(filename):
+    """Dosya uzantısının izin verilen formatlardan olup olmadığını kontrol eder."""
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/profile/remove/avatar', methods=['POST'])
+def remove_avatar():
+    """Kullanıcı avatarını kaldırma."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
+    
+    try:
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı!'})
+        
+        # Kullanıcının avatar yolunu kaydet (eğer dosyaysa silmek için)
+        old_avatar = user.avatar_url
+        
+        # Varsayılan avatarı ayarla
+        user.avatar_url = "avatars/default/default_avatar.png"
+        db.session.commit()
+        
+        # Eğer önceki avatar bir dosya yüklemesiyse ve uploads klasöründeyse dosyayı sil
+        if old_avatar and 'uploads' in old_avatar:
+            try:
+                avatar_path = os.path.join('static', old_avatar)
+                if os.path.exists(avatar_path):
+                    os.remove(avatar_path)
+                    logger.info(f"Kullanıcı {user.username} dosya avatarı silindi: {old_avatar}")
+            except Exception as e:
+                logger.error(f"Avatar dosyası silinirken hata: {str(e)}")
+        
+        logger.info(f"Kullanıcı {user.username} avatarını kaldırdı")
+        return jsonify({
+            'success': True, 
+            'message': 'Avatar başarıyla kaldırıldı!',
+            'default_avatar': user.avatar_url
+        })
+        
+    except Exception as e:
+        logger.error(f"Avatar kaldırma hatası: {str(e)}")
+        return jsonify({'success': False, 'message': 'Avatar kaldırılırken bir hata oluştu!'})
+
+@app.route('/initialize-database')
+def initialize_database():
+    try:
+        # Veritabanında kullanıcı var mı kontrol et
+        if User.query.count() == 0:
+            # Test kullanıcıları oluştur
+            users = [
+                User(
+                    username="admin",
+                    email="admin@example.com",
+                    password_hash=generate_password_hash("adminpass"),
+                    role="admin",
+                    is_verified=True,
+                    avatar_url="avatars/default/default_avatar.png"
+                ),
+                User(
+                    username="test",
+                    email="test@example.com",
+                    password_hash=generate_password_hash("testpass"),
+                    role="user",
+                    is_verified=True,
+                    avatar_url="avatars/default/default_avatar.png"
                 )
             ]
-
+            
+            for user in users:
+                db.session.add(user)
+            
+            # Örnek makaleler
+            articles = [
+                Article(
+                    title="Bilişsel Egzersizin Faydaları",
+                    content="Bu makalede beyin egzersizlerinin bilişsel sağlığa faydaları anlatılacaktır.",
+                    category="article"
+                )
+            ]
+            
             for article in articles:
                 db.session.add(article)
 
@@ -1257,11 +1404,23 @@ def login():
 
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
+            session['username'] = user.username
+            
+            # Kullanıcının avatar_url'sini session'a kaydet
+            if user.avatar_url and user.avatar_url.strip():
+                session['avatar_url'] = user.avatar_url
+            
+            # Tema tercihini session'a ekle
+            session['theme_preference'] = user.theme_preference or 'dark'
+            
             # Kullanıcının son aktif zamanını güncelle
             user.last_active = datetime.utcnow()
             db.session.commit()
 
             flash('Giriş başarılı!', 'success')
+
+            # Debug için console log ekle
+            print(f"Kullanıcı girişi başarılı: {user.username}, Avatar: {user.avatar_url}")
 
             # Yönlendirilecek sayfa varsa oraya git
             if redirect_url:
@@ -1528,6 +1687,13 @@ def memory_match():
 def labyrinth():
     return render_template('games/labyrinth.html')
 
+# Bayrak Tahmin Oyunu
+@app.route('/games/flag-quiz')
+def flag_quiz():
+    """Bayrak Tahmin Oyunu: Görsel hafıza ve coğrafi bilgi testi
+    Dünya bayraklarını tahmin ederek görsel hafızanızı ve coğrafi bilginizi geliştirin."""
+    return render_template('games/flagQuiz.html')
+
 # Bulmaca Oyunu
 @app.route('/games/puzzle')
 def puzzle():
@@ -1644,6 +1810,28 @@ def puzzle_slider():
     """Puzzle Slider: Görsel bulmaca
     Görsel dikkat ve mekansal becerileri geliştiren kare bulmaca oyunu"""
     return render_template('games/puzzleSlider.html')
+    
+@app.route('/games/photo-puzzle')
+def photo_puzzle():
+    """Fotoğraf Yapboz: Görsel bulmaca oyunu
+    Ünlü kişilerin, manzaraların ve sanat eserlerinin resimlerini parçalara ayırıp birleştirerek
+    görsel dikkat ve mekansal becerilerinizi geliştirin."""
+    try:
+        return render_template('games/photo_puzzle.html')
+    except Exception as e:
+        logger.error(f"Photo puzzle game error: {str(e)}")
+        return render_template('error.html', message="Oyun yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.")
+
+@app.route('/games/inventions-quiz')
+def inventions_quiz():
+    """İcatlar ve İsimler: Tarih bilgisi oyunu
+    Tarih boyunca önemli icatları ve mucitlerini eşleştirerek bilgi dağarcığınızı 
+    genişletin ve genel kültürünüzü artırın."""
+    try:
+        return render_template('games/inventions_quiz.html')
+    except Exception as e:
+        logger.error(f"Inventions quiz game error: {str(e)}")
+        return render_template('error.html', message="Oyun yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.")
 
 # Login required decorator
 def login_required(f):
@@ -1657,7 +1845,6 @@ def login_required(f):
 
 # Mayın Tarlası Oyunu
 @app.route('/games/minesweeper')
-@login_required
 def minesweeper():
     """Mayın Tarlası: Mantık ve strateji oyunu
     Mantık yürüterek mayınları işaretle ve tarlanı temizle!"""
@@ -2135,14 +2322,27 @@ def update_profile():
 
     return jsonify({'success': True, 'message': 'Profil bilgileri güncellendi!'})
 
-# Avatar Güncelleme
-@app.route('/profile/update/avatar', methods=['POST'])
-def update_avatar():
-    """Profil fotoğrafını güncelleme."""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Oturum açık değil!'})
-
-    user = User.query.get(session['user_id'])
+# First implementation is kept, this duplicate route has been removed
+    
+    # JSON veri kontrolü (hazır avatar seçimi için)
+    if request.is_json:
+        data = request.get_json()
+        selected_avatar = data.get('selected_avatar')
+        if selected_avatar and selected_avatar.strip():
+            # Seçili hazır avatarı kullan
+            user.avatar_url = selected_avatar
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Avatar güncellendi!', 'avatar_url': user.avatar_url})
+        return jsonify({'success': False, 'message': 'Geçersiz avatar seçimi!'})
+    
+    # Form verisi kontrolü
+    # Hazır avatar seçimi kontrolü
+    selected_avatar = request.form.get('selected_avatar')
+    if selected_avatar and selected_avatar.strip():
+        # Seçili hazır avatarı kullan
+        user.avatar_url = selected_avatar
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Avatar güncellendi!', 'avatar_url': user.avatar_url})
 
     # Dosyanın gelip gelmediğini kontrol et
     if 'avatar' not in request.files:
@@ -2174,6 +2374,9 @@ def update_avatar():
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Profil fotoğrafı güncellendi!', 'avatar_url': user.avatar_url})
+
+
+# Bu route kaldırıldı, çünkü yukarıda zaten tanımlanmış.
 
 # Şifre Değiştirme
 @app.route('/profile/change-password', methods=['POST'])
@@ -2255,9 +2458,11 @@ def update_theme():
         return jsonify({'success': False, 'message': 'Oturum açık değil!'})
 
     user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı!'})
 
     # Tema tercihini al
-    theme = request.form.get('theme', 'dark')
+    theme = request.form.get('theme_preference', 'dark')
 
     # Tema tercihini doğrula
     if theme not in ['light', 'dark', 'system']:
@@ -2265,9 +2470,20 @@ def update_theme():
 
     # Kullanıcı ayarını güncelle
     user.theme_preference = theme
-    db.session.commit()
-
-    return jsonify({'success': True, 'message': 'Tema tercihi güncellendi!'})
+    
+    try:
+        # Session'daki tema tercihini de güncelle
+        session['theme_preference'] = theme
+        
+        # Veritabanına kaydet
+        db.session.commit()
+        
+        print(f"Tema tercihi güncellendi: {user.username}, Tema: {theme}")
+        return jsonify({'success': True, 'message': 'Tema tercihi güncellendi!'})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Tema güncelleme hatası: {str(e)}")
+        return jsonify({'success': False, 'message': 'Tema güncellenirken bir hata oluştu!'})
 
 # Hesap Silme
 @app.route('/profile/delete', methods=['POST'])
@@ -2362,26 +2578,39 @@ def suspend_account():
 def calculate_multipliers(game_type, difficulty=None, game_stats=None):
     """
     Oyun türüne, zorluğuna ve oyun istatistiklerine göre puan ve XP çarpanlarını hesaplar
+    Yeni 0-100 standardize edilmiş puan sistemini kullanır
 
     Args:
         game_type (str): Oyun türü
-        difficulty (str, optional): Zorluk seviyesi (easy, medium, hard)
+        difficulty (str, optional): Zorluk seviyesi (easy, medium, hard, expert)
         game_stats (dict, optional): Oyun istatistikleri (süre, hamle sayısı, ipucu sayısı, vb.)
 
     Returns:
         dict: Puan ve XP çarpanları
     """
+    # Zorluk seviyesi çarpanları
+    difficulty_multipliers = {
+        'easy': 0.8,
+        'medium': 1.0,
+        'hard': 1.3,
+        'expert': 1.6
+    }
+    
     # Varsayılan çarpanlar
     multipliers = {
-        'point_base': 50,  # Temel puan
-        'score_multiplier': 0.5,  # Skor çarpanı
-        'xp_base': 30,  # Temel XP
-        'xp_score_multiplier': 0.25,  # Skor başına XP - arttırıldı
-        'difficulty_multiplier': 1.0,  # Zorluk çarpanı
-        'final_score': None  # Hesaplanacak nihai skor
+        'point_base': 10,            # Temel puan
+        'score_multiplier': 1.0,     # Skor çarpanı
+        'xp_base': 15,               # Temel XP
+        'xp_score_multiplier': 0.5,  # Skor başına XP
+        'difficulty_multiplier': difficulty_multipliers.get(difficulty, 1.0),  # Zorluk çarpanı
+        'final_score': None,         # Hesaplanacak nihai skor (0-100)
+        'minimum_score_required': 5, # Minimum puan almak için gereken skor
+        'performance_score': 0,      # Performans puanı (0-60)
+        'skill_score': 0,            # Beceri puanı (0-30)
+        'social_score': 0            # Sosyal puanı (0-10)
     }
 
-    # Oyun türüne göre özel çarpanlar
+    # Oyun türüne göre özel çarpanlar - geriye dönük uyumluluk için korundu
     game_multipliers = {
         'memoryCards': {'point_base': 70, 'score_multiplier': 0.6},
         'wordPuzzle': {'point_base': 60, 'score_multiplier': 0.7},
@@ -2403,124 +2632,168 @@ def calculate_multipliers(game_type, difficulty=None, game_stats=None):
         'iq_test': {'point_base': 90, 'score_multiplier': 0.4},
         'numberChain': {'point_base': 75, 'score_multiplier': 0.55},
         'minesweeper': {'point_base': 90, 'score_multiplier': 0.4},
-        'memoryMatch': {'point_base': 60, 'score_multiplier': 0.7} # Memory Match için çarpanlar eklendi
-
+        'memoryMatch': {'point_base': 60, 'score_multiplier': 0.7},
+        'audio_memory': {'point_base': 65, 'score_multiplier': 0.6},
+        'hangman': {'point_base': 70, 'score_multiplier': 0.6}
     }
 
-    # Oyun türüne göre çarpanları güncelle
+    # Oyun türüne göre çarpanları güncelle (geriye dönük uyumluluk)
     if game_type in game_multipliers:
         multipliers.update(game_multipliers[game_type])
 
-    # Zorluk seviyesine göre çarpanı ayarla - daha belirgin farklar yaratılıyor
+    # XP hesaplamaları için zorluk seviyesini ayarla
     if difficulty:
         if difficulty == 'easy':
-            multipliers['difficulty_multiplier'] = 1.0  # Kolay seviye temel puan
             multipliers['xp_base'] = 20  # Kolay seviye temel XP
         elif difficulty == 'medium':
-            multipliers['difficulty_multiplier'] = 1.5  # Orta seviye %50 daha fazla puan
             multipliers['xp_base'] = 30  # Orta seviye temel XP
         elif difficulty == 'hard':
-            multipliers['difficulty_multiplier'] = 2.5  # Zor seviye %150 daha fazla puan
             multipliers['xp_base'] = 45  # Zor seviye temel XP
         elif difficulty == 'expert':
-            multipliers['difficulty_multiplier'] = 4.0  # Uzman seviye %300 daha fazla puan
             multipliers['xp_base'] = 70  # Uzman seviye temel XP
 
-    # Eğer oyun istatistikleri verildiyse, daha gerçekçi bir puan hesapla
+    # İstemciden önceden hesaplanmış normalized_score geldiyse (0-100 arası), doğrudan kullan
+    if game_stats and 'normalized_score' in game_stats:
+        normalized_score = game_stats.get('normalized_score', 0)
+        multipliers['final_score'] = max(0, min(100, int(normalized_score)))
+        
+        # İstemciden gelen performans, beceri ve sosyal puanları kullan (eğer varsa)
+        multipliers['performance_score'] = game_stats.get('score_breakdown', {}).get('performance', {}).get('total', 60)
+        multipliers['skill_score'] = game_stats.get('score_breakdown', {}).get('skill', {}).get('total', 30)
+        multipliers['social_score'] = game_stats.get('score_breakdown', {}).get('social', {}).get('total', 10)
+        
+        # İstemci puanlamasına güven - burada tamamlanıyor
+        return multipliers
+
+    # Eğer game_stats varsa ve istemciden normalized_score gelmemişse, 
+    # sunucu tarafında 0-100 arası puan hesapla
     if game_stats:
-        # Başlangıç puanı
-        base_score = 50
-
-        # Oyun süresini puan hesaplamasına kat
-        duration_seconds = game_stats.get('duration_seconds', 0)
-        duration_minutes = duration_seconds / 60.0
-
-        # Süreye bağlı puanlama (oyuna göre değişebilir)
-        duration_score = 0
-        if game_type in ['tetris', 'snake_game']:
-            # Bu oyunlarda uzun süre dayanmak iyidir
-            duration_score = min(30, int(duration_minutes * 5))
-        else:
-            # Bu oyunlarda hızlı bitirmek iyidir
-            # Oyun tipine göre optimal süre değişir (dakika cinsinden)
-            optimal_duration_dict = {
-                'memoryCards': 2.5,  # 2.5 dakika
-                'wordPuzzle': 3.0,  # 3 dakika
-                'wordle': 2.0,  # 2 dakika
-                '2048': 3.0,  # 3 dakika
-                'simon_says': 2.0,  # 2 dakika
-                'audioMemory': 2.0,  # 2 dakika
-                'nBack': 3.0,  # 3 dakika
-                'numberSequence': 2.5,  # 2.5 dakika
-                'labyrinth': 4.0,  # 4 dakika
-                'puzzle': 3.0,  # 3 dakika
-                'color_match': 1.5,  # 1.5 dakika
-                'math_challenge': 2.0,  # 2 dakika
-                'iq_test': 10.0,  # 10 dakika
-                'numberChain': 2.5,  # 2.5 dakika
-                'minesweeper': 5.0,  # Mayın Tarlası için optimal süre
-                'memoryMatch': 2.0  # Memory Match için optimal süre eklendi
-            }
-            optimal_duration = game_stats.get('optimal_duration', optimal_duration_dict.get(game_type, 3.0))
-            if duration_minutes <= optimal_duration:
-                duration_score = int(30 * (optimal_duration - duration_minutes) / optimal_duration)
+        # =====================================================
+        # 1. PERFORMANS METRİKLERİ (Toplam Puanın %60'ı)
+        # =====================================================
+        
+        # Oyun tamamlama bilgisi
+        game_completed = game_stats.get('completed', True)
+        
+        # Oyun tamamlama puanı (0-10 puan)
+        completion_score = 10 if game_completed else 2
+        
+        # Ham skoru normalize et (0-20 puan)
+        score_value = float(game_stats.get('original_score', 0))
+        max_possible_score = {
+            'tetris': 200,
+            'wordle': 6,
+            'memoryCards': 20,
+            'puzzle': 500,
+            'snake': 50,
+            'minesweeper': 300,
+            'hangman': 100,
+            'numberSequence': 500,
+            'numberChain': 300,
+            'nBack': 200,
+            'audio_memory': 150
+        }.get(game_type, 100)
+        
+        score_ratio = min(1.0, score_value / max_possible_score)
+        score_based_points = score_ratio * 20
+        
+        # Performans puanı (0-60 arası normalize edilecek)
+        performance_raw = completion_score + score_based_points
+        performance_score = min(60, (performance_raw / 30) * 60)
+        
+        # =====================================================
+        # 2. YETENEK & BECERİ FAKTÖRLERİ (Toplam Puanın %30'u)
+        # =====================================================
+        
+        # Süre bilgisi
+        playtime = game_stats.get('playtime', 0)
+        max_time = game_stats.get('max_time', 300)  # Varsayılan 5 dakika
+        
+        # Süre puanı (0-10 puan)
+        time_score = 5  # Varsayılan orta değer
+        if max_time > 0 and playtime > 0:
+            # Süre bazlı oyunlarda (Tetris, Snake) uzun süre = iyi
+            if game_type in ['tetris', 'snake_game']:
+                time_score = min(10, (playtime / max_time) * 10)
             else:
-                duration_score = max(0, int(30 * (1 - (duration_minutes - optimal_duration) / (optimal_duration * 2))))
-
-        # Hamle sayısına bağlı puanlama
-        move_count = game_stats.get('move_count', 0)
-        move_score = 0
-        if move_count > 0:
-            # Oyun tipine göre optimal hamle sayısı değişir
-            optimal_moves = {
-                'memoryCards': 30,
-                'wordPuzzle': 25,
-                'puzzle_slider': 40,
-                'tetris': 100,
-                'chess': 40,
-                'wordle': 20,
-                '2048': 80,
-                'snake_game': 120,
-                'simon_says': 25,
-                'audioMemory': 35,
-                'nBack': 40,
-                'numberSequence': 45,
-                'labyrinth': 50,
-                'puzzle': 35,
-                'color_match': 60,
-                'math_challenge': 30,
-                'typing_speed': 200,  # Yazmada daha fazla hamle normal
-                'iq_test': 20,
-                'numberChain': 40,
-                'minesweeper': 50,  # Mayın Tarlası için optimal hamle sayısı
-                'memoryMatch': 25 # Memory Match için optimal hamle sayısı eklendi
-            }.get(game_type, 50)
-
-            # Optimal hamlelerden daha fazla yapıldıysa puan düşer
-            if move_count <= optimal_moves:
-                move_score = 20
-            else:
-                move_score = max(0, int(20 * (1 - (move_count - optimal_moves) / optimal_moves)))
-
-        # İpucu kullanımına bağlı puanlama
+                # Hızlı bitirme = iyi
+                time_score = max(0, min(10, (1 - (playtime / max_time)) * 10))
+        
+        # Doğruluk bilgisi
+        correct_answers = game_stats.get('correct_answers', 0)
+        total_questions = game_stats.get('total_questions', 0)
+        accuracy = game_stats.get('accuracy', 0)
+        
+        # Doğruluk puanı (0-10 puan)
+        accuracy_score = 5  # Varsayılan orta değer
+        if total_questions > 0:
+            accuracy_score = min(10, (correct_answers / total_questions) * 10)
+        elif accuracy > 0:
+            accuracy_score = accuracy / 10
+        
+        # İpucu kullanımı
         hint_count = game_stats.get('hint_count', 0)
-        hint_penalty = min(20, hint_count * 5)  # Her ipucu 5 puan düşürür, max 20 puan
-
-        # Doğruluk oranına bağlı puanlama
-        accuracy = game_stats.get('accuracy', 0)  # 0-100 arası
-        accuracy_score = int(accuracy * 0.2)  # Max 20 puan
-
-        # Brüt puanı hesapla
-        raw_score = base_score + duration_score + move_score + accuracy_score - hint_penalty
-
-        # Zorluk seviyesi katsayısını uygula
+        
+        # İpucu cezası (0-10 puan)
+        hint_penalty = min(10, hint_count * 2)
+        
+        # Beceri puanı (0-30 arası normalize edilecek)
+        skill_raw = time_score + accuracy_score - hint_penalty
+        skill_score = min(30, (skill_raw / 20) * 30)
+        
+        # =====================================================
+        # 3. SOSYAL & DAVRANIŞSAL FAKTÖRLER (Toplam Puanın %10'u)
+        # =====================================================
+        
+        # Kullanıcının streak bilgisi
+        streak_days = game_stats.get('streak_days', 0)
+        
+        # Streak puanı (0-7 puan)
+        streak_score = min(7, streak_days)
+        
+        # Sosyal aktiviteler
+        social_actions = game_stats.get('social_actions', 0)
+        
+        # Sosyal puan (0-3 puan)
+        social_action_score = min(3, social_actions)
+        
+        # Sosyal faktör puanı (0-10 arası normalize edilecek)
+        social_raw = streak_score + social_action_score
+        social_score = min(10, (social_raw / 10) * 10)
+        
+        # =====================================================
+        # 4. TOPLAM PUAN HESAPLAMA
+        # =====================================================
+        
+        # Ana formül: Toplam Puan = (Performans Puanı * 0.6) + (Yetenek Puanı * 0.3) + (Sosyal Puan * 0.1)
+        raw_score = performance_score * 0.6 + skill_score * 0.3 + social_score * 0.1
+        
+        # Zorluk seviyesi çarpanını uygula
         adjusted_score = raw_score * multipliers['difficulty_multiplier']
-
-        # Sınırları uygula (10-100 arası)
-        final_score = max(10, min(100, int(adjusted_score)))
-
-        # Nihai puanı ayarla
+        
+        # Son sınırları uygula (0-100 arası)
+        final_score = max(0, min(100, int(adjusted_score)))
+        
+        # Hesaplanan değerleri multipliers'a ekle
         multipliers['final_score'] = final_score
+        multipliers['performance_score'] = int(performance_score)
+        multipliers['skill_score'] = int(skill_score)
+        multipliers['social_score'] = int(social_score)
+        
+        logger.debug(f"Performans: {performance_score}, Beceri: {skill_score}, Sosyal: {social_score}, Final: {final_score}")
+
+    # Eğer final_score hala hesaplanmadıysa basit bir hesaplama yap
+    if multipliers['final_score'] is None:
+        # Basit hesaplama: temel puan + skor bazlı puan * zorluk çarpanı
+        base_score = multipliers['point_base']
+        score_points = multipliers.get('score', 0) * multipliers['score_multiplier']
+        total_points = base_score + score_points
+        
+        # Sınırları uygula (0-100 arası)
+        total_points = max(0, min(100, int(total_points * multipliers['difficulty_multiplier'])))
+        
+        # Nihai puanı ayarla
+        multipliers['final_score'] = total_points
 
     return multipliers
 
@@ -2547,14 +2820,18 @@ def check_daily_bonus(user_id):
 # Skor Kaydetme API'si
 @app.route('/api/save-score', methods=['POST'])
 def save_score():
-    """Oyun skorlarını kaydetme ve kullanıcı XP'sini güncelleme API'si"""
+    """
+    Oyun skorlarını kaydetme ve kullanıcı XP'sini güncelleme API'si
+    Yeni 0-100 standardize edilmiş puan sistemini kullanır
+    """
     # Gelen veriyi al ve doğrula
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'message': 'Geçersiz JSON verisi!'})
 
     game_type = data.get('game_type')
-    score = data.get('score')
+    score = data.get('score')  # Orijinal/ham skor
+    normalized_score = data.get('normalized_score')  # İstemci tarafından hesaplanmış 0-100 arası puan
     playtime = data.get('playtime', 60)  # Varsayılan oyun süresi 60 saniye
     difficulty = data.get('difficulty', 'medium')  # Varsayılan zorluk medium
     game_stats = data.get('game_stats', {})  # Oyun istatistikleri
@@ -2570,47 +2847,32 @@ def save_score():
         # Çok önemli: Bazen string veya float olarak gönderiliyor, int'e çevir
         score = int(float(score))
         playtime = int(float(playtime))
+        # Normalize edilmiş skor kontrolü (0-100 arası)
+        if normalized_score is not None:
+            normalized_score = int(float(normalized_score))
+            normalized_score = max(0, min(100, normalized_score))
+            # Normalize edilmiş skoru game_stats'e ekle
+            game_stats['normalized_score'] = normalized_score
+        
         logger.debug(f"Skor dönüşümü: {score}, Süre dönüşümü: {playtime}")
     except (ValueError, TypeError) as e:
         logger.error(f"Skor veya süre dönüşüm hatası: {str(e)}, Değerler: score={score}, playtime={playtime}")
         return jsonify({'success': False, 'message': 'Geçersiz skor veya süre değeri!'})
 
-    # Çarpanları hesapla 
+    # Çarpanları ve standartlaştırılmış skoru hesapla
     logger.debug(f"Çarpanlar hesaplanıyor: game_type={game_type}, difficulty={difficulty}")
     multipliers = calculate_multipliers(game_type, difficulty, game_stats)
     logger.debug(f"Hesaplanan çarpanlar: {multipliers}")
 
-    # Performansa dayalı puanlama
-    if multipliers.get('final_score'):
-        # Yeni puanlama sisteminden gelen nihai puan
-        final_score = multipliers['final_score']
-        base_points = final_score * 0.5
-        score_points = final_score * 0.5
-        total_points = final_score
-
-        # Puan bilgisini multipliers'a ekle
-        multipliers['total_score'] = int(total_points)
-        logger.debug(f"Final skor hesaplaması: {final_score}")
+    # Standart puan hesaplama (0-100 arası)
+    if multipliers.get('final_score') is not None:
+        # Hesaplanan standart puan (0-100 arası)
+        standard_score = multipliers['final_score']
+        logger.debug(f"Final skor hesaplaması: {standard_score}")
     else:
-        # Temel puanlama sistemi
-        # Zorluk seviyesine dayalı taban puan
-        base_points = multipliers['point_base'] * multipliers['difficulty_multiplier']
-
-        # Oyun skoruna dayalı ek puan (bu gerçek oyun performansını yansıtır)
-        score_points = score * multipliers['score_multiplier']
-
-        # Oyun süresine dayalı ek puan
-        playtime_minutes = playtime / 60.0
-        duration_points = min(20, int(playtime_minutes * 2))  # En fazla 20 puan
-
-        # Toplam puanı hesapla
-        total_points = base_points + score_points + duration_points
-
-        # Sınırları uygula (10-100 arası)
-        total_points = max(10, min(100, int(total_points)))
-
-        multipliers['total_score'] = int(total_points)
-        logger.debug(f"Standart skor hesaplaması: base={base_points}, score={score_points}, time={duration_points}, total={total_points}")
+        # Eğer final_score hesaplanmadıysa basit bir hesaplama yap
+        standard_score = 50  # Varsayılan orta değer
+        logger.warning(f"Standart puan hesaplanamadı, varsayılan değer kullanıldı: {standard_score}")
 
     # Kullanıcı giriş yapmış mı kontrol et
     if 'user_id' in session:
@@ -2623,7 +2885,7 @@ def save_score():
         streak_bonus = 0
 
         if check_daily_bonus(user_id):
-            daily_bonus = 20  # Günlük ilk oyun bonusu
+            daily_bonus = 10  # Günlük ilk oyun bonusu
 
             # Ardışık günlerde oynama bonusu (streak bonus)
             last_play_date = user.last_active
@@ -2638,67 +2900,55 @@ def save_score():
                     user.streak_count = streak_count
 
                 # Streak bonusu hesapla (her ardışık gün için artan bonus)
-                streak_bonus = min(streak_count * 5, 50)  # Maximum 50 bonus
+                streak_bonus = min(streak_count * 2, 10)  # Maximum 10 puan
+                
+                # Game stats için streak bilgisi ekle
+                game_stats['streak_days'] = streak_count
             else:
                 # Ardışık oynama bozulmuşsa sıfırla
                 if hasattr(user, 'streak_count'):
                     user.streak_count = 1
                 else:
                     user.streak_count = 1
+                
+                # Game stats için streak bilgisi ekle
+                game_stats['streak_days'] = 1
 
-        # Toplam puanı hesapla
-        total_points = base_points + score_points + daily_bonus + streak_bonus
-
-        # Geliştirilmiş XP hesaplama sistemi
-        # Temel XP değeri (oyun türü ve zorluğa göre)
-        xp_base = multipliers['xp_base']
-
-        # Oyun performansına bağlı XP (skor ne kadar yüksekse o kadar çok XP)
-        xp_from_score = score * multipliers['xp_score_multiplier']
-
-        # Oyunda harcanan zamanına bağlı XP - her dakika için 5 XP, 
-        # ama çok uzun oyunlarda azalan getiri
-        playtime_minutes = playtime / 60
-        if playtime_minutes <= 5:
-            # 5 dakikaya kadar tam XP
-            xp_from_time = playtime_minutes * 5
-        else:
-            # 5 dakikadan sonra azalan XP
-            xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
-
-        # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
-        difficulty_bonus = 1.0
-        if difficulty == "easy":
-            difficulty_bonus = 1.0  # Temel değer
-        elif difficulty == "medium":
-            difficulty_bonus = 1.5  # %50 bonus
-        elif difficulty == "hard":
-            difficulty_bonus = 2.5  # %150 bonus
-        elif difficulty == "expert":
-            difficulty_bonus = 4.0  # %300 bonus
-        # Tamamlama başarısına göre bonus
+        # XP hesaplama sistemi
+        # Temel XP değeri (standardize edilmiş puana göre)
+        xp_base = multipliers.get('xp_base', 15)
+        
+        # Performansa dayalı XP 
+        xp_from_performance = standard_score * 0.5  # Standart puanın %50'si kadar XP
+        
+        # Zorluk seviyesine göre çarpan
+        difficulty_multiplier = {
+            'easy': 1.0,
+            'medium': 1.5,
+            'hard': 2.5,
+            'expert': 4.0
+        }.get(difficulty, 1.0)
+        
+        # Tamamlama bonusu
         completion_bonus = 0
         if game_stats.get('completed', False):
-            completion_bonus = int(xp_base * 0.3)  # Oyunu tamamlamak için %30 bonus
-
-        # Ard arda kazanma (streak) bonusu
+            completion_bonus = xp_base * 0.3  # %30 bonus
+        
+        # Streak bonusu
         streak_xp_bonus = 0
-        if hasattr(user, 'streak_count') and user.streak_count > 1:
-            streak_xp_bonus = min(user.streak_count * 2, 30)  # Maksimum 30 XP bonus
-
+        if streak_count := getattr(user, 'streak_count', 0):
+            streak_xp_bonus = min(streak_count * 2, 20)  # En fazla 20 XP
+        
         # Toplam XP hesaplama
-        xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus + completion_bonus + streak_xp_bonus)
-
-        # Yeni skoru kaydet (orijinal oyun skorunu ve zorluk seviyesini kullanarak)
-        # Zorluk seviyesine göre düzenlenmiş skoru hesapla
-        adjusted_score = int(score * multipliers['difficulty_multiplier'])
-
+        xp_gain = int((xp_base + xp_from_performance) * difficulty_multiplier + completion_bonus + streak_xp_bonus)
+        
+        # Yeni skoru kaydet
         new_score = Score(
             user_id=user_id,
             game_type=game_type,
-            score=score,  # Orijinal oyun skorunu kaydediyoruz
-            difficulty=difficulty,  # Zorluk seviyesini kaydediyoruz
-            adjusted_score=adjusted_score  # Zorluk seviyesine göre düzenlenmiş skoru kaydediyoruz
+            score=score,  # Orijinal oyun skoru
+            difficulty=difficulty,  # Zorluk seviyesi
+            adjusted_score=standard_score  # 0-100 arası standardize edilmiş puan
         )
 
         db.session.add(new_score)
@@ -2713,11 +2963,10 @@ def save_score():
             user.highest_score = score
             
         # Kullanıcının toplam puanını güncelle
-        # Hesaplanan toplam puanı kullanıcının toplam_score değerine ekle
-        adjusted_game_points = int(multipliers.get('total_score', 0))
-        user.total_score += adjusted_game_points
+        # 0-100 arası standardize edilmiş puanı kullanıcının toplam_score değerine ekle
+        user.total_score += standard_score
         
-        logger.debug(f"Kullanıcı toplam puanı güncellendi: {user.total_score} (+{adjusted_game_points})")
+        logger.debug(f"Kullanıcı toplam puanı güncellendi: {user.total_score} (+{standard_score})")
 
         db.session.commit()
 
@@ -2732,20 +2981,23 @@ def save_score():
         # Seviye yükseltme oldu mu kontrol et
         level_up = new_level > old_level
 
-        # Ödül detayları
+        # Puan detayları
         rewards = {
-            'base_points': int(base_points),
-            'score_points': int(score_points),
+            'base_points': int(multipliers.get('point_base', 10)),
+            'score_points': int(standard_score * 0.7),  # Standardize edilmiş puanın %70'i skor puanı
             'daily_bonus': daily_bonus,
             'streak_bonus': streak_bonus,
-            'difficulty_multiplier': multipliers['difficulty_multiplier']
+            'difficulty_multiplier': multipliers['difficulty_multiplier'],
+            'time_bonus': int(playtime / 60),  # Dakika başına puan
+            'time_factor': game_stats.get('time_factor', 1.0)
         }
 
+        # Yanıt JSON'u oluştur - yeni puan sistemine göre
         return jsonify({
             'success': True, 
             'message': 'Skor kaydedildi!',
             'points': {
-                'total': int(total_points),
+                'total': standard_score,  # 0-100 arası standartlaştırılmış puan
                 'rewards': rewards
             },
             'xp': {
@@ -2759,10 +3011,14 @@ def save_score():
                 'old_level': old_level
             },
             'score_info': {
-                'total_score': multipliers.get('total_score', int(total_points)),
+                'total_score': standard_score,
                 'difficulty': difficulty,
-                'game_type': game_type
+                'game_type': game_type,
+                'performance_score': multipliers.get('performance_score', 0),
+                'skill_score': multipliers.get('skill_score', 0),
+                'social_score': multipliers.get('social_score', 0)
             },
+            'playtime': playtime,
             'redirect_params': {
                 'levelUp': True,
                 'newLevel': new_level
@@ -2770,40 +3026,29 @@ def save_score():
         })
     else:
         # Kullanıcı giriş yapmamış - skorunu kaydetmiyoruz
-        # Ödül detayları (gösterge amaçlı)
+        # Sadece gösterge amaçlı hesaplama yapıyoruz
+        
+        # Puan detayları (gösterge amaçlı)
         rewards = {
-            'base_points': int(base_points),
-            'score_points': int(score_points),
+            'base_points': int(multipliers.get('point_base', 10)),
+            'score_points': int(standard_score * 0.7),
             'daily_bonus': 0,
             'streak_bonus': 0,
             'difficulty_multiplier': multipliers['difficulty_multiplier']
         }
 
         # Misafir kullanıcılar için tahmini XP hesaplama (gösterge amaçlı)
-        # Geliştirilmiş XP hesaplama sistemi (misafir kullanıcılar için)
-        xp_base = multipliers['xp_base']
-        xp_from_score = score * multipliers['xp_score_multiplier']
-        # Zorluk seviyesine göre ek XP bonusu - değerleri arttırdık
-        difficulty_bonus = 1.0
-        if difficulty == "easy":
-            difficulty_bonus = 1.0  # Temel değer
-        elif difficulty == "medium":
-            difficulty_bonus = 1.5  # %50 bonus
-        elif difficulty == "hard":
-            difficulty_bonus = 2.5  # %150 bonus
-        elif difficulty == "expert":
-            difficulty_bonus = 4.0  # %300 bonus
-
-        # Oyun süresine göre hesaplama
-        playtime_minutes = playtime / 60
-        if playtime_minutes <= 5:
-            xp_from_time = playtime_minutes * 5
-        else:
-            xp_from_time = 5 * 5 + (playtime_minutes - 5) * 3
-
-        # Misafir kullanıcıya göstermek için toplam XP - giriş yapınca alabilecekleri miktar
-        xp_gain = int((xp_base + xp_from_score + xp_from_time) * difficulty_bonus)
-        total_points = base_points + score_points
+        xp_base = multipliers.get('xp_base', 15)
+        xp_from_score = standard_score * 0.5
+        difficulty_multiplier = {
+            'easy': 1.0,
+            'medium': 1.5,
+            'hard': 2.5,
+            'expert': 4.0
+        }.get(difficulty, 1.0)
+        
+        # Tahmini XP hesaplama
+        xp_gain = int((xp_base + xp_from_score) * difficulty_multiplier)
 
         # Misafir kullanıcılara bilgi mesajı
         guest_message = "Skorunuz kaydedilmedi! Skorlarınızı kaydetmek ve XP kazanmak için giriş yapın veya kayıt olun."
@@ -2814,7 +3059,7 @@ def save_score():
             'guest': True,  # Misafir kullanıcı olduğunu belirt
             'login_required': True,  # Giriş gerektiğini belirt
             'points': {
-                'total': int(total_points),
+                'total': standard_score,
                 'rewards': rewards
             },
             'xp': {
@@ -2823,9 +3068,12 @@ def save_score():
                 'progress_percent': 0
             },
             'score_info': {
-                'total_score': multipliers.get('total_score', int(total_points)),
+                'total_score': standard_score,
                 'difficulty': difficulty,
-                'game_type': game_type
+                'game_type': game_type,
+                'performance_score': multipliers.get('performance_score', 0),
+                'skill_score': multipliers.get('skill_score', 0),
+                'social_score': multipliers.get('social_score', 0)
             }
         })
 
@@ -3247,13 +3495,20 @@ def get_leaderboard(game_type):
 # Kullanıcı Seviyeleri API'si
 @app.route('/api/users/levels')
 def get_users_levels():
-    """En yüksek seviyeli ilk 10 kullanıcıyı döndürür"""
+    """En yüksek seviyeli kullanıcıları döndürür (limit parametresi ile sınırlandırılabilir)"""
     try:
         # Kullanıcı giriş yapmışsa kullanıcı ID'sini al
         current_user_id = session.get('user_id')
 
-        # En yüksek 10 seviyeye sahip kullanıcıları getir
-        users = User.query.order_by(User.experience_points.desc()).limit(10).all()
+        # Limit parametresini al (varsayılan 10)
+        limit = request.args.get('limit', 10, type=int)
+        
+        # Limit maksimum 100 olabilir
+        if limit > 100:
+            limit = 100
+            
+        # En yüksek seviyeye sahip kullanıcıları getir
+        users = User.query.order_by(User.experience_points.desc()).limit(limit).all()
 
         result = []
 
@@ -3365,7 +3620,66 @@ def get_leaderboard_data(game_type):
 
 # Yardımcı fonksiyonlar
 
-# Kullanıcılar Liderlik Tablosu (Seviye veya Puan bazlı)
+# Geri bildirim
+@app.route('/api/send-feedback', methods=['POST'])
+def send_feedback():
+    """
+    Geri bildirim formundan gelen verileri alıp e-posta olarak gönderir
+    """
+    try:
+        data = request.json
+        feedback_type = data.get('type', 'Belirtilmemiş')
+        feedback_subject = data.get('subject', 'Geri Bildirim')
+        feedback_content = data.get('content', '')
+        
+        # Kullanıcı bilgilerini ekle
+        user_info = ""
+        if session.get('user_id'):
+            user_info = "\n\n--- Kullanıcı Bilgileri ---\n"
+            user_info += f"Kullanıcı Adı: {session.get('username')}\n"
+            user_info += f"E-posta: {session.get('email')}\n"
+            user_info += f"Kullanıcı ID: {session.get('user_id')}"
+        else:
+            user_info = "\n\n--- Kullanıcı giriş yapmamış ---"
+        
+        # E-posta içeriği oluştur
+        subject = f"OmGame Geri Bildirim: {feedback_type} - {feedback_subject}"
+        
+        # HTML içerik
+        html_body = """
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #4a67e8;">Yeni Geri Bildirim Alındı</h2>
+                    <p><strong>Tür:</strong> """ + feedback_type + """</p>
+                    <p><strong>Konu:</strong> """ + feedback_subject + """</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                        """ + feedback_content.replace('\n', '<br>') + """
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <h4>Kullanıcı Bilgileri</h4>
+                        <pre style="font-family: monospace; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">""" + user_info + """</pre>
+                    </div>
+                    <p style="font-size: 12px; color: #777; margin-top: 30px;">
+                        Bu e-posta OmGame web sitesinin geri bildirim formundan gönderilmiştir.
+                    </p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        # Var olan e-posta gönderme fonksiyonunu kullan
+        result = send_email_in_background("omgameee@gmail.com", subject, html_body, from_name="OmGame Geri Bildirim")
+        
+        if result:
+            return jsonify({"success": True, "message": "Geri bildiriminiz başarıyla gönderildi."})
+        else:
+            return jsonify({"success": False, "message": "Geri bildirim gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyiniz."}), 500
+            
+    except Exception as e:
+        app.logger.error(f"Geri bildirim gönderme hatası: {str(e)}")
+        return jsonify({"success": False, "message": f"Geri bildirim gönderilirken bir hata oluştu: {str(e)}"}), 500
+
 @app.route('/api/users/leaderboard')
 def get_users_leaderboard():
     """
@@ -3438,11 +3752,84 @@ def education_games():
     """Eğitim, eğlence ve oyun sayfası"""
     # Eğitici oyun listesi oluştur
     games = [
+        # Dil ve Kelime Oyunları
+        {
+            "title": "Bayrak Tahmin Oyunu",
+            "description": "Dünya bayraklarını tahmin ederek görsel hafızanızı ve coğrafi bilginizi geliştirin.",
+            "icon": "fas fa-flag",
+            "url": "/games/flag-quiz"
+        },
         {
             "title": "Dil Öğrenme",
             "description": "Duolingo tarzı interaktif dil öğrenme egzersizleri ile yeni bir dil öğrenin.",
             "icon": "fas fa-language",
             "url": "/games/language-learning"
+        },
+        {
+            "title": "Word Master",
+            "description": "Çoktan seçmeli, yazım ve telaffuz aşamalarıyla İngilizce kelime haznenizi geliştirin.",
+            "icon": "fas fa-spell-check",
+            "url": "/word-master"
+        },
+        
+        # Mantık ve Matematik Oyunları
+        {
+            "title": "Sudoku",
+            "description": "Her satır, sütun ve blokta 1-9 rakamlarını doğru yerleştirerek mantıksal düşünme becerinizi geliştirin.",
+            "icon": "fas fa-th",
+            "url": "/games/sudoku"
+        },
+        {
+            "title": "Mayın Tarlası",
+            "description": "Mantık yürüterek mayınların yerlerini tespit edin ve güvenli alanları açın.",
+            "icon": "fas fa-bomb",
+            "url": "/games/minesweeper"
+        },
+        {
+            "title": "Fotoğraf Yapboz",
+            "description": "Ünlü kişilerin ve manzaraların resimlerini parçalara ayırıp birleştirerek görsel hafıza ve odaklanma becerilerinizi geliştirin.",
+            "icon": "fas fa-puzzle-piece",
+            "url": "/games/photo-puzzle"
+        },
+        
+        # Bilim Temalı Oyunlar
+        {
+            "title": "Bilimsel Keşif Zaman Çizelgesi",
+            "description": "Tarihi bilimsel keşifleri kronolojik sıraya dizme oyunu. Bilim tarihini öğrenin.",
+            "icon": "fas fa-history",
+            "url": "/games/science-timeline"
+        },
+        {
+            "title": "Element Avı",
+            "description": "Periyodik tabloda element bulma oyunu. Elementlerin sembollerini ve özelliklerini öğrenin.",
+            "icon": "fas fa-flask",
+            "url": "/games/element-hunt"
+        },
+        {
+            "title": "Bilim İnsanı Bulmacası",
+            "description": "Bilim insanlarını buluşlarıyla eşleştirin. Tarihe yön veren bilim insanlarını tanıyın.",
+            "icon": "fas fa-microscope",
+            "url": "/games/scientist-puzzle"
+        },
+        
+        # Kültür ve Sanat Temalı Oyunlar
+        {
+            "title": "Kültür Mozaiği",
+            "description": "Dünya kültürlerini keşfedin. Ülkelerin bayrak, gelenek ve kültürel öğelerini eşleştirin.",
+            "icon": "fas fa-globe-americas",
+            "url": "/games/culture-mosaic"
+        },
+        {
+            "title": "Sanat Eseri Tahmini",
+            "description": "Ünlü sanat eserlerini tanıma oyunu. Ressamları, tabloları ve sanat akımlarını öğrenin.",
+            "icon": "fas fa-paint-brush",
+            "url": "/games/art-guess"
+        },
+        {
+            "title": "Dünya Harita Yarışması",
+            "description": "Coğrafi konumları harita üzerinde bulun. Şehirler, dağlar, nehirler ve kültürel mirası keşfedin.",
+            "icon": "fas fa-map-marked-alt",
+            "url": "/games/world-map-quiz"
         }
     ]
     
@@ -3455,40 +3842,98 @@ def language_learning():
     """Duolingo tarzı dil öğrenme oyunu"""
     # Dil öğrenme oyunu için dersler ve ifadeler oluştur
     lessons = [
+        # A1 Seviyesi (Başlangıç)
         {
             "id": 1,
             "title": "Temel İfadeler",
             "description": "Günlük hayatta kullanılan temel ifadeleri öğrenin",
             "difficulty": "Kolay",
-            "progress": 0
+            "progress": 0,
+            "level": "A1",
+            "xp": 10
         },
         {
             "id": 2,
             "title": "Selamlaşma",
             "description": "Farklı dillerde selamlaşma ve tanışma ifadeleri",
             "difficulty": "Kolay", 
-            "progress": 0
+            "progress": 0,
+            "level": "A1",
+            "xp": 10
         },
         {
             "id": 3,
-            "title": "Yemek ve İçecekler",
-            "description": "Restoranlarda ve kafelerde kullanabileceğiniz ifadeler",
-            "difficulty": "Orta",
-            "progress": 0
+            "title": "Sayılar",
+            "description": "1'den 100'e kadar sayıları öğrenin",
+            "difficulty": "Kolay",
+            "progress": 0,
+            "level": "A1",
+            "xp": 15
         },
         {
             "id": 4,
+            "title": "Renkler ve Şekiller",
+            "description": "Temel renkler ve geometrik şekillerin adları",
+            "difficulty": "Kolay",
+            "progress": 0,
+            "level": "A1",
+            "xp": 15
+        },
+        # A2 Seviyesi (Orta Seviye)
+        {
+            "id": 5,
+            "title": "Yemek ve İçecekler",
+            "description": "Restoranlarda ve kafelerde kullanabileceğiniz ifadeler",
+            "difficulty": "Orta",
+            "progress": 0,
+            "level": "A2",
+            "xp": 20
+        },
+        {
+            "id": 6,
             "title": "Seyahat Terimleri",
             "description": "Seyahat ederken ihtiyaç duyacağınız temel kelimeler",
             "difficulty": "Orta",
-            "progress": 0
+            "progress": 0,
+            "level": "A2",
+            "xp": 20
         },
         {
-            "id": 5,
+            "id": 7,
             "title": "Alışveriş Terimleri",
             "description": "Alışveriş yaparken kullanabileceğiniz ifadeler",
+            "difficulty": "Orta",
+            "progress": 0,
+            "level": "A2",
+            "xp": 25
+        },
+        {
+            "id": 8,
+            "title": "Günlük Rutinler",
+            "description": "Günlük aktiviteleri anlatmak için gereken kelimeler",
+            "difficulty": "Orta",
+            "progress": 0,
+            "level": "A2",
+            "xp": 25
+        },
+        # B1 Seviyesi (İleri Seviye)
+        {
+            "id": 9,
+            "title": "İş Hayatı",
+            "description": "İş görüşmeleri ve profesyonel ortamlarda kullanabileceğiniz ifadeler",
             "difficulty": "Zor",
-            "progress": 0
+            "progress": 0,
+            "level": "B1",
+            "xp": 30
+        },
+        {
+            "id": 10,
+            "title": "Sağlık ve Hastalıklar",
+            "description": "Hastane ve eczanede kullanabileceğiniz terimler",
+            "difficulty": "Zor",
+            "progress": 0,
+            "level": "B1",
+            "xp": 30
         }
     ]
     
@@ -3501,8 +3946,33 @@ def language_learning():
         {"code": "it", "name": "İtalyanca", "flag": "it"}
     ]
     
+    # Kullanıcı giriş yapmış mı kontrol et
+    user_id = session.get('user_id')
+    user_streak = 0
+    daily_xp = 0
+    
+    if user_id:
+        # Kullanıcının streak (üst üste gün) bilgisini al
+        user = User.query.get(user_id)
+        if user:
+            # Burada gerçek uygulamada veritabanından kullanıcı streak bilgisini alırsınız
+            # Şimdilik rastgele değerler kullanıyoruz
+            user_streak = random.randint(0, 10)
+            daily_xp = random.randint(0, 50)
+    
     # Şablonu döndür
-    return render_template('language_learning.html', lessons=lessons, languages=languages)
+    return render_template('language_learning.html', 
+                          lessons=lessons, 
+                          languages=languages, 
+                          user_streak=user_streak,
+                          daily_xp=daily_xp)
+
+@app.route('/games/word-master')
+@app.route('/word-master')
+def word_master():
+    """Word Master: İngilizce kelime eğitimi
+    Çoktan seçmeli, yazım ve telaffuz egzersizleriyle İngilizce kelime haznenizi geliştirin!"""
+    return render_template('word_master.html')
 
 @app.route('/language-lesson/<int:lesson_id>')
 def language_lesson(lesson_id):
@@ -3511,6 +3981,74 @@ def language_lesson(lesson_id):
     
     # Kullanıcının seçtiği dil (gerçek uygulamada session veya veritabanından alınır)
     selected_language = request.args.get('lang', 'en')
+
+# Bilim ve Kültür Temalı Oyunlar için Rotalar
+# Kaldırıldı: Bilimsel Keşif Zaman Çizelgesi, Element Avı, Bilim İnsanı Bulmacası, Kültür Mozaiği, Sanat Eseri Tahmini, Dünya Harita Yarışması
+
+@app.route('/send-certificate', methods=['POST'])
+def send_certificate():
+    """Word Master oyunu için sertifika e-postası gönderir"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"success": False, "error": "Geçersiz istek verisi"}), 400
+            
+        user_email = data.get('userEmail')
+        user_name = data.get('userName', 'Değerli Kullanıcı')
+        score = data.get('score', 0)
+        success_rate = data.get('successRate', '0%')
+        level = data.get('level', 'A1')
+        date = data.get('date', datetime.now().strftime('%d/%m/%Y'))
+        
+        # E-posta içeriği
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #8a6fff;">İngilizce Dil Sertifikası</h1>
+            <p style="font-size: 18px; color: #555;">English Word Quest</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0; padding: 20px; border: 2px solid #8a6fff; border-radius: 10px;">
+            <h2 style="margin-bottom: 5px;">Bu belge</h2>
+            <h1 style="margin: 10px 0; color: #333; font-size: 24px;">{user_name}</h1>
+            <h2 style="margin-top: 5px;">adına düzenlenmiştir</h2>
+
+            <p style="margin: 20px 0; font-size: 18px;">
+              İngilizce dil seviyesi: <strong style="color: #8a6fff;">{level}</strong>
+            </p>
+
+            <p style="font-size: 16px; color: #555;">
+              Başarı oranı: {success_rate}<br>
+              Doğru cevap: {score}<br>
+              Tarih: {date}
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 30px; color: #777; font-size: 14px;">
+            <p>Bu sertifika, Word Master uygulamasında tamamlanan final deneme sınavı sonucuna göre düzenlenmiştir.</p>
+            <p>©️ {datetime.now().year} Word Master</p>
+          </div>
+        </div>
+        """
+        
+        # E-posta gönderme işlemi
+        result = send_email_in_background(
+            to_email=user_email, 
+            subject="İngilizce Dil Sertifikası - Word Master", 
+            html_body=html_content,
+            from_name="Word Master"
+        )
+        
+        if result:
+            logger.info(f"Sertifika e-postası gönderildi: {user_email}")
+            return jsonify({"success": True})
+        else:
+            logger.error(f"Sertifika e-postası gönderilemedi: {user_email}")
+            return jsonify({"success": False, "error": "E-posta gönderimi başarısız"})
+            
+    except Exception as e:
+        logger.error(f"Sertifika gönderme hatası: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
     
     # Ders bilgisi
     lesson = None
@@ -3567,6 +4105,42 @@ def language_lesson(lesson_id):
                 }
             ]
         }
+    elif lesson_id == 3:
+        lesson = {
+            "id": 3,
+            "title": "Sayılar",
+            "description": "1'den 100'e kadar sayıları öğrenin",
+            "exercises": [
+                {
+                    "type": "multiple_choice",
+                    "question": "'Seven' hangi sayıya karşılık gelir?",
+                    "options": ["6", "7", "8", "9"],
+                    "correct": "7"
+                },
+                {
+                    "type": "translation",
+                    "question": "12",
+                    "options": ["Ten", "Eleven", "Twelve", "Thirteen"],
+                    "correct": "Twelve",
+                    "language": "en"
+                },
+                {
+                    "type": "matching",
+                    "pairs": [
+                        {"native": "1", "foreign": "One"},
+                        {"native": "5", "foreign": "Five"},
+                        {"native": "10", "foreign": "Ten"},
+                        {"native": "20", "foreign": "Twenty"}
+                    ]
+                },
+                {
+                    "type": "multiple_choice",
+                    "question": "Yirmiden sonraki sayı hangisidir?",
+                    "options": ["Twenty-one", "Twenty-two", "Twelve", "Nineteen"],
+                    "correct": "Twenty-one"
+                }
+            ]
+        }
     else:
         # Diğer dersler için basit bir şablon
         lesson = {
@@ -3578,6 +4152,36 @@ def language_lesson(lesson_id):
     
     # Şablonu döndür
     return render_template('language_lesson.html', lesson=lesson, lesson_id=lesson_id, selected_language=selected_language)
+
+# Bot sistemini başlatmak için yardımcı fonksiyon
+def setup_bot_system():
+    """Bot sistemini başlatır"""
+    try:
+        logger.info("Bot sistemi başlatılıyor...")
+        from bot_system import initialize_bot_system
+        # Bot sistemini başlat (15 bot oluşturarak)
+        initialize_bot_system(initial_bot_count=15)
+        logger.info("Bot sistemi başlatıldı!")
+    except Exception as e:
+        logger.error(f"Bot sistemi başlatılırken hata: {str(e)}")
+
+# Bot sistemini başlatmak için route tanımla
+@app.route('/admin/setup-bots', methods=['GET'])
+def admin_setup_bots():
+    """Bot sistemini manuel olarak başlatmak için yönetici sayfası"""
+    setup_bot_system()
+    return "Bot sistemi başlatıldı! Ana sayfaya dönmek için <a href='/'>buraya tıklayın</a>."
+
+# Bot sistemini başlatmak için route'u çağıralım
+try:
+    # Uygulama başladığında bot sistemini aktifleştir
+    from bot_system import initialize_bot_system
+    # Doğrudan bot sistemini başlat
+    with app.app_context():
+        initialize_bot_system(initial_bot_count=15)
+        print("Bot sistemi başlatıldı!")
+except Exception as e:
+    print(f"Bot sistemini başlatırken hata: {e}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

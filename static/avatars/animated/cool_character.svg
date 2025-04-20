@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes fadeColor {
+      0% { fill: #FF5722; }
+      33% { fill: #FF9800; }
+      66% { fill: #FF6D00; }
+      100% { fill: #FF5722; }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(2deg); }
+      75% { transform: rotate(-2deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    #cool-head {
+      animation: bounce 4s ease-in-out infinite;
+    }
+    
+    #hair {
+      animation: shake 3s ease-in-out infinite;
+    }
+    
+    #sunglasses {
+      animation: pulse 5s ease-in-out infinite;
+    }
+    
+    #flame-bg {
+      animation: fadeColor 5s infinite;
+    }
+  </style>
+  
+  <!-- Background Circle -->
+  <circle id="flame-bg" cx="100" cy="100" r="95" fill="#FF5722" />
+  
+  <!-- Cool Character -->
+  <g id="cool-character">
+    <!-- Head Shape -->
+    <g id="cool-head">
+      <circle cx="100" cy="100" r="55" fill="#FFAB91" />
+      
+      <!-- Hair -->
+      <g id="hair" fill="#3E2723">
+        <path d="M60,75 C60,50 140,50 140,75 L130,50 C130,40 70,40 70,50 Z" />
+        <path d="M55,85 L50,75 L55,65 L50,60 L55,55 L60,60 L65,55 L70,60 L65,65 L70,70 L65,75 L70,80 L65,85 Z" />
+      </g>
+      
+      <!-- Sunglasses -->
+      <g id="sunglasses">
+        <rect x="70" y="85" width="25" height="15" rx="5" fill="#212121" />
+        <rect x="105" y="85" width="25" height="15" rx="5" fill="#212121" />
+        <rect x="95" y="85" width="10" height="3" fill="#212121" />
+        <rect x="70" y="85" width="5" height="3" fill="#212121" />
+        <rect x="125" y="85" width="5" height="3" fill="#212121" />
+      </g>
+      
+      <!-- Mouth -->
+      <path d="M85,120 Q100,130 115,120" fill="none" stroke="#E64A19" stroke-width="3" />
+      
+      <!-- Nose -->
+      <circle cx="100" cy="105" r="3" fill="#E64A19" />
+      
+      <!-- Earring -->
+      <circle cx="140" cy="100" r="4" fill="#FFC107" />
+    </g>
+    
+    <!-- Clothes Hint -->
+    <path d="M70,150 C70,170 130,170 130,150" fill="#3F51B5" />
+  </g>
+</svg>

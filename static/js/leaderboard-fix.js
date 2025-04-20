@@ -1,3 +1,4 @@
+
 /**
  * ZekaPark - Liderlik Tablosu (Leaderboard) Modülü
  * Bu dosya, platform liderlik tablosu işlevlerini sağlar.
@@ -70,7 +71,7 @@ function loadLeaderboard() {
       }
 
       console.log("Kullanıcı skorları alındı:", data.length);
-      
+
       // Kullanıcı son oyun puanını ekle
       data = data.map(player => {
         return {
@@ -136,7 +137,7 @@ function loadLeaderboard() {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl.startsWith('/') ? avatarUrl : '/' + avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }
@@ -241,19 +242,27 @@ function loadLevelLeaderboard() {
         else if (index === 2) userNameColorClass = 'third-place';
 
         // Avatar URL'ini kontrol et ve düzelt
-        let avatarUrl = playerData.avatar_url;
-        if (avatarUrl && !avatarUrl.startsWith('http')) {
-          if (!avatarUrl.startsWith('/')) {
-            avatarUrl = '/' + avatarUrl;
-          }
+        let avatarUrl = playerData.avatar_url || '';
 
-          if (avatarUrl.startsWith('/uploads/')) {
-            avatarUrl = '/static' + avatarUrl;
-          } else if (!avatarUrl.startsWith('/static/')) {
-            if (!avatarUrl.startsWith('/static/uploads/')) {
-              avatarUrl = '/static/uploads' + avatarUrl;
+        // Avatar URL boş veya tanımsız ise varsayılan bir avatar ata
+        if (!avatarUrl || avatarUrl === '') {
+            // Erkek veya kadın rastgele avatar seç
+            const randomGender = Math.random() > 0.5 ? 'male' : 'female';
+            const randomNum = randomGender === 'male' ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 2) + 1;
+            avatarUrl = `/static/avatars/bots/avatar_${randomGender}_${randomNum}.svg`;
+        } else if (!avatarUrl.startsWith('http')) {
+            // URL yolunu düzelt
+            if (!avatarUrl.startsWith('/')) {
+                avatarUrl = '/' + avatarUrl;
             }
-          }
+
+            if (avatarUrl.startsWith('/uploads/')) {
+                avatarUrl = '/static' + avatarUrl;
+            } else if (!avatarUrl.startsWith('/static/')) {
+                if (!avatarUrl.startsWith('/static/uploads/')) {
+                    avatarUrl = '/static/uploads' + avatarUrl;
+                }
+            }
         }
 
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
@@ -283,7 +292,7 @@ function loadLevelLeaderboard() {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="${avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl.startsWith('/') ? avatarUrl : '/' + avatarUrl}" alt="${playerData.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }
@@ -377,11 +386,11 @@ function updateProfileScores() {
 // Global skorları kaydetme yardımcı fonksiyonu
 window.saveScoreToLeaderboard = function(gameType, score, playTime, difficulty = 'medium', gameStats = {}) {
   console.log(`${gameType} oyunu için puan kaydediliyor: ${score}`);
-  
+
   // Puan hesaplama parametreleri
   const calculatedScore = calculateGameScore(gameType, score, playTime, difficulty, gameStats);
   console.log(`Hesaplanan puan: ${calculatedScore}`);
-  
+
   return fetch('/api/save-score', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -419,22 +428,22 @@ function calculateGameScore(gameType, score, playTime, difficulty, gameStats = {
     'hard': 1.3,
     'expert': 1.6
   }[difficulty] || 1.0;
-  
+
   // Oyun tipine göre baz puan hesaplama
   let baseScore = score;
-  
+
   // Oynama süresi faktörü (oyun tipine bağlı olarak değişebilir)
   const timeFactorMultiplier = gameStats.timeBonus || 1.0;
-  
+
   // Doğruluk oranı (eğer varsa)
   const accuracyMultiplier = gameStats.accuracy ? (gameStats.accuracy / 100 * 0.5 + 0.5) : 1.0;
-  
+
   // Final puan hesaplama
   let finalScore = Math.round(baseScore * difficultyMultiplier * timeFactorMultiplier * accuracyMultiplier);
-  
+
   // Puanı 0-100 arasında sınırla
   finalScore = Math.min(100, Math.max(0, finalScore));
-  
+
   return finalScore;
 }
 
@@ -458,11 +467,64 @@ function showScoreNotification(gameScore, totalScore) {
   }
 }
 
+// Kullanıcının liderlik tablosundaki sırasını getir
+async function getUserRanking(userId) {
+  try {
+    // Kullanıcı ID parametresi verilmişse, onu kullan
+    // Verilmemişse sayfadan bulmaya çalış
+    let currentUserId = userId;
+    
+    if (!currentUserId) {
+      // Yaygın veri özniteliklerini kontrol et
+      currentUserId = document.body.getAttribute('data-user-id') || 
+                    document.querySelector('[data-user-id]')?.getAttribute('data-user-id') || 
+                    document.querySelector('#user-id')?.value || 
+                    document.querySelector('.user-profile')?.getAttribute('data-id');
+                    
+      // Hala bulunamadıysa ve URL'de bir kullanıcı ID'si varsa, onu al
+      if (!currentUserId && window.location.pathname.includes('/profile/')) {
+        const pathParts = window.location.pathname.split('/');
+        const idIndex = pathParts.indexOf('profile') + 1;
+        if (idIndex < pathParts.length && !isNaN(pathParts[idIndex])) {
+          currentUserId = pathParts[idIndex];
+        }
+      }
+    }
+
+    // Kullanıcı ID bulunamadıysa fonksiyonu sonlandır
+    if (!currentUserId) {
+      console.error('Kullanıcı ID bulunamadı.');
+      return null;
+    }
+
+    // Puan sıralaması
+    const pointsResponse = await fetch('/api/scores/aggregated?nocache=' + new Date().getTime());
+    const pointsData = await pointsResponse.json();
+
+    // Seviye sıralaması  
+    const levelResponse = await fetch('/api/users/levels?limit=100&nocache=' + new Date().getTime());
+    const levelData = await levelResponse.json();
+
+    // Kullanıcının sıralamalarını bul
+    const pointRanking = pointsData.findIndex(user => user.is_current_user || user.user_id == currentUserId) + 1;
+    const levelRanking = levelData.findIndex(user => user.is_current_user || user.user_id == currentUserId) + 1;
+
+    return {
+      pointRanking: pointRanking > 0 ? pointRanking : null,
+      levelRanking: levelRanking > 0 ? levelRanking : null
+    };
+  } catch (error) {
+    console.error('Sıralama bilgisi alınırken hata:', error);
+    return null;
+  }
+}
+
 // Global nesne olarak dışa aktar
 window.LeaderboardManager = {
-  loadLeaderboard,
-  loadLevelLeaderboard,
-  updateScoreBoard,
-  updateProfileScores,
-  saveScoreToLeaderboard
+  loadLeaderboard: loadLeaderboard,
+  loadLevelLeaderboard: loadLevelLeaderboard,
+  updateScoreBoard: updateScoreBoard,
+  updateProfileScores: updateProfileScores,
+  saveScoreToLeaderboard: saveScoreToLeaderboard,
+  getUserRanking: getUserRanking
 };

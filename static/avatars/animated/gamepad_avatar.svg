@@ -1,0 +1,55 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#222222" />
+  
+  <!-- Controller Base -->
+  <rect x="40" y="70" width="120" height="60" rx="15" ry="15" fill="#444444" stroke="#333333" stroke-width="2" />
+  
+  <!-- Left Grip -->
+  <path d="M40,100 C20,100 20,130 40,130 L50,130 L50,70 L40,70 C20,70 20,100 40,100 Z" fill="#444444" stroke="#333333" stroke-width="2" />
+  
+  <!-- Right Grip -->
+  <path d="M160,100 C180,100 180,130 160,130 L150,130 L150,70 L160,70 C180,70 180,100 160,100 Z" fill="#444444" stroke="#333333" stroke-width="2" />
+  
+  <!-- D-Pad -->
+  <rect x="55" y="90" width="30" height="10" fill="#333333" />
+  <rect x="65" y="80" width="10" height="30" fill="#333333" />
+  
+  <!-- Buttons -->
+  <circle id="button-y" cx="135" cy="80" r="8" fill="#FFCC00">
+    <animate attributeName="fill" values="#FFCC00;#FFFF00;#FFCC00" dur="3s" repeatCount="indefinite" begin="0s" />
+  </circle>
+  <circle id="button-x" cx="115" cy="100" r="8" fill="#3366CC">
+    <animate attributeName="fill" values="#3366CC;#0099FF;#3366CC" dur="3s" repeatCount="indefinite" begin="1s" />
+  </circle>
+  <circle id="button-a" cx="135" cy="120" r="8" fill="#66CC33">
+    <animate attributeName="fill" values="#66CC33;#99FF33;#66CC33" dur="3s" repeatCount="indefinite" begin="2s" />
+  </circle>
+  <circle id="button-b" cx="155" cy="100" r="8" fill="#CC3333">
+    <animate attributeName="fill" values="#CC3333;#FF3333;#CC3333" dur="3s" repeatCount="indefinite" begin="1.5s" />
+  </circle>
+  
+  <!-- Start/Select Buttons -->
+  <ellipse cx="85" cy="100" rx="5" ry="3" fill="#999999" />
+  <ellipse cx="100" cy="100" rx="5" ry="3" fill="#999999" />
+  
+  <!-- Connect Light -->
+  <circle cx="100" cy="75" r="3" fill="#00FF00">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Controller Brand Logo -->
+  <circle cx="100" cy="125" r="5" fill="#FFFFFF" opacity="0.7" />
+  
+  <!-- Wireless Waves -->
+  <path d="M80,40 Q100,30 120,40" stroke="#999999" stroke-width="2" fill="none" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite" />
+  </path>
+  <path d="M70,50 Q100,35 130,50" stroke="#999999" stroke-width="2" fill="none" opacity="0.4">
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite" begin="0.5s" />
+  </path>
+  <path d="M60,60 Q100,40 140,60" stroke="#999999" stroke-width="2" fill="none" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite" begin="1s" />
+  </path>
+</svg>

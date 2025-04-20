@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
@@ -8,55 +9,60 @@
   </div>
 
   <div class="game-grid">
-    <!-- Dil Öğrenme Oyunu - YENİ -->
-    <div class="game-card language-game">
-      <div class="game-badge">YENİ</div>
-      <div class="game-icon"><i class="fas fa-globe-europe"></i></div>
-      <div class="game-info">
-        <h3>Dil Ustası</h3>
-        <p>Duolingo tarzı interaktif dil öğrenme oyunu ile yeni diller öğrenin ve pratik yapın.</p>
-      </div>
-      <a href="/language-learning" class="game-btn">Oyna</a>
-    </div>
-    
-    <!-- Kod Çözme Uzmanı -->
     <div class="game-card">
-      <div class="game-icon"><i class="fas fa-code"></i></div>
-      <div class="game-info">
-        <h3>Kod Çözme Uzmanı</h3>
-        <p>Programlama mantığını öğreten interaktif bulmacalarla algoritma becerilerini geliştirin.</p>
+      <div class="tiny-face language-face">
+        <div class="tiny-face-smile"></div>
       </div>
-      <a href="/games/coding-expert" class="game-btn">Oyna</a>
-    </div>
-
-    <!-- Çeviri Ustası -->
-    <div class="game-card">
       <div class="game-icon"><i class="fas fa-language"></i></div>
       <div class="game-info">
-        <h3>Çeviri Ustası</h3>
-        <p>Farklı zorluk seviyelerindeki metinleri çevirerek dil becerilerinizi geliştirin.</p>
+        <h3>Dil Öğrenme</h3>
+        <p>Duolingo tarzı interaktif dil öğrenme egzersizleri ile yeni bir dil öğrenin.</p>
       </div>
-      <a href="/games/translation-master" class="game-btn">Oyna</a>
+      <a href="/games/language-learning" class="game-btn">Oyna</a>
     </div>
-
-    {% if games %}
-      {% for game in games %}
-        <div class="game-card">
-          <div class="game-icon"><i class="{{ game.icon }}"></i></div>
-          <div class="game-info">
-            <h3>{{ game.title }}</h3>
-            <p>{{ game.description }}</p>
-          </div>
-          <a href="{{ game.url }}" class="game-btn">Oyna</a>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="coming-soon-message">
-        <i class="fas fa-tools"></i>
-        <h3>Yakında Geliyor!</h3>
-        <p>Eğitim kategorisindeki oyunlarımız hazırlanıyor. Çok yakında burada olacaklar.</p>
+    
+    <div class="game-card">
+      <div class="tiny-face word-master-face">
+        <div class="tiny-face-smile"></div>
       </div>
-    {% endif %}
+      <div class="game-icon"><i class="fas fa-spell-check"></i></div>
+      <div class="game-info">
+        <h3>Word Master</h3>
+        <p>Çoktan seçmeli, yazım ve telaffuz aşamalarıyla İngilizce kelime haznenizi geliştirin.</p>
+      </div>
+      <a href="/word-master" class="game-btn">Oyna</a>
+    </div>
+    
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-th"></i></div>
+      <div class="game-info">
+        <h3>Sudoku</h3>
+        <p>Her satır, sütun ve blokta 1-9 rakamlarını doğru yerleştirerek mantıksal düşünme becerinizi geliştirin.</p>
+      </div>
+      <a href="/games/sudoku" class="game-btn">Oyna</a>
+    </div>
+    
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-bomb"></i></div>
+      <div class="game-info">
+        <h3>Mayın Tarlası</h3>
+        <p>Mantık yürüterek mayınların yerlerini tespit edin ve güvenli alanları açın.</p>
+      </div>
+      <a href="/games/minesweeper" class="game-btn">Oyna</a>
+    </div>
+    
+    <!-- Fotoğraf Yapboz game removed -->
+    
+    <div class="game-card">
+      <div class="game-icon"><i class="fas fa-flag"></i></div>
+      <div class="game-info">
+        <h3>Bayrak Tahmin Oyunu</h3>
+        <p>Dünya bayraklarını tahmin ederek görsel hafızanızı ve coğrafi bilginizi geliştirin.</p>
+      </div>
+      <a href="/games/flag-quiz" class="game-btn">Oyna</a>
+    </div>
+    
+    <!-- İcatlar ve İsimler game removed -->
   </div>
 
   <div class="row mt-5 mb-5">
@@ -71,69 +77,7 @@
 
 {% block extra_css %}
 <style>
-  /* Yeni Dil Öğrenme Oyunu Stili */
-  .language-game {
-    background: linear-gradient(135deg, #58cc02, #26a61d);
-    border: none;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .language-game::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/></svg>') no-repeat;
-    background-position: -20px -20px;
-    background-size: 140px 140px;
-    opacity: 0.3;
-    z-index: 0;
-  }
-  
-  .language-game .game-icon {
-    color: #fff;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
-    position: relative;
-    z-index: 1;
-  }
-  
-  .language-game .game-info h3 {
-    color: #fff;
-    position: relative;
-    z-index: 1;
-  }
-  
-  .language-game .game-info h3::after {
-    background: #fff;
-  }
-  
-  .language-game .game-info p {
-    color: rgba(255, 255, 255, 0.9);
-    position: relative;
-    z-index: 1;
-  }
-  
-  .language-game .game-btn {
-    background: #fff;
-    color: #58cc02;
-    font-weight: 700;
-    box-shadow: 0 5px 0 #26a61d;
-    position: relative;
-    z-index: 1;
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
-  
-  .language-game .game-btn:hover {
-    background: #fff;
-    color: #26a61d;
-    transform: translateY(-2px);
-    box-shadow: 0 7px 0 #26a61d;
-  }
-  
+  /* Game styles */
   .language-game .game-badge {
     position: absolute;
     top: 15px;
@@ -149,7 +93,7 @@
     box-shadow: 0 3px 10px rgba(255, 150, 0, 0.3);
     text-transform: uppercase;
   }
-  
+
   /* Modern oyun kartları ve ızgara düzeni */
   .game-grid {
     display: grid;
@@ -276,6 +220,100 @@
     box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
     transform: translateY(-2px);
   }
+  
+  /* Animasyonlu Minik Yüz */
+  .tiny-face {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffd700;
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: bounce 3s ease-in-out infinite;
+  }
+  
+  /* Tiny face features */
+  .tiny-face::before, .tiny-face::after {
+    content: '';
+    position: absolute;
+    background: #333;
+    border-radius: 50%;
+    width: 5px;
+    height: 5px;
+    top: 10px;
+  }
+  
+  .tiny-face::before {
+    left: 8px;
+  }
+  
+  .tiny-face::after {
+    right: 8px;
+  }
+  
+  .tiny-face-smile {
+    position: absolute;
+    width: 14px;
+    height: 7px;
+    border-radius: 0 0 10px 10px;
+    border-bottom: 2px solid #333;
+    bottom: 8px;
+    left: 8px;
+  }
+  
+  /* Bounce animation */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* Wink animation */
+  @keyframes wink {
+    0%, 90%, 100% {
+      height: 5px;
+      transform: scaleY(1);
+    }
+    95% {
+      height: 1px;
+      transform: scaleY(0.2);
+    }
+  }
+  
+  /* Different face styles for different games */
+  .language-face {
+    background: #ff9d7a;
+    animation: bounce 2.5s ease-in-out infinite;
+  }
+  
+  .language-face::before {
+    animation: wink 5s ease-in-out infinite;
+  }
+  
+  .word-master-face {
+    background: #7ad7ff;
+    animation: bounce 3.2s ease-in-out infinite;
+  }
+  
+  .word-master-face::after {
+    animation: wink 7s ease-in-out infinite;
+  }
+  
+  .history-face {
+    background: #a5d6a7;
+    animation: bounce 2.8s ease-in-out infinite;
+  }
+  
+  .history-face::before {
+    animation: wink 6s ease-in-out infinite;
+  }
 
   /* Sayfa başlığı */
   .page-title-section {
@@ -335,7 +373,7 @@
   .home-button i {
     margin-right: 8px;
   }
-  
+
   /* Yakında gelecek oyunlar mesajı */
   .coming-soon-message {
     grid-column: 1 / -1;
@@ -346,21 +384,21 @@
     text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .coming-soon-message i {
     font-size: 5rem;
     color: #6a5ae0;
     margin-bottom: 20px;
     display: block;
   }
-  
+
   .coming-soon-message h3 {
     font-size: 2rem;
     color: #fff;
     margin-bottom: 15px;
     font-weight: 600;
   }
-  
+
   .coming-soon-message p {
     color: rgba(255, 255, 255, 0.7);
     font-size: 1.2rem;

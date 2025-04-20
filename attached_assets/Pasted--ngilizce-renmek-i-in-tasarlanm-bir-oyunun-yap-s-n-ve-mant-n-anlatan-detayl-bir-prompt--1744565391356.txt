@@ -1,0 +1,42 @@
+İngilizce öğrenmek için tasarlanmış bir oyunun yapısını ve mantığını anlatan detaylı bir prompt:  
+
+---  
+
+**Prompt:**  
+*"İngilizce öğrenmeye yönelik interaktif bir mobil/PC oyunu tasarlamak istiyorum. Oyun, kullanıcıların kelime dağarcığını, dilbilgisi becerilerini ve dinleme yeteneğini eğlenceli bir şekilde geliştirmeli. Aşağıdaki özellikleri ve mekanikleri içermeli:*  
+
+### **1. Oyunun Temel Mantığı:**  
+- **Seviye Sistemi:** Kullanıcılar başlangıç (A1) ileri (C2) seviyeler arasında ilerler.  
+- **Günlük Hedefler:** Her gün yeni kelimeler, diyaloglar veya mini sınavlarla ödüllendirme.  
+- **Adaptif Öğrenme:** Kullanıcının hatalarına göre zorluk ayarlayan bir AI sistemi.  
+
+### **2. Oyun Mekanikleri:**  
+- **Kelime Avı:**  
+  - Sahnedeki nesnelerin İngilizce isimlerini bulma (örnek: "Find the *apple*").  
+  - Sesli telaffuz ve örnek cümlelerle pekiştirme.  
+- **Diyalog Simülasyonu:**  
+  - NPC'lerle gerçekçi konuşmalar (örn: bir kafede sipariş verme).  
+  - Mikrofonla konuşma pratiği yapabilme.  
+- **Zamanlı Testler:**  
+  - 4 şıklı sorular, boşluk doldurma veya cümle sıralama.  
+  - Skor sistemi ve lider tablosu.  
+- **Hikaye Modu:**  
+  - Kullanıcının seçimleriyle ilerleyen, İngilizce diyaloglara dayalı bir macera.  
+
+### **3. Görsel ve Ses Tasarımı:**  
+- Renkli, çizgi film tarzı grafikler.  
+- Native speaker seslendirmeleri (Amerikan/İngiliz aksanı seçeneği).  
+- Eğlenceli animasyonlar (örnek: kelimeyi doğru bilince kutlama efekti).  
+
+### **4. Ödül Sistemi:**  
+- **Jetonlar:** Doğru cevaplarla kazanılır, karakter giysileri veya arka planlar için harcanır.  
+- **Rozetler:** "10 gün üst üste giriş" gibi başarım görevleri.  
+- **Sosyal Paylaşım:** Skorları arkadaşlarla paylaşabilme.  
+
+### **5. Teknik Detaylar:**  
+- Platform: iOS, Android ve Steam.  
+- Offline mod: İnternetsiz temel egzersizler.  
+- Veri Analizi: Kullanıcının ilerlemesini gösteren detaylı raporlar.  
+
+**Örnek Senaryo:**  
+*Kullanıcı "Restaurant" seviyesinde bir NPC ile sohbet ediyor. Ekranda "How much is the pizza?" yazıyor. Kullanıcı mikrofonla cevap verirse (veya yazarsa), AI anlamı ve grameri kontrol edip puan veriyor.*  

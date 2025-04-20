@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 2px #00BCD4); }
+      50% { filter: drop-shadow(0 0 8px #00BCD4); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes hover {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    
+    #digital-head {
+      animation: pulse 4s ease-in-out infinite;
+    }
+    
+    #eyes {
+      animation: glow 2s infinite;
+    }
+    
+    #circuit-lines {
+      animation: glow 3s infinite alternate;
+    }
+    
+    #holo-ring {
+      transform-origin: center;
+      animation: spin 10s linear infinite;
+    }
+    
+    #digital-features {
+      animation: hover 3s ease-in-out infinite;
+    }
+  </style>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#01579B" />
+  
+  <!-- Digital Character -->
+  <g id="digital-character">
+    <!-- Head Shape -->
+    <g id="digital-head">
+      <path d="M60,70 Q60,50 100,50 Q140,50 140,70 L140,130 Q140,150 100,150 Q60,150 60,130 Z" fill="#0288D1" />
+      
+      <!-- Circuit Lines -->
+      <g id="circuit-lines" fill="none" stroke="#03A9F4" stroke-width="1.5">
+        <path d="M70,60 H90 V80 H110 V60 H130" />
+        <path d="M70,140 H90 V120 H110 V140 H130" />
+        <path d="M60,100 H75 V110 H125 V100 H140" />
+      </g>
+      
+      <!-- Digital Features -->
+      <g id="digital-features">
+        <!-- Eyes -->
+        <g id="eyes">
+          <rect x="75" y="80" width="15" height="7" rx="2" fill="#00BCD4" />
+          <rect x="110" y="80" width="15" height="7" rx="2" fill="#00BCD4" />
+        </g>
+        
+        <!-- Mouth -->
+        <path d="M85,115 Q100,125 115,115" fill="none" stroke="#00BCD4" stroke-width="2" />
+        
+        <!-- Digital Patterns -->
+        <circle cx="100" cy="65" r="3" fill="#00BCD4" />
+        <circle cx="100" cy="135" r="3" fill="#00BCD4" />
+        <rect x="90" y="95" width="20" height="3" rx="1" fill="#00BCD4" />
+      </g>
+    </g>
+    
+    <!-- Holographic Ring -->
+    <g id="holo-ring" fill="none" stroke="#80DEEA" stroke-width="2" stroke-dasharray="10 5">
+      <circle cx="100" cy="100" r="75" />
+    </g>
+    
+    <!-- Digital Bits -->
+    <g fill="#80DEEA">
+      <circle cx="130" cy="55" r="2" />
+      <circle cx="70" cy="55" r="2" />
+      <circle cx="50" cy="100" r="2" />
+      <circle cx="150" cy="100" r="2" />
+      <circle cx="130" cy="145" r="2" />
+      <circle cx="70" cy="145" r="2" />
+    </g>
+  </g>
+</svg>

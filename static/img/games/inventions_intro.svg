@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="300" fill="#f0f2f8" rx="15" ry="15" opacity="0.3" />
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="50" r="20" fill="#6a5ae0" opacity="0.2" />
+  <circle cx="400" cy="250" r="30" fill="#ffd166" opacity="0.2" />
+  <circle cx="450" cy="70" r="15" fill="#28a745" opacity="0.2" />
+  <circle cx="50" cy="200" r="25" fill="#e74a3b" opacity="0.2" />
+  
+  <!-- Light bulb (invention symbol) -->
+  <path d="M250 60 C 220 60, 200 90, 200 120 C 200 140, 210 160, 225 170 L 225 200 L 275 200 L 275 170 C 290 160, 300 140, 300 120 C 300 90, 280 60, 250 60 Z" fill="#ffd166" />
+  <rect x="235" y="200" width="30" height="10" fill="#e0e3ef" />
+  <rect x="235" y="210" width="30" height="10" fill="#c8cfe0" />
+  <path d="M240 220 L 240 230 L 260 230 L 260 220 Z" fill="#6a5ae0" />
+  
+  <!-- Light rays -->
+  <path d="M250 40 L 250 20" stroke="#ffd166" stroke-width="3" />
+  <path d="M290 70 L 310 50" stroke="#ffd166" stroke-width="3" />
+  <path d="M310 120 L 330 120" stroke="#ffd166" stroke-width="3" />
+  <path d="M290 170 L 310 190" stroke="#ffd166" stroke-width="3" />
+  <path d="M210 70 L 190 50" stroke="#ffd166" stroke-width="3" />
+  <path d="M190 120 L 170 120" stroke="#ffd166" stroke-width="3" />
+  <path d="M210 170 L 190 190" stroke="#ffd166" stroke-width="3" />
+  
+  <!-- Gear (invention symbol) -->
+  <circle cx="140" cy="170" r="30" fill="#6a5ae0" />
+  <circle cx="140" cy="170" r="12" fill="#f0f2f8" />
+  <path d="M140 130 L 145 140 L 155 140 L 160 130 L 160 140 L 150 140 L 150 130 Z" fill="#6a5ae0" />
+  <path d="M140 210 L 145 200 L 155 200 L 160 210 L 160 200 L 150 200 L 150 210 Z" fill="#6a5ae0" />
+  <path d="M180 170 L 170 165 L 170 155 L 180 150 L 170 150 L 170 160 L 180 160 Z" fill="#6a5ae0" />
+  <path d="M100 170 L 110 165 L 110 155 L 100 150 L 110 150 L 110 160 L 100 160 Z" fill="#6a5ae0" />
+  <path d="M167 143 L 157 147 L 152 140 L 158 131 L 153 140 L 160 144 L 165 137 Z" fill="#6a5ae0" />
+  <path d="M113 197 L 123 193 L 128 200 L 122 209 L 127 200 L 120 196 L 115 203 Z" fill="#6a5ae0" />
+  <path d="M167 197 L 157 193 L 152 200 L 158 209 L 153 200 L 160 196 L 165 203 Z" fill="#6a5ae0" />
+  <path d="M113 143 L 123 147 L 128 140 L 122 131 L 127 140 L 120 144 L 115 137 Z" fill="#6a5ae0" />
+  
+  <!-- Book (knowledge symbol) -->
+  <path d="M360 150 L 360 220 L 390 210 L 420 220 L 420 150 L 390 160 Z" fill="#28a745" />
+  <path d="M360 150 L 390 160 L 420 150" fill="none" stroke="#28a745" stroke-width="2" />
+  <path d="M390 160 L 390 210" fill="none" stroke="#f0f2f8" stroke-width="2" />
+  <path d="M370 170 L 380 170 M 400 170 L 410 170 M 370 180 L 380 180 M 400 180 L 410 180 M 370 190 L 380 190 M 400 190 L 410 190" stroke="#f0f2f8" stroke-width="2" />
+  
+  <!-- Title -->
+  <text x="250" y="270" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#2c3e50">İcatlar ve İsimler: Tarihin Dehaları</text>
+</svg>

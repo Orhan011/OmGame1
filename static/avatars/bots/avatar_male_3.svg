@@ -1,0 +1,17 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="grad_male_3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F2027;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#203A43;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2C5364;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="90" fill="url(#grad_male_3)"/>
+  <rect x="65" y="60" width="70" height="45" rx="22.5" ry="22.5" fill="white" opacity="0.9"/>
+  <path d="M60,140 C60,105 140,105 140,140 L140,155 C140,175 60,175 60,155 Z" fill="white" opacity="0.9"/>
+  <circle cx="85" cy="80" r="6" fill="#333"/>
+  <circle cx="115" cy="80" r="6" fill="#333"/>
+  <path d="M90,95 Q100,90 110,95" fill="none" stroke="#333" stroke-width="2.5"/>
+  <rect x="75" y="60" width="50" height="10" rx="5" ry="5" fill="#333" opacity="0.7"/>
+</svg>

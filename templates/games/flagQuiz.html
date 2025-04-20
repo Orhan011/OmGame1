@@ -1,0 +1,945 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flag-quiz-container">
+  <!-- Ana Başlık -->
+  <div class="fq-header">
+    <h1 class="fq-title"><i class="fas fa-flag"></i> Bayrak Tahmin Oyunu</h1>
+    <p class="fq-subtitle">Dünya bayraklarını keşfet, coğrafi bilgini test et!</p>
+  </div>
+  
+  <!-- Ayarlar Ekranı -->
+  <div id="flagQuizSettings" class="fq-card fq-settings-card">
+    <div class="fq-card-content">
+      <div class="fq-settings-grid">
+        <!-- Zorluk Seviyesi -->
+        <div class="fq-setting-group">
+          <div class="fq-setting-header">
+            <i class="fas fa-signal fq-icon"></i>
+            <h3>Zorluk</h3>
+          </div>
+          <div class="fq-select-options">
+            <button class="fq-option-btn difficulty-option" data-difficulty="easy">Kolay</button>
+            <button class="fq-option-btn difficulty-option" data-difficulty="medium">Orta</button>
+            <button class="fq-option-btn difficulty-option" data-difficulty="hard">Zor</button>
+          </div>
+        </div>
+        
+        <!-- Zaman Modu -->
+        <div class="fq-setting-group">
+          <div class="fq-setting-header">
+            <i class="fas fa-clock fq-icon"></i>
+            <h3>Zaman</h3>
+          </div>
+          <div class="fq-select-options">
+            <button class="fq-option-btn time-option" data-time="none">Limitsiz</button>
+            <button class="fq-option-btn time-option" data-time="relaxed">30s</button>
+            <button class="fq-option-btn time-option" data-time="normal">15s</button>
+            <button class="fq-option-btn time-option" data-time="challenge">8s</button>
+          </div>
+        </div>
+        
+        <!-- Oyun Modu -->
+        <div class="fq-setting-group">
+          <div class="fq-setting-header">
+            <i class="fas fa-gamepad fq-icon"></i>
+            <h3>Oyun Modu</h3>
+          </div>
+          <div class="fq-select-options">
+            <button class="fq-option-btn mode-option" data-mode="choice">Çoktan Seçmeli</button>
+            <button class="fq-option-btn mode-option" data-mode="write">Yazarak Cevapla</button>
+          </div>
+        </div>
+        
+        <!-- Bayrak Sayısı -->
+        <div class="fq-setting-group">
+          <div class="fq-setting-header">
+            <i class="fas fa-globe-americas fq-icon"></i>
+            <h3>Bayrak Sayısı</h3>
+          </div>
+          <div class="fq-counter">
+            <button id="decreaseFlagCount" class="fq-counter-btn">
+              <i class="fas fa-minus"></i>
+            </button>
+            <div class="fq-counter-display">10</div>
+            <button id="increaseFlagCount" class="fq-counter-btn">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Başlat Düğmesi -->
+      <div class="fq-actions">
+        <button id="flagQuizSoundToggle" class="fq-sound-toggle">
+          <i class="fas fa-volume-up"></i>
+        </button>
+        <button id="flagQuizStartButton" class="fq-play-btn">
+          <i class="fas fa-play"></i> Oyunu Başlat
+        </button>
+      </div>
+      
+      <!-- Kurallar Bölümü -->
+      <div class="fq-rules">
+        <div class="fq-rules-header">
+          <i class="fas fa-info-circle"></i>
+          <h3>Nasıl Oynanır?</h3>
+        </div>
+        <div class="fq-rules-content">
+          <div class="fq-rule">
+            <i class="fas fa-check-circle fq-rule-icon"></i>
+            <p>Ekrandaki bayrakların hangi ülkelere ait olduğunu tahmin edin</p>
+          </div>
+          <div class="fq-rule">
+            <i class="fas fa-check-circle fq-rule-icon"></i>
+            <p>Zorluk seviyesi arttıkça, daha az bilinen ülke bayrakları gelir</p>
+          </div>
+          <div class="fq-rule">
+            <i class="fas fa-check-circle fq-rule-icon"></i>
+            <p>Ne kadar hızlı cevaplarsanız o kadar çok puan kazanırsınız</p>
+          </div>
+          <div class="fq-rule">
+            <i class="fas fa-check-circle fq-rule-icon"></i>
+            <p>Yanlış cevaplar 2 puan kaybettirir</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Oyun Ekranı -->
+  <div id="flagQuizGameplay" class="fq-card fq-gameplay-card d-none">
+    <!-- Üst Bilgi Çubuğu -->
+    <div class="fq-top-stats">
+      <div class="fq-stat-pill">
+        <i class="fas fa-star"></i>
+        <span id="flagQuizScore">0</span>
+      </div>
+      <div class="fq-stat-pill">
+        <i class="fas fa-check"></i>
+        <span id="flagQuizCorrect">0</span>
+      </div>
+      <div class="fq-stat-pill">
+        <i class="fas fa-times"></i>
+        <span id="flagQuizWrong">0</span>
+      </div>
+      <div class="fq-stat-pill fq-timer">
+        <i class="fas fa-clock"></i>
+        <span id="flagQuizTimer">0</span>
+      </div>
+    </div>
+    
+    <!-- İlerleme Çubuğu -->
+    <div class="fq-progress">
+      <div id="flagQuizProgress" class="fq-progress-bar"></div>
+    </div>
+    
+    <!-- Bayrak Görüntüleme -->
+    <div class="fq-flag-display">
+      <img id="flagQuizCurrentFlag" class="fq-flag-image" src="" alt="Ülke Bayrağı">
+      <div id="flagQuizCountryInfo" class="fq-country-info d-none">
+        <h3 id="flagQuizCountryName"></h3>
+        <p id="flagQuizCountryDetails"></p>
+      </div>
+    </div>
+    
+    <!-- Cevap Alanı -->
+    <div id="flagQuizAnswerContainer" class="fq-answer-area">
+      <!-- Çoktan Seçmeli Düğmeler -->
+      <div id="flagQuizChoices" class="fq-choices"></div>
+      
+      <!-- Yazma Alanı -->
+      <div id="flagQuizWriteAnswer" class="fq-write-answer d-none">
+        <input type="text" id="flagQuizAnswerInput" class="fq-text-input" placeholder="Ülke adını yazın..." autocomplete="off">
+        <div class="fq-answer-btns">
+          <button id="flagQuizSubmitAnswer" class="fq-submit-btn">
+            <i class="fas fa-check"></i> Gönder
+          </button>
+          <button id="flagQuizSkipQuestion" class="fq-skip-btn">
+            <i class="fas fa-forward"></i> Geç
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Geri Bildirim Alanı -->
+    <div id="flagQuizFeedback" class="fq-feedback"></div>
+  </div>
+  
+  <!-- Oyun Sonu Ekranı -->
+  <div id="flagQuizGameOver" class="fq-card fq-result-card d-none">
+    <div class="fq-result-header">
+      <i class="fas fa-trophy fq-trophy"></i>
+      <h2>Oyun Bitti!</h2>
+    </div>
+    
+    <div class="fq-result-stats">
+      <div class="fq-result-row">
+        <div class="fq-result-item">
+          <div class="fq-result-value" id="flagQuizFinalScore">0</div>
+          <div class="fq-result-label">Toplam Puan</div>
+        </div>
+        <div class="fq-result-item">
+          <div class="fq-result-value" id="flagQuizFinalCorrect">0</div>
+          <div class="fq-result-label">Doğru</div>
+        </div>
+        <div class="fq-result-item">
+          <div class="fq-result-value" id="flagQuizFinalWrong">0</div>
+          <div class="fq-result-label">Yanlış</div>
+        </div>
+      </div>
+      
+      <div class="fq-result-row">
+        <div class="fq-result-item">
+          <div class="fq-result-value" id="flagQuizAccuracy">0%</div>
+          <div class="fq-result-label">Doğruluk</div>
+        </div>
+        <div class="fq-result-item">
+          <div class="fq-result-value" id="flagQuizAverageTime">0s</div>
+          <div class="fq-result-label">Ort. Süre</div>
+        </div>
+        <div class="fq-result-item" id="flagQuizPersonalBest">
+          <div class="fq-result-value" id="flagQuizPersonalBestValue">0</div>
+          <div class="fq-result-label">Rekor</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Öğrenilen Bayraklar -->
+    <div class="fq-learned-flags">
+      <h3>Öğrenilen Bayraklar</h3>
+      <div id="flagQuizLearnedFlags" class="fq-flag-gallery"></div>
+    </div>
+    
+    <!-- Oyun Sonu Butonları -->
+    <div class="fq-result-actions">
+      <button id="flagQuizPlayAgain" class="fq-replay-btn">
+        <i class="fas fa-redo"></i> Tekrar Oyna
+      </button>
+      <button id="flagQuizReturnToMenu" class="fq-menu-btn">
+        <i class="fas fa-home"></i> Ana Menü
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ------------------------------
+   Bayrak Tahmin Oyunu - Yeni Tasarım
+   ------------------------------ */
+
+/* Ana Stil ve Renkler */
+:root {
+  --fq-primary: #4d7cfe;
+  --fq-secondary: #50e3c2;
+  --fq-dark: #1a2236;
+  --fq-light: #f8faff;
+  --fq-accent: #ff5e84;
+  --fq-success: #3ce9b3;
+  --fq-error: #ff5e84;
+  --fq-gray: #a0a8bd;
+  
+  --fq-gradient: linear-gradient(135deg, var(--fq-primary), var(--fq-secondary));
+  --fq-radius: 16px;
+  --fq-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  --fq-transition: all 0.3s ease;
+}
+
+/* Ana Konteyner */
+.flag-quiz-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Başlık Stil */
+.fq-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.fq-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: var(--fq-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+
+.fq-subtitle {
+  color: var(--fq-gray);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+/* Kart Tasarımı */
+.fq-card {
+  background: rgba(26, 34, 54, 0.7);
+  backdrop-filter: blur(15px);
+  border-radius: var(--fq-radius);
+  box-shadow: var(--fq-shadow);
+  overflow: hidden;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.fq-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--fq-gradient);
+}
+
+.fq-card-content {
+  padding: 25px;
+}
+
+/* Ayarlar Ekranı */
+.fq-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.fq-setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fq-setting-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fq-setting-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--fq-light);
+  margin: 0;
+}
+
+.fq-icon {
+  color: var(--fq-primary);
+  font-size: 1.2rem;
+}
+
+.fq-select-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fq-option-btn {
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--fq-gray);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--fq-transition);
+}
+
+.fq-option-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.fq-option-btn.active {
+  background: var(--fq-primary);
+  color: white;
+  border-color: var(--fq-primary);
+  box-shadow: 0 5px 15px rgba(77, 124, 254, 0.3);
+}
+
+/* Sayaç Stil */
+.fq-counter {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 30px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.fq-counter-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--fq-gray);
+  cursor: pointer;
+  transition: var(--fq-transition);
+}
+
+.fq-counter-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.fq-counter-display {
+  padding: 0 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* Butonlar */
+.fq-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.fq-sound-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--fq-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--fq-transition);
+}
+
+.fq-sound-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.fq-sound-toggle.active {
+  color: var(--fq-primary);
+}
+
+.fq-play-btn {
+  flex-grow: 1;
+  background: var(--fq-gradient);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: var(--fq-transition);
+  box-shadow: 0 5px 20px rgba(77, 124, 254, 0.3);
+}
+
+.fq-play-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(77, 124, 254, 0.4);
+}
+
+/* Kurallar Bölümü */
+.fq-rules {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--fq-radius);
+  padding: 20px;
+}
+
+.fq-rules-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.fq-rules-header i {
+  color: var(--fq-primary);
+  font-size: 1.2rem;
+}
+
+.fq-rules-header h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.fq-rules-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.fq-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.fq-rule-icon {
+  color: var(--fq-success);
+  font-size: 1rem;
+  margin-top: 3px;
+}
+
+.fq-rule p {
+  margin: 0;
+  color: var(--fq-gray);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Oyun Ekranı */
+.fq-gameplay-card {
+  padding: 20px;
+}
+
+/* Üst Bilgi Çubuğu */
+.fq-top-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fq-stat-pill {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 30px;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+}
+
+.fq-stat-pill i {
+  color: var(--fq-primary);
+  font-size: 0.9rem;
+}
+
+.fq-timer.warning {
+  animation: pulse 1s infinite;
+}
+
+.fq-timer.warning i,
+.fq-timer.warning span {
+  color: var(--fq-error);
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* İlerleme Çubuğu */
+.fq-progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.fq-progress-bar {
+  height: 100%;
+  background: var(--fq-gradient);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Bayrak Görüntüleme */
+.fq-flag-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.fq-flag-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 200px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.fq-country-info {
+  margin-top: 15px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.fq-country-info h3 {
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.fq-country-info p {
+  color: var(--fq-gray);
+  font-size: 0.9rem;
+}
+
+/* Cevap Alanı */
+.fq-answer-area {
+  margin-bottom: 20px;
+}
+
+.fq-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.fq-choices button {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--fq-transition);
+  text-align: center;
+}
+
+.fq-choices button:hover {
+  background: rgba(77, 124, 254, 0.2);
+  transform: translateY(-2px);
+}
+
+.fq-choices button.correct {
+  background: var(--fq-success);
+  color: #143d2d;
+  animation: correctAnswer 0.5s ease;
+}
+
+.fq-choices button.incorrect {
+  background: var(--fq-error);
+  color: #5e2631;
+  animation: incorrectAnswer 0.5s ease;
+}
+
+@keyframes correctAnswer {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes incorrectAnswer {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.fq-write-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fq-text-input {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  font-size: 1.1rem;
+  transition: var(--fq-transition);
+}
+
+.fq-text-input:focus {
+  outline: none;
+  border-color: var(--fq-primary);
+  box-shadow: 0 0 10px rgba(77, 124, 254, 0.3);
+}
+
+.fq-answer-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.fq-submit-btn, .fq-skip-btn {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--fq-transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.fq-submit-btn {
+  background: var(--fq-primary);
+  color: white;
+  border: none;
+}
+
+.fq-skip-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--fq-gray);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fq-submit-btn:hover {
+  background: #3a69f2;
+}
+
+.fq-skip-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+/* Geri Bildirim */
+.fq-feedback {
+  text-align: center;
+  min-height: 60px;
+}
+
+.fq-feedback-message {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 30px;
+  color: white;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
+}
+
+.fq-feedback-correct {
+  background: var(--fq-success);
+  color: #143d2d;
+}
+
+.fq-feedback-incorrect {
+  background: var(--fq-error);
+  color: #5e2631;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sonuç Ekranı */
+.fq-result-card {
+  padding: 30px;
+  text-align: center;
+}
+
+.fq-result-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.fq-trophy {
+  font-size: 3rem;
+  color: #ffd700;
+  margin-bottom: 15px;
+  animation: trophyGlow 2s infinite alternate;
+}
+
+@keyframes trophyGlow {
+  from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+  to { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+}
+
+.fq-result-header h2 {
+  font-size: 2.2rem;
+  color: white;
+  margin: 0;
+}
+
+.fq-result-stats {
+  margin-bottom: 30px;
+}
+
+.fq-result-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.fq-result-item {
+  flex: 1;
+  padding: 15px;
+}
+
+.fq-result-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.fq-result-label {
+  font-size: 0.9rem;
+  color: var(--fq-gray);
+}
+
+/* Öğrenilen Bayraklar */
+.fq-learned-flags {
+  margin-bottom: 30px;
+}
+
+.fq-learned-flags h3 {
+  font-size: 1.3rem;
+  color: white;
+  margin-bottom: 15px;
+}
+
+.fq-flag-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 15px;
+}
+
+.fq-gallery-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.fq-gallery-img {
+  width: 70px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.fq-gallery-name {
+  font-size: 0.8rem;
+  color: var(--fq-gray);
+  text-align: center;
+}
+
+/* Sonuç Ekranı Butonları */
+.fq-result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.fq-replay-btn, .fq-menu-btn {
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--fq-transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fq-replay-btn {
+  background: var(--fq-gradient);
+  color: white;
+  border: none;
+  box-shadow: 0 5px 20px rgba(77, 124, 254, 0.3);
+}
+
+.fq-menu-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--fq-gray);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fq-replay-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(77, 124, 254, 0.4);
+}
+
+.fq-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+/* Duyarlı Tasarım */
+@media (max-width: 768px) {
+  .fq-flag-image {
+    max-height: 150px;
+  }
+  
+  .fq-choices {
+    grid-template-columns: 1fr;
+  }
+  
+  .fq-result-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .fq-result-item {
+    padding: 10px;
+  }
+  
+  .fq-result-value {
+    font-size: 1.7rem;
+  }
+  
+  .fq-result-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 576px) {
+  .fq-settings-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .fq-title {
+    font-size: 2rem;
+  }
+  
+  .fq-card {
+    border-radius: 12px;
+  }
+  
+  .fq-card-content {
+    padding: 20px;
+  }
+  
+  .fq-trophy {
+    font-size: 2.5rem;
+  }
+  
+  .fq-result-header h2 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Yardımcı Sınıflar */
+.d-none {
+  display: none !important;
+}
+</style>
+
+<!-- JavaScript dosyaları -->
+<script src="{{ url_for('static', filename='js/games/flagQuiz.js') }}"></script>
+<script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
+{% endblock %}

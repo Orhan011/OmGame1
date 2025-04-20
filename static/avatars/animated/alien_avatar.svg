@@ -1,0 +1,64 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#222222" />
+  
+  <!-- Alien Head -->
+  <ellipse cx="100" cy="110" rx="55" ry="60" fill="#33CC33" />
+  
+  <!-- Alien Eyes -->
+  <ellipse cx="80" cy="95" rx="20" ry="25" fill="#000000" />
+  <ellipse cx="120" cy="95" rx="20" ry="25" fill="#000000" />
+  
+  <!-- Eye Shine -->
+  <circle cx="85" cy="90" r="5" fill="#FFFFFF" />
+  <circle cx="125" cy="90" r="5" fill="#FFFFFF" />
+  
+  <!-- Mouth -->
+  <ellipse cx="100" cy="135" rx="15" ry="5" fill="#000000" />
+  
+  <!-- Antenna -->
+  <g id="left-antenna">
+    <line x1="80" y1="50" x2="75" y2="20" stroke="#33CC33" stroke-width="4" />
+    <circle cx="75" cy="20" r="5" fill="#CCFF00">
+      <animate attributeName="cy" values="20;15;20" dur="2s" repeatCount="indefinite" />
+    </circle>
+  </g>
+  
+  <g id="right-antenna">
+    <line x1="120" y1="50" x2="125" y2="20" stroke="#33CC33" stroke-width="4" />
+    <circle cx="125" cy="20" r="5" fill="#CCFF00">
+      <animate attributeName="cy" values="20;25;20" dur="2s" repeatCount="indefinite" />
+    </circle>
+  </g>
+  
+  <!-- Stars in Background -->
+  <g id="stars">
+    <circle cx="30" cy="30" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="50" cy="170" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="2.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="170" cy="40" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="3.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="150" cy="150" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="4s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="40" cy="120" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="160" cy="100" r="1" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="3.2s" repeatCount="indefinite" />
+    </circle>
+  </g>
+  
+  <!-- UFO Lights -->
+  <circle cx="40" cy="180" r="3" fill="#CCFF00">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="160" cy="180" r="3" fill="#CCFF00">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="1s" />
+  </circle>
+</svg>

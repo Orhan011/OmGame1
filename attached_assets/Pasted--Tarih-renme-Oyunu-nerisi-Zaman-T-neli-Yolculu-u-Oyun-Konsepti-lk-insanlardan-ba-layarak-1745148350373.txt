@@ -1,0 +1,78 @@
+# Tarih Öğrenme Oyunu Önerisi: "Zaman Tüneli Yolculuğu"
+
+## Oyun Konsepti
+İlk insanlardan başlayarak Azerbaycan Türkleri ve diğer Türk devletlerinin tarihini interaktif şekilde öğreten bir oyun.
+
+## Oyun Mekanikleri
+
+### 1. Zaman Çizelgesi Labirenti
+- **Oynanış**: Kullanıcılar tarihsel olayları doğru kronolojik sıraya yerleştirir
+- **İçerik**:
+  - İlk insanların göç yolları
+  - Hunlar, Göktürkler, Selçuklular, Osmanlılar
+  - Azerbaycan hanlıkları ve modern Azerbaycan'ın kuruluşu
+
+### 2. Tarihi Figür Buluşması
+- **Oynanış**: Ünlü tarihi şahsiyetlerin özelliklerini eşleştirme
+- **İçerik**:
+  - Alp Arslan, Fatih Sultan Mehmet, Uzun Hasan
+  - Azerbaycan'ın milli kahramanları
+  - Bilim insanları (İbn Sina, Biruni vb.)
+
+### 3. Kültürel Miras Avı
+- **Oynanış**: Arkeolojik eserleri ve mimari yapıları tanıma
+- **İçerik**:
+  - Göbeklitepe'den modern eserlere
+  - Azerbaycan'ın tarihi yapıları (Şirvanşahlar Sarayı vb.)
+  - Ortak Türk kültür mirası
+
+### 4. Savaş Stratejisi Simülasyonu
+- **Oynanış**: Tarihi savaşlarda taktikler geliştirme
+- **İçerik**:
+  - Malazgirt, Mohaç, Çaldıran Savaşları
+  - Azerbaycan'ın bağımsızlık mücadelesi
+
+## Teknik Özellikler
+
+### Veritabanı Yapısı
+```json
+{
+  "tarihi_olay": {
+    "olay_adi": "Malazgirt Savaşı",
+    "tarih": "1071",
+    "konum": "Malazgirt, Muş",
+    "onem": "Anadolu'nun kapılarının Türklere açılması",
+    "medya": ["resim.jpg", "animasyon.mp4"]
+  }
+}
+```
+
+### Örnek Kod (JavaScript)
+```javascript
+// Tarih sıralama oyunu için basit bir örnek
+function tarihSiralamaOyunu() {
+  const olaylar = [
+    {ad: "Hunların Avrupa'ya göçü", yil: 375},
+    {ad: "Göktürk Kağanlığı'nın kuruluşu", yil: 552},
+    {ad: "Azerbaycan Halk Cumhuriyeti'nin kuruluşu", yil: 1918}
+  ];
+  
+  // Karıştırılmış olaylar
+  const karisikOlaylar = [...olaylar].sort(() => Math.random() - 0.5);
+  
+  // Oyun mantığı burada devam eder...
+}
+```
+
+## Görsel Tasarım Önerileri
+1. **Tema**: Eski el yazmaları ve kil tablet tarzı
+2. **Renk Paleti**: Toprak tonları, turkuaz (Azerbaycan renkleri)
+3. **Karakterler**: Tarihi figürlerin stilize çizimleri
+
+## Öğrenme Çıktıları
+- ✓ Türk tarihinin ana dönüm noktaları
+- ✓ Azerbaycan'ın tarihsel gelişimi
+- ✓ Kültürel bağların kökenleri
+- ✓ Kronolojik düşünme becerisi
+
+Hangi bölümü detaylandırmamı istersiniz? Özellikle Azerbaycan tarihine daha fazla vurgu yapabilir veya belirli bir döneme odaklanabiliriz.

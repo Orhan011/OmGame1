@@ -1,0 +1,94 @@
+Tabii! İşte Wordle oyunu için farklı ihtiyaçlara yönelik hazırlanmış prompt örnekleri:
+
+---
+
+### **1. Temel Wordle Oyunu için Prompt**  
+**Amaç:** Klasik Wordle kurallarına göre oynatmak.  
+
+**Prompt:**  
+"5 harfli bir İngilizce kelime seç. Ben her tahminde sonucu şu şekilde göstereceğim:  
+- **Doğru harf & doğru konum:** Büyük harf (ör: **A**)  
+- **Doğru harf & yanlış konum:** Küçük harf (ör: *a*)  
+- **Yanlış harf:** Alt çizgi (ör: _ )  
+
+Örnek çıktı:  
+Tahmin: **APPLE** → Sonuç: **A** *p* _ _ _  
+(Kural: Kelime 'ARMOR' olsun; A doğru konum, p var ama yanlış yerde, diğerleri yok.)  
+
+Oyunu başlat, ilk tahminimi bekliyor."
+
+---
+
+### **2. Türkçe Wordle için Prompt**  
+**Amaç:** Türkçe kelimelerle oynatmak.  
+
+**Prompt:**  
+"5 harfli bir Türkçe kelime seç (ör: 'kitap', 'şansı'). Kurallar:  
+- **Doğru harf & konum:** Büyük (ör: **K**)  
+- **Doğru harf & yanlış konum:** Küçük (ör: *k*)  
+- **Yanlış harf:** '-'  
+
+Örnek:  
+Tahmin: **kalem** → Sonuç: **K** - *a* - - (Kelime 'kablo' ise).  
+
+Not: Türkçe karakterleri (ç, ş, ğ, ü, ö) destekle. Başla!"
+
+---
+
+### **3. Görsel Tasarım Odaklı Prompt**  
+**Amaç:** Renkler ve emojilerle görsel feedback vermek.  
+
+**Prompt:**  
+"5 harfli rastgele bir kelime seç. Her tahminde şu şekilde renkli emojilerle yanıt ver:  
+- 🟩: Doğru harf & konum  
+- 🟨: Doğru harf, yanlış konum  
+- ⬛: Yanlış harf  
+
+Örnek:  
+Tahmin: **table** → 🟩🟨⬛⬛🟨 (Kelime 'tiger' ise).  
+
+Oyunu başlat, 6 tahmin hakkım var."
+
+---
+
+### **4. Zor Mod için Prompt**  
+**Amaç:** Yanlış harfleri eleyerek strateji kurdurmak.  
+
+**Prompt:**  
+"5 harfli bir kelime seç. Her tahminden sonra:  
+1. Bana **kullanılmaması gereken harfleri** listele (yanlış tahminler).  
+2. **Ortak harfleri** göster (doğru ama konumu yanlış olanlar).  
+3. **Sabit harfleri** belirt (doğru konumdakiler).  
+
+Örnek:  
+Tahmin: **CRANE** → Sabit: C _ _ _ _, Ortak: A, Kullanma: R, N, E.  
+
+Başla!"
+
+---
+
+### **5. İpucu Destekli Prompt**  
+**Amaç:** Belirli aralıklarla ipucu vermek.  
+
+**Prompt:**  
+"5 harfli bir kelime seç. Ben her 2 tahminde bir kelimeyle ilgili bir ipucu ver (ör: 'hayvan ismi', 'fiil', 'ülke adı').  
+
+Kurallar:  
+- Doğru harfler: **Büyük**  
+- Yanlış konum: *italik*  
+- Yanlış harf: _  
+
+Örnek:  
+İpucu: 'Bir meyve.'  
+Tahmin: **APPLE** → **A** *p* _ _ _  
+
+Hazırsan başla!"
+
+---
+
+### **Özelleştirme İpuçları:**  
+- **Dil:** İngilizce/Türkçe seçeneklerini değiştirebilirsiniz.  
+- **Zorluk:** Tahmin sayısını (ör: 4 veya 8) veya kelime uzunluğunu (6 harf) ayarlayabilirsiniz.  
+- **Görsel:** Emoji yerine 🟥/🟦 gibi renkler de kullanabilirsiniz.  
+
+İhtiyacınıza en uygun prompt'u seçip özelleştirebilirsiniz! 😊

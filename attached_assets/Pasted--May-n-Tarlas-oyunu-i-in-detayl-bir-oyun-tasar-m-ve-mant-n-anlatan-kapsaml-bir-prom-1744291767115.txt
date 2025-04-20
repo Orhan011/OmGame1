@@ -1,0 +1,78 @@
+ **Mayın Tarlası oyunu** için detaylı bir **oyun tasarımı ve mantığını** anlatan kapsamlı bir **prompt**. Bu prompt, hem mobil hem de PC'de kolayca oynanabilir bir oyun yapmanız için gereken tüm detayları içeriyor:
+
+---
+
+### **Mayın Tarlası Oyunu Tasarımı ve Mantığı – Geliştirme Prompt'u**  
+
+#### **1. Oyunun Temel Amacı**  
+- Klasik Mayın Tarlası oyununun modern ve kullanıcı dostu bir versiyonu.  
+- Oyuncu, tıkladığı karelerde mayın olup olmadığını tahmin ederek tüm mayınları işaretlemeye çalışır.  
+- **Hedef:** Tüm güvenli kareleri açmak ve mayınları işaretleyerek oyunu kazanmak.  
+
+#### **2. Oyun Mekaniği**  
+- **Kare Grid Sistemi:**  
+  - Varsayılan boyut: **9x9** (kolay), **16x16** (orta), **30x16** (zor).  
+  - Her kare ya boştur ya da mayın içerir.  
+  - Mayın sayısı: Grid boyutuna göre değişir (örneğin 9x9’da **10 mayın**).  
+
+- **Kullanıcı Etkileşimi:**  
+  - **Sol Tık:** Kareyi açar.  
+    - Eğer mayına basarsa, oyun biter.  
+    - Boşsa, etraftaki mayın sayısını gösterir (1-8 arası).  
+    - Hiç mayın yoksa, otomatik olarak komşu kareleri açar.  
+  - **Sağ Tık (Mobilde Uzun Basma):** Mayın şüphesi olan kareyi bayrakla işaretler.  
+  - **Çift Tık (Opsiyonel):** Hızlı açma (etrafında doğru sayıda bayrak varsa).  
+
+#### **3. Oyun Akışı**  
+1. **Başlangıç:**  
+   - Oyun tahtası rastgele mayınlarla doldurulur (ilk tıklanan kare asla mayın olmaz).  
+2. **Oyun İçi:**  
+   - Açılan karelerdeki sayılar, etraftaki mayınları gösterir.  
+   - Oyuncu mantık yürüterek mayınları işaretler.  
+3. **Oyun Sonu:**  
+   - **Kazanma:** Tüm mayınlar doğru işaretlenirse.  
+   - **Kaybetme:** Mayına basılırsa (tüm mayınlar gösterilir).  
+
+#### **4. Kullanıcı Arayüzü (UI) Tasarımı**  
+- **PC ve Mobil Uyumlu:** Responsive tasarım (dokunmatik ve fare uyumlu).  
+- **Ana Menü:**  
+  - Oyun modu seçimi (Kolay/Orta/Zor).  
+- **Oyun Ekranı:**  
+  - Grid (kareler), kalan mayın sayısı, kronometre.  
+  - Yeniden başlat butonu. 
+
+#### **5. Teknik Detaylar**  
+- **Grid Algoritması:**  
+  - Mayınlar rastgele yerleştirilir (ilk tıklama güvenli).  
+  - Açılan kareler için BFS (Breadth-First Search) algoritması kullanılır (0 mayınlı kareler için).  
+- **Kontrol Sistemi:**  
+  - Kazanma: Tüm mayınlar bayraklı VE tüm boş kareler açıksa.  
+  - Kaybetme: Mayına tıklanırsa.  
+
+#### **6. Ekstra Özellikler (Opsiyonel)**  
+- **Yardım Modu:** Yeni başlayanlar için ilk hamle ipucu.  
+  - Limitli bayrak modu.  
+
+#### **7. Platformlar**  
+- **Mobil (iOS/Android):** Dokunmatik optimizasyon (uzun basma = bayrak).  
+- **PC (Web/Desktop):** Fare kontrollü, klavye kısayolları (örneğin boşluk = bayrak).  
+
+---
+
+### **Örnek Kod Yapısı (Pseudocode)**  
+```python  
+# Mayınları yerleştirme  
+def place_mines(grid, first_click):  
+    # İlk tıklanan kare ve etrafına mayın koyma  
+
+# Kare açma  
+def reveal_cell(x, y):  
+    if cell_has_mine:  
+        game_over()  
+    else:  
+        show_adjacent_mines_count(x, y)  
+
+# Kazanma kontrolü  
+def check_win():  
+    if all_non_mine_cells_opened():  
+        win_game()  

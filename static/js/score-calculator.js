@@ -29,6 +29,9 @@ window.ScoreCalculator = (function() {
     'wordPuzzle': 200,  // Kelime bulmaca için 200 puan 
     'labyrinth': 200,   // Labirent için 200 puan
     'chess': 1000,      // Satranç puanı
+    'audio_memory': 150, // Sesli hafıza oyunu
+    'color_match': 250, // Renk eşleştirme
+    'math_challenge': 200, // Matematik mücadelesi
     'default': 100      // Varsayılan
   };
 
@@ -54,7 +57,7 @@ window.ScoreCalculator = (function() {
   };
 
   /**
-   * Puan hesaplama
+   * 0-100 arasında puan hesaplama
    * @param {Object} params - Hesaplama parametreleri
    * @returns {Object} - Hesaplanan puanlar ve detaylar
    */
@@ -70,43 +73,41 @@ window.ScoreCalculator = (function() {
       totalQuestions = 0,
       hintsUsed = 0,
       moves = 0,
+      gameCompleted = false,
+      streakDays = 0,
+      socialActions = 0,
       gameSpecificStats = {}
     } = params;
 
-    // Hesaplama için alt fonksiyonlar
-    function calculateTimeScore() {
-      if (!maxTime || maxTime <= 0) return 20; // Zaman yoksa ortalama puan
+    // =====================================================
+    // 1. PERFORMANS METRİKLERİ (Toplam Puanın %60'ı)
+    // =====================================================
+    
+    // Oyun tamamlama puanı (0-10 puan)
+    let completionScore = gameCompleted ? 10 : 2;
+    
+    // Skor bazlı puan (0-20 puan)
+    let maxPossibleScore = MAX_SCORES[gameType] || 100;
+    let scoreFactor = Math.min(1, score / maxPossibleScore);
+    let scoreBasedPoints = scoreFactor * 20;
 
-      // Zamanın yarısından önce bitirildiyse bonus
-      if (timeSpent < maxTime / 2) {
-        return 30; // Maksimum zaman puanı
-      } 
-      // Zamanın tamamına yakın bitirildiyse az puan
-      else if (timeSpent > maxTime * 0.8) {
-        return 10; // Minimum zaman puanı
-      }
-      // Normal aralık
-      else {
-        return 20; // Ortalama zaman puanı
-      }
+    // =====================================================
+    // 2. YETENEK & BECERİ FAKTÖRLERİ (Toplam Puanın %30'u)
+    // =====================================================
+    
+    // Zaman verimliliği (0-10 puan)
+    let timeEfficiencyScore = 5; // Varsayılan orta değer
+    if (maxTime > 0 && timeSpent > 0) {
+      timeEfficiencyScore = Math.max(0, Math.min(10, (1 - (timeSpent / maxTime)) * 10));
     }
-
-    function calculateAccuracyScore() {
-      if (totalQuestions <= 0) return 25; // Soru yoksa ortalama puan
-
-      // Doğruluk oranını hesapla
-      const accuracy = correctAnswers / totalQuestions;
-      return Math.round(accuracy * 50); // 0-50 arası puan
-    }
-
-    function calculateHintPenalty() {
-      // Her ipucu kullanımı için 5 puan düşür, max 25 puan
-      return Math.min(25, hintsUsed * 5);
-    }
-
-    function calculateMoveEfficiency() {
-      if (moves <= 0) return 20; // Hamle yoksa ortalama puan
-
+    
+    // Doğruluk oranı (0-10 puan)
+    let accuracyScore = 5; // Varsayılan orta değer
+    if (totalQuestions > 0 && correctAnswers >= 0) {
+      accuracyScore = Math.min(10, (correctAnswers / totalQuestions) * 10);
+    } 
+    // Eğer doğru/yanlış bilgisi yoksa, hamle verimliliğini kullan
+    else if (moves > 0) {
       // Oyun tipine göre optimal hamle sayısını hesapla
       let optimalMoves = gameSpecificStats.optimalMoves || 0;
       
@@ -117,56 +118,113 @@ window.ScoreCalculator = (function() {
           gameSpecificStats.boardSize || gameSpecificStats.cardCount || gameSpecificStats.questionCount
         );
       }
-
-      if (optimalMoves <= 0) return 20; // Hesaplanamadıysa ortalama puan
       
-      // Hamle verimliliği puanı
-      if (moves <= optimalMoves) {
-        return 40; // Optimal veya daha iyi
-      } else {
-        // Her fazla hamle için puan düşür
-        const efficiency = Math.max(0, 1 - ((moves - optimalMoves) / optimalMoves) * 0.5);
-        return Math.round(efficiency * 40);
+      if (optimalMoves > 0) {
+        const moveRatio = optimalMoves / moves;
+        accuracyScore = Math.min(10, moveRatio * 10);
       }
     }
-
-    // Temel puan bileşenlerini hesapla
-    const timeScore = calculateTimeScore();
-    const accuracyScore = calculateAccuracyScore();
-    const moveScore = calculateMoveEfficiency();
-    const hintPenalty = calculateHintPenalty();
-
-    // Temel puanı hesapla
-    const baseScore = Math.max(0, timeScore + accuracyScore + moveScore - hintPenalty);
     
-    // Zorluk çarpanını uygula
+    // İpucu kullanımı cezası (0-10 puan üzerinden)
+    const hintPenalty = Math.min(10, hintsUsed * 2); // Her ipucu 2 puan düşürür
+    
+    // =====================================================
+    // 3. SOSYAL & DAVRANIŞSAL FAKTÖRLER (Toplam Puanın %10'u)
+    // =====================================================
+    
+    // Günlük giriş zinciri puanı (max 7 puan)
+    const streakScore = Math.min(7, streakDays);
+    
+    // Sosyal aktiviteler puanı (max 3 puan)
+    const socialScore = Math.min(3, socialActions);
+
+    // =====================================================
+    // 4. TOPLAM PUAN HESAPLAMA
+    // =====================================================
+    
+    // Alt puanları hesapla
+    const performanceScore = completionScore + scoreBasedPoints; // Max 30
+    const skillScore = timeEfficiencyScore + accuracyScore - hintPenalty; // Max 20
+    const socialScore_total = streakScore + socialScore; // Max 10
+    
+    // Alt kategorileri normalize et (0-100 arası)
+    const normalizedPerformance = (performanceScore / 30) * 100;
+    const normalizedSkill = (skillScore / 20) * 100;
+    const normalizedSocial = (socialScore_total / 10) * 100;
+    
+    // Ana formül: Toplam Puan = (Performans Puanı * 0.6) + (Yetenek Puanı * 0.3) + (Sosyal Puan * 0.1)
+    let rawScore = (normalizedPerformance * 0.6) + 
+                 (normalizedSkill * 0.3) + 
+                 (normalizedSocial * 0.1);
+                 
+    // Zorluk seviyesi katsayısını uygula
     const difficultyMultiplier = DIFFICULTY_MULTIPLIERS[difficulty] || 1.0;
+    rawScore = rawScore * difficultyMultiplier;
     
-    // Ham puanı hesapla
-    const rawScore = Math.round(baseScore * difficultyMultiplier);
-    
-    // Nihai puanı hesapla (0-100 arası)
-    const finalScore = Math.min(100, Math.max(0, rawScore));
+    // Sınırları uygula (0-100 arası)
+    const finalScore = Math.max(0, Math.min(100, Math.round(rawScore)));
 
     // Detaylı puan dökümü
     return {
-      finalScore: finalScore,
+      finalScore,
       breakdown: {
-        baseScore: baseScore,
-        timeScore: timeScore,
-        accuracyScore: accuracyScore,
-        moveScore: moveScore,
-        hintPenalty: hintPenalty,
-        difficultyMultiplier: difficultyMultiplier,
-        rawScore: rawScore
+        performance: {
+          total: Math.round(normalizedPerformance),
+          completion: completionScore,
+          scorePoints: Math.round(scoreBasedPoints)
+        },
+        skill: {
+          total: Math.round(normalizedSkill),
+          timeEfficiency: Math.round(timeEfficiencyScore),
+          accuracy: Math.round(accuracyScore),
+          hintPenalty: Math.round(hintPenalty)
+        },
+        social: {
+          total: Math.round(normalizedSocial),
+          streak: streakScore,
+          social: socialScore
+        },
+        difficultyMultiplier,
+        rawScore: Math.round(rawScore)
+      }
+    };
+  }
+
+  /**
+   * Basitleştirilmiş puan hesaplama (oyun skoru + zorluk çarpanı)
+   * Mevcut oyunlarla geriye dönük uyumluluk için
+   */
+  function calculateLegacy(gameType, score, difficulty = 'medium') {
+    // Maksimum skor bulunması
+    const maxScore = MAX_SCORES[gameType] || 100;
+    
+    // Skor oranı (0-1 arası)
+    const scoreRatio = Math.min(1, score / maxScore);
+    
+    // Baz puan (0-80 arası)
+    const baseScore = Math.round(scoreRatio * 80);
+    
+    // Zorluk çarpanı
+    const diffMultiplier = DIFFICULTY_MULTIPLIERS[difficulty] || 1.0;
+    
+    // Nihai puan (0-100 arası)
+    const finalScore = Math.min(100, Math.round(baseScore * diffMultiplier));
+    
+    return {
+      finalScore,
+      breakdown: {
+        baseScore,
+        difficultyMultiplier: diffMultiplier,
+        rawScore: baseScore * diffMultiplier
       }
     };
   }
 
   // Dışa aktarılan API
   return {
-    calculate: calculate,
-    DIFFICULTY_MULTIPLIERS: DIFFICULTY_MULTIPLIERS,
-    MAX_SCORES: MAX_SCORES
+    calculate,
+    calculateLegacy,
+    DIFFICULTY_MULTIPLIERS,
+    MAX_SCORES
   };
 })();

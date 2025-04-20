@@ -1,0 +1,317 @@
+<!-- HTML Yapısı -->
+<!-- Page Container - Tüm sayfaları içeren ana konteyner -->
+<div class="page-container" id="pageContainer">
+    <div class="shadow-overlay" id="shadowOverlay"></div>
+    
+    <!-- Sayfalar buraya gelecek, örnek yapı: -->
+    <div id="sayfa1" class="page active" data-index="1">
+        <!-- Sayfa içeriği -->
+    </div>
+    
+    <div id="sayfa2" class="page" data-index="2">
+        <div class="header">
+            <div class="back-button" onclick="goBack()">Geri</div>
+            <div class="page-title">Sayfa 2</div>
+        </div>
+        <!-- Sayfa içeriği -->
+    </div>
+    
+    <div id="sayfa3" class="page" data-index="3">
+        <div class="header">
+            <div class="back-button" onclick="goBack()">Geri</div>
+            <div class="page-title">Sayfa 3</div>
+        </div>
+        <!-- Sayfa içeriği -->
+    </div>
+    
+    <div id="sayfa4" class="page" data-index="4">
+        <div class="header">
+            <div class="back-button" onclick="goBack()">Geri</div>
+            <div class="page-title">Sayfa 4</div>
+        </div>
+        <!-- Sayfa içeriği -->
+    </div>
+    
+    <!-- Diğer sayfalar... -->
+</div>
+
+<!-- CSS Stilleri -->
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+        overflow-x: hidden;
+        position: relative;
+        touch-action: pan-y;
+    }
+    
+    .page-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .page {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        transition: transform 0.3s ease-out;
+        overflow-y: auto;
+        z-index: 1;
+    }
+    
+    .page.active {
+        z-index: 2;
+    }
+    
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 50px;
+        background-color: #f8f8f8;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        z-index: 10;
+    }
+    
+    .back-button {
+        color: #007AFF;
+        font-size: 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .back-button:before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-left: 2px solid #007AFF;
+        border-bottom: 2px solid #007AFF;
+        transform: rotate(45deg);
+        margin-right: 5px;
+    }
+    
+    .page-title {
+        flex-grow: 1;
+        text-align: center;
+        font-weight: 600;
+        font-size: 17px;
+        margin-left: -15px;
+    }
+    
+    /* Kaydırma hareketi için gölge efekti */
+    .shadow-overlay {
+        position: absolute;
+        top: 0;
+        left: -10px;
+        width: 10px;
+        height: 100%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        z-index: 3;
+    }
+</style>
+
+<!-- JavaScript Kodu -->
+<script>
+    // Sayfa ID'lerini indeksleriyle birlikte saklamak için
+    const pageIds = ['sayfa1', 'sayfa2', 'sayfa3', 'sayfa4']; // Tüm sayfa ID'lerini buraya ekleyin
+    
+    let currentPage = 'sayfa1';   // İlk sayfa ID'nizi buraya yazın
+    let touchStartX = 0;
+    let touchMoveX = 0;
+    let isDragging = false;
+    const threshold = 50; // kaydırma eşiği (px cinsinden)
+    
+    // Bir sayfadan bir sonraki sayfaya navigasyon için fonksiyon
+    function navigateTo(pageId) {
+        if (currentPage === pageId) return;
+        
+        const currentPageElem = document.getElementById(currentPage);
+        const newPageElem = document.getElementById(pageId);
+        
+        if (!newPageElem) return;
+        
+        // Eski sayfayı sol tarafa yerleştir
+        currentPageElem.style.transform = 'translateX(-100%)';
+        currentPageElem.classList.remove('active');
+        
+        // Yeni sayfayı doğru konuma getir
+        newPageElem.style.transform = 'translateX(0)';
+        newPageElem.classList.add('active');
+        
+        // Güncel sayfayı güncelle
+        currentPage = pageId;
+    }
+    
+    // Bir önceki sayfaya dönmek için fonksiyon
+    function goBack() {
+        const currentPageElem = document.getElementById(currentPage);
+        const currentIndex = parseInt(currentPageElem.getAttribute('data-index'));
+        
+        // Eğer zaten ilk sayfadaysak, bir şey yapma
+        if (currentIndex <= 1) return;
+        
+        // Bir önceki sayfa indeksini hesapla
+        const prevIndex = currentIndex - 1;
+        const prevPageId = pageIds[prevIndex - 1]; // Diziler 0-indexed olduğu için -1
+        
+        const prevPageElem = document.getElementById(prevPageId);
+        
+        if (!prevPageElem) return;
+        
+        // Şimdiki sayfayı sağa doğru hareket ettir
+        currentPageElem.style.transform = 'translateX(100%)';
+        currentPageElem.classList.remove('active');
+        
+        // Önceki sayfayı görünür konuma getir
+        prevPageElem.style.transform = 'translateX(0)';
+        prevPageElem.classList.add('active');
+        
+        // Güncel sayfayı güncelle
+        currentPage = prevPageId;
+    }
+    
+    // İki sayfa ID'si arasındaki indeks farkını bulur
+    function getPageDistance(fromPageId, toPageId) {
+        const fromPageElem = document.getElementById(fromPageId);
+        const toPageElem = document.getElementById(toPageId);
+        
+        if (!fromPageElem || !toPageElem) return 0;
+        
+        const fromIndex = parseInt(fromPageElem.getAttribute('data-index'));
+        const toIndex = parseInt(toPageElem.getAttribute('data-index'));
+        
+        return Math.abs(toIndex - fromIndex);
+    }
+    
+    // Belirli bir indeksteki sayfayı bul
+    function getPageIdByIndex(index) {
+        const pageElem = document.querySelector(`.page[data-index="${index}"]`);
+        return pageElem ? pageElem.id : null;
+    }
+    
+    // Dokunmatik olayları
+    document.addEventListener('touchstart', function(e) {
+        // Sadece ekranın sol kenarına yakın dokunuşları algıla
+        if (e.touches[0].clientX < 30) {
+            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+            
+            const currentPageElem = document.getElementById(currentPage);
+            const currentIndex = parseInt(currentPageElem.getAttribute('data-index'));
+            
+            // Eğer ilk sayfada değilsek
+            if (currentIndex > 1) {
+                const prevIndex = currentIndex - 1;
+                const prevPageId = getPageIdByIndex(prevIndex);
+                const prevPageElem = document.getElementById(prevPageId);
+                
+                if (prevPageElem) {
+                    prevPageElem.style.transform = 'translateX(-30%)';
+                    prevPageElem.style.transition = 'none';
+                    shadowOverlay.style.opacity = '0';
+                }
+            }
+        }
+    });
+    
+    document.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        
+        touchMoveX = e.touches[0].clientX;
+        const deltaX = touchMoveX - touchStartX;
+        
+        const currentPageElem = document.getElementById(currentPage);
+        const currentIndex = parseInt(currentPageElem.getAttribute('data-index'));
+        
+        if (deltaX > 0 && currentIndex > 1) {
+            e.preventDefault(); // Varsayılan kaydırma davranışını engelle
+            
+            const prevIndex = currentIndex - 1;
+            const prevPageId = getPageIdByIndex(prevIndex);
+            const prevPageElem = document.getElementById(prevPageId);
+            
+            if (prevPageElem) {
+                // Kaydırma esnasında sayfaları hareket ettir
+                const movePercentage = Math.min(100, (deltaX / window.innerWidth) * 100);
+                currentPageElem.style.transform = `translateX(${movePercentage}%)`;
+                currentPageElem.style.transition = 'none';
+                
+                prevPageElem.style.transform = `translateX(${-30 + (movePercentage * 0.3)}%)`;
+                
+                // Gölge efektini güncelle
+                shadowOverlay.style.opacity = (movePercentage / 100).toString();
+            }
+        }
+    });
+    
+    document.addEventListener('touchend', function(e) {
+        if (!isDragging) return;
+        
+        const deltaX = touchMoveX - touchStartX;
+        
+        const currentPageElem = document.getElementById(currentPage);
+        const currentIndex = parseInt(currentPageElem.getAttribute('data-index'));
+        
+        if (currentIndex > 1) {
+            const prevIndex = currentIndex - 1;
+            const prevPageId = getPageIdByIndex(prevIndex);
+            const prevPageElem = document.getElementById(prevPageId);
+            
+            if (prevPageElem) {
+                // Geçiş efektlerini geri yükle
+                currentPageElem.style.transition = 'transform 0.3s ease-out';
+                prevPageElem.style.transition = 'transform 0.3s ease-out';
+                
+                if (deltaX > threshold) {
+                    // Eşik değeri aşıldı, geri dön
+                    currentPageElem.style.transform = 'translateX(100%)';
+                    currentPageElem.classList.remove('active');
+                    
+                    prevPageElem.style.transform = 'translateX(0)';
+                    prevPageElem.classList.add('active');
+                    
+                    currentPage = prevPageId;
+                } else {
+                    // Eşik değeri aşılmadı, mevcut sayfada kal
+                    currentPageElem.style.transform = 'translateX(0)';
+                    prevPageElem.style.transform = 'translateX(-30%)';
+                }
+                
+                // Gölge efektini sıfırla
+                shadowOverlay.style.opacity = '0';
+            }
+        }
+        
+        isDragging = false;
+    });
+    
+    // Sayfaları başlangıç konumlarına yerleştir
+    window.onload = function() {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => {
+            if (!page.classList.contains('active')) {
+                page.style.transform = 'translateX(100%)';
+            }
+        });
+    };
+</script>

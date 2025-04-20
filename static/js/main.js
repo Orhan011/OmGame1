@@ -422,6 +422,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Ekran boyutu değiştiğinde ayarla
   window.addEventListener('resize', adjustUserDropdown);
+  
+  // Hamburger menü butonuna tıklandığında avatarların konumunu koru
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  if (navbarToggler) {
+    navbarToggler.addEventListener('click', function() {
+      // Avatar konumunu sabitlemek için bir şey yapmaya gerek yok,
+      // CSS'de position: fixed ile halledildi
+    });
+  }
 });
 
 // Yeni profil paneli işlevselliği
@@ -478,4 +487,66 @@ document.addEventListener('DOMContentLoaded', function() {
   if (profilePicture && document.getElementById('profile-picture-container')) {
     document.getElementById('profile-picture-container').appendChild(profilePicture);
   }
+  
+  // Tema değiştirme özelliği kaldırıldı - Varsayılan temayı kullan
+  document.documentElement.className = 'dark';
+});
+
+// Avatar ve resim yükleme hatası için alternatif gösterimi
+document.addEventListener('DOMContentLoaded', function() {
+  // Kullanılabilir avatarlar listesi - yükleme hatası durumunda rastgele kullanılacak
+  const availableAvatars = [
+    '/static/images/avatars/default.svg',
+    '/static/avatars/bots/avatar_male_1.svg',
+    '/static/avatars/bots/avatar_male_2.svg',
+    '/static/avatars/bots/avatar_male_3.svg',
+    '/static/avatars/bots/avatar_female_1.svg',
+    '/static/avatars/bots/avatar_female_2.svg',
+    '/static/avatars/avatar1.svg',
+    '/static/avatars/avatar2.svg',
+    '/static/avatars/avatar3.svg',
+    '/static/avatars/avatar4.svg',
+    '/static/avatars/avatar5.svg',
+    '/static/avatars/avatar6.svg',
+    '/static/avatars/avatar7.svg',
+    '/static/avatars/avatar8.svg',
+    '/static/avatars/avatar9.svg',
+    '/static/avatars/avatar10.svg'
+  ];
+
+  // Rasgele bir avatar seç
+  function getRandomAvatar() {
+    const randomIndex = Math.floor(Math.random() * availableAvatars.length);
+    return availableAvatars[randomIndex];
+  }
+
+  // Profil resimleri için hata kontrolü
+  document.querySelectorAll('img.profile-avatar, img.navbar-avatar, img.comment-avatar, img.leaderboard-avatar, img.navbar-corner-avatar').forEach(img => {
+    img.onerror = function() {
+      // Resim yüklenemezse, varsayılan avatar veya placeholder göster
+      console.log('Avatar yüklenemedi:', this.src);
+
+      // Placeholder div oluştur (kullanıcı adının ilk harfi)
+      if (this.getAttribute('data-username')) {
+        const username = this.getAttribute('data-username');
+        const placeholder = document.createElement('div');
+
+        // Orijinal resim elementinin sınıflarını koru, ancak avatar sınıfını placeholder ile değiştir
+        placeholder.className = this.className.replace('profile-avatar', 'profile-avatar-placeholder')
+                                             .replace('navbar-avatar', 'navbar-avatar-placeholder')
+                                             .replace('comment-avatar', 'comment-avatar-placeholder')
+                                             .replace('leaderboard-avatar', 'leaderboard-avatar-placeholder');
+
+        placeholder.textContent = username.charAt(0).toUpperCase();
+
+        // Elementi değiştir
+        if (this.parentNode) {
+          this.parentNode.replaceChild(placeholder, this);
+        }
+      } else {
+        // Rasgele bir avatar seç
+        this.src = getRandomAvatar();
+      }
+    };
+  });
 });

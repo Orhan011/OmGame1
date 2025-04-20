@@ -1,0 +1,73 @@
+### **Oyun İçi Dinamik Puanlama Sistemi (0-100 Skala)**  
+
+**Amaç:**  
+Kullanıcıların performansını **0 ile 100 arasında** hassas bir algoritmayla ölçen, adil ve sürdürülebilir bir puanlama mekanizması tasarlamak.  
+
+---
+
+### **1. Puan Hesaplama Kriterleri**  
+Puanlar, aşağıdaki faktörlere göre **bilimsel bir formülle** otomatik hesaplanacak:  
+
+#### **A. Temel Performans Metrikleri (Toplam Puanın %60'ı)**  
+- **Oyun Tamamlama:**  
+  - Her başarılı oyun bitişi: **+10 puan** (Max günlük 30 puan).  
+  - Kaybetme durumunda: **+2 puan** (Motivasyon için minimal ödül).  
+- **Skor Bazlı Bonus:**  
+  - Skor, oyunun zorluk seviyesine göre normalize edilecek.  
+  - Örnek formül: `(Kullanıcı Skoru / Maksimum Skor) * 20` (Max +20 puan).  
+
+#### **B. Yetenek & Beceri Faktörleri (Toplam Puanın %30'u)**  
+- **Zaman Verimliliği:**  
+  - Hızlı tamamlama: `(1 - (Harcanan Süre / Maks Süre)) * 10` (Max +10 puan).  
+- **Doğruluk Oranı:**  
+  - Örn. ateş etme oyununda isabet oranı: `(İsabet Sayısı / Toplam Atış) * 10` (Max +10 puan).  
+
+#### **C. Sosyal & Davranışsal Faktörler (Toplam Puanın %10'u)**  
+- **Günlük Giriş Zinciri:**  
+  - Üst üste her girişte **+1 puan** (Max 7 puan/hafta).  
+- **Arkadaş Daveti:**  
+  - Her başarılı davet **+3 puan** (Max 9 puan/ay).  
+
+---
+
+### **2. Puan Sınırlamaları & Koruma Mekanizmaları**  
+- **Max 100, Min 0** kuralı için:  
+  - Haftalık puan kazanımı **70 ile sınırlı** (Aşırı farmı önlemek için).  
+  - Puan düşüşleri yavaş olacak (Örn: 7 gün aktif olmayan kullanıcılar **-5 puan/gün**).  
+
+---
+
+### **3. Profesyonel Hesaplama Formülü (Örnek)**  
+```  
+Toplam Puan =  
+  (Performans Puanı * 0.6) + (Yetenek Puanı * 0.3) + (Sosyal Puan * 0.1)  
+```  
+*Not: Tüm değerler 0-100 aralığına normalize edilecek.*  
+
+---
+
+### **4. Teknik Altyapı Önerileri**  
+- **Veritabanı Yapısı:**  
+  ```json
+  {
+    "user_id": "123",
+    "total_score": 85,
+    "performance_score": 52,
+    "skill_score": 25,
+    "social_score": 8,
+    "last_active": "2024-05-20"
+  }
+  ```  
+- **Backend Logic:**  
+  - Puanlar her oyun sonunda **Python/R** ile hesaplanıp güncellenecek.  
+  - Anti-cheat için anormal skorlar **manuel onay**a gidecek.  
+
+---
+
+**Örnek Senaryo:**  
+> Kullanıcı:  
+> - 3 oyun kazandı (30 puan),  
+> - Skor performansından +18 puan,  
+> - Hızlı tamamlamadan +7 puan,  
+> - 3 gün üst üste giriş yaptı (+3 puan).  
+> **Toplam:** 58/100 (Yeni seviye: "Bronz").

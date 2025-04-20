@@ -39,6 +39,13 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+// Debug kodu - sayfa yüklendiğinde
+console.log('Liderlik tablosu sayfası yükleniyor...');
+window.addEventListener('error', function(e) {
+  console.error('JavaScript hatası (Liderlik Tablosu):', e.message, 'Satır:', e.lineno, 'Dosya:', e.filename);
+});
+</script>
 <script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/level-leaderboard.js') }}"></script>
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}"></script>

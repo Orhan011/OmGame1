@@ -2,354 +2,1143 @@
 
 {% block content %}
 <div class="container language-lesson-container">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <div class="lesson-header">
-    <a href="{{ url_for('language_learning') }}" class="back-btn">
-      <i class="fas fa-arrow-left"></i> Geri
+    <a href="{{ url_for('language_learning') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Geri Dön
     </a>
-    <div class="lesson-title-container">
+    <div class="lesson-info">
       <h1>{{ lesson.title }}</h1>
       <p>{{ lesson.description }}</p>
     </div>
-    <div class="progress-indicator">
-      <div class="hearts">
-        <i class="fas fa-heart"></i>
-        <i class="fas fa-heart"></i>
-        <i class="fas fa-heart"></i>
-        <span>3</span>
+    <div class="lesson-progress">
+      <div class="progress-circle large" data-progress="0" id="lesson-progress-circle">
+        <span class="progress-text">0%</span>
       </div>
     </div>
   </div>
-  
-  <div class="lesson-content">
-    {% if lesson.exercises %}
-      <div class="exercise-container" id="exercise-container">
-        <!-- Burada egzersizler dinamik olarak gösterilecek -->
-      </div>
-      
-      <div class="lesson-navigation">
-        <button id="check-answer-btn" class="action-btn check-btn disabled">Kontrol Et</button>
-        <button id="continue-btn" class="action-btn continue-btn" style="display: none;">Devam Et</button>
-      </div>
-      
-      <div class="progress-bar-container">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%;" id="lesson-progress-bar"></div>
-        </div>
-        <div class="progress-text">
-          <span id="current-exercise">1</span> / <span id="total-exercises">{{ lesson.exercises|length }}</span>
-        </div>
-      </div>
-    {% else %}
-      <div class="no-exercises">
-        <i class="fas fa-tools"></i>
-        <h2>Bu ders henüz hazırlanıyor</h2>
-        <p>Çok yakında burada interaktif egzersizler olacak.</p>
-        <a href="{{ url_for('language_learning') }}" class="back-link">Derslere Dön</a>
-      </div>
-    {% endif %}
-  </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Ders verileri
-    const lessonData = {{ lesson|tojson|safe }};
-    const exercises = lessonData.exercises || [];
-    let currentExerciseIndex = 0;
-    let correctAnswers = 0;
-    let userChoices = null;
+  <div class="lesson-resources">
+    <div class="resource-card">
+      <div class="resource-icon">
+        <i class="fas fa-volume-up"></i>
+      </div>
+      <h3>Sesli Kelimeler</h3>
+      <p>Kelimelerin doğru telaffuzunu dinleyin</p>
+    </div>
     
-    const exerciseContainer = document.getElementById('exercise-container');
-    const checkBtn = document.getElementById('check-answer-btn');
-    const continueBtn = document.getElementById('continue-btn');
-    const progressBar = document.getElementById('lesson-progress-bar');
-    const currentExerciseEl = document.getElementById('current-exercise');
+    <div class="resource-card">
+      <div class="resource-icon">
+        <i class="fas fa-book"></i>
+      </div>
+      <h3>Kelime Listesi</h3>
+      <p>Derste geçen tüm kelimeleri görüntüleyin</p>
+    </div>
     
-    // Eğer egzersiz yoksa erken çık
-    if (!exercises || exercises.length === 0) return;
-    
-    // İlk egzersizi göster
-    showExercise(currentExerciseIndex);
-    
-    // Kontrol Et butonuna tıklama olay dinleyicisi
-    if (checkBtn) {
-      checkBtn.addEventListener('click', function() {
-        if (checkBtn.classList.contains('disabled')) return;
-        
-        // Kullanıcının cevabını kontrol et
-        checkAnswer();
-      });
-    }
-    
-    // Devam Et butonuna tıklama olay dinleyicisi
-    if (continueBtn) {
-      continueBtn.addEventListener('click', function() {
-        currentExerciseIndex++;
-        
-        if (currentExerciseIndex < exercises.length) {
-          // Sonraki egzersizi göster
-          showExercise(currentExerciseIndex);
-          // İlerleme çubuğunu güncelle
-          updateProgressBar();
-          
-          continueBtn.style.display = 'none';
-          checkBtn.style.display = 'block';
-          checkBtn.classList.add('disabled');
-        } else {
-          // Dersi tamamla
-          showLessonComplete();
-        }
-      });
-    }
-    
-    // Egzersizi görüntüle
-    function showExercise(index) {
-      if (!exerciseContainer) return;
+    <div class="resource-card">
+      <div class="resource-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h3>Dilbilgisi Notları</h3>
+      <p>Derse ait dilbilgisi kurallarını öğrenin</p>
+    </div>
+  </div>
+
+  <div class="exercise-container" id="exercise-container">
+    {% if lesson.exercises %}
+    <div class="exercise" id="current-exercise" data-index="0">
+      <div class="lives-container">
+        <div class="lives">
+          <i class="fas fa-heart"></i>
+          <i class="fas fa-heart"></i>
+          <i class="fas fa-heart"></i>
+        </div>
+        <div class="hints">
+          <button id="hint-button" class="hint-button">
+            <i class="fas fa-lightbulb"></i> İpucu
+          </button>
+        </div>
+      </div>
       
-      const exercise = exercises[index];
-      
-      // Mevcut egzersiz numarasını güncelle
-      if (currentExerciseEl) {
-        currentExerciseEl.textContent = index + 1;
-      }
-      
-      let html = '';
-      
-      // Egzersiz tipine göre HTML oluştur
-      if (exercise.type === 'translation') {
-        html = `
-          <div class="exercise translation-exercise">
-            <div class="exercise-prompt">
-              <h2>"${exercise.question}" ne demek?</h2>
-            </div>
-            <div class="options-container">
-              ${exercise.options.map((option, i) => `
-                <div class="option" data-index="${i}">
-                  <span>${option}</span>
-                </div>
-              `).join('')}
-            </div>
+      <div class="exercise-content">
+        <div class="exercise-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
           </div>
-        `;
-      } else if (exercise.type === 'multiple_choice') {
-        html = `
-          <div class="exercise multiple-choice-exercise">
-            <div class="exercise-prompt">
-              <h2>${exercise.question}</h2>
-            </div>
-            <div class="options-container">
-              ${exercise.options.map((option, i) => `
-                <div class="option" data-index="${i}">
-                  <span>${option}</span>
-                </div>
-              `).join('')}
-            </div>
+          <div class="progress-text">
+            <span id="current-question">1</span>/<span id="total-questions">{{ lesson.exercises|length }}</span>
           </div>
-        `;
-      } else if (exercise.type === 'matching') {
-        html = `
-          <div class="exercise matching-exercise">
-            <div class="exercise-prompt">
-              <h2>Eşleştirmeleri doğru şekilde yapın</h2>
-            </div>
-            <div class="matching-container">
-              <div class="matching-pairs">
-                ${exercise.pairs.map((pair, i) => `
-                  <div class="matching-pair">
-                    <div class="native-term" data-index="${i}">${pair.native}</div>
-                    <div class="foreign-term unmatched" data-index="${i}">${pair.foreign}</div>
-                  </div>
-                `).join('')}
+        </div>
+        
+        <div class="exercise-type">{{ lesson.exercises[0].type|capitalize }}</div>
+        
+        <div class="question-container">
+          {% if lesson.exercises[0].type == "translation" %}
+            <h2>{{ lesson.exercises[0].question }}</h2>
+            <p class="question-subtitle">Cümlenin çevirisini seçin</p>
+          {% elif lesson.exercises[0].type == "multiple_choice" %}
+            <h2>{{ lesson.exercises[0].question }}</h2>
+          {% elif lesson.exercises[0].type == "matching" %}
+            <h2>Doğru eşleştirmeleri yapın</h2>
+          {% endif %}
+        </div>
+        
+        <div class="options-container" id="options-container">
+          {% if lesson.exercises[0].type == "translation" or lesson.exercises[0].type == "multiple_choice" %}
+            {% for option in lesson.exercises[0].options %}
+              <div class="option" data-value="{{ option }}">{{ option }}</div>
+            {% endfor %}
+          {% elif lesson.exercises[0].type == "matching" %}
+            <div class="matching-game">
+              <div class="matching-column" id="native-column">
+                {% for pair in lesson.exercises[0].pairs %}
+                  <div class="matching-item" data-pair-id="{{ loop.index }}">{{ pair.native }}</div>
+                {% endfor %}
+              </div>
+              <div class="matching-column" id="foreign-column">
+                {% for pair in lesson.exercises[0].pairs|shuffle %}
+                  <div class="matching-item" data-pair-id="{{ loop.index }}">{{ pair.foreign }}</div>
+                {% endfor %}
               </div>
             </div>
-          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="exercise-actions">
+        <button id="check-answer" class="check-answer-btn">Kontrol Et</button>
+        <button id="continue-btn" class="continue-btn" style="display: none;">Devam Et</button>
+        <button id="complete-btn" class="complete-btn" style="display: none;">Dersi Tamamla</button>
+      </div>
+      
+      <div class="feedback-container" id="feedback-container" style="display: none;">
+        <div class="feedback correct-feedback">
+          <i class="fas fa-check-circle"></i>
+          <h3>Doğru!</h3>
+          <p>Harika iş çıkardın!</p>
+        </div>
+        <div class="feedback incorrect-feedback">
+          <i class="fas fa-times-circle"></i>
+          <h3>Yanlış!</h3>
+          <p>Doğru cevap: <span id="correct-answer"></span></p>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-exercises">
+      <div class="empty-state">
+        <i class="fas fa-tools"></i>
+        <h2>Bu ders henüz hazırlanıyor</h2>
+        <p>Çok yakında burada olacak. Lütfen daha sonra tekrar kontrol edin.</p>
+        <a href="{{ url_for('language_learning') }}" class="btn btn-primary">Dil Öğrenme Sayfasına Dön</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="results-container" id="results-container" style="display: none;">
+    <div class="results-header">
+      <h2>Ders Tamamlandı!</h2>
+      <div class="results-stats">
+        <div class="result-stat">
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-value" id="correct-count">0</div>
+          <div class="stat-label">Doğru</div>
+        </div>
+        <div class="result-stat">
+          <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+          <div class="stat-value" id="incorrect-count">0</div>
+          <div class="stat-label">Yanlış</div>
+        </div>
+        <div class="result-stat">
+          <div class="stat-icon"><i class="fas fa-star"></i></div>
+          <div class="stat-value" id="xp-earned">0</div>
+          <div class="stat-label">XP</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="results-message">
+      <p id="results-feedback">Harika iş çıkardın! Başarılı bir şekilde dersi tamamladın.</p>
+    </div>
+    
+    <div class="achievement">
+      <div class="achievement-icon">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <div class="achievement-info">
+        <h3>İlk Ders Tamamlandı</h3>
+        <p>Tebrikler! İlk dil öğrenme dersini tamamladın.</p>
+      </div>
+    </div>
+    
+    <div class="results-actions">
+      <a href="{{ url_for('language_learning') }}" class="btn btn-secondary">Dil Öğrenme Ana Sayfası</a>
+      {% if lesson_id < 5 %}
+      <a href="{{ url_for('language_lesson', lesson_id=lesson_id+1, lang=selected_language) }}" class="btn btn-primary">Sonraki Ders</a>
+      {% else %}
+      <a href="{{ url_for('language_learning') }}" class="btn btn-primary">Bitir</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .language-lesson-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    background: linear-gradient(135deg, #4e43b8, #6a5ae0);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(106, 90, 224, 0.3);
+    color: white;
+  }
+  
+  .back-button {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .back-button i {
+    margin-right: 8px;
+  }
+  
+  .lesson-info {
+    flex: 1;
+    margin: 0 20px;
+  }
+  
+  .lesson-info h1 {
+    margin: 0 0 5px 0;
+    font-size: 1.8rem;
+  }
+  
+  .lesson-info p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+  }
+  
+  .progress-circle.large {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .progress-circle.large:before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: conic-gradient(#FFFFFF 0% var(--progress), rgba(255,255,255,0.2) var(--progress) 100%);
+  }
+  
+  .progress-circle .progress-text {
+    position: relative;
+    z-index: 1;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+  }
+  
+  .lesson-resources {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .resource-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  
+  .resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .resource-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #e8f0ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 24px;
+    color: #4e73df;
+  }
+  
+  .resource-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+  }
+  
+  .resource-card p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .exercise-container {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  }
+  
+  .exercise {
+    padding: 30px;
+  }
+  
+  .lives-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+  
+  .lives {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .lives i {
+    color: #e74a3b;
+    font-size: 24px;
+  }
+  
+  .hint-button {
+    background-color: #f8f9fa;
+    color: #4e73df;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .hint-button:hover {
+    background-color: #e8eaed;
+  }
+  
+  .exercise-content {
+    margin-bottom: 30px;
+  }
+  
+  .exercise-progress {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 15px;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background-color: #4e73df;
+    transition: width 0.3s;
+  }
+  
+  .progress-text {
+    font-weight: 600;
+    color: #666;
+  }
+  
+  .exercise-type {
+    display: inline-block;
+    background-color: #e8f0ff;
+    color: #4e73df;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  .question-container {
+    margin-bottom: 30px;
+  }
+  
+  .question-container h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+  }
+  
+  .question-subtitle {
+    color: #666;
+    margin: 0;
+  }
+  
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .option {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  
+  .option:hover {
+    background-color: #e8eaed;
+    border-color: #dadce0;
+  }
+  
+  .option.selected {
+    background-color: #e8f0ff;
+    border-color: #4e73df;
+  }
+  
+  .option.correct {
+    background-color: #d4edda;
+    border-color: #28a745;
+  }
+  
+  .option.incorrect {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+  }
+  
+  .matching-game {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  
+  .matching-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .matching-item {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    text-align: center;
+  }
+  
+  .matching-item:hover {
+    background-color: #e8eaed;
+  }
+  
+  .matching-item.selected {
+    background-color: #e8f0ff;
+    border-color: #4e73df;
+  }
+  
+  .matching-item.matched {
+    background-color: #d4edda;
+    border-color: #28a745;
+    pointer-events: none;
+  }
+  
+  .exercise-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .check-answer-btn, .continue-btn, .complete-btn {
+    background-color: #4e73df;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .check-answer-btn:hover, .continue-btn:hover, .complete-btn:hover {
+    background-color: #2e59d9;
+  }
+  
+  .check-answer-btn:disabled {
+    background-color: #b7b7b7;
+    cursor: not-allowed;
+  }
+  
+  .feedback-container {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .feedback {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 400px;
+  }
+  
+  .feedback i {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+  
+  .feedback h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+  }
+  
+  .feedback p {
+    margin: 0;
+    color: #666;
+  }
+  
+  .correct-feedback i {
+    color: #28a745;
+  }
+  
+  .incorrect-feedback i {
+    color: #dc3545;
+  }
+  
+  .no-exercises {
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .empty-state {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .empty-state i {
+    font-size: 50px;
+    color: #b7b7b7;
+    margin-bottom: 20px;
+  }
+  
+  .empty-state h2 {
+    margin: 0 0 15px 0;
+  }
+  
+  .empty-state p {
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .results-container {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 30px;
+  }
+  
+  .results-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .results-header h2 {
+    margin: 0 0 30px 0;
+    font-size: 2rem;
+    color: #4e73df;
+  }
+  
+  .results-stats {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+  }
+  
+  .result-stat {
+    text-align: center;
+  }
+  
+  .stat-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  
+  .result-stat:nth-child(1) .stat-icon i {
+    color: #28a745;
+  }
+  
+  .result-stat:nth-child(2) .stat-icon i {
+    color: #dc3545;
+  }
+  
+  .result-stat:nth-child(3) .stat-icon i {
+    color: #ffc107;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .stat-label {
+    color: #666;
+  }
+  
+  .results-message {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+  }
+  
+  .achievement {
+    display: flex;
+    align-items: center;
+    background-color: #fff3cd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .achievement-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #ffeeba;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    font-size: 24px;
+    color: #856404;
+  }
+  
+  .achievement-info h3 {
+    margin: 0 0 5px 0;
+    color: #856404;
+  }
+  
+  .achievement-info p {
+    margin: 0;
+    color: #856404;
+  }
+  
+  .results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .btn {
+    display: inline-block;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-primary {
+    background-color: #4e73df;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2e59d9;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background-color: #f8f9fa;
+    color: #4e73df;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e8eaed;
+    color: #2e59d9;
+  }
+  
+  @media (max-width: 768px) {
+    .lesson-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .lesson-progress {
+      align-self: center;
+    }
+    
+    .lesson-resources {
+      grid-template-columns: 1fr;
+    }
+    
+    .matching-game {
+      flex-direction: column;
+    }
+    
+    .results-stats {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .results-actions {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Eğer hiç egzersiz yoksa bu kısmı atla
+    if (!document.getElementById('current-exercise')) return;
+    
+    const exerciseData = {{ lesson.exercises|tojson }};
+    let currentExerciseIndex = 0;
+    let correctAnswers = 0;
+    let incorrectAnswers = 0;
+    let remainingLives = 3;
+    let selectedOption = null;
+    let selectedMatches = [];
+    
+    const currentExerciseEl = document.getElementById('current-exercise');
+    const optionsContainer = document.getElementById('options-container');
+    const checkAnswerBtn = document.getElementById('check-answer');
+    const continueBtn = document.getElementById('continue-btn');
+    const completeBtn = document.getElementById('complete-btn');
+    const feedbackContainer = document.getElementById('feedback-container');
+    const correctFeedback = document.querySelector('.correct-feedback');
+    const incorrectFeedback = document.querySelector('.incorrect-feedback');
+    const correctAnswerText = document.getElementById('correct-answer');
+    const progressFill = document.querySelector('.progress-fill');
+    const currentQuestionText = document.getElementById('current-question');
+    const progressCircle = document.getElementById('lesson-progress-circle');
+    const hintButton = document.getElementById('hint-button');
+    
+    const resultsContainer = document.getElementById('results-container');
+    const correctCountEl = document.getElementById('correct-count');
+    const incorrectCountEl = document.getElementById('incorrect-count');
+    const xpEarnedEl = document.getElementById('xp-earned');
+    const resultsFeedbackEl = document.getElementById('results-feedback');
+    
+    // İlk sorunun ilerleme durumunu ayarla
+    updateProgressBar();
+    
+    // Seçenek seçme işlevi - çoktan seçmeli ve çeviri soruları için
+    if (exerciseData[0].type === 'translation' || exerciseData[0].type === 'multiple_choice') {
+      const options = document.querySelectorAll('.option');
+      options.forEach(option => {
+        option.addEventListener('click', function() {
+          // Önceki seçileni temizle
+          options.forEach(opt => opt.classList.remove('selected'));
+          // Yeni seçileni işaretle
+          this.classList.add('selected');
+          selectedOption = this.dataset.value;
+          checkAnswerBtn.disabled = false;
+        });
+      });
+    }
+    
+    // Eşleştirme oyunu için
+    if (exerciseData[0].type === 'matching') {
+      const matchingItems = document.querySelectorAll('.matching-item');
+      matchingItems.forEach(item => {
+        item.addEventListener('click', function() {
+          if (this.classList.contains('matched')) return;
+          
+          const pairId = this.dataset.pairId;
+          const columnType = this.parentElement.id;
+          
+          // Eğer zaten seçili bir öğe varsa, onunla eşleştirmeyi dene
+          if (selectedMatches.length > 0 && selectedMatches[0].columnType !== columnType) {
+            const existingMatch = selectedMatches[0];
+            
+            // Eğer doğru eşleşme varsa
+            if (existingMatch.pairId === pairId) {
+              // Her iki öğeyi de eşleştirilmiş olarak işaretle
+              this.classList.add('matched');
+              document.querySelector(`.matching-item.selected`).classList.add('matched');
+              document.querySelector(`.matching-item.selected`).classList.remove('selected');
+              
+              // Eşleşmeyi temizle
+              selectedMatches = [];
+              
+              // Tüm eşleştirmeler tamamlandıysa kontrol butonu aktif olsun
+              const unmatchedItems = document.querySelectorAll('.matching-item:not(.matched)');
+              if (unmatchedItems.length === 0) {
+                checkAnswerBtn.disabled = false;
+              }
+            } else {
+              // Eşleşme başarısız, önceki seçimi temizle
+              document.querySelector(`.matching-item.selected`).classList.remove('selected');
+              selectedMatches = [];
+              
+              // Yeni öğeyi seç
+              this.classList.add('selected');
+              selectedMatches.push({
+                pairId: pairId,
+                columnType: columnType
+              });
+            }
+          } else {
+            // Önceki seçileni temizle (aynı sütunda)
+            const sameColumnSelected = document.querySelector(`#${columnType} .matching-item.selected`);
+            if (sameColumnSelected) {
+              sameColumnSelected.classList.remove('selected');
+              selectedMatches = [];
+            }
+            
+            // Yeni öğeyi seç
+            this.classList.add('selected');
+            selectedMatches.push({
+              pairId: pairId,
+              columnType: columnType
+            });
+          }
+        });
+      });
+    }
+    
+    // Doğru cevabı kontrol et
+    checkAnswerBtn.addEventListener('click', function() {
+      let isCorrect = false;
+      const currentExercise = exerciseData[currentExerciseIndex];
+      
+      // Egzersiz tipine göre doğrulama
+      if (currentExercise.type === 'translation' || currentExercise.type === 'multiple_choice') {
+        isCorrect = selectedOption === currentExercise.correct;
+      } else if (currentExercise.type === 'matching') {
+        // Eşleştirme egzersizlerinde tüm öğelerin eşleştirilmiş olup olmadığını kontrol et
+        const unmatchedItems = document.querySelectorAll('.matching-item:not(.matched)');
+        isCorrect = unmatchedItems.length === 0;
+      }
+      
+      // Sonucu göster
+      feedbackContainer.style.display = 'block';
+      
+      if (isCorrect) {
+        correctAnswers++;
+        correctFeedback.style.display = 'block';
+        incorrectFeedback.style.display = 'none';
+      } else {
+        incorrectAnswers++;
+        remainingLives--;
+        incorrectFeedback.style.display = 'block';
+        correctFeedback.style.display = 'none';
+        
+        // Doğru cevabı göster
+        if (currentExercise.type === 'translation' || currentExercise.type === 'multiple_choice') {
+          correctAnswerText.textContent = currentExercise.correct;
+        } else {
+          correctAnswerText.textContent = 'Eşleştirmeleri doğru şekilde tamamlayamamışsınız.';
+        }
+        
+        // Kalan canları güncelle
+        updateLives();
+      }
+      
+      // Butonları güncelle
+      checkAnswerBtn.style.display = 'none';
+      
+      // Eğer son soru ise veya can kalmadıysa
+      if (currentExerciseIndex === exerciseData.length - 1 || remainingLives === 0) {
+        completeBtn.style.display = 'block';
+      } else {
+        continueBtn.style.display = 'block';
+      }
+    });
+    
+    // Sonraki soruya geç
+    continueBtn.addEventListener('click', function() {
+      currentExerciseIndex++;
+      updateExercise();
+      
+      // Geri bildirim panelini gizle
+      feedbackContainer.style.display = 'none';
+      continueBtn.style.display = 'none';
+      checkAnswerBtn.style.display = 'block';
+      checkAnswerBtn.disabled = true;
+    });
+    
+    // Dersi tamamla
+    completeBtn.addEventListener('click', function() {
+      // Egzersiz container'ını gizle
+      document.getElementById('exercise-container').style.display = 'none';
+      
+      // Sonuç sayfasını göster
+      resultsContainer.style.display = 'block';
+      
+      // Sonuçları güncelle
+      correctCountEl.textContent = correctAnswers;
+      incorrectCountEl.textContent = incorrectAnswers;
+      
+      // XP'yi hesapla (doğru cevap başına 10 XP)
+      const xpEarned = correctAnswers * 10;
+      xpEarnedEl.textContent = xpEarned;
+      
+      // Geri bildirim mesajını güncelle
+      if (correctAnswers === exerciseData.length) {
+        resultsFeedbackEl.textContent = 'Mükemmel! Tüm soruları doğru yanıtladın.';
+      } else if (correctAnswers > exerciseData.length / 2) {
+        resultsFeedbackEl.textContent = 'Harika iş! Çoğu soruyu doğru yanıtladın.';
+      } else {
+        resultsFeedbackEl.textContent = 'İyi bir başlangıç. Pratik yapmaya devam et.';
+      }
+      
+      // Sonuçları kaydet (gerçek bir uygulamada API ile yapılır)
+      saveResults(xpEarned);
+    });
+    
+    // İpucu butonu
+    hintButton.addEventListener('click', function() {
+      // İpucu vermek için bir alert göster
+      // Gerçek uygulamada daha sofistike bir ipucu sistemi olabilir
+      const currentExercise = exerciseData[currentExerciseIndex];
+      let hintMessage = '';
+      
+      if (currentExercise.type === 'translation') {
+        hintMessage = 'İpucu: Bu kelimenin ilk harfi "' + currentExercise.correct.charAt(0) + '" ile başlar.';
+      } else if (currentExercise.type === 'multiple_choice') {
+        hintMessage = 'İpucu: Diğer seçenekleri eleyerek doğru cevaba ulaşabilirsiniz.';
+      } else if (currentExercise.type === 'matching') {
+        hintMessage = 'İpucu: Önce bildiğiniz kelimeleri eşleştirerek başlayın.';
+      }
+      
+      alert(hintMessage);
+    });
+    
+    // Egzersizi güncelle
+    function updateExercise() {
+      const currentExercise = exerciseData[currentExerciseIndex];
+      
+      // Soru sayısını güncelle
+      currentQuestionText.textContent = currentExerciseIndex + 1;
+      
+      // İlerleme çubuğunu güncelle
+      updateProgressBar();
+      
+      // Egzersiz tipini güncelle
+      const exerciseTypeEl = document.querySelector('.exercise-type');
+      exerciseTypeEl.textContent = currentExercise.type.charAt(0).toUpperCase() + currentExercise.type.slice(1);
+      
+      // Soru içeriğini güncelle
+      const questionContainer = document.querySelector('.question-container');
+      
+      if (currentExercise.type === 'translation') {
+        questionContainer.innerHTML = `
+          <h2>${currentExercise.question}</h2>
+          <p class="question-subtitle">Cümlenin çevirisini seçin</p>
+        `;
+      } else if (currentExercise.type === 'multiple_choice') {
+        questionContainer.innerHTML = `
+          <h2>${currentExercise.question}</h2>
+        `;
+      } else if (currentExercise.type === 'matching') {
+        questionContainer.innerHTML = `
+          <h2>Doğru eşleştirmeleri yapın</h2>
         `;
       }
       
-      // HTML'i sayfaya ekle
-      exerciseContainer.innerHTML = html;
-      
-      // Egzersiz tipine göre olay dinleyicileri ekle
-      if (exercise.type === 'translation' || exercise.type === 'multiple_choice') {
-        const options = document.querySelectorAll('.option');
-        
-        options.forEach(option => {
-          option.addEventListener('click', function() {
-            // Önceden seçilmiş seçeneği temizle
-            document.querySelectorAll('.option.selected').forEach(el => {
-              el.classList.remove('selected');
-            });
-            
-            // Bu seçeneği seçili olarak işaretle
+      // Seçenekleri güncelle
+      if (currentExercise.type === 'translation' || currentExercise.type === 'multiple_choice') {
+        optionsContainer.innerHTML = '';
+        currentExercise.options.forEach(option => {
+          const optionEl = document.createElement('div');
+          optionEl.className = 'option';
+          optionEl.dataset.value = option;
+          optionEl.textContent = option;
+          optionEl.addEventListener('click', function() {
+            // Önceki seçileni temizle
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            // Yeni seçileni işaretle
             this.classList.add('selected');
-            
-            // Kontrol butonunu aktifleştir
-            if (checkBtn) {
-              checkBtn.classList.remove('disabled');
-            }
-            
-            // Kullanıcı seçimini kaydet
-            userChoices = parseInt(this.getAttribute('data-index'));
+            selectedOption = this.dataset.value;
+            checkAnswerBtn.disabled = false;
           });
+          optionsContainer.appendChild(optionEl);
         });
-      } else if (exercise.type === 'matching') {
-        // Matching egzersizleri için işaretleme sistemi eklenecek
-        // Basitlik için şimdilik bir yöntem ekleyeceğiz
-        const matchingTerms = document.querySelectorAll('.foreign-term');
+      } else if (currentExercise.type === 'matching') {
+        optionsContainer.innerHTML = `
+          <div class="matching-game">
+            <div class="matching-column" id="native-column">
+              ${currentExercise.pairs.map((pair, index) => `
+                <div class="matching-item" data-pair-id="${index + 1}">${pair.native}</div>
+              `).join('')}
+            </div>
+            <div class="matching-column" id="foreign-column">
+              ${shuffleArray([...currentExercise.pairs]).map((pair, index) => `
+                <div class="matching-item" data-pair-id="${currentExercise.pairs.findIndex(p => p.foreign === pair.foreign) + 1}">${pair.foreign}</div>
+              `).join('')}
+            </div>
+          </div>
+        `;
         
-        matchingTerms.forEach(term => {
-          term.addEventListener('click', function() {
-            // Bu terimi seçili yap 
-            if (!this.classList.contains('selected')) {
-              document.querySelectorAll('.foreign-term.selected').forEach(el => {
-                el.classList.remove('selected');
-              });
-              this.classList.add('selected');
-            } else {
-              this.classList.remove('selected');
-            }
+        // Eşleştirme olaylarını yeniden ekle
+        const matchingItems = document.querySelectorAll('.matching-item');
+        matchingItems.forEach(item => {
+          item.addEventListener('click', function() {
+            if (this.classList.contains('matched')) return;
             
-            // Tüm terimler eşleştirildiğinde kontrol butonunu aktifleştir
-            const allMatched = document.querySelectorAll('.foreign-term.matched').length === exercise.pairs.length;
-            if (allMatched && checkBtn) {
-              checkBtn.classList.remove('disabled');
-              userChoices = true;
-            }
-          });
-        });
-        
-        // Basitleştirilmiş eşleştirme - gerçek uygulamada sürükle bırak kullanılabilir
-        const nativeTerms = document.querySelectorAll('.native-term');
-        
-        nativeTerms.forEach(term => {
-          term.addEventListener('click', function() {
-            const selectedForeign = document.querySelector('.foreign-term.selected');
+            const pairId = this.dataset.pairId;
+            const columnType = this.parentElement.id;
             
-            if (selectedForeign) {
-              const nativeIndex = parseInt(this.getAttribute('data-index'));
-              const foreignIndex = parseInt(selectedForeign.getAttribute('data-index'));
+            // Eğer zaten seçili bir öğe varsa, onunla eşleştirmeyi dene
+            if (selectedMatches.length > 0 && selectedMatches[0].columnType !== columnType) {
+              const existingMatch = selectedMatches[0];
               
-              // Doğru eşleştirme yapıldıysa
-              if (nativeIndex === foreignIndex) {
-                selectedForeign.classList.remove('selected', 'unmatched');
-                selectedForeign.classList.add('matched');
+              // Eğer doğru eşleşme varsa
+              if (existingMatch.pairId === pairId) {
+                // Her iki öğeyi de eşleştirilmiş olarak işaretle
                 this.classList.add('matched');
-              } else {
-                // Yanlış eşleştirme - görsel geri bildirim
-                term.classList.add('error');
-                selectedForeign.classList.add('error');
+                document.querySelector(`.matching-item.selected`).classList.add('matched');
+                document.querySelector(`.matching-item.selected`).classList.remove('selected');
                 
-                setTimeout(() => {
-                  term.classList.remove('error');
-                  selectedForeign.classList.remove('error', 'selected');
-                }, 800);
+                // Eşleşmeyi temizle
+                selectedMatches = [];
+                
+                // Tüm eşleştirmeler tamamlandıysa kontrol butonu aktif olsun
+                const unmatchedItems = document.querySelectorAll('.matching-item:not(.matched)');
+                if (unmatchedItems.length === 0) {
+                  checkAnswerBtn.disabled = false;
+                }
+              } else {
+                // Eşleşme başarısız, önceki seçimi temizle
+                document.querySelector(`.matching-item.selected`).classList.remove('selected');
+                selectedMatches = [];
+                
+                // Yeni öğeyi seç
+                this.classList.add('selected');
+                selectedMatches.push({
+                  pairId: pairId,
+                  columnType: columnType
+                });
+              }
+            } else {
+              // Önceki seçileni temizle (aynı sütunda)
+              const sameColumnSelected = document.querySelector(`#${columnType} .matching-item.selected`);
+              if (sameColumnSelected) {
+                sameColumnSelected.classList.remove('selected');
+                selectedMatches = [];
               }
               
-              // Tüm terimler eşleştirildiğinde kontrol butonunu aktifleştir
-              const allMatched = document.querySelectorAll('.foreign-term.matched').length === exercise.pairs.length;
-              if (allMatched && checkBtn) {
-                checkBtn.classList.remove('disabled');
-                userChoices = true;
-              }
+              // Yeni öğeyi seç
+              this.classList.add('selected');
+              selectedMatches.push({
+                pairId: pairId,
+                columnType: columnType
+              });
             }
           });
         });
       }
-    }
-    
-    // Kullanıcının cevabını kontrol et
-    function checkAnswer() {
-      const exercise = exercises[currentExerciseIndex];
-      let isCorrect = false;
       
-      if (exercise.type === 'translation' || exercise.type === 'multiple_choice') {
-        const selectedOption = document.querySelector('.option.selected');
-        if (!selectedOption) return;
-        
-        const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
-        isCorrect = exercise.options[selectedIndex] === exercise.correct;
-        
-        // Görsel geri bildirim
-        if (isCorrect) {
-          selectedOption.classList.add('correct');
-          correctAnswers++;
-        } else {
-          selectedOption.classList.add('incorrect');
-          
-          // Doğru cevabı göster
-          const correctIndex = exercise.options.indexOf(exercise.correct);
-          const options = document.querySelectorAll('.option');
-          if (options[correctIndex]) {
-            options[correctIndex].classList.add('correct');
-          }
-        }
-      } else if (exercise.type === 'matching') {
-        // Tüm eşleştirmeler tamamlandıysa, zaten doğru kabul edilir
-        isCorrect = true;
-        correctAnswers++;
-      }
-      
-      // Kontrol butonunu gizle, devam butonunu göster
-      if (checkBtn) checkBtn.style.display = 'none';
-      if (continueBtn) continueBtn.style.display = 'block';
+      // Seçili seçeneği sıfırla
+      selectedOption = null;
+      selectedMatches = [];
     }
     
     // İlerleme çubuğunu güncelle
     function updateProgressBar() {
-      if (!progressBar) return;
+      const progress = ((currentExerciseIndex + 1) / exerciseData.length) * 100;
+      progressFill.style.width = `${progress}%`;
       
-      const progress = ((currentExerciseIndex + 1) / exercises.length) * 100;
-      progressBar.style.width = `${progress}%`;
+      // Ders ilerleme dairesini de güncelle
+      progressCircle.style.setProperty('--progress', `${progress}%`);
+      progressCircle.querySelector('.progress-text').textContent = `${Math.round(progress)}%`;
     }
     
-    // Ders tamamlandı ekranını göster
-    function showLessonComplete() {
-      if (!exerciseContainer) return;
+    // Kalan canları güncelle
+    function updateLives() {
+      const livesIcons = document.querySelectorAll('.lives i');
       
-      const accuracy = Math.floor((correctAnswers / exercises.length) * 100);
+      livesIcons.forEach((icon, index) => {
+        if (index < remainingLives) {
+          icon.className = 'fas fa-heart';
+        } else {
+          icon.className = 'far fa-heart';
+        }
+      });
+    }
+    
+    // Sonuçları kaydet
+    function saveResults(xpEarned) {
+      // Gerçek bir uygulamada API ile sonuçları kaydedebilirsiniz
+      console.log('Sonuçlar kaydedildi:', {
+        correctAnswers,
+        incorrectAnswers,
+        xpEarned
+      });
       
-      exerciseContainer.innerHTML = `
-        <div class="lesson-complete">
-          <div class="lesson-complete-header">
-            <i class="fas fa-trophy"></i>
-            <h2>Tebrikler! Dersi tamamladınız.</h2>
-          </div>
-          <div class="lesson-results">
-            <div class="result-item">
-              <span class="result-label">Doğruluk:</span>
-              <span class="result-value">${accuracy}%</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Doğru Cevaplar:</span>
-              <span class="result-value">${correctAnswers} / ${exercises.length}</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Kazanılan XP:</span>
-              <span class="result-value">+${Math.max(5, correctAnswers * 5)} XP</span>
-            </div>
-          </div>
-          <div class="lesson-complete-actions">
-            <a href="{{ url_for('language_learning') }}" class="action-btn back-to-lessons">Derslere Dön</a>
-            <a href="{{ url_for('language_lesson', lesson_id=lesson_id, lang=selected_language) }}" class="action-btn retry-lesson">Dersi Tekrarla</a>
-          </div>
-        </div>
-      `;
-      
-      // Navigasyon butonlarını gizle
-      const navigation = document.querySelector('.lesson-navigation');
-      if (navigation) {
-        navigation.style.display = 'none';
+      // Ayrıca sunucuya da gönderebilirsiniz (simüle edilmiş)
+      setTimeout(() => {
+        console.log('Sunucuya kaydedildi');
+      }, 1000);
+    }
+    
+    // Yardımcı fonksiyonlar
+    function shuffleArray(array) {
+      // Fisher-Yates algoritması ile diziyi karıştır
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
+      return shuffled;
     }
-    
-    // İlk ilerleme çubuğu güncellemesi
-    updateProgressBar();
   });
 </script>
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/language_lesson.css') }}">
 {% endblock %}

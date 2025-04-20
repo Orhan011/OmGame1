@@ -77,6 +77,7 @@
           <button class="key-btn" data-key="T">T</button>
           <button class="key-btn" data-key="Y">Y</button>
           <button class="key-btn" data-key="U">U</button>
+          <button class="key-btn" data-key="I">I</button>
           <button class="key-btn" data-key="İ">İ</button>
           <button class="key-btn" data-key="O">O</button>
           <button class="key-btn" data-key="P">P</button>
@@ -88,6 +89,7 @@
           <button class="key-btn" data-key="D">D</button>
           <button class="key-btn" data-key="F">F</button>
           <button class="key-btn" data-key="G">G</button>
+          <button class="key-btn" data-key="Ğ">Ğ</button>
           <button class="key-btn" data-key="H">H</button>
           <button class="key-btn" data-key="J">J</button>
           <button class="key-btn" data-key="K">K</button>
@@ -95,15 +97,19 @@
           <div class="keyboard-spacer"></div>
         </div>
         <div class="keyboard-row">
-          <div class="keyboard-spacer-large"></div>
+          <div class="keyboard-spacer-small"></div>
           <button class="key-btn" data-key="Z">Z</button>
           <button class="key-btn" data-key="X">X</button>
           <button class="key-btn" data-key="C">C</button>
+          <button class="key-btn" data-key="Ç">Ç</button>
           <button class="key-btn" data-key="V">V</button>
           <button class="key-btn" data-key="B">B</button>
           <button class="key-btn" data-key="N">N</button>
           <button class="key-btn" data-key="M">M</button>
-          <div class="keyboard-spacer-large"></div>
+          <button class="key-btn" data-key="Ö">Ö</button>
+          <button class="key-btn" data-key="Ü">Ü</button>
+          <button class="key-btn" data-key="Ş">Ş</button>
+          <div class="keyboard-spacer-small"></div>
         </div>
       </div>
 
@@ -484,6 +490,10 @@
 
 .keyboard-spacer-large {
   width: 16px;
+}
+
+.keyboard-spacer-small {
+  width: 4px;
 }
 
 .key-btn {
@@ -1031,11 +1041,21 @@ document.addEventListener('DOMContentLoaded', function() {
       {word: "KAPI", category: "Ev Eşyası", hint: "Bir odaya giriş sağlayan açılır kapanır parça"},
       {word: "KALEM", category: "Kırtasiye", hint: "Yazı yazmak için kullanılan araç"},
       {word: "KÖPEK", category: "Hayvan", hint: "En popüler evcil hayvanlardan biri"},
-{word: "KEDI", category: "Hayvan", hint: "Miyavlayan tüylü evcil hayvan"},
+      {word: "KEDI", category: "Hayvan", hint: "Miyavlayan tüylü evcil hayvan"},
       {word: "SU", category: "İçecek", hint: "Hayat kaynağı olan renksiz içecek"},
       {word: "GÖZ", category: "Vücut", hint: "Görmeyi sağlayan organ"},
       {word: "TOP", category: "Oyuncak", hint: "Yuvarlak şekilli oyun aracı"},
-      {word: "EV", category: "Yapı", hint: "İnsanların yaşadığı barınak"}
+      {word: "EV", category: "Yapı", hint: "İnsanların yaşadığı barınak"},
+      {word: "KIŞ", category: "Mevsim", hint: "Kar yağan soğuk mevsim"},
+      {word: "YAZ", category: "Mevsim", hint: "En sıcak mevsim"},
+      {word: "KUŞ", category: "Hayvan", hint: "Gökyüzünde uçan canlı"},
+      {word: "DİŞ", category: "Vücut", hint: "Yemek yemeye yarayan sert parça"},
+      {word: "KAŞ", category: "Vücut", hint: "Gözlerin üzerindeki kıllı bölge"},
+      {word: "SAÇ", category: "Vücut", hint: "Baş derisini kaplayan kıllar"},
+      {word: "DAĞ", category: "Doğa", hint: "Yüksek tepeli arazi"},
+      {word: "GÜL", category: "Bitki", hint: "Güzel kokulu dikenli çiçek"},
+      {word: "TAŞ", category: "Doğa", hint: "Sert, katı mineral madde"},
+      {word: "YOL", category: "Ulaşım", hint: "Gidilecek yeri gösteren hat"}
     ],
     medium: [
       {word: "TELEFON", category: "Teknoloji", hint: "İletişim kurmak için kullanılan elektronik cihaz"},
@@ -1047,7 +1067,17 @@ document.addEventListener('DOMContentLoaded', function() {
       {word: "ANKARA", category: "Şehir", hint: "Türkiye'nin başkenti"},
       {word: "BUZDOLABI", category: "Elektrikli Eşya", hint: "Yiyecekleri taze tutmak için kullanılan cihaz"},
       {word: "KAHVE", category: "İçecek", hint: "Kafeini ile bilinen sıcak içecek"},
-      {word: "TAVŞAN", category: "Hayvan", hint: "Uzun kulaklı, hızlı koşan memeli hayvan"}
+      {word: "TAVŞAN", category: "Hayvan", hint: "Uzun kulaklı, hızlı koşan memeli hayvan"},
+      {word: "HASTANE", category: "Bina", hint: "Hastaların tedavi edildiği yer"},
+      {word: "OKUL", category: "Eğitim", hint: "Öğrencilerin eğitim aldığı kurum"},
+      {word: "OTOBÜS", category: "Ulaşım", hint: "Toplu taşıma aracı"},
+      {word: "ANAHTAR", category: "Eşya", hint: "Kilidi açmaya yarayan alet"},
+      {word: "TELEVİZYON", category: "Teknoloji", hint: "Görüntü ve ses yayını yapan cihaz"},
+      {word: "ÇANTA", category: "Aksesuar", hint: "Eşya taşımaya yarayan ürün"},
+      {word: "KÜTÜPHANE", category: "Mekan", hint: "Kitapların bulunduğu yer"},
+      {word: "BİSİKLET", category: "Ulaşım", hint: "Pedal çevrilerek kullanılan taşıt"},
+      {word: "ÇİKOLATA", category: "Tatlı", hint: "Kakaolu tatlı yiyecek"},
+      {word: "SÖZLÜK", category: "Kitap", hint: "Kelimelerin anlamlarını açıklayan kitap"}
     ],
     hard: [
       {word: "KÜTÜPHANE", category: "Mekan", hint: "Kitapların saklandığı ve ödünç alındığı yer"},
@@ -1059,7 +1089,17 @@ document.addEventListener('DOMContentLoaded', function() {
       {word: "DEMOKRASİ", category: "Siyaset", hint: "Halkın kendi kendini yönetme biçimi"},
       {word: "MÜZE", category: "Kültür", hint: "Tarihi eserlerin sergilendiği yer"},
       {word: "SPOR", category: "Aktivite", hint: "Fiziksel çaba gerektiren yarışmalı aktivite"},
-      {word: "ÜNİVERSİTE", category: "Eğitim", hint: "Yüksek eğitim veren kurum"}
+      {word: "ÜNİVERSİTE", category: "Eğitim", hint: "Yüksek eğitim veren kurum"},
+      {word: "ANTROPOLOJİ", category: "Bilim", hint: "İnsan kültürünü ve evrimini inceleyen bilim"},
+      {word: "SÜRDÜRÜLEBİLİRLİK", category: "Çevre", hint: "Doğal kaynakları koruyarak gelecek nesillere aktarma"},
+      {word: "KÜRESELLEŞTİRME", category: "Ekonomi", hint: "Dünya çapında bütünleşme süreci"},
+      {word: "KORPORATİF", category: "İş Dünyası", hint: "Şirketlerle ilgili, kurumsal"},
+      {word: "GASTRONOMİ", category: "Mutfak", hint: "Yemek sanatı ve kültürü bilimi"},
+      {word: "MİMARLIK", category: "Meslek", hint: "Yapı tasarımı sanatı"},
+      {word: "ENDÜSTRİYEL", category: "Sanayi", hint: "Sanayiye ait veya sanayi ile ilgili"},
+      {word: "FOTOSENTEZ", category: "Biyoloji", hint: "Bitkilerin güneş ışığını besin enerjisine dönüştürme süreci"},
+      {word: "JURİSDİKSİYON", category: "Hukuk", hint: "Hukuki yetki alanı"},
+      {word: "PARADİGMA", category: "Felsefe", hint: "Düşünce modeli veya örüntüsü"}
     ]
   };
 
@@ -1070,21 +1110,51 @@ document.addEventListener('DOMContentLoaded', function() {
       {word: "KUŞ", category: "Hayvan", hint: "Gökyüzünde uçan tüylü canlı"},
       {word: "YOL", category: "Yapı", hint: "Bir yerden bir yere gitmeyi sağlayan geçit"},
       {word: "DİŞ", category: "Vücut", hint: "Yemekleri çiğnemeye yarayan sert organ"},
-      {word: "GÜN", category: "Zaman", hint: "24 saatten oluşan zaman dilimi"}
+      {word: "GÜN", category: "Zaman", hint: "24 saatten oluşan zaman dilimi"},
+      {word: "ÇAY", category: "İçecek", hint: "Yaprakları demlenerek içilen sıcak içecek"},
+      {word: "BAŞ", category: "Vücut", hint: "Vücudun en üst kısmı"},
+      {word: "KAR", category: "Doğa", hint: "Gökyüzünden beyaz taneler halinde yağar"},
+      {word: "TUZ", category: "Gıda", hint: "Yemeklere tat veren beyaz kristal madde"},
+      {word: "GÖL", category: "Doğa", hint: "Etrafı kara ile çevrili su kütlesi"},
+      {word: "KOL", category: "Vücut", hint: "Omuzdan ele kadar uzanan uzuv"},
+      {word: "KIZ", category: "İnsan", hint: "Dişi çocuk"},
+      {word: "BAŞ", category: "Vücut", hint: "İnsanın düşünme organı"},
+      {word: "ÇİM", category: "Bitki", hint: "Yeşil ince yapraklı bitki örtüsü"},
+      {word: "KUM", category: "Doğa", hint: "Sahillerde bulunan minik tanecikler"}
     ],
     medium: [
       {word: "UÇURTMA", category: "Oyuncak", hint: "Rüzgarla havada uçabilen oyuncak"},
       {word: "KARANLIK", category: "Doğa", hint: "Işığın olmadığı durum"},
       {word: "FIRIN", category: "Mutfak", hint: "Yemek pişirmeye yarayan ısıtıcı cihaz"},
       {word: "TELEVİZYON", category: "Teknoloji", hint: "Görüntü ve ses ileten elektronik cihaz"},
-      {word: "HASTANE", category: "Mekan", hint: "Hastaların tedavi edildiği yer"}
+      {word: "HASTANE", category: "Mekan", hint: "Hastaların tedavi edildiği yer"},
+      {word: "KULALIK", category: "Teknoloji", hint: "Müzik dinlemek için kullanılan aksesuar"},
+      {word: "ÇATALKAŞIK", category: "Mutfak", hint: "Sofrada kullanılan yemek gereçleri"},
+      {word: "KAPLUMBAĞA", category: "Hayvan", hint: "Sırtında kabuğu olan yavaş hayvan"},
+      {word: "GÜNEŞGÖZLÜĞÜ", category: "Aksesuar", hint: "Gözleri güneşten koruyan aksesuar"},
+      {word: "BASKETBOL", category: "Spor", hint: "Topun çemberden geçirildiği oyun"},
+      {word: "MAĞAZA", category: "Ticaret", hint: "Alışveriş yapılan yer"},
+      {word: "RESTORAN", category: "Mekan", hint: "Dışarıda yemek yenilen yer"},
+      {word: "FOTOĞRAF", category: "Sanat", hint: "Anı yakalamak için çekilen görüntü"},
+      {word: "PASAPORT", category: "Seyahat", hint: "Yurtdışına çıkarken kullanılan resmi belge"},
+      {word: "CUMARTESI", category: "Zaman", hint: "Haftanın altıncı günü"}
     ],
     hard: [
       {word: "KÜRESELLEŞME", category: "Sosyoloji", hint: "Dünyanın ekonomik ve kültürel bütünleşmesi süreci"},
       {word: "SÜRDÜRÜLEBİLİRLİK", category: "Çevre", hint: "Kaynakları tüketmeden gelecek nesilleri düşünme"},
       {word: "ENTEGRASYON", category: "Sosyal", hint: "Farklı parçaların bir bütün haline gelmesi"},
       {word: "MİKROSKOP", category: "Bilim", hint: "Çok küçük nesneleri görmeyi sağlayan alet"},
-      {word: "REHABİLİTASYON", category: "Sağlık", hint: "İyileşme ve normale dönme süreci"}
+      {word: "REHABİLİTASYON", category: "Sağlık", hint: "İyileşme ve normale dönme süreci"},
+      {word: "KRİPTOGRAFİ", category: "Bilişim", hint: "Bilgileri şifreleme bilimi"},
+      {word: "KALORİFER", category: "Ev", hint: "Evleri ısıtmak için kullanılan sistem"},
+      {word: "BAĞIŞIKLIK", category: "Sağlık", hint: "Vücudun hastalıklara karşı savunma sistemi"},
+      {word: "PROTOKOL", category: "İş", hint: "Resmi işlerde izlenen yol ve kurallar"},
+      {word: "ARKEOLOJİ", category: "Bilim", hint: "Eski uygarlıkları ve kalıntılarını inceleyen bilim"},
+      {word: "PARLAMENTO", category: "Siyaset", hint: "Yasaların çıkarıldığı meclis"},
+      {word: "OTOMOTİV", category: "Sanayi", hint: "Motorlu taşıt üretim sektörü"},
+      {word: "KARŞILAŞTIRMA", category: "Düşünce", hint: "İki şeyi birbirine göre değerlendirme"},
+      {word: "ORGANİZASYON", category: "Etkinlik", hint: "Düzenli bir şekilde planlama ve gerçekleştirme"},
+      {word: "PERİYODİK", category: "Zaman", hint: "Belirli aralıklarla tekrarlanan"}
     ]
   };
 
@@ -1157,14 +1227,34 @@ document.addEventListener('DOMContentLoaded', function() {
   hintButton.addEventListener('click', function() {
     if (gameOver || hintUsed) return;
 
+    // Daha az ipucu verelim - kelimeyi tamamen vermek yerine sadece birkaç harf veya kategori bilgisi
+    let hint = '';
+    
+    // Zorluk seviyesine göre ipucunu ayarla
+    if (currentDifficulty === 'easy') {
+      // Kolay seviyede kelimenin ilk harfini göster
+      hint = `Kelimenin ilk harfi: "${currentWord[0]}"`;
+    } else if (currentDifficulty === 'medium') {
+      // Orta seviyede kelime uzunluğunu ve kategorisini göster
+      hint = `${currentWord.length} harfli bir ${currentCategory.toLowerCase()}`;
+    } else {
+      // Zor seviyede sadece bir ipucu ver
+      const randomHint = [
+        `Bu kelime ${currentWord.length} harften oluşur`,
+        `Bu kelime ${currentCategory} kategorisindedir`,
+        `Bu kelimenin ilk harfi "${currentWord[0]}"dir`
+      ];
+      hint = randomHint[Math.floor(Math.random() * randomHint.length)];
+    }
+
     // İpucunu göster
-    hintText.textContent = currentHint;
+    hintText.textContent = hint;
     hintButton.disabled = true;
     hintButton.style.opacity = 0.5;
     hintUsed = true;
 
     // İpucu kullanıldığında puandan düşürelim
-    score -= 5;
+    score -= 10;
   });
 
   // Tekrar oynama düğmesi

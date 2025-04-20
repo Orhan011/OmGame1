@@ -469,6 +469,24 @@ document.addEventListener('DOMContentLoaded', function() {
       // Seviyeyi yükselt ve yeni labirent oluştur
       setTimeout(() => {
         currentLevel++;
+        
+        // Eğer maksimum seviyeye ulaşıldıysa oyunu bitir
+        const MAX_LEVEL = 5;
+        if (currentLevel > MAX_LEVEL) {
+          // Final skoru hesapla ve kaydet
+          const finalGameStats = {
+            totalLevelsCompleted: MAX_LEVEL,
+            difficulty: difficulty,
+            totalScore: totalScore,
+            totalTime: (Date.now() - gameStartTime) / 1000
+          };
+          
+          saveScore(totalScore, finalGameStats);
+          
+          // Oyunu bitir ve son skoru göster
+          showFinalScore(totalScore);
+          return;
+        }
 
         // Zorluk seviyesine göre labirent boyutunu artır
         mazeWidth = difficultyToSize(difficulty, currentLevel);

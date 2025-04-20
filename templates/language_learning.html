@@ -1,193 +1,2217 @@
 {% extends "layout.html" %}
 
+{% block title %}LangBlitz - OmGame{% endblock %}
+
 {% block content %}
-<div class="container language-learning-container">
-  <div class="page-title-section">
-    <div class="duolingo-header">
-      <div class="duo-owl-container">
-        <svg class="duo-owl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" fill="#58cc02" />
-          <circle cx="65" cy="80" r="25" fill="white" />
-          <circle cx="135" cy="80" r="25" fill="white" />
-          <circle cx="65" cy="80" r="15" fill="#1cb0f6" />
-          <circle cx="135" cy="80" r="15" fill="#1cb0f6" />
-          <circle cx="65" cy="75" r="7" fill="white" />
-          <circle cx="135" cy="75" r="7" fill="white" />
-          <ellipse cx="100" cy="130" rx="30" ry="20" fill="#fed5b2" />
-          <path d="M80,110 Q100,130 120,110" stroke="#784918" stroke-width="5" fill="none" />
-        </svg>
-      </div>
-      <div class="header-text">
-        <h1>Dil Ustası</h1>
-        <p>Eğlenceli ve ücretsiz dil öğrenme deneyimi</p>
-      </div>
-      <div class="header-actions">
-        <div class="xp-badge">
-          <i class="fas fa-star"></i>
-          <span>15 XP</span>
+<div class="container mt-3 mb-5">
+  <div class="language-learning-container">
+    <!-- Başlık ve Açıklama -->
+    <div class="language-header mb-4">
+      <h1 class="text-center language-title">Dil Öğrenmeye Başlayın</h1>
+      <p class="text-center language-subtitle">Kelime bilginizi test edin, yeni kelimeler öğrenin</p>
+    </div>
+
+    <!-- Dil Seçimi -->
+    <div class="language-selection mb-5">
+      <h3 class="language-section-title">Öğrenmek istediğiniz dili seçin</h3>
+      <div class="language-flags-row">
+        <div class="language-flag-item" data-language="en">
+          <div class="flag-container animate-float">
+            <img src="{{ url_for('static', filename='images/flags/gb.svg') }}" alt="İngilizce" class="flag-img">
+          </div>
+          <div class="flag-info">
+            <h5 class="highlight">İngilizce</h5>
+            <span>1000+ kelime</span>
+          </div>
         </div>
-        <div class="level-badge">
-          <i class="fas fa-crown"></i>
-          <span>Seviye 1</span>
+        <div class="language-flag-item disabled" data-language="fr">
+          <div class="flag-container">
+            <img src="{{ url_for('static', filename='images/flags/fr.svg') }}" alt="Fransızca" class="flag-img">
+          </div>
+          <div class="flag-info">
+            <h5>Fransızca</h5>
+            <span>Yakında <i class="fas fa-clock" style="font-size: 0.8rem; opacity: 0.7;"></i></span>
+          </div>
+        </div>
+        <div class="language-flag-item disabled" data-language="de">
+          <div class="flag-container">
+            <img src="{{ url_for('static', filename='images/flags/de.svg') }}" alt="Almanca" class="flag-img">
+          </div>
+          <div class="flag-info">
+            <h5>Almanca</h5>
+            <span>Yakında <i class="fas fa-clock" style="font-size: 0.8rem; opacity: 0.7;"></i></span>
+          </div>
+        </div>
+        <div class="language-flag-item disabled" data-language="es">
+          <div class="flag-container">
+            <img src="{{ url_for('static', filename='images/flags/es.svg') }}" alt="İspanyolca" class="flag-img">
+          </div>
+          <div class="flag-info">
+            <h5>İspanyolca</h5>
+            <span>Yakında <i class="fas fa-clock" style="font-size: 0.8rem; opacity: 0.7;"></i></span>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Seviye Seçimi -->
+    <div class="language-levels mb-5">
+      <h3 class="language-section-title">Zorluk seviyesini seçin</h3>
+      <div class="level-grid">
+        <div class="level-card" data-level="beginner">
+          <div class="level-icon">
+            <i class="fas fa-seedling"></i>
+          </div>
+          <div class="level-info">
+            <h4>Başlangıç</h4>
+            <p>Temel kelimeler ve ifadeler</p>
+          </div>
+        </div>
+        <div class="level-card" data-level="intermediate">
+          <div class="level-icon">
+            <i class="fas fa-tree"></i>
+          </div>
+          <div class="level-info">
+            <h4>Orta Seviye</h4>
+            <p>Günlük konuşma için yaygın kelimeler</p>
+          </div>
+        </div>
+        <div class="level-card" data-level="advanced">
+          <div class="level-icon">
+            <i class="fas fa-mountain"></i>
+          </div>
+          <div class="level-info">
+            <h4>İleri Seviye</h4>
+            <p>Karmaşık ve spesifik kelimeler</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Oyun Modu Seçimi -->
+    <div class="language-modes mb-5">
+      <h3 class="language-section-title">Öğrenme modunu seçin</h3>
+      <div class="mode-grid">
+        <div class="mode-card" data-mode="quiz">
+          <div class="mode-icon">
+            <i class="fas fa-question-circle"></i>
+          </div>
+          <div class="mode-info">
+            <h4>Quiz Modu</h4>
+            <p>Kelimeleri test edin</p>
+          </div>
+        </div>
+        <div class="mode-card" data-mode="flashcards">
+          <div class="mode-icon">
+            <i class="fas fa-clone"></i>
+          </div>
+          <div class="mode-info">
+            <h4>Kelime Kartları</h4>
+            <p>Yeni kelimeler öğrenin</p>
+          </div>
+        </div>
+        <div class="mode-card" data-mode="matching">
+          <div class="mode-icon">
+            <i class="fas fa-object-group"></i>
+          </div>
+          <div class="mode-info">
+            <h4>Eşleştirme</h4>
+            <p>Kelimeleri eşleştirin</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Başlat Butonu -->
+    <div class="text-center">
+      <button id="startLanguageLearning" class="start-learning-btn" disabled>
+        <i class="fas fa-play-circle me-2"></i>Öğrenmeye Başla
+      </button>
     </div>
   </div>
 
-  <div class="language-selection">
-    <h2>Öğrenmek İstediğiniz Dili Seçin</h2>
-    <div class="language-flags">
-      {% for language in languages %}
-      <div class="language-option {% if loop.first %}active{% endif %}" data-lang="{{ language.code }}">
-        <div class="flag-container">
-          <img src="https://flagcdn.com/w80/{{ language.flag }}.png" alt="{{ language.name }} bayrağı">
+  <!-- Quiz Sorusu Modal -->
+  <div class="modal fade" id="quizModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-graduation-cap me-2"></i>Kelime Quizi</h5>
+          <div class="question-counter">
+            <span id="currentQuestion">1</span>/<span id="totalQuestions">10</span>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
         </div>
-        <span class="language-name">{{ language.name }}</span>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div class="lessons-section">
-    <h2>Dersler</h2>
-    <div class="lesson-progress-container">
-      <div class="level-progress">
-        <div class="level-indicator">Seviye 1</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 15%;"></div>
-        </div>
-        <div class="xp-indicator">15 XP / 100 XP</div>
-      </div>
-    </div>
-
-    <div class="lessons-grid">
-      {% for lesson in lessons %}
-      <div class="lesson-card" data-lesson-id="{{ lesson.id }}">
-        <div class="lesson-icon">
-          {% if lesson.id == 1 %}
-          <i class="fas fa-comment"></i>
-          {% elif lesson.id == 2 %}
-          <i class="fas fa-handshake"></i>
-          {% elif lesson.id == 3 %}
-          <i class="fas fa-utensils"></i>
-          {% elif lesson.id == 4 %}
-          <i class="fas fa-plane"></i>
-          {% elif lesson.id == 5 %}
-          <i class="fas fa-shopping-bag"></i>
-          {% else %}
-          <i class="fas fa-book"></i>
-          {% endif %}
-        </div>
-        <div class="lesson-info">
-          <h3>{{ lesson.title }}</h3>
-          <p>{{ lesson.description }}</p>
-          <div class="lesson-meta">
-            <span class="difficulty-badge 
-              {% if lesson.difficulty == 'Kolay' %}easy{% elif lesson.difficulty == 'Orta' %}medium{% else %}hard{% endif %}">
-              {{ lesson.difficulty }}
-            </span>
-            <div class="lesson-progress">
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ lesson.progress }}%;"></div>
+        <div class="modal-body">
+          <div class="quiz-container">
+            <div class="question-container">
+              <div class="time-indicator mb-2">
+                <div class="progress" style="height: 6px;">
+                  <div id="timeProgress" class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
               </div>
-              <span class="progress-text">{{ lesson.progress }}%</span>
+              <h3 id="questionWord" class="question-word animate-float">Apple</h3>
+              <p class="question-text">Bu kelimenin Türkçe karşılığı nedir?</p>
+            </div>
+            <div class="options-container">
+              <button class="option-btn" data-answer="Elma">
+                <span class="option-text">Elma</span>
+                <span class="option-result-icon"></span>
+              </button>
+              <button class="option-btn" data-answer="Armut">
+                <span class="option-text">Armut</span>
+                <span class="option-result-icon"></span>
+              </button>
+              <button class="option-btn" data-answer="Muz">
+                <span class="option-text">Muz</span>
+                <span class="option-result-icon"></span>
+              </button>
+              <button class="option-btn" data-answer="Üzüm">
+                <span class="option-text">Üzüm</span>
+                <span class="option-result-icon"></span>
+              </button>
             </div>
           </div>
         </div>
-        <a href="/language-lesson/{{ lesson.id }}?lang=en" class="lesson-btn">Başla</a>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div class="daily-goals">
-    <h2>Günlük Hedefler</h2>
-    <div class="goals-container">
-      <div class="goal-item">
-        <div class="goal-icon"><i class="fas fa-fire"></i></div>
-        <div class="goal-info">
-          <h3>3 Gün Serisi</h3>
-          <p>Her gün bir ders tamamlayarak serinizi uzatın!</p>
-          <div class="streak-progress">
-            <div class="streak-day complete"><i class="fas fa-check"></i></div>
-            <div class="streak-day complete"><i class="fas fa-check"></i></div>
-            <div class="streak-day active">Bugün</div>
-            <div class="streak-day">-</div>
-            <div class="streak-day">-</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="goal-item">
-        <div class="goal-icon"><i class="fas fa-trophy"></i></div>
-        <div class="goal-info">
-          <h3>Günlük XP</h3>
-          <p>Bugün 50 XP kazanmaya çalışın!</p>
-          <div class="progress-bar xp-bar">
-            <div class="progress-fill" style="width: 30%;"></div>
-          </div>
-          <span class="xp-text">15 XP / 50 XP</span>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Vazgeç</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="back-section">
-    <a href="{{ url_for('education_games') }}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Eğitim Oyunlarına Dön
-    </a>
+  <!-- Sonuç Modal -->
+  <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Quiz Sonuçları</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <div class="result-container">
+            <div class="result-summary">
+              <div class="result-score-container">
+                <div class="result-score-circle">
+                  <span id="scorePercent">80%</span>
+                </div>
+              </div>
+              <div class="result-stats">
+                <div class="result-stat">
+                  <i class="fas fa-check-circle text-success"></i>
+                  <span id="correctAnswers">8</span> doğru
+                </div>
+                <div class="result-stat">
+                  <i class="fas fa-times-circle text-danger"></i>
+                  <span id="incorrectAnswers">2</span> yanlış
+                </div>
+                <div class="result-stat">
+                  <i class="fas fa-star text-warning"></i>
+                  <span id="xpEarned">40</span> XP kazandınız
+                </div>
+              </div>
+            </div>
+            <div class="result-message">
+              <p id="resultMessage">Harika! Kelime bilginiz gelişiyor.</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn retry-btn" id="retryQuiz">
+            <i class="fas fa-redo me-2"></i>Tekrar Dene
+          </button>
+          <button type="button" class="btn new-lesson-btn">
+            <i class="fas fa-arrow-right me-2"></i>Yeni Ders
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kelime Kartı Modal -->
+  <div class="modal fade" id="flashcardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kelime Kartları</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <div class="flashcard-container">
+            <div class="flashcard" id="flashcard">
+              <div class="flashcard-front">
+                <h2 id="flashcardWord">Book</h2>
+                <p class="flashcard-pronunciation">/bʊk/</p>
+                <p class="flashcard-hint">Çevirmek için tıklayın</p>
+              </div>
+              <div class="flashcard-back">
+                <h2 id="flashcardTranslation">Kitap</h2>
+                <p class="flashcard-example">I'm reading a book.</p>
+                <p class="flashcard-example-translation">Bir kitap okuyorum.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="flashcard-nav">
+            <button id="prevCard" class="btn nav-btn">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <span id="cardIndex">1/10</span>
+            <button id="nextCard" class="btn nav-btn">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eşleştirme Modal -->
+  <div class="modal fade" id="matchingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kelime Eşleştirme</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <div class="matching-container">
+            <div class="matching-game" id="matchingGame">
+              <!-- Eşleştirme kartları buraya JS ile eklenecek -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="matching-status">
+            <span id="matchesMade">0</span>/<span id="totalMatches">5</span> eşleşme
+          </div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<style>
+/* Ana Konteyner */
+.language-learning-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(45, 52, 95, 0.9), rgba(35, 42, 85, 0.9));
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Başlık Stilleri */
+.language-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #8a67ff, #b38cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 10px rgba(138, 103, 255, 0.3);
+}
+
+.language-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 30px;
+}
+
+.language-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 25px;
+  position: relative;
+  padding-left: 15px;
+}
+
+.language-section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 25px;
+  background: linear-gradient(to bottom, #8a67ff, #b38cff);
+  border-radius: 3px;
+}
+
+/* Dil Seçimi - Satır Formatında Bayraklar */
+.language-flags-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.language-flag-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 12px;
+  background: rgba(60, 65, 110, 0.7);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  width: 100px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.language-flag-item:hover {
+  transform: translateY(-5px);
+  background: rgba(70, 75, 130, 0.8);
+  border-color: rgba(138, 103, 255, 0.6);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.language-flag-item.selected {
+  background: rgba(80, 85, 150, 0.9);
+  border-color: #8a67ff;
+  box-shadow: 0 0 20px rgba(138, 103, 255, 0.6);
+}
+
+.language-flag-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(50, 55, 99, 0.5);
+}
+
+.flag-container {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 35, 65, 0.6);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 10px;
+}
+
+.flag-img {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+.flag-info {
+  text-align: center;
+}
+
+.flag-info h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.flag-info span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
+/* Level ve Mod kartları için mevcut stiller */
+.level-grid, .mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.level-card, .mode-card {
+  background: rgba(60, 65, 110, 0.7);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.level-card::after, .mode-card::after {
+  content: '😊';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 18px;
+  opacity: 0.5;
+  transition: all 0.4s ease;
+  transform: scale(0.8);
+}
+
+.level-card:hover::after, .mode-card:hover::after {
+  transform: scale(1.2) rotate(10deg);
+  opacity: 1;
+  animation: cardWink 2s infinite;
+}
+
+@keyframes cardWink {
+  0%, 100% { transform: scale(1.1) rotate(0deg); }
+  30% { transform: scale(1.2) rotate(10deg); }
+  60% { transform: scale(1.15) rotate(-5deg); }
+}
+
+.level-card:hover, .mode-card:hover {
+  transform: translateY(-6px);
+  background: rgba(70, 75, 130, 0.8);
+  border-color: rgba(138, 103, 255, 0.6);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.level-card.selected, .mode-card.selected {
+  background: rgba(80, 85, 150, 0.9);
+  border-color: #8a67ff;
+  box-shadow: 0 0 20px rgba(138, 103, 255, 0.6);
+}
+
+.level-icon, .mode-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  background: rgba(30, 35, 65, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.level-icon i, .mode-icon i {
+  font-size: 28px;
+  color: #8a67ff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.language-info h4, .level-info h4, .mode-info h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.language-info p, .level-info p, .mode-info p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0;
+}
+
+/* Başlat Butonu */
+.start-learning-btn {
+  background: linear-gradient(45deg, #8a67ff, #b38cff);
+  color: white;
+  border: none;
+  padding: 16px 42px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 25px rgba(138, 103, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+  letter-spacing: 0.5px;
+}
+
+.start-learning-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(138, 103, 255, 0.5);
+}
+
+.start-learning-btn:active {
+  transform: translateY(-2px);
+}
+
+.start-learning-btn:disabled {
+  background: linear-gradient(45deg, #9c9c9c, #b0b0b0);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
+}
+
+/* Modal Stil Düzenlemeleri */
+.modal-content {
+  background: linear-gradient(135deg, rgba(35, 42, 85, 0.95), rgba(25, 32, 65, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  color: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tam ekran modal için özel stiller */
+.modal-fullscreen .modal-dialog {
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-fullscreen .modal-content {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 25px;
+  background: rgba(60, 65, 110, 0.3);
+  border-radius: 18px 18px 0 0;
+  flex-shrink: 0; /* Başlık sabit kalır */
+}
+
+.modal-title {
+  color: white;
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-close {
+  color: white;
+  opacity: 0.8;
+  filter: invert(1) grayscale(100%) brightness(200%);
+  transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 30px;
+  overflow-y: auto; /* İçerik uzunsa kaydırma çubuğu göster */
+  flex-grow: 1; /* İçerik alanı genişleyebilir */
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 25px;
+  background: rgba(60, 65, 110, 0.3);
+  border-radius: 0 0 18px 18px;
+  flex-shrink: 0; /* Alt kısım sabit kalır */
+}
+
+/* Quiz Soruları */
+.quiz-container {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.question-container {
+  margin-bottom: 25px;
+  background: linear-gradient(135deg, rgba(70, 75, 130, 0.6), rgba(60, 65, 110, 0.6));
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.question-container:hover {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  border-color: rgba(138, 103, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+.question-word {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(45deg, #ffffff, #e0e0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+.question-text {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.time-indicator {
+  margin-bottom: 20px !important;
+}
+
+.time-indicator .progress {
+  height: 8px !important;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.time-indicator .progress-bar {
+  background: linear-gradient(90deg, #8a67ff, #b38cff);
+  transition: width 0.3s linear;
+  border-radius: 8px;
+}
+
+.options-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.option-btn {
+  background: rgba(60, 65, 110, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1.15rem;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.option-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  transition: 0.6s;
+}
+
+.option-btn:hover {
+  background: rgba(80, 85, 150, 0.8);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(138, 103, 255, 0.4);
+}
+
+.option-btn:hover::after {
+  left: 100%;
+}
+
+.option-btn.correct {
+  background: rgba(39, 174, 96, 0.8);
+  border-color: rgba(39, 174, 96, 0.4);
+  box-shadow: 0 0 25px rgba(39, 174, 96, 0.3);
+}
+
+.option-btn.incorrect {
+  background: rgba(231, 76, 60, 0.8);
+  border-color: rgba(231, 76, 60, 0.4);
+  box-shadow: 0 0 25px rgba(231, 76, 60, 0.3);
+}
+
+.option-text {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.option-result-icon {
+  position: absolute;
+  right: 15px;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.quiz-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.question-counter {
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #8a67ff, #b38cff);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  margin: 0 20px;
+  transition: all 0.3s ease;
+}
+
+.question-counter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Sonuç Ekranı */
+.result-container {
+  padding: 25px;
+}
+
+.result-summary {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  background: rgba(70, 75, 130, 0.4);
+  border-radius: 18px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.result-summary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border-color: rgba(138, 103, 255, 0.3);
+}
+
+.result-score-container {
+  flex: 1;
+  text-align: center;
+}
+
+.result-score-circle {
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, rgba(138, 103, 255, 0.3), rgba(179, 140, 255, 0.3));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid rgba(138, 103, 255, 0.6);
+  margin: 0 auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), inset 0 2px 10px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: pulse 3s infinite;
+}
+
+.result-score-circle::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  opacity: 0.7;
+}
+
+.result-score-circle span {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.result-stats {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  color: white;
+  font-size: 1.15rem;
+  background: rgba(80, 85, 150, 0.5);
+  padding: 14px 18px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.result-stat:hover {
+  background: rgba(90, 95, 170, 0.6);
+  transform: translateX(8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: rgba(138, 103, 255, 0.3);
+}
+
+.result-stat i {
+  margin-right: 15px;
+  font-size: 1.4rem;
+  width: 30px;
+  text-align: center;
+}
+
+.result-message {
+  text-align: center;
+  padding: 25px;
+  background: rgba(80, 85, 150, 0.5);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  margin-top: 25px;
+  transition: all 0.3s ease;
+}
+
+.result-message:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border-color: rgba(138, 103, 255, 0.3);
+}
+
+.result-message p {
+  font-size: 1.3rem;
+  color: white;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.retry-btn, .new-lesson-btn, .btn-outline-light {
+  padding: 14px 32px;
+  font-weight: 600;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 10px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.retry-btn {
+  background: rgba(70, 75, 130, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.new-lesson-btn {
+  background: linear-gradient(45deg, #8a67ff, #b38cff);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 20px rgba(138, 103, 255, 0.4);
+}
+
+.btn-outline-light {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  background: rgba(70, 75, 130, 0.3);
+}
+
+.retry-btn::after, .new-lesson-btn::after, .btn-outline-light::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  transition: 0.6s;
+}
+
+.retry-btn:hover, .new-lesson-btn:hover, .btn-outline-light:hover {
+  transform: translateY(-4px);
+  color: white;
+}
+
+.retry-btn:hover {
+  background: rgba(80, 85, 150, 0.8);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.new-lesson-btn:hover {
+  box-shadow: 0 10px 25px rgba(138, 103, 255, 0.5);
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.retry-btn:hover::after, .new-lesson-btn:hover::after, .btn-outline-light:hover::after {
+  left: 100%;
+}
+
+/* Kelime Kartları */
+.flashcard-container {
+  height: 320px;
+  perspective: 1000px;
+  margin: 0 auto;
+}
+
+.flashcard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(70, 75, 130, 0.8), rgba(50, 55, 95, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.flashcard-front::after, .flashcard-back::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front h2, .flashcard-back h2 {
+  font-size: 2.4rem;
+  color: white;
+  margin-bottom: 15px;
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(45deg, #fff, #e0e0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.flashcard-pronunciation {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 25px;
+  background: rgba(60, 65, 110, 0.5);
+  padding: 8px 16px;
+  border-radius: 30px;
+}
+
+.flashcard-hint {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  bottom: 25px;
+  background: rgba(60, 65, 110, 0.4);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: pulse 2s infinite;
+}
+
+.flashcard-example, .flashcard-example-translation {
+  text-align: center;
+  margin-top: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  background: rgba(60, 65, 110, 0.4);
+  padding: 12px;
+  border-radius: 12px;
+  width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flashcard-example {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.flashcard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-top: 15px;
+}
+
+.nav-btn {
+  background: rgba(70, 75, 130, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  font-size: 1.1rem;
+}
+
+.nav-btn:hover {
+  background: rgba(80, 85, 150, 0.8);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:active {
+  transform: translateY(-1px);
+}
+
+#cardIndex {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(60, 65, 110, 0.5);
+  padding: 8px 16px;
+  border-radius: 30px;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Eşleştirme Oyunu */
+.matching-container {
+  padding: 15px;
+}
+
+.matching-game {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.matching-card {
+  height: 110px;
+  background: rgba(60, 65, 110, 0.7);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 1.05rem;
+  color: white;
+  text-align: center;
+  padding: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  user-select: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.matching-card::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.matching-card:hover {
+  background: rgba(70, 75, 130, 0.8);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.matching-card.flipped {
+  background: rgba(80, 85, 150, 0.9);
+  border-color: rgba(138, 103, 255, 0.6);
+  box-shadow: 0 0 20px rgba(138, 103, 255, 0.4);
+  pointer-events: none;
+  transform: scale(1.03);
+}
+
+.matching-card.matched {
+  background: rgba(39, 174, 96, 0.7);
+  border-color: rgba(39, 174, 96, 0.4);
+  box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+  pointer-events: none;
+  transform: scale(1.03);
+}
+
+.matching-status {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  background: rgba(60, 65, 110, 0.5);
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: inline-block;
+  margin-right: 15px;
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+  .language-learning-container {
+    padding: 15px;
+    margin: 0 auto;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .language-title {
+    font-size: 1.8rem;
+  }
+
+  .language-subtitle {
+    font-size: 1rem;
+  }
+
+  .language-section-title {
+    font-size: 1.3rem;
+  }
+
+  .language-flags-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .language-flag-item {
+    width: 80px;
+    padding: 8px;
+  }
+
+  .flag-container {
+    width: 35px;
+    height: 35px;
+  }
+
+  .flag-img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .flag-info h5 {
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+
+  .flag-info span {
+    font-size: 0.7rem;
+  }
+
+  .level-grid, .mode-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .level-card, .mode-card {
+    padding: 15px;
+  }
+
+  .level-icon, .mode-icon {
+    width: 45px;
+    height: 45px;
+    margin-right: 10px;
+  }
+
+  .level-icon i, .mode-icon i {
+    font-size: 20px;
+  }
+
+  .level-info h4, .mode-info h4 {
+    font-size: 1rem;
+  }
+
+  .level-info p, .mode-info p {
+    font-size: 0.8rem;
+  }
+
+  .start-learning-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+
+  .question-word {
+    font-size: 1.6rem;
+  }
+
+  .question-text {
+    font-size: 1rem;
+  }
+
+  .options-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .option-btn {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .result-summary {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .result-score-container {
+    margin-bottom: 20px;
+  }
+
+  .result-score-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .result-score-circle span {
+    font-size: 2rem;
+  }
+
+  .result-stat {
+    padding: 10px 15px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .matching-game {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .matching-card {
+    height: 80px;
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .modal-content {
+    border-radius: 15px;
+    max-height: 85vh; /* Mobil ekranlarda biraz daha küçük */
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-body {
+    padding: 20px;
+    -webkit-overflow-scrolling: touch; /* iOS'ta daha akıcı kaydırma */
+    overflow-y: auto;
+    max-height: 60vh; /* Mobil ekranlarda içerik için maksimum yükseklik (artırıldı) */
+  }
+
+  .modal-footer {
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-info {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .quiz-status, .quiz-score {
+    width: 100%;
+    text-align: center;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .retry-btn, .new-lesson-btn, .btn-outline-light {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .flashcard-container {
+    height: 280px;
+  }
+
+  .flashcard-front h2, .flashcard-back h2 {
+    font-size: 1.8rem;
+  }
+
+  .flashcard-pronunciation {
+    font-size: 1rem;
+  }
+
+    /* Quiz için özel mobil düzenlemeler */
+    .quiz-container {
+      padding: 0;
+    }
+
+    .options-container {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .option-btn {
+      font-size: 1rem;
+      padding: 12px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+  .language-flag-item {
+    width: 90px;
+    padding: 8px;
+  }
+
+  .flag-container {
+    width: 35px;
+    height: 35px;
+  }
+
+  .flag-img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .flag-info h5 {
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+
+  .flag-info span {
+    font-size: 0.7rem;
+  }
+
+  .question-word {
+    font-size: 1.6rem;
+  }
+
+  .question-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ekstra Animasyonlar */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Randomize emoji faces for cards */
+.level-card:nth-child(1)::after { content: '😄'; }
+.level-card:nth-child(2)::after { content: '😁'; }
+.level-card:nth-child(3)::after { content: '😃'; }
+.mode-card:nth-child(1)::after { content: '😊'; }
+.mode-card:nth-child(2)::after { content: '😍'; }
+.mode-card:nth-child(3)::after { content: '😋'; }
+
+/* Özel Vurgular */
+.highlight {
+  position: relative;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #8a67ff, transparent);
+  border-radius: 2px;
+}
+</style>
+
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Dil seçimi için event listener
-    const languageOptions = document.querySelectorAll('.language-option');
-    
-    languageOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        // Önceki aktif seçeneği sıfırla
-        const activeOption = document.querySelector('.language-option.active');
-        if (activeOption) {
-          activeOption.classList.remove('active');
-        }
-        // Yeni seçeneği aktif et
-        this.classList.add('active');
-        
-        // Seçilen dili al
-        const selectedLang = this.getAttribute('data-lang');
-        
-        // Ders linklerini güncelle
-        document.querySelectorAll('.lesson-btn').forEach(btn => {
-          const url = btn.href.split('?')[0];
-          btn.href = `${url}?lang=${selectedLang}`;
-        });
-        
-        // Konsolda bilgilendirme
-        console.log(`Dil seçildi: ${selectedLang}`);
-      });
-    });
-    
-    // Ders kartlarına tıklama işlemi
-    const lessonCards = document.querySelectorAll('.lesson-card');
-    
-    lessonCards.forEach(card => {
-      card.addEventListener('click', function(e) {
-        // Eğer tıklanan buton değilse, buton linkine yönlendir
-        if (!e.target.classList.contains('lesson-btn')) {
-          const lessonBtn = this.querySelector('.lesson-btn');
-          if (lessonBtn) {
-            window.location.href = lessonBtn.href;
-          }
-        }
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("Language learning page initialized");
+
+  // Sayfanın pürüzsüz kaydırma özelliği
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
       });
     });
   });
-</script>
-{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/language_learning.css') }}">
+  // Performans iyileştirmesi için
+  window.addEventListener('resize', debounce(function() {
+    adjustLayoutForScreenSize();
+  }, 250));
+
+  // İlk yükleme için düzen ayarlaması
+  adjustLayoutForScreenSize();
+
+  // Değişkenler
+  let selectedLanguage = null;
+  let selectedLevel = null;
+  let selectedMode = null;
+  const startButton = document.getElementById('startLanguageLearning');
+
+  // Dil Seçimi
+  const languageFlags = document.querySelectorAll('.language-flag-item:not(.disabled)');
+  languageFlags.forEach(flag => {
+    flag.addEventListener('click', function() {
+      // Önceki seçimleri temizle
+      document.querySelectorAll('.language-flag-item').forEach(f => f.classList.remove('selected'));
+      // Bu bayrağı seç
+      this.classList.add('selected');
+      selectedLanguage = this.getAttribute('data-language');
+      checkSelections();
+    });
+  });
+
+  // Seviye Seçimi
+  const levelCards = document.querySelectorAll('.level-card');
+  levelCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // Önceki seçimleri temizle
+      document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+      // Bu kartı seç
+      this.classList.add('selected');
+      selectedLevel = this.getAttribute('data-level');
+      checkSelections();
+    });
+  });
+
+  // Mod Seçimi
+  const modeCards = document.querySelectorAll('.mode-card');
+  modeCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // Önceki seçimleri temizle
+      document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+      // Bu kartı seç
+      this.classList.add('selected');
+      selectedMode = this.getAttribute('data-mode');
+      checkSelections();
+    });
+  });
+
+  // Tüm seçimlerin yapıldığını kontrol et
+  function checkSelections() {
+    if (selectedLanguage && selectedLevel && selectedMode) {
+      startButton.disabled = false;
+    } else {
+      startButton.disabled = true;
+    }
+  }
+
+  // Başlat butonu tıklandığında
+  startButton.addEventListener('click', function() {
+    // Seçilen moda göre ilgili modalı aç
+    if (selectedMode === 'quiz') {
+      startQuiz();
+    } else if (selectedMode === 'flashcards') {
+      startFlashcards();
+    } else if (selectedMode === 'matching') {
+      startMatching();
+    }
+  });
+
+  // ÖRNEK VERİLER - Gerçek uygulamada bu veriler sunucudan alınacak
+  const sampleWords = [
+    // Başlangıç seviye kelimeleri (kısa ve basit)
+    { english: "apple", turkish: "elma", pronunciation: "/ˈæpl/", example: "I eat an apple every day.", exampleTranslation: "Her gün bir elma yerim." },
+    { english: "book", turkish: "kitap", pronunciation: "/bʊk/", example: "She reads a book before bed.", exampleTranslation: "Yatmadan önce kitap okur." },
+    { english: "water", turkish: "su", pronunciation: "/ˈwɔːtər/", example: "Please drink water regularly.", exampleTranslation: "Lütfen düzenli olarak su için." },
+    { english: "car", turkish: "araba", pronunciation: "/kɑːr/", example: "My car is blue.", exampleTranslation: "Arabam mavi." },
+    { english: "time", turkish: "zaman", pronunciation: "/taɪm/", example: "We don't have much time.", exampleTranslation: "Çok zamanımız yok." },
+    { english: "door", turkish: "kapı", pronunciation: "/dɔːr/", example: "Please close the door.", exampleTranslation: "Lütfen kapıyı kapat." },
+    { english: "school", turkish: "okul", pronunciation: "/skuːl/", example: "Children go to school.", exampleTranslation: "Çocuklar okula gider." },
+    { english: "one", turkish: "bir", pronunciation: "/wʌn/", example: "I have one brother.", exampleTranslation: "Bir erkek kardeşim var." },
+    { english: "two", turkish: "iki", pronunciation: "/tuː/", example: "She has two cats.", exampleTranslation: "İki kedisi var." },
+    { english: "sun", turkish: "güneş", pronunciation: "/sʌn/", example: "The sun is very bright today.", exampleTranslation: "Güneş bugün çok parlak." },
+    { english: "moon", turkish: "ay", pronunciation: "/muːn/", example: "The moon is beautiful tonight.", exampleTranslation: "Ay bu gece çok güzel." },
+    { english: "dog", turkish: "köpek", pronunciation: "/dɔːɡ/", example: "The dog is barking.", exampleTranslation: "Köpek havlıyor." },
+    { english: "cat", turkish: "kedi", pronunciation: "/kæt/", example: "The cat is sleeping.", exampleTranslation: "Kedi uyuyor." },
+    { english: "day", turkish: "gün", pronunciation: "/deɪ/", example: "It's a beautiful day.", exampleTranslation: "Güzel bir gün." },
+    { english: "big", turkish: "büyük", pronunciation: "/bɪɡ/", example: "That's a big house.", exampleTranslation: "Bu büyük bir ev." },
+    { english: "hot", turkish: "sıcak", pronunciation: "/hɒt/", example: "It's hot today.", exampleTranslation: "Bugün hava sıcak." },
+    { english: "cold", turkish: "soğuk", pronunciation: "/koʊld/", example: "It's cold outside.", exampleTranslation: "Dışarısı soğuk." },
+    { english: "man", turkish: "adam", pronunciation: "/mæn/", example: "The man is tall.", exampleTranslation: "Adam uzun boylu." },
+    { english: "boy", turkish: "erkek çocuk", pronunciation: "/bɔɪ/", example: "The boy is playing.", exampleTranslation: "Erkek çocuk oynuyor." },
+    { english: "girl", turkish: "kız", pronunciation: "/ɡɜːrl/", example: "The girl is singing.", exampleTranslation: "Kız şarkı söylüyor." },
+    // Orta seviye kelimeleri (orta uzunlukta)
+    { english: "computer", turkish: "bilgisayar", pronunciation: "/kəmˈpjuːtər/", example: "I work on my computer.", exampleTranslation: "Bilgisayarımda çalışıyorum." },
+    { english: "house", turkish: "ev", pronunciation: "/haʊs/", example: "They live in a big house.", exampleTranslation: "Büyük bir evde yaşıyorlar." },
+    { english: "friend", turkish: "arkadaş", pronunciation: "/frend/", example: "She is my best friend.", exampleTranslation: "O benim en iyi arkadaşım." },
+    { english: "mountain", turkish: "dağ", pronunciation: "/ˈmaʊntən/", example: "We climbed the mountain.", exampleTranslation: "Dağa tırmandık." },
+    { english: "teacher", turkish: "öğretmen", pronunciation: "/ˈtiːtʃər/", example: "My teacher is very kind.", exampleTranslation: "Öğretmenim çok nazik." },
+    { english: "language", turkish: "dil", pronunciation: "/ˈlæŋɡwɪdʒ/", example: "I am learning a new language.", exampleTranslation: "Yeni bir dil öğreniyorum." },
+    { english: "building", turkish: "bina", pronunciation: "/ˈbɪldɪŋ/", example: "This building is very tall.", exampleTranslation: "Bu bina çok yüksek." },
+    { english: "morning", turkish: "sabah", pronunciation: "/ˈmɔːrnɪŋ/", example: "Good morning!", exampleTranslation: "Günaydın!" },
+    { english: "evening", turkish: "akşam", pronunciation: "/ˈiːvnɪŋ/", example: "Good evening!", exampleTranslation: "İyi akşamlar!" },
+    { english: "weather", turkish: "hava durumu", pronunciation: "/ˈweðər/", example: "The weather is nice today.", exampleTranslation: "Bugün hava güzel." },
+    { english: "summer", turkish: "yaz", pronunciation: "/ˈsʌmər/", example: "I love summer.", exampleTranslation: "Yazı seviyorum." },
+    { english: "winter", turkish: "kış", pronunciation: "/ˈwɪntər/", example: "Winter is cold.", exampleTranslation: "Kış soğuktur." },
+    { english: "football", turkish: "futbol", pronunciation: "/ˈfʊtbɔːl/", example: "They play football every Sunday.", exampleTranslation: "Her pazar futbol oynarlar." },
+    { english: "holiday", turkish: "tatil", pronunciation: "/ˈhɒlədeɪ/", example: "We went on holiday last week.", exampleTranslation: "Geçen hafta tatile gittik." },
+    { english: "station", turkish: "istasyon", pronunciation: "/ˈsteɪʃən/", example: "The train station is nearby.", exampleTranslation: "Tren istasyonu yakında." },
+    { english: "dinner", turkish: "akşam yemeği", pronunciation: "/ˈdɪnər/", example: "Dinner is ready.", exampleTranslation: "Akşam yemeği hazır." },
+    { english: "student", turkish: "öğrenci", pronunciation: "/ˈstuːdənt/", example: "She is a good student.", exampleTranslation: "O iyi bir öğrenci." },
+    { english: "weekend", turkish: "hafta sonu", pronunciation: "/ˈwiːkend/", example: "What are you doing this weekend?", exampleTranslation: "Bu hafta sonu ne yapıyorsun?" },
+    { english: "question", turkish: "soru", pronunciation: "/ˈkwestʃən/", example: "I have a question.", exampleTranslation: "Bir sorum var." },
+    { english: "answer", turkish: "cevap", pronunciation: "/ˈænsər/", example: "What's the answer?", exampleTranslation: "Cevap nedir?" },
+    // İleri seviye kelimeleri (uzun ve karmaşık)
+    { english: "responsibility", turkish: "sorumluluk", pronunciation: "/rɪˌspɒnsəˈbɪlɪti/", example: "This job comes with a lot of responsibility.", exampleTranslation: "Bu iş çok sorumluluk gerektiriyor." },
+    { english: "opportunity", turkish: "fırsat", pronunciation: "/ˌɒpərˈtuːnɪti/", example: "This is a great opportunity.", exampleTranslation: "Bu harika bir fırsat." },
+    { english: "communication", turkish: "iletişim", pronunciation: "/kəˌmjuːnɪˈkeɪʃən/", example: "Good communication is important.", exampleTranslation: "İyi iletişim önemlidir." },
+    { english: "environment", turkish: "çevre", pronunciation: "/ɪnˈvaɪrənmənt/", example: "We must protect the environment.", exampleTranslation: "Çevreyi korumalıyız." },
+    { english: "development", turkish: "gelişim", pronunciation: "/dɪˈveləpmənt/", example: "This area needs more development.", exampleTranslation: "Bu bölge daha fazla gelişime ihtiyaç duyuyor." },
+    { english: "government", turkish: "hükümet", pronunciation: "/ˈɡʌvərnmənt/", example: "The government announced new policies.", exampleTranslation: "Hükümet yeni politikalar açıkladı." },
+    { english: "experience", turkish: "deneyim", pronunciation: "/ɪkˈspɪriəns/", example: "She has a lot of experience.", exampleTranslation: "Onun çok deneyimi var." },
+    { english: "technology", turkish: "teknoloji", pronunciation: "/tekˈnɒlədʒi/", example: "Technology is advancing rapidly.", exampleTranslation: "Teknoloji hızla ilerliyor." },
+    { english: "application", turkish: "uygulama", pronunciation: "/ˌæplɪˈkeɪʃən/", example: "I downloaded a new application.", exampleTranslation: "Yeni bir uygulama indirdim." },
+    { english: "interesting", turkish: "ilginç", pronunciation: "/ˈɪntrəstɪŋ/", example: "This book is very interesting.", exampleTranslation: "Bu kitap çok ilginç." },
+    { english: "university", turkish: "üniversite", pronunciation: "/ˌjuːnɪˈvɜːrsɪti/", example: "She studies at the university.", exampleTranslation: "Üniversitede okuyor." },
+    { english: "personality", turkish: "kişilik", pronunciation: "/ˌpɜːrsəˈnælɪti/", example: "He has a strong personality.", exampleTranslation: "Güçlü bir kişiliği var." },
+    { english: "achievement", turkish: "başarı", pronunciation: "/əˈtʃiːvmənt/", example: "This is a great achievement.", exampleTranslation: "Bu büyük bir başarı." },
+    { english: "imagination", turkish: "hayal gücü", pronunciation: "/ɪˌmædʒɪˈneɪʃən/", example: "Children have vivid imaginations.", exampleTranslation: "Çocukların canlı hayal güçleri vardır." },
+    { english: "explanation", turkish: "açıklama", pronunciation: "/ˌekspləˈneɪʃən/", example: "I need an explanation.", exampleTranslation: "Bir açıklamaya ihtiyacım var." },
+    { english: "celebration", turkish: "kutlama", pronunciation: "/ˌselɪˈbreɪʃən/", example: "The celebration lasted all night.", exampleTranslation: "Kutlama tüm gece sürdü." },
+    { english: "conversation", turkish: "konuşma", pronunciation: "/ˌkɒnvərˈseɪʃən/", example: "We had an interesting conversation.", exampleTranslation: "İlginç bir konuşma yaptık." },
+    { english: "relationship", turkish: "ilişki", pronunciation: "/rɪˈleɪʃənʃɪp/", example: "They have a good relationship.", exampleTranslation: "İyi bir ilişkileri var." },
+    { english: "understanding", turkish: "anlayış", pronunciation: "/ˌʌndərˈstændɪŋ/", example: "Thank you for your understanding.", exampleTranslation: "Anlayışınız için teşekkür ederim." },
+    { english: "concentration", turkish: "konsantrasyon", pronunciation: "/ˌkɒnsənˈtreɪʃən/", example: "This task requires concentration.", exampleTranslation: "Bu görev konsantrasyon gerektirir." }
+  ];
+
+  // Quiz Modu İşlevleri
+  let currentQuizIndex = 0;
+  let quizScore = 0;
+  let quizQuestions = [];
+
+  function startQuiz() {
+    // Quiz sorularını hazırla
+    quizQuestions = prepareQuizQuestions(sampleWords);
+    currentQuizIndex = 0;
+    quizScore = 0;
+
+    // İlk soruyu göster
+    showQuizQuestion(quizQuestions[currentQuizIndex]);
+
+    // Quiz modalını aç
+    const quizModal = new bootstrap.Modal(document.getElementById('quizModal'));
+    quizModal.show();
+  }
+
+  // Kullanıcının gördüğü kelimeleri takip etmek için
+  const userWordHistory = {
+    beginner: [],
+    intermediate: [],
+    advanced: []
+  };
+
+  function prepareQuizQuestions(words) {
+    // Seviyeye göre kelime zorluğunu belirle
+    const levelDifficulty = {
+      'beginner': { minLength: 2, maxLength: 5, maxPoints: 1 },
+      'intermediate': { minLength: 4, maxLength: 8, maxPoints: 2 },
+      'advanced': { minLength: 7, maxLength: 15, maxPoints: 3 }
+    };
+    
+    const currentLevel = selectedLevel || 'beginner';
+    const difficulty = levelDifficulty[currentLevel];
+    
+    // Kullanıcı geçmişindeki kelimeleri filtrele (eğer varsa)
+    let availableWords = [...words];
+    if (userWordHistory[currentLevel].length > 0) {
+      // Daha önce gösterilen kelimeleri filtrele
+      availableWords = availableWords.filter(word => 
+        !userWordHistory[currentLevel].includes(word.english));
+      
+      // Eğer yeterli kelime kalmadıysa, geçmişi sıfırla
+      if (availableWords.length < 20) {
+        userWordHistory[currentLevel] = [];
+        availableWords = [...words];
+      }
+    }
+    
+    // Seçilen seviyeye göre uygun kelimeleri filtrele
+    let levelWords = availableWords.filter(word => {
+      // Temel seviye filtreleme - kelime uzunluğuna göre
+      return word.english.length >= difficulty.minLength && 
+             word.english.length <= difficulty.maxLength;
+    });
+    
+    // Eğer yeterince kelime yoksa tüm kelimeleri kullan
+    if (levelWords.length < 20) {
+      levelWords = availableWords;
+    }
+    
+    // Kelimeleri karıştır
+    const shuffledWords = [...levelWords].sort(() => Math.random() - 0.5);
+    
+    // Quiz için 10 kelime seç
+    const selectedWords = shuffledWords.slice(0, 10);
+    
+    // Seçilen kelimeleri geçmişe ekle
+    selectedWords.forEach(word => {
+      if (!userWordHistory[currentLevel].includes(word.english)) {
+        userWordHistory[currentLevel].push(word.english);
+      }
+    });
+
+    // Her soru için 4 seçenek oluştur (1 doğru, 3 yanlış)
+    return selectedWords.map(word => {
+      const correctAnswer = word.turkish;
+
+      // Yanlış cevaplar için diğer kelimelerden rastgele seç
+      // Zorluk seviyesine göre benzer uzunlukta kelimeler seç
+      let wrongAnswers = words
+        .filter(w => {
+          return w.turkish !== correctAnswer && 
+                 Math.abs(w.turkish.length - correctAnswer.length) <= difficulty.maxPoints;
+        })
+        .map(w => w.turkish)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      
+      // Eğer yeterli kelime bulunamazsa, herhangi bir kelimeyi kullan
+      if (wrongAnswers.length < 3) {
+        wrongAnswers = words
+          .filter(w => w.turkish !== correctAnswer)
+          .map(w => w.turkish)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+      }
+
+      // Tüm seçenekleri birleştir ve karıştır
+      const options = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+
+      return {
+        word: word.english,
+        correctAnswer,
+        options
+      };
+    });
+  }
+
+  // Zamanlayıcı değişkeni
+  let timerInterval;
+  let timeLeft = 15; // 15 saniye
+
+  function showQuizQuestion(question) {
+    // Timer'ı sıfırla
+    clearInterval(timerInterval);
+    const progressBar = document.getElementById('timeProgress');
+    progressBar.style.width = '100%';
+    timeLeft = 15;
+
+    // Soruyu göster
+    document.getElementById('questionWord').textContent = question.word;
+
+    // Seçenekleri temizle ve ekle
+    const optionsContainer = document.querySelector('.options-container');
+    optionsContainer.innerHTML = '';
+
+    question.options.forEach(option => {
+      const button = document.createElement('button');
+      button.classList.add('option-btn');
+      button.setAttribute('data-answer', option);
+
+      // İç içe span elementleri ekle
+      button.innerHTML = `
+        <span class="option-text">${option}</span>
+        <span class="option-result-icon"></span>
+      `;
+
+      // Cevap tıklaması
+      button.addEventListener('click', function() {
+        const selectedAnswer = this.getAttribute('data-answer');
+        checkAnswer(selectedAnswer, question.correctAnswer);
+      });
+
+      optionsContainer.appendChild(button);
+    });
+
+    // Sesli kelime telaffuzu (opsiyonel, tarayıcı desteği varsa)
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(question.word);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    // Soru sayacını güncelle
+    const currentQuestionElements = document.querySelectorAll('#currentQuestion');
+    currentQuestionElements.forEach(element => {
+      element.textContent = currentQuizIndex + 1;
+    });
+    
+    const totalQuestionsElements = document.querySelectorAll('#totalQuestions');
+    totalQuestionsElements.forEach(element => {
+      element.textContent = quizQuestions.length;
+    });
+
+    // Zamanlayıcıyı başlat
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      const percentage = (timeLeft / 15) * 100;
+      progressBar.style.width = `${percentage}%`;
+
+      // Renk değişimi
+      if (percentage < 30) {
+        progressBar.style.background = 'linear-gradient(90deg, #e74c3c, #ff7675)';
+      } else if (percentage < 60) {
+        progressBar.style.background = 'linear-gradient(90deg, #f39c12, #fdcb6e)';
+      } else {
+        progressBar.style.background = 'linear-gradient(90deg, #8a67ff, #b38cff)';
+      }
+
+      // Zaman dolduğunda otomatik geç
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+
+        // Zamanı bitti, doğru cevabı göster
+        const correctAnswer = question.correctAnswer;
+        const correctButton = document.querySelector(`.option-btn[data-answer="${correctAnswer}"]`);
+
+        // Tüm butonları devre dışı bırak
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        // Doğru cevabı göster
+        if (correctButton) {
+          correctButton.classList.add('correct');
+          correctButton.querySelector('.option-result-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
+
+          // Süre bitti sesi çal
+          const timeoutSound = new Audio('/static/sounds/wrong.mp3');
+          timeoutSound.volume = 0.3;
+          timeoutSound.play();
+        }
+
+        // Sonraki soruya geç
+        setTimeout(() => {
+          currentQuizIndex++;
+
+          if (currentQuizIndex < quizQuestions.length) {
+            showQuizQuestion(quizQuestions[currentQuizIndex]);
+          } else {
+            // Quiz bitti
+            showQuizResults();
+          }
+        }, 1800);
+      }
+    }, 1000);
+  }
+
+  function checkAnswer(selected, correct) {
+    // Animasyonu durdur
+    clearInterval(timerInterval);
+
+    // Bütün butonları devre dışı bırak
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => btn.disabled = true);
+
+    // Seçilen butonu bul
+    const selectedButton = document.querySelector(`.option-btn[data-answer="${selected}"]`);
+
+    // Doğru cevap kontrolü
+    if (selected === correct) {
+      selectedButton.classList.add('correct');
+      selectedButton.querySelector('.option-result-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
+      // Doğru cevap için ses efekti oynat
+      const correctSound = new Audio('/static/sounds/correct.mp3');
+      correctSound.volume = 0.5;
+      correctSound.play();
+      quizScore++;
+    } else {
+      selectedButton.classList.add('incorrect');
+      selectedButton.querySelector('.option-result-icon').innerHTML = '<i class="fas fa-times-circle"></i>';
+
+      // Yanlış cevap için ses efekti oynat
+      const wrongSound = new Audio('/static/sounds/wrong.mp3');
+      wrongSound.volume = 0.5;
+      wrongSound.play();
+
+      // Doğru cevabı göster
+      const correctButton = document.querySelector(`.option-btn[data-answer="${correct}"]`);
+      if (correctButton) {
+        correctButton.classList.add('correct');
+        correctButton.querySelector('.option-result-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
+      }
+    }
+
+    // Sonraki soruya geç (kısa bir gecikme ile)
+    setTimeout(() => {
+      currentQuizIndex++;
+
+      if (currentQuizIndex < quizQuestions.length) {
+        showQuizQuestion(quizQuestions[currentQuizIndex]);
+      } else {
+        // Quiz bitti
+        showQuizResults();
+      }
+    }, 1800);
+  }
+
+  function showQuizResults() {
+    // Quiz modalını kapat
+    bootstrap.Modal.getInstance(document.getElementById('quizModal')).hide();
+
+    // Sonuçları hesapla
+    const correctAnswers = quizScore;
+    const incorrectAnswers = quizQuestions.length - quizScore;
+    const scorePercent = Math.round((quizScore / quizQuestions.length) * 100);
+    const xpEarned = correctAnswers * 10;
+
+    // Sonuç modalında değerleri göster
+    document.getElementById('scorePercent').textContent = `${scorePercent}%`;
+    document.getElementById('correctAnswers').textContent = correctAnswers;
+    document.getElementById('incorrectAnswers').textContent = incorrectAnswers;
+    document.getElementById('xpEarned').textContent = xpEarned;
+
+    // Başarı mesajını ayarla
+    let resultMessage = '';
+    if (scorePercent >= 90) {
+      resultMessage = 'Mükemmel! Harika bir performans!';
+    } else if (scorePercent >= 70) {
+      resultMessage = 'Çok iyi! Kelime bilgin gelişiyor.';
+    } else if (scorePercent >= 50) {
+      resultMessage = 'İyi! Biraz daha pratik yaparak gelişebilirsin.';
+    } else {
+      resultMessage = 'Bu konuya biraz daha çalışmalısın.';
+    }
+    document.getElementById('resultMessage').textContent = resultMessage;
+
+    // Sonuçları kaydet (örnek)
+    const results = {
+      correctAnswers,
+      incorrectAnswers,
+      xpEarned
+    };
+
+    console.log("Sonuçlar kaydedildi:", results);
+
+    // API'ye kaydetme simülasyonu
+    setTimeout(() => {
+      console.log("Sunucuya kaydedildi");
+    }, 500);
+
+    // Sonuç modalını göster
+    const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+    resultModal.show();
+
+    // Tekrar dene butonu olayı
+    document.getElementById('retryQuiz').addEventListener('click', function() {
+      resultModal.hide();
+      startQuiz();
+    });
+  }
+
+  // Kelime Kartları İşlevleri
+  let currentCardIndex = 0;
+  let flashcards = [];
+
+  function startFlashcards() {
+    // Kelime listesini karıştır
+    flashcards = [...sampleWords].sort(() => Math.random() - 0.5);
+    currentCardIndex = 0;
+
+    // İlk kartı göster
+    showFlashcard(flashcards[currentCardIndex]);
+
+    // Kelime kartı modalını aç
+    const flashcardModal = new bootstrap.Modal(document.getElementById('flashcardModal'));
+    flashcardModal.show();
+  }
+
+  function showFlashcard(card) {
+    // Kart içeriğini güncelle
+    document.getElementById('flashcardWord').textContent = card.english;
+    document.getElementById('flashcardTranslation').textContent = card.turkish;
+    document.querySelector('.flashcard-pronunciation').textContent = card.pronunciation;
+    document.querySelector('.flashcard-example').textContent = card.example;
+    document.querySelector('.flashcard-example-translation').textContent = card.exampleTranslation;
+
+    // Kart sayacını güncelle
+    document.getElementById('cardIndex').textContent = `${currentCardIndex + 1}/${flashcards.length}`;
+
+    // Kartı ilk pozisyonuna getir
+    const flashcard = document.getElementById('flashcard');
+    flashcard.classList.remove('flipped');
+
+    // Kart çevirme olayı
+    flashcard.addEventListener('click', function() {
+      this.classList.toggle('flipped');
+    });
+  }
+
+  // Kelime kartı gezinme butonları
+  document.getElementById('prevCard').addEventListener('click', function() {
+    if (currentCardIndex > 0) {
+      currentCardIndex--;
+      showFlashcard(flashcards[currentCardIndex]);
+    }
+  });
+
+  document.getElementById('nextCard').addEventListener('click', function() {
+    if (currentCardIndex < flashcards.length - 1) {
+      currentCardIndex++;
+      showFlashcard(flashcards[currentCardIndex]);
+    }
+  });
+
+  // Eşleştirme Oyunu İşlevleri
+  let matchingCards = [];
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let matches = 0;
+
+  function startMatching() {
+    // Eşleştirme kartlarını hazırla
+    const shuffledWords = [...sampleWords].sort(() => Math.random() - 0.5).slice(0, 6);
+
+    // İngilizce ve Türkçe kelime kartları oluştur
+    matchingCards = [];
+    shuffledWords.forEach(word => {
+      matchingCards.push({ id: 'en_' + word.english, text: word.english, matched: false, lang: 'en' });
+      matchingCards.push({ id: 'tr_' + word.english, text: word.turkish, matched: false, lang: 'tr' });
+    });
+
+    // Kartları karıştır
+    matchingCards.sort(() => Math.random() - 0.5);
+
+    // Oyun alanını temizle ve kartları ekle
+    const matchingGame = document.getElementById('matchingGame');
+    matchingGame.innerHTML = '';
+
+    matchingCards.forEach(card => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('matching-card');
+      cardElement.setAttribute('data-id', card.id);
+      cardElement.textContent = '?';
+
+      cardElement.addEventListener('click', flipCard);
+
+      matchingGame.appendChild(cardElement);
+    });
+
+    // Eşleştirme sayacını sıfırla
+    matches = 0;
+    document.getElementById('matchesMade').textContent = matches;
+    document.getElementById('totalMatches').textContent = shuffledWords.length;
+
+    // Eşleştirme modalını aç
+    const matchingModal = new bootstrap.Modal(document.getElementById('matchingModal'));
+    matchingModal.show();
+  }
+
+  function flipCard() {
+    if (lockBoard) return;
+    if (this.classList.contains('flipped')) return;
+
+    this.classList.add('flipped');
+    const cardId = this.getAttribute('data-id');
+    const card = matchingCards.find(c => c.id === cardId);
+    this.textContent = card.text;
+
+    if (!firstCard) {
+      // Birinci kart
+      firstCard = this;
+    } else {
+      // İkinci kart
+      secondCard = this;
+
+      // Eşleşme kontrolü
+      checkForMatch();
+    }
+  }
+
+  function checkForMatch() {
+    const firstCardId = firstCard.getAttribute('data-id');
+    const secondCardId = secondCard.getAttribute('data-id');
+
+    const firstCardObj = matchingCards.find(c => c.id === firstCardId);
+    const secondCardObj = matchingCards.find(c => c.id === secondCardId);
+
+    // Birinci kart İngilizce, ikinci kart Türkçe mi kontrol et
+    const isMatch =
+      (firstCardObj.lang === 'en' && secondCardObj.lang === 'tr' && firstCardId.split('_')[1] === secondCardId.split('_')[1]) ||
+      (firstCardObj.lang === 'tr' && secondCardObj.lang === 'en' && firstCardId.split('_')[1] === secondCardId.split('_')[1]);
+
+    if (isMatch) {
+      disableCards();
+      matches++;
+      document.getElementById('matchesMade').textContent = matches;
+
+      // Tüm eşleştirmeler tamamlandı mı kontrol et
+      if (matches === matchingCards.length / 2) {
+        setTimeout(() => {
+          // Oyun tamamlandı, sonuç göster
+          alert('Tebrikler! Tüm eşleştirmeleri buldunuz.');
+        }, 500);
+      }
+    } else {
+      unflipCards();
+    }
+  }
+
+  function disableCards() {
+    firstCard.classList.add('matched');
+    secondCard.classList.add('matched');
+
+    resetBoard();
+  }
+
+  function unflipCards() {
+    lockBoard = true;
+
+    setTimeout(() => {
+      firstCard.classList.remove('flipped');
+      secondCard.classList.remove('flipped');
+      firstCard.textContent = '?';
+      secondCard.textContent = '?';
+
+      resetBoard();
+    }, 1500);
+  }
+
+  function resetBoard() {
+    [firstCard, secondCard] = [null, null];
+    lockBoard = false;
+  }
+
+  // Ekran boyutu değişikliklerine göre düzen ayarlaması
+  function adjustLayoutForScreenSize() {
+    const width = window.innerWidth;
+    const container = document.querySelector('.language-learning-container');
+
+    if (width <= 480) {
+      // Çok küçük ekranlar için
+      document.querySelectorAll('.language-flag-item').forEach(item => {
+        item.style.width = '70px';
+      });
+
+      document.querySelectorAll('.flag-container').forEach(item => {
+        item.style.width = '30px';
+        item.style.height = '30px';
+      });
+    } else if (width <= 768) {
+      // Tablet ve küçük ekranlar için
+      document.querySelectorAll('.language-flag-item').forEach(item => {
+        item.style.width = '80px';
+      });
+
+      document.querySelectorAll('.flag-container').forEach(item => {
+        item.style.width = '35px';
+        item.style.height = '35px';
+      });
+    } else {
+      // Normal ekranlar
+      document.querySelectorAll('.language-flag-item').forEach(item => {
+        item.style.width = '100px';
+      });
+
+      document.querySelectorAll('.flag-container').forEach(item => {
+        item.style.width = '50px';
+        item.style.height = '50px';
+      });
+    }
+
+    // Modal içerikleri için kaydırma kontrolü
+    document.querySelectorAll('.modal-body').forEach(modal => {
+      if (modal.scrollHeight > modal.clientHeight) {
+        modal.style.overflowY = 'auto';
+      }
+    });
+
+    // Modal açıldığında sayfa kaydırma ayarları
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+      modal.addEventListener('shown.bs.modal', function() {
+        // Modal açıldığında sayfa scroll'unu koru
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+      });
+    });
+  }
+
+  // Performans için debounce fonksiyonu
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+});
+</script>
 {% endblock %}

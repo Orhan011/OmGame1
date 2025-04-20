@@ -1,0 +1,54 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#6A40BF" />
+  
+  <!-- Wizard Face -->
+  <circle cx="100" cy="115" r="50" fill="#F8D5A8" />
+  
+  <!-- Wizard Hat -->
+  <path d="M50 95 L100 30 L150 95 Z" fill="#8A2BE2" />
+  <path d="M40 95 L160 95 L150 115 L50 115 Z" fill="#6A0DAD" />
+  <circle cx="100" cy="50" r="8" fill="#FFD700">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Eyes -->
+  <g id="eyes">
+    <path d="M75 105 L85 95 L95 105 L85 115 Z" fill="#FFD700">
+      <animate attributeName="transform" attributeType="XML" type="rotate" 
+              from="0 85 105" to="360 85 105" 
+              begin="0s" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M105 105 L115 95 L125 105 L115 115 Z" fill="#FFD700">
+      <animate attributeName="transform" attributeType="XML" type="rotate" 
+              from="0 115 105" to="360 115 105" 
+              begin="0s" dur="3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Mouth -->
+  <path d="M80 130 Q100 145 120 130" stroke="#333" stroke-width="3" fill="none" />
+  
+  <!-- Magic Sparkles -->
+  <g id="sparkles">
+    <circle cx="50" cy="70" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="150" cy="70" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="70" cy="50" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+    <circle cx="130" cy="50" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="0.9s"/>
+    </circle>
+    <circle cx="40" cy="120" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+    <circle cx="160" cy="120" r="4" fill="#FFD700">
+      <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+  </g>
+</svg>

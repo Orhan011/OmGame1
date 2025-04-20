@@ -60,12 +60,24 @@ document.addEventListener('DOMContentLoaded', function() {
     hard: { rows: 3, cols: 10, timeBonus: 1000, movePenalty: 0.5 }
   };
 
-  // Theme configuration with emojis
+  // Theme configuration with emojis and language learning
   const themes = {
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🦋', '🐝', '🐙', '🦑', '🦈', '🐊', '🦓', '🦒', '🦔', '🐘', '🦍', '🐆', '🦬', '🦥', '🐦', '🦅'],
     fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥦', '🥬', '🧄', '🧅', '🍄', '🥜', '🌰', '🥐'],
     emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨'],
-    shapes: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🔺', '🔻', '💠', '🔷', '🔶', '🔹', '🔸', '♠️', '♥️', '♦️', '♣️', '🎴', '🃏', '🀄', '🎭', '🎯', '🎲', '🎮', '🎰', '🧩', '🎪', '🎨', '🎺']
+    shapes: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫', '⚪', '🔺', '🔻', '💠', '🔷', '🔶', '🔹', '🔸', '♠️', '♥️', '♦️', '♣️', '🎴', '🃏', '🀄', '🎭', '🎯', '🎲', '🎮', '🎰', '🧩', '🎪', '🎨', '🎺'],
+    english: [
+      'Hello:Merhaba', 'Goodbye:Hoşçakal', 'Thank you:Teşekkürler', 'Friend:Arkadaş',
+      'Book:Kitap', 'School:Okul', 'Teacher:Öğretmen', 'Student:Öğrenci',
+      'Water:Su', 'Food:Yiyecek', 'House:Ev', 'Family:Aile',
+      'Happy:Mutlu', 'Sad:Üzgün', 'Beautiful:Güzel', 'Big:Büyük'
+    ],
+    spanish: [
+      'Hola:Merhaba', 'Adiós:Hoşçakal', 'Gracias:Teşekkürler', 'Amigo:Arkadaş',
+      'Libro:Kitap', 'Escuela:Okul', 'Maestro:Öğretmen', 'Estudiante:Öğrenci',
+      'Agua:Su', 'Comida:Yiyecek', 'Casa:Ev', 'Familia:Aile',
+      'Feliz:Mutlu', 'Triste:Üzgün', 'Hermoso:Güzel', 'Grande:Büyük'
+    ]
   };
 
   // Audio effects - inicializasyonu daha güvenli hale getirmek için boş objeler oluşturalım
@@ -342,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Create a single card element
    * @param {number} id - Card unique identifier
-   * @param {string} symbol - Card symbol/emoji
+   * @param {string} symbol - Card symbol/emoji or word
    * @returns {HTMLElement} - The card DOM element
    */
   function createCard(id, symbol) {
@@ -353,7 +365,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const frontFace = document.createElement('div');
     frontFace.className = 'memory-card__front';
-    frontFace.textContent = symbol;
+    
+    // Check if the symbol contains translation data (for language learning)
+    if (typeof symbol === 'string' && symbol.includes(':')) {
+      const [word, translation] = symbol.split(':');
+      
+      const wordSpan = document.createElement('span');
+      wordSpan.className = 'card-word';
+      wordSpan.textContent = word;
+      
+      const translationSpan = document.createElement('span');
+      translationSpan.className = 'card-translation';
+      translationSpan.textContent = translation;
+      
+      frontFace.appendChild(wordSpan);
+      frontFace.appendChild(translationSpan);
+    } else {
+      // For regular symbols/emoji themes
+      frontFace.textContent = symbol;
+    }
 
     const backFace = document.createElement('div');
     backFace.className = 'memory-card__back';

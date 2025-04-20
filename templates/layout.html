@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" class="{{ get_user_data().theme_preference if get_user_data() else 'dark' }}">
+<html lang="tr" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,6 +125,7 @@ function loadArticleContent() {
 
 <nav class="navbar navbar-expand-lg navbar-dark">
 <div class="container">
+  
   <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="OmGame Logo" class="navbar-logo me-2">
     <span class="brand-text">OmGame</span>
@@ -136,6 +137,18 @@ function loadArticleContent() {
       <span></span>
     </div>
   </button>
+  
+  {% if request.path != '/' and request.path != '/profile/v2' and session.get('user_id') %}
+  <div class="navbar-avatar-corner">
+    <a href="{{ url_for('profile_v2') }}">
+      {% if session.get('avatar_url') %}
+        <img src="{{ url_for('static', filename=session.get('avatar_url')) }}" alt="{{ session.get('username') }}" class="navbar-corner-avatar" data-username="{{ session.get('username') }}">
+      {% else %}
+        <div class="navbar-corner-avatar-placeholder">{{ session.get('username')[0]|upper }}</div>
+      {% endif %}
+    </a>
+  </div>
+  {% endif %}
 
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav me-auto">
@@ -250,6 +263,7 @@ function loadArticleContent() {
   <div class="text-center footer-text">
     <p>&copy; 2025 OmGame | Her hakkı saklıdır</p>
   </div>
+
 </div>
 </footer>
 
@@ -265,10 +279,11 @@ function loadArticleContent() {
 <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
     <!-- Standartlaştırılmış Puanlama Sistemi -->
-    <script src="{{ url_for('static', filename='js/score-calculator.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/score-handler.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/standard-score-helper.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/game-integration-helper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/score-calculator.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/score-handler.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/standard-score-helper.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/game-integration-helper.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/score-display.js') }}" defer></script>
     <script>
       // Oyun bittikten sonra puanı yakalamaya çalış
       document.addEventListener('DOMContentLoaded', function() {
@@ -304,15 +319,16 @@ function loadArticleContent() {
             else if (typeof window.ScoreCalculator !== 'undefined' && typeof window.ScoreCalculator.calculate === 'function') {
               // Yeni puan hesaplama sistemini kullan (10-100 arası)
               const scoreDetails = window.ScoreCalculator.calculate(scoreParams);
-            const finalScore = scoreDetails.finalScore;
+              const finalScore = scoreDetails.finalScore;
 
-            console.log(`New standardized score for ${gameType}: ${finalScore} points`);
+              console.log(`New standardized score for ${gameType}: ${finalScore} points`);
 
-            // Skor kaydetme
-            ScoreHandler.saveScore(gameType, finalScore, difficulty, playtime, {
-              ...gameStats,
-              scoreBreakdown: scoreDetails.breakdown
-            });
+              // Skor kaydetme
+              ScoreHandler.saveScore(gameType, finalScore, difficulty, playtime, {
+                ...gameStats,
+                scoreBreakdown: scoreDetails.breakdown
+              });
+            }
           }
         });
 
@@ -352,6 +368,8 @@ function loadArticleContent() {
 
 <!-- iOS Swipe Navigasyon - Touch cihazlar için optimize edildi -->
 <script src="{{ url_for('static', filename='js/swipeNavigation.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/bot-avatar-support.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/theme-cleanup.js') }}" defer></script>
 
 <script>
 // Seviye yükseltme bildirimi ve konfeti animasyonu
@@ -436,5 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
+
   </body>
 </html>

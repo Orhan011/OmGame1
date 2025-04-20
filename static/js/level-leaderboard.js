@@ -1,9 +1,8 @@
-
 // Sayfa yüklendiğinde seviye tablosunu getir
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('levelLeaderboardContainer')) {
     loadLevelLeaderboard();
-    
+
     // Her 60 saniyede bir tabloyu otomatik güncelle
     setInterval(loadLevelLeaderboard, 60000);
   }
@@ -12,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Seviye tablosunu yükleyen fonksiyon
 function loadLevelLeaderboard() {
   const levelLeaderboardContainer = document.getElementById('levelLeaderboardContainer');
-  
+
   // Yükleniyor gösterimi
   levelLeaderboardContainer.innerHTML = `
     <div class="loading">
@@ -63,7 +62,14 @@ function loadLevelLeaderboard() {
         else if (index === 2) userNameColorClass = 'third-place';
         else if (index < 10) userNameColorClass = 'top-ten';
 
-        const avatarUrl = player.avatar_url || '';
+        // Avatar URL'sini düzelt ve kontrol et
+        let avatarUrl = player.avatar_url || '';
+        // Fix avatar URL if it's from static folder
+        if (avatarUrl && avatarUrl.startsWith('avatars/')) {
+          avatarUrl = '/static/' + avatarUrl;
+        } else if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
+          avatarUrl = '/' + avatarUrl;
+        }
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
 
         html += `
@@ -75,7 +81,7 @@ function loadLevelLeaderboard() {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="/${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }

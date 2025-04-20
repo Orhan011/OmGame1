@@ -1,4 +1,4 @@
-# Python
+# Python artifacts
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,32 +20,51 @@ var/
 .installed.cfg
 *.egg
 
+# Flask artifacts
+instance/
+.webassets-cache
+
 # Virtual Environment
 venv/
 ENV/
 
-# Flask
-instance/
-.webassets-cache
-
-# SQLite
-*.sqlite
-*.db
-
-# Replit 
+# Replit specific
 .replit
 replit.nix
 .config/
-.cache/
+.upm/
 
-# Environment Variables
-.env
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
-# Other
-.DS_Store
+# IDE files
 .idea/
-*.swp
-*.swo
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
 
 # Logs
 *.log
+debug_output.log
+
+# User uploads (uncomment if you want to exclude)
+# static/uploads/
+# static/avatars/
+
+# Temporary files
+tmp*
+temp*
+.DS_Store

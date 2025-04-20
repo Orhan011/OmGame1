@@ -1,0 +1,68 @@
+### **Profesyonel Prompt: "X2 Blocks: 2048 Number Puzzle" Oyun Tasarımı ve Çalışma Mantığı**  
+
+**Amaç:**  
+"X2 Blocks: 2048 Number Puzzle" tarzı bir sayı birleştirme oyununun **tasarımını, mekaniklerini ve çalışma mantığını** detaylı bir şekilde analiz eden profesyonel bir doküman hazırlanması.  
+
+---  
+
+### **1. Oyun Mekaniği ve Temel Kurallar**  
+- **Oyunun Temel Hedefi:** Oyuncular, 4x4 (veya farklı boyutlarda) bir ızgarada kaydırma hareketleriyle blokları birleştirerek **"2048"** ve üzeri değerlere ulaşmaya çalışır.  
+- **Blok Oluşumu:**  
+  - Her hamlede rastgele bir boş kareye **"2"** veya **"4"** değerinde yeni bir blok eklenir.  
+  - Aynı değerdeki bloklar çarpıştığında birleşir ve toplamları yeni bir blok olur (2+2=4, 4+4=8, ..., 1024+1024=2048).  
+- **Kontrol Sistemi:**  
+  - Kaydırma (swipe) veya dokunmatik yön tuşları ile bloklar **yukarı, aşağı, sağa, sola** hareket ettirilir.  
+  - Bloklar, hareket yönünde duvara kadar kayar ve eşleşme varsa birleşir.  
+
+---  
+
+### **2. Oyun Tasarımı ve Kullanıcı Deneyimi (UX/UI)**  
+- **Arayüz Tasarımı:**  
+  - **Minimal ve temiz tasarım** (rakamlar net, renkler ayırt edici).  
+  - Blok renkleri, değerlerine göre gradiyent veya farklı paletlerle kodlanmış.  
+  - Skor tablosu (mevcut puan, en yüksek puan) ve hamle sayacı belirgin şekilde gösterilir.  
+- **Animasyon ve Feedback:**  
+  - Blok birleşmelerinde **parlama, hafif büyüme efekti**.  
+  - Kaydırma hareketlerinde **yumuşak animasyonlar**.  
+  - Oyun sonu (yenilgi) durumunda **"Game Over"** veya **"Yeniden Dene"** butonu.  
+
+---  
+
+### **3. Teknik Altyapı ve Algoritma**  
+- **Oyun Mantığı (Pseudocode):**  
+  ```  
+  FUNCTION handleSwipe(direction):  
+    FOR each tile in grid (ordered by direction):  
+      IF tile has a value:  
+        MOVE tile as far as possible in direction  
+        IF next tile has same value:  
+          MERGE tiles (sum values)  
+          ADD merged value to score  
+          SPAWN new random "2" or "4" tile in empty space  
+  ```  
+- **Rastgele Blok Üretimi:**  
+  - Boş hücreler listelenir, rastgele biri seçilir ve %90 "2", %10 "4" yerleştirilir.  
+- **Kazanma/Kaybetme Kontrolü:**  
+  - **Kazanma:** 2048 veya üstü bir blok oluştuğunda.  
+  - **Kaybetme:** Tüm hücreler dolu ve hiçbir birleştirme hamlesi kalmadığında.  
+
+---  
+
+### **4. Oyun Döngüsü ve Progression**  
+- **Zorluk Seviyeleri:**  
+  - 4x4 (klasik), 5x5 (zor), 3x3 (hızlı) gibi farklı ızgara boyutları.  
+  - "Zaman modu" veya "hamle sınırı" gibi varyasyonlar.  
+- **Geri Bildirim ve Ödüller:**  
+  - Her yeni en yüksek skorda tebrik mesajı.  
+  - Başarı rozetleri (ör: "512 bloğunu ilk kez birleştirdin!").  
+
+---  
+
+**Sonuç:**  
+Bu prompt, "2048" klonlarının temel tasarımını, kod yapısını ve kullanıcı deneyimi unsurlarını kapsamlı şekilde açıklar. Geliştiriciler, bu çerçeveyi genişleterek **özelleştirilmiş tema, yeni modlar veya mekanikler** ekleyebilir.  
+
+### ** Teknik Uygulama**
+- **Web Teknolojileri:**  
+  - **HTML5 Canvas + JavaScript** (temiz ve performanslı bir çözüm).  
+  - **React/Phaser.js** gibi kütüphanelerle daha interaktif hale getirebilirsiniz.  
+- **Mobil Uyumluluk:** Dokunmatik kontroller için **touch event** desteği ekleyin.  

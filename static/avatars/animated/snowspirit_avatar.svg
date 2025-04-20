@@ -1,0 +1,91 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#ADD8E6" />
+  
+  <!-- Snowflake Background -->
+  <g id="snowflake-bg" opacity="0.3">
+    <path d="M100,40 L100,160" stroke="#FFFFFF" stroke-width="2" />
+    <path d="M40,100 L160,100" stroke="#FFFFFF" stroke-width="2" />
+    <path d="M60,60 L140,140" stroke="#FFFFFF" stroke-width="2" />
+    <path d="M60,140 L140,60" stroke="#FFFFFF" stroke-width="2" />
+  </g>
+  
+  <!-- Snow Spirit -->
+  <circle cx="100" cy="100" r="50" fill="#E0F7FF" opacity="0.9">
+    <animate attributeName="r" values="50;52;50" dur="3s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Snowflake Core -->
+  <circle cx="100" cy="100" r="30" fill="#FFFFFF" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Eyes -->
+  <circle cx="85" cy="90" r="5" fill="#87CEFA" />
+  <circle cx="115" cy="90" r="5" fill="#87CEFA" />
+  
+  <!-- Mouth -->
+  <path d="M90,115 Q100,125 110,115" stroke="#87CEFA" stroke-width="2" fill="none" />
+  
+  <!-- Snowflake Decorations -->
+  <g id="snowflake-decorations">
+    <!-- Top -->
+    <path d="M100,45 L100,55" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M95,50 L105,50" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Bottom -->
+    <path d="M100,145 L100,155" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M95,150 L105,150" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Left -->
+    <path d="M45,100 L55,100" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M50,95 L50,105" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Right -->
+    <path d="M145,100 L155,100" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M150,95 L150,105" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Diagonal Top-Left to Bottom-Right -->
+    <path d="M65,65 L75,75" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M72,67 L68,73" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Diagonal Top-Right to Bottom-Left -->
+    <path d="M135,65 L125,75" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M128,67 L132,73" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Diagonal Bottom-Left to Top-Right -->
+    <path d="M65,135 L75,125" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M68,127 L72,133" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Diagonal Bottom-Right to Top-Left -->
+    <path d="M135,135 L125,125" stroke="#FFFFFF" stroke-width="3" />
+    <path d="M132,127 L128,133" stroke="#FFFFFF" stroke-width="3" />
+  </g>
+  
+  <!-- Sparkles -->
+  <g id="sparkles">
+    <circle cx="70" cy="50" r="2" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0s" />
+    </circle>
+    <circle cx="130" cy="50" r="2" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.4s" />
+    </circle>
+    <circle cx="50" cy="130" r="2" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.8s" />
+    </circle>
+    <circle cx="150" cy="130" r="2" fill="#FFFFFF">
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="1.2s" />
+    </circle>
+  </g>
+  
+  <!-- Floating Animation for the Entire Spirit -->
+  <animateTransform 
+    xlink:href="#snowflake-core"
+    attributeName="transform"
+    attributeType="XML"
+    type="translate"
+    values="0,0; 0,-5; 0,0"
+    dur="3s"
+    repeatCount="indefinite" />
+</svg>

@@ -1,204 +1,35 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="minesweeper-page">
-  <div class="mine-game-container">
-    <div class="game-header-section">
-      <div class="game-title">
-        <h1>Mayın Tarlası</h1>
-        <p class="game-subtitle">Mantık yürüterek mayınları işaretle ve tarlanı temizle!</p>
-      </div>
-
-      <div class="game-controls-section">
-        <div class="game-stats">
-          <div class="stat-box mines-counter">
-            <i class="fas fa-bomb"></i>
-            <span id="mines-left">10</span>
-          </div>
-          <div class="stat-box timer">
-            <i class="fas fa-clock"></i>
-            <span id="timer">00:00</span>
-          </div>
-        </div>
-
-        <div class="difficulty-selector">
-          <select id="difficulty-select" class="difficulty-select">
-            <option value="beginner">Kolay (9x9, 10 mayın)</option>
-            <option value="intermediate">Orta (16x16, 40 mayın)</option>
-            <option value="expert">Uzman (16x30, 99 mayın)</option>
-          </select>
-          <button id="new-game-btn" class="control-btn new-game">
-            <i class="fas fa-play"></i> Yeni Oyun
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="game-board-section">
-      <div id="mine-field-container">
-        <div class="board-background">
-          <div id="mine-field" class="mine-field">
-            <!-- JavaScript ile mayın tarlası burada oluşturulacak -->
-          </div>
-          <div class="board-shadow"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="game-options-section">
-      <div class="options-row">
-        <div class="option-toggle">
-          <label class="toggle-switch">
-            <input type="checkbox" id="first-click-safe" checked>
-            <span class="toggle-slider"></span>
-          </label>
-          <span class="option-label">İlk Tıklama Güvenli</span>
-        </div>
-
-        <div class="option-toggle">
-          <label class="toggle-switch">
-            <input type="checkbox" id="highlight-suggestions" checked>
-            <span class="toggle-slider"></span>
-          </label>
-          <span class="option-label">İpuçlarını Vurgula</span>
-        </div>
-      </div>
-
-      <div class="help-buttons">
-        <button id="hint-btn" class="help-btn">
-          <i class="fas fa-lightbulb"></i> İpucu
-        </button>
-        <button id="help-btn" class="help-btn">
-          <i class="fas fa-question-circle"></i> Nasıl Oynanır?
-        </button>
-      </div>
-    </div>
+<div class="container game-container">
+  <div class="game-header">
+    <h1 class="game-title">Mayın Tarlası <i class="fas fa-lock lock-icon"></i></h1>
+    <p class="game-description">Mantık yürüterek mayınları işaretle ve tarlanı temizle!</p>
   </div>
 
-  <!-- Yardım Paneli (varsayılan olarak gizli) -->
-  <div id="help-panel" class="help-panel hidden">
-    <div class="help-header">
-      <h3><i class="fas fa-question-circle"></i> Nasıl Oynanır?</h3>
-      <button id="close-help-btn" class="close-btn"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="help-content">
-      <div class="help-section">
-        <h4>Kontroller</h4>
-        <div class="control-instruction">
-          <div class="control-icon"><i class="fas fa-mouse-pointer"></i></div>
-          <div class="control-info">
-            <h5>Sol Tıklama</h5>
-            <p>Bir kareyi açar. Mayın yoksa, etrafındaki mayın sayısını gösterir.</p>
-          </div>
-        </div>
-        <div class="control-instruction">
-          <div class="control-icon"><i class="fas fa-flag"></i></div>
-          <div class="control-info">
-            <h5>Sağ Tıklama</h5>
-            <p>Mayın olduğunu düşündüğünüz kareyi işaretler.</p>
-          </div>
-        </div>
-        <div class="control-instruction">
-          <div class="control-icon"><i class="fas fa-mouse"></i></div>
-          <div class="control-info">
-            <h5>Çift/Orta Tıklama</h5>
-            <p>Açık bir sayı karesindeki işaretli mayın sayısı, gösterilen sayıya eşitse, etrafındaki işaretlenmemiş tüm kareleri açar.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="help-section">
-        <h4>Oyun Mantığı</h4>
-        <p>Her kare şu durumlardan birindedir:</p>
-        <ul>
-          <li>Kapalı (bilinmeyen)</li>
-          <li>Bayrakla işaretli (mayın olduğunu düşündüğünüz)</li>
-          <li>Açık ve sayı içeriyor (etrafındaki mayın sayısı)</li>
-          <li>Açık ve boş (etrafında mayın yok)</li>
-        </ul>
-        <p>Açılan sayılar, etraflarındaki 8 karede bulunan mayın sayısını gösterir. Bu ipuçlarını kullanarak mayınları mantıksal olarak bulabilirsiniz.</p>
-      </div>
-
-      <div class="help-section">
-        <h4>Stratejiler</h4>
-        <ul>
-          <li>Sıfır gösterilen kareler güvenlidir ve etrafındaki tüm kareler otomatik açılır.</li>
-          <li>Sayının etrafında tam o kadar bayrak varsa, diğer tüm kareler güvenlidir.</li>
-          <li>Sayının etrafındaki bilinmeyen kare sayısı, gösterilen sayıya eşitse, hepsi mayındır.</li>
-        </ul>
-      </div>
+  <div id="minesweeper-container" class="coming-soon-container">
+    <div class="coming-soon-message">
+      <i class="fas fa-hourglass-half pulse"></i>
+      <h2>Çok Yakında</h2>
+      <p>Bu oyun yapım aşamasındadır. Lütfen daha sonra tekrar ziyaret edin.</p>
     </div>
   </div>
 </div>
 
-<!-- Sonuç Modalı -->
-<div class="modal fade" id="result-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<div id="messageModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modal-title">Tebrikler!</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">Bilgi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
       </div>
-      <div class="modal-body">
-        <div id="win-message" class="result-message win">
-          <div class="result-icon">
-            <i class="fas fa-trophy"></i>
-          </div>
-          <h4>Mayın tarlasını başarıyla temizlediniz!</h4>
-          <p>Harika bir sonuç! Tüm mayınları doğru işaretlediniz.</p>
-        </div>
-        <div id="lose-message" class="result-message lose" style="display:none;">
-          <div class="result-icon">
-            <i class="fas fa-bomb"></i>
-          </div>
-          <h4>Boom! Mayına bastınız!</h4>
-          <p>Üzülme, bir dahaki sefere daha dikkatli ol!</p>
-        </div>
-        <div class="result-stats">
-          <div class="stat-item">
-            <div class="stat-label">Süre</div>
-            <div class="stat-value" id="result-time">00:00</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Zorluk</div>
-            <div class="stat-value" id="result-difficulty">Kolay</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Mayınlar</div>
-            <div class="stat-value" id="result-mines">10</div>
-          </div>
-        </div>
-
-        <!-- Skor Gösterimi (Score Display) -->
-        <div id="score-display-container" class="mt-4"></div>
+      <div class="modal-body text-center">
+        <i class="fas fa-hourglass-half fa-3x mb-3 text-primary"></i>
+        <h4>Çok Yakında</h4>
+        <p>Bu oyun şu anda geliştirme aşamasındadır. Çok yakında burada olacak!</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
-        <button type="button" class="modal-btn primary" id="new-game-modal">Yeni Oyun</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- İpucu Modalı -->
-<div class="modal fade" id="hint-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">İpucu</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="hint-content">
-          <div class="hint-icon">
-            <i class="fas fa-lightbulb"></i>
-          </div>
-          <p id="hint-text">Burada bir ipucu göreceksiniz...</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="modal-btn secondary" data-bs-dismiss="modal">Kapat</button>
-        <button type="button" class="modal-btn primary" id="show-hint-btn">Göster</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tamam</button>
       </div>
     </div>
   </div>
@@ -206,116 +37,78 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/static/css/games/minesweeper.css">
-<link rel="stylesheet" href="/static/css/score-display.css">
+<style>
+  .lock-icon {
+    color: #ff9800;
+    margin-left: 10px;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .coming-soon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    margin: 30px 0;
+    cursor: pointer;
+  }
+
+  .coming-soon-message {
+    text-align: center;
+    padding: 40px;
+  }
+
+  .coming-soon-message i {
+    font-size: 3em;
+    color: #ff9800;
+    margin-bottom: 20px;
+  }
+
+  .coming-soon-message h2 {
+    font-size: 2em;
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  .coming-soon-message p {
+    font-size: 1.1em;
+    color: #666;
+  }
+
+  .pulse {
+    animation: pulse 1.5s infinite;
+  }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-<script src="/static/js/score-display.js"></script>
-<script src="/static/js/score-handler.js"></script>
-<script src="/static/js/games/minesweeper.js"></script>
-<script src="/static/js/scoreCalculator.js"></script>
-<script src="/static/js/score-handler.js"></script>
-<script src="/static/js/score-display.js"></script>
-<script src="/static/js/game-score-integration.js"></script>
-<script src="/static/js/game-integration-helper.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Oyun başlatıldıktan sonra puan entegrasyonunu ekle
-    if (typeof window.minesweeperGame !== 'undefined') {
-      const scoreSystem = integrateGameScore('minesweeper', window.minesweeperGame, {
-        maxScore: 100,
-        expectedTime: 300 // 5 dakika
-      });
-      
-      // Zorluk dinleyicisini kur
-      setupDifficultyListener(scoreSystem);
-      
-      // Hamle sayacını izle
-      const originalReveal = window.minesweeperGame.revealCell;
-      window.minesweeperGame.revealCell = function(...args) {
-        const wasHidden = !this.revealed[args[0]][args[1]];
-        const result = originalReveal.apply(this, args);
-        
-        // Sadece gizli hücreleri açınca hamle say
-        if (result && wasHidden) {
-          scoreSystem.incrementMoves();
-        }
-        return result;
-      };
-      
-      // İpucu kullanımını izle
-      if (typeof window.minesweeperGame.useHint === 'function') {
-        const originalHint = window.minesweeperGame.useHint;
-        window.minesweeperGame.useHint = function(...args) {
-          const result = originalHint.apply(this, args);
-          if (result) {
-            scoreSystem.incrementHints();
-          }
-          return result;
-        };
-      }
-      
-      // Oyun kazanıldığında puan hesapla
-      const originalCheckWin = window.minesweeperGame.checkWin;
-      window.minesweeperGame.checkWin = function(...args) {
-        const isWon = originalCheckWin.apply(this, args);
-        
-        if (isWon) {
-          // Oyun süresini hesapla
-          const timeSpent = (Date.now() - scoreSystem.startTime) / 1000;
-          
-          // Mayın tarlası için temizlenmesi gereken hücre sayısı
-          const totalCells = this.width * this.height;
-          const remainingCells = totalCells - this.mines - this.revealedCount;
-          const completion = (totalCells - this.mines - remainingCells) / (totalCells - this.mines);
-          
-          // Oyundaki ham puan (0-100)
-          const timeFactor = Math.min(1, scoreSystem.expectedTime / timeSpent);
-          const completionScore = completion * 80; // Tamamlanma oranı 80 puana kadar etkili
-          const timeScore = timeFactor * 20; // Hız faktörü 20 puana kadar etkili
-          const hintPenalty = (this.hintsUsed || 0) * 5;
-          const rawScore = Math.max(0, completionScore + timeScore - hintPenalty);
-          
-          // Metrikleri güncelle
-          scoreSystem.updateMetrics({
-            hintsUsed: this.hintsUsed || 0,
-            completed: true,
-            score: rawScore
-          });
-          
-          // Puan hesapla ve göster
-          scoreSystem.endGame(true);
-        }
-        
-        return isWon;
-      };
-      
-      // Oyun kaybedildiğinde puan hesapla (mayına basınca)
-      const originalGameOver = window.minesweeperGame.gameOver;
-      window.minesweeperGame.gameOver = function(...args) {
-        const result = originalGameOver.apply(this, args);
-        
-        // Mayın tarlası için temizlenmesi gereken hücre sayısı
-        const totalCells = this.width * this.height;
-        const completion = this.revealedCount / (totalCells - this.mines);
-        
-        // Kısmi tamamlamaya göre puan - maksimum 50 puan
-        const partialScore = Math.max(0, Math.floor(completion * 50));
-        
-        // Metrikleri güncelle
-        scoreSystem.updateMetrics({
-          hintsUsed: this.hintsUsed || 0,
-          completed: false,
-          score: partialScore
-        });
-        
-        // Puan hesapla ve göster (oyun tamamlanmadı)
-        scoreSystem.endGame(false);
-        
-        return result;
-      };
-    }
+    // Show modal when page loads
+    var myModal = new bootstrap.Modal(document.getElementById('messageModal'));
+    myModal.show();
+
+    // Also show modal when clicking on the coming soon container
+    document.querySelector('.coming-soon-container').addEventListener('click', function() {
+      myModal.show();
+    });
   });
 </script>
 {% endblock %}

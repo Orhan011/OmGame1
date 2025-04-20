@@ -9,11 +9,11 @@
   --memory-card-font-size: 2.2rem;
   --memory-animation-time: 0.6s;
 
-  /* Modern Game Colors - Updated elegant and professional palette */
-  --memory-primary: #6366f1; /* Indigo */
-  --memory-secondary: #4f46e5; /* Deep indigo */
-  --memory-tertiary: #8b5cf6; /* Purple accent */
-  --memory-success: #10b981; /* Emerald green */
+  /* Modern Game Colors - Enhanced for language learning */
+  --memory-primary: #4a6bdf; /* Royal blue */
+  --memory-secondary: #3b55c5; /* Deep blue */
+  --memory-tertiary: #6d8bf8; /* Light blue accent */
+  --memory-success: #1db954; /* Spotify green */
   --memory-warning: #f59e0b; /* Amber */
   --memory-danger: #ef4444; /* Modern red */
   
@@ -22,16 +22,16 @@
   --memory-dark-bg: rgba(15, 23, 42, 0.75);
   --memory-darker-bg: rgba(10, 15, 30, 0.85);
   
-  /* Enhanced card styles with modern gradients */
-  --memory-card-back: linear-gradient(145deg, #818cf8, #4338ca); /* Rich indigo gradient */
-  --memory-front-bg: linear-gradient(145deg, rgba(99, 102, 241, 0.85), rgba(67, 56, 202, 0.95));
-  --memory-card-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
-  --memory-card-border: rgba(99, 102, 241, 0.35);
+  /* Enhanced card styles with modern gradients for language cards */
+  --memory-card-back: linear-gradient(145deg, #4a6bdf, #3b55c5); /* Royal blue gradient */
+  --memory-front-bg: linear-gradient(145deg, #4a6bdf, #3b55c5); /* Royal blue gradient */
+  --memory-card-shadow: 0 15px 30px rgba(74, 107, 223, 0.4);
+  --memory-card-border: rgba(74, 107, 223, 0.35);
   
   /* Improved text and accent colors */
   --memory-light-text: rgba(255, 255, 255, 0.98);
-  --memory-muted-text: rgba(255, 255, 255, 0.75);
-  --memory-border-color: rgba(99, 102, 241, 0.28);
+  --memory-muted-text: rgba(255, 255, 255, 0.85);
+  --memory-border-color: rgba(74, 107, 223, 0.28);
   --memory-border-light: rgba(255, 255, 255, 0.18);
   --memory-glass-effect: rgba(255, 255, 255, 0.04);
   
@@ -40,8 +40,8 @@
   --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   
   /* Enhanced glowing effects for better visual feedback */
-  --memory-glow-primary: 0 0 30px rgba(99, 102, 241, 0.45);
-  --memory-glow-success: 0 0 30px rgba(16, 185, 129, 0.45);
+  --memory-glow-primary: 0 0 30px rgba(74, 107, 223, 0.45);
+  --memory-glow-success: 0 0 30px rgba(29, 185, 84, 0.45);
   --memory-glow-warning: 0 0 30px rgba(245, 158, 11, 0.45);
 }
 
@@ -842,44 +842,64 @@
   align-items: center;
   font-size: var(--memory-card-font-size);
   box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.35), 
+    0 15px 35px rgba(0, 0, 0, 0.25), 
     0 0 0 1px rgba(99, 102, 241, 0.25);
   transition: all 0.3s var(--transition-smooth);
   overflow: hidden;
 }
 
-/* Front Card Face - More modern styling */
+/* Front Card Face - Enhanced modern styling for language learning */
 .memory-card__front {
-  background: var(--memory-front-bg);
+  background: linear-gradient(145deg, #4a6bdf, #3b55c5);
   transform: rotateY(180deg);
   color: white;
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  text-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.4), 
+    0 15px 35px rgba(0, 0, 0, 0.3), 
     inset 0 0 20px rgba(255, 255, 255, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-/* Add depth to front card face with inner glowing effect */
+/* Add content styling for language cards */
+.memory-card__front .card-word {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+  display: block;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.memory-card__front .card-translation {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+  display: block;
+}
+
+/* Add depth to front card face with enhanced glowing effect */
 .memory-card__front::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent 70%);
   opacity: 0.7;
 }
 
-/* Back Card Face - More elegant design */
+/* Back Card Face - Enhanced elegant design */
 .memory-card__back {
-  background: var(--memory-card-back);
+  background: linear-gradient(145deg, #3955d1, #2a43b3);
   color: transparent;
-  border: 3px solid rgba(129, 140, 248, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.15);
   position: relative;
   box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.4), 
-    inset 0 0 15px rgba(255, 255, 255, 0.15),
-    0 0 0 1px rgba(129, 140, 248, 0.2);
+    0 15px 35px rgba(0, 0, 0, 0.3), 
+    inset 0 0 15px rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(74, 107, 223, 0.4);
 }
 
 /* Back pattern - More elegant and modern */
@@ -903,7 +923,7 @@
   position: absolute;
   width: 200%;
   height: 200%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
   top: -50%;
   left: -50%;
   transform: rotate(35deg);
@@ -922,19 +942,19 @@
 /* Add subtle glow effect on hover */
 .memory-card:hover .memory-card__back {
   box-shadow: 
-    0 20px 35px rgba(0, 0, 0, 0.4), 
-    inset 0 0 25px rgba(255, 255, 255, 0.15), 
-    0 0 15px rgba(99, 102, 241, 0.3);
+    0 20px 35px rgba(0, 0, 0, 0.3), 
+    inset 0 0 25px rgba(255, 255, 255, 0.1), 
+    0 0 15px rgba(74, 107, 223, 0.5);
 }
 
 /* Card States */
 /* Matched cards styling */
 .memory-card.matched .memory-card__front {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.85), rgba(5, 150, 105, 0.95));
-  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(145deg, #1db954, #169e46);
+  border-color: rgba(29, 185, 84, 0.5);
   box-shadow: 
-    0 0 30px rgba(16, 185, 129, 0.5),
-    inset 0 0 15px rgba(255, 255, 255, 0.3);
+    0 0 30px rgba(29, 185, 84, 0.5),
+    inset 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .memory-card.matched {
@@ -946,7 +966,7 @@
   content: '';
   position: absolute;
   inset: -8px;
-  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.3), transparent 70%);
+  background: radial-gradient(circle at center, rgba(29, 185, 84, 0.3), transparent 70%);
   border-radius: 20px;
   opacity: 0;
   z-index: -1;
@@ -962,10 +982,20 @@
   top: 0;
   left: 0;
   border-radius: 16px;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 20px rgba(29, 185, 84, 0.6);
   opacity: 0;
   z-index: 5;
   animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+
+/* Hint cards styling - Improved contrast */
+.memory-card.hint .memory-card__front {
+  background: linear-gradient(145deg, #f59e0b, #d97706);
+  box-shadow: 
+    0 0 30px rgba(245, 158, 11, 0.5),
+    inset 0 0 15px rgba(255, 255, 255, 0.2);
+  border-color: rgba(245, 158, 11, 0.5);
+  animation: hint-pulse 1.5s infinite alternate;
 }
 
 @keyframes success-pulse {

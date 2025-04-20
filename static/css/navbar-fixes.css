@@ -40,10 +40,10 @@
 /* Mobil görünümde kullanıcı dropdown menüsünün her zaman görünmesi için */
 @media (max-width: 991.98px) {
   .navbar-nav.ms-auto.d-flex {
-    position: absolute;
+    position: fixed;
     right: 70px;
     top: 12px;
-    z-index: 1050;
+    z-index: 1060;
   }
   
   /* Hamburger menüde kullanıcı bilgilerini gizle */
@@ -55,5 +55,56 @@
   .navbar-nav.ms-auto.d-flex .user-dropdown {
     background-color: rgba(106, 90, 224, 0.1);
     padding: 8px;
+  }
+}
+
+/* Navbar corner avatar styles */
+.navbar-avatar-corner {
+  position: fixed;
+  right: 60px;
+  top: 25px;
+  z-index: 1070;
+}
+
+.navbar-corner-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.navbar-corner-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 12px rgba(106, 90, 224, 0.4);
+}
+
+.navbar-corner-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a5ae0, #9f8aff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  font-size: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.navbar-corner-avatar-placeholder:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 12px rgba(106, 90, 224, 0.4);
+}
+
+/* Show only on mobile */
+@media (min-width: 992px) {
+  .navbar-avatar-corner {
+    display: none;
   }
 }

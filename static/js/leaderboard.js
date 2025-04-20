@@ -1,4 +1,3 @@
-
 // Sayfa yüklendiğinde skorları getir
 document.addEventListener('DOMContentLoaded', function() {
   loadLeaderboard('all');
@@ -61,7 +60,13 @@ function loadLeaderboard(gameType = 'all') {
         else if (index === 2) userNameColorClass = 'third-place';
         else if (index < 10) userNameColorClass = 'top-ten';
 
-        const avatarUrl = player.avatar_url || '';
+        let avatarUrl = player.avatar_url || '';
+        // Fix avatar URL if it's from static folder
+        if (avatarUrl && avatarUrl.startsWith('avatars/')) {
+          avatarUrl = '/static/' + avatarUrl;
+        } else if (avatarUrl && !avatarUrl.startsWith('http') && !avatarUrl.startsWith('/')) {
+          avatarUrl = '/' + avatarUrl;
+        }
         const crownHTML = index === 0 ? '<div class="crown"><i class="fas fa-crown"></i></div>' : '';
         const scoreValue = gameType === 'all' ? player.total_score : player.score;
 
@@ -74,7 +79,7 @@ function loadLeaderboard(gameType = 'all') {
               <div class="player-avatar">
                 ${crownHTML}
                 ${avatarUrl ? 
-                  `<img src="/${avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                  `<img src="${avatarUrl.startsWith('/') ? avatarUrl : '/' + avatarUrl}" alt="${player.username}" class="avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                    <span class="avatar-content" style="display:none">${initial}</span>` : 
                   `<span class="avatar-content">${initial}</span>`
                 }

@@ -1,0 +1,80 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Definitions for gradient and filters -->
+  <defs>
+    <!-- Fire gradient -->
+    <radialGradient id="fireGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#FFFF00" />
+      <stop offset="40%" stop-color="#FF9900" />
+      <stop offset="70%" stop-color="#FF3300" />
+      <stop offset="100%" stop-color="#CC0000" />
+    </radialGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#330000" />
+  
+  <!-- Fire Core -->
+  <circle cx="100" cy="100" r="60" fill="url(#fireGradient)" filter="url(#glow)">
+    <animate attributeName="r" values="60;62;60" dur="1s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Fire Flames -->
+  <g id="flames" filter="url(#glow)">
+    <!-- Outer Flames -->
+    <path d="M100,35 Q120,50 110,70 Q140,60 130,90 Q150,80 140,110 Q160,100 130,140 Q170,130 100,165 Q30,130 60,140 Q40,100 70,110 Q50,80 70,90 Q60,60 90,70 Q80,50 100,35" fill="#FF6600">
+      <animate attributeName="d" 
+               values="M100,35 Q120,50 110,70 Q140,60 130,90 Q150,80 140,110 Q160,100 130,140 Q170,130 100,165 Q30,130 60,140 Q40,100 70,110 Q50,80 70,90 Q60,60 90,70 Q80,50 100,35;
+                     M100,35 Q125,55 115,70 Q145,65 135,90 Q155,85 145,110 Q165,105 135,140 Q175,135 100,165 Q25,135 65,140 Q35,105 65,110 Q45,85 65,90 Q55,65 85,70 Q75,55 100,35;
+                     M100,35 Q120,50 110,70 Q140,60 130,90 Q150,80 140,110 Q160,100 130,140 Q170,130 100,165 Q30,130 60,140 Q40,100 70,110 Q50,80 70,90 Q60,60 90,70 Q80,50 100,35" 
+               dur="2s" repeatCount="indefinite" />
+    </path>
+    
+    <!-- Inner Flames -->
+    <path d="M100,50 Q110,60 105,80 Q125,75 115,95 Q135,90 120,120 Q145,110 100,145 Q55,110 80,120 Q65,90 85,95 Q75,75 95,80 Q90,60 100,50" fill="#FFCC00">
+      <animate attributeName="d" 
+               values="M100,50 Q110,60 105,80 Q125,75 115,95 Q135,90 120,120 Q145,110 100,145 Q55,110 80,120 Q65,90 85,95 Q75,75 95,80 Q90,60 100,50;
+                     M100,50 Q115,65 110,80 Q130,80 120,95 Q140,95 125,120 Q150,115 100,145 Q50,115 75,120 Q60,95 80,95 Q70,80 90,80 Q85,65 100,50;
+                     M100,50 Q110,60 105,80 Q125,75 115,95 Q135,90 120,120 Q145,110 100,145 Q55,110 80,120 Q65,90 85,95 Q75,75 95,80 Q90,60 100,50" 
+               dur="2.5s" repeatCount="indefinite" />
+    </path>
+  </g>
+  
+  <!-- Eyes -->
+  <circle cx="80" cy="90" r="8" fill="#330000" />
+  <circle cx="120" cy="90" r="8" fill="#330000" />
+  
+  <!-- Glowing Pupils -->
+  <circle cx="82" cy="88" r="3" fill="#FFFF00">
+    <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="122" cy="88" r="3" fill="#FFFF00">
+    <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Ember Particles -->
+  <g id="embers">
+    <circle cx="90" cy="50" r="2" fill="#FFFF00">
+      <animate attributeName="cy" values="50;30;50" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="110" cy="50" r="2" fill="#FFFF00">
+      <animate attributeName="cy" values="50;35;50" dur="2.5s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="70" cy="70" r="2" fill="#FFFF00">
+      <animate attributeName="cy" values="70;50;70" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0;1" dur="4s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="130" cy="70" r="2" fill="#FFFF00">
+      <animate attributeName="cy" values="70;55;70" dur="3.5s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="1;0;1" dur="3.5s" repeatCount="indefinite" />
+    </circle>
+  </g>
+</svg>
