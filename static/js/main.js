@@ -377,6 +377,111 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Hamburger menü toggle
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navbarMenu = document.querySelector('#navbarNav');
+
+  if (navbarToggler && navbarMenu) {
+    navbarToggler.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  // Çerezleri kabul et
+  const cookieBanner = document.getElementById('cookie-consent-banner');
+  const acceptCookies = document.getElementById('accept-cookies');
+
+  if (cookieBanner && acceptCookies) {
+    if (!getCookie('cookie_consent')) {
+      cookieBanner.style.display = 'block';
+    }
+
+    acceptCookies.addEventListener('click', function() {
+      setCookie('cookie_consent', 'true', 365);
+      cookieBanner.style.display = 'none';
+    });
+  }
+
+  // Tüm butonları modernize et
+  modernizeButtons();
+
+  // Çerez ayarlama fonksiyonu
+  function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  }
+
+  // Çerez okuma fonksiyonu
+  function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+
+  // Butonları modernize etme fonksiyonu
+  function modernizeButtons() {
+    // Standart butonlar
+    document.querySelectorAll('.btn:not(.navbar-toggler):not(.close):not(.btn-sm):not(.btn-link)').forEach(button => {
+      // Eğer yeni modern sınıf zaten eklenmemişse
+      if (!button.classList.contains('modern-btn')) {
+        button.classList.add('modern-btn');
+
+        // Buton türlerine göre modern sınıflar ekle
+        if (button.classList.contains('btn-primary')) {
+          button.classList.add('modern-btn-primary');
+        } else if (button.classList.contains('btn-secondary')) {
+          button.classList.add('modern-btn-secondary');
+        } else if (button.classList.contains('btn-success')) {
+          button.classList.add('modern-btn-success');
+        } else if (button.classList.contains('btn-danger')) {
+          button.classList.add('modern-btn-danger');
+        } else if (button.classList.contains('btn-warning')) {
+          button.classList.add('modern-btn-warning');
+        } else if (button.classList.contains('btn-info')) {
+          button.classList.add('modern-btn-info');
+        } else if (button.classList.contains('btn-outline-primary')) {
+          button.classList.add('modern-btn-outline', 'modern-btn-outline-primary');
+        }
+
+        // Buton boyutuna göre sınıflar
+        if (button.classList.contains('btn-lg')) {
+          button.classList.add('modern-btn-lg');
+        }
+      }
+    });
+
+    // Oyun butonları
+    document.querySelectorAll('.btn-game').forEach(button => {
+      if (!button.classList.contains('modern-btn')) {
+        button.classList.add('modern-btn', 'modern-btn-primary');
+      }
+    });
+
+    // Standart başlat butonları
+    document.querySelectorAll('.standard-start-btn').forEach(button => {
+      if (!button.classList.contains('modern-btn')) {
+        button.classList.add('modern-btn', 'modern-btn-primary');
+      }
+    });
+
+    // Standart geri butonları
+    document.querySelectorAll('.standard-back-btn').forEach(button => {
+      if (!button.classList.contains('modern-btn')) {
+        button.classList.add('modern-btn', 'modern-btn-secondary');
+      }
+    });
+  }
 });
 
 // Profile Modal Lazy Loading
@@ -422,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Ekran boyutu değiştiğinde ayarla
   window.addEventListener('resize', adjustUserDropdown);
-  
+
   // Hamburger menü butonuna tıklandığında avatarların konumunu koru
   const navbarToggler = document.querySelector('.navbar-toggler');
   if (navbarToggler) {
@@ -487,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (profilePicture && document.getElementById('profile-picture-container')) {
     document.getElementById('profile-picture-container').appendChild(profilePicture);
   }
-  
+
   // Tema değiştirme özelliği kaldırıldı - Varsayılan temayı kullan
   document.documentElement.className = 'dark';
 });

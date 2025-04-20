@@ -650,68 +650,101 @@ font-weight: 500;
 text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 .btn {
-border-radius:50px;
-padding:10px 25px;
-font-weight:600;
-letter-spacing:0.5px;
-text-transform:uppercase;
-font-size:0.9rem;
-position:relative;
-overflow:hidden;
-z-index:1;
-transition:all 0.4s ease;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.btn::before {
-content:'';
-position:absolute;
-top:0;left:0;width:0;height:100%;
-z-index:-1;
-transition:width 0.4s ease;
-}
-.btn-primary {
-background:var(--gradient-1);
-border:none;
-box-shadow:0 5px 15px rgba(120,104,230,0.4);
-}
-.btn-primary::before {background:var(--accent-hover);}
-.btn-primary:hover {
-box-shadow:0 8px 25px rgba(120,104,230,0.6);
-transform:translateY(-3px);
-background:var(--accent-color);
-}
-.btn-primary:hover::before {width:100%;}
-.btn-outline-primary {
-color:var(--accent-color);
-border:2px solid var(--accent-color);
-background:transparent;
-}
-.btn-outline-primary::before {background:var(--gradient-1);}
-.btn-outline-primary:hover {
-color:white;
-transform:translateY(-3px);
-box-shadow:0 8px 25px rgba(120,104,230,0.4);
-border-color:transparent;
-}
-.btn-outline-primary:hover::before {width:100%;}
 
-/* Oyun başlatma butonu */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  z-index: -1;
+  transition: width 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-color), #5246c0);
+  border: none;
+  color: white;
+  box-shadow: 0 6px 18px rgba(106, 90, 224, 0.3);
+}
+
+.btn-primary::before {
+  background: linear-gradient(135deg, #5246c0, var(--accent-color));
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 30px rgba(106, 90, 224, 0.5);
+  transform: translateY(-4px);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.3);
+}
+
+.btn-primary:hover::before {
+  width: 100%;
+}
+
+.btn-outline-primary {
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  background: transparent;
+  box-shadow: 0 4px 12px rgba(106, 90, 224, 0.1);
+}
+
+.btn-outline-primary::before {
+  background: linear-gradient(135deg, var(--accent-color), #5246c0);
+}
+
+.btn-outline-primary:hover {
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(106, 90, 224, 0.3);
+  border-color: transparent;
+}
+
+.btn-outline-primary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.2);
+}
+
+.btn-outline-primary:hover::before {
+  width: 100%;
+}
+
+/* Oyun başlatma butonu - Modern Tasarım */
 .btn-game {
   background: linear-gradient(135deg, #6A5AE0, #8C66FF);
   color: white;
   border: none;
-  padding: 12px 24px;
-  font-size: 1rem;
+  padding: 14px 28px;
+  font-size: 1.05rem;
   font-weight: 600;
-  border-radius: 50px;
+  border-radius: 12px;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
   z-index: 1;
+  letter-spacing: 0.5px;
 }
 
 .btn-game::before {
@@ -721,28 +754,61 @@ border-color:transparent;
   left: 0;
   width: 0;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
-  transition: width 0.4s ease;
+  background: linear-gradient(135deg, #8C66FF, #6A5AE0);
+  transition: width 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: -1;
 }
 
+.btn-game::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  transform: rotate(45deg);
+}
+
 .btn-game:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(106, 90, 224, 0.6);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(106, 90, 224, 0.6);
 }
 
 .btn-game:hover::before {
   width: 100%;
 }
 
+.btn-game:hover::after {
+  opacity: 1;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: rotate(45deg) translateY(-60%);
+  }
+  100% {
+    transform: rotate(45deg) translateY(60%);
+  }
+}
+
 .btn-game:active {
-  transform: translateY(1px);
-  box-shadow: 0 5px 15px rgba(106, 90, 224, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(106, 90, 224, 0.4);
 }
 
 .btn-game i {
-  margin-right: 8px;
-  font-size: 1.1rem;
+  margin-right: 10px;
+  font-size: 1.15rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-game:hover i {
+  transform: scale(1.2);
 }
 
 .feature-icon {
@@ -6271,40 +6337,95 @@ main {
   }
 }
 
-/* Standart Başlatma ve Geri Butonları */
+/* Standart Başlatma ve Geri Butonları - Modern Tasarım */
 .standard-start-btn {
   background: linear-gradient(135deg, #6a5ae0, #5246c0);
   border: none;
-  padding: 10px 20px;
-  border-radius: 50px;
-  box-shadow: 0 4px 10px rgba(106, 90, 224, 0.3);
-  transition: all 0.3s ease;
+  padding: 12px 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   font-weight: 600;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.standard-start-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #5246c0, #6a5ae0);
+  z-index: -1;
+  transition: width 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .standard-start-btn:hover {
-  background: linear-gradient(135deg, #7a6aff, #6255e0);
-  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.5);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(106, 90, 224, 0.5);
+  transform: translateY(-4px);
+}
+
+.standard-start-btn:hover::before {
+  width: 100%;
+}
+
+.standard-start-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(106, 90, 224, 0.3);
 }
 
 .standard-back-btn {
-  background: linear-gradient(135deg, #adb5bd, #868e96);
+  background: linear-gradient(135deg, #6c757d, #495057);
   border: none;
-  padding: 10px 20px;
-  border-radius: 50px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  padding: 12px 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   font-weight: 600;
   color: white;
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.standard-back-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #495057, #6c757d);
+  z-index: -1;
+  transition: width 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .standard-back-btn:hover {
-  background: linear-gradient(135deg, #868e96, #6c757d);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
   color: white;
+}
+
+.standard-back-btn:hover::before {
+  width: 100%;
+}
+
+.standard-back-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 /* Türkiye Haritası Stilleri */
