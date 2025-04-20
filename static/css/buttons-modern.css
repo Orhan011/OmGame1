@@ -1,0 +1,230 @@
+
+/* Modern Buton Stilleri */
+.btn-modern {
+  position: relative;
+  overflow: hidden;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-modern::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0) 100%);
+  transition: all 0.8s ease;
+  z-index: 1;
+}
+
+.btn-modern:hover::before {
+  left: 100%;
+}
+
+.btn-modern:hover {
+  transform: translateY(-5px);
+}
+
+.btn-modern:active {
+  transform: translateY(-2px);
+}
+
+.btn-modern i {
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-modern:hover i {
+  transform: translateY(-2px);
+}
+
+/* Varyasyonlar */
+.btn-modern.primary {
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  color: white;
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+.btn-modern.primary:hover {
+  background: linear-gradient(135deg, #9061F9, #7C3AED);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.5);
+}
+
+.btn-modern.secondary {
+  background: linear-gradient(135deg, #4B5563, #374151);
+  color: white;
+  box-shadow: 0 8px 20px rgba(75, 85, 99, 0.3);
+}
+
+.btn-modern.secondary:hover {
+  background: linear-gradient(135deg, #4F5B6A, #3D4A5F);
+  box-shadow: 0 12px 30px rgba(75, 85, 99, 0.5);
+}
+
+.btn-modern.success {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-modern.success:hover {
+  background: linear-gradient(135deg, #15CF91, #06A171);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+}
+
+.btn-modern.danger {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: white;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.btn-modern.danger:hover {
+  background: linear-gradient(135deg, #F55B5B, #E93535);
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
+}
+
+.btn-modern.warning {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: white;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+.btn-modern.warning:hover {
+  background: linear-gradient(135deg, #FBBF24, #E9A11B);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+}
+
+.btn-modern.info {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: white;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-modern.info:hover {
+  background: linear-gradient(135deg, #4F8EF6, #3973F4);
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+}
+
+/* Gradient buton */
+.btn-modern.gradient {
+  background: linear-gradient(135deg, #F472B6, #EC4899, #DB2777);
+  color: white;
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
+}
+
+.btn-modern.gradient:hover {
+  box-shadow: 0 12px 30px rgba(236, 72, 153, 0.5);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Outline butonlar */
+.btn-modern.outline {
+  background: transparent;
+  border: 2px solid;
+  box-shadow: none;
+}
+
+.btn-modern.outline.primary {
+  color: #8B5CF6;
+  border-color: #8B5CF6;
+}
+
+.btn-modern.outline.primary:hover {
+  background: rgba(139, 92, 246, 0.1);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+}
+
+.btn-modern.outline.secondary {
+  color: #4B5563;
+  border-color: #4B5563;
+}
+
+.btn-modern.outline.secondary:hover {
+  background: rgba(75, 85, 99, 0.1);
+  box-shadow: 0 8px 20px rgba(75, 85, 99, 0.2);
+}
+
+/* Boyut Varyasyonları */
+.btn-modern.sm {
+  padding: 8px 20px;
+  font-size: 0.8rem;
+}
+
+.btn-modern.lg {
+  padding: 16px 40px;
+  font-size: 1.1rem;
+  border-radius: 14px;
+}
+
+/* İkon butonları */
+.btn-modern.icon-only {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-modern.icon-only i {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.btn-modern.icon-only.sm {
+  width: 36px;
+  height: 36px;
+}
+
+.btn-modern.icon-only.lg {
+  width: 60px;
+  height: 60px;
+}
+
+.btn-modern.icon-only.lg i {
+  font-size: 1.5rem;
+}
+
+/* Yükleme durumu */
+.btn-modern.loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.btn-modern.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: calc(50% - 10px);
+  left: calc(50% - 10px);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  animation: btnSpin 0.8s linear infinite;
+}
+
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}

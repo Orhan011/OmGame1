@@ -550,3 +550,91 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   });
 });
+// Button modernization script
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover effects to buttons
+  const buttons = document.querySelectorAll('.btn');
+  
+  buttons.forEach(button => {
+    // Skip buttons that already have the modernized class
+    if (button.classList.contains('btn-modern')) {
+      return;
+    }
+    
+    // Add ripple effect to buttons
+    button.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple-effect');
+      
+      const rect = button.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      button.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+  
+  // Convert .btn-game buttons to use the new modern styles
+  const gameButtons = document.querySelectorAll('.btn-game');
+  gameButtons.forEach(button => {
+    button.classList.add('btn-modern', 'primary');
+  });
+});
+
+// Apply modern style to dynamically created buttons
+function modernizeNewButtons() {
+  const newButtons = document.querySelectorAll('.btn:not(.has-modern-effect)');
+  
+  newButtons.forEach(button => {
+    button.classList.add('has-modern-effect');
+    
+    button.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple-effect');
+      
+      const rect = button.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      button.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+}
+
+// Call this function when new content is loaded dynamically
+document.addEventListener('contentLoaded', modernizeNewButtons);
+
+// Optional: Add this to style.css
+document.head.insertAdjacentHTML('beforeend', `
+  <style>
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+    }
+    
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+  </style>
+`);
